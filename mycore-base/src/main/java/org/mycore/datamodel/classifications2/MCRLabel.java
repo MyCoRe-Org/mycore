@@ -24,6 +24,8 @@
 package org.mycore.datamodel.classifications2;
 
 import java.io.Serializable;
+import java.util.Locale;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -34,20 +36,23 @@ import javax.xml.bind.annotation.XmlRootElement;
  * This class represents a label of a MCRCategory.
  * 
  * @author Thomas Scheffler (yagee)
- * 
  * @version $Revision$ $Date$
  * @since 2.0
  */
-@XmlRootElement(name = "label")
+@XmlRootElement(
+    name = "label")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MCRLabel implements Cloneable, Serializable {
 
     private static final long serialVersionUID = -843799854929361194L;
 
-    @XmlAttribute(namespace="http://www.w3.org/XML/1998/namespace")
+    @XmlAttribute(
+        namespace = "http://www.w3.org/XML/1998/namespace")
     String lang;
+
     @XmlAttribute
     String text;
+
     @XmlAttribute
     String description;
 
@@ -55,26 +60,56 @@ public class MCRLabel implements Cloneable, Serializable {
 
     }
 
-    public MCRLabel(String lang, String text, String description) {
+    /**
+     * @param lang see {@link #setLang(String)}
+     * @param text see {@link #setText(String)}
+     * @param description see {@link #setDescription(String)}
+     * @throws NullPointerException if lang or text is null
+     * @throws IllegalArgumentException if lang or text is invalid
+     */
+    public MCRLabel(String lang, String text, String description) throws NullPointerException, IllegalArgumentException {
         super();
-        this.lang = lang;
-        this.text = text;
-        this.description = description;
+        setLang(lang);
+        setText(text);
+        setDescription(description);
     }
 
     public String getLang() {
         return lang;
     }
 
+    /**
+     * @param lang language tag in RFC4646 form
+     * @throws NullPointerException if lang is null
+     * @throws IllegalArgumentException if lang is somehow invalid (empty or 'und')
+     */
     public void setLang(String lang) {
-        this.lang = lang;
+        Objects.requireNonNull(lang, "'lang' of label may not be null.");
+        if (lang.trim().isEmpty()) {
+            throw new IllegalArgumentException("'lang' of label may not be empty.");
+        }
+        Locale locale = Locale.forLanguageTag(lang);
+        String languageTag = locale.toLanguageTag();
+        if ("und".equals(languageTag)) {
+            throw new IllegalArgumentException("'lang' of label is not valid language tag (RFC4646):" + lang);
+        }
+        this.lang = languageTag;
     }
 
     public String getText() {
         return text;
     }
 
+    /**
+     * @param text required attribute of label
+     * @throws NullPointerException if text is null
+     * @throws IllegalArgumentException if text is empty
+     */
     public void setText(String text) {
+        Objects.requireNonNull(text, "'text' of label('" + lang + "') may not be null.");
+        if (text.trim().isEmpty()) {
+            throw new IllegalArgumentException("'text' of label('" + lang + "') may not be empty.");
+        }
         this.text = text;
     }
 

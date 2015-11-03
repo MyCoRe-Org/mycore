@@ -35,6 +35,7 @@ import java.util.Set;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -52,7 +53,11 @@ public class MCRXMLTransformer {
         //database access see: org.mycore.datamodel.classifications2.impl.MCRAbstractCategoryImpl.getChildren()
         category.setChildren(new ArrayList<MCRCategory>());
         buildChildCategories(classID, xml.getRootElement().getChild("categories").getChildren("category"), category);
-        category.setLabels(getLabels(xml.getRootElement().getChildren("label")));
+        try {
+            category.setLabels(getLabels(xml.getRootElement().getChildren("label")));
+        } catch (NullPointerException | IllegalArgumentException ex) {
+            throw new MCRException("Error while adding labels to classification: " + classID, ex);
+        }
         return category;
     }
 
@@ -63,7 +68,11 @@ public class MCRXMLTransformer {
         category.setRoot(parent.getRoot());
         category.setChildren(new ArrayList<MCRCategory>());
         category.setParent(parent);
-        category.setLabels(getLabels(e.getChildren("label")));
+        try {
+            category.setLabels(getLabels(e.getChildren("label")));
+        } catch (NullPointerException | IllegalArgumentException ex) {
+            throw new MCRException("Error while adding labels to category: " + category.getId(), ex);
+        }
         category.setLevel(parent.getLevel() + 1);
         if (e.getChild("url") != null) {
             final String uri = e.getChild("url").getAttributeValue("href", XLINK_NAMESPACE);
@@ -84,7 +93,7 @@ public class MCRXMLTransformer {
         return children;
     }
 
-    public static Set<MCRLabel> getLabels(List<Element> elements) {
+    public static Set<MCRLabel> getLabels(List<Element> elements) throws NullPointerException, IllegalArgumentException {
         Set<MCRLabel> labels = new HashSet<MCRLabel>(elements.size(), 1l);
         for (Element labelElement : elements) {
             MCRLabel label = getLabel(labelElement);
@@ -93,7 +102,7 @@ public class MCRXMLTransformer {
         return labels;
     }
 
-    public static MCRLabel getLabel(Element labelElement) {
+    public static MCRLabel getLabel(Element labelElement) throws NullPointerException, IllegalArgumentException {
         String lang = labelElement.getAttributeValue("lang", Namespace.XML_NAMESPACE);
         MCRLabel label = new MCRLabel(lang, labelElement.getAttributeValue("text"),
             labelElement.getAttributeValue("description"));
