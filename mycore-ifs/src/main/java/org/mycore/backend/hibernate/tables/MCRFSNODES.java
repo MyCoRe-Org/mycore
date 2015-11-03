@@ -63,9 +63,6 @@ public class MCRFSNODES {
 
     private int numchtf;
 
-    /**
-     * @hibernate.property column="ID" not-null="true" update="true"
-     */
     @Id
     @Column(name = "ID", length = 16)
     public String getId() {
@@ -76,9 +73,6 @@ public class MCRFSNODES {
         this.id = id;
     }
 
-    /**
-     * @hibernate.property column="PID" not-null="true" update="true"
-     */
     @Column(name = "PID", length = 16)
     public String getPid() {
         return pid;
@@ -88,10 +82,7 @@ public class MCRFSNODES {
         this.pid = pid;
     }
 
-    /**
-     * @hibernate.property column="TYPE" not-null="true" update="true"
-     */
-    @Column(name = "TYPE", length = 1)
+    @Column(name = "TYPE", length = 1, nullable = false)
     public String getType() {
         return type;
     }
@@ -100,10 +91,7 @@ public class MCRFSNODES {
         this.type = type;
     }
 
-    /**
-     * @hibernate.property column="OWNER" not-null="true" update="true"
-     */
-    @Column(name = "OWNER", length = 64)
+    @Column(name = "OWNER", length = 64, nullable = false)
     public String getOwner() {
         return owner;
     }
@@ -112,10 +100,7 @@ public class MCRFSNODES {
         this.owner = owner;
     }
 
-    /**
-     * @hibernate.property column="NAME" not-null="true" update="true"
-     */
-    @Column(name = "NAME", length = 250)
+    @Column(name = "NAME", length = 250, nullable = false)
     public String getName() {
         return name;
     }
@@ -124,10 +109,7 @@ public class MCRFSNODES {
         this.name = name;
     }
 
-    /**
-     * @hibernate.property column="LABEL" not-null="true" update="true"
-     */
-    @Column(name = "NAME", length = 250)
+    @Column(name = "LABEL", length = 250)
     public String getLabel() {
         return label;
     }
@@ -136,10 +118,7 @@ public class MCRFSNODES {
         this.label = label;
     }
 
-    /**
-     * @hibernate.property column="SIZE" not-null="true" update="true"
-     */
-    @Column(name = "SIZE")
+    @Column(name = "SIZE", nullable = false)
     public long getSize() {
         return size;
     }
@@ -148,9 +127,6 @@ public class MCRFSNODES {
         this.size = size;
     }
 
-    /**
-     * @hibernate.property column="DATE" not-null="true" update="true"
-     */
     @Column(name = "DATE")
     public Date getDate() {
         return new Date(date.getTime());
@@ -160,9 +136,6 @@ public class MCRFSNODES {
         this.date = new Date(date.getTime());
     }
 
-    /**
-     * @hibernate.property column="STOREID" not-null="true" update="true"
-     */
     @Column(name = "STOREID", length = 32)
     public String getStoreid() {
         return storeid;
@@ -172,9 +145,6 @@ public class MCRFSNODES {
         this.storeid = storeid;
     }
 
-    /**
-     * @hibernate.property column="STORAGEID" not-null="true" update="true"
-     */
     @Column(name = "STORAGEID", length = 250)
     public String getStorageid() {
         return storageid;
@@ -184,9 +154,6 @@ public class MCRFSNODES {
         this.storageid = storageid;
     }
 
-    /**
-     * @hibernate.property column="FCTID" not-null="true" update="true"
-     */
     @Column(name = "FCTID", length = 32)
     public String getFctid() {
         return fctid;
@@ -196,9 +163,6 @@ public class MCRFSNODES {
         this.fctid = fctid;
     }
 
-    /**
-     * @hibernate.property column="MD5" not-null="true" update="true"
-     */
     @Column(name = "MD5", length = 32)
     public String getMd5() {
         return md5;
@@ -208,9 +172,6 @@ public class MCRFSNODES {
         this.md5 = md5;
     }
 
-    /**
-     * @hibernate.property column="NUMCHDD" not-null="true" update="true"
-     */
     @Column(name = "NUMCHDD")
     public int getNumchdd() {
         return numchdd;
@@ -220,9 +181,6 @@ public class MCRFSNODES {
         this.numchdd = numchdd;
     }
 
-    /**
-     * @hibernate.property column="NUMCHDF" not-null="true" update="true"
-     */
     @Column(name = "NUMCHDF")
     public int getNumchdf() {
         return numchdf;
@@ -232,9 +190,6 @@ public class MCRFSNODES {
         this.numchdf = numchdf;
     }
 
-    /**
-     * @hibernate.property column="NUMCHTD" not-null="true" update="true"
-     */
     @Column(name = "NUMCHTD")
     public int getNumchtd() {
         return numchtd;
@@ -244,9 +199,6 @@ public class MCRFSNODES {
         this.numchtd = numchtd;
     }
 
-    /**
-     * @hibernate.property column="NUMCHTF" not-null="true" update="true"
-     */
     @Column(name = "NUMCHTF")
     public int getNumchtf() {
         return numchtf;
