@@ -481,16 +481,15 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "check classification {0}", help = "checks if all redundant information are stored without conflicts", order = 150)
     public static void checkClassification(String id) {
         LOGGER.info("Checking classifcation " + id);
-        MCRCategoryImpl category = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(
-            MCRCategoryID.rootID(id), -1);
-        LOGGER.info(id + ": checking left, right and level values and for non-null children");
         ArrayList<String> log = new ArrayList<String>();
-        checkLeftRightAndLevel(category, 0, 0, log);
-        if (log.size() > 0) {
-            LOGGER.error("Some errors occured on last test, report will follow");
-        }
         LOGGER.info(id + ": checking for empty labels");
         checkEmptyLabels(id, log);
+        if (!log.isEmpty()) {
+            MCRCategoryImpl category = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(
+                MCRCategoryID.rootID(id), -1);
+            LOGGER.info(id + ": checking left, right and level values and for non-null children");
+            checkLeftRightAndLevel(category, 0, 0, log);
+        }
         if (log.size() > 0) {
             LOGGER.error("Some errors occured on last test, report will follow");
             StringBuilder sb = new StringBuilder();
