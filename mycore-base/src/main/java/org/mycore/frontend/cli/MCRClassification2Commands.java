@@ -484,7 +484,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         ArrayList<String> log = new ArrayList<String>();
         LOGGER.info(id + ": checking for empty labels");
         checkEmptyLabels(id, log);
-        if (!log.isEmpty()) {
+        if (log.isEmpty()) {
             MCRCategoryImpl category = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(
                 MCRCategoryID.rootID(id), -1);
             LOGGER.info(id + ": checking left, right and level values and for non-null children");
