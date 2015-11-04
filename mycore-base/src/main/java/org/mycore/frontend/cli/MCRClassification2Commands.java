@@ -364,7 +364,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "repair category with empty labels", help = "fixes all categories with no labels (adds a label with categid as @text for default lang)", order = 110)
     public static void repairEmptyLabels() {
         Session session = MCRHIBConnection.instance().getSession();
-        String sqlQuery = "select cat.classid,cat.categid from mcrcategory cat left outer join mcrcategorylabels label on cat.internalid = label.category where label.text is null or trim(label.text) = ''";
+        String deleteEmptyLabels = "delete from MCRCategoryLabels where text is null or trim(text) = ''";
+        int affected = session.createSQLQuery(deleteEmptyLabels).executeUpdate();
+        LOGGER.info("Deleted " + affected + " labels.");
+        String sqlQuery = "select cat.classid,cat.categid from mcrcategory cat left outer join mcrcategorylabels label on cat.internalid = label.category where label.text is null";
         @SuppressWarnings("unchecked")
         List<Object[]> list = session.createSQLQuery(sqlQuery).list();
 
