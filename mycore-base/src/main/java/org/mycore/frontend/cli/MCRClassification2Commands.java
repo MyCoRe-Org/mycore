@@ -364,7 +364,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "repair category with empty labels", help = "fixes all categories with no labels (adds a label with categid as @text for default lang)", order = 110)
     public static void repairEmptyLabels() {
         Session session = MCRHIBConnection.instance().getSession();
-        String sqlQuery = "select cat.classid,cat.categid from mcrcategory cat left outer join mcrcategorylabels label on cat.internalid = label.category where label.text is null";
+        String sqlQuery = "select cat.classid,cat.categid from mcrcategory cat left outer join mcrcategorylabels label on cat.internalid = label.category where label.text is null or trim(label.text) = ''";
         @SuppressWarnings("unchecked")
         List<Object[]> list = session.createSQLQuery(sqlQuery).list();
 
@@ -526,7 +526,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     private static void checkEmptyLabels(String classID, List<String> log) {
         Session session = MCRHIBConnection.instance().getSession();
         String sqlQuery = "select cat.categid from MCRCategory cat left outer join MCRCategoryLabels label on cat.internalid = label.category where cat.classid='"
-            + classID + "' and label.text is null";
+            + classID + "' and (label.text is null or trim(label.text) = '')";
         @SuppressWarnings("unchecked")
         List<String> list = session.createSQLQuery(sqlQuery).list();
 
