@@ -228,8 +228,7 @@ public class MCRClassMapper {
         String auth = authCache.getIfUpToDate(rootID, classLastModified);
         if (auth == null) {
             MCRCategory rootCategory = DAO.getRootCategory(MCRCategoryID.rootID(rootID), 0);
-            MCRLabel label = rootCategory.getLabel("x-auth");
-            auth = label == null ? "" : label.getText();
+            auth = rootCategory.getLabel("x-auth").map(MCRLabel::getText).orElse("");
             authCache.put(rootID, auth, classLastModified);
         }
         return auth.isEmpty() ? null : auth;

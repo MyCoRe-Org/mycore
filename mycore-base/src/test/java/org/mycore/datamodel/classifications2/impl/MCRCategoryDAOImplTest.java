@@ -464,7 +464,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         startNewTransaction();
         rootNode = getRootCategoryFromSession();
         assertEquals("Label count does not match.", count + 1, rootNode.getLabels().size());
-        assertEquals("Label does not match.", description, rootNode.getLabel(lang).getDescription());
+        assertEquals("Label does not match.", description, rootNode.getLabel(lang).get().getDescription());
     }
 
     @Test
@@ -485,8 +485,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         france = DAO.getCategory(MCRCategoryID.fromString("World:France"), 0);
         assertEquals(1, germany.getLabels().size());
         assertEquals(1, france.getLabels().size());
-        assertEquals("deutschland", germany.getLabel("de").getText());
-        assertEquals("frankreich", france.getLabel("de").getText());
+        assertEquals("deutschland", germany.getLabel("de").get().getText());
+        assertEquals("frankreich", france.getLabel("de").get().getText());
     }
 
     /**

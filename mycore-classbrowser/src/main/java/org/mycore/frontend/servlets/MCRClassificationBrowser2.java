@@ -36,6 +36,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -158,7 +159,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
      * description
      */
     private void addLabel(HttpServletRequest req, MCRCategory child, Element category) {
-        MCRLabel label = child.getCurrentLabel();
+        MCRLabel label = child.getCurrentLabel()
+            .orElseThrow(() -> new MCRException("Category " + child.getId() + " has no labels."));
 
         category.addContent(new Element("label").setText(label.getText()));
 

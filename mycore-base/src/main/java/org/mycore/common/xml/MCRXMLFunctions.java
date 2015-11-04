@@ -39,7 +39,6 @@ import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -75,6 +74,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.common.MCRISO8601Date;
@@ -686,11 +686,10 @@ public class MCRXMLFunctions {
     }
 
     public static String getDisplayName(String classificationId, String categoryId) {
-        MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
+        MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         MCRCategory category = dao.getCategory(categID, 0);
-
-        return category.getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage()).getText();
+        return category.getCurrentLabel().map(MCRLabel::getText).orElse("");
     }
 
     public static boolean isCategoryID(String classificationId, String categoryId) {

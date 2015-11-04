@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications2.mapper;
 
 import java.util.List;
 
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -40,7 +41,8 @@ public class MCRCategoryMapper extends MCRCategoryMapperBase {
 
     protected String getMappingRule(MCRCategoryID categoryID) {
         MCRCategory category = DAO.getCategory(categoryID, 0);
-        MCRLabel label = category.getLabel("x-mapper");
+        MCRLabel label = category.getLabel("x-mapper")
+            .orElseThrow(() -> new MCRException("Category " + category + " does not hav a label for 'x-mapper'."));
         return label.getText();
     }
 

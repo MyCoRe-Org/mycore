@@ -37,7 +37,6 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -132,8 +131,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     private void addMappings(MCRMetaElement mappings, MCRCategory categ) {
         if (categ != null) {
-            MCRLabel label = categ.getLabel("x-mapping");
-            if (label != null) {
+            categ.getLabel("x-mapping").ifPresent(label -> {
                 String[] str = label.getText().split("\\s");
                 for (String s : str) {
                     if (s.contains(":")) {
@@ -143,7 +141,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                         mappings.addMetaObject(metaClass);
                     }
                 }
-            }
+            });
         }
     }
 

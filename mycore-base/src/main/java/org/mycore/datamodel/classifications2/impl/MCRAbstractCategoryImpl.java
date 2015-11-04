@@ -26,6 +26,8 @@ package org.mycore.datamodel.classifications2.impl;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -161,29 +163,24 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         }
     }
 
-    public MCRLabel getCurrentLabel() {
+    public Optional<MCRLabel> getCurrentLabel() {
         if (labels.isEmpty()) {
-            return new MCRLabel("", "", "");
+            return Optional.empty();
         }
-        MCRLabel label = getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
-        if (label != null) {
-            return label;
-        }
-
-        label = getLabel(defaultLang);
-        if (label != null) {
-            return label;
-        }
-        return labels.iterator().next();
+        return Optional.of(
+            getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage())
+                .orElse(getLabel(defaultLang)
+                    .orElse(labels.iterator().next())));
     }
 
-    public MCRLabel getLabel(String lang) {
+    public Optional<MCRLabel> getLabel(String lang) {
+        String languageTag = Locale.forLanguageTag(lang).toLanguageTag();
         for (MCRLabel label : labels) {
-            if (label.getLang().equals(lang)) {
-                return label;
+            if (label.getLang().equals(languageTag)) {
+                return Optional.of(label);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public String toString() {

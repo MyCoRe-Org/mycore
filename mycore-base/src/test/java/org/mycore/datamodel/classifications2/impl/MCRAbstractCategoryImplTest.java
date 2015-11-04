@@ -38,12 +38,12 @@ public class MCRAbstractCategoryImplTest extends MCRTestCase {
         cat.getLabels().add(label3);
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setCurrentLanguage("en");
-        assertEquals("German label expected", label3, cat.getCurrentLabel());
+        assertEquals("German label expected", label3, cat.getCurrentLabel().get());
         cat.getLabels().clear();
         cat.getLabels().add(label2);
         cat.getLabels().add(label3);
         cat.getLabels().add(label1);
-        assertEquals("German label expected", label3, cat.getCurrentLabel());
+        assertEquals("German label expected", label3, cat.getCurrentLabel().get());
     }
 
     @Override

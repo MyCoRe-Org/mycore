@@ -122,7 +122,6 @@ public class MCRISO8601Date {
                     dt != null ? df.format(dt) : null);
             LOGGER.debug(msg);
         }
-
         String formatted = null;
         try {
             formatted = dt == null ? null : format.indexOf("G") == -1 ? df.format(dt) : df.format(dt).replace("-", "");

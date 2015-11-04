@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications2;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -87,12 +88,12 @@ public interface MCRCategory {
     /**
      * @return the label in the current language (if available), default language (if available) or any other language  
      */
-    public abstract MCRLabel getCurrentLabel();
+    public abstract Optional<MCRLabel> getCurrentLabel();
 
     /**
      * @return the label in the specified language (if available) or null
      */
-    public abstract MCRLabel getLabel(String lang);
+    public abstract Optional<MCRLabel> getLabel(String lang);
 
     /**
      * Returns the hierarchie level of this category.

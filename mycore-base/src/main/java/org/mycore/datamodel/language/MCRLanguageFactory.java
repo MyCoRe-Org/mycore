@@ -257,19 +257,19 @@ public class MCRLanguageFactory {
      */
     private void buildLanguage(MCRCategory category) {
         String xmlCode = category.getId().getID();
-        MCRLabel lTermCode = category.getLabel("x-term");
-        MCRLabel lBiblCode = category.getLabel("x-bibl");
-        String termCode = lTermCode == null ? null : lTermCode.getText();
-        String biblCode = lBiblCode == null ? termCode : lBiblCode.getText();
+        String termCode = category.getLabel("x-term").map(MCRLabel::getText).orElse(null);
+        String biblCode = category.getLabel("x-bibl").map(MCRLabel::getText).orElse(termCode);
 
         MCRLanguage language = buildLanguage(xmlCode, termCode, biblCode);
-
-        for (MCRLabel label : category.getLabels()) {
-            String code = label.getLang();
-            if (!code.startsWith("x-")) {
-                MCRLanguage languageOfLabel = lookupLanguage(code);
-                language.setLabel(languageOfLabel, label.getText());
-            }
-        }
+        
+        category
+            .getLabels()
+            .stream()
+            .filter(l -> !l.getLang().startsWith("x-"))
+            .sequential() //MCRLanguage is not thread safe
+            .forEach(l -> {
+                MCRLanguage languageOfLabel = lookupLanguage(l.getLang());
+                language.setLabel(languageOfLabel, l.getText());
+            });
     }
 }

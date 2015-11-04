@@ -1,6 +1,7 @@
 package org.mycore.frontend.classeditor.json;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -89,7 +90,7 @@ public class MCRJSONCategory implements MCRCategory {
         return category.getParent();
     }
 
-    public MCRLabel getCurrentLabel() {
+    public Optional<MCRLabel> getCurrentLabel() {
         return category.getCurrentLabel();
     }
 
@@ -97,7 +98,7 @@ public class MCRJSONCategory implements MCRCategory {
         category.setLabels(labels);
     }
 
-    public MCRLabel getLabel(String lang) {
+    public Optional<MCRLabel> getLabel(String lang) {
         return category.getLabel(lang);
     }
 

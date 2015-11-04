@@ -38,6 +38,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -114,7 +115,7 @@ public class MCRRoleServlet extends MCRServlet {
             if (category == null) {
                 continue;
             }
-            role.setAttribute("label", category.getCurrentLabel().getText());
+            role.setAttribute("label", category.getCurrentLabel().map(MCRLabel::getText).orElse(categID.getID()));
             list.add(role);
         }
         return list;

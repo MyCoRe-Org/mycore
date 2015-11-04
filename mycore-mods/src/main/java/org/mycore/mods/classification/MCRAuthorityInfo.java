@@ -28,8 +28,7 @@ abstract class MCRAuthorityInfo {
      * category.
      */
     protected static String getLabel(MCRCategory category, String labelType, String defaultLabel) {
-        MCRLabel label = category.getLabel(labelType);
-        return label == null ? defaultLabel : label.getText();
+        return category.getLabel(labelType).map(MCRLabel::getText).orElse(defaultLabel);
     }
 
     /**

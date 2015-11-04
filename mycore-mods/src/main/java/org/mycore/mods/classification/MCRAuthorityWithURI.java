@@ -110,7 +110,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
     @Override
     protected MCRCategoryID lookupCategoryID() {
         for (MCRCategory category : getCategoryByURI(valueURI)) {
-            if (authorityURI.equals(category.getRoot().getLabel(LABEL_LANG_URI).getText())) {
+            if (authorityURI.equals(category.getRoot().getLabel(LABEL_LANG_URI).get().getText())) {
                 return category.getId();
             }
         }

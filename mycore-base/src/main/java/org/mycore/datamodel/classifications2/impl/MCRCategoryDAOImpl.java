@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -398,12 +399,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public MCRCategory removeLabel(MCRCategoryID id, String lang) {
         Session session = getHibConnection().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
-        MCRLabel oldLabel = category.getLabel(lang);
-        if (oldLabel != null) {
+        category.getLabel(lang).ifPresent(oldLabel -> {
             category.getLabels().remove(oldLabel);
             updateTimeStamp();
             updateLastModified(category.getRootID());
-        }
+        });
         return category;
     }
 
@@ -500,10 +500,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {
         Session session = getHibConnection().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
-        MCRLabel oldLabel = category.getLabel(label.getLang());
-        if (oldLabel != null) {
-            category.getLabels().remove(oldLabel);
-        }
+        category.getLabel(label.getLang()).ifPresent(category.getLabels()::remove);
         category.getLabels().add(label);
         session.update(category);
         updateTimeStamp();
@@ -635,23 +632,24 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 MCRCategoryImpl.wrapCategories(detachCategories(category.getChildren()), previousVersion,
                     previousVersion.getRoot()));
             for (MCRLabel newLabel : category.getLabels()) {
-                MCRLabel oldLabel = previousVersion.getLabel(newLabel.getLang());
-                if (oldLabel == null) {
+                Optional<MCRLabel> label = previousVersion.getLabel(newLabel.getLang());
+                if (!label.isPresent()) {
                     // copy new label
                     previousVersion.getLabels().add(newLabel);
-                } else {
+                }
+                label.ifPresent(oldLabel -> {
                     if (!oldLabel.getText().equals(newLabel.getText())) {
                         oldLabel.setText(newLabel.getText());
                     }
                     if (!oldLabel.getDescription().equals(newLabel.getDescription())) {
                         oldLabel.setDescription(newLabel.getDescription());
                     }
-                }
+                });
             }
             Iterator<MCRLabel> labels = previousVersion.getLabels().iterator();
             while (labels.hasNext()) {
                 // remove labels that are not present in new version
-                if (category.getLabel(labels.next().getLang()) == null) {
+                if (!category.getLabel(labels.next().getLang()).isPresent()) {
                     labels.remove();
                 }
             }
