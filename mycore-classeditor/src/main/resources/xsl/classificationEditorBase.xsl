@@ -8,9 +8,6 @@
   <xsl:param name="returnURL" select="$WebApplicationBaseURL"/>
   <!-- Classeditor XSL Parameter -->
   <xsl:param name="classeditor.debug" select="false()" />
-  <xsl:param name="classeditor.class" select="''"/>
-  <xsl:param name="classeditor.categ" select="''"/>
-  <xsl:param name="classeditor.showId" select="false()" />
 
   <!-- Variables -->
   <xsl:variable name="classeditor.dojoVersion" select="'1.9.3'" />
