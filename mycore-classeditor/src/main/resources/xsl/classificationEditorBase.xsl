@@ -20,9 +20,9 @@
 
   <!-- Call this template before you include dojo. Because of dojoConfig! -->
   <xsl:template name="classeditor.loadSettings">
-    <xsl:param name="classeditor.class" select="$classeditor.class"/>
-    <xsl:param name="classeditor.categ" select="$classeditor.categ"/>
-    <xsl:param name="classeditor.showId" select="$classeditor.showId"/>
+    <xsl:param name="classeditor.class" select="''"/>
+    <xsl:param name="classeditor.categ" select="''"/>
+    <xsl:param name="classeditor.showId" select="false()"/>
     <script type="text/javascript">
       var classeditor = classeditor || {
         dojoVersion: "<xsl:value-of select='$classeditor.dojoVersion' />",
