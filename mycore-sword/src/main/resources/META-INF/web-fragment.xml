@@ -4,28 +4,38 @@
 <!-- Servlets and mappings of mycore-sword -->
 <!-- **************************************************************** -->
   <servlet>
-    <servlet-name>SwordServiceDocumentServlet</servlet-name>
-    <servlet-class>org.mycore.sword.MCRSWORDServiceDocumentServlet</servlet-class>
+    <servlet-name>MCRSword2CollectionServlet</servlet-name>
+    <servlet-class>org.mycore.sword.servlets.MCRSwordCollectionServlet</servlet-class>
   </servlet>
-  <servlet>
-    <servlet-name>AtomDocumentServlet</servlet-name>
-    <servlet-class>org.purl.sword.server.AtomDocumentServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>MCRSWORDDepositServlet</servlet-name>
-    <servlet-class>org.mycore.sword.MCRSWORDDepositServlet</servlet-class>
-  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRSword2CollectionServlet</servlet-name>
+    <url-pattern>/sword2/col/*</url-pattern>
+  </servlet-mapping>
 
+  <servlet>
+    <servlet-name>MCRSword2ContainerServlet</servlet-name>
+    <servlet-class>org.mycore.sword.servlets.MCRSwordContainerServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
-    <servlet-name>AtomDocumentServlet</servlet-name>
-    <url-pattern>/servlets/AtomDocument</url-pattern>
+    <servlet-name>MCRSword2ContainerServlet</servlet-name>
+    <url-pattern>/sword2/edit/*</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>MCRSword2MediaResourceServlet</servlet-name>
+    <servlet-class>org.mycore.sword.servlets.MCRSwordMediaResourceServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
-    <servlet-name>SwordServiceDocumentServlet</servlet-name>
-    <url-pattern>/servlets/SwordServiceDocument</url-pattern>
+    <servlet-name>MCRSword2MediaResourceServlet</servlet-name>
+    <url-pattern>/sword2/edit-media/*</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>MCRSword2ServiceDocumentServlet</servlet-name>
+    <servlet-class>org.mycore.sword.servlets.MCRSwordServiceDocumentServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
-    <servlet-name>MCRSWORDDepositServlet</servlet-name>
-    <url-pattern>/servlets/SwordDeposit</url-pattern>
+    <servlet-name>MCRSword2ServiceDocumentServlet</servlet-name>
+    <url-pattern>/sword2/sd/</url-pattern>
   </servlet-mapping>
 </web-fragment>

@@ -9,10 +9,6 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-sword</artifactId>
   <name>MyCoRe SWORD Interface</name>
-  <properties>
-    <forbiddenapis.skip>true</forbiddenapis.skip>
-    <maven.compiler.arg />
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
@@ -20,14 +16,6 @@
       <version>${project.version}</version>
     </dependency>
     <!-- additional dependencies for the sword-common code -->
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -37,20 +25,41 @@
       <artifactId>log4j-1.2-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>xom</groupId>
-      <artifactId>xom</artifactId>
+      <groupId>org.mycore.sword</groupId>
+      <artifactId>easy-sword2-lib</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-user2</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom2</artifactId>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-solr</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
+      <groupId>org.apache.abdera</groupId>
+      <artifactId>abdera-i18n</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.abdera</groupId>
+      <artifactId>abdera-core</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.9</version>
     </dependency>
   </dependencies>
 </project>
