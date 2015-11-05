@@ -104,9 +104,23 @@
   <!-- retain the original query parameters, for attaching them to a url -->
   <xsl:variable name="solrParams">
     <xsl:value-of select="'?'" />
-    <xsl:for-each select="$params/str[not(@name='start' or @name='rows')]">
-      <!-- parameterName=parameterValue -->
-      <xsl:value-of select="concat(@name,'=', encoder:encode(., 'UTF-8'))" />
+    <xsl:for-each select="$params/*[not(@name='start' or @name='rows')]">
+      <xsl:choose>
+        <xsl:when test="local-name(.)='arr'">
+          <xsl:variable name="pName" select="@name" />
+          <xsl:for-each select="str">
+            <xsl:value-of select="concat($pName,'=', encoder:encode(., 'UTF-8'))" />
+            <xsl:if test="not (position() = last())">
+              <xsl:value-of select="'&amp;'" />
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- local-name()='str' -->
+          <!-- parameterName=parameterValue -->
+          <xsl:value-of select="concat(@name,'=', encoder:encode(., 'UTF-8'))" />
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:if test="not (position() = last())">
         <xsl:value-of select="'&amp;'" />
       </xsl:if>
