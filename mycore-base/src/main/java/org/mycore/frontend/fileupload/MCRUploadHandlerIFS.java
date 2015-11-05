@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -50,7 +50,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * handles uploads via the UploadApplet and store files directly into the IFS.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @author Frank L\u00FCtzenkirchen
  * 
@@ -65,8 +65,6 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static final String ID_TYPE = "derivate";
-
-    private static final String ID_PROJECT = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "MCR");
 
     protected String documentID;
 
@@ -101,7 +99,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     private MCRObjectID getOrCreateDerivateID() {
         if (derivateID == null) {
-            MCRObjectID oid = MCRObjectID.getNextFreeId(ID_PROJECT + '_' + ID_TYPE);
+            String projectID = MCRObjectID.getInstance(this.documentID).getProjectId();
+            MCRObjectID oid = MCRObjectID.getNextFreeId(projectID + '_' + ID_TYPE);
             this.derivateID = oid.toString();
             return oid;
         } else
