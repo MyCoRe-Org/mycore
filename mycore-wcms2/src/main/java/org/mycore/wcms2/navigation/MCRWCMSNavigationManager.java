@@ -8,6 +8,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRDOMUtils;
@@ -70,13 +71,31 @@ public class MCRWCMSNavigationManager {
         out.close();
     }
 
+    /**
+     * Returns the navigation as json.
+     * 
+     * @return
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws JAXBException
+     */
     public synchronized static JsonObject getNavigationAsJSON() throws IOException, ParserConfigurationException,
         SAXException, JAXBException {
         return NAVIGATION_PROVIDER.toJSON(getNavigation());
     }
 
     /**
-     * Returns the given navigatio
+     * Returns the navigation as jdom document.
+     * 
+     * @return
+     */
+    public synchronized static Document getNavigationAsXML() {
+        return MCRLayoutUtilities.getNavi();
+    }
+
+    /**
+     * Returns the navigation as pojo.
      * 
      * @return
      * @throws IOException
