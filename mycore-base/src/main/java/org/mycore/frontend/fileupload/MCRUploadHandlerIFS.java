@@ -177,23 +177,13 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         try {
             Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
             long myLength = Files.size(tempFile);
-            if (length != myLength) {
+            if (length != 0 && length != myLength) {
                 throw new IOException("Length of transmitted data does not match promised length: " + myLength + "!="
                     + length);
             }
-            startTransaction();
             MCRPath file = getFile(path);
             Files.copy(tempFile, file, StandardCopyOption.REPLACE_EXISTING);
-            commitTransaction();
             return myLength;
-        } catch (Exception e) {
-            LOGGER.error("Error while uploading file: " + path, e);
-            try {
-                rollbackTransaction();
-            } catch (Exception e2) {
-                LOGGER.error("Error while rolling back transaction", e);
-            }
-            throw e;
         } finally {
             if (Files.exists(tempFile)) {
                 Files.delete(tempFile);

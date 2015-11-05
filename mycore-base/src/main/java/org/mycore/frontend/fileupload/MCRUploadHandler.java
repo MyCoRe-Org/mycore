@@ -117,8 +117,7 @@ public abstract class MCRUploadHandler {
      * bytes stored. The UploadHandler can also compare the MD5 checksum calculated
      * at the client side with its own checksum, to detect magical transfer errors.
      * 
-     * This method is not covered by a database transaction.
-     * The implementation has to handle transactions by itself.
+     * This method requires a database transaction.
      * 
      * @param path
      *            the path and filename of the file
@@ -166,6 +165,10 @@ public abstract class MCRUploadHandler {
         MCRUploadHandlerManager.unregister(uploadID);
     }
 
+    /**
+     * @deprecated caller should handle transaction
+     */
+    @Deprecated
     protected void startTransaction() {
         LOGGER.debug("Starting transaction");
         if (tx == null || !tx.isActive()) {
@@ -175,6 +178,10 @@ public abstract class MCRUploadHandler {
         }
     }
 
+    /**
+     * @deprecated caller should handle transaction
+     */
+    @Deprecated
     protected void commitTransaction() {
         LOGGER.debug("Committing transaction");
         if (tx != null) {
@@ -185,6 +192,10 @@ public abstract class MCRUploadHandler {
         }
     }
 
+    /**
+     * @deprecated caller should handle transaction
+     */
+    @Deprecated
     protected void rollbackTransaction() {
         LOGGER.debug("Rolling back transaction");
         if (tx != null) {
