@@ -41,7 +41,6 @@
     <dependency>
       <groupId>org.apache.abdera</groupId>
       <artifactId>abdera-i18n</artifactId>
-      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -54,7 +53,6 @@
     <dependency>
       <groupId>org.apache.abdera</groupId>
       <artifactId>abdera-core</artifactId>
-      <version>1.1.1</version>
     </dependency>
   </dependencies>
 </project>
