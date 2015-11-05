@@ -59,7 +59,7 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
             //        Set<MCRCategoryID> categories = MCRCategUtils.getRootCategoryIDs(value);
             HashMap<MCRCategoryID, String> categories = MCRCategUtils.getCategoryIDMap(value);
             if (categories == null) {
-                LOGGER.error("Could not parse: " + value);
+                LOGGER.error("Could not parse " + value);
                 return false;
             }
             for (Map.Entry<MCRCategoryID, String> categoryEntry : categories.entrySet()) {
@@ -67,7 +67,7 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
                 String state = categoryEntry.getValue();
 
                 if (!hasPermission(category, state)) {
-                    LOGGER.info("Permission denied on classification: " + category);
+                    LOGGER.info("Permission " + category.getRootID() + " denied on classification " + category);
                     return false;
                 }
             }
