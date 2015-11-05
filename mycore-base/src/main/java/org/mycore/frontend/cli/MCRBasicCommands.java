@@ -1,16 +1,16 @@
 /*
- * $Revision: 24802 $ 
+ * $Revision: 24802 $
  * $Date: 2012-08-01 15:23:08 +0200 (Mi, 01 Aug 2012) $
- * 
- * This file is part of   M y C o R e 
+ *
+ * This file is part of   M y C o R e
  * See http://www.mycore.de/ for details.
- * 
+ *
  * This program is free software; you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the
  * Free Software Foundation; either version 2 of the License or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with this program, in a file called gpl.txt or license.txt. If not, write to the Free
  * Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  */
@@ -38,7 +38,7 @@ import org.xml.sax.SAXParseException;
 
 /**
  * This class contains the basic commands for MyCoRe Command Line and WebCLI.
- * 
+ *
  * @author Robert Stephan
  */
 
@@ -64,7 +64,7 @@ public class MCRBasicCommands {
 
     /**
      * Shows the help text for one or more commands.
-     * 
+     *
      * @param pattern
      *            the command, or a fragment of it
      */
@@ -142,6 +142,7 @@ public class MCRBasicCommands {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         ArrayList<File> directories = new ArrayList<>(3);
         directories.add(configurationDirectory);
+        directories.add(new File(configurationDirectory, "data"));
         directories.add(new File(configurationDirectory, "lib"));
         directories.add(new File(configurationDirectory, "resources"));
         for (File directory : directories) {
@@ -190,7 +191,7 @@ public class MCRBasicCommands {
 
     /**
      * The method parse and check an XML file.
-     * 
+     *
      * @param fileName
      *            the location of the xml file
      * @throws SAXParseException 
