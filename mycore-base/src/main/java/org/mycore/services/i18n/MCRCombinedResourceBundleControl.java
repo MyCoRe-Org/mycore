@@ -40,6 +40,7 @@ import com.google.common.collect.Lists;
 
 /**
  * A {@link Control} that stacks ResourceBundles of {@link MCRComponent}.
+ * 
  * @author Thomas Scheffler (yagee)
  * @since 2014.04
  */
@@ -56,6 +57,10 @@ public class MCRCombinedResourceBundleControl extends Control {
         throws IllegalAccessException, InstantiationException, IOException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("New bundle: " + baseName + ", locale " + locale);
+        }
+        if (locale.equals(Locale.ROOT)) {
+            //MCR-1064 fallback should be default language, if property key does not exist
+            locale = defaultLocale;
         }
         String bundleName = baseName.substring(baseName.indexOf(':') + 1);
         String filename = CONTROL_HELPER.toBundleName(bundleName, locale) + ".properties";
