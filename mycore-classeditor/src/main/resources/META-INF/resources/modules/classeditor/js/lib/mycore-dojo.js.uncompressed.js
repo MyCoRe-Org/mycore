@@ -1768,7 +1768,7 @@ return declare("mycore.common.I18nStore", null, {
 			this.cache[language] = {};
 		}
 		var xhrArgs = {
-			url : this.url + language+"/" + prefix + "*",
+			url : this.url + "/" + language + "/" + prefix + "*",
 			sync : true,
 			handleAs : "json",
 			load : lang.hitch(this, function(data) {
@@ -1864,7 +1864,7 @@ return declare("mycore.common.I18nStore", null, {
 	 */
 	get18nTextFromServer: function(/*Object*/ args) {
 		var xhrArgs = {
-			url : this.url + args.language + "/" + args.label,
+			url : this.url + "/" + args.language + "/" + args.label,
 			load : lang.hitch(this, function(text) {
 				this.cache[language][label] = text;
 				if(args.load) {
@@ -2472,11 +2472,12 @@ return declare("mycore.common.CompoundEdit", undoableEdit, {
 'mycore/common/I18nManager':function(){
 define([
     "dojo/_base/declare",
-    "dojo/cookie",
+	"dojo/_base/lang",
     "dojo/_base/json",
+	"dojo/_base/xhr",
     "mycore/common/I18nStore",
     "mycore/common/I18nResolver"
-], function(declare, cookie, json) {
+], function(declare, lang, json, xhr) {
 
 	var I18nManager = declare("mycore.common.I18nManager", [], {
 
@@ -2488,13 +2489,36 @@ define([
 
 		languages: null,
 
-	    constructor: function(/*Object*/ args) {
-	    	this.language = cookie("i18n.language") ? cookie("i18n.language") : "de";
-	    	this.languages = cookie("i18n.languages") ? json.fromJson(cookie("i18n.languages")) : ["de", "en"];
-	    },
-
-	    init: function(/*mycore.common.I18nStore*/ store) {
-	    	this.store = store;
+	    init: function(/*URL*/ url) {
+			xhr.get({
+				url : url + "/language",
+				sync : true,
+				handleAs : "text",
+				load : lang.hitch(this, function(language) {
+					this.language = language;
+				}),
+				error : function(error) {
+					this.language = "de";
+					console.log("Error while fetching current language! Use 'de' as default.");
+					console.log(error);
+				}
+			});
+			xhr.get({
+				url : url + "/languages",
+				sync : true,
+				handleAs : "json",
+				load : lang.hitch(this, function(languages) {
+					this.languages = languages;
+				}),
+				error : function(error) {
+					this.languages = ["de", "en"];
+					console.log("Error while fetching available languages! Use 'de' and 'en'.");
+					console.log(error);
+				}
+			});
+	    	this.store = new mycore.common.I18nStore({
+				url: url + "/translate"
+			});
 	    	this.resolver = new mycore.common.I18nResolver({
 	    		store: this.store
 	    	});
@@ -2502,12 +2526,10 @@ define([
 
 	    setLanguage: function(/*String*/ language) {
 	    	this.language = language;
-	    	cookie("i18n.language", this.language, {expires: 365});
 	    },
 
 	    setLanguages: function(/*Array*/ languages) {
 	    	this.languages = languages;
-	    	cookie("i18n.languages", json.toJson(this.languages), {expires: 365});
 	    },
 
 	    getLanguage: function() {

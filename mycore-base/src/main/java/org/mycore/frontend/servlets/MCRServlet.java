@@ -624,15 +624,19 @@ public class MCRServlet extends HttpServlet {
         return MCRTranslation.translate(key, args);
     }
 
+    /**
+     * Cache the response.
+     * 
+     * @param response response to cache
+     * @param CACHE_TIME time to cache
+     * @param lastModified
+     * @param useExpire
+     * @deprecated use {@link MCRFrontendUtil#writeCacheHeaders(HttpServletResponse, long, long, boolean)}
+     */
+    @Deprecated
     protected static void writeCacheHeaders(HttpServletResponse response, long CACHE_TIME, long lastModified,
         boolean useExpire) {
-        response.setHeader("Cache-Control", "public, max-age=" + CACHE_TIME);
-        response.setDateHeader("Last-Modified", lastModified);
-        if (useExpire) {
-            Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
-            LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
-            response.setDateHeader("Expires", expires.getTime());
-        }
+        MCRFrontendUtil.writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
     }
 
     /**

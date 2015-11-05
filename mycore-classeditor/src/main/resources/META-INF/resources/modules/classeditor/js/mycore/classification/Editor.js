@@ -55,11 +55,7 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 
 	create: function(args) {
 		// i18n
-		var i18nStore = new mycore.common.I18nStore({
-			url: this.settings.webAppBaseURL + "servlets/MCRLocaleServlet/"
-		});
-		i18n.setLanguage(this.settings.language);
-		i18n.init(i18nStore);
+		i18n.init(this.settings.webAppBaseURL + "rsc/locale");
 		i18n.fetch("component.classeditor");
 		// settings dialog
 		this.settingsDialog = new mycore.classification.SettingsDialog();
