@@ -43,7 +43,6 @@ import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.log4j.Logger;
@@ -51,6 +50,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -190,8 +190,7 @@ public class MCRSwordUtil {
         final MessageDigest md5 = MessageDigest.getInstance("MD5");
         final DigestInputStream digestInputStream = new DigestInputStream(inputStream, md5);
         Files.copy(digestInputStream, zipTempFile, StandardCopyOption.REPLACE_EXISTING);
-        final String md5String = DigestUtils.md5Hex(md5.digest());
-
+        final String md5String = MCRUtils.toHexString(md5.digest());
 
         try(FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipTempFile.toUri().toString()), new HashMap<String, Object>())) {
             final Path sourcePath = zipfs.getPath("/");
