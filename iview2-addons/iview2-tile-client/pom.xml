@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.mycore.iview2</groupId>
     <artifactId>iview2-addons</artifactId>
-    <version>2015.08-SNAPSHOT</version>
+    <version>2015.11</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
