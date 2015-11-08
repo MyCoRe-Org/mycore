@@ -93,7 +93,7 @@
       </field>
     </xsl:for-each>
     <xsl:for-each
-      select=".//mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher|.//mods:name[mods:role/mods:roleTerm[@authority='marcrelator' and (@type='text' and text()='publisher') or (@type='code' and text()='pbl')]]">
+      select=".//mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
       <field name="mods.publisher">
         <xsl:for-each select="mods:displayForm | mods:namePart | text()">
           <xsl:value-of select="concat(' ',.)" />
