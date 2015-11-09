@@ -41,6 +41,11 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
            setProperty("canvas.overview.enabled", Boolean.valueOf(canvasOverviewEnabled));
         }
 
+        final String canvasOverviewCanvasOverviewMinVisibleSize = MCRIView2Tools.getIView2Property("canvas.overview.minVisibleSize");
+        if(canvasOverviewCanvasOverviewMinVisibleSize != null){
+            setProperty("canvas.overview.minVisibleSize", canvasOverviewCanvasOverviewMinVisibleSize);
+        }
+
         // script & css
         boolean developerMode = isDebugParameterSet(request);
         addLocalScript("iview-client-base.js", developerMode);
