@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.iview2.services.MCRIView2Tools;
 
 /**
  * Base configuration for the mycore image viewer. Sets the following parameter:
@@ -34,6 +35,11 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         setProperty("i18nURL", MCRServlet.getServletBaseURL() + "MCRLocaleServlet/{lang}/component.iview2.*");
         setProperty("derivateURL", MCRServlet.getServletBaseURL() + "MCRFileNodeServlet/" + getDerivate(request) + "/");
         setProperty("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+
+        final String canvasOverviewEnabled = MCRIView2Tools.getIView2Property("canvas.overview.enabled");
+        if(canvasOverviewEnabled != null){
+           setProperty("canvas.overview.enabled", Boolean.valueOf(canvasOverviewEnabled));
+        }
 
         // script & css
         boolean developerMode = isDebugParameterSet(request);
