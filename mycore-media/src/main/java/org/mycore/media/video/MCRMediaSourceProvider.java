@@ -40,7 +40,7 @@ public class MCRMediaSourceProvider {
     public MCRMediaSourceProvider(String derivateId, String path, Optional<String> userAgent,
         Supplier<String[]> parameterSupplier) throws IOException {
         try {
-            wowzaToken = wowzaBaseURL.filter(s -> !s.trim().isEmpty()).map(
+            wowzaToken = wowzaBaseURL.map(
                 (w) -> new MCRSecureTokenV2(
                     MCRConfiguration2.getStringOrThrow("MCR.Media.Wowza.ContentPathPrefix")
                         + getContentPath(derivateId, path),

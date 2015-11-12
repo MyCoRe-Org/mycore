@@ -62,7 +62,7 @@ public class MCRConfiguration2 {
 
     /**
      * Returns the configuration property with the specified name.
-     * 
+     * If the value of the property is empty after trimming the returned Optional is empty.
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as an {@link Optional Optional&lt;String&gt;}
@@ -70,7 +70,10 @@ public class MCRConfiguration2 {
      *             if the property with this name is not set
      */
     public static Optional<String> getString(String name) {
-        return Optional.ofNullable(MCRConfiguration.instance().getString(name, null));
+        return Optional
+            .ofNullable(MCRConfiguration.instance().getString(name, null))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty());
     }
 
     /**
