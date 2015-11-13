@@ -29,11 +29,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.MCRCalendar;
-import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
@@ -53,8 +49,6 @@ import com.ibm.icu.util.GregorianCalendar;
  * @author Frank Lützenkirchen
  */
 public class MCRQueryParser extends MCRBooleanClauseParser {
-
-    private final static Logger LOGGER = Logger.getLogger(MCRQueryParser.class);
 
     /**
      * Parses XML element containing a simple query condition
@@ -97,24 +91,24 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 oc.addChild(buildConditions(st.nextToken(), oper, value));
             }
             return oc;
-        } else if (field.contains("-")) { // date and MCRMetaHistoryDate condition von-bis
+        } else if (field.contains("-")) { // date condition von-bis
             StringTokenizer st = new StringTokenizer(field, "- ");
             String fieldFrom = st.nextToken();
             String fieldTo = st.nextToken();
             if (oper.equals("=")) {
                 // von-bis = x --> (von <= x) AND (bis >= x)
                 MCRAndCondition<Object> ac = new MCRAndCondition<Object>();
-                ac.addChild(buildCondition(fieldFrom, "<=", value, true));
-                ac.addChild(buildCondition(fieldTo, ">=", value, true));
+                ac.addChild(buildCondition(fieldFrom, "<=", value));
+                ac.addChild(buildCondition(fieldTo, ">=", value));
                 return ac;
             } else if (oper.contains("<")) {
-                return buildCondition(fieldFrom, oper, value, true);
+                return buildCondition(fieldFrom, oper, value);
             } else {
                 // oper.contains( ">" )
-                return buildCondition(fieldTo, oper, value, true);
+                return buildCondition(fieldTo, oper, value);
             }
         } else {
-            return buildCondition(field, oper, value, false);
+            return buildCondition(field, oper, value);
         }
     }
 
@@ -127,19 +121,9 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      *            the condition operator
      * @param value
      *            the condition value
-     * @param vonbis
-     *            is a 'from to' query, used for date and MetaHistoryDate
      * @return
      */
-    private MCRQueryCondition buildCondition(String field, String oper, String value, boolean vonbis) {
-        try {
-            if (vonbis) {
-                value = normalizeHistoryDate(oper, value);
-            }
-        } catch (MCRConfigurationException mcrExc) {
-            // ignore exception if field not exist:
-            // this is ugly, but MCRFieldDef shouldn't appear here to hack MCRMetaHistoryDates
-        }
+    private MCRQueryCondition buildCondition(String field, String oper, String value) {
         if ("TODAY".equals(value)) {
             value = getToday();
         }
@@ -325,32 +309,5 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         } catch (Throwable t) {
             return false;
         }
-    }
-
-    /**
-     * Normalizes MCRMetaHistoryDate values used in a query. If the
-     * date is incomplete (for example, only the year given), it depends
-     * on the search operator used, whether the upper (31th Dec of year)
-     * or lower (1st Jan of year) bound is used.
-     * 
-     * @param operator the search operator, one of >, >=, <, <=
-     * @param date the date to search for
-     * @return the julian day number, as a String
-     */
-    private static String normalizeHistoryDate(String operator, String date) {
-        Calendar calendar = null;
-        if (operator.equals(">")) {
-            calendar = MCRCalendar.getHistoryDateAsCalendar(date, true, "gregorian");
-        }
-        if (operator.equals("<")) {
-            calendar = MCRCalendar.getHistoryDateAsCalendar(date, false, "gregorian");
-        }
-        if (operator.equals(">=")) {
-            calendar = MCRCalendar.getHistoryDateAsCalendar(date, false, "gregorian");
-        }
-        if (operator.equals("<=")) {
-            calendar = MCRCalendar.getHistoryDateAsCalendar(date, true, "gregorian");
-        }
-        return String.valueOf(MCRCalendar.getJulianDayNumber(calendar));
     }
 }
