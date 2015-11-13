@@ -90,6 +90,11 @@
   <xs:attributeGroup name="MCRMetaPersonName">
     <xs:attributeGroup ref="baseMetaAttributes" />
   </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaNumber">
+    <xs:attributeGroup ref="baseMetaAttributes" />
+    <xs:attribute name="dimension" type="xs:string"/>
+    <xs:attribute name="measurement" type="xs:string"/>
+  </xs:attributeGroup>
 
   <!-- this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined elsewhere <service> is defined 
     below -->
