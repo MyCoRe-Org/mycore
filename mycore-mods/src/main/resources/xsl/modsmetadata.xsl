@@ -61,26 +61,40 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued" mode="present">
-    <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name()))" />
-    <tr>
-      <td valign="top" class="metaname">
-        <xsl:value-of select="concat($label,':')" />
-      </td>
-      <td class="metavalue">
-        <xsl:if test="local-name()='dateIssued'">
-          <meta property="datePublished">
-            <xsl:attribute name="content">
-              <xsl:value-of select="." />
-            </xsl:attribute>
-          </meta>
-        </xsl:if>
-        <xsl:apply-templates select="." mode="formatDate" />
-      </td>
-    </tr>
+  <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued|mods:dateCaptured|mods:dateModified" mode="present">
+  	<xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name()))" />
+  	<xsl:if test="not(@point='end' and preceding-sibling::*[name(current())=name()][@point='start'])">
+		<tr>
+			<td valign="top" class="metaname">
+				<xsl:value-of select="concat($label,':')" />
+			</td>
+			<td class="metavalue">
+				<xsl:if test="local-name()='dateIssued'">
+					<meta property="datePublished">
+						<xsl:attribute name="content">
+			              <xsl:value-of select="." />
+			            </xsl:attribute>
+					</meta>
+				</xsl:if>
+				<xsl:choose>
+					<xsl:when
+						test="@point='start'and following-sibling::*[name(current())=name()][@point='end']">
+						<xsl:apply-templates select="." mode="formatDate" />
+						<xsl:value-of select="' - '"/>
+						<xsl:apply-templates
+							select="following-sibling::*[name(current())=name()][@point='end']"
+							mode="formatDate" />
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:apply-templates select="." mode="formatDate" />
+					</xsl:otherwise>
+				</xsl:choose>
+			</td>
+		</tr>
+	</xsl:if>
   </xsl:template>
 
-  <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued" mode="formatDate">
+  <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued|mods:dateCaptured|mods:dateModified" mode="formatDate">
     <xsl:variable name="dateFormat">
       <xsl:choose>
         <xsl:when test="string-length(normalize-space(.))=4">
