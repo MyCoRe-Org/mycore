@@ -132,6 +132,9 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return
      */
     private MCRQueryCondition buildCondition(String field, String oper, String value, boolean vonbis) {
+        if ("TODAY".equals(value)) {
+            value = getToday();
+        }
         try {
             if (vonbis) {
                 value = normalizeHistoryDate(oper, value);
@@ -139,9 +142,6 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         } catch (MCRConfigurationException mcrExc) {
             // ignore exception if field not exist:
             // this is ugly, but MCRFieldDef shouldn't appear here to hack MCRMetaHistoryDates
-        }
-        if ("TODAY".equals(value)) {
-            value = getToday();
         }
         return new MCRQueryCondition(field, oper, value);
     }
