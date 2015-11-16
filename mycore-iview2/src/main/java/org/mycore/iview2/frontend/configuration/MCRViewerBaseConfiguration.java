@@ -1,5 +1,7 @@
 package org.mycore.iview2.frontend.configuration;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.common.MCRSessionMgr;
@@ -44,6 +46,11 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         final String canvasOverviewCanvasOverviewMinVisibleSize = MCRIView2Tools.getIView2Property("canvas.overview.minVisibleSize");
         if(canvasOverviewCanvasOverviewMinVisibleSize != null){
             setProperty("canvas.overview.minVisibleSize", canvasOverviewCanvasOverviewMinVisibleSize);
+        }
+
+        final String canvasStartupFitWidth = MCRIView2Tools.getIView2Property("canvas.startup.fitWidth");
+        if(canvasStartupFitWidth != null && canvasStartupFitWidth.toLowerCase(Locale.ROOT).equals("true")){
+            setProperty("canvas.startup.fitWidth", true);
         }
 
         // script & css
