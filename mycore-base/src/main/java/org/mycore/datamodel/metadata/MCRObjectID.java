@@ -156,10 +156,16 @@ public final class MCRObjectID {
         return getNextFreeId(base_id, 0);
     }
 
+
+    public static synchronized MCRObjectID getNextFreeId(String base, String type) {
+        return getNextFreeId(base + "_" + type);
+    }
+
     /**
      * Returns the next free MCRObjectID based on the given type string.
      *  
-     * @see MCRObjectID#getNextFreeId(String) 
+     * @see MCRObjectID#getNextFreeId(String)
+     * @deprecated use {@link org.mycore.datamodel.metadata.MCRObjectID#getNextFreeId(java.lang.String, java.lang.String)} instead
      */
     public static synchronized MCRObjectID getNextFreeIdByType(String type) {
         String prefix = CONFIG.getString("MCR.SWF.Project.ID." + type, CONFIG.getString("MCR.SWF.Project.ID"));
