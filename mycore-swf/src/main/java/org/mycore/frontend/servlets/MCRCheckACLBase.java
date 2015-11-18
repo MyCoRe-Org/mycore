@@ -23,8 +23,8 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,6 @@ import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRJDOMContent;
@@ -55,6 +54,7 @@ import org.xml.sax.SAXParseException;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
+ * @deprecated
  */
 abstract public class MCRCheckACLBase extends MCRCheckBase {
 

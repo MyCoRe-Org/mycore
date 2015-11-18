@@ -47,6 +47,7 @@ import org.xml.sax.SAXParseException;
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRCheckEditACLServlet extends MCRCheckACLBase {
 

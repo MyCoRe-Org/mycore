@@ -23,8 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -36,6 +34,8 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
  * dependencies directory, check it dependence of the MCR type and store the XML
@@ -44,6 +44,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
 

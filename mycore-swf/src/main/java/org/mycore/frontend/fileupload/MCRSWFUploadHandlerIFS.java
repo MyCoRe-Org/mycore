@@ -36,6 +36,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * @version $Revision$ $Date$
  * 
  * @see MCRUploadHandler
+ * @deprecated
  */
 public class MCRSWFUploadHandlerIFS extends MCRUploadHandlerIFS {
     

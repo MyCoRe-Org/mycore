@@ -48,6 +48,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date: 2009-07-28 11:32:04 +0200 (Di, 28. Jul
  *          2009) $
+ * @deprecated
  */
 public class MCRFileViewWorkflowServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;

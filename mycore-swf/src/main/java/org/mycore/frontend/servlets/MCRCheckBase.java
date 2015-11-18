@@ -40,6 +40,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 abstract public class MCRCheckBase extends MCRServlet {
 

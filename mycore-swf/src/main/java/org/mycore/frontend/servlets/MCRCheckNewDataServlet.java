@@ -40,6 +40,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRCheckNewDataServlet extends MCRCheckDataBase {
 

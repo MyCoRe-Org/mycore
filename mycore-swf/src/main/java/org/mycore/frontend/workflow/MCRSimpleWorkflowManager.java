@@ -24,8 +24,6 @@
 // package
 package org.mycore.frontend.workflow;
 
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -61,11 +59,14 @@ import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.xml.sax.SAXParseException;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 /**
  * This class holds methods to manage the workflow file system of MyCoRe.
  * 
  * @author Jens Kupferschmidt
  * @version $Revision: 30735 $ $Date: 2014-09-29 14:22:50 +0200 (Mo, 29. Sep 2014) $
+ * @deprecated
  */
 
 public class MCRSimpleWorkflowManager {

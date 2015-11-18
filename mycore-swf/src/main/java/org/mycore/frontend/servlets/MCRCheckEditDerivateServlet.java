@@ -23,10 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import static org.jdom2.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.io.File;
 import java.util.List;
 
@@ -43,6 +39,10 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 
+import static org.jdom2.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
  * dependencies directory, check it dependence of the MCR type and store the XML
@@ -51,6 +51,7 @@ import org.mycore.frontend.MCRFrontendUtil;
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRCheckEditDerivateServlet extends MCRCheckBase {
 

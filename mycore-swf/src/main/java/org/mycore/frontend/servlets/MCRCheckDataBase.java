@@ -64,6 +64,7 @@ import org.xml.sax.SAXException;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
+ * @deprecated
  */
 abstract public class MCRCheckDataBase extends MCRCheckBase {
     private static final long serialVersionUID = 8744330302159842747L;

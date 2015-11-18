@@ -3,10 +3,6 @@
  */
 package org.mycore.frontend.workflow;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,9 +36,13 @@ import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 /**
  * @author Thomas Scheffler (yagee)
- *
+ * @deprecated
  */
 public class MCRSWFResolver implements URIResolver {
     private static final Logger LOGGER = Logger.getLogger(MCRSWFResolver.class);

@@ -86,6 +86,7 @@ import org.xml.sax.SAXParseException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date: 2009-01-26 12:02:59 +0100 (Mo, 26. Jan
  *          2009) $
+ * @deprecated
  */
 public class MCRStartEditorServlet extends MCRServlet {
 
