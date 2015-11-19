@@ -89,7 +89,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             }
         }
         if (System.getProperty(configFileKey) != null) {
-            System.out.printf(Locale.ROOT, "Using Log4J2 configuration at: %s\n", System.getProperty(configFileKey));
+            System.out.printf(Locale.ROOT, "Using Log4J2 configuration at: %s%n", System.getProperty(configFileKey));
             if (servletContext != null) {
                 Log4jServletContainerInitializer log4jInitializer = new Log4jServletContainerInitializer();
                 try {

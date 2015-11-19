@@ -74,8 +74,8 @@ public class MCRCoreVersion {
     }
 
     public static void main(String arg[]) {
-        System.out.printf(Locale.ROOT, "MyCoRe\tver: %s\trev: %d\n", VERSION, REVISION);
-        System.out.printf(Locale.ROOT, "Config directory: %s\n", MCRConfigurationDir.getConfigurationDirectory());
+        System.out.printf(Locale.ROOT, "MyCoRe\tver: %s\trev: %d%n", VERSION, REVISION);
+        System.out.printf(Locale.ROOT, "Config directory: %s%n", MCRConfigurationDir.getConfigurationDirectory());
     }
 
     private static int getRevisionFromProperty() {

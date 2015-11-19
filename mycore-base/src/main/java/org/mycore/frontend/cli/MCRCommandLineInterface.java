@@ -253,7 +253,7 @@ public class MCRCommandLineInterface {
         output("The following command failed:");
         output(lastCommand);
         if (!commandQueue.isEmpty()) {
-            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.\n", system,
+            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.%n", system,
                 commandQueue.size());
         } else if (interactiveMode) {
             return;
@@ -280,7 +280,7 @@ public class MCRCommandLineInterface {
         output("The following command failed:");
         output(lastCommand);
         if (!commandQueue.isEmpty()) {
-            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.\n", system,
+            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.%n", system,
                 commandQueue.size());
         }
         failedCommands.add(lastCommand);
@@ -303,7 +303,7 @@ public class MCRCommandLineInterface {
         AtomicInteger ln=new AtomicInteger();
         System.out.println();
         Files.readAllLines(Paths.get(fname), Charset.defaultCharset())
-            .forEach(l->System.out.printf(Locale.ROOT,"%04d: %s\n",ln.incrementAndGet(),l));
+            .forEach(l->System.out.printf(Locale.ROOT,"%04d: %s",ln.incrementAndGet(),l));
         System.out.println();
     }
 
