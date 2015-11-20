@@ -23,11 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -72,6 +67,11 @@ import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 /**
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
@@ -81,8 +81,6 @@ public class MCRPersistentServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRPersistentServlet.class);
-
-    protected static String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
 
     public static enum Operation {
         create, update, delete
@@ -461,7 +459,7 @@ public class MCRPersistentServlet extends MCRServlet {
 
     /** Check for existing file type *.xed or *.xml
      *
-     * @param file name base
+     * @param base_name name base
      * @return the complete file name, *.xed is default
      */
     private String checkFileName(String base_name) {
@@ -484,7 +482,7 @@ public class MCRPersistentServlet extends MCRServlet {
      *   <dt>type</dt>
      *   <dd>object type of the new object (required)</dd>
      *   <dt>project</dt>
-     *   <dd>project ID part of object ID</dd>
+     *   <dd>project ID part of object ID (required)</dd>
      *   <dt>layout</dt>
      *   <dd>special editor form layout</dd>
      * </dl>
@@ -495,10 +493,7 @@ public class MCRPersistentServlet extends MCRServlet {
         String projectID = getProperty(job.getRequest(), "project");
         String type = getProperty(job.getRequest(), "type");
         String layout = getProperty(job.getRequest(), "layout");
-        if (projectID == null) {
-            String defaultProjectID = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "MCR");
-            projectID = MCRConfiguration.instance().getString("MCR.SWF.Project.ID." + type, defaultProjectID);
-        }
+
         String base = projectID + "_" + type;
         if (!(MCRAccessManager.checkPermission("create-" + base) || MCRAccessManager.checkPermission("create-" + type))) {
             // TODO: don't use swf code here...
@@ -507,7 +502,7 @@ public class MCRPersistentServlet extends MCRServlet {
             return;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(pagedir).append("editor_form_author").append('-').append(type);
+        sb.append("editor_form_author").append('-').append(type);
         if (layout != null && layout.length() != 0) {
             sb.append('-').append(layout);
         }
@@ -582,7 +577,7 @@ public class MCRPersistentServlet extends MCRServlet {
             params.put("sourceUri", sb.toString());
             params.put("cancelUrl", getCancelUrl(job));
             sb = new StringBuilder();
-            sb.append(MCRFrontendUtil.getBaseURL()).append(pagedir);
+            sb.append(MCRFrontendUtil.getBaseURL());
             try {
                 MCRURIResolver.instance().resolve("webapp:/editor_form_derivate.xed");
                 sb.append("editor_form_derivate.xed");
@@ -607,7 +602,7 @@ public class MCRPersistentServlet extends MCRServlet {
     private void redirectToUploadPage(MCRServletJob job, String parentObjectID, String derivateID) throws IOException {
         MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(parentObjectID, derivateID, getCancelUrl(job));
         String fuhid = fuh.getID();
-        String page = pagedir + "fileupload_commit.xml";
+        String page = "fileupload_commit.xml";
 
         String base = MCRFrontendUtil.getBaseURL() + page;
         Properties params = new Properties();
@@ -634,9 +629,7 @@ public class MCRPersistentServlet extends MCRServlet {
         }
 
         // prepare editor with error messages
-        String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
-        String myfile = pagedir
-            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
+        String myfile = MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
         //TODO: Access File directly
         Element root = MCRURIResolver.instance().resolve("webapp:" + myfile);
         List<Element> sectionlist = root.getChildren("section");
