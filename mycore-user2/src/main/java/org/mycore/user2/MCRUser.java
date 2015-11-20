@@ -197,6 +197,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         this.internalID = internalID;
     }
 
+    @Column(name = "locked", nullable = true)
     public boolean isLocked() {
         return locked;
     }
@@ -205,15 +206,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         this.locked = locked == null ? false : locked;
     }
 
-    /* Getter for JPA */
-    @Column(name = "locked", nullable = true)
-    private Boolean getLocked() {
-        return this.locked;
-    }
-
     /**
      * @return the disabled
      */
+    @Column(name = "disabled", nullable = true)
     public boolean isDisabled() {
         return disabled;
     }
@@ -223,12 +219,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      */
     public void setDisabled(Boolean disabled) {
         this.disabled = disabled == null ? false : disabled;
-    }
-
-    /* Getter for JPA */
-    @Column(name = "disabled", nullable = true)
-    private Boolean getDisabled() {
-        return this.disabled;
     }
 
     /**
