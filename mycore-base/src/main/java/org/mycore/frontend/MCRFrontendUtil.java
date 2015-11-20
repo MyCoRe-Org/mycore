@@ -8,9 +8,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -100,10 +104,7 @@ public class MCRFrontendUtil {
 
     public static void configureSession(MCRSession session, HttpServletRequest request) {
         // language
-        String lang = getProperty(request, "lang");
-        if (lang != null && lang.trim().length() != 0) {
-            session.setCurrentLanguage(lang.trim());
-        }
+        getProperty(request, "lang").ifPresent(session::setCurrentLanguage);
 
         // Set the IP of the current session
         if (session.getCurrentIP().length() == 0) {
@@ -119,15 +120,22 @@ public class MCRFrontendUtil {
         putParamsToSession(request);
     }
 
-    public static String getProperty(HttpServletRequest request, String name) {
-        String value = (String) request.getAttribute(name);
-
-        // if Attribute not given try Parameter
-        if (value == null || value.length() == 0) {
-            value = request.getParameter(name);
-        }
-
-        return value;
+    /**
+     * @param request current request to get property from
+     * @param name of request {@link HttpServletRequest#getAttribute(String) attribute} or {@link HttpServletRequest#getParameter(String) parameter}
+     * @return an Optional that is either empty or contains a trimmed non-empty String that is either
+     *  the value of the request attribute or a parameter (in that order) with the given <code>name</code>.
+     */
+    public static Optional<String> getProperty(HttpServletRequest request, String name){
+        return Stream.<Supplier<Object>> of(
+            () -> request.getAttribute(name),
+            () -> request.getParameter(name))
+            .map(Supplier::get)
+            .filter(Objects::nonNull)
+            .map(Object::toString)
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .findFirst();
     }
 
     /**

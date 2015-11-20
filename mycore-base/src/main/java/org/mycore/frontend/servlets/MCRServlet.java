@@ -580,7 +580,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     public static String getProperty(HttpServletRequest request, String name) {
-        return MCRFrontendUtil.getProperty(request, name);
+        return MCRFrontendUtil.getProperty(request, name).orElse(null);
     }
 
     /**

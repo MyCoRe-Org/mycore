@@ -204,10 +204,10 @@ public class MCRErrorServlet extends HttpServlet {
         LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN, MessageFormat.format(
             "{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
 
-        String style = MCRFrontendUtil.getProperty(request, "XSL.Style");
-        if (!"xml".equals(style)) {
-            style = "default";
-        }
+        String style = MCRFrontendUtil
+            .getProperty(request, "XSL.Style")
+            .filter("xml"::equals)
+            .orElse("default");
         request.setAttribute("XSL.Style", style);
 
         Document errorDoc = buildErrorPage(msg, statusCode, requestURI, exceptionType, servletName, ex);
