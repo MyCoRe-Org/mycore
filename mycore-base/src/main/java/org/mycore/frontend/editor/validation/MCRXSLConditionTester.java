@@ -72,10 +72,7 @@ public class MCRXSLConditionTester {
         otherwise.addContent("false");
         choose.addContent(otherwise);
 
-        Document document = new Document(stylesheet);
-        if (LOGGER.isDebugEnabled()) {
-        }
-        return document;
+        return new Document(stylesheet);
     }
 
     private String transform(Document input, Document xsl) throws Exception {
