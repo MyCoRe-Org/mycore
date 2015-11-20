@@ -424,7 +424,7 @@ public class MCRUserManager {
                 LOGGER.warn("User " + user.getUserID() + " was disabled!");
             } else {
                 LOGGER.warn("Password expired for user " + user.getUserID() + " on "
-                        + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
+                        + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.COMPLETE_HH_MM_SS.toString()));
             }
             return null;
         }
