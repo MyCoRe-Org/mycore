@@ -95,20 +95,14 @@ public class MCRTranslation {
      * @return <code>true</code> if there is a value, <code>false</code> otherwise
      */
     public static boolean exists(String label) {
-        ResourceBundle message;
         try {
-            message = getResourceBundle(MESSAGES_BUNDLE, getCurrentLocale());
-        } catch (MissingResourceException mre) {
-            return false;
-        }
-        String result = null;
-        try {
-            result = message.getString(label);
+            ResourceBundle message = getResourceBundle(MESSAGES_BUNDLE, getCurrentLocale());
+            message.getString(label);
         } catch (MissingResourceException mre) {
             LOGGER.debug(mre);
             return false;
         }
-        return result == null ? false : true;
+        return true;
     }
 
     /**

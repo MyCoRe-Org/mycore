@@ -118,11 +118,6 @@ public class MCRMetaNBN extends MCRMetaDefault {
         super.setFromDOM(element);
 
         String temp_nbn = element.getText().trim();
-
-        if (temp_nbn == null) {
-            temp_nbn = "";
-        }
-
         nbn = temp_nbn;
     }
 

@@ -23,10 +23,6 @@
 
 package org.mycore.datamodel.classifications2.utils;
 
-import static org.jdom2.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,6 +38,10 @@ import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
+
+import static org.jdom2.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * 
@@ -268,7 +268,6 @@ public class MCRCategoryTransformer {
             }
 
             String labtext = label.getText() != null ? label.getText() : "";
-            String labdesc = label.getDescription() != null ? label.getDescription() : "";
 
             String text;
             try {
@@ -277,7 +276,7 @@ public class MCRCategoryTransformer {
                 throw new RuntimeException("Error while inserting '" + labtext + "' into: " + labelFormat, e);
             }
             text = ID_PATTERN.matcher(text).replaceAll(cat.getId().getID());
-            text = DESCR_PATTERN.matcher(text).replaceAll(labdesc);
+            text = DESCR_PATTERN.matcher(text).replaceAll(label.getDescription());
             int num = countMap == null ? -1 : countMap.get(cat.getId()).intValue();
             if (num >= 0) {
                 text = COUNT_PATTERN.matcher(text).replaceAll(String.valueOf(num));
