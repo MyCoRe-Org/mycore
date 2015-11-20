@@ -25,6 +25,8 @@ package org.mycore.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
@@ -89,9 +91,9 @@ public class MCRCalendar {
             TAG_HEBREW, TAG_ISLAMIC, TAG_JAPANESE };
 
     /** convert following calendars from input to calendar */
-    public static final ArrayList<String> CALENDARS_LIST = new ArrayList<String>(Arrays.asList(TAG_GREGORIAN,
+    public static final List<String> CALENDARS_LIST = Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(TAG_GREGORIAN,
             TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC, TAG_JAPANESE, TAG_ARMENIAN,
-            TAG_EGYPTIAN));
+            TAG_EGYPTIAN)));
 
     /**
      * This method check a ancient date string for the given calendar. For
