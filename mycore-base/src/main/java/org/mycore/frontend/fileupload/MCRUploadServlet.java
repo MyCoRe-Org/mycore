@@ -457,7 +457,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             throw new MCRException("Path name " + path + " may not contain \"../\".");
         }
         String fileName = getFileName(path);
-        if (fileName != fileName.trim()) {
+        if (!fileName.equals(fileName.trim())) {
             throw new MCRException("File name '" + fileName + "' may not start or end with whitespace character.");
         }
     }

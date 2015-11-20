@@ -59,7 +59,7 @@ public class MCRUploadHandlerManager {
 
         String sessionID = entry.getSessionID();
 
-        if (sessionID != MCRSessionMgr.getCurrentSessionID()) {
+        if (sessionID.equals(MCRSessionMgr.getCurrentSessionID())) {
             MCRSession session = MCRSessionMgr.getSession(sessionID);
             if (session != null)
                 MCRSessionMgr.setCurrentSession(session);

@@ -201,8 +201,7 @@ public class MCRXMLHelper {
         }
 
         public static boolean equivalent(DocType d1, DocType d2) {
-            boolean equals = (d1.getPublicID() == d2.getPublicID() || d1.getPublicID().equals(d2.getPublicID()))
-                && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
+            boolean equals = d1.getPublicID().equals(d2.getPublicID()) && d1.getSystemID().equals(d2.getSystemID());
             if (!equals && LOGGER.isDebugEnabled()) {
                 LOGGER.debug("DocType differs \"" + d1 + "\"!=\"" + d2 + "\"");
             }
