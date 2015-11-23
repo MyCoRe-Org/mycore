@@ -43,7 +43,7 @@ public interface MCRTriConsumer<T, U, V> {
      *             if after is null
      */
     public default MCRTriConsumer<T, U, V> andThen(MCRTriConsumer<? super T, ? super U, ? super V> after) {
-        Objects.nonNull(after);
+        Objects.requireNonNull(after);
         return (a, b, c) -> {
             accept(a, b, c);
             after.accept(a, b, c);
