@@ -33,6 +33,7 @@ import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -51,6 +52,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.content.MCRJDOMContent;
@@ -212,7 +214,14 @@ public class MCRServlet extends HttpServlet {
         // Store current session in HttpSession
         theSession.setAttribute("mycore.session", session);
         // store the HttpSession ID in MCRSession
-        session.put("http.session", theSession.getId());
+        if (session.put("http.session", theSession.getId()) == null) {
+            //first request
+            MCRUtils.asStream(req.getLocales())
+                .map(Locale::toString)
+                .filter(MCRTranslation.getAvailableLanguages()::contains)
+                .findFirst()
+                .ifPresent(session::setCurrentLanguage);
+        }
         // Forward MCRSessionID to XSL Stylesheets
         req.setAttribute("XSL.MCRSessionID", session.getID());
 
