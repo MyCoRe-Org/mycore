@@ -31,15 +31,9 @@ import java.io.IOError;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.FileStore;
-import java.nio.file.InvalidPathException;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.ProviderMismatchException;
+import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -468,7 +462,7 @@ public abstract class MCRPath implements Path {
      */
     @Override
     public WatchKey register(final WatchService watcher, final Kind<?>... events) throws IOException {
-        return register(watcher, events);
+        return register(watcher, events, new WatchEvent.Modifier[0]);
     }
 
     /* (non-Javadoc)
