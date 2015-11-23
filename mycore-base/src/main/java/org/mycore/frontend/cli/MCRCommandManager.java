@@ -49,6 +49,7 @@ public class MCRCommandManager {
         }
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("DM_EXIT")
     protected void handleInitException(Exception ex) {
         MCRCLIExceptionHandler.handleException(ex);
         System.exit(1);

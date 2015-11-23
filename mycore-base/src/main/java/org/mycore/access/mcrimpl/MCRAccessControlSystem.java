@@ -23,6 +23,7 @@
 
 package org.mycore.access.mcrimpl;
 
+import java.io.Serializable;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +47,7 @@ import org.mycore.common.config.MCRConfiguration;
 
 /**
  * MyCoRe-Standard Implementation of the MCRAccessInterface Maps object ids to rules
- * 
+ *
  * @author Matthias Kramm
  * @author Heiko Helmbrecht
  */
@@ -286,7 +287,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     /**
      * Validator methods to validate access definition for given object and pool
-     * 
+     *
      * @param permission
      *            poolname as string
      * @param objID
@@ -310,7 +311,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     /**
      * method that delivers the next free ruleID for a given Prefix and sets the counter to counter + 1
-     * 
+     *
      * @param prefix
      *            String
      * @return String
@@ -331,7 +332,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     /**
      * delivers the rule as string, after normalizing it via sorting with MCRAccessConditionsComparator
-     * 
+     *
      * @param rule
      *            Jdom-Element
      * @return String
@@ -348,7 +349,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     /**
      * returns a auto-generated MCRRuleMapping, needed to create Access Definitions
-     * 
+     *
      * @param rule
      *            JDOM-Representation of a MCRAccess Rule
      * @param creator
@@ -386,7 +387,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     /**
      * method, that normalizes the jdom-representation of a mycore access condition
-     * 
+     *
      * @param rule
      *            condition-JDOM of an access-rule
      * @return the normalized JDOM-Rule
@@ -414,7 +415,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     /**
      * A Comparator for the Condition Elements for normalizing the access conditions
      */
-    private static class MCRAccessConditionsComparator implements Comparator<Element> {
+    private static class MCRAccessConditionsComparator implements Comparator<Element>, Serializable {
 
         public int compare(Element el0, Element el1) {
             String nameEl0 = el0.getName();

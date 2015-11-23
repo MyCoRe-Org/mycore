@@ -3,8 +3,6 @@
  */
 package org.mycore.frontend.servlets;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -17,6 +15,8 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 /**
  * @author shermann
  */
@@ -28,22 +28,23 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         String derivate = job.getRequest().getParameter("derivate");
-        if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(derivate), PERMISSION_WRITE)) {
-            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, "You have to be logged in.");
-            return;
-        }
 
         if (derivate == null || (!derivate.contains("_derivate_"))) {
             LOGGER.error("Cannot toogle display attribute. No derivate id provided.");
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "You must provide a proper derivate id");
             return;
         }
+
+        if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(derivate), PERMISSION_WRITE)) {
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, "You have to be logged in.");
+            return;
+        }
+
         LOGGER.info("Toggling display attribute of " + derivate);
         MCRDerivate obj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
         toggleDisplay(obj);
 
         String url = MCRFrontendUtil.getBaseURL() + "receive/" + getParentHref(obj);
-        job.getResponse().encodeRedirectURL(url);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
     }
 

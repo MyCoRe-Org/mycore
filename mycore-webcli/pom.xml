@@ -14,6 +14,11 @@
   </properties>
   <dependencies>
     <dependency>
+      <!-- because of MCRCommandManager-->
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>annotations</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
       <version>${project.version}</version>
