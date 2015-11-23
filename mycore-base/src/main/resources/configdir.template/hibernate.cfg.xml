@@ -12,8 +12,8 @@
   <session-factory>
     <!-- Database connection settings -->
     <!-- H2 -->
-    <property name="connection.driver_class">org.h2.Driver</property>
     <!-- please modify -->
+    <property name="connection.driver_class">org.h2.Driver</property>
     <property name="connection.url">jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE</property>
     <property name="connection.username">sa</property>
     <property name="connection.password"></property>
@@ -21,7 +21,7 @@
     <!-- MySQL -->
     <!--
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-    <property name="connection.url">jdbc:mysql://127.0.0.1/mycore</property>
+    <property name="connection.url">jdbc:mysql://127.0.0.1/mycore?useUnicode=true&amp;characterEncoding=UTF-8</property>
     <property name="connection.username">mcradmin</property>
     <property name="connection.password"></property>
     <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
