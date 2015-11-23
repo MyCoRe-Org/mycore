@@ -31,6 +31,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -45,7 +48,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -82,7 +86,7 @@ public class MCRServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     private static String SERVLET_URL;
 
@@ -186,7 +190,14 @@ public class MCRServlet extends HttpServlet {
     }
 
     public static MCRSession getSession(HttpServletRequest req) {
+        boolean reusedSession = req.isRequestedSessionIdValid();
         HttpSession theSession = req.getSession(true);
+        if (reusedSession) {
+            LOGGER.debug(() -> "Reused HTTP session: " + theSession.getId() + ", created: " + LocalDateTime
+                .ofInstant(Instant.ofEpochMilli(theSession.getCreationTime()), ZoneId.systemDefault()).toString());
+        } else {
+            LOGGER.info(() -> "Created new HTTP session: " + theSession.getId());
+        }
         MCRSession session = null;
 
         MCRSession fromHttpSession = (MCRSession) theSession.getAttribute("mycore.session");
