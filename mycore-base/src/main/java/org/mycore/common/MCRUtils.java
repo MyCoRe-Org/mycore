@@ -52,14 +52,18 @@ import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.SAXParser;
@@ -85,6 +89,8 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.google.common.collect.Iterators;
 
 /**
  * This class represent a general set of external methods to support the programming API.
@@ -873,6 +879,11 @@ public class MCRUtils {
         }
 
         return sizeText + " " + sizeUnit;
+    }
+    
+    public static <T> Stream<T> asStream(Enumeration<T> e){
+        return StreamSupport
+            .stream(Spliterators.spliteratorUnknownSize(Iterators.forEnumeration(e), Spliterator.ORDERED), false);
     }
 
 }
