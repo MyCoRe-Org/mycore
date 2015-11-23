@@ -23,14 +23,14 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -48,18 +48,24 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
 
     @Test
     public void getInstance() {
-        System.gc();
-        System.runFinalization();
+        runGarbageCollection();
         long before = MCRObjectIDPool.getSize();
         String id = "MyCoRe_test_11111111";
         @SuppressWarnings("unused")
         MCRObjectID mcrId = MCRObjectIDPool.getMCRObjectID(id);
         assertEquals("ObjectIDPool size is different", before + 1, MCRObjectIDPool.getSize());
         mcrId = null;
-        System.gc();
-        System.runFinalization();
+        runGarbageCollection();
         assertNull("ObjectIDPool should not contain ID anymore.", MCRObjectIDPool.getIfPresent(id));
         assertEquals("ObjectIDPool size is different", before, MCRObjectIDPool.getSize());
+    }
+
+    private void runGarbageCollection() {
+        final int garbageIterations = 2;
+        for (int i = 0; i < garbageIterations; i++) {
+            System.gc();
+            System.runFinalization();
+        }
     }
 
     @Override
