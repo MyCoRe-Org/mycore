@@ -45,7 +45,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserErrorHandler;
@@ -496,8 +495,7 @@ public class MCRPersistentServlet extends MCRServlet {
 
         String base = projectID + "_" + type;
         if (!(MCRAccessManager.checkPermission("create-" + base) || MCRAccessManager.checkPermission("create-" + type))) {
-            // TODO: don't use swf code here...
-            String msg = MCRTranslation.translate("component.swf.page.error.user.text");
+            String msg = MCRTranslation.translate("component.base.error.MCRPersistentServlet.editorAccessDenied");
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return;
         }
@@ -629,7 +627,7 @@ public class MCRPersistentServlet extends MCRServlet {
         }
 
         // prepare editor with error messages
-        String myfile = MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
+        String myfile = "editor_error_formular.xml";
         //TODO: Access File directly
         Element root = MCRURIResolver.instance().resolve("webapp:" + myfile);
         List<Element> sectionlist = root.getChildren("section");
