@@ -41,6 +41,11 @@
       <xsl:when test="$mods-type='confpro' or $mods-type='proceedings'">
         <xsl:apply-templates select="." mode="mods.title.confpro" />
       </xsl:when>
+      <xsl:when test="$mods-type='issue'">
+        <xsl:apply-templates select="." mode="mods.title.issue" >
+          <xsl:with-param name="withSubtitle" select="$withSubtitle" />
+        </xsl:apply-templates>
+      </xsl:when>
       <xsl:when test="mods:titleInfo/mods:title">
         <xsl:choose>
           <xsl:when test="string-length($type) &gt; 0 and string-length($position) = 0">
@@ -108,6 +113,29 @@
           </xsl:for-each>
         </xsl:variable>
         <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.proceedingOf',$completeTitle)" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates mode="mods.internalId" select="." />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template mode="mods.title.issue" match="mods:mods">
+    <xsl:param name="withSubtitle" select="false()" />
+    <xsl:choose>
+      <xsl:when test="mods:titleInfo/mods:title">
+        <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]" mode="mods.printTitle">
+          <xsl:with-param name="withSubtitle" select="$withSubtitle" />
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:when test="mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']">
+        <xsl:value-of select="mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']" />
+        <xsl:if test="mods:relatedItem[@type='host']/mods:part/mods:detail[@type='issue']">
+          <xsl:text>, </xsl:text>
+          <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.issue')" />
+          <xsl:text> </xsl:text>
+          <xsl:value-of select="mods:relatedItem[@type='host']/mods:part/mods:detail[@type='issue']" />
+        </xsl:if>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates mode="mods.internalId" select="." />
