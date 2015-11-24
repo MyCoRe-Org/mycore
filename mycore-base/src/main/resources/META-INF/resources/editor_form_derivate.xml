@@ -3,7 +3,7 @@
 
 <MyCoReWebPage>
   
-  <section i18n="component.swf.page.commit.derivate.title" xml:lang="all">
+  <section i18n="editor.common.derivate.title" xml:lang="all">
     <editor id="editor-derivate">
       <source uri="{sourceUri}"/>
       <target type="servlet" name="UpdateDerivateServlet" method="post" format="xml"/>
