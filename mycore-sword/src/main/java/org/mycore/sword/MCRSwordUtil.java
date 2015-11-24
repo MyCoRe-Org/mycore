@@ -71,11 +71,11 @@ import org.swordapp.server.UriRegistry;
 public class MCRSwordUtil {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-    private static final String ID_PROJECT = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "MCR");
     private static Logger LOGGER = Logger.getLogger(MCRSwordUtil.class);
 
     public static MCRDerivate createDerivate(String documentID) throws MCRPersistenceException, IOException {
-        MCRObjectID oid = MCRObjectID.getNextFreeId(ID_PROJECT + "_derivate");
+        final String projectId = MCRObjectID.getInstance(documentID).getProjectId();
+        MCRObjectID oid = MCRObjectID.getNextFreeId(projectId, "_derivate");
         final String derivateID = oid.toString();
 
         MCRDerivate derivate = new MCRDerivate();
@@ -190,7 +190,7 @@ public class MCRSwordUtil {
         Files.copy(digestInputStream, zipTempFile, StandardCopyOption.REPLACE_EXISTING);
         final String md5String = MCRUtils.toHexString(md5.digest());
 
-        try(FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipTempFile.toUri().toString()), new HashMap<String, Object>())) {
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipTempFile.toUri().toString()), new HashMap<String, Object>())) {
             final Path sourcePath = zipfs.getPath("/");
             Files.walkFileTree(sourcePath,
                     new SimpleFileVisitor<Path>() {
@@ -199,7 +199,7 @@ public class MCRSwordUtil {
                                 throws IOException {
                             final Path relativeSP = sourcePath.relativize(dir);
                             //WORKAROUND for bug
-                            Path targetdir = relativeSP.getNameCount()==0?target:target.resolve(relativeSP);
+                            Path targetdir = relativeSP.getNameCount() == 0 ? target : target.resolve(relativeSP);
                             try {
                                 Files.copy(dir, targetdir);
                             } catch (FileAlreadyExistsException e) {
@@ -415,6 +415,7 @@ public class MCRSwordUtil {
 
         /**
          * Creates Pagination links
+         *
          * @param collectionIRI      IRI of the collection
          * @param collection         name of the collection
          * @param feed               the feed where the link will be inserted
