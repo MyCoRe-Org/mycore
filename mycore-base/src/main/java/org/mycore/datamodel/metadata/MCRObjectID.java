@@ -163,7 +163,7 @@ public final class MCRObjectID {
 
     /**
      * Returns the next free MCRObjectID based on the given type string.
-     *  
+     * If you use this method <code>MCR.SWF.Project.ID</code> or <code>MCR.SWF.Project.ID.$type></code> must be set.
      * @see MCRObjectID#getNextFreeId(String)
      * @deprecated use {@link org.mycore.datamodel.metadata.MCRObjectID#getNextFreeId(java.lang.String, java.lang.String)} instead
      */
