@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -37,7 +36,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
     /***/
     private static final long serialVersionUID = 1L;
 
-    private static final String USERERRORPAGE = MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
+    private static final String USER_ERROR_PAGE =  "editor_error_user.xml";
 
     @Override
     protected void doGetPost(MCRServletJob job) throws IOException {
@@ -74,7 +73,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 LOGGER.info("Adding URN to single file");
                 String path = job.getRequest().getParameter("path");
                 if (path == null) {
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USERERRORPAGE));
+                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
                     return;
                 }
 
@@ -88,7 +87,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 try {
                     LOGGER.info("Adding URN to derivate " + object);
                     if (!urnAdder.addURNToDerivate(object)) {
-                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USERERRORPAGE));
+                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
                         return;
                     }
                 } catch (Exception e) {
@@ -104,7 +103,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 try {
                     LOGGER.info("Adding URN to all files in derivate (urn granular) " + object);
                     if (!urnAdder.addURNToDerivates(object)) {
-                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USERERRORPAGE));
+                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
                         return;
                     }
                 } catch (Exception e) {
@@ -115,7 +114,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 try {
                     LOGGER.info("Assigning urn to object '" + object);
                     if (!urnAdder.addURN(object)) {
-                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USERERRORPAGE));
+                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
                         return;
                     }
                 } catch (Exception e) {
