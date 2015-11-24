@@ -345,7 +345,7 @@
                         <xsl:if test="$derivateWithURN=false()">
                           <li>
                             <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
-                              <xsl:value-of select="i18n:translate('component.swf.derivate.addFile')" />
+                              <xsl:value-of select="i18n:translate('component.mods.derivate.addFile')" />
                             </a>
                           </li>
                         </xsl:if>
@@ -354,7 +354,7 @@
                             <xsl:attribute name="class">last</xsl:attribute>
                           </xsl:if>
                           <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?id={@xlink:href}{$suffix}">
-                            <xsl:value-of select="i18n:translate('component.swf.derivate.editDerivate')" />
+                            <xsl:value-of select="i18n:translate('component.mods.derivate.editDerivate')" />
                           </a>
                         </li>
                         <xsl:if test="$derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID)">
@@ -373,7 +373,7 @@
                         <xsl:if test="acl:checkPermission(./@xlink:href,'deletedb') and $derivateWithURN=false()">
                           <li class="last">
                             <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}" class="confirm_derivate_deletion">
-                              <xsl:value-of select="i18n:translate('component.swf.derivate.delDerivate')" />
+                              <xsl:value-of select="i18n:translate('component.mods.derivate.delDerivate')" />
                             </a>
                           </li>
                         </xsl:if>
