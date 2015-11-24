@@ -33,7 +33,10 @@ import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileContentInfoFactory;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.message.ParameterizedMessage;
 
 /**
  * Reads MCRContent from Apache Commons Virtual Filesystem (VFS) sources.
@@ -45,7 +48,7 @@ public class MCRVFSContent extends MCRContent {
 
     private FileObject fo;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRVFSContent.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public MCRVFSContent(FileObject fo) throws IOException {
         this.fo = fo;
@@ -69,26 +72,20 @@ public class MCRVFSContent extends MCRContent {
     @Override
     public InputStream getInputStream() throws IOException {
         final FileContent content = fo.getContent();
-        if (LOGGER.isDebugEnabled()) {
-            final String uri = fo.getName().getURI();
-            final String id = toString().substring(toString().indexOf('@'));
-            LOGGER.debug(id + ": returning InputStream of " + uri, new IOException("open"));
-            return new FilterInputStream(content.getInputStream()) {
-                @Override
-                public void close() throws IOException {
-                    LOGGER.debug(id + ": closing Inputstream of " + uri, new IOException("close"));
-                    super.close();
-                    content.close();
-                }
-            };
-        }
+        LOGGER.debug(() -> getDebugMessage("{}: returning InputStream of {}", "open"));
         return new FilterInputStream(content.getInputStream()) {
             @Override
             public void close() throws IOException {
+                LOGGER.debug(() -> getDebugMessage("{}: closing InputStream of {}", "close"));
                 super.close();
                 content.close();
             }
         };
+    }
+    private Message getDebugMessage(String paramMsg, String throwableMsg){
+        final String uri = fo.getName().getURI();
+        final String id = toString().substring(toString().indexOf('@'));
+        return new ParameterizedMessage(paramMsg, new String[] { id, uri }, new IOException(throwableMsg));
     }
 
     @Override
