@@ -34,8 +34,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.spi.FileSystemProvider;
 import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.Objects;
 import java.util.Vector;
 
 import org.apache.commons.io.IOUtils;
@@ -182,13 +184,25 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
             }
         }
         try {
-            Path pathTest = Paths.get(absoluteSystemId);
-            LOGGER.debug("Checking: " + pathTest);
-            return Files.exists(pathTest);
+            if (isFileSystemAvailable(absoluteSystemId.getScheme())) {
+                Path pathTest = Paths.get(absoluteSystemId);
+                LOGGER.debug("Checking: " + pathTest);
+                return Files.exists(pathTest);
+            }
         } catch (Exception e) {
             LOGGER.error("Error while checking (Path) URI: " + absoluteSystemId, e);
         }
         return false;
+    }
+
+    private boolean isFileSystemAvailable(String scheme) {
+        return FileSystemProvider
+            .installedProviders()
+            .stream()
+            .map(FileSystemProvider::getScheme)
+            .filter(Objects.requireNonNull(scheme)::equals)
+            .findAny()
+            .isPresent();
     }
 
     private URI resolveRelativeURI(String baseURI, String systemId) {
