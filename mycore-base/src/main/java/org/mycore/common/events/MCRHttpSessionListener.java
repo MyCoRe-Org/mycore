@@ -31,7 +31,8 @@ import javax.servlet.http.HttpSessionBindingListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 
 /**
@@ -43,7 +44,7 @@ import org.mycore.common.MCRSession;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionBindingListener {
-    Logger LOGGER = Logger.getLogger(MCRHttpSessionListener.class);
+    Logger LOGGER = LogManager.getLogger();
 
     /*
      * (non-Javadoc)
@@ -51,6 +52,7 @@ public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionB
      * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
      */
     public void sessionCreated(HttpSessionEvent hse) {
+        LOGGER.debug(() -> "HttpSession " + hse.getSession().getId() + " is beeing created by: " + hse.getSource());
     }
 
     /*
@@ -58,11 +60,11 @@ public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionB
      * 
      * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
      */
-    @SuppressWarnings("unchecked")
     public void sessionDestroyed(HttpSessionEvent hse) {
         // clear MCRSessions
-        LOGGER.debug("HttpSession will be destroyed, clearing up.");
         HttpSession httpSession = hse.getSession();
+        LOGGER.debug(() -> "HttpSession " + httpSession.getId() + " is beeing destroyed by " + hse.getSource()
+            + ", clearing up.");
         LOGGER.debug("Removing any MCRSessions from HttpSession");
         for (Enumeration<String> e = httpSession.getAttributeNames(); e.hasMoreElements();) {
             String key = e.nextElement();
