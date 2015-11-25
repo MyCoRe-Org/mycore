@@ -146,8 +146,7 @@ public class MCRURNAdder {
             LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xpath + "]");
             mcrmetadata.mergeMetadata(urnmetadata);
         } catch (Exception ex) {
-            LOGGER.error("Updating metadata of object " + objectId + " with URN " + urn + " failed. [" + xpath + "]",
-                ex);
+            LOGGER.error("Updating metadata of object " + objectId + " with URN " + urn + " failed. [" + xpath + "]", ex);
             return false;
         }
         try {
@@ -224,8 +223,7 @@ public class MCRURNAdder {
         if (elementNamespace != null && attBeginIndex == -1) {
             toReturn = new Element(s.substring(nsEndIndex + 1), MCRConstants.getStandardNamespace(elementNamespace));
         } else if (elementNamespace != null && attBeginIndex != -1) {
-            toReturn = new Element(s.substring(nsEndIndex + 1, attBeginIndex),
-                MCRConstants.getStandardNamespace(elementNamespace));
+            toReturn = new Element(s.substring(nsEndIndex + 1, attBeginIndex), MCRConstants.getStandardNamespace(elementNamespace));
         } else if (elementNamespace == null && attBeginIndex != -1) {
             toReturn = new Element(s.substring(0, attBeginIndex));
         } else if (elementNamespace == null && attBeginIndex == -1) {
@@ -273,8 +271,8 @@ public class MCRURNAdder {
             if (namespace == null) {
                 list.add(new Attribute(attributeName, attributeValue));
             } else {
-                list.add(new Attribute(attributeName, attributeValue, namespace.equals("xml") ? Namespace.XML_NAMESPACE
-                    : MCRConstants.getStandardNamespace(namespace)));
+                list.add(new Attribute(attributeName, attributeValue,
+                        namespace.equals("xml") ? Namespace.XML_NAMESPACE : MCRConstants.getStandardNamespace(namespace)));
             }
         }
         return list;
@@ -302,7 +300,12 @@ public class MCRURNAdder {
      */
     public boolean addURNToDerivates(String derivateId) throws IOException, JDOMException, SAXException {
         // create parent URN and add it to derivate
-        addURNToDerivate(derivateId);
+        boolean successful = addURNToDerivate(derivateId);
+
+        if (!successful) {
+            LOGGER.warn("Could set urn for derivate " + derivateId);
+            return false;
+        }
 
         MCRObjectID id = MCRObjectID.getInstance(derivateId);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
@@ -393,8 +396,8 @@ public class MCRURNAdder {
             LOGGER.info("Assigning urn " + parentURN.toString() + " to " + derivate.getId().toString());
             MCRURNManager.assignURN(parentURN.toString(), derivate.getId().toString(), null, null);
         } catch (Exception ex) {
-            LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate "
-                + derivate.getId().toString() + " failed.", ex);
+            LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate " + derivate.getId().toString()
+                    + " failed.", ex);
             return false;
         }
 
@@ -488,8 +491,8 @@ public class MCRURNAdder {
                 return true;
             }
         }
-        LOGGER.warn("URN assignment failed as the object type " + givenType
-            + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        LOGGER.warn("URN assignment failed as the object type " + givenType + " is not in the list of allowed objects. See property \""
+                + propertyName + "\"");
         return false;
     }
 
@@ -501,8 +504,7 @@ public class MCRURNAdder {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    private MCRIURNProvider getURNProvider() throws ClassNotFoundException, InstantiationException,
-        IllegalAccessException {
+    private MCRIURNProvider getURNProvider() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         String className = MCRConfiguration.instance().getString("MCR.URN.Provider.Class");
         LOGGER.info("Loading class " + className + " as IURNProvider");
         Class<MCRIURNProvider> c = (Class<MCRIURNProvider>) Class.forName(className);
@@ -533,7 +535,7 @@ public class MCRURNAdder {
             MCRMetadataManager.updateMCRDerivateXML(derivate);
         } catch (Exception ex) {
             LOGGER.error("An exception occured while updating the object " + derivate.getId()
-                + " in database. The adding of the fileset element failed.", ex);
+                    + " in database. The adding of the fileset element failed.", ex);
             handleError(derivate);
         }
     }
