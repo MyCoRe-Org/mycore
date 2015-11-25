@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -558,10 +559,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         Transformer trans = null;
 
         try {
-            InputStream in = MCRDerivateCommands.class.getResourceAsStream("/" + xslfile);
+            URL xslURL = MCRDerivateCommands.class.getResource("/" + xslfile);
 
-            if (in != null) {
-                StreamSource source = new StreamSource(in);
+            if (xslURL != null) {
+                StreamSource source = new StreamSource(xslURL.toURI().toASCIIString());
                 TransformerFactory transfakt = TransformerFactory.newInstance();
                 transfakt.setURIResolver(MCRURIResolver.instance());
                 trans = transfakt.newTransformer(source);

@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileContentInfoFactory;
@@ -72,20 +74,38 @@ public class MCRVFSContent extends MCRContent {
     @Override
     public InputStream getInputStream() throws IOException {
         final FileContent content = fo.getContent();
-        LOGGER.debug(() -> getDebugMessage("{}: returning InputStream of {}", "open"));
+        LOGGER.debug(() -> getDebugMessage("{}: returning InputStream of {}"));
         return new FilterInputStream(content.getInputStream()) {
             @Override
             public void close() throws IOException {
-                LOGGER.debug(() -> getDebugMessage("{}: closing InputStream of {}", "close"));
+                LOGGER.debug(() -> getDebugMessage("{}: closing InputStream of {}"));
                 super.close();
                 content.close();
             }
         };
     }
-    private Message getDebugMessage(String paramMsg, String throwableMsg){
+    private Message getDebugMessage(String paramMsg){
         final String uri = fo.getName().getURI();
         final String id = toString().substring(toString().indexOf('@'));
-        return new ParameterizedMessage(paramMsg, new String[] { id, uri }, new IOException(throwableMsg));
+        return new ParameterizedMessage(paramMsg+"\n{}", new String[] { id, uri, getDebugStacktrace() });
+    }
+
+    private String getDebugStacktrace() {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        int i=0;
+        for (StackTraceElement se : stackTrace) {
+            i++;
+            if (se.getClassName().contains(getClass().getName()) && se.getMethodName().contains("close")
+                || se.getMethodName().contains("getInputStream")) {
+                break;
+            }
+        }
+        return Stream
+            .of(stackTrace)
+            .skip(i)
+            .filter(s -> !(s.getClassName().equals(getClass()) && s.getMethodName().contains("Debug")))
+            .map(s -> "\tat "+s.toString())
+            .collect(Collectors.joining(System.getProperty("line.separator")));
     }
 
     @Override

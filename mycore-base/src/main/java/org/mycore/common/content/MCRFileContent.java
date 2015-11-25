@@ -24,6 +24,10 @@
 package org.mycore.common.content;
 
 import java.io.File;
+import java.io.IOException;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * Reads MCRContent from a local file.
@@ -32,12 +36,20 @@ import java.io.File;
  */
 public class MCRFileContent extends MCRPathContent {
 
+    private File file;
+
     public MCRFileContent(File file) {
         super(file.toPath());
+        this.file = file;
     }
 
     public MCRFileContent(String file) {
         this(new File(file));
+    }
+
+    @Override
+    public Source getSource() throws IOException {
+        return new StreamSource(file);
     }
 
 }

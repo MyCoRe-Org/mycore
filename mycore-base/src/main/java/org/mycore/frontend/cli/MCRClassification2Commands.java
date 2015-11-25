@@ -26,7 +26,6 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -279,12 +278,17 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         }
         Transformer trans = null;
 
-        InputStream in = MCRClassification2Commands.class.getResourceAsStream("/" + xslfile);
-        if (in == null) {
-            in = MCRClassification2Commands.class.getResourceAsStream(DEFAULT_TRANSFORMER);
+        URL styleURL = MCRClassification2Commands.class.getResource("/" + xslfile);
+        if (styleURL == null) {
+            styleURL = MCRClassification2Commands.class.getResource(DEFAULT_TRANSFORMER);
         }
-        if (in != null) {
-            StreamSource source = new StreamSource(in);
+        if (styleURL != null) {
+            StreamSource source;
+            try {
+                source = new StreamSource(styleURL.toURI().toASCIIString());
+            } catch (URISyntaxException e) {
+                throw new TransformerConfigurationException(e);
+            }
             TransformerFactory transfakt = TransformerFactory.newInstance();
             transfakt.setURIResolver(MCRURIResolver.instance());
             trans = transfakt.newTransformer(source);

@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -575,13 +574,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         LOGGER.debug("Will load transformer stylesheet " + xslfile + "for export.");
 
-        InputStream in = MCRObjectCommands.class.getResourceAsStream("/" + xslfile);
-        if (in == null) {
-            in = MCRObjectCommands.class.getResourceAsStream("/xsl/" + DEFAULT_TRANSFORMER);
+        URL xslURL = MCRObjectCommands.class.getResource("/" + xslfile);
+        if (xslURL == null) {
+            xslURL = MCRObjectCommands.class.getResource("/xsl/" + DEFAULT_TRANSFORMER);
         }
         try {
-            if (in != null) {
-                StreamSource source = new StreamSource(in);
+            if (xslURL != null) {
+                StreamSource source = new StreamSource(xslURL.toURI().toASCIIString());
                 TransformerFactory transfakt = TransformerFactory.newInstance();
                 transfakt.setURIResolver(MCRURIResolver.instance());
                 trans = transfakt.newTransformer(source);
