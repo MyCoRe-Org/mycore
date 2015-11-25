@@ -41,7 +41,9 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * MCRContent implementation that uses Java 7 {@link FileSystem} features.
@@ -50,9 +52,11 @@ import org.apache.log4j.Logger;
  */
 public class MCRPathContent extends MCRContent implements MCRSeekableChannelContent {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRPathContent.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Path path;
+
+    private static int BUFFER_SIZE = 8192;
 
     public MCRPathContent(Path path) {
         this.path = Objects.requireNonNull(path).toAbsolutePath().normalize();
@@ -82,23 +86,35 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
         if (len > Integer.MAX_VALUE) {
             throw new IOException("Content does not fit into byte array: " + len);
         }
+        int size = (int) len;
         try (SeekableByteChannel channel = getSeekableByteChannel()) {
             if (channel instanceof FileChannel) {
-                MappedByteBuffer mappedByteBuffer = ((FileChannel) channel).map(MapMode.PRIVATE, 0, len);
+                MappedByteBuffer mappedByteBuffer = ((FileChannel) channel).map(MapMode.READ_ONLY, 0, size);
                 if (mappedByteBuffer.hasArray()) {
-                    LOGGER.info(path + " -> shortcut via MappedByteBuffer available");
+                    LOGGER.debug(() -> path + " -> shortcut via MappedByteBuffer available");
                     return mappedByteBuffer.array();
                 }
-                LOGGER.info(path + " -> shortcut via MappedByteBuffer NOT available");
+                LOGGER.debug(() -> path + " -> shortcut via MappedByteBuffer NOT available");
+                byte[] returns = new byte[size];
+                int nGet, offset;
+                while (mappedByteBuffer.hasRemaining()) {
+                    offset = mappedByteBuffer.position();
+                    nGet = Math.min(mappedByteBuffer.remaining(), BUFFER_SIZE);
+                    mappedByteBuffer.get(returns, offset, nGet);
+                }
+                return returns;
             }
-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect((int) len);
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(size);
             if (!byteBuffer.hasArray()) {
-                LOGGER.warn("Your OS does not support byte[] backed ByteBuffer.");
+                LOGGER.debug(() -> "Your OS does not support byte[] backed ByteBuffer.");
                 byteBuffer.clear();
-                byteBuffer = ByteBuffer.wrap(new byte[(int) len]);
+                byteBuffer = ByteBuffer.wrap(new byte[size]);
             }
-            while (channel.read(byteBuffer) != -1)
-                ;
+            while (byteBuffer.hasRemaining()) {
+                if (channel.read(byteBuffer) < 0) {
+                    throw new IOException("Bytebuffer size does not match");
+                }
+            }
             return byteBuffer.array();
         }
     }
