@@ -9,11 +9,12 @@ import java.util.Optional;
 
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRException;
 
 
 /**
+ * A {@link StreamSource} that offers a lazy initialization to {@link #getInputStream()}.
+ * 
  * @author Thomas Scheffler (yagee)
  */
 public class MCRLazyStreamSource extends StreamSource {
@@ -32,7 +33,6 @@ public class MCRLazyStreamSource extends StreamSource {
 
     @Override
     public InputStream getInputStream() {
-        LogManager.getLogger().info(()-> "getInputStream is called ", new IOException("track me"));
         try {
             return inputStreamSupplier.get();
         } catch (IOException e) {
