@@ -680,7 +680,7 @@
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-model</artifactId>
-        <version>0.8</version>
+        <version>0.9-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>log4j</groupId>
