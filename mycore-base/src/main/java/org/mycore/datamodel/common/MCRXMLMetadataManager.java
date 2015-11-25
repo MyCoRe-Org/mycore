@@ -313,7 +313,7 @@ public class MCRXMLMetadataManager {
                 File projectDir = new File(svnDir, project);
                 if (!projectDir.exists()) {
                     if (!projectDir.mkdirs()) {
-                        throw new MCRException(MessageFormat.format("Could not set up Store for project ''{0}'' and objectType ''{1}'' and config prefix ''{2}''", project, objectType, configPrefix));
+                        throwStoreDirException(projectDir, project, objectType, configPrefix);
                     }
                 }
             }
@@ -325,16 +325,10 @@ public class MCRXMLMetadataManager {
         }
 
         File projectDir = new File(baseDir, project);
-        if (!projectDir.exists()) {
-            if(!projectDir.mkdir()){
-                throw new MCRException(MessageFormat.format("Could not set up Store for project ''{0}'' and objectType ''{1}'' and config prefix ''{2}''", project, objectType, configPrefix));
-            }
-        }
-
         File typeDir = new File(projectDir, objectType);
         if (!typeDir.exists()) {
-            if(!typeDir.mkdir()){
-                throw new MCRException(MessageFormat.format("Could not set up Store for project ''{0}'' and objectType ''{1}'' and config prefix ''{2}''", project, objectType, configPrefix));
+            if(!typeDir.mkdirs()){
+                throwStoreDirException(typeDir, project, objectType, configPrefix);
             }
         }
 
@@ -343,6 +337,10 @@ public class MCRXMLMetadataManager {
         config.set(configPrefix + "ForceDocType", objectType.equals("derivate") ? "mycorederivate" : "mycoreobject");
         createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, impl);
+    }
+    
+    private void throwStoreDirException(File dir, String project, String objectType, String configPrefix){
+        throw new MCRException(MessageFormat.format("Could create directory ''{0}'' to set up Store for project ''{1}'' and objectType ''{2}'' and config prefix ''{3}''", dir.getAbsolutePath(), project, objectType, configPrefix));
     }
 
     private String getStoryKey(String project, String objectType) {
