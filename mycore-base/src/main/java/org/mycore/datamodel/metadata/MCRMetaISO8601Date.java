@@ -177,9 +177,18 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     public void setFormat(String format) {
         isoDate.setFormat(format);
     }
-    
+
     public String getFormat() {
         return isoDate == null || isoDate.getIsoFormat() == null ? null : isoDate.getIsoFormat().toString();
+    }
+
+    /**
+     * Returns the internal date.
+     * 
+     * @return the base date
+     */
+    public MCRISO8601Date getMCRISO8601Date() {
+        return isoDate;
     }
 
     /**
