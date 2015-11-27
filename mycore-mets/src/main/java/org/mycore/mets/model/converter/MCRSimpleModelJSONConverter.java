@@ -1,5 +1,6 @@
 package org.mycore.mets.model.converter;
 
+import org.mycore.mets.model.simple.MCRMetsAltoLink;
 import org.mycore.mets.model.simple.MCRMetsLink;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
 
@@ -15,6 +16,7 @@ public class MCRSimpleModelJSONConverter {
         GsonBuilder gsonBuilder = new GsonBuilder();
 
         gsonBuilder.registerTypeAdapter(MCRMetsLink.class, new MCRMetsLinkTypeAdapter());
+        gsonBuilder.registerTypeAdapter(MCRMetsAltoLink.class, new MCRAltoLinkTypeAdapter());
         gsonBuilder.setPrettyPrinting();
 
         return gsonBuilder.create().toJson(model);

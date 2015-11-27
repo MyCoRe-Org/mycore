@@ -15,6 +15,7 @@ import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
+import org.mycore.mets.model.struct.Area;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
@@ -22,6 +23,7 @@ import org.mycore.mets.model.struct.LogicalStructMap;
 import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
+import org.mycore.mets.model.struct.Seq;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
 
@@ -117,9 +119,28 @@ public class MCRSimpleModelXMLConverter {
     }
 
 
+
     private static void buildLogicalSubDiv(MCRMetsSection metsSection, LogicalDiv parent, int nthChild, Map<MCRMetsSection, String> sectionIdMap) {
         String id = LOGICAL_ID_PREFIX + UUID.randomUUID().toString();
         LogicalDiv logicalSubDiv = new LogicalDiv(id, metsSection.getType(), metsSection.getLabel(), nthChild);
+
+        if(metsSection.getAltoLinks().size()>0){
+            Fptr fptr = new Fptr();
+            List<Seq> seqList = fptr.getSeqList();
+
+            Seq seq = new Seq();
+            seqList.add(seq);
+
+            metsSection.getAltoLinks().forEach(al -> {
+                Area area = new Area();
+                seq.getAreaList().add(area);
+                area.setBetype("IDREF");
+                area.setBegin(al.getBegin());
+                area.setEnd(al.getEnd());
+                area.setFileId(al.getFile().getId());
+            });
+            parent.getFptrList().add(fptr);
+        }
 
         sectionIdMap.put(metsSection, id);
         parent.add(logicalSubDiv);

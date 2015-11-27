@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.jdom2.Document;
+import org.mycore.common.MCRException;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FileGrp;
+import org.mycore.mets.model.simple.MCRMetsAltoLink;
 import org.mycore.mets.model.simple.MCRMetsFile;
 import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.simple.MCRMetsLink;
@@ -39,33 +41,53 @@ public class MCRXMLSimpleModelConverter {
 
         MCRMetsSimpleModel msm = new MCRMetsSimpleModel();
 
-        Map<String, MCRMetsSection> idSectionMap = new Hashtable<>();
-        MCRMetsSection rootMetsSection = buidRootSection(mets, idSectionMap);
-        msm.setRootSection(rootMetsSection);
-
         Map<String, MCRMetsPage> idPageMap = new Hashtable<>();
-        List<MCRMetsPage> metsPageList = buildPageList(mets, idPageMap);
+        Map<String, MCRMetsFile> idFileMap = buildidFileMap(mets);
+        List<MCRMetsPage> metsPageList = buildPageList(mets, idPageMap, idFileMap);
         msm.getMetsPageList().addAll(metsPageList);
+
+        Map<String, MCRMetsSection> idSectionMap = new Hashtable<>();
+        MCRMetsSection rootMetsSection = buidRootSection(mets, idSectionMap, idFileMap);
+        msm.setRootSection(rootMetsSection);
 
         linkPages(mets, idSectionMap, idPageMap, msm);
 
         return msm;
     }
 
-    private static MCRMetsSection buidRootSection(Mets mets, Map<String, MCRMetsSection> idSectionMap) {
+    private static MCRMetsSection buidRootSection(Mets mets, Map<String, MCRMetsSection> idSectionMap, Map<String, MCRMetsFile> idFileMap) {
         IStructMap structMap = mets.getStructMap(LogicalStructMap.TYPE);
         LogicalStructMap logicalStructMap = (LogicalStructMap) structMap;
         LogicalDiv divContainer = logicalStructMap.getDivContainer();
 
-        return buildSection(divContainer, idSectionMap, null);
+        return buildSection(divContainer, idSectionMap, null, idFileMap);
     }
 
-    private static MCRMetsSection buildSection(LogicalDiv current, Map<String, MCRMetsSection> idSectionMap, MCRMetsSection parent) {
+    private static MCRMetsSection buildSection(LogicalDiv current, Map<String, MCRMetsSection> idSectionMap, MCRMetsSection parent, Map<String, MCRMetsFile> idFileMap) {
         MCRMetsSection metsSection = new MCRMetsSection();
 
         metsSection.setLabel(current.getLabel());
         metsSection.setType(current.getType());
         metsSection.setParent(parent);
+
+
+        current.getFptrList().forEach(fptr -> {
+            fptr.getSeqList().forEach(seq -> {
+                seq.getAreaList().forEach(area -> {
+                    String fileId = area.getFileId();
+                    String begin = area.getBegin();
+                    String end = area.getEnd();
+
+                    if(!idFileMap.containsKey(fileId)){
+                        throw new MCRException("No file with id " + fileId + " found!");
+                    }
+
+                    MCRMetsFile file = idFileMap.get(fileId);
+                    MCRMetsAltoLink e = new MCRMetsAltoLink(file, begin, end);
+                    metsSection.addAltoLink(e);
+                });
+            });
+        });
 
         if (idSectionMap != null) {
             idSectionMap.put(current.getId(), metsSection);
@@ -75,16 +97,15 @@ public class MCRXMLSimpleModelConverter {
         current.getChildren()
                 .stream()
                 .sorted((child1, child2) -> child1.getOrder() - child2.getOrder())
-                .map(section -> MCRXMLSimpleModelConverter.buildSection(section, idSectionMap, metsSection))
+                .map(section -> MCRXMLSimpleModelConverter.buildSection(section, idSectionMap, metsSection, idFileMap))
                 .forEachOrdered(metsSection::addSection);
 
         return metsSection;
     }
 
-    private static List<MCRMetsPage> buildPageList(Mets mets, Map<String, MCRMetsPage> idPageMap) {
+    private static List<MCRMetsPage> buildPageList(Mets mets, Map<String, MCRMetsPage> idPageMap, Map<String, MCRMetsFile> idFileMap) {
         PhysicalStructMap physicalStructMap = (PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE);
         List<PhysicalSubDiv> physicalSubDivs = physicalStructMap.getDivContainer().getChildren();
-        Map<String, MCRMetsFile> idFileMap = buildidFileMap(mets);
 
         List<MCRMetsPage> result = new ArrayList<>();
 

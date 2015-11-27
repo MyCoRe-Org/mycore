@@ -9,6 +9,7 @@ public class MCRMetsSection {
 
     public MCRMetsSection() {
         this.metsSectionList = new ArrayList<>();
+        this.altoLinks = new ArrayList<>();
     }
 
     public MCRMetsSection(String type, String label, MCRMetsSection parent) {
@@ -23,6 +24,7 @@ public class MCRMetsSection {
     private String id = UUID.randomUUID().toString();
     private String type;
     private String label;
+    private List<MCRMetsAltoLink> altoLinks;
 
 
     private transient MCRMetsSection parent;
@@ -68,4 +70,22 @@ public class MCRMetsSection {
     public void setParent(MCRMetsSection parent) {
         this.parent = parent;
     }
+
+    public List<MCRMetsAltoLink> getAltoLinks() {
+        return Collections.unmodifiableList(altoLinks);
+    }
+
+    public void setAltoLinks(List<MCRMetsAltoLink> altoLinks) {
+        this.altoLinks = altoLinks;
+    }
+
+    public void addAltoLink(MCRMetsAltoLink link){
+        this.altoLinks.add(link);
+    }
+
+    public void removeAltoLink(MCRMetsAltoLink link){
+        this.altoLinks.remove(link);
+    }
+
+
 }
