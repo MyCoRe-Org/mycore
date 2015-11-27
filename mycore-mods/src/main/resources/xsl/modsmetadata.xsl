@@ -78,12 +78,21 @@
 				</xsl:if>
 				<xsl:choose>
 					<xsl:when
-						test="@point='start'and following-sibling::*[name(current())=name()][@point='end']">
+						test="@point='start' and following-sibling::*[name(current())=name()][@point='end']">
 						<xsl:apply-templates select="." mode="formatDate" />
 						<xsl:value-of select="' - '"/>
 						<xsl:apply-templates
 							select="following-sibling::*[name(current())=name()][@point='end']"
 							mode="formatDate" />
+					</xsl:when>
+					<xsl:when
+						test="@point='start' and not(following-sibling::*[name(current())=name()][@point='end'])">
+						<xsl:apply-templates select="." mode="formatDate" />
+						<xsl:value-of select="' - '"/>
+					</xsl:when>
+					<xsl:when test="@point='end'">
+						<xsl:value-of select="' - '"/>
+						<xsl:apply-templates select="." mode="formatDate" />
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:apply-templates select="." mode="formatDate" />
