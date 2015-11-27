@@ -71,6 +71,7 @@ import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -281,15 +282,16 @@ public final class MCRURIResolver implements URIResolver {
             return uriResolver.resolve(href, base);
         } else { // try to handle as URL, use default resolver for file:// and
             try {
-                InputSource entity = MCREntityResolver.instance().resolveEntity(null, href);
+                final InputSource entity = MCREntityResolver.instance().resolveEntity(null, href);
                 if (entity != null) {
                     LOGGER.debug("Resolved via EntityResolver: " + entity.getSystemId());
-                    if (entity.getByteStream() != null) {
-                        StreamSource streamSource = new StreamSource(entity.getByteStream());
-                        streamSource.setSystemId(entity.getSystemId());
-                        return streamSource;
-                    }
-                    return new StreamSource(entity.getSystemId());
+                    return new MCRLazyStreamSource(new MCRLazyStreamSource.InputStreamSupplier() {
+
+                        @Override
+                        public InputStream get() throws IOException {
+                            return entity.getByteStream();
+                        }
+                    }, entity.getSystemId());
                 }
             } catch (SAXException | IOException e) {
                 LOGGER.debug("Error while resolving uri: " + href);

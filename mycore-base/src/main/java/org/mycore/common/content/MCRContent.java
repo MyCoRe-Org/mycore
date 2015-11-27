@@ -43,7 +43,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
@@ -56,6 +55,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -166,7 +166,12 @@ public abstract class MCRContent {
      * @return content as Source
      */
     public Source getSource() throws IOException {
-        return new StreamSource(getInputStream(), getSystemId());
+        return new MCRLazyStreamSource(new MCRLazyStreamSource.InputStreamSupplier() {
+            @Override
+            public InputStream get() throws IOException {
+                return getInputStream();
+            }
+        }, getSystemId());
     }
 
     /**
