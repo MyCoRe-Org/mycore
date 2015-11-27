@@ -56,7 +56,9 @@ import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
 import org.jdom2.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
@@ -68,6 +70,8 @@ import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 /**
  * This servlet implements the server side of communication with the upload applet. The content of the uploaded files
@@ -315,8 +319,26 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             sendResponse(res, "OK");
         } else if (method.equals("formBasedUpload")) {
             String uploadId = parms.getParameter("uploadId");
-            MCRUploadHandler handler = MCRUploadHandlerManager.getHandler(uploadId);
-
+            
+            String parentObjectID = parms.getParameter("parentObjectID");
+            String derivateID = parms.getParameter("derivateID");
+            String cancelUrl = parms.getParameter("cancelUrl");
+            MCRUploadHandler handler;
+            
+            if (uploadId != null) {
+            	handler = MCRUploadHandlerManager.getHandler(uploadId);
+            } else {
+            	if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
+                    throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
+                        + parentObjectID + ".");
+                }
+                if (derivateID != null && !MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
+                    throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
+                        + derivateID + ".");
+                }
+            	handler = new MCRUploadHandlerIFS(parentObjectID, derivateID, cancelUrl);
+            }
+            
             LOGGER.info("UploadHandler form based file upload for ID " + uploadId);
 
             // look up filenames of editor submission or request parameters
