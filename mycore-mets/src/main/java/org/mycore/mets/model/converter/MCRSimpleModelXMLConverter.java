@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.jdom2.Document;
+import org.mycore.common.MCRException;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
@@ -46,10 +47,11 @@ public class MCRSimpleModelXMLConverter {
         Mets mets = new Mets();
 
         Hashtable<MCRMetsPage, String> pageIdMap = new Hashtable<>();
-        buildPhysicalPages(msm, mets, pageIdMap);
+        Map<String, String> idToNewIDMap = new Hashtable<>();
+        buildPhysicalPages(msm, mets, pageIdMap, idToNewIDMap);
 
         Hashtable<MCRMetsSection, String> sectionIdMap = new Hashtable<>();
-        buildLogicalPages(msm, mets, sectionIdMap);
+        buildLogicalPages(msm, mets, sectionIdMap, idToNewIDMap);
 
         StructLink structLink = mets.getStructLink();
         msm.getSectionPageLinkList().stream()
@@ -65,7 +67,7 @@ public class MCRSimpleModelXMLConverter {
         return mets.asDocument();
     }
 
-    private static void buildPhysicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsPage, String> pageIdMap) {
+    private static void buildPhysicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsPage, String> pageIdMap, Map<String, String> idToNewIDMap) {
         List<MCRMetsPage> pageList = msm.getMetsPageList();
         PhysicalStructMap structMap = (PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE);
         structMap.setDivContainer(new PhysicalDiv(PHYSICAL_ID_PREFIX + UUID.randomUUID().toString(),PhysicalDiv.TYPE_PHYS_SEQ));
@@ -88,7 +90,7 @@ public class MCRSimpleModelXMLConverter {
                 MCRMetsFileUse use = simpleFile.getUse();
                 String mimeType = simpleFile.getMimeType();
                 String fileID = use.toString().toLowerCase(Locale.ROOT) + "_"  + simpleFile.getId();
-
+                idToNewIDMap.put(simpleFile.getId(), fileID);
                 File file = new File(fileID, mimeType);
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
                 file.setFLocat(fLocat);
@@ -101,7 +103,7 @@ public class MCRSimpleModelXMLConverter {
         }
     }
 
-    private static void buildLogicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsSection, String> sectionIdMap) {
+    private static void buildLogicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsSection, String> sectionIdMap, Map<String, String> idToNewIDMap) {
         LogicalStructMap logicalStructMap = (LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE);
         MCRMetsSection rootSection = msm.getRootSection();
         String type = rootSection.getType();
@@ -112,15 +114,14 @@ public class MCRSimpleModelXMLConverter {
 
         Integer count = 1;
         for (MCRMetsSection metsSection : rootSection.getMetsSectionList()) {
-            buildLogicalSubDiv(metsSection, logicalDiv, count, sectionIdMap);
+            buildLogicalSubDiv(metsSection, logicalDiv, count, sectionIdMap, idToNewIDMap);
             count++;
         }
         logicalStructMap.setDivContainer(logicalDiv);
     }
 
 
-
-    private static void buildLogicalSubDiv(MCRMetsSection metsSection, LogicalDiv parent, int nthChild, Map<MCRMetsSection, String> sectionIdMap) {
+    private static void buildLogicalSubDiv(MCRMetsSection metsSection, LogicalDiv parent, int nthChild, Map<MCRMetsSection, String> sectionIdMap, Map<String, String> idToNewIDMap) {
         String id = LOGICAL_ID_PREFIX + UUID.randomUUID().toString();
         LogicalDiv logicalSubDiv = new LogicalDiv(id, metsSection.getType(), metsSection.getLabel(), nthChild);
 
@@ -137,16 +138,20 @@ public class MCRSimpleModelXMLConverter {
                 area.setBetype("IDREF");
                 area.setBegin(al.getBegin());
                 area.setEnd(al.getEnd());
-                area.setFileId(al.getFile().getId());
+                String oldID = al.getFile().getId();
+                if (!idToNewIDMap.containsKey(oldID)) {
+                    throw new MCRException("Could not get new id for: " + oldID);
+                }
+                area.setFileId(idToNewIDMap.get(oldID));
             });
-            parent.getFptrList().add(fptr);
+            logicalSubDiv.getFptrList().add(fptr);
         }
 
         sectionIdMap.put(metsSection, id);
         parent.add(logicalSubDiv);
         int count = 0;
         for (MCRMetsSection section : metsSection.getMetsSectionList()) {
-            buildLogicalSubDiv(section, logicalSubDiv, count, sectionIdMap);
+            buildLogicalSubDiv(section, logicalSubDiv, count, sectionIdMap, idToNewIDMap);
         }
     }
 
