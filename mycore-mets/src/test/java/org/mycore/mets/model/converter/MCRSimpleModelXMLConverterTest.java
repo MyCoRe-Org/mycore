@@ -22,8 +22,8 @@ public class MCRSimpleModelXMLConverterTest {
             "count(//mets:structMap[@TYPE='LOGICAL']/mets:div[@LABEL='testRootLabel']/mets:div[@LABEL='subSection2Label' and @ORDER='2'])=1;" +
             "count(//mets:fileGrp[@USE='MASTER']/mets:file)=3;" +
             "count(//mets:fileGrp[@USE='ALTO']/mets:file)=3;" +
-            "count(//mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[@TYPE='Page'])=3;" +
-            "count(//mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[@TYPE='Page']/mets:fptr)=6";
+            "count(//mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[@TYPE='page'])=3;" +
+            "count(//mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[@TYPE='page']/mets:fptr)=6";
 
     private MCRMetsSimpleModel metsSimpleModel;
 
