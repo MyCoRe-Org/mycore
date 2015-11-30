@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRAbstractFileStore;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -38,7 +39,7 @@ public class MCRMediaSourceProvider {
     private ArrayList<MCRMediaSource> sources;
 
     public MCRMediaSourceProvider(String derivateId, String path, Optional<String> userAgent,
-        Supplier<String[]> parameterSupplier) throws IOException {
+        Supplier<String[]> parameterSupplier) throws IOException, URISyntaxException {
         try {
             wowzaToken = wowzaBaseURL.map(
                 (w) -> new MCRSecureTokenV2(
@@ -49,8 +50,13 @@ public class MCRMediaSourceProvider {
                     parameterSupplier.get()));
         } catch (RuntimeException e) {
             Throwable cause = e.getCause();
-            if (cause != null && cause instanceof IOException) {
-                throw (IOException) cause;
+            if (cause != null) {
+                if (cause instanceof IOException) {
+                    throw (IOException) cause;
+                }
+                if (cause instanceof URISyntaxException) {
+                    throw (URISyntaxException) cause;
+                }
             }
             throw e;
         }
@@ -126,8 +132,9 @@ public class MCRMediaSourceProvider {
             java.nio.file.Path absolutePath = fileStore.getPhysicalPath(mcrPath);
             java.nio.file.Path relativePath = fileStore.getBaseDirectory().relativize(absolutePath);
             LogManager.getLogger().info("{} -> {} -> {}", mcrPath, absolutePath, relativePath);
-            return relativePath.toString().replaceAll(relativePath.getFileSystem().getSeparator(), "/");
-        } catch (IOException e) {
+            return MCRXMLFunctions
+                .encodeURIPath(relativePath.toString().replaceAll(relativePath.getFileSystem().getSeparator(), "/"));
+        } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

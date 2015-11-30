@@ -1,6 +1,7 @@
 package org.mycore.media.frontend;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,12 +19,12 @@ public class MCRXMLFunctions {
 
     private static final String[] EMPTY_ARRAY = new String[0];
 
-    public static NodeList getSources(String derivateId, String path) throws IOException, ParserConfigurationException {
+    public static NodeList getSources(String derivateId, String path) throws IOException, ParserConfigurationException, URISyntaxException {
         return getSources(derivateId, path, null);
     }
 
     public static NodeList getSources(String derivateId, String path, String userAgent)
-        throws IOException, ParserConfigurationException {
+        throws IOException, ParserConfigurationException, URISyntaxException {
         MCRMediaSourceProvider provider = new MCRMediaSourceProvider(derivateId, path, Optional.ofNullable(userAgent),
             () -> EMPTY_ARRAY);
         List<MCRMediaSource> sources = provider.getSources();
