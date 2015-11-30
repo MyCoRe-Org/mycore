@@ -34,7 +34,7 @@ import org.mycore.mets.model.struct.StructLink;
  */
 public class MCRSimpleModelXMLConverter {
 
-    public static final String DEFAULT_PHYSICAL_TYPE = "Page";
+    public static final String DEFAULT_PHYSICAL_TYPE = "page";
     public static final String PHYSICAL_ID_PREFIX = "phys_";
     public static final String LOGICAL_ID_PREFIX = "log_";
 
