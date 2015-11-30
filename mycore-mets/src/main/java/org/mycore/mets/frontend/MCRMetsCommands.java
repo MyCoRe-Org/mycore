@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -68,7 +69,8 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 
 	@MCRCommand(syntax = "try fix invalid mets", help = "This Command can be used to fix invalid mets files that was found in any validate selected mets runs.", order = 15)
 	public static void fixInvalidMets() {
-		invalidMetsQueue.stream().forEach(selectedObjectID -> {
+		String selectedObjectID;
+		while ((selectedObjectID = invalidMetsQueue.poll()) != null) {
 			LOGGER.info("Try to fix METS of " + selectedObjectID);
 			MCRPath metsFile = MCRPath.getPath(selectedObjectID, "/mets.xml");
 			SAXBuilder saxBuilder = new SAXBuilder();
@@ -76,7 +78,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 			try (InputStream metsInputStream = Files.newInputStream(metsFile)) {
 				metsDocument = saxBuilder.build(metsInputStream);
 			} catch (IOException | JDOMException e) {
-				LOGGER.error("Cannot fix METS of " + selectedObjectID + ". Can not parse mets.xml!", e);
+				LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not parse mets.xml!", selectedObjectID), e);
 				return;
 			}
 
@@ -84,7 +86,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 			try {
 				mcrMetsSimpleModel = MCRXMLSimpleModelConverter.fromXML(metsDocument);
 			} catch (Exception e) {
-				LOGGER.error("Cannot fix METS of " + selectedObjectID + ". Can not convert to SimpleModel!", e);
+				LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not convert to SimpleModel!", selectedObjectID), e);
 				return;
 			}
 
@@ -93,9 +95,9 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 			try (OutputStream os = Files.newOutputStream(metsFile)) {
 				xmlOutputter.output(newMets, os);
 			} catch (IOException e) {
-				LOGGER.error("Cannot fix METS of " + selectedObjectID + ". Can not write mets to derivate.");
+				LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not write mets to derivate.", selectedObjectID));
 			}
-		});
+		}
 	}
 
 	@MCRCommand(syntax = "add mets files for derivate {0}", help = "", order = 20)
