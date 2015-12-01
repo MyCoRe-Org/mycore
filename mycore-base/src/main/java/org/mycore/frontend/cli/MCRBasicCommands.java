@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
@@ -142,15 +143,25 @@ public class MCRBasicCommands {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         ArrayList<File> directories = new ArrayList<>(3);
         directories.add(configurationDirectory);
-        directories.add(new File(configurationDirectory, "data"));
-        directories.add(new File(configurationDirectory, "lib"));
-        directories.add(new File(configurationDirectory, "resources"));
+        for (String dir : MCRConfiguration.instance().getString("MCR.ConfigurationDirectory.template.directories", "")
+            .split(",")) {
+            if (!dir.trim().isEmpty()) {
+                directories.add(new File(configurationDirectory, dir.trim()));
+            }
+        }
         for (File directory : directories) {
             if (!createDirectory(directory)) {
                 break;
             }
         }
-        createSampleConfigFile("mycore.properties");
+        
+        for (String f : MCRConfiguration.instance().getString("MCR.ConfigurationDirectory.template.files", "")
+            .split(",")) {
+            if (!f.trim().isEmpty()) {
+                createSampleConfigFile(f.trim());
+            }
+        }
+        
         createSampleConfigFile("hibernate.cfg.xml");
     }
 
