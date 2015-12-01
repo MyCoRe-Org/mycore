@@ -24,6 +24,7 @@
 package org.mycore.frontend.servlets;
 
 import java.security.Principal;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -79,23 +80,17 @@ public class MCRContainerLoginServlet extends MCRServlet {
 
         @Override
         public String getUserID() {
-            HttpServletRequest request = getCurrentRequest();
-            if (request == null) {
-                return lastUser;
-            }
-            Principal principal = request.getUserPrincipal();
-            if (principal == null) {
-                LOGGER.warn("Principal for current user is null. Using guest user as fallback!");
-                return MCRSystemUserInformation.getGuestInstance().getUserID();
-            }
-            lastUser = principal.getName();
+            lastUser = getCurrentRequest()
+                .flatMap(r -> Optional.ofNullable(r.getUserPrincipal()))
+                .map(Principal::getName)
+                .orElseGet(() -> Optional.ofNullable(lastUser)
+                    .orElseGet(MCRSystemUserInformation.getGuestInstance()::getUserID));
             return lastUser;
         }
-
+        
         @Override
         public boolean isUserInRole(String role) {
-            HttpServletRequest request = getCurrentRequest();
-            return request != null && request.isUserInRole(role);
+            return getCurrentRequest().map(r -> r.isUserInRole(role)).orElse(Boolean.FALSE);
         }
 
         @Override
@@ -103,10 +98,9 @@ public class MCRContainerLoginServlet extends MCRServlet {
             return null;
         }
 
-        protected HttpServletRequest getCurrentRequest() {
+        protected Optional<HttpServletRequest> getCurrentRequest() {
             Logger.getLogger(getClass()).debug("Getting request from session: " + session.getID());
-            MCRServletJob job = (MCRServletJob) session.get(MCRServlet.MCR_SERVLET_JOB_KEY);
-            return job == null ? null : job.getRequest();
+            return session.getServletRequest();
         }
     }
 

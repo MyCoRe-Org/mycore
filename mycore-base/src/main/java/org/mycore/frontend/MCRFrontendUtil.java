@@ -103,6 +103,7 @@ public class MCRFrontendUtil {
     }
 
     public static void configureSession(MCRSession session, HttpServletRequest request) {
+        session.setServletRequest(request);
         // language
         getProperty(request, "lang").ifPresent(session::setCurrentLanguage);
 

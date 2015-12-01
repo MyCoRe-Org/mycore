@@ -80,8 +80,6 @@ import org.xml.sax.SAXParseException;
 public class MCRServlet extends HttpServlet {
     private static final String CURRENT_THREAD_NAME_KEY = "currentThreadName";
 
-    public static final String MCR_SERVLET_JOB_KEY = "MCRServletJob";
-
     private static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
 
     private static final long serialVersionUID = 1L;
@@ -331,7 +329,6 @@ public class MCRServlet extends HttpServlet {
                 throw new RuntimeException(ex);
             }
         } finally {
-            MCRSessionMgr.getCurrentSession().deleteObject(MCR_SERVLET_JOB_KEY);
             // Release current MCRSession from current Thread,
             // in case that Thread pooling will be used by servlet engine
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
@@ -351,7 +348,6 @@ public class MCRServlet extends HttpServlet {
 
     private void configureSession(MCRServletJob job) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        session.put(MCR_SERVLET_JOB_KEY, job);
 
         String c = getClass().getName();
         c = c.substring(c.lastIndexOf(".") + 1);

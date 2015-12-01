@@ -134,15 +134,16 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
         }
 
         private void loginIfNeeded() {
-            HttpServletRequest currentRequest = getCurrentRequest();
-            if (currentRequest != null && currentRequest.getUserPrincipal() == null) {
-                try {
-                    currentRequest.login(user, pwd);
-                    LOGGER.debug("Re-Logged in: " + user);
-                } catch (ServletException e) {
-                    throw new MCRException(e);
+            getCurrentRequest().ifPresent(currentRequest -> {
+                if (currentRequest.getUserPrincipal() == null) {
+                    try {
+                        currentRequest.login(user, pwd);
+                        LOGGER.debug("Re-Logged in: " + user);
+                    } catch (ServletException e) {
+                        throw new MCRException(e);
+                    }
                 }
-            }
+            });
         }
 
         @Override
