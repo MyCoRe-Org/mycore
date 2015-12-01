@@ -1,20 +1,20 @@
 /*
- * 
+ *
  * $Revision$ $Date$
- * 
+ *
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
- * 
+ *
  * This program is free software; you can use it, redistribute it and / or
  * modify it under the terms of the GNU General Public License (GPL) as
  * published by the Free Software Foundation; either version 2 of the License or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program, in a file called gpl.txt or license.txt. If not, write to the
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -44,7 +44,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * three parts, they are the project identifier, the type identifier and a
  * string with a number. The syntax of the ID is "<em>projectID</em>_
  * <em>typeID</em>_ <em>number</em>" as "<em>String_String_Integer</em>".
- * 
+ *
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
@@ -121,7 +121,7 @@ public final class MCRObjectID {
 
     /**
      * The constructor for MCRObjectID from a given string.
-     * 
+     *
      * @exception MCRException
      *                if the given string is not valid.
      */
@@ -139,16 +139,16 @@ public final class MCRObjectID {
      * given project ID and type ID, with the following additional restriction:
      * The ID returned can be divided by idFormat.numberDistance without rest.
      * The ID returned minus the last ID returned is at least idFormat.numberDistance.
-     * 
+     *
      * Example for number distance of 1 (default):
      *   last ID = 7, next ID = 8
      *   last ID = 8, next ID = 9
-     *   
+     *
      * Example for number distance of 2:
      *   last ID = 7, next ID = 10
      *   last ID = 8, next ID = 10
      *   last ID = 10, next ID = 20
-     * 
+     *
      * @param base_id
      *            <em>project_id</em>_<em>type_id</em>
      */
@@ -163,7 +163,7 @@ public final class MCRObjectID {
 
     /**
      * Returns the next free MCRObjectID based on the given type string.
-     * If you use this method <code>MCR.SWF.Project.ID</code> or <code>MCR.SWF.Project.ID.$type></code> must be set.
+     * If you use this method <code>MCR.SWF.Project.ID</code> or <code>MCR.SWF.Project.ID.$type</code> must be set.
      * @see MCRObjectID#getNextFreeId(String)
      * @deprecated use {@link org.mycore.datamodel.metadata.MCRObjectID#getNextFreeId(java.lang.String, java.lang.String)} instead
      */
@@ -176,7 +176,7 @@ public final class MCRObjectID {
      * Returns a MCRObjectID from a given base ID string. Same as
      * {@link #getNextFreeId(String)} but the additional parameter acts as a
      * lower limit for integer part of the ID.
-     * 
+     *
      * @param base_id
      *            <em>project_id</em>_<em>type_id</em>
      * @param maxInWorkflow
@@ -213,7 +213,7 @@ public final class MCRObjectID {
 
     /**
      * Returns the last ID used or reserved for the given object base type.
-     * 
+     *
      * @return a valid MCRObjectID, or null when there is no ID for the given
      *         type
      */
@@ -228,7 +228,7 @@ public final class MCRObjectID {
 
     /**
      * This method instantiate this class with a given identifier in MyCoRe schema.
-     * 
+     *
      * @param id
      *          the MCRObjectID
      * @return an MCRObjectID class instance
@@ -241,7 +241,7 @@ public final class MCRObjectID {
     /**
      * This method get the string with <em>project_id</em>. If the ID is not
      * valid, an empty string was returned.
-     * 
+     *
      * @return the string of the project id
      */
     public final String getProjectId() {
@@ -251,7 +251,7 @@ public final class MCRObjectID {
     /**
      * This method gets the string with <em>type_id</em>. If the ID is not
      * valid, an empty string will be returned.
-     * 
+     *
      * @return the string of the type id
      */
     public final String getTypeId() {
@@ -261,7 +261,7 @@ public final class MCRObjectID {
     /**
      * This method gets the string with <em>number</em>. If the ID is not valid,
      * an empty string will be returned.
-     * 
+     *
      * @return the string of the number
      */
     public final String getNumberAsString() {
@@ -271,7 +271,7 @@ public final class MCRObjectID {
     /**
      * This method gets the integer with <em>number</em>. If the ID is not
      * valid, -1 will be returned.
-     * 
+     *
      * @return the number as integer
      */
     public final int getNumberAsInteger() {
@@ -282,7 +282,7 @@ public final class MCRObjectID {
      * This method gets the basic string with <em>project_id</em>_
      * <em>type_id</em>. If the Id is not valid, an empty string will be
      * returned.
-     * 
+     *
      * @return the string of the schema name
      */
     public String getBase() {
@@ -310,7 +310,7 @@ public final class MCRObjectID {
     /**
      * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
      * <em>number</em>, where number has leading zeros.
-     * 
+     *
      * @param baseID
      *            is <em>project_id</em>_<em>type_id</em>
      * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
@@ -324,7 +324,7 @@ public final class MCRObjectID {
      * Splits the submitted <code>id</code> in its parts.
      * <code>MyCoRe_document_00000001</code> would be transformed in { "MyCoRe",
      * "document", "00000001" }
-     * 
+     *
      * @param id
      *            either baseID or complete ID
      */
@@ -343,7 +343,7 @@ public final class MCRObjectID {
      * <li>The ID is not longer as MAX_LENGTH.
      * <li>The ID has only characters, they must not encoded.
      * </ul>
-     * 
+     *
      * @param id
      *            the MCRObjectID
      * @return the validation value, true if the MCRObjectID is correct,
@@ -392,7 +392,7 @@ public final class MCRObjectID {
     /**
      * This method check this data again the input and retuns the result as
      * boolean.
-     * 
+     *
      * @param in
      *            the MCRObjectID to check
      * @return true if all parts are equal, else return false
@@ -404,7 +404,7 @@ public final class MCRObjectID {
     /**
      * This method check this data again the input and retuns the result as
      * boolean.
-     * 
+     *
      * @param in
      *            the MCRObjectID to check
      * @return true if all parts are equal, else return false.
@@ -431,7 +431,7 @@ public final class MCRObjectID {
 
     /**
      * returns toString().hashCode()
-     * 
+     *
      * @see #toString()
      * @see java.lang.Object#hashCode()
      */
@@ -448,11 +448,11 @@ public final class MCRObjectID {
     }
 
     /**
-     * Check whether the type passed is a valid type in the current mycore environment. 
+     * Check whether the type passed is a valid type in the current mycore environment.
      * That being said property <code>MCR.Metadata.Type.&#60;type&#62;</code> must be set to <code>true</code> in mycore.properties.
-     * 
+     *
      * @param type the type to check
-     * @return true if valid, false otherwise 
+     * @return true if valid, false otherwise
      */
     public static boolean isValidType(String type) {
         return VALID_TYPE_LIST.contains(type);
