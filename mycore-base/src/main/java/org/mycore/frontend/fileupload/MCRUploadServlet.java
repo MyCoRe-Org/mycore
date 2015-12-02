@@ -351,13 +351,13 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                 session.commitTransaction();
 
                 for (Map.Entry<String, FileItem> entry : paths.entrySet()) {
-
-                    FileItem item = entry.getValue();
+                	
+                	FileItem item = entry.getValue();
                     String path = entry.getKey().trim();
-
+                    
                     InputStream in = item.getInputStream();
                     path = getFileName(path);
-
+                    
                     LOGGER.info("UploadServlet uploading " + path);
                     if (path.toLowerCase(Locale.ROOT).endsWith(".zip")) {
                         uploadZipFile(handler, in);
@@ -411,13 +411,17 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
      */
     private LinkedHashMap<String, FileItem> getFileItems(MCRRequestParameters params) {
         LinkedHashMap<String, FileItem> result = new LinkedHashMap<String, FileItem>();
-        Enumeration<String> parameterNames = params.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String path = parameterNames.nextElement().toString();
-            String prefix = "/upload/path/";
-            if (path.startsWith(prefix)) {
+        List<FileItem> fileList = params.getFileList();
+        String prefix = "/upload/path/";
+        for ( FileItem fileItem : fileList ) {
+        	String path = fileItem.getFieldName();
+        	if (path.startsWith(prefix)) {
                 String filename = path.substring(prefix.length());
-                result.put(filename, params.getFileItem(path));
+                result.put(filename, fileItem);
+            } else if (fileItem != null) {
+            	String filename = fileItem.getName();
+            	if (filename == "") continue;
+            	result.put(filename, fileItem);
             }
         }
         return result;
