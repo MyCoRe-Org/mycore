@@ -317,7 +317,7 @@ public class MCRPersistentServlet extends MCRServlet {
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         byte[] xml = new MCRJDOMContent(editorSubmission).asByteArray();
         MCRDerivate der = new MCRDerivate(xml, true);
-        String derivateID = der.getId().toString();
+        MCRObjectID derivateID = der.getId();
         if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
             throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
                 + derivateID + ".");
