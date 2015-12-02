@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -54,6 +55,8 @@ public class MCRRequestParameters {
     private Hashtable<String, String[]> parameters = new Hashtable<String, String[]>();
 
     private Hashtable<String, FileItem> files = new Hashtable<String, FileItem>();
+    
+    private ArrayList<FileItem> filelist = new ArrayList<FileItem>();
 
     private static int threshold;
 
@@ -110,6 +113,8 @@ public class MCRRequestParameters {
                     value = item.getName();
                 }
 
+                if (!item.isFormField()) filelist.add(item);
+                
                 if (value != null && value.trim().length() > 0 && !files.containsKey(name)) {
                     if (!item.isFormField()) {
                         files.put(name, item);
@@ -151,5 +156,9 @@ public class MCRRequestParameters {
 
     public FileItem getFileItem(String name) {
         return files.get(name);
+    }
+    
+    public List<FileItem> getFileList() {
+        return (List<FileItem>) filelist.clone();
     }
 }
