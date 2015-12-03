@@ -99,6 +99,7 @@ public class MCRFrontendUtil {
     }
 
     public static void configureSession(MCRSession session, HttpServletRequest request) {
+        session.setServletRequest(request);
         // language
         String lang = getProperty(request, "lang");
         if (lang != null && lang.trim().length() != 0) {

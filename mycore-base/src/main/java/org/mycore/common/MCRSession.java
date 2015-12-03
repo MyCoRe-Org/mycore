@@ -37,6 +37,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
 import org.hibernate.TransactionException;
@@ -99,6 +101,8 @@ public class MCRSession implements Cloneable {
     private boolean dataBaseAccess;
 
     private ThreadLocal<Transaction> transaction = new ThreadLocal<Transaction>();
+    
+    private ThreadLocal<HttpServletRequest> httpRequest = new ThreadLocal<>();
 
     private StackTraceElement[] constructingStackTrace;
 
@@ -339,6 +343,19 @@ public class MCRSession implements Cloneable {
     public long getLastAccessedTime() {
         return lastAccessTime;
     }
+    
+    public void setServletRequest(HttpServletRequest req){
+        httpRequest.set(req);
+    }
+    
+    /**
+     * Returns this thread current HttpServletRequest.
+     * Does not work in a Thread that does not handle the current request or in CLI.
+     * 2015.12 onwards will return an Optional
+     */
+    public HttpServletRequest getServletRequest(){
+        return httpRequest.get();
+    }
 
     /**
      * Activate this session. For internal use mainly by MCRSessionMgr.
@@ -372,6 +389,7 @@ public class MCRSession implements Cloneable {
         } else {
             LOGGER.debug("deactivate currentThreadCount: " + currentThreadCount.get().get());
         }
+        httpRequest.remove();
     }
 
     /**

@@ -91,7 +91,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
             lastUser = principal.getName();
             return lastUser;
         }
-
+        
         @Override
         public boolean isUserInRole(String role) {
             HttpServletRequest request = getCurrentRequest();
@@ -105,8 +105,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
 
         protected HttpServletRequest getCurrentRequest() {
             Logger.getLogger(getClass()).debug("Getting request from session: " + session.getID());
-            MCRServletJob job = (MCRServletJob) session.get(MCRServlet.MCR_SERVLET_JOB_KEY);
-            return job == null ? null : job.getRequest();
+            return session.getServletRequest();
         }
     }
 
