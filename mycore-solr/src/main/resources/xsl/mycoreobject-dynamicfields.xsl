@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="xalan xlink mods mcrxsl"
->
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
+  exclude-result-prefixes="xalan xlink mods mcrxsl">
 
   <xsl:import href="xslImport:solr-document:mycoreobject-dynamicfields.xsl" />
 
@@ -80,7 +80,8 @@
 
       <!-- dynamic class fields -->
       <xsl:for-each select="metadata/*[@class='MCRMetaClassification']/*">
-        <xsl:variable name="classTree" select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
+        <xsl:variable name="classTree"
+          select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
         <xsl:variable name="classid" select="@classid" />
         <xsl:variable name="notInherited" select="@inherited = '0'" />
 
@@ -89,14 +90,17 @@
           <xsl:value-of select="@categid" />
         </field>
 
-
-        <xsl:for-each select=" $ classTree ">
+        <xsl:for-each select=" $classTree ">
           <xsl:if test="position() = 1">
             <field name="{$classid}.root">
               <!-- categid as value -->
               <xsl:value-of select="@ID" />
             </field>
           </xsl:if>
+
+          <field name="{$classid}.id.in.position.{position()}">
+            <xsl:value-of select="@ID" />
+          </field>
 
           <!-- classid as fieldname -->
           <field name="{$classid}">
@@ -112,6 +116,7 @@
               <xsl:value-of select="@text" />
             </field>
           </xsl:for-each>
+
           <xsl:if test="$notInherited">
             <field name="{$classid}.top">
               <xsl:value-of select="@ID" />
