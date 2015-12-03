@@ -180,6 +180,7 @@ final public class MCRObject extends MCRBase {
         LOGGER.debug("MCRObject Label : " + mcr_label);
         LOGGER.debug("MCRObject Schema : " + mcr_schema);
         LOGGER.debug("");
+        mcr_struct.debug();
         mcr_metadata.debug();
     }
 
