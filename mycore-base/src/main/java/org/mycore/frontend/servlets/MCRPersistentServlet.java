@@ -61,6 +61,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
@@ -316,26 +317,25 @@ public class MCRPersistentServlet extends MCRServlet {
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         byte[] xml = MCRUtils.getByteArray(editorSubmission);
         MCRDerivate der = new MCRDerivate(xml, true);
-        String derivateID = der.getId().toString();
-        if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
+        // store dervate XML
+        MCRObjectID derivateID = der.getId();
+        if (!MCRAccessManager.checkPermission(derivateID.toString(), PERMISSION_WRITE)) {
             throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
                 + derivateID + ".");
         }
         MCRMetadataManager.updateMCRDerivateXML(der);
+        // store entry of derivate xlink:title in object
         objectID = der.getDerivate().getMetaLink().getXLinkHrefID();
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
-        List<MCRMetaLinkID> linkIDs = obj.getStructure().getDerivates();
-        for (MCRMetaLinkID linkID : linkIDs) {
-        	if (linkID.getXLinkHrefID().equals(derivateID)) {
-        		linkID.setXLinkTitle(der.getLabel());
-        		try {
-					MCRMetadataManager.update(obj);
-				} catch (MCRPersistenceException | MCRActiveLinkException e) {
-		            throw new MCRPersistenceException("Can't store label of derivate " + derivateID
-		                 + " in derivate list of object " + objectID + ".", e);
-				}
-        	}
-        }
+		MCRObjectStructure structure = obj.getStructure();
+        MCRMetaLinkID linkID = structure.getDerivateLink(derivateID);
+        linkID.setXLinkTitle(der.getLabel());
+		try {
+			MCRMetadataManager.update(obj);
+		} catch (MCRPersistenceException | MCRActiveLinkException e) {
+            throw new MCRPersistenceException("Can't store label of derivate " + derivateID
+                 + " in derivate list of object " + objectID + ".", e);
+		}
         return objectID;
     }
 

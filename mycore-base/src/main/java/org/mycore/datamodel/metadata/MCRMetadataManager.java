@@ -37,6 +37,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -717,10 +718,21 @@ public final class MCRMetadataManager {
         for (MCRMetaLinkID derID : mcrObject.getStructure().getDerivates()) {
             derOrder.add(derID.getXLinkHref());
         }
+        Hashtable<String, String> newlinkIDs = new Hashtable<String, String>();
+        for (MCRMetaLinkID newlinkID : mcrObject.getStructure().getDerivates()) {
+        	newlinkIDs.put(newlinkID.getXLinkHref(), newlinkID.getXLinkTitle());
+        }
         mcrObject.getStructure().clearDerivates();
 
         // set the derivate data in structure
-        mcrObject.getStructure().getDerivates().addAll(old.getStructure().getDerivates());
+        List <MCRMetaLinkID> linkIDs = mcrObject.getStructure().getDerivates();
+        List <MCRMetaLinkID> oldlinkIDs = old.getStructure().getDerivates();
+        for (MCRMetaLinkID oldlinkID : oldlinkIDs) {
+        	if (newlinkIDs.containsKey(oldlinkID.getXLinkHref())) {
+        		oldlinkID.setXLinkTitle(newlinkIDs.get(oldlinkID.getXLinkHref()));
+        	}
+        	linkIDs.add(oldlinkID);
+        }
 
         //set the new order of derivates
         for (int newPos = 0; newPos < derOrder.size(); newPos++) {
