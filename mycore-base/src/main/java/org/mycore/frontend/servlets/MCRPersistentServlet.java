@@ -322,20 +322,17 @@ public class MCRPersistentServlet extends MCRServlet {
             throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
                 + derivateID + ".");
         }
-        MCRMetadataManager.updateMCRDerivateXML(der);
+        // store entry of derivate xlink:title in object
         objectID = der.getDerivate().getMetaLink().getXLinkHrefID();
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
-        List<MCRMetaLinkID> linkIDs = obj.getStructure().getDerivates();
-        for (MCRMetaLinkID linkID : linkIDs) {
-            if (linkID.getXLinkHrefID().equals(derivateID)) {
-                linkID.setXLinkTitle(der.getLabel());
-                try {
-                    MCRMetadataManager.update(obj);
-                } catch (MCRPersistenceException | MCRActiveLinkException e) {
-                    throw new MCRPersistenceException("Can't store label of derivate " + derivateID
-                         + " in derivate list of object " + objectID + ".", e);
-                }
-            }
+        MCRObjectStructure structure = obj.getStructure();
+        MCRMetaLinkID linkID = structure.getDerivateLink(derivateID);
+        linkID.setXLinkTitle(der.getLabel());
+        try {
+            MCRMetadataManager.update(obj);
+        } catch (MCRPersistenceException | MCRActiveLinkException e) {
+            throw new MCRPersistenceException("Can't store label of derivate " + derivateID
+                 + " in derivate list of object " + objectID + ".", e);
         }
         return objectID;
     }
