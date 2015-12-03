@@ -54,6 +54,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.MCRWebsiteWriteProtection;

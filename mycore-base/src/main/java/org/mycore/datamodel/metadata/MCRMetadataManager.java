@@ -35,6 +35,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -686,7 +687,7 @@ public final class MCRMetadataManager {
         for (MCRMetaLinkID derID : mcrObject.getStructure().getDerivates()) {
             derOrder.add(derID.getXLinkHref());
         }
-        Hashtable<String, String> newlinkIDs = new Hashtable<String, String>();
+        HashMap<String, String> newlinkIDs = new HashMap<>();
         for (MCRMetaLinkID newlinkID : mcrObject.getStructure().getDerivates()) {
             newlinkIDs.put(newlinkID.getXLinkHref(), newlinkID.getXLinkTitle());
         }
