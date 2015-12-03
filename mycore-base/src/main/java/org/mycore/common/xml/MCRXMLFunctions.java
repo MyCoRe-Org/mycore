@@ -507,6 +507,34 @@ public class MCRXMLFunctions {
     }
 
     /**
+     * Returns a list of link targets of a given MCR object type. The structure
+     * is <em>link</em>. If no links are found an empty NodeList is returned.
+     * 
+     * @param mcrid
+     *            MCRObjectID as String as the link source
+     * @param destinationType
+     *            MCR object type
+     * @return a NodeList with <em>link</em> elements
+     */
+    public static NodeList getLinkDestinations(String mcrid, String destinationType) {
+        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
+        try {
+            Document document = documentBuilder.newDocument();
+            Element rootElement = document.createElement("linklist");
+            document.appendChild(rootElement);
+            MCRLinkTableManager ltm = MCRLinkTableManager.instance();
+            for (String id : ltm.getDestinationOf(mcrid, destinationType)) {
+                Element link = document.createElement("link");
+                link.setTextContent(id);
+                rootElement.appendChild(link);
+            }
+            return rootElement.getChildNodes();
+        } finally {
+            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
+        }
+    }
+
+    /**
      * Returns a list of link sources of a given MCR object type. The structure
      * is <em>link</em>. If no links are found an empty NodeList is returned.
      *
