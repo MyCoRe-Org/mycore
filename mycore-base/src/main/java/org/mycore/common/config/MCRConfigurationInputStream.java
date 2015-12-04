@@ -93,7 +93,6 @@ public class MCRConfigurationInputStream extends InputStream {
      * @since 2014.04
      */
     public static MCRConfigurationInputStream getMyCoRePropertiesInstance() throws IOException {
-        String filename = System.getProperty("MCR.Configuration.File", MYCORE_PROPERTIES);
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         InputStream initStream = null;
         if (configurationDirectory != null) {
@@ -103,7 +102,7 @@ public class MCRConfigurationInputStream extends InputStream {
                 initStream = getBaseDirInputStream(configurationDirectory);
             }
         }
-        return new MCRConfigurationInputStream(filename, initStream);
+        return new MCRConfigurationInputStream(MYCORE_PROPERTIES, initStream);
     }
 
     public boolean isEmpty() {

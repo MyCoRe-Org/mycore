@@ -2,34 +2,33 @@ package org.mycore.common.events.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.events.MCREventManager;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRSortBy;
 
 public class MCREventManagerTest extends MCRTestCase {
     static String defaultProperties;
 
-    @BeforeClass
-    public static void initTestProperties() {
-        defaultProperties = System.getProperty(MCR_CONFIGURATION_FILE);
-        System
-            .setProperty(MCR_CONFIGURATION_FILE, "props/" + MCREventManagerTest.class.getSimpleName() + ".properties");
-    }
-
-    @AfterClass
-    public static void resetTestProperties() {
-        if (defaultProperties == null) {
-            System.getProperties().remove(MCR_CONFIGURATION_FILE);
-        } else {
-            System.setProperty(MCR_CONFIGURATION_FILE, defaultProperties);
-        }
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.Store.BaseDir", "tmp");
+        testProperties.put("MCR.Metadata.Store.SVNBase", "/tmp/versions");
+        testProperties.put("MCR.EventHandler.MCRObject.1.Class", "org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
+        testProperties.put("MCR.EventHandler.MCRObject.4.Indexer", "lucene-metadata");
+        testProperties.put("MCR.EventHandler.MCRObject.4.Foo", "fooProp");
+        testProperties.put("MCR.EventHandler.MCRDerivate.2.Class", "org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
+        testProperties.put("MCR.Searcher.lucene-metadata.Class", "org.mycore.common.events.test.MCREventManagerTest$FakeLuceneSearcher");
+        testProperties.put("MCR.Searcher.lucene-metadata.Index", "metadata");
+        testProperties.put("MCR.Searcher.lucene-metadata.IndexDir", "%MCR.datadir%/lucene-index4metadata");
+        testProperties.put("MCR.Searcher.lucene-metadata.StoreQueryFields", "true");
+        return testProperties;
     }
 
     @Test

@@ -369,7 +369,7 @@ public class MCRConfiguration {
         return getPropertiesMap().entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(startsWith))
-            .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**

@@ -24,7 +24,6 @@ import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
 
 public class MCRTestCase {
-    protected static final String MCR_CONFIGURATION_FILE = "MCR.Configuration.File";
 
     File properties = null;
 
@@ -86,25 +85,11 @@ public class MCRTestCase {
             properties.delete();
             properties = null;
         }
-        if (oldProperties == null) {
-            System.getProperties().remove(MCR_CONFIGURATION_FILE);
-        } else {
-            System.setProperty(MCR_CONFIGURATION_FILE, oldProperties);
-        }
         MCRConfiguration.instance().initialize(Collections.<String, String> emptyMap(), true);
     }
 
     protected Map<String, String> getTestProperties() {
-        HashMap<String, String> props = new HashMap<>();
-        if (isDebugEnabled()) {
-            props.put("log4j.rootLogger", "DEBUG, stdout");
-        } else {
-            props.put("log4j.rootLogger", "INFO, stdout");
-        }
-        props.put("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender");
-        props.put("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout");
-        props.put("log4j.appender.stdout.layout.ConversionPattern", "%-5p %c{1} %m%n");
-        return props;
+        return new HashMap<>();
     }
 
     /**
@@ -117,31 +102,12 @@ public class MCRTestCase {
     protected void initProperties() throws IOException {
         String currentComponent = getCurrentComponentName();
         System.setProperty("MCRRuntimeComponentDetector.underTesting", currentComponent);
-        oldProperties = System.getProperties().getProperty(MCR_CONFIGURATION_FILE);
-        if (oldProperties == null && getClass().getClassLoader().getResource("mycore.properties") != null) {
-            return;
-        }
-        properties = getPropertiesFile();
-        if (System.getProperties().getProperty(MCR_CONFIGURATION_FILE) == null) {
-            System.getProperties().setProperty(MCR_CONFIGURATION_FILE, properties.getAbsolutePath());
-        }//if
-        else if (properties.getAbsoluteFile().equals(System.getProperties().getProperty(MCR_CONFIGURATION_FILE))) {
-            if (!properties.exists()) {
-                throw new FileNotFoundException("File does not exist: " + properties.getAbsolutePath());
-            }
-        }
     }
 
     private static String getCurrentComponentName() {
         String userDir = System.getProperty("user.dir");
         String currentComponent = Paths.get(userDir).getFileName().toString();
         return currentComponent;
-    }
-
-    private File getPropertiesFile() throws IOException {
-        File newFile = junitFolder.newFile("mycore.properties");
-        System.out.println("Create new file: " + newFile);
-        return newFile;
     }
 
     protected boolean isDebugEnabled() {
