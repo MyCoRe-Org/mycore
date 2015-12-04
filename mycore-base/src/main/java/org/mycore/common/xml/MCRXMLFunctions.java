@@ -713,17 +713,38 @@ public class MCRXMLFunctions {
         return parents.size() > 1;
     }
 
+    /**
+     * @param classificationId
+     * @param categoryId
+     * @return
+     */
     public static String getDisplayName(String classificationId, String categoryId) {
-        MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-        MCRCategory category = dao.getCategory(categID, 0);
+        MCRCategory category = null;
+        try {
+            MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+            category = dao.getCategory(categID, 0);
+        } catch (Exception e) {
+            LOGGER.warn("Could not determine display name for classification id " + classificationId + " and category id " + categoryId);
+        }
+
         return category.getCurrentLabel().map(MCRLabel::getText).orElse("");
     }
 
+    /**
+     * @param classificationId
+     * @param categoryId
+     * @return
+     */
     public static boolean isCategoryID(String classificationId, String categoryId) {
-        MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-        MCRCategory category = dao.getCategory(categID, 0);
+        MCRCategory category = null;
+        try {
+            MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+            category = dao.getCategory(categID, 0);
+        } catch (Exception e) {
+            LOGGER.warn("Could not determine state for classification id " + classificationId + " and category id " + categoryId);
+        }
 
         return category == null ? false : true;
     }
