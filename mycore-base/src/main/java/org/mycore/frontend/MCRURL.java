@@ -37,6 +37,9 @@ public class MCRURL {
     private Map<String, List<String>> buildParameterMap(URL url) {
         Map<String, List<String>> p = new HashMap<String, List<String>>();
         String queryString = url.getQuery();
+        if(queryString == null) {
+            return p;
+        }
         for (String pair : queryString.split("&")) {
             int eq = pair.indexOf("=");
             String key = eq >= 0 ? pair.substring(0, eq) : pair;
