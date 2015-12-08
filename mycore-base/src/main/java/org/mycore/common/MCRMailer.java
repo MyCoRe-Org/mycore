@@ -23,13 +23,16 @@
 
 package org.mycore.common;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -44,21 +47,36 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMSource;
+import org.mycore.common.MCRMailer.EMail.MessagePart;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class provides methods to send emails from within a MyCoRe application.
@@ -66,10 +84,13 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Marc Schluepmann
  * @author Frank L\u00FCtzenkirchen
  * @author Werner Greßhoff
+ * @author Ren\u00E9 Adler (eagle)
  * 
  * @version $Revision$ $Date$
  */
 public class MCRMailer extends MCRServlet {
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -229,50 +250,51 @@ public class MCRMailer extends MCRServlet {
      *   &lt;bcc&gt;frau.waas@lummerland.de&lt;/bcc&gt;
      *   &lt;subject&gt;Grüße aus der Stadt der Drachen&lt;/subject&gt;
      *   &lt;body&gt;Es ist recht bewölkt. Alles Gute, Jim.&lt;/body&gt;
+     *   &lt;body type="html"&gt;Es ist recht bewölkt. Alles Gute, Jim.&lt;/body&gt;
      *   &lt;part&gt;http://upload.wikimedia.org/wikipedia/de/f/f7/JimKnopf.jpg&lt;/part&gt;
      * &lt;/email&gt;
      * </pre>
      * @param email the email as JDOM element.
      */
     public static void send(Element email) {
-        String from = email.getChildTextTrim("from");
-
-        @SuppressWarnings("unchecked")
-        List<Element> rptList = email.getChildren("replyTo");
-        List<String> replyTo = new ArrayList<String>();
-
-        for (Element reply : rptList) {
-            replyTo.add(reply.getTextTrim());
+        try {
+            send(email, false);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
         }
+    }
 
-        @SuppressWarnings("unchecked")
-        List<Element> toList = email.getChildren("to");
-        List<String> to = new ArrayList<String>();
+    /**
+     * Send email from a given XML document. See the sample mail below:
+     * <pre>
+     * &lt;email&gt;
+     *   &lt;from&gt;bingo@bongo.com&lt;/from&gt;
+     *   &lt;to&gt;jim.knopf@lummerland.de&lt;/to&gt;
+     *   &lt;bcc&gt;frau.waas@lummerland.de&lt;/bcc&gt;
+     *   &lt;subject&gt;Grüße aus der Stadt der Drachen&lt;/subject&gt;
+     *   &lt;body&gt;Es ist recht bewölkt. Alles Gute, Jim.&lt;/body&gt;
+     *   &lt;body type="html"&gt;Es ist recht bewölkt. Alles Gute, Jim.&lt;/body&gt;
+     *   &lt;part&gt;http://upload.wikimedia.org/wikipedia/de/f/f7/JimKnopf.jpg&lt;/part&gt;
+     * &lt;/email&gt;
+     * </pre>
+     * @param email the email as JDOM element.
+     * @param allowException allow to throw exceptions if set to <code>true</code>
+     * @throws Exception 
+     */
+    public static void send(Element email, Boolean allowException) throws Exception {
+        EMail mail = EMail.parseXML(email);
 
-        for (Element toElement : toList) {
-            to.add(toElement.getTextTrim());
+        if (allowException) {
+            if (mail.to == null || mail.to.isEmpty()) {
+                StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
+                sb.append(mail.toString()).append('\n');
+                throw new MCRException(sb.toString());
+            }
+
+            trySending(mail);
+        } else {
+            send(mail);
         }
-
-        @SuppressWarnings("unchecked")
-        List<Element> bccList = email.getChildren("bcc");
-        List<String> bcc = new ArrayList<String>();
-
-        for (Element bccElement : bccList) {
-            bcc.add(bccElement.getTextTrim());
-        }
-
-        String subject = email.getChildTextTrim("subject");
-        String body = email.getChildTextTrim("body");
-
-        @SuppressWarnings("unchecked")
-        List<Element> partsList = email.getChildren("part");
-        List<String> parts = new ArrayList<String>();
-
-        for (Element partsElement : partsList) {
-            parts.add(partsElement.getTextTrim());
-        }
-
-        send(from, replyTo, to, bcc, subject, body, parts);
     }
 
     /**
@@ -300,16 +322,39 @@ public class MCRMailer extends MCRServlet {
      */
     public static void send(final String from, final List<String> replyTo, final List<String> to,
             final List<String> bcc, final String subject, final String body, final List<String> parts) {
-        if (to == null || to.size() == 0) {
+        EMail mail = new EMail();
+
+        mail.from = from;
+        mail.replyTo = replyTo;
+        mail.to = to;
+        mail.bcc = bcc;
+        mail.subject = subject;
+
+        mail.msgParts = new ArrayList<MessagePart>();
+        mail.msgParts.add(new MessagePart(body));
+
+        mail.parts = parts;
+
+        send(mail);
+    }
+
+    /**
+     * Sends email. When sending email fails (for example, outgoing mail server
+     * is not responding), sending will be retried after five minutes. This is
+     * done up to 10 times.
+     * 
+     * @param mail the email
+     */
+    public static void send(EMail mail) {
+        if (mail.to == null || mail.to.isEmpty()) {
             StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
-            sb.append("Subject: ").append(subject).append('\n');
-            sb.append("Body:\n").append(body).append('\n');
-            sb.append("Parts: ").append(parts).append('\n');
+            sb.append(mail.toString()).append('\n');
             throw new MCRException(sb.toString());
         }
+
         try {
             if (numTries > 0) {
-                trySending(from, replyTo, to, bcc, subject, body, parts);
+                trySending(mail);
             }
         } catch (Exception ex) {
             LOGGER.info("Sending e-mail failed: ", ex);
@@ -317,21 +362,23 @@ public class MCRMailer extends MCRServlet {
                 return;
             }
 
-            Thread t = new Thread(() -> {
-                for (int i = numTries - 1; i > 0; i--) {
-                    LOGGER.info("Retrying in 5 minutes...");
-                    try {
-                        Thread.sleep(300000);
-                    } // wait 5 minutes
-                    catch (InterruptedException ignored) {
-                    }
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    for (int i = numTries - 1; i > 0; i--) {
+                        LOGGER.info("Retrying in 5 minutes...");
+                        try {
+                            Thread.sleep(300000);
+                        } // wait 5 minutes
+                        catch (InterruptedException ignored) {
+                        }
 
-                    try {
-                        trySending(from, replyTo, to, bcc, subject, body, parts);
-                        LOGGER.info("Successfully resended e-mail.");
-                        break;
-                    } catch (Exception ex1) {
-                        LOGGER.info("Sending e-mail failed: ", ex1);
+                        try {
+                            trySending(mail);
+                            LOGGER.info("Successfully resended e-mail.");
+                            break;
+                        } catch (Exception ex) {
+                            LOGGER.info("Sending e-mail failed: ", ex);
+                        }
                     }
                 }
             });
@@ -339,90 +386,82 @@ public class MCRMailer extends MCRServlet {
         }
     }
 
-    private static void trySending(String from, List<String> replyTo, List<String> to, List<String> bcc,
-            String subject, String body, List<String> parts) throws Exception {
+    private static void trySending(EMail mail) throws Exception {
         MimeMessage msg = new MimeMessage(mailSession);
-        msg.setFrom(buildAddress(from));
+        msg.setFrom(EMail.buildAddress(mail.from));
 
-        if (replyTo != null) {
-            InternetAddress[] adrs = new InternetAddress[replyTo.size()];
+        Optional<List<InternetAddress>> toList = EMail.buildAddressList(mail.to);
+        if (toList.isPresent())
+            msg.addRecipients(Message.RecipientType.TO, toList.get().toArray(new InternetAddress[toList.get().size()]));
 
-            for (int i = 0; i < replyTo.size(); i++) {
-                adrs[i] = buildAddress(replyTo.get(i));
-            }
+        Optional<List<InternetAddress>> replyToList = EMail.buildAddressList(mail.replyTo);
+        if (replyToList.isPresent())
+            msg.setReplyTo((replyToList.get().toArray(new InternetAddress[replyToList.get().size()])));
 
-            msg.setReplyTo(adrs);
-        }
-
-        for (String aTo : to) {
-            msg.addRecipient(Message.RecipientType.TO, buildAddress(aTo));
-        }
-
-        if (bcc != null) {
-            for (String aBcc : bcc) {
-                msg.addRecipient(Message.RecipientType.BCC, buildAddress(aBcc));
-            }
-        }
+        Optional<List<InternetAddress>> bccList = EMail.buildAddressList(mail.bcc);
+        if (bccList.isPresent())
+            msg.addRecipients(Message.RecipientType.BCC,
+                    bccList.get().toArray(new InternetAddress[bccList.get().size()]));
 
         msg.setSentDate(new Date());
-        msg.setSubject(subject, encoding);
+        msg.setSubject(mail.subject, encoding);
 
-        if (parts == null || parts.size() == 0) {
-            msg.setText(body, encoding);
-        } else {
+        if (mail.parts != null && !mail.parts.isEmpty() || mail.msgParts != null && mail.msgParts.size() > 1) {
+            Multipart multipart = new MimeMultipart();
             // Create the message part
             MimeBodyPart messagePart = new MimeBodyPart();
 
-            // Fill the message
-            messagePart.setText(body, encoding);
+            if (mail.msgParts.size() > 1) {
+                multipart = new MimeMultipart("mixed");
+                MimeMultipart alternative = new MimeMultipart("alternative");
 
-            Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(messagePart);
-
-            for (String part : parts) {
-                messagePart = new MimeBodyPart();
-
-                URL url = new URL(part);
-                DataSource source = new URLDataSource(url);
-                messagePart.setDataHandler(new DataHandler(source));
-
-                String fileName = url.getPath();
-                if (fileName.contains("\\")) {
-                    fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
-                } else if (fileName.contains("/")) {
-                    fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+                for (MessagePart m : mail.msgParts) {
+                    messagePart = new MimeBodyPart();
+                    messagePart.setText(m.message, encoding, m.type.value());
+                    alternative.addBodyPart(messagePart);
                 }
-                messagePart.setFileName(fileName);
 
+                messagePart = new MimeBodyPart();
+                messagePart.setContent(alternative);
                 multipart.addBodyPart(messagePart);
+            } else {
+                Optional<MessagePart> plainMsg = mail.getTextMessage();
+                if (plainMsg.isPresent()) {
+                    messagePart.setText(plainMsg.get().message, encoding);
+                    multipart.addBodyPart(messagePart);
+                }
             }
 
-            // Put parts in message
+            if (mail.parts != null && !mail.parts.isEmpty()) {
+                for (String part : mail.parts) {
+                    messagePart = new MimeBodyPart();
+
+                    URL url = new URL(part);
+                    DataSource source = new URLDataSource(url);
+                    messagePart.setDataHandler(new DataHandler(source));
+
+                    String fileName = url.getPath();
+                    if (fileName.contains("\\")) {
+                        fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+                    } else if (fileName.contains("/")) {
+                        fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+                    }
+                    messagePart.setFileName(fileName);
+
+                    multipart.addBodyPart(messagePart);
+                }
+            }
+
             msg.setContent(multipart);
+        } else {
+            Optional<MessagePart> plainMsg = mail.getTextMessage();
+            if (plainMsg.isPresent()) {
+                msg.setText(plainMsg.get().message, encoding);
+            }
         }
 
-        LOGGER.info("Sending e-mail to " + to.get(0));
+        LOGGER.info("Sending e-mail to " + mail.to.get(0));
         Transport.send(msg);
-    }
-
-    /**
-     * Builds email address from a string. The string may be a single email
-     * address or a combination of a personal name and address, like "John Doe"
-     * <john@doe.com>
-     */
-    private static InternetAddress buildAddress(String s) throws Exception {
-        if (!s.endsWith(">")) {
-            return new InternetAddress(s.trim());
-        }
-
-        String name = s.substring(0, s.lastIndexOf("<")).trim();
-        String addr = s.substring(s.lastIndexOf("<") + 1, s.length() - 1).trim();
-
-        if (name.startsWith("\"") && name.endsWith("\"")) {
-            name = name.substring(1, name.length() - 1);
-        }
-
-        return new InternetAddress(addr, name);
     }
 
     /**
@@ -493,6 +532,248 @@ public class MCRMailer extends MCRServlet {
     private static void debug(Element xml) {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         LOGGER.debug(delimiter + xout.outputString(xml) + delimiter);
+    }
+
+    @XmlRootElement(name = "email")
+    public static class EMail {
+
+        private static final JAXBContext JAXB_CONTEXT = initContext();
+
+        @XmlElement
+        public String from;
+
+        @XmlElement
+        public List<String> replyTo;
+
+        @XmlElement
+        public List<String> to;
+
+        @XmlElement
+        public List<String> bcc;
+
+        @XmlElement
+        public String subject;
+
+        @XmlElement(name = "body")
+        public List<MessagePart> msgParts;
+
+        @XmlElement(name = "part")
+        public List<String> parts;
+
+        private static JAXBContext initContext() {
+            try {
+                return JAXBContext.newInstance(EMail.class.getPackage().getName(), EMail.class.getClassLoader());
+            } catch (final JAXBException e) {
+                throw new MCRException("Could not instantiate JAXBContext.", e);
+            }
+        }
+
+        /**
+         * Parse a email from given {@link Element}.
+         * 
+         * @param xml the email
+         * @return the {@link EMail} object
+         */
+        public static EMail parseXML(final Element xml) {
+            try {
+                final Unmarshaller unmarshaller = JAXB_CONTEXT.createUnmarshaller();
+                return (EMail) unmarshaller.unmarshal(new JDOMSource(xml));
+            } catch (final JAXBException e) {
+                throw new MCRException("Exception while transforming Element to EMail.", e);
+            }
+        }
+
+        /**
+         * Builds email address from a string. The string may be a single email
+         * address or a combination of a personal name and address, like "John Doe"
+         * &lt;john@doe.com&gt;
+         * 
+         * @param s the email address string
+         * @return a {@link InternetAddress}
+         * @throws Exception throws AddressException or UnsupportedEncodingException
+         */
+        private static InternetAddress buildAddress(String s) throws Exception {
+            if (!s.endsWith(">")) {
+                return new InternetAddress(s.trim());
+            }
+
+            String name = s.substring(0, s.lastIndexOf("<")).trim();
+            String addr = s.substring(s.lastIndexOf("<") + 1, s.length() - 1).trim();
+
+            if (name.startsWith("\"") && name.endsWith("\"")) {
+                name = name.substring(1, name.length() - 1);
+            }
+
+            return new InternetAddress(addr, name);
+        }
+
+        /**
+         * Builds a list of email addresses from a string list.
+         * 
+         * @param addresses the list with email addresses
+         * @return a list of {@link InternetAddress}s
+         * @see Mailer.EMail#buildAddress(String)
+         */
+        private static Optional<List<InternetAddress>> buildAddressList(final List<String> addresses) {
+            return addresses != null ? Optional.ofNullable(addresses.stream().map(address -> {
+                try {
+                    return buildAddress(address);
+                } catch (Exception ex) {
+                    return null;
+                }
+            }).collect(Collectors.toList())) : Optional.empty();
+        }
+
+        /**
+         * Returns the text message part.
+         * 
+         * @return the text message part
+         */
+        public Optional<MessagePart> getTextMessage() {
+            return msgParts != null ? Optional.ofNullable(msgParts).get().stream()
+                    .filter(m -> m.type.equals(MessageType.TEXT)).findFirst() : Optional.empty();
+        }
+
+        /**
+         * Returns the HTML message part.
+         * 
+         * @return the HTML message part
+         */
+        public Optional<MessagePart> getHTMLMessage() {
+            return msgParts != null ? Optional.ofNullable(msgParts).get().stream()
+                    .filter(m -> m.type.equals(MessageType.HTML)).findFirst() : Optional.empty();
+        }
+
+        /**
+         * Returns the {@link EMail} as XML.
+         * 
+         * @return the XML
+         */
+        public Document toXML() {
+            final MCRJAXBContent<EMail> content = new MCRJAXBContent<EMail>(JAXB_CONTEXT, this);
+            try {
+                final Document xml = content.asXML();
+                return xml;
+            } catch (final SAXParseException | JDOMException | IOException e) {
+                throw new MCRException("Exception while transforming EMail to JDOM document.", e);
+            }
+        }
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            final int maxLen = 10;
+            StringBuilder builder = new StringBuilder();
+            builder.append("EMail [");
+            if (from != null) {
+                builder.append("from=");
+                builder.append(from);
+                builder.append(", ");
+            }
+            if (replyTo != null) {
+                builder.append("replyTo=");
+                builder.append(replyTo.subList(0, Math.min(replyTo.size(), maxLen)));
+                builder.append(", ");
+            }
+            if (to != null) {
+                builder.append("to=");
+                builder.append(to.subList(0, Math.min(to.size(), maxLen)));
+                builder.append(", ");
+            }
+            if (bcc != null) {
+                builder.append("bcc=");
+                builder.append(bcc.subList(0, Math.min(bcc.size(), maxLen)));
+                builder.append(", ");
+            }
+            if (subject != null) {
+                builder.append("subject=");
+                builder.append(subject);
+                builder.append(", ");
+            }
+            if (msgParts != null) {
+                builder.append("msgParts=");
+                builder.append(msgParts.subList(0, Math.min(msgParts.size(), maxLen)));
+                builder.append(", ");
+            }
+            if (parts != null) {
+                builder.append("parts=");
+                builder.append(parts.subList(0, Math.min(parts.size(), maxLen)));
+            }
+            builder.append("]");
+            return builder.toString();
+        }
+
+        @XmlRootElement(name = "body")
+        public static class MessagePart {
+
+            @XmlAttribute
+            public MessageType type = MessageType.TEXT;
+
+            @XmlValue
+            public String message;
+
+            MessagePart() {
+            }
+
+            public MessagePart(final String message) {
+                this.message = message;
+            }
+
+            public MessagePart(final String message, final MessageType type) {
+                this.message = message;
+                this.type = type;
+            }
+
+            /* (non-Javadoc)
+             * @see java.lang.Object#toString()
+             */
+            @Override
+            public String toString() {
+                final int maxLen = 50;
+                StringBuilder builder = new StringBuilder();
+                builder.append("MessagePart [");
+                if (type != null) {
+                    builder.append("type=");
+                    builder.append(type);
+                    builder.append(", ");
+                }
+                if (message != null) {
+                    builder.append("message=");
+                    builder.append(message.substring(0, Math.min(message.length(), maxLen)));
+                }
+                builder.append("]");
+                return builder.toString();
+            }
+        }
+
+        @XmlType(name = "mcrmailer-messagetype")
+        @XmlEnum
+        public static enum MessageType {
+            @XmlEnumValue("text") TEXT("text"),
+
+            @XmlEnumValue("html") HTML("html");
+
+            private final String value;
+
+            MessageType(String v) {
+                value = v;
+            }
+
+            public String value() {
+                return value;
+            }
+
+            public static MessageType fromValue(String v) {
+                for (MessageType t : MessageType.values()) {
+                    if (t.value.equals(v)) {
+                        return t;
+                    }
+                }
+                throw new IllegalArgumentException(v);
+            }
+        }
     }
 
     private static class SMTPAuthenticator extends javax.mail.Authenticator {
