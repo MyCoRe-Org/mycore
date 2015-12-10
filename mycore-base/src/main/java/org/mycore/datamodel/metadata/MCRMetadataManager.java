@@ -687,9 +687,15 @@ public final class MCRMetadataManager {
         for (MCRMetaLinkID derID : mcrObject.getStructure().getDerivates()) {
             derOrder.add(derID.getXLinkHref());
         }
-        HashMap<String, String> newlinkIDs = new HashMap<>();
+        HashMap<String, String> newlinkTitles = new HashMap<String, String>();
+        HashMap<String, String> newlinkLabels = new HashMap<String, String>();
         for (MCRMetaLinkID newlinkID : mcrObject.getStructure().getDerivates()) {
-            newlinkIDs.put(newlinkID.getXLinkHref(), newlinkID.getXLinkTitle());
+            if(newlinkID.getXLinkTitle()!=null){
+                newlinkTitles.put(newlinkID.getXLinkHref(), newlinkID.getXLinkTitle());
+            }
+            if(newlinkID.getXLinkLabel()!=null){
+                newlinkLabels.put(newlinkID.getXLinkHref(), newlinkID.getXLinkLabel());
+            }
         }
         mcrObject.getStructure().clearDerivates();
 
@@ -697,8 +703,11 @@ public final class MCRMetadataManager {
         List <MCRMetaLinkID> linkIDs = mcrObject.getStructure().getDerivates();
         List <MCRMetaLinkID> oldlinkIDs = old.getStructure().getDerivates();
         for (MCRMetaLinkID oldlinkID : oldlinkIDs) {
-            if (newlinkIDs.containsKey(oldlinkID.getXLinkHref())) {
-                oldlinkID.setXLinkTitle(newlinkIDs.get(oldlinkID.getXLinkHref()));
+            if (newlinkTitles.containsKey(oldlinkID.getXLinkHref())) {
+                oldlinkID.setXLinkTitle(newlinkTitles.get(oldlinkID.getXLinkHref()));
+            }
+            if (newlinkLabels.containsKey(oldlinkID.getXLinkHref())) {
+                oldlinkID.setXLinkLabel(newlinkLabels.get(oldlinkID.getXLinkHref()));
             }
             linkIDs.add(oldlinkID);
         }
