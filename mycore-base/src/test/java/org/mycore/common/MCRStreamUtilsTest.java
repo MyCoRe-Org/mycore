@@ -37,7 +37,7 @@ public class MCRStreamUtilsTest {
             .flatten("F", ((Function<String, String[]>) children::get).andThen(Arrays::asList), true)
             .collect(Collectors.toList())
             .toArray(new String[nodes.length]);
-        assertEquals("Node cound differs", nodes.length, nodesPreOrder.length);
+        assertEquals("Node count differs", nodes.length, nodesPreOrder.length);
         for (int i = 0; i < nodes.length; i++) {
             assertEquals("unexpected node", nodes[i], nodesPreOrder[i]);
         }
