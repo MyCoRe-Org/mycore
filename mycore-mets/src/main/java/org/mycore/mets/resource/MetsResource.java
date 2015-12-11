@@ -21,13 +21,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -44,7 +44,6 @@ import org.mycore.mets.tools.MCRMetsLock;
 public class MetsResource {
 
     public static final String METS_XML_PATH = "/mets.xml";
-    private static final Logger LOGGER = Logger.getLogger(MetsResource.class);
 
     @GET
     @Path("/editor/start/{derivateId}")
@@ -60,6 +59,12 @@ public class MetsResource {
             StringWriter writer = new StringWriter();
             IOUtils.copy(resourceAsStream, writer, Charset.forName("UTF-8"));
             String htmlTemplate = writer.toString();
+            // add additional javascript code
+            String js = MCRConfiguration.instance().getString("MCR.Mets.Editor.additional.javascript", null);
+            if(js != null && !js.isEmpty()) {
+                htmlTemplate = htmlTemplate.replace("<link rel=\"additionalJS\" />", js);
+            }
+            // replace variables
             htmlTemplate = htmlTemplate.replaceAll("\\{baseURL\\}", MCRFrontendUtil.getBaseURL())
                     .replaceAll("\\{derivateID\\}", derivateId);
             return htmlTemplate;
