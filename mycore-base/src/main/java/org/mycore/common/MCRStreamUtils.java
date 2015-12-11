@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public class MCRStreamUtils {
 
     /**
-     * Short circuit for calling <code>flatten(node, subNodeSupplier, parallel, t -> true)</code>
+     * Short circuit for calling <code>flatten(node, subNodeSupplier, parallel, t -&gt; true)</code>
      * @param node node that holds kind-of subtree.
      * @param subNodeSupplier a function that delivers subtree items of next level
      * @param parallel if the returned Stream should be parallel
