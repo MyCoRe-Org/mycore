@@ -52,6 +52,8 @@ public class MCRStoredMetadata {
 
     private String docType;
 
+    private boolean deleted;
+
     /**
      * Creates a new stored metadata object
      * 
@@ -69,6 +71,7 @@ public class MCRStoredMetadata {
         this.id = id;
         this.fo = fo;
         this.docType = docType;
+        this.deleted = false;
     }
 
     /**
@@ -177,8 +180,9 @@ public class MCRStoredMetadata {
      * 
      */
     public void delete() throws IOException {
-        if (!isDeleted()) {
+        if (!deleted) {
             store.delete(fo);
+            deleted = true;
         }
     }
 
@@ -186,6 +190,6 @@ public class MCRStoredMetadata {
      * Returns true if this object is deleted
      */
     public boolean isDeleted() throws IOException {
-        return !fo.exists();
+        return deleted;
     }
 }
