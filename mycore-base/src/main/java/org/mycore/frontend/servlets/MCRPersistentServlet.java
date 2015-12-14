@@ -23,12 +23,19 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -66,11 +73,6 @@ import org.mycore.frontend.support.MCRObjectIDLockTable;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -378,6 +380,18 @@ public class MCRPersistentServlet extends MCRServlet {
                 errorLog.add(MCRXMLParserErrorHandler.getSAXErrorMessage((SAXParseException) ex));
                 errorHandlerValid(job, errorLog);
                 return;
+            }
+            if (ex instanceof MCRActiveLinkException) {
+                String msg = ((MCRActiveLinkException) ex)
+                    .getActiveLinks()
+                    .values()
+                    .iterator()
+                    .next()
+                    .stream()
+                    .collect(Collectors.joining(String.format(Locale.ROOT, "%n  - "),
+                        String.format(Locale.ROOT, "%s%n  - ", ex.getMessage()),
+                        String.format(Locale.ROOT, "%nPlease remove links before trying again.")));
+                throw new ServletException(msg, ex);
             }
             throw ex;
         }

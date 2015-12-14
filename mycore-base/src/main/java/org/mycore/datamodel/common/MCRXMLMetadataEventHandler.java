@@ -23,6 +23,9 @@
 
 package org.mycore.datamodel.common;
 
+import java.io.IOException;
+
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -139,15 +142,19 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
     }
 
     private void handleStoreEvent(MCREvent evt, MCRBase obj) {
-        MCRBaseContent content = new MCRBaseContent(obj);
-        if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
-            metaDataManager.update(obj.getId(), content, obj.getService().getDate("modifydate"));
-        } else if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
-            metaDataManager.create(obj.getId(), content, obj.getService().getDate("modifydate"));
-        } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
-            metaDataManager.delete(obj.getId());
+        try {
+            MCRBaseContent content = new MCRBaseContent(obj);
+            if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
+                metaDataManager.update(obj.getId(), content, obj.getService().getDate("modifydate"));
+            } else if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
+                metaDataManager.create(obj.getId(), content, obj.getService().getDate("modifydate"));
+            } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
+                metaDataManager.delete(obj.getId());
+            }
+            evt.put("content", content);
+        } catch (IOException e) {
+            throw new MCRPersistenceException("Error while handling event.", e);
         }
-        evt.put("content", content);
     }
 
 }

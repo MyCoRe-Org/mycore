@@ -136,15 +136,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "delete object {0}", help = "Removes a MCRObject with the MCRObjectID {0}", order = 40)
     public static void delete(String ID) throws MCRActiveLinkException {
         MCRObjectID mcrId = MCRObjectID.getInstance(ID);
-
-        try {
-            MCRMetadataManager.deleteMCRObject(mcrId);
-            LOGGER.info(mcrId + " deleted.");
-        } catch (MCRException ex) {
-            LOGGER.error("Can't delete " + mcrId + ".", ex);
-        } catch (MCRActiveLinkException ex) {
-            LOGGER.error("Can't delete " + mcrId + " cause the object is referenced by other.");
-        }
+        MCRMetadataManager.deleteMCRObject(mcrId);
+        LOGGER.info(mcrId + " deleted.");
     }
 
     /**
@@ -154,11 +147,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the start ID for deleting the MCRObjects
      * @param IDto
      *            the stop ID for deleting the MCRObjects
+     * @return 
      */
     @MCRCommand(
         syntax = "delete object from {0} to {1}",
         help = "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.", order = 30)
-    public static void deleteFromTo(String IDfrom, String IDto) throws MCRActiveLinkException {
+    public static List<String> deleteFromTo(String IDfrom, String IDto) throws MCRActiveLinkException {
         int from_i = 0;
         int to_i = 0;
 
@@ -170,18 +164,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (from_i > to_i) {
             throw new MCRException("The from-to-interval is false.");
         }
+        List<String> cmds = new ArrayList<String>(to_i - from_i);
 
         for (int i = from_i; i < to_i + 1; i++) {
             String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
             if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
-                try {
-                    delete(id);
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage());
-                    LOGGER.debug(e.getStackTrace());
-                }
+                cmds.add("delete object " + id);
             }
         }
+        return cmds;
     }
 
     /**
@@ -914,7 +905,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "check derivate entries in objects for base {0}",
         help = "check in all objects with MCR base ID {0} for existing linked derivates", order = 400)
-    public static void checkDerivatesInObjects(String base_id) {
+    public static void checkDerivatesInObjects(String base_id) throws IOException {
         if (base_id == null || base_id.length() == 0) {
             LOGGER.error("Base ID missed for check derivate entries in objects for base {0}");
             return;

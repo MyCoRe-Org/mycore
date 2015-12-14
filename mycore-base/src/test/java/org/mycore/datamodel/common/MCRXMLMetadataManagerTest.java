@@ -80,23 +80,27 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void create() {
+    public void create() throws IOException {
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);
         getStore().create(MCR_document_00000001.id, MCR_document_00000001.blob, MCR_document_00000001.lastModified);
     }
 
     @Test
-    public void delete() {
+    public void delete() throws IOException {
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);
-        getStore().delete(MCR_document_00000001.id);
+        try {
+            getStore().delete(MCR_document_00000001.id);
+        } catch (IOException e) {
+            //is expected as MCR_document_00000001 does not exist 
+        }
         assertTrue(MyCoRe_document_00000001.id + " should not have been deleted",
             getStore().exists(MyCoRe_document_00000001.id));
     }
 
     @Test
-    public void update() {
+    public void update() throws IOException {
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);
         getStore().update(MyCoRe_document_00000001_new.id, MyCoRe_document_00000001_new.blob,
@@ -142,7 +146,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void exists() {
+    public void exists() throws IOException {
         assertFalse("Object " + MyCoRe_document_00000001.id + " should not exist.",
             getStore().exists(MyCoRe_document_00000001.id));
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
@@ -152,7 +156,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void retrieveAllIDs() {
+    public void retrieveAllIDs() throws IOException {
         assertEquals("Store should not contain any objects.", 0, getStore().listIDs().size());
         getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);

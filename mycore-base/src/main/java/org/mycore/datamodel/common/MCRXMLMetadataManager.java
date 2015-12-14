@@ -372,16 +372,8 @@ public class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @return the stored metadata as IFS2 object
      */
-    public MCRStoredMetadata create(MCRObjectID mcrid, Document xml, Date lastModified) {
-        try {
-            return create(mcrid, new MCRJDOMContent(xml), lastModified);
-        } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
-            }
-            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.toString();
-            throw new MCRPersistenceException(msg, ex);
-        }
+    public MCRStoredMetadata create(MCRObjectID mcrid, Document xml, Date lastModified) throws IOException {
+        return create(mcrid, new MCRJDOMContent(xml), lastModified);
     }
 
     /**
@@ -392,16 +384,8 @@ public class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @return the stored metadata as IFS2 object
      */
-    public MCRStoredMetadata create(MCRObjectID mcrid, byte[] xml, Date lastModified) {
-        try {
-            return create(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
-        } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
-            }
-            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.toString();
-            throw new MCRPersistenceException(msg, ex);
-        }
+    public MCRStoredMetadata create(MCRObjectID mcrid, byte[] xml, Date lastModified) throws IOException {
+        return create(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
     }
 
     /**
@@ -412,37 +396,24 @@ public class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @return the stored metadata as IFS2 object
      */
-    public MCRStoredMetadata create(MCRObjectID mcrid, MCRContent xml, Date lastModified) {
+    public MCRStoredMetadata create(MCRObjectID mcrid, MCRContent xml, Date lastModified) throws IOException {
+        MCRStoredMetadata sm;
         try {
-            MCRStoredMetadata sm = getStore(mcrid).create(xml, mcrid.getNumberAsInteger());
-            sm.setLastModified(lastModified);
-            MCRConfiguration.instance().systemModified();
-            return sm;
-        } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
-            }
-            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.toString();
-            throw new MCRPersistenceException(msg, ex);
+            sm = getStore(mcrid).create(xml, mcrid.getNumberAsInteger());
+        } catch (JDOMException e) {
+            throw new MCRPersistenceException("Error while storing object: " + mcrid, e);
         }
+        sm.setLastModified(lastModified);
+        MCRConfiguration.instance().systemModified();
+        return sm;
     }
 
-    public void delete(String mcrid) {
+    public void delete(String mcrid) throws IOException {
         delete(MCRObjectID.getInstance(mcrid));
     }
 
-    public void delete(MCRObjectID mcrid) {
-        try {
-            if (exists(mcrid)) {
-                getStore(mcrid).delete(mcrid.getNumberAsInteger());
-            }
-        } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
-            }
-            String msg = "Exception while deleting XML metadata of mcrobject " + mcrid.toString();
-            throw new MCRPersistenceException(msg, ex);
-        }
+    public void delete(MCRObjectID mcrid) throws IOException {
+        getStore(mcrid).delete(mcrid.getNumberAsInteger());
         MCRConfiguration.instance().systemModified();
     }
 
@@ -453,17 +424,10 @@ public class MCRXMLMetadataManager {
      * @param xml the xml metadata of the MCRObject
      * @param lastModified the date of last modification to set
      * @return the stored metadata as IFS2 object
+     * @throws IOException 
      */
-    public MCRStoredMetadata update(MCRObjectID mcrid, Document xml, Date lastModified) {
-        try {
-            return update(mcrid, new MCRJDOMContent(xml), lastModified);
-        } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
-            }
-            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.toString();
-            throw new MCRPersistenceException(msg, ex);
-        }
+    public MCRStoredMetadata update(MCRObjectID mcrid, Document xml, Date lastModified) throws IOException {
+        return update(mcrid, new MCRJDOMContent(xml), lastModified);
     }
 
     /**
@@ -473,8 +437,9 @@ public class MCRXMLMetadataManager {
      * @param xml the xml metadata of the MCRObject
      * @param lastModified the date of last modification to set
      * @return the stored metadata as IFS2 object
+     * @throws IOException 
      */
-    public MCRStoredMetadata createOrUpdate(MCRObjectID mcrid, Document xml, Date lastModified) {
+    public MCRStoredMetadata createOrUpdate(MCRObjectID mcrid, Document xml, Date lastModified) throws IOException {
         if (exists(mcrid)) {
             return update(mcrid, xml, lastModified);
         } else {
@@ -490,16 +455,8 @@ public class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @return the stored metadata as IFS2 object
      */
-    public MCRStoredMetadata update(MCRObjectID mcrid, byte[] xml, Date lastModified) {
-        try {
-            return update(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
-        } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
-            }
-            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.toString();
-            throw new MCRPersistenceException(msg, ex);
-        }
+    public MCRStoredMetadata update(MCRObjectID mcrid, byte[] xml, Date lastModified) throws IOException {
+        return update(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
     }
 
     /**
@@ -510,25 +467,21 @@ public class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @return the stored metadata as IFS2 object
      */
-    public MCRStoredMetadata update(MCRObjectID mcrid, MCRContent xml, Date lastModified) {
+    public MCRStoredMetadata update(MCRObjectID mcrid, MCRContent xml, Date lastModified) throws IOException {
         if (!exists(mcrid)) {
             String msg = "Object to update does not exist: " + mcrid;
             throw new MCRPersistenceException(msg);
         }
 
+        MCRStoredMetadata sm = getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
         try {
-            MCRStoredMetadata sm = getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
             sm.update(xml);
-            sm.setLastModified(lastModified);
-            MCRConfiguration.instance().systemModified();
-            return sm;
-        } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
-            }
-            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.toString();
-            throw new MCRPersistenceException(msg, ex);
+        } catch (JDOMException e) {
+            throw new MCRPersistenceException("Error while updating object: " + mcrid, e);
         }
+        sm.setLastModified(lastModified);
+        MCRConfiguration.instance().systemModified();
+        return sm;
     }
 
     /**
@@ -639,16 +592,8 @@ public class MCRXMLMetadataManager {
      *
      * @param mcrid the MCRObjectID
      */
-    private MCRStoredMetadata retrieveStoredMetadata(MCRObjectID mcrid) {
-        try {
-            return getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
-        } catch (Exception ex) {
-            if (ex instanceof RuntimeException) {
-                throw (RuntimeException) ex;
-            }
-            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.toString();
-            throw new MCRPersistenceException(msg, ex);
-        }
+    private MCRStoredMetadata retrieveStoredMetadata(MCRObjectID mcrid) throws IOException {
+        return getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
     }
 
     /**
@@ -670,16 +615,8 @@ public class MCRXMLMetadataManager {
     /**
      * Checks if an object with the given MCRObjectID exists in the store.
      */
-    public boolean exists(MCRObjectID mcrid) {
-        try {
-            return getStore(mcrid).exists(mcrid.getNumberAsInteger());
-        } catch (Exception ex) {
-            if (ex instanceof MCRException) {
-                throw (MCRException) ex;
-            }
-            String msg = "Exception while checking existence of mcrobject " + mcrid.toString();
-            throw new MCRPersistenceException(msg, ex);
-        }
+    public boolean exists(MCRObjectID mcrid) throws IOException {
+        return getStore(mcrid).exists(mcrid.getNumberAsInteger());
     }
 
     /**

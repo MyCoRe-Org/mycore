@@ -34,7 +34,6 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -223,7 +222,7 @@ final public class MCRObject extends MCRBase {
                 }
                 if (inf instanceof MCRMetaLinkID) {
                     MCRObjectID destination = ((MCRMetaLinkID) inf).getXLinkHrefID();
-                    if (!MCRXMLMetadataManager.instance().exists(destination)) {
+                    if (MCRMetadataManager.exists(destination)) {
                         continue;
                     }
                     MCRActiveLinkException activeLink = new MCRActiveLinkException(

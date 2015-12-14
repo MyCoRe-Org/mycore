@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -750,7 +749,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the base part of a MCRObjectID e.g. DocPortal_derivate
      */
     @MCRCommand(syntax = "check object entries in derivates for base {0}", help = "check in all derivates of MCR base ID {0} for existing linked objects", order = 400)
-    public static void checkObjectsInDerivates(String base_id) {
+    public static void checkObjectsInDerivates(String base_id) throws IOException {
         if (base_id == null || base_id.length() == 0) {
             LOGGER.error("Base ID missed for check object entries in derivates for base {0}");
             return;
