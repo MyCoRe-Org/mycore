@@ -265,7 +265,10 @@ public class MCRXMLFunctions {
             if (g_calendar.get(GregorianCalendar.ERA) == GregorianCalendar.BC)
                 formatted_date = "-" + formatted_date;
         } catch (Exception e) {
-            e.printStackTrace();
+            if (LOGGER.isDebugEnabled()) {
+                e.printStackTrace();
+            }
+            LOGGER.warn("Error while converting date string :" + date_value + " - " + use_last_value + " - " + calendar_name);
             return "";
         }
         return formatted_date;
