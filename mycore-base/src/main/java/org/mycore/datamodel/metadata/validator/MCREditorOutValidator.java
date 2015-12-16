@@ -37,7 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -58,14 +59,12 @@ import org.mycore.datamodel.metadata.MCRMetaBoolean;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaHistoryDate;
-import org.mycore.datamodel.metadata.MCRMetaISBN;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaInstitutionName;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLink;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
-import org.mycore.datamodel.metadata.MCRMetaNBN;
 import org.mycore.datamodel.metadata.MCRMetaNumber;
 import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -78,7 +77,7 @@ import org.xml.sax.SAXParseException;
  */
 public class MCREditorOutValidator {
 
-    private static Logger LOGGER = Logger.getLogger(MCREditorOutValidator.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     private static Map<String, MCREditorMetadataValidator> VALIDATOR_MAP = getValidatorMap();
 
@@ -168,10 +167,9 @@ public class MCREditorOutValidator {
             getObjectCheckWithLangNotEmptyInstance(MCRMetaISO8601Date.class));
         map.put(MCRMetaLangText.class.getSimpleName(), getObjectCheckWithLangNotEmptyInstance(MCRMetaLangText.class));
         map.put(MCRMetaAccessRule.class.getSimpleName(), getObjectCheckInstance(MCRMetaAccessRule.class));
-        map.put(MCRMetaNBN.class.getSimpleName(), getObjectCheckInstance(MCRMetaNBN.class));
-        map.put(MCRMetaISBN.class.getSimpleName(), getObjectCheckInstance(MCRMetaISBN.class));
         map.put(MCRMetaClassification.class.getSimpleName(), new MCRMetaClassificationCheck());
         map.put(MCRMetaHistoryDate.class.getSimpleName(), new MCRMetaHistoryDateCheck());
+        addDeprecatedMetaValidators(map);
         Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX + "class.");
         for (Entry<String, String> entry : props.entrySet()) {
             try {
@@ -190,6 +188,18 @@ public class MCREditorOutValidator {
             }
         }
         return map;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void addDeprecatedMetaValidators(Map<String, MCREditorMetadataValidator> map) {
+        try {
+            map.put("MCRMetaNBN", getObjectCheckInstance((Class<? extends MCRMetaInterface>) Class.forName("org.mycore.datamodel.metadata.MCRMetaNBN")));
+            map.put("MCRMetaISBN", getObjectCheckInstance((Class<? extends MCRMetaInterface>) Class.forName("org.mycore.datamodel.metadata.MCRMetaISBN")));
+        } catch (ClassNotFoundException e) {
+            LOGGER.error(
+                "MCRMetaNBN and MCRMetaISBN were marked deprecated. Could not found those classes anymore. Please remove this code.",
+                e);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -373,7 +383,6 @@ public class MCREditorOutValidator {
      */
     private boolean checkMetaTags(Element datatag) {
         String mcrclass = datatag.getAttributeValue("class");
-        @SuppressWarnings("unchecked")
         List<Element> datataglist = datatag.getChildren();
         Iterator<Element> datatagIt = datataglist.iterator();
 
@@ -409,7 +418,6 @@ public class MCREditorOutValidator {
      * @throws IOException 
      * @throws JDOMException 
      */
-    @SuppressWarnings("unchecked")
     private void checkObjectService(Element root, Element service) throws JDOMException, IOException {
         if (service == null) {
             service = new org.jdom2.Element("service");
@@ -505,7 +513,6 @@ public class MCREditorOutValidator {
     /**
      * @param metadata
      */
-    @SuppressWarnings("unchecked")
     private void checkObjectMetadata(Element metadata) {
         if (metadata.getAttribute("lang") != null) {
             metadata.getAttribute("lang").setNamespace(XML_NAMESPACE);
