@@ -63,7 +63,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
         href += (href.contains("?") ? "&" : "?") + PARAM_SUBSELECT_SESSION + "=" + session.getCombinedSessionStepID();
 
         LOGGER.info("Redirecting to subselect " + href);
-        job.getResponse().sendRedirect(href);
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(href));
     }
 
     public static String encode(String href) {

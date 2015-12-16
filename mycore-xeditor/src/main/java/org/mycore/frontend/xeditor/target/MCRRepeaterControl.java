@@ -39,7 +39,7 @@ public abstract class MCRRepeaterControl implements MCREditorTarget {
         String param = buttonName.substring(0, posOfAnchor);
         String anchor = buttonName.substring(posOfAnchor + 1);
         handleRepeaterControl(context, job, session, param);
-        job.getResponse().sendRedirect(session.getRedirectURL(anchor));
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(session.getRedirectURL(anchor)));
     }
 
     protected abstract void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String param)

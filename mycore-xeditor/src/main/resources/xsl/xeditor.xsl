@@ -14,6 +14,7 @@
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
+  <xsl:param name="HttpSession" />
 
   <xsl:variable name="transformer" select="transformer:getTransformer($XEditorTransformerKey)" />
   <xsl:variable name="includer" select="includer:new()" />
@@ -25,7 +26,7 @@
     <form>
       <xsl:apply-templates select="@*" mode="xeditor" />
       <xsl:attribute name="action">
-        <xsl:value-of select="concat($ServletsBaseURL,'XEditor')" />
+        <xsl:value-of select="concat($ServletsBaseURL,'XEditor',$HttpSession)" />
       </xsl:attribute>
       
       <!-- method="post" is default, may be overwritten by xed:form/@method -->

@@ -59,6 +59,6 @@ public class MCRCancelTarget implements MCREditorTarget {
             cancelURL = pageURL.substring(0, pageURL.lastIndexOf('/') + 1) + cancelURL;
         }
 
-        job.getResponse().sendRedirect(cancelURL);
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(cancelURL));
     }
 }
