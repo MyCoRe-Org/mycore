@@ -43,41 +43,52 @@ import com.ibm.icu.util.JapaneseCalendar;
 
 /**
  * This class implements all methods for handling calendars in MyCoRe objects
- * and data models. It use the GPL licensed ICU library of IBM.
+ * and data models. It is licensed by <a href="http://source.icu-project.org/repos/icu/icu/trunk/license.html>ICU License</a>.
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Junge
  * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
- * @see <a href="http://icu.sourceforge.net/">http://icu.sourceforge.net/</a>
+ * @see <a href="http://site.icu-project.org/home">http://site.icu-project.org/home</a>
  */
 public class MCRCalendar {
 
     /** Logger */
     static Logger LOGGER = Logger.getLogger(MCRCalendar.class.getName());
 
-    /** Tag for calendars */
+    /** Tag for Buddhistic calendar */
     public static final String TAG_BUDDHIST = "buddhist";
 
+    /** Tag for Chinese calendar */
     public static final String TAG_CHINESE = "chinese";
 
+    /** Tag for Coptic calendar */
     public static final String TAG_COPTIC = "coptic";
 
+    /** Tag for Ethiopic calendar */
     public static final String TAG_ETHIOPIC = "ethiopic";
 
+    /** Tag for Gregorian calendar */
     public static final String TAG_GREGORIAN = "gregorian";
 
+    /** Tag for Hebrew calendar */
     public static final String TAG_HEBREW = "hebrew";
 
+    /** Tag for Islamic calendar */
     public static final String TAG_ISLAMIC = "islamic";
 
+    /** Tag for Japanese calendar */
     public static final String TAG_JAPANESE = "japanese";
 
+    /** Tag for Julian calendar */
     public static final String TAG_JULIAN = "julian";
 
+    /** Tag for Persic calendar */
     public static final String TAG_PERSIC = "persic";
 
+    /** Tag for Armenian calendar */
     public static final String TAG_ARMENIAN = "armenian";
 
+    /** Tag for Egyptian calendar */
     public static final String TAG_EGYPTIAN = "egyptian";
 
     /** Minimum Julian Day number is 0 = 01.01.4713 BC */
@@ -86,18 +97,18 @@ public class MCRCalendar {
     /** Maximum Julian Day number is 3182057 = 28.01.4000 */
     public static final int MAX_JULIAN_DAY_NUMBER = 3182057;
 
-    /** all available calendars of ICU */
+    /** all available calendars of ICU as String area */
     public static final String CALENDARS_ICU[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN,
             TAG_HEBREW, TAG_ISLAMIC, TAG_JAPANESE };
 
-    /** convert following calendars from input to calendar */
+    /** a list of calendar tags they are supported in this class */
     public static final List<String> CALENDARS_LIST = Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(TAG_GREGORIAN,
             TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC, TAG_JAPANESE, TAG_ARMENIAN,
             TAG_EGYPTIAN)));
 
     /**
      * This method check a ancient date string for the given calendar. For
-     * syntax of the string see javadocs of calendar methods.
+     * syntax of the date string see javadocs of calendar methods.
      * 
      * @param date_string
      *            the date as string.
@@ -356,7 +367,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static GregorianCalendar getCalendarFromGregorianDate(String date_string, boolean last) throws MCRException {
+    protected static GregorianCalendar getCalendarFromGregorianDate(String date_string, boolean last) throws MCRException {
         try {
             int fields[] = checkDateStringForJulianCalendar(date_string, last);
             GregorianCalendar calendar = new GregorianCalendar();
@@ -398,7 +409,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static Calendar getCalendarFromJulianDate(String date_string, boolean last) throws MCRException {
+    protected static Calendar getCalendarFromJulianDate(String date_string, boolean last) throws MCRException {
         try {
             int fields[] = checkDateStringForJulianCalendar(date_string, last);
             Calendar calendar = new GregorianCalendar();
@@ -468,7 +479,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static IslamicCalendar getCalendarFromIslamicDate(String date_string, boolean last) {
+    protected static IslamicCalendar getCalendarFromIslamicDate(String date_string, boolean last) {
         try {
             date_string = date_string.toUpperCase(Locale.ROOT);
             int start = 0;
@@ -584,7 +595,7 @@ public class MCRCalendar {
      *                MCRException if parsing has an error
      */
 
-    private static HebrewCalendar getCalendarFromHebrewDate(String datestr, boolean last) {
+    protected static HebrewCalendar getCalendarFromHebrewDate(String datestr, boolean last) {
         try {
             int start = 0;
             datestr = datestr.trim();
@@ -786,7 +797,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static CopticCalendar getCalendarFromCopticDate(String date_string, boolean last) {
+    protected static CopticCalendar getCalendarFromCopticDate(String date_string, boolean last) {
         try {
             int fields[] = checkDateStringForCopticCalendar(date_string, last);
             CopticCalendar calendar = new CopticCalendar();
@@ -816,7 +827,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static EthiopicCalendar getCalendarFromEthiopicDate(String date_string, boolean last) {
+    protected static EthiopicCalendar getCalendarFromEthiopicDate(String date_string, boolean last) {
         try {
             int fields[] = checkDateStringForCopticCalendar(date_string, last);
             EthiopicCalendar calendar = new EthiopicCalendar();
@@ -847,7 +858,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static JapaneseCalendar getCalendarFromJapaneseDate(String datestr, boolean last) {
+    protected static JapaneseCalendar getCalendarFromJapaneseDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
 
@@ -974,7 +985,7 @@ public class MCRCalendar {
      *                MCRException if parsing has an error
      */
 
-    private static BuddhistCalendar getCalendarFromBuddhistDate(String datestr, boolean last) {
+    protected static BuddhistCalendar getCalendarFromBuddhistDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before Buddhas
@@ -1110,7 +1121,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static GregorianCalendar getCalendarFromPersicDate(String datestr, boolean last) {
+    protected static GregorianCalendar getCalendarFromPersicDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before
@@ -1286,7 +1297,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static GregorianCalendar getCalendarFromArmenianDate(String datestr, boolean last) {
+    protected static GregorianCalendar getCalendarFromArmenianDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before
@@ -1454,7 +1465,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static GregorianCalendar getCalendarFromEgyptianDate(String datestr, boolean last) {
+    protected static GregorianCalendar getCalendarFromEgyptianDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before
