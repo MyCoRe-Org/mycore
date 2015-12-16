@@ -35,6 +35,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRMetaNBN extends MCRMetaDefault {
     // MetaNBN data
     protected String nbn;

@@ -36,6 +36,7 @@ import org.mycore.common.MCRException;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRMetaISBN extends MCRMetaDefault {
     // MetaISBN data
     protected String isbn;
