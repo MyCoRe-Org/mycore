@@ -181,19 +181,33 @@
       <xs:attributeGroup ref="structureInheritance" />
     </xs:complexType>
   </xs:element>
+  <!-- BEGIN: MCR-1148 -->
+  <xs:simpleType name="servdateTypeBaseType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:enumeration value="createdate" />
+      <xs:enumeration value="modifydate" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="servdateTypeMCRType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:pattern value="mcr-[a-zA-Z]{1,8}:[\c-[:]]+" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="servdateTypeExtType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:pattern value="[a-zA-Z]{1,3}:[\c-[:]]+" />
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- END: MCR-1148 -->
+  <xs:simpleType name="servdateTypeType">
+    <xs:union memberTypes="servdateTypeBaseType servdateTypeMCRType servdateTypeExtType" />
+  </xs:simpleType>
   <xs:element name="servdate">
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="mycoreDate">
           <xs:attribute name="inherited" use="required" type="xs:integer" fixed="0" />
-          <xs:attribute name="type" use="required">
-            <xs:simpleType>
-              <xs:restriction base="xs:string">
-                <xs:enumeration value="createdate" />
-                <xs:enumeration value="modifydate" />
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
+          <xs:attribute name="type" use="required" type="servdateTypeType" />
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>
