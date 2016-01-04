@@ -120,17 +120,7 @@
               </xsl:choose>
             </xsl:variable>
 
-            <xsl:variable name="href">
-              <xsl:choose>
-                <xsl:when test="$MCR.Module-iview2.useNewViewer='true'">
-                  <xsl:value-of select="concat($WebApplicationBaseURL,  'rsc/viewer/', $derivate, '/', $file)" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of
-                    select="concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derivate)" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
+            <xsl:variable name="href" select="concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derivate)" />
 
             <a href="{$href}" title="{i18n:translate('metaData.iView')}">
               <xsl:call-template name="iview2.getImageElement">
