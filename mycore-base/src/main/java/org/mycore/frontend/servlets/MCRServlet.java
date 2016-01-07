@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
@@ -78,6 +79,8 @@ import org.xml.sax.SAXParseException;
  * @version $Revision$ $Date$
  */
 public class MCRServlet extends HttpServlet {
+    public static final String ATTR_MYCORE_SESSION = "mycore.session";
+
     private static final String CURRENT_THREAD_NAME_KEY = "currentThreadName";
 
     private static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
@@ -198,7 +201,9 @@ public class MCRServlet extends HttpServlet {
         }
         MCRSession session = null;
 
-        MCRSession fromHttpSession = (MCRSession) theSession.getAttribute("mycore.session");
+        MCRSession fromHttpSession = Optional.ofNullable((String) theSession.getAttribute(ATTR_MYCORE_SESSION))
+            .map(MCRSessionMgr::getSession)
+            .orElse(null);
 
         if (fromHttpSession != null && fromHttpSession.getID() != null) {
             // Take session from HttpSession with servlets
@@ -221,7 +226,7 @@ public class MCRServlet extends HttpServlet {
         }
 
         // Store current session in HttpSession
-        theSession.setAttribute("mycore.session", session);
+        theSession.setAttribute(ATTR_MYCORE_SESSION, session.getID());
         // store the HttpSession ID in MCRSession
         if (session.put("http.session", theSession.getId()) == null) {
             //first request

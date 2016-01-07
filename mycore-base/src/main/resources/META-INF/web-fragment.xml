@@ -32,6 +32,11 @@
     <filter-class>org.mycore.frontend.filter.MCRSecureTokenV2Filter</filter-class>
   </filter>
 
+  <filter>
+    <filter-name>RequestDebugFilter</filter-name>
+    <filter-class>org.mycore.frontend.filter.MCRRequestDebugFilter</filter-class>
+  </filter>
+
   <servlet id="CreateObjectServlet">
     <servlet-name>CreateObjectServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRPersistentServlet</servlet-class>
@@ -199,6 +204,11 @@
     <url-pattern> /servlets/MCRXSLInfoServlet </url-pattern>
   </servlet-mapping>
 
+  <filter-mapping>
+    <filter-name>RequestDebugFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
   <filter-mapping>
     <filter-name>WebAppBaseFilter</filter-name>
     <url-pattern>/*</url-pattern>

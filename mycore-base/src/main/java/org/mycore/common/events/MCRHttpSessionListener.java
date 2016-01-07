@@ -34,6 +34,8 @@ import javax.servlet.http.HttpSessionListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * Handles different HttpSession events.
@@ -68,8 +70,8 @@ public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionB
         LOGGER.debug("Removing any MCRSessions from HttpSession");
         for (Enumeration<String> e = httpSession.getAttributeNames(); e.hasMoreElements();) {
             String key = e.nextElement();
-            if (httpSession.getAttribute(key) instanceof MCRSession) {
-                MCRSession mcrSession = (MCRSession) httpSession.getAttribute(key);
+            if (key.equals(MCRServlet.ATTR_MYCORE_SESSION)) {
+                MCRSession mcrSession = MCRSessionMgr.getSession((String)httpSession.getAttribute(key));
                 mcrSession.close();
                 // remove reference in httpSession
                 httpSession.removeAttribute(key);
