@@ -30,8 +30,6 @@ import javax.xml.parsers.DocumentBuilder;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRDOMUtils;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -90,32 +88,6 @@ public final class MCRMODSClassificationSupport {
             }
             final Element returns = document.createElement("returns");
             returns.setAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "mcr:categId", category.toString());
-            return returns.getChildNodes();
-        } catch (Throwable e) {
-            LOGGER.warn("Error in Xalan Extension", e);
-            return null;
-        } finally {
-            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
-        }
-    }
-    
-    public static NodeList convertIsoToRfc(final NodeList sources) {
-        if (sources.getLength() == 0) {
-            LOGGER.warn("Cannot get first element of node list 'sources'.");
-            return null;
-        }
-        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
-        try {
-            final Document document = documentBuilder.newDocument();
-            final Element source = (Element) sources.item(0);
-            final Element returns = document.createElement(source.getTagName());
-            String iso6392String = source.getTextContent();
-            MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
-            MCRCategoryID classID = MCRCategoryID.fromString("rfc4646");
-            String rfcString = categoryDAO.getCategoriesByLabel(classID, "x-bibl", iso6392String).get(0).getId().getID();
-            returns.setAttribute("authority", "rfc4646");
-            returns.setAttribute("type", "code");
-            returns.setTextContent(rfcString);
             return returns.getChildNodes();
         } catch (Throwable e) {
             LOGGER.warn("Error in Xalan Extension", e);
