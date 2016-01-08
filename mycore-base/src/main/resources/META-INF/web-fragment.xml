@@ -386,6 +386,15 @@
     <url-pattern>/img/qrcodes/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>MCRPackerServlet</servlet-name>
+    <servlet-class>org.mycore.services.packaging.MCRPackerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRPackerServlet</servlet-name>
+    <url-pattern>/servlets/MCRPackerServlet</url-pattern>
+  </servlet-mapping>
+
   <!-- **************************************************************** -->
   <!-- Jersey -->
   <!-- **************************************************************** -->
