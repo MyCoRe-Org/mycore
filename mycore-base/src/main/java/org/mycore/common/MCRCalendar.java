@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
  *
  * This file is part of ***  M y C o R e  ***
@@ -43,8 +43,8 @@ import com.ibm.icu.util.JapaneseCalendar;
 
 /**
  * This class implements all methods for handling calendars in MyCoRe objects
- * and data models. It is licensed by <a href="http://source.icu-project.org/repos/icu/icu/trunk/license.html>ICU License</a>.
- * 
+ * and data models. It is licensed by <a href="http://source.icu-project.org/repos/icu/icu/trunk/license.html">ICU License</a>.
+ *
  * @author Jens Kupferschmidt
  * @author Thomas Junge
  * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
@@ -109,7 +109,7 @@ public class MCRCalendar {
     /**
      * This method check a ancient date string for the given calendar. For
      * syntax of the date string see javadocs of calendar methods.
-     * 
+     *
      * @param date_string
      *            the date as string.
      * @param last
@@ -120,7 +120,7 @@ public class MCRCalendar {
      *            the calendar name as String, kind of the calendars are
      *            ('gregorian', 'julian', 'islamic', 'buddhist', 'coptic',
      *            'ethiopic', 'persic', 'japanese', 'armenian' or 'egyptian' )
-     * 
+     *
      * @return the ICU Calendar instance of the concrete calendar type or null if an error was occurred.
      * @exception MCRException if parsing has an error
      */
@@ -193,7 +193,7 @@ public class MCRCalendar {
 
     /**
      * Check the date string for julian or gregorian calendar
-     * 
+     *
      * @param date_string the date string
      * @param last the flag for first / last day
      * @return an integer array with [0] = year; [1] = month; [2] = day; [3] = era : -1 = BC : +1 = AC
@@ -354,14 +354,14 @@ public class MCRCalendar {
      * <li> y[yyy][-m[m][-t[t]]] [AD|BC]</li>
      * <li> [-|AD|BC] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
-     * 
+     *
      * @param date_string
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 12 or 31 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
      * @exception a
@@ -396,14 +396,14 @@ public class MCRCalendar {
      * <li> y[yyy][-m[m][-t[t]]] [AD|BC]</li>
      * <li> [-|AD|BC] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
-     * 
+     *
      * @param datestr
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 12 or 31 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
      * @exception a
@@ -467,14 +467,14 @@ public class MCRCalendar {
      * <li> [.\u0647 | .\u0647 .\u0642] [[[t]t.][m]m.][yyy]y</li>
      * <li> y[yyy][-m[m][-t[t]]] H.|h.</li>
      * </ul>
-     * 
+     *
      * @param date_string
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 12 or 30 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the IslamicCalendar date value or null if an error was occurred.
      * @exception a
      *                MCRException if parsing has an error
@@ -511,7 +511,7 @@ public class MCRCalendar {
                 iso = true;
                 token = "-";
             }
-            // 
+            //
             int firstdot = date_string.indexOf(token, start + 1);
             int secdot = -1;
 
@@ -582,14 +582,14 @@ public class MCRCalendar {
      * This method convert a HebrewCalendar date to a HebrewCalendar value. The
      * syntax for the hebrew input is [[t]t.][m]m.][yyy]y] or
      * [[yyy]y-[[m]m]-[[t]t].
-     * 
+     *
      * @param datestr
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 13 or 30 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the HebewCalendar date value or null if an error was occurred.
      * @exception a
      *                MCRException if parsing has an error
@@ -609,7 +609,7 @@ public class MCRCalendar {
                 iso = true;
                 token = "-";
             }
-            // 
+            //
             int firstdot = datestr.indexOf(token, start + 1);
             int secdot = -1;
 
@@ -673,7 +673,7 @@ public class MCRCalendar {
 
     /**
      * Check the date string for ethiopic or coptic calendar
-     * 
+     *
      * @param date_string the date string
      * @param last the flag for first / last day
      * @return an integer array with [0] = year; [1] = month; [2] = day; [3] = era : -1 = B.M.: +1 = A.M.
@@ -715,7 +715,7 @@ public class MCRCalendar {
             iso = true;
             token = "-";
         }
-        // 
+        //
         int firstdot = date_string.indexOf(token, start + 1);
         int secdot = -1;
 
@@ -777,7 +777,7 @@ public class MCRCalendar {
         fields[2] = day;
         return fields;
     }
-    
+
     /**
      * This method convert a CopticCalendar date to a CopticCalendar value. The
      * syntax for the coptic input is: <br>
@@ -785,14 +785,14 @@ public class MCRCalendar {
      * <li> [[[t]t.][m]m.][yyy]y [[A.|a.]M.]</li>
      * <li> y[yyy][-m[m][-t[t]]] [A.|a.]M.]</li>
      * </ul>
-     * 
+     *
      * @param date_string
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 12 or 30 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the CopticCalendar date value or null if an error was occurred.
      * @exception a
      *                MCRException if parsing has an error
@@ -815,14 +815,14 @@ public class MCRCalendar {
      * <li> [[[t]t.][m]m.][yyy]y [E.E.]</li>
      * <li> y[yyy][-m[m][-t[t]]] [E.E.]</li>
      * </ul>
-     * 
+     *
      * @param datestr
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 13 or 30 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the EthiopicCalendar date value or null if an error was occurred.
      * @exception a
      *                MCRException if parsing has an error
@@ -842,18 +842,19 @@ public class MCRCalendar {
      * This method convert a JapaneseCalendar date to a JapaneseCalendar value.
      * The syntax for the japanese input is: <br>
      * <ul>
-     * <li> [[[t]t.][m]m.][H|M|S|T][yyy]y</li>
+     * <li> [[[t]t.][m]m.][H|M|S|T][yyy]y <br>
      * H: Heisei; M: Meiji, S: Showa, T: Taiso
+     * </li>
      * <li> [H|M|S|T]y[yyy][-m[m][-t[t]]]</li>
      * </ul>
-     * 
+     *
      * @param datestr
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 12 or 30 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the JapaneseCalendar date value or null if an error was occurred.
      * @exception a
      *                MCRException if parsing has an error
@@ -875,7 +876,7 @@ public class MCRCalendar {
                 iso = true;
                 token = "-";
             }
-            // 
+            //
             int firstdot = datestr.indexOf(token, start + 1);
             int secdot = -1;
 
@@ -972,14 +973,14 @@ public class MCRCalendar {
      * <li> [-] y[yyy][-m[m][-t[t]]] [B.E.]</li>
      * <li> [-] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
-     * 
+     *
      * @param datestr
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 12 or 31 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the BuddhistCalendar date value or null if an error was occurred.
      * @exception a
      *                MCRException if parsing has an error
@@ -1017,7 +1018,7 @@ public class MCRCalendar {
                 iso = true;
                 token = "-";
             }
-            // 
+            //
             int firstdot = datestr.indexOf(token, start + 1);
             int secdot = -1;
 
@@ -1108,14 +1109,14 @@ public class MCRCalendar {
      * <li> [-] [[[t]t.][m]m.][yyy]y</li>
      * <li> [-] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
-     * 
+     *
      * @param datestr
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 13 or 30 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
      * @exception a
@@ -1279,19 +1280,19 @@ public class MCRCalendar {
      * This method convert a ArmenianCalendar date to a GregorianCalendar value.
      * The syntax for the Armenian input is [-][[t]t.][m]m.][yyy]y] or
      * [-][[yyy]y-[[m]m]-[[t]t].
-     * 
+     *
      * <ul>
      * <li> [-] [[[t]t.][m]m.][yyy]y</li>
      * <li> [-] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
-     * 
+     *
      * @param datestr
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 13 or 30 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
      * @exception a
@@ -1395,7 +1396,7 @@ public class MCRCalendar {
                 ecal.set(1582, 9, 15);
                 ecal.add(Calendar.DATE, difday);
             }
-            if (year * 10000 + mon * 100 + day < 10311214 && year * 10000 + mon * 100 + day > 10311204) { // 
+            if (year * 10000 + mon * 100 + day < 10311214 && year * 10000 + mon * 100 + day > 10311204) { //
                 ecal.set(1582, 9, 15);
             }
             if (year * 10000 + mon * 100 + day <= 10311204) {// Jahr <
@@ -1452,14 +1453,14 @@ public class MCRCalendar {
      * <li> [-] y[yyy][-m[m][-t[t]]] [A.N.]</li>
      * <li> [-] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
-     * 
+     *
      * @param datestr
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 13 or 30 else it fill the
      *            date with the lowest value 1 for month and day.
-     * 
+     *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
      * @exception a
@@ -1575,7 +1576,7 @@ public class MCRCalendar {
                 ecal.add(Calendar.DATE, difday);
             }
 
-            if (year * 10000 + mon * 100 + day < 23310314 && year * 10000 + mon * 100 + day >= 23310304) { // 
+            if (year * 10000 + mon * 100 + day < 23310314 && year * 10000 + mon * 100 + day >= 23310304) { //
                 ecal.set(1582, 9, 15);
             }
             if (year * 10000 + mon * 100 + day < 23310304) {// Jahr <
@@ -1625,7 +1626,7 @@ public class MCRCalendar {
 
     /**
      * This method return the Julian Day number for a given Calendar instance.
-     * 
+     *
      * @return the Julian Day number as Integer
      */
     public static int getJulianDayNumber(Calendar input_calendar) {
@@ -1634,30 +1635,30 @@ public class MCRCalendar {
 
     /**
      * This method return the Julian Day number for a given Calendar instance.
-     * 
+     *
      * @return the Julian Day number as String
      */
     public static String getJulianDayNumberAsString(Calendar input_calendar) {
         return Integer.toString(input_calendar.get(Calendar.JULIAN_DAY));
     }
-    
+
     /**
      * This method get the Gregorian calendar form a given calendar
-     * 
+     *
      * @param input_calendar
      *            an instance of a Calendar
      * @return a Gregorian calendar
      */
      public static GregorianCalendar getGregorianCalendarOfACalendar(Calendar input_calendar) {
-    	 int julian_day = getJulianDayNumber(input_calendar);
-    	 GregorianCalendar ret = new GregorianCalendar();
-    	 ret.set(Calendar.JULIAN_DAY, julian_day);
-    	 return ret;
+         int julian_day = getJulianDayNumber(input_calendar);
+         GregorianCalendar ret = new GregorianCalendar();
+         ret.set(Calendar.JULIAN_DAY, julian_day);
+         return ret;
      }
-     
+
     /**
      * This method returns the date as string in format 'yy-MM-dd G'.
-     * 
+     *
      * @return the date string
      */
     public static String getCalendarDateToFormattedString(Calendar calendar) {
@@ -1671,15 +1672,15 @@ public class MCRCalendar {
 
     /**
      * This method returns the date as string.
-     * 
+     *
      * @param calendar
      *            the Calendar date
      * @param format
      *            the format of the date as String
-     * 
+     *
      * @return the date string in the format. If the format is wrong dd.MM.yyyy
      *         G is set. If the date is wrong an empty string will be returned.
-     *         The output is depending on calendar type. For Calendar it will use 
+     *         The output is depending on calendar type. For Calendar it will use
      *         the Julian Calendar to 05.10.1582. Then it use the Gregorian Calendar.
      */
     public static String getCalendarDateToFormattedString(Calendar calendar, String format) {
@@ -1716,7 +1717,7 @@ public class MCRCalendar {
 
     /**
      * This method returns the calendar type as string.
-     * 
+     *
      * @param calendar
      *            the Calendar date
      * @return The clendar type as string. If Calendar is empty an empty string will be returned.
