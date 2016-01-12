@@ -1,19 +1,19 @@
 /*
  * $Id$ $Revision: 5697 $ $Date: 10.09.2010 $
- * 
+ *
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
- * 
+ *
  * This program is free software; you can use it, redistribute it and / or
  * modify it under the terms of the GNU General Public License (GPL) as
  * published by the Free Software Foundation; either version 2 of the License or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program, in a file called gpl.txt or license.txt. If not, write to the
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -37,7 +37,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -61,7 +61,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Delivers persistence operations for {@link MCRObject} and {@link MCRDerivate} .
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2.0.92
  */
@@ -83,7 +83,7 @@ public final class MCRMetadataManager {
 
     /**
      * Returns the MCRObjectID of the object containing derivate with the given ID.
-     * 
+     *
      * @param derivateID
      *            derivateID
      * @param expire
@@ -123,7 +123,7 @@ public final class MCRMetadataManager {
 
     /**
      * Returns a list of MCRObjectID of the derivates contained in the object with the given ID.
-     * 
+     *
      * @param objectId
      *            objectId
      * @param expire
@@ -164,7 +164,7 @@ public final class MCRMetadataManager {
 
     /**
      * Stores the derivate.
-     * 
+     *
      * @param mcrDerivate
      *            derivate instance to store
      * @exception MCRPersistenceException
@@ -297,7 +297,7 @@ public final class MCRMetadataManager {
 
     /**
      * Stores the object.
-     * 
+     *
      * @param mcrObject
      *            object instance to store
      * @exception MCRPersistenceException
@@ -354,7 +354,7 @@ public final class MCRMetadataManager {
 
     /**
      * Deletes MCRDerivate.
-     * 
+     *
      * @param mcrDerivate
      *            to be deleted
      * @throws MCRPersistenceException
@@ -400,7 +400,7 @@ public final class MCRMetadataManager {
 
     /**
      * Deletes MCRObject.
-     * 
+     *
      * @param mcrObject
      *            to be deleted
      * @throws MCRPersistenceException
@@ -473,7 +473,7 @@ public final class MCRMetadataManager {
      * <li>remove all files from IFS</li>
      * <li>remove derivate</li>
      * </ul>
-     * 
+     *
      * @param id
      *            the object ID
      * @exception MCRPersistenceException
@@ -486,7 +486,7 @@ public final class MCRMetadataManager {
 
     /**
      * Deletes the object.
-     * 
+     *
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      * @throws MCRActiveLinkException
@@ -499,7 +499,7 @@ public final class MCRMetadataManager {
 
     /**
      * Tells if the object or derivate with <code>id</code> exists.
-     * 
+     *
      * @param id
      *            the object ID
      * @exception MCRPersistenceException
@@ -511,7 +511,7 @@ public final class MCRMetadataManager {
 
     /**
      * Fires {@link MCREvent#REPAIR_EVENT} for given derivate.
-     * 
+     *
      * @param mcrDerivate
      */
     public static void fireRepairEvent(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
@@ -521,7 +521,7 @@ public final class MCRMetadataManager {
 
     /**
      * Fires {@link MCREvent#REPAIR_EVENT} for given object.
-     * 
+     *
      * @param mcrBaseObj
      */
     public static void fireRepairEvent(final MCRBase mcrBaseObj) throws MCRPersistenceException {
@@ -534,7 +534,7 @@ public final class MCRMetadataManager {
 
     /**
      * Fires {@link MCREvent#REPAIR_EVENT} for given object.
-     * 
+     *
      * @param mcrObject
      */
     public static void fireRepairEvent(final MCRObject mcrObject) throws MCRPersistenceException {
@@ -551,7 +551,7 @@ public final class MCRMetadataManager {
     /**
      * Fires {@link MCREvent#UPDATE_EVENT} for given object. If {@link MCRObject#isImportMode()} modifydate will not be
      * updated.
-     * 
+     *
      * @param mcrObject
      *            TODO
      */
@@ -570,7 +570,7 @@ public final class MCRMetadataManager {
 
     /**
      * Retrieves instance of {@link MCRDerivate} with the given {@link MCRObjectID}
-     * 
+     *
      * @param id
      *            the derivate ID
      * @exception MCRPersistenceException
@@ -586,7 +586,7 @@ public final class MCRMetadataManager {
 
     /**
      * Retrieves instance of {@link MCRObject} with the given {@link MCRObjectID}
-     * 
+     *
      * @param id
      *            the object ID
      * @exception MCRPersistenceException
@@ -615,7 +615,7 @@ public final class MCRMetadataManager {
 
     /**
      * Retrieves instance of {@link MCRObject} or {@link MCRDerivate} depending on {@link MCRObjectID#getTypeId()}
-     * 
+     *
      * @param id
      *            derivate or object id
      * @exception MCRPersistenceException
@@ -630,7 +630,7 @@ public final class MCRMetadataManager {
 
     /**
      * Updates the derivate or creates it if it does not exist yet.
-     * 
+     *
      * @param mcrDerivate
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
@@ -695,7 +695,7 @@ public final class MCRMetadataManager {
 
     /**
      * Updates the object or creates it if it does not exist yet.
-     * 
+     *
      * @param mcrObject
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
@@ -739,8 +739,8 @@ public final class MCRMetadataManager {
             }
             if (newlinkLabels.containsKey(oldlinkID.getXLinkHref())) {
                 oldlinkID.setXLinkLabel(newlinkLabels.get(oldlinkID.getXLinkHref()));
-        	}
-        	linkIDs.add(oldlinkID);
+            }
+            linkIDs.add(oldlinkID);
         }
 
         //set the new order of derivates
@@ -789,7 +789,7 @@ public final class MCRMetadataManager {
             for(String flagCreatedBy : old.getService().getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY)){
                 mcrObject.getService().addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, flagCreatedBy);
             }
-        } 
+        }
 
         // update this dataset
         MCRMetadataManager.fireUpdateEvent(mcrObject);
@@ -831,7 +831,7 @@ public final class MCRMetadataManager {
 
     /**
      * Updates only the XML part of the derivate.
-     * 
+     *
      * @param mcrDerivate
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
@@ -845,7 +845,7 @@ public final class MCRMetadataManager {
 
     /**
      * Adds a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data store.
-     * 
+     *
      * @param id
      *            the object ID
      * @param link
@@ -872,7 +872,7 @@ public final class MCRMetadataManager {
     /**
      * Adds or updates a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data
      * store.
-     * 
+     *
      * @param id
      *            the object ID
      * @param link
