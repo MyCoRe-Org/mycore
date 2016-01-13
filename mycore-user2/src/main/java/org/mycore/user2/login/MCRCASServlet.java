@@ -26,7 +26,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.Cas20ProxyTicketValidator;
@@ -69,7 +70,7 @@ public class MCRCASServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRCASServlet.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     /** The URL of THIS servlet */
     private String clientURL;
@@ -132,6 +133,8 @@ public class MCRCASServlet extends MCRServlet {
 
         // Store login user in session and redirect browser to target url
         MCRSessionMgr.getCurrentSession().setUserInformation(user);
+        // MCR-1154
+        req.changeSessionId();
         MCRLoginServlet.redirect(res);
     }
 }

@@ -6,7 +6,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -24,7 +25,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRShibbolethLoginServlet.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRShibbolethLoginServlet.class);
 
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
@@ -67,6 +68,8 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
                 }
 
                 MCRSessionMgr.getCurrentSession().setUserInformation(userinfo);
+                // MCR-1154
+                req.changeSessionId();
 
                 res.sendRedirect(res.encodeRedirectURL(req.getParameter("url")));
                 return;

@@ -31,7 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRSessionMgr;
@@ -69,7 +70,7 @@ public class MCRLoginServlet extends MCRServlet {
 
     static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(HTTPS_ONLY_PROPERTY);
 
-    private static Logger LOGGER = Logger.getLogger(MCRLoginServlet.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void init() throws ServletException {
@@ -166,6 +167,8 @@ public class MCRLoginServlet extends MCRServlet {
                 root.setAttribute("loginFailed", "true");
             } else {
                 //user logged in
+                // MCR-1154
+                req.changeSessionId();
                 LOGGER.info("user " + uid + " logged in successfully.");
                 res.sendRedirect(res.encodeRedirectURL(getReturnURL(req)));
                 return;
