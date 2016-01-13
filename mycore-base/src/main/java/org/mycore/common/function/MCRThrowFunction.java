@@ -38,7 +38,7 @@ public interface MCRThrowFunction<T,R,E extends Throwable>{
      * function and then applies this function
      * @throws NullPointerException if before is null
      *
-     * @see #andThen(Function)
+     * @see #andThen(MCRThrowFunction)
      */
     default <V> MCRThrowFunction<V, R, E> compose(MCRThrowFunction<? super V, ? extends T, ? extends E> before) {
         Objects.requireNonNull(before);
@@ -58,7 +58,7 @@ public interface MCRThrowFunction<T,R,E extends Throwable>{
      * applies the {@code after} function
      * @throws NullPointerException if after is null
      *
-     * @see #compose(Function)
+     * @see #compose(MCRThrowFunction)
      */
     default <V> MCRThrowFunction<T, V, E> andThen(MCRThrowFunction<? super R, ? extends V, ? extends E> after) {
         Objects.requireNonNull(after);
