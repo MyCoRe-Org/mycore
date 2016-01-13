@@ -132,6 +132,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.add("sort", sortBy);
         params.add("q", restriction);
+        params.add("fq", fieldName + ":*");
         params.add("fl", fieldName);
         params.add("rows", "1");
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
