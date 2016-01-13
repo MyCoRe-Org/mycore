@@ -23,11 +23,10 @@
 
 package org.mycore.frontend.jersey.access;
 
+import com.sun.jersey.spi.container.ContainerRequest;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
-
-import com.sun.jersey.spi.container.ContainerRequest;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -41,7 +40,7 @@ public class MCRRequireLogin implements MCRResourceAccessChecker {
     @Override
     public boolean isPermitted(ContainerRequest request) {
         if (MCRSessionMgr.hasCurrentSession()) {
-            return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(MCRSystemUserInformation
+            return ! MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(MCRSystemUserInformation
                 .getGuestInstance().getUserID());
         }
         return false;
