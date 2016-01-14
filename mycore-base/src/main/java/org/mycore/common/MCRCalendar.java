@@ -364,8 +364,7 @@ public class MCRCalendar {
      *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     protected static GregorianCalendar getCalendarFromGregorianDate(String date_string, boolean last) throws MCRException {
         try {
@@ -397,7 +396,7 @@ public class MCRCalendar {
      * <li> [-|AD|BC] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
      *
-     * @param datestr
+     * @param date_string
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
@@ -406,8 +405,7 @@ public class MCRCalendar {
      *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     protected static Calendar getCalendarFromJulianDate(String date_string, boolean last) throws MCRException {
         try {
@@ -476,8 +474,7 @@ public class MCRCalendar {
      *            date with the lowest value 1 for month and day.
      *
      * @return the IslamicCalendar date value or null if an error was occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     protected static IslamicCalendar getCalendarFromIslamicDate(String date_string, boolean last) {
         try {
@@ -591,8 +588,7 @@ public class MCRCalendar {
      *            date with the lowest value 1 for month and day.
      *
      * @return the HebewCalendar date value or null if an error was occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
 
     protected static HebrewCalendar getCalendarFromHebrewDate(String datestr, boolean last) {
@@ -794,8 +790,7 @@ public class MCRCalendar {
      *            date with the lowest value 1 for month and day.
      *
      * @return the CopticCalendar date value or null if an error was occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     protected static CopticCalendar getCalendarFromCopticDate(String date_string, boolean last) {
         try {
@@ -816,7 +811,7 @@ public class MCRCalendar {
      * <li> y[yyy][-m[m][-t[t]]] [E.E.]</li>
      * </ul>
      *
-     * @param datestr
+     * @param date_string
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
@@ -824,8 +819,7 @@ public class MCRCalendar {
      *            date with the lowest value 1 for month and day.
      *
      * @return the EthiopicCalendar date value or null if an error was occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     protected static EthiopicCalendar getCalendarFromEthiopicDate(String date_string, boolean last) {
         try {
@@ -856,8 +850,7 @@ public class MCRCalendar {
      *            date with the lowest value 1 for month and day.
      *
      * @return the JapaneseCalendar date value or null if an error was occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     protected static JapaneseCalendar getCalendarFromJapaneseDate(String datestr, boolean last) {
         try {
@@ -982,8 +975,7 @@ public class MCRCalendar {
      *            date with the lowest value 1 for month and day.
      *
      * @return the BuddhistCalendar date value or null if an error was occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
 
     protected static BuddhistCalendar getCalendarFromBuddhistDate(String datestr, boolean last) {
@@ -1119,8 +1111,7 @@ public class MCRCalendar {
      *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     protected static GregorianCalendar getCalendarFromPersicDate(String datestr, boolean last) {
         try {
@@ -1295,8 +1286,7 @@ public class MCRCalendar {
      *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     protected static GregorianCalendar getCalendarFromArmenianDate(String datestr, boolean last) {
         try {
@@ -1463,8 +1453,7 @@ public class MCRCalendar {
      *
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     protected static GregorianCalendar getCalendarFromEgyptianDate(String datestr, boolean last) {
         try {

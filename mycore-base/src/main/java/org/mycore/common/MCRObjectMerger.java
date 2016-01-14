@@ -10,7 +10,7 @@ import org.mycore.datamodel.metadata.MCRObjectMetadata;
 /**
  * Helper class to merge mycore objects. Only metadata merging is
  * currently supported.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCRObjectMerger {
@@ -19,8 +19,8 @@ public class MCRObjectMerger {
 
     /**
      * Creates a new instance of the object merger. The target will be cloned for
-     * further processing. You will receive a copy when calling {@link #get()}. 
-     * 
+     * further processing. You will receive a copy when calling {@link #get()}.
+     *
      * @param target the target mycore object
      */
     public MCRObjectMerger(MCRObject target) {
@@ -31,7 +31,7 @@ public class MCRObjectMerger {
      * Merges the metadata of the given source into the target object. Be aware that
      * performance isn't that good when validation is activated, due checking against
      * the schema each time a change is made.
-     * 
+     *
      * @param source the source which is merged into the target
      * @param validate If true, every change is tracked and validated against the
      *          xml schema of the mycore object. When a change is invalid it will be
@@ -78,7 +78,7 @@ public class MCRObjectMerger {
 
     /**
      * Validates the given mcr object against its own schema.
-     * 
+     *
      * @param mcrobj the object to validate
      * @return true if the object is valid, otherwise false
      */
@@ -93,8 +93,7 @@ public class MCRObjectMerger {
 
     /**
      * Returns a copy of the merged target object.
-     * 
-     * @return
+     *
      */
     public MCRObject get() {
         return this.target;
