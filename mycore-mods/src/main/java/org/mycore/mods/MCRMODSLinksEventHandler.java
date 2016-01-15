@@ -39,8 +39,6 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mods.classification.MCRClassMapper;
-import org.mycore.mods.classification.MCRMODSClassificationSupport;
 
 /**
  * Eventhandler for linking MODS_OBJECTTYPE document to MyCoRe classifications.
@@ -58,15 +56,7 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             return;
         }
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(obj);
-        final List<Element> categoryNodes = modsWrapper
-            .getElements("mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])]");
-        final HashSet<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
-        for (Element node : categoryNodes) {
-            final MCRCategoryID categoryID = MCRClassMapper.getCategoryID(node);
-            if (categoryID != null) {
-                categories.add(categoryID);
-            }
-        }
+        final HashSet<MCRCategoryID> categories = new HashSet(modsWrapper.getMcrCategoryIDs());
         if (!categories.isEmpty()) {
             final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId());
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);

@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -37,12 +38,14 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaXML;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.mods.classification.MCRClassMapper;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -171,8 +174,14 @@ public class MCRMODSWrapper {
      * Sets or adds an element with target name and value. The element name and attributes are used as xpath expression
      * to filter for an element. The attributes are used with and operation if present.
      */
-    public void setElement(String elementName, String elementValue, Map<String, String> attributes) {
+    public Optional<Element> setElement(String elementName, String elementValue, Map<String, String> attributes) {
         boolean isAttributeDataPresent = attributes != null && !attributes.isEmpty();
+        boolean isValuePresent = elementValue != null && !elementValue.isEmpty();
+
+        if (!isValuePresent && !isAttributeDataPresent) {
+            return Optional.empty();
+        }
+
         StringBuilder xPath = new StringBuilder("mods:");
         xPath.append(elementName);
 
@@ -199,24 +208,23 @@ public class MCRMODSWrapper {
             }
         }
 
-        if (elementValue != null)
+        if (isValuePresent)
             element.setText(elementValue.trim());
-        else
-            element.detach();
+
+        return Optional.of(element);
     }
 
-    public void setElement(String elementName, String attributeName, String attributeValue, String elementValue) {
-
+    public Optional<Element> setElement(String elementName, String attributeName, String attributeValue, String elementValue) {
         Map<String, String> attributes = Collections.emptyMap();
         if (attributeName != null && attributeValue != null) {
             attributes = new HashMap<>();
             attributes.put(attributeName, attributeValue);
         }
-        setElement(elementName, elementValue, attributes);
+        return setElement(elementName, elementValue, attributes);
     }
 
-    public void setElement(String elementName, String elementValue) {
-        setElement(elementName, null, null, elementValue);
+    public Optional<Element> setElement(String elementName, String elementValue) {
+        return setElement(elementName, null, null, elementValue);
     }
 
     public Element addElement(String elementName) {
@@ -275,5 +283,21 @@ public class MCRMODSWrapper {
             os.removeFlags(type);
         if ((value != null) && !value.trim().isEmpty())
             os.addFlag(type, value.trim());
+    }
+
+    public List<MCRCategoryID> getMcrCategoryIDs() {
+        final List<Element> categoryNodes = getCategoryNodes();
+        final List<MCRCategoryID> categories = new ArrayList<>(categoryNodes.size());
+        for (Element node : categoryNodes) {
+            final MCRCategoryID categoryID = MCRClassMapper.getCategoryID(node);
+            if (categoryID != null) {
+                categories.add(categoryID);
+            }
+        }
+        return categories;
+    }
+
+    private List<Element> getCategoryNodes() {
+        return getElements("mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])]");
     }
 }
