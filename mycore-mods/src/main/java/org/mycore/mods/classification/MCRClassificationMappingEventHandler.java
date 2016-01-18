@@ -2,6 +2,7 @@ package org.mycore.mods.classification;
 
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -68,6 +69,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         LOGGER.info("check mappings " + obj.getId().toString());
         mcrmodsWrapper.getMcrCategoryIDs().stream()
                 .map(categoryId -> DAO.getCategory(categoryId, 0))
+                .filter(Objects::nonNull)
                 .map(category -> category.getLabel("x-mapping"))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -77,12 +79,16 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 .distinct()
                 .forEach(categoryId -> {
                     LOGGER.info("add Mapping to " + categoryId.toString());
-                    Optional<Element> createdClassificationElement = mcrmodsWrapper.setElement("classification", "generator", this.getClass().getSimpleName() + GENERATOR_SUFFIX, null);
+                    Optional<Element> createdClassificationElement = mcrmodsWrapper.setElement("classification", "generator", getGenerator(), null);
                     Element element = createdClassificationElement.orElseThrow(() -> new MCRException("Could not add mapping to classification " + categoryId.toString()));
                     MCRClassMapper.assignCategory(element, categoryId);
                 });
 
         LOGGER.info("mapping complete.");
+    }
+
+    protected static String getGenerator() {
+        return MCRClassificationMappingEventHandler.class.getSimpleName() + GENERATOR_SUFFIX;
     }
 
 }

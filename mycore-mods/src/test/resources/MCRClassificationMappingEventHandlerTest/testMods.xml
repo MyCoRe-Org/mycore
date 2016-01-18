@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <mods:typeOfResource>text</mods:typeOfResource>
+  <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#bachelor_thesis"/>
+  <mods:titleInfo xml:lang="de" xlink:type="simple">
+    <mods:title>Test-Titel</mods:title>
+  </mods:titleInfo>
+  <mods:language>
+    <mods:languageTerm authority="rfc4646" type="code">de</mods:languageTerm>
+  </mods:language>
+  <mods:classification authority="sdnb" displayLabel="sdnb">000</mods:classification>
+  <mods:accessCondition type="use and reproduction" xlink:type="simple">cc_by-nc</mods:accessCondition>
+</mods:mods>
