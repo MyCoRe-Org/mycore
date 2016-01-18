@@ -49,11 +49,13 @@ public class MCRFrontendUtil {
 
     /** returns the base URL of the mycore system */
     public static String getBaseURL() {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        Object value = session.get(BASE_URL_ATTRIBUTE);
-        if (value != null) {
-            LOGGER.debug("Returning BaseURL " + value.toString() + " from user session.");
-            return value.toString();
+        if(MCRSessionMgr.hasCurrentSession()) {
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            Object value = session.get(BASE_URL_ATTRIBUTE);
+            if (value != null) {
+                LOGGER.debug("Returning BaseURL " + value.toString() + " from user session.");
+                return value.toString();
+            }
         }
         return BASE_URL;
     }
@@ -229,7 +231,6 @@ public class MCRFrontendUtil {
      * @return
      */
     private static TreeSet<String> getTrustedProxies() {
-        boolean closeSession = !MCRSessionMgr.hasCurrentSession();
         HashSet<InetAddress> trustedProxies = new HashSet<>();
 
         String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies");
@@ -257,14 +258,11 @@ public class MCRFrontendUtil {
             LOGGER.warn("Could not get IP adresses of 'localhost'.", e);
         }
 
-        //junit test cannot configure baseurl properly
-        if (getBaseURL() != null) {
-            try {
-                String host = new java.net.URL(getBaseURL()).getHost();
-                Collections.addAll(trustedProxies, InetAddress.getAllByName(host));
-            } catch (Exception ex) {
-                LOGGER.warn("Could not determine IP of local host serving:" + getBaseURL(), ex);
-            }
+        try {
+            String host = new java.net.URL(getBaseURL()).getHost();
+            Collections.addAll(trustedProxies, InetAddress.getAllByName(host));
+        } catch (Exception ex) {
+            LOGGER.warn("Could not determine IP of local host serving:" + getBaseURL(), ex);
         }
 
         TreeSet<String> sortedAdresses = new TreeSet<>();
@@ -277,10 +275,6 @@ public class MCRFrontendUtil {
         }
         for (InetAddress address : trustedProxies) {
             sortedAdresses.add(address.getHostAddress());
-        }
-        if (closeSession) {
-            //getBaseURL() creates MCRSession
-            MCRSessionMgr.getCurrentSession().close();
         }
         return sortedAdresses;
     }
