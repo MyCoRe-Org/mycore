@@ -26,7 +26,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -48,7 +50,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  */
 public class MCRLanguageFactory {
 
-    private static Logger LOGGER = Logger.getLogger(MCRLanguageFactory.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     private static MCRLanguageFactory singleton = new MCRLanguageFactory();
 
@@ -152,7 +154,7 @@ public class MCRLanguageFactory {
      * should be read again.
      */
     private boolean classificationHasChanged() {
-        return (classification != null) && (DAO.getLastModified() > classificationLastRead);
+        return MCRHIBConnection.isEnabled() && (classification != null) && (DAO.getLastModified() > classificationLastRead);
     }
 
     /**
