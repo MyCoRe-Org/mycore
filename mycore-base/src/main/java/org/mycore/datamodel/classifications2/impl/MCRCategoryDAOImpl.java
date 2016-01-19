@@ -313,7 +313,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         session.setFlushMode(FlushMode.MANUAL);
         try {
             List<MCRCategory> parents = getParents(baseID);
-            if (parents == null) {
+            if (parents == null || parents.size() == 0) {
                 return null;
             }
 
@@ -321,6 +321,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             for (int i = parents.size() - 1; i >= 0; i--) {
                 parentsCopy.add(copyDeep(parents.get(i), 0));
             }
+
             MCRCategoryImpl root = parentsCopy.get(0);
             for (int i = 1; i < parentsCopy.size(); i++) {
                 parentsCopy.get(i).setRoot(root);
