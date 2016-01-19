@@ -49,7 +49,7 @@ public class MCRSwordConfigurationDefault implements SwordConfiguration {
 
     @Override
     public String getTempDirectory() {
-        return System.getProperty("java.io.tmpdir");
+        return MCRConfiguration.instance().getString("MCR.SWORD.TempDirectory", System.getProperty("java.io.tmpdir"));
     }
 
     @Override
