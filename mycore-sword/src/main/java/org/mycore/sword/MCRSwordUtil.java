@@ -75,7 +75,7 @@ public class MCRSwordUtil {
 
     public static MCRDerivate createDerivate(String documentID) throws MCRPersistenceException, IOException {
         final String projectId = MCRObjectID.getInstance(documentID).getProjectId();
-        MCRObjectID oid = MCRObjectID.getNextFreeId(projectId, "_derivate");
+        MCRObjectID oid = MCRObjectID.getNextFreeId(projectId, "derivate");
         final String derivateID = oid.toString();
 
         MCRDerivate derivate = new MCRDerivate();
