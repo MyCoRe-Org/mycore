@@ -262,7 +262,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         List<MCRCategory> parents = new ArrayList<MCRCategory>();
         MCRCategory category = getByNaturalID(session, id);
         if (category == null) {
-            return parents;
+            return null;
         }
         while (category.getParent() != null) {
             category = category.getParent();
