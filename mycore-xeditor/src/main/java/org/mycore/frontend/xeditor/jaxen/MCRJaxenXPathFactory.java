@@ -10,6 +10,7 @@ import org.jdom2.Namespace;
 import org.jdom2.filter.Filter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.jaxen.JaxenXPathFactory;
+import org.mycore.common.MCRConstants;
 import org.mycore.frontend.xeditor.MCRUsedNamespaces;
 
 /**
@@ -19,9 +20,9 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
 
     private final static Logger LOGGER = Logger.getLogger(MCRJaxenXPathFactory.class);
 
-    private final static String EXTENSION_FUNCTIONS_PREFX = MCRUsedNamespaces.XEDITOR_NAMESPACE.getPrefix();
+    private final static String EXTENSION_FUNCTIONS_PREFX = "xed";
 
-    private final static String EXTENSION_FUNCTIONS_URI = MCRUsedNamespaces.XEDITOR_NAMESPACE.getURI();
+    private final static String EXTENSION_FUNCTIONS_URI = MCRConstants.getStandardNamespace(EXTENSION_FUNCTIONS_PREFX).getURI();
 
     public MCRJaxenXPathFactory() {
         super();
