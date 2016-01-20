@@ -3,14 +3,18 @@
  */
 package org.mycore.frontend.filter;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Enumeration;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -23,6 +27,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.logging.log4j.LogManager;
@@ -58,7 +63,7 @@ public class MCRRequestDebugFilter implements Filter {
 
     private String getLogMsg(ServletRequest request) {
         HttpServletRequest req = (HttpServletRequest) request;
-        StringBuilder sb = new StringBuilder("REQUEST URI: " + req.getRequestURI() + " \n");
+        StringBuilder sb = new StringBuilder("REQUEST (" + req.getMethod() + ") URI: " + req.getRequestURI() + " \n");
         logCookies(req, sb);
         logRequestParameters(request, sb);
         logSessionAttributes(req, sb);
@@ -68,7 +73,7 @@ public class MCRRequestDebugFilter implements Filter {
 
     private String getLogMsg(ServletRequest request, ServletResponse response) {
         HttpServletRequest req = (HttpServletRequest) request;
-        StringBuilder sb = new StringBuilder("RESPONSE URI: " + req.getRequestURI() + " \n");
+        StringBuilder sb = new StringBuilder("RESPONSE (" + req.getMethod() + ") URI: " + req.getRequestURI() + " \n");
         HttpServletResponse res = (HttpServletResponse) response;
         sb.append("Status: " + res.getStatus() + "\n");
         logHeader(res.getHeaderNames().stream(), s -> res.getHeaders(s).stream(), sb);
@@ -115,56 +120,70 @@ public class MCRRequestDebugFilter implements Filter {
             "Session " + (request.isRequestedSessionIdFromCookie() ? "is" : "is not") + " requested by cookie.\n");
         sb.append("Session " + (request.isRequestedSessionIdFromURL() ? "is" : "is not") + " requested by URL.\n");
         sb.append("Session " + (request.isRequestedSessionIdValid() ? "is" : "is not") + " valid.\n");
-        if (request.getSession(false) != null) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
             sb.append("SESSION " + request.getSession().getId() + " created at: " + LocalDateTime
                 .ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()), ZoneId.systemDefault())
                 .toString() + "\n");
             sb.append("SESSION ATTRIBUTES: \n");
-            Map<String, Object> sortedAttrs = sortSessionAttributes(request);
-            for (Map.Entry<String, Object> entry : sortedAttrs.entrySet()) {
-                String description = "";
-                try {
-                    description = BeanUtils.describe(entry.getValue()).toString();
-                } catch (Exception e) {
-                    LOGGER.error("BeanUtils Exception describing attribute " + entry.getKey(), e);
-                }
-                sb.append(" " + entry.getKey() + ": " + description + "\n");
-            }
+            MCRUtils
+                .asStream(session.getAttributeNames())
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .forEachOrdered(attrName -> {
+                    sb.append(" " + attrName + ": "
+                        + getValue(attrName, Optional.ofNullable(session.getAttribute(attrName))) + "\n");
+                });
             sb.append("SESSION ATTRIBUTES END \n\n");
         }
     }
 
+    private String getValue(String key, Optional<Object> value) {
+        String description = value.map(o -> {
+            if (!hasSafeToString(o)) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> beanDescription = BeanUtils.describe(value);
+                    if (!beanDescription.isEmpty()) {
+                        return beanDescription.toString();
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("BeanUtils Exception describing attribute " + key, e);
+                }
+            }
+            return o.toString();
+        }).orElse("<null>");
+
+        return description;
+    }
+
+    private static boolean hasSafeToString(Object o) {
+        return o != null && Stream
+            .of(CharSequence.class, Number.class, Boolean.class, Map.class, Collection.class, URI.class, URL.class,
+                InetAddress.class, Throwable.class,
+                Path.class, File.class, Class.class)
+            .parallel()
+            .filter(c -> c.isAssignableFrom(o.getClass()))
+            .findAny()
+            .isPresent();
+    }
+
     private void logRequestParameters(ServletRequest request, StringBuilder sb) {
         sb.append("REQUEST PARAMETERS:\n");
-        Map<String, String[]> sortedParams = sortRequestParameters(request);
-        for (Map.Entry<String, String[]> entry : sortedParams.entrySet()) {
-            StringBuilder builder = new StringBuilder();
-            for (String s : entry.getValue()) {
-                builder.append(s);
-                builder.append(", ");
-            }
-            sb.append(" " + entry.getKey() + ": " + builder.toString() + "\n");
-        }
+        request.getParameterMap()
+            .entrySet()
+            .stream()
+            .sorted((o1, o2) -> {
+                return String.CASE_INSENSITIVE_ORDER.compare(o1.getKey(), o2.getKey());
+            })
+            .forEachOrdered(entry -> {
+                sb.append(" " + entry.getKey() + ": ");
+                for (String s : entry.getValue()) {
+                    sb.append(s);
+                    sb.append(", ");
+                }
+                sb.append("\n");
+            });
         sb.append("REQUEST PARAMETERS END \n\n");
-    }
-
-    private Map<String, Object> sortSessionAttributes(HttpServletRequest request) {
-        Map<String, Object> sortedAttrs = new TreeMap<String, Object>();
-        Enumeration<String> attrEnum = request.getSession().getAttributeNames();
-        while (attrEnum.hasMoreElements()) {
-            String s = attrEnum.nextElement();
-            sortedAttrs.put(s, request.getAttribute(s));
-        }
-        return sortedAttrs;
-    }
-
-    private Map<String, String[]> sortRequestParameters(ServletRequest request) {
-        Map<String, String[]> sortedParams = new TreeMap<String, String[]>();
-        Set<Map.Entry<String, String[]>> params = request.getParameterMap().entrySet();
-        for (Map.Entry<String, String[]> entry : params) {
-            sortedParams.put(entry.getKey(), entry.getValue());
-        }
-        return sortedParams;
     }
 
     /* (non-Javadoc)
