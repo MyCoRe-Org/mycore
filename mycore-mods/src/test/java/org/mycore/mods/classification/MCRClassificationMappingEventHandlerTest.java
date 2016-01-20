@@ -53,7 +53,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRHibTestCase {
         MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
         mapper.handleObjectUpdated(null, mcro);
 
-        String expression = "//mods:classification[@generator='" + MCRClassificationMappingEventHandler.getGenerator() + "' and contains(@valueURI, 'StudyThesis')]";
+        String expression = "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
         XPathExpression<Element> expressionObject = XPathFactory.instance().compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
         Assert.assertNotNull("The mapped classification should be in the MyCoReObject now!", expressionObject.evaluateFirst(mcro.createXML()));
     }
