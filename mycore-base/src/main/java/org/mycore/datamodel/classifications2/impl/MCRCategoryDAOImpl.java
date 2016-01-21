@@ -322,6 +322,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 parentsCopy.add(copyDeep(parents.get(i), 0));
             }
 
+            if (parentsCopy.size() == 0) {
+                return null;
+            }
+
             MCRCategoryImpl root = parentsCopy.get(0);
             for (int i = 1; i < parentsCopy.size(); i++) {
                 parentsCopy.get(i).setRoot(root);
