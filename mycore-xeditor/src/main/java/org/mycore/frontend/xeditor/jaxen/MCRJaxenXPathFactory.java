@@ -11,7 +11,6 @@ import org.jdom2.filter.Filter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.jaxen.JaxenXPathFactory;
 import org.mycore.common.MCRConstants;
-import org.mycore.frontend.xeditor.MCRUsedNamespaces;
 
 /**
  * @author Frank Lützenkirchen

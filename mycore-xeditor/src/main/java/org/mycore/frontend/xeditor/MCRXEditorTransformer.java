@@ -99,7 +99,7 @@ public class MCRXEditorTransformer {
     }
 
     public void addNamespace(String prefix, String uri) {
-        MCRUsedNamespaces.addNamespace(Namespace.getNamespace(prefix, uri));
+        MCRConstants.registerNamespace(Namespace.getNamespace(prefix, uri));
     }
 
     public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {

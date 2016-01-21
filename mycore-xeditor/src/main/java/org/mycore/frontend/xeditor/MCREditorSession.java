@@ -36,8 +36,11 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
 import org.jdom2.Verifier;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
@@ -165,7 +168,16 @@ public class MCREditorSession {
 
     public void setEditedXML(Document editedXML) throws JDOMException {
         this.editedXML = editedXML;
-        MCRUsedNamespaces.addNamespacesFrom(editedXML.getRootElement());
+        addNamespacesFrom(editedXML.getRootElement());
+    }
+    
+    private void addNamespacesFrom(Element element) {
+        MCRConstants.registerNamespace(element.getNamespace());
+        for (Namespace ns : element.getAdditionalNamespaces()) {
+            MCRConstants.registerNamespace(ns);
+        }
+        for (Element child : element.getChildren())
+            addNamespacesFrom(child);
     }
 
     public void setEditedXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {

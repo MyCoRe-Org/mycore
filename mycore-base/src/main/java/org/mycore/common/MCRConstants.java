@@ -122,8 +122,8 @@ public final class MCRConstants {
                     Namespace namespace = (Namespace) f.get(null);
                     registerNamespace(namespace);
                 } catch (Exception e) {
-                    Logger.getLogger(MCRConstants.class)
-                        .error("Error while initialising Namespace list and HashMap", e);
+                    Logger.getLogger(MCRConstants.class).error("Error while initialising Namespace list and HashMap",
+                        e);
                 }
             }
         }
@@ -138,11 +138,16 @@ public final class MCRConstants {
     }
 
     /**
-     * Adds and registers a standard namespace.
+     * Adds and registers a standard namespace with prefix.
+     * Note that a default namespace without prefix will be ignored here!
      */
     public static void registerNamespace(Namespace namespace) {
-        namespaces.add(namespace);
-        namespacesByPrefix.put(namespace.getPrefix(), namespace);
+        String prefix = namespace.getPrefix();
+
+        if ((prefix != null) && !prefix.isEmpty()) {
+            namespaces.add(namespace);
+            namespacesByPrefix.put(prefix, namespace);
+        }
     }
 
     /**
