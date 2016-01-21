@@ -45,7 +45,7 @@ public class MCRXPathBuilderTest extends MCRTestCase {
         Element title2 = new Element("title");
         Element author = new Element("contributor");
         Attribute role = new Attribute("role", "author");
-        Attribute lang = new Attribute("lang", "fodeo", Namespace.XML_NAMESPACE);
+        Attribute lang = new Attribute("lang", "de", Namespace.XML_NAMESPACE);
         author.setAttribute(role);
         author.setAttribute(lang);
         root.addContent(title1);
