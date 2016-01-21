@@ -41,6 +41,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRWrappedContent;
@@ -143,7 +144,7 @@ public class MCRXEditorTransformer {
         LocationPath lp = (LocationPath) (baseXPath.getRootExpr());
         NameStep nameStep = (NameStep) (lp.getSteps().get(0));
         String prefix = nameStep.getPrefix();
-        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRUsedNamespaces.getNamespace(prefix);
+        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRConstants.getStandardNamespace(prefix);
         return new Element(nameStep.getLocalName(), ns);
     }
 

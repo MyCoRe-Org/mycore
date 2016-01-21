@@ -40,6 +40,7 @@ import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
 import org.mycore.frontend.xeditor.tracker.MCRAddedAttribute;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
 import org.mycore.frontend.xeditor.tracker.MCRChangeData;
@@ -100,7 +101,7 @@ public class MCRBinding {
         Map<String, Object> variables = buildXPathVariables();
 
         XPathExpression<Object> xPathExpr = XPathFactory.instance().compile(xPath, Filters.fpassthrough(), variables,
-                MCRUsedNamespaces.getNamespaces());
+            MCRConstants.getStandardNamespaces());
 
         boundNodes.addAll(xPathExpr.evaluate(parent.getBoundNodes()));
 

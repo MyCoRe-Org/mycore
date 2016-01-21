@@ -12,6 +12,7 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
 
 public class MCRXMLCleaner {
 
@@ -97,9 +98,9 @@ class MCRCleaningRule {
     public MCRCleaningRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
         this.xPathExprNodesToInspect = xPathExprNodesToInspect;
         this.xPathNodesToInspect = XPathFactory.instance().compile(xPathExprNodesToInspect, Filters.fpassthrough(), null,
-                MCRUsedNamespaces.getNamespaces());
+            MCRConstants.getStandardNamespaces());
         this.xPathRelevancyTest = XPathFactory.instance().compile(xPathExprRelevancyTest, Filters.fpassthrough(), null,
-                MCRUsedNamespaces.getNamespaces());
+            MCRConstants.getStandardNamespaces());
     }
 
     public List<Object> getNodesToInspect(Document xml) {

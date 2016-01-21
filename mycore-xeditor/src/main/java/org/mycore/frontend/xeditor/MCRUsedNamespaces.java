@@ -23,11 +23,6 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
@@ -38,23 +33,6 @@ import org.mycore.common.MCRConstants;
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRUsedNamespaces {
-
-    private static List<Namespace> namespaces = new ArrayList<Namespace>();
-
-    private static Map<String, Namespace> prefix2namespace = new HashMap<String, Namespace>();
-
-    static {
-        for (Namespace ns : MCRConstants.getStandardNamespaces())
-            addNamespace(ns);
-    }
-
-    public static List<Namespace> getNamespaces() {
-        return namespaces;
-    }
-
-    public static Namespace getNamespace(String prefix) {
-        return prefix2namespace.get(prefix);
-    }
 
     public static void addNamespacesFrom(Element element) {
         addNamespace(element.getNamespace());
@@ -68,10 +46,9 @@ public class MCRUsedNamespaces {
     public static void addNamespace(Namespace ns) {
         String prefix = ns.getPrefix();
 
-        if ((prefix == null) || prefix.isEmpty() || prefix2namespace.containsKey(prefix))
+        if ((prefix == null) || prefix.isEmpty() )
             return;
 
-        namespaces.add(ns);
-        prefix2namespace.put(prefix, ns);
+        MCRConstants.registerNamespace(ns);
     }
 }

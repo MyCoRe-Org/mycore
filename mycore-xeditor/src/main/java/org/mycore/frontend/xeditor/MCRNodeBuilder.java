@@ -44,6 +44,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
+import org.mycore.common.MCRConstants;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -164,7 +165,7 @@ public class MCRNodeBuilder {
     private Object buildNameStep(NameStep nameStep, String value, Parent parent) throws JaxenException {
         String name = nameStep.getLocalName();
         String prefix = nameStep.getPrefix();
-        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRUsedNamespaces.getNamespace(prefix);
+        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRConstants.getStandardNamespace(prefix);
 
         if (nameStep.getAxis() == Axis.CHILD) {
             if (parent instanceof Document)

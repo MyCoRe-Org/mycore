@@ -28,6 +28,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
+import org.mycore.common.MCRConstants;
 
 /**
  * Builds an absolute XPath expression for a given element or attribute within a JDOM XML structure.
@@ -98,7 +99,7 @@ public class MCRXPathBuilder {
      */
     public static String getNamespacePrefix(Element element) {
         Namespace nsElement = element.getNamespace();
-        for (Namespace ns : MCRUsedNamespaces.getNamespaces())
+        for (Namespace ns : MCRConstants.getStandardNamespaces())
             if (ns.equals(nsElement))
                 return ns.getPrefix() + ":";
 
