@@ -26,7 +26,6 @@ package org.mycore.frontend.xeditor;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.jaxen.JaxenException;
@@ -60,42 +59,5 @@ public class MCRXPathEvaluatorTest extends MCRTestCase {
     public void testEvaluator() throws JaxenException, JDOMException {
         assertEquals("n1", evaluator.replaceXPathOrI18n("name[1]/@id"));
         assertEquals("n1", evaluator.replaceXPathOrI18n("/document/name[1]/@id"));
-    }
-
-    @Test
-    public void testGenerateID() throws JaxenException, JDOMException {
-        String id = evaluator.replaceXPathOrI18n("xed:generate-id(/document)");
-        assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(.)"));
-        assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id()"));
-        assertFalse(id.equals(evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[1])")));
-
-        id = evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[1])");
-        assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[1])"));
-        assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(/document/name)"));
-        assertFalse(id.equals(evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[2])")));
-    }
-
-    @Test
-    public void testJavaCall() throws JaxenException, JDOMException {
-        String res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','testNoArgs')");
-        assertEquals(testNoArgs(), res);
-
-        res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','testOneArg',name[2])");
-        assertEquals("n2", res);
-    }
-
-    public static String testNoArgs() {
-        return "testNoArgs";
-    }
-
-    public static String testOneArg(List<Element> nodes) {
-        return nodes.get(0).getAttributeValue("id");
-    }
-
-    @Test
-    public void testExternalJavaTest() throws JaxenException, JDOMException {
-        assertTrue(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserGuestUser')"));
-        assertFalse(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserSuperUser')"));
-        assertFalse(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserInRole','admins')"));
     }
 }

@@ -16,7 +16,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactory;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.services.i18n.MCRTranslation;
 
 /**
@@ -92,7 +92,12 @@ public class MCRXPathEvaluator {
             return true;
     }
 
-    private final static XPathFactory factory = XPathFactory.newInstance(MCRJaxenXPathFactory.class.getName());
+    private final static XPathFactory factory;
+
+    static {
+        String factoryClass = MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null);
+        factory = factoryClass == null ? XPathFactory.instance() : XPathFactory.newInstance(factoryClass);
+    }
 
     public Object evaluateFirst(String xPathExpression) {
         try {
