@@ -1,5 +1,5 @@
 /*
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -31,7 +31,7 @@ import org.jdom2.Parent;
 
 /**
  * Builds an absolute XPath expression for a given element or attribute within a JDOM XML structure.
- * 
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRXPathBuilder {
@@ -40,7 +40,7 @@ public class MCRXPathBuilder {
      * Builds an absolute XPath expression for a given element or attribute within a JDOM XML structure.
      * In case any ancestor element in context is not the first one, the XPath will also contain a position predicate.
      * For all namespaces commonly used in MyCoRe, their namespace prefixes will be used.
-     * 
+     *
      * @param object a JDOM element or attribute
      * @return absolute XPath of that object. In case there is a root Document, it will begin with a "/".
      */
@@ -57,8 +57,8 @@ public class MCRXPathBuilder {
      * Builds an absolute XPath expression for the given attribute within a JDOM XML structure.
      * In case any ancestor element in context is not the first one, the XPath will also contain position predicates.
      * For all namespaces commonly used in MyCoRe, their namespace prefixes will be used.
-     * 
-     * @param object a JDOM attribute
+     *
+     * @param attribute a JDOM attribute
      * @return absolute XPath of that attribute. In case there is a root Document, it will begin with a "/".
      */
     public static String buildXPath(Attribute attribute) {
@@ -72,8 +72,8 @@ public class MCRXPathBuilder {
      * Builds an absolute XPath expression for the given element within a JDOM XML structure.
      * In case any ancestor element in context is not the first one, the XPath will also contain position predicates.
      * For all namespaces commonly used in MyCoRe, their namespace prefixes will be used.
-     * 
-     * @param object a JDOM element
+     *
+     * @param element a JDOM element
      * @return absolute XPath of that element. In case there is a root Document, it will begin with a "/".
      */
     public static String buildXPath(Element element) {
@@ -87,14 +87,14 @@ public class MCRXPathBuilder {
     }
 
     /**
-     * Builds a local XPath fragment as combined namespace prefix, local element name and position predicate  
+     * Builds a local XPath fragment as combined namespace prefix, local element name and position predicate
      */
     public static String buildChildPath(Element element) {
         return getNamespacePrefix(element) + element.getName() + buildPositionPredicate(element);
     }
 
     /**
-     * Returns the namespace prefix for this element, followed by a ":", or the empty string if no namespace prefix known.  
+     * Returns the namespace prefix for this element, followed by a ":", or the empty string if no namespace prefix known.
      */
     public static String getNamespacePrefix(Element element) {
         Namespace nsElement = element.getNamespace();
