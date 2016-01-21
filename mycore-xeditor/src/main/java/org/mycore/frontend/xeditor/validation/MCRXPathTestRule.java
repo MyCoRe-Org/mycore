@@ -2,8 +2,8 @@ package org.mycore.frontend.xeditor.validation;
 
 import java.util.List;
 
+import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
-import org.mycore.frontend.xeditor.MCRXPathBuilder;
 import org.mycore.frontend.xeditor.MCRXPathEvaluator;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

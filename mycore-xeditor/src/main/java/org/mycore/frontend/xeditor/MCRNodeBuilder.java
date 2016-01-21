@@ -45,6 +45,7 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.xml.MCRXPathBuilder;
 
 /**
  * @author Frank L\u00FCtzenkirchen

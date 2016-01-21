@@ -2,8 +2,8 @@ package org.mycore.frontend.xeditor.validation;
 
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
+import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
-import org.mycore.frontend.xeditor.MCRXPathBuilder;
 import org.w3c.dom.Node;
 
 public abstract class MCRValidationRule {

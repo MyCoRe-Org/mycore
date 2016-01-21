@@ -10,6 +10,7 @@ import java.util.Set;
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.common.xml.MCRXPathBuilder;
 
 public class MCREditorSubmission {
 
