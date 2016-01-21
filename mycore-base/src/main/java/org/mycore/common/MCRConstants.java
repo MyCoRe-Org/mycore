@@ -130,7 +130,8 @@ public final class MCRConstants {
             if (f.getType() == Namespace.class) {
                 try {
                     Namespace namespace = (Namespace) f.get(null);
-                    addStandardNamespace(namespace);
+                    namespaces.add(namespace);
+                    namespacesByPrefix.put(namespace.getPrefix(), namespace);
                 } catch (Exception e) {
                     Logger.getLogger(MCRConstants.class)
                         .error("Error while initialising Namespace list and HashMap", e);
@@ -143,16 +144,9 @@ public final class MCRConstants {
             String uri = p.get(prefix);
             prefix = prefix.substring(prefix.lastIndexOf(".") + 1);
             Namespace ns = Namespace.getNamespace(prefix, uri);
-            addStandardNamespace(ns);
+            namespacesByPrefix.put(prefix, ns);
+            namespaces.add(ns);
         }
-    }
-
-    /**
-     * Adds and registers a standard namespace.
-     */
-    public static void addStandardNamespace(Namespace namespace) {
-        namespaces.add(namespace);
-        namespacesByPrefix.put(namespace.getPrefix(), namespace);
     }
 
     /**
