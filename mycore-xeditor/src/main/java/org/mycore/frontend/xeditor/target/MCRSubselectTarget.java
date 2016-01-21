@@ -33,7 +33,6 @@ import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCRXPathEvaluator;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -55,7 +54,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
         LOGGER.info("New subselect for " + xPath + " using pattern " + href);
 
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-        href = new MCRXPathEvaluator(binding).replaceXPaths(href, true);
+        href = binding.getXPathEvaluator().replaceXPaths(href, true);
         binding.detach();
 
         session.setBreakpoint("After starting subselect at " + href + " for " + xPath);

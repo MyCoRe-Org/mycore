@@ -24,7 +24,7 @@ import org.mycore.services.i18n.MCRTranslation;
  */
 public class MCRXPathEvaluator {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRBinding.class);
+    private final static Logger LOGGER = Logger.getLogger(MCRXPathEvaluator.class);
 
     private final static Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
 
@@ -32,15 +32,15 @@ public class MCRXPathEvaluator {
 
     private List<Object> context;
 
+    public MCRXPathEvaluator(Map<String, Object> variables, List<Object> context) {
+        this.variables = variables;
+        this.context = context;
+    }
+
     public MCRXPathEvaluator(Map<String, Object> variables, Parent context) {
         this.variables = variables;
         this.context = new ArrayList<Object>();
         this.context.add(context);
-    }
-
-    public MCRXPathEvaluator(MCRBinding binding) {
-        this.variables = binding.buildXPathVariables();
-        this.context = binding.getBoundNodes();
     }
 
     public String replaceXPaths(String text, boolean urlEncode) {

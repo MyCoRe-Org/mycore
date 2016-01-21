@@ -203,6 +203,13 @@ public class MCRNodeBuilder {
         return canNotBuild(ee);
     }
 
+    /**
+     * Resolves the first match for the given XPath and returns its value as a String 
+     * 
+     * @param xPath the XPath expression
+     * @param parent the context element or document 
+     * @return the value of the element or attribute as a String
+     */
     public String getValueOf(String xPath, Parent parent) {
         Object result = evaluateFirst(xPath, parent);
 
@@ -258,6 +265,9 @@ public class MCRNodeBuilder {
         return attribute;
     }
 
+    /**
+     * Removes obsolete child:: and attribute:: axis prefixes from given XPath
+     */
     public static String simplify(String xPath) {
         return xPath.replaceAll("child::", "").replaceAll("attribute::", "@");
     }

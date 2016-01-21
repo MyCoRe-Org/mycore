@@ -30,7 +30,7 @@ public class MCRXPathTestRule extends MCRValidationRule {
                 continue;
 
             MCRBinding nodeBinding = new MCRBinding(i + 1, binding);
-            MCRXPathEvaluator evaluator = new MCRXPathEvaluator(nodeBinding);
+            MCRXPathEvaluator evaluator = nodeBinding.getXPathEvaluator();
             boolean result = evaluator.test(xPathExpression);
             nodeBinding.detach();
 

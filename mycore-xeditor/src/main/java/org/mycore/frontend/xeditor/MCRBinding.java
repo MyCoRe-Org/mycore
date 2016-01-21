@@ -276,6 +276,10 @@ public class MCRBinding {
     public String getAbsoluteXPath() {
         return MCRXPathBuilder.buildXPath(getBoundNode());
     }
+    
+    public MCRXPathEvaluator getXPathEvaluator() {
+        return new MCRXPathEvaluator(buildXPathVariables(), getBoundNodes());
+    }
 
     public void track(MCRChangeData change) {
         if (tracker != null)

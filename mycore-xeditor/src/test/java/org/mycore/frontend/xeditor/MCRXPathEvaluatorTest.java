@@ -50,12 +50,10 @@ public class MCRXPathEvaluatorTest extends MCRTestCase {
         super.setUp();
         String builder = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
         Element document = new MCRNodeBuilder().buildElement(builder, null, null);
-        MCRBinding rootBinding = new MCRBinding(new Document(document));
+        new Document(document);
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.put("CurrentUser", "gast");
-        rootBinding.setVariables(variables);
-        MCRBinding documentBinding = new MCRBinding("/document", false, rootBinding);
-        evaluator = new MCRXPathEvaluator(documentBinding);
+        evaluator = new MCRXPathEvaluator(variables, document);
     }
 
     @Test

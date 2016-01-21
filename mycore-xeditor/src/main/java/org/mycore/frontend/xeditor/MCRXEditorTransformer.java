@@ -41,6 +41,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.jdom2.Parent;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
@@ -82,8 +83,10 @@ public class MCRXEditorTransformer {
         if (transformer instanceof MCRParameterizedTransformer) {
             String key = MCRXEditorTransformerStore.storeTransformer(this);
             transformationParameters.setParameter("XEditorTransformerKey", key);
-            MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
-            if (result instanceof MCRWrappedContent && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {
+            MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource,
+                transformationParameters);
+            if (result instanceof MCRWrappedContent
+                && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {
                 //lazy transformation make JUnit tests fail
                 result = ((MCRWrappedContent) result).getBaseContent();
             }
@@ -202,12 +205,13 @@ public class MCRXEditorTransformer {
 
     public MCRXPathEvaluator getXPathEvaluator() {
         if (currentBinding != null)
-            return new MCRXPathEvaluator(currentBinding);
+            return currentBinding.getXPathEvaluator();
         else
-            return new MCRXPathEvaluator(editorSession.getVariables(), null);
+            return new MCRXPathEvaluator(editorSession.getVariables(), (Parent) null);
     }
 
-    public String repeat(String xPath, int minRepeats, int maxRepeats, String method) throws JDOMException, JaxenException {
+    public String repeat(String xPath, int minRepeats, int maxRepeats, String method)
+        throws JDOMException, JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
         setCurrentBinding(repeat);
         return StringUtils.repeat("a ", repeat.getBoundNodes().size());
@@ -300,15 +304,17 @@ public class MCRXEditorTransformer {
 
         String xPaths2CheckResubmission = editorSession.getSubmission().getXPaths2CheckResubmission();
         if (!xPaths2CheckResubmission.isEmpty())
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION, xPaths2CheckResubmission));
+            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
+                xPaths2CheckResubmission));
 
         Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();
         for (String xPath : defaultValues.keySet())
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath, defaultValues.get(xPath)));
+            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
+                defaultValues.get(xPath)));
 
         editorSession.setBreakpoint("After transformation to HTML");
         nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSessionStore.XEDITOR_SESSION_PARAM,
-                editorSession.getCombinedSessionStepID()));
+            editorSession.getCombinedSessionStepID()));
 
         return nodeSet;
     }
