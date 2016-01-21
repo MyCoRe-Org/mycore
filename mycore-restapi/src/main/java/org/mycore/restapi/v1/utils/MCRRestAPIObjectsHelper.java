@@ -43,6 +43,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Comment;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -71,6 +76,7 @@ import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.errors.MCRRestAPIFieldError;
 import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
+import org.mycore.solr.MCRSolrClientFactory;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -745,26 +751,29 @@ public class MCRRestAPIObjectsHelper {
 
             return MCRMetadataManager.retrieveMCRObject(mcrID);
         } else {
-            //TODO SOLR Migration
-            /*
-            MCRQuery mcrQuery = new MCRQuery((new MCRQueryParser()).parse("("+key+" = "+idString+")"));
-             MCRResults result = MCRQueryManager.search(mcrQuery);
-             
-             if(result.getNumHits()==1){
-                 String id = result.getHit(0).getID();
-                 return MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
-             }
-             else{
-                 if(result.getNumHits()==0){
-                     throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND,
-                             "There is no object with the given ID '" + key+":"+idString + "'.", null));
-                 }
-                 else{
-                     throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND,
-                             "The ID is not unique. There are "+result.getNumHits()+" objecst fore the given ID '" + key+":"+idString + "'.", null));
-                 }
-             }
-             */
+            SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+            SolrQuery query = new SolrQuery();
+            query.setQuery(key + ":" + idString);
+            try {
+                QueryResponse response = solrClient.query(query);
+                SolrDocumentList solrResults = response.getResults();
+                if (solrResults.getNumFound() == 1) {
+                    String id = solrResults.get(0).getFieldValue("returnId").toString();
+                    return retrieveMCRObject(id);
+                } else {
+                    if (solrResults.getNumFound() == 0) {
+                        throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND,
+                            "There is no object with the given ID '" + key + ":" + idString + "'.", null));
+                    } else {
+                        throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND,
+                            "The ID is not unique. There are " + solrResults.getNumFound()
+                                + " objecst fore the given ID '" + key + ":" + idString + "'.",
+                            null));
+                    }
+                }
+            } catch (SolrServerException | IOException e) {
+                LOGGER.error(e);
+            }
             return null;
         }
     }
