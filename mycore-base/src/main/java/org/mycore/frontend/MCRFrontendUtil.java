@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * Servlet/Jersey Resource utility class.
@@ -104,8 +105,8 @@ public class MCRFrontendUtil {
         }
     }
 
-    public static void configureSession(MCRSession session, HttpServletRequest request) {
-        session.setServletRequest(request);
+    public static void configureSession(MCRSession session, HttpServletRequest request, HttpServletResponse response) {
+        session.setServletJob(new MCRServletJob(request, response));
         // language
         getProperty(request, "lang").ifPresent(session::setCurrentLanguage);
 

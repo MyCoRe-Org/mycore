@@ -23,12 +23,15 @@
 package org.mycore.user2.login;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
@@ -39,10 +42,13 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.frontend.support.MCRLogin.InputField;
+import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.user2.MCRRealm;
 import org.mycore.user2.MCRRealmFactory;
 import org.mycore.user2.MCRUser;
@@ -60,6 +66,8 @@ import org.xml.sax.SAXException;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRLoginServlet extends MCRServlet {
+    private static final String REALM_URL_PARAMETER = "realm";
+
     static final String HTTPS_ONLY_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly";
 
     private static final long serialVersionUID = 1L;
@@ -76,7 +84,7 @@ public class MCRLoginServlet extends MCRServlet {
     public void init() throws ServletException {
         if (!LOCAL_LOGIN_SECURE_ONLY) {
             LOGGER.warn("Login over unsecure connection is permitted. Set '" + HTTPS_ONLY_PROPERTY
-                    + "=true' to prevent cleartext transmissions of passwords.");
+                + "=true' to prevent cleartext transmissions of passwords.");
         }
         super.init();
     }
@@ -106,7 +114,7 @@ public class MCRLoginServlet extends MCRServlet {
         HttpServletResponse res = job.getResponse();
 
         String action = req.getParameter("action");
-        String realm = req.getParameter("realm");
+        String realm = req.getParameter(REALM_URL_PARAMETER);
         job.getResponse().setHeader("Cache-Control", "no-cache");
         job.getResponse().setHeader("Pragma", "no-cache");
         job.getResponse().setHeader("Expires", "0");
@@ -116,7 +124,7 @@ public class MCRLoginServlet extends MCRServlet {
         } else if ("cancel".equals(action)) {
             redirect(res);
         } else if (realm != null) {
-            loginToRealm(req, res, req.getParameter("realm"));
+            loginToRealm(req, res, req.getParameter(REALM_URL_PARAMETER));
         } else {
             chooseLoginMethod(req, res);
         }
@@ -149,22 +157,26 @@ public class MCRLoginServlet extends MCRServlet {
         loginToRealm(req, res, realmID);
     }
 
-    private void presentLoginForm(MCRServletJob job) throws IOException, TransformerException, SAXException {
+    private void presentLoginForm(MCRServletJob job)
+        throws IOException, TransformerException, SAXException, JAXBException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
         if (LOCAL_LOGIN_SECURE_ONLY && !req.isSecure()) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, getErrorI18N("component.user2.login", "httpsOnly"));
             return;
         }
-        Element root = new Element("login");
 
+        String returnURL = getReturnURL(req);
+        String formAction = req.getRequestURI();
+        MCRLogin loginForm = new MCRLogin(MCRSessionMgr.getCurrentSession().getUserInformation(), returnURL,
+            formAction);
         String uid = getProperty(req, "uid");
         String pwd = getProperty(req, "pwd");
         if (uid != null) {
             MCRUser user = MCRUserManager.login(uid, pwd);
             if (user == null) {
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                root.setAttribute("loginFailed", "true");
+                loginForm.setLoginFailed(true);
             } else {
                 //user logged in
                 // MCR-1154
@@ -174,18 +186,17 @@ public class MCRLoginServlet extends MCRServlet {
                 return;
             }
         }
-        addCurrentUserInfo(root);
-        root.addContent(new org.jdom2.Element("returnURL").addContent(getReturnURL(req)));
-        getLayoutService().doLayout(req, res, new MCRJDOMContent(root));
+        addFormFields(loginForm, job.getRequest().getParameter(REALM_URL_PARAMETER));
+        getLayoutService().doLayout(req, res, new MCRJAXBContent<>(JAXBContext.newInstance(MCRLogin.class), loginForm));
     }
 
     private void listRealms(HttpServletRequest req, HttpServletResponse res)
-            throws IOException, TransformerException, SAXException {
+        throws IOException, TransformerException, SAXException {
         String redirectURL = getReturnURL(req);
         Document realmsDoc = MCRRealmFactory.getRealmsDocument();
         Element realms = realmsDoc.getRootElement();
         addCurrentUserInfo(realms);
-        List<Element> realmList = realms.getChildren("realm");
+        List<Element> realmList = realms.getChildren(REALM_URL_PARAMETER);
         for (Element realm : realmList) {
             String realmID = realm.getAttributeValue("id");
             Element login = realm.getChild("login");
@@ -195,21 +206,49 @@ public class MCRLoginServlet extends MCRServlet {
         getLayoutService().doLayout(req, res, new MCRJDOMContent(realmsDoc));
     }
 
+    protected static void addFormFields(MCRLogin login, String loginToRealm) {
+        ArrayList<org.mycore.frontend.support.MCRLogin.InputField> fields = new ArrayList<>();
+        if (loginToRealm != null) {
+            //realmParameter
+            MCRRealm realm = MCRRealmFactory.getRealm(loginToRealm);
+            InputField realmParameter = new InputField(realm.getRealmParameter(), loginToRealm, null, null, false,
+                true);
+            fields.add(realmParameter);
+        }
+        fields.add(new InputField("action", "login", null, null, false, true));
+        fields.add(new InputField("url", login.getReturnURL(), null, null, false, true));
+        String userNameText = MCRTranslation.translate("component.user2.login.form.userName");
+        fields.add(new InputField("uid", null, userNameText, userNameText, false, false));
+        String pwdText = MCRTranslation.translate("component.user2.login.form.password");
+        fields.add(new InputField("pwd", null, pwdText, pwdText, true, false));
+        login.getForm().getInput().addAll(fields);
+    }
+
     static void addCurrentUserInfo(Element rootElement) {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
         rootElement.setAttribute("user", userInfo.getUserID());
         String realmId = (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel()
-                : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
+            : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
         if (realmId == null) {
             realmId = MCRRealmFactory.getLocalRealm().getLabel();
         }
-        rootElement.setAttribute("realm", realmId);
+        rootElement.setAttribute(REALM_URL_PARAMETER, realmId);
         rootElement.setAttribute("guest", String.valueOf(currentUserIsGuest()));
+    }
+
+    static void addCurrentUserInfo(MCRLogin login) {
+        MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
+        String realmId = (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel()
+            : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
+        if (realmId == null) {
+            realmId = MCRRealmFactory.getLocalRealm().getLabel();
+        }
+        login.setRealm(realmId);
     }
 
     private static boolean currentUserIsGuest() {
         return MCRSessionMgr.getCurrentSession().getUserInformation()
-                .equals(MCRSystemUserInformation.getGuestInstance());
+            .equals(MCRSystemUserInformation.getGuestInstance());
     }
 
     private int getNumLoginOptions() {

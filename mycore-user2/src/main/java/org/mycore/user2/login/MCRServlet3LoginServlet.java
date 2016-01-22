@@ -31,14 +31,16 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
-import org.jdom2.Element;
-import org.mycore.common.MCRException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRJAXBContent;
+import org.mycore.frontend.filter.MCRRequestAuthenticationFilter;
 import org.mycore.frontend.servlets.MCRContainerLoginServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealm;
@@ -51,7 +53,7 @@ import org.xml.sax.SAXException;
 public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRServlet3LoginServlet.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void init() throws ServletException {
@@ -76,7 +78,8 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
         if (uid != null && pwd != null) {
             MCRSession session = MCRSessionMgr.getCurrentSession();
             req.login(uid, pwd);
-            session.setUserInformation(new Servlet3ContainerUserInformation(session, realm, uid, pwd));
+            session.setUserInformation(new Servlet3ContainerUserInformation(session, realm));
+            req.getSession().setAttribute(MCRRequestAuthenticationFilter.SESSION_KEY, Boolean.TRUE);
             LOGGER.info("Logged in: " + session.getUserInformation().getUserID());
         }
     }
@@ -104,58 +107,33 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
     }
 
     private void presentLoginForm(HttpServletRequest req, HttpServletResponse res, ServletException ex)
-        throws IOException, TransformerException, SAXException {
-        Element root = new Element("login");
-        MCRLoginServlet.addCurrentUserInfo(root);
-        root.addContent(new org.jdom2.Element("returnURL").addContent(MCRLoginServlet.getReturnURL(req)));
-        req.setAttribute("XSL.FormTarget", req.getRequestURI());
+        throws IOException, TransformerException, SAXException, JAXBException {
+        String returnURL = MCRLoginServlet.getReturnURL(req);
+        String formAction = req.getRequestURI();
+        MCRLogin loginForm = new MCRLogin(MCRSessionMgr.getCurrentSession().getUserInformation(), returnURL,
+            formAction);
+        MCRLoginServlet.addCurrentUserInfo(loginForm);
         String realm = getProperty(req, "realm");
         if (realm != null) {
             req.setAttribute("XSL.Realm", realm);
         }
+        MCRLoginServlet.addFormFields(loginForm, realm);
         if (ex != null) {
             //Login failed
             res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            root.setAttribute("loginFailed", "true");
-            root.addContent(new Element("errorMessage").setText(ex.getMessage()));
+            loginForm.setLoginFailed(true);
+            loginForm.setErrorMessage(ex.getMessage());
         }
-        getLayoutService().doLayout(req, res, new MCRJDOMContent(root));
+        getLayoutService().doLayout(req, res, new MCRJAXBContent<>(JAXBContext.newInstance(MCRLogin.class), loginForm));
     }
 
     private static class Servlet3ContainerUserInformation extends ContainerUserInformation {
 
-        private String user, pwd, realm;
+        private String realm;
 
-        public Servlet3ContainerUserInformation(MCRSession session, String realm, String user, String pwd) {
+        public Servlet3ContainerUserInformation(MCRSession session, String realm) {
             super(session);
             this.realm = realm;
-            this.user = user;
-            this.pwd = pwd;
-        }
-
-        private void loginIfNeeded() {
-            getCurrentRequest().ifPresent(currentRequest -> {
-                if (currentRequest.getUserPrincipal() == null) {
-                    try {
-                        currentRequest.login(user, pwd);
-                        LOGGER.debug("Re-Logged in: " + user);
-                    } catch (ServletException e) {
-                        throw new MCRException(e);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public String getUserID() {
-            loginIfNeeded();
-            return super.getUserID();
-        }
-
-        @Override
-        public boolean isUserInRole(String role) {
-            loginIfNeeded();
-            return super.isUserInRole(role);
         }
 
         @Override

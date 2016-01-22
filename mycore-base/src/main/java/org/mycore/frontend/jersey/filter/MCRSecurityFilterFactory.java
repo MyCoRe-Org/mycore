@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -25,11 +26,14 @@ public class MCRSecurityFilterFactory implements ResourceFilterFactory {
 
     @Context
     HttpServletRequest httpRequest;
+    
+    @Context
+    HttpServletResponse httpResponse;
 
     @Override
     public List<ResourceFilter> create(AbstractMethod am) {
         List<ResourceFilter> filters = new ArrayList<ResourceFilter>();
-        filters.add(new MCRSessionHookFilter(httpRequest));
+        filters.add(new MCRSessionHookFilter(httpRequest, httpResponse));
         filters.add(TRANSACTION_FILTER);
         
         MCRRestrictedAccess restrictedAccessMETHOD = am.getAnnotation(MCRRestrictedAccess.class);

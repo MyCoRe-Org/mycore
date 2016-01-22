@@ -365,7 +365,7 @@ public class MCRServlet extends HttpServlet {
         msg.append(" user=").append(session.getUserInformation().getUserID());
         LOGGER.info(msg.toString());
 
-        MCRFrontendUtil.configureSession(session, job.getRequest());
+        MCRFrontendUtil.configureSession(session, job.getRequest(), job.getResponse());
     }
 
     private Exception processThinkPhase(MCRServletJob job) {

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+
+  <section i18n="users.login.error.loginFailedHeader" xml:lang="all">
+    <div class="jumbotron text-center">
+      <h1>
+        <i18n key="users.login.error.header" />
+      </h1>
+      <h2>
+        <i18n key="users.login.error.loginFailedHeader" />
+      </h2>
+      <p class="lead">
+        <i18n key="users.login.error.loginFailedMsg" />
+      </p>
+      <div class="form-actions">
+        <a href="javascript:window.history.go(-2)" class="btn btn-default">
+          <i18n key="users.login.error.BtnGoBack" />
+        </a>
+        <a href="javascript:window.history.go(-1)" class="btn btn-primary">
+          <i18n key="users.login.error.BtnRetry" />
+        </a>
+      </div>
+    </div>
+  </section>
+</MyCoReWebPage>

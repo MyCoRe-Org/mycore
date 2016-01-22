@@ -39,6 +39,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
@@ -48,6 +49,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * Instances of this class collect information kept during a session like the currently active user, the preferred
@@ -100,7 +102,7 @@ public class MCRSession implements Cloneable {
 
     private ThreadLocal<Transaction> transaction = new ThreadLocal<Transaction>();
     
-    private ThreadLocal<HttpServletRequest> httpRequest = new ThreadLocal<>();
+    private ThreadLocal<MCRServletJob> servletJob = new ThreadLocal<>();
 
     private StackTraceElement[] constructingStackTrace;
 
@@ -284,8 +286,8 @@ public class MCRSession implements Cloneable {
         return lastAccessTime;
     }
     
-    public void setServletRequest(HttpServletRequest req){
-        httpRequest.set(req);
+    public void setServletJob(MCRServletJob job){
+        servletJob.set(job);
     }
     
     /**
@@ -293,7 +295,15 @@ public class MCRSession implements Cloneable {
      * Does not work in a Thread that does not handle the current request or in CLI.
      */
     public Optional<HttpServletRequest> getServletRequest(){
-        return Optional.ofNullable(httpRequest.get());
+        return Optional.ofNullable(servletJob.get()).map(MCRServletJob::getRequest);
+    }
+
+    /**
+     * Returns this thread current HttpServletResponse.
+     * Does not work in a Thread that does not handle the current request or in CLI.
+     */
+    public Optional<HttpServletResponse> getServletResponse(){
+        return Optional.ofNullable(servletJob.get()).map(MCRServletJob::getResponse);
     }
 
     /**
@@ -328,7 +338,7 @@ public class MCRSession implements Cloneable {
         } else {
             LOGGER.debug("deactivate currentThreadCount: " + currentThreadCount.get().get());
         }
-        httpRequest.remove();
+        servletJob.remove();
     }
 
     /**

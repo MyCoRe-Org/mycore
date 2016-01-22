@@ -34,8 +34,6 @@
   &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:param name="FormTarget" select="concat($ServletsBaseURL,'MCRLoginServlet')" />
-  <xsl:param name="Realm" select="'local'" />
-  <xsl:variable name="loginToRealm" select="document(concat('realm:',$Realm))" />
 
   <xsl:variable name="PageTitle" select="i18n:translate('component.user2.login.form.title')" />
 
@@ -50,36 +48,17 @@
   </xsl:template>
 
   <xsl:template match="login" mode="userAction">
-    <form action="{$FormTarget}{$HttpSession}" method="post" role="form" class="form-login">
+    <xsl:apply-templates select="form" />
+  </xsl:template>
+  
+  <xsl:template match="form">
+    <form action="{@action}{$HttpSession}" method="post" role="form" class="form-login">
       <h2 class="form-login-heading">
         <xsl:value-of select="i18n:translate('component.user2.login.heading')" />
       </h2>
-      <xsl:apply-templates select="$loginToRealm" mode="form" />
-      <input type="hidden" name="action" value="login" />
-      <input type="hidden" name="url" value="{returnURL}" />
-      <xsl:variable name="userNameText" select="i18n:translate('component.user2.login.form.userName')" />
-      <xsl:variable name="passwordText" select="i18n:translate('component.user2.login.form.password')" />
       <fieldset>
         <!-- Here come the input fields... -->
-        <div>
-          <xsl:apply-templates select="." mode="controlGroupClass" />
-          <label class="control-label" for="user">
-            <xsl:value-of select="concat($userNameText,' :')" />
-          </label>
-          <div class="controls">
-            <input type="text" name="uid" class="form-control input-large" placeholder="{$userNameText}" title="{$userNameText}" autocorrect="off"
-              autocapitalize="off" />
-          </div>
-        </div>
-        <div>
-          <xsl:apply-templates select="." mode="controlGroupClass" />
-          <label class="control-label" for="password">
-            <xsl:value-of select="concat($passwordText,' :')" />
-          </label>
-          <div class="controls">
-            <input type="password" name="pwd" class="form-control input-large" placeholder="{$passwordText}" title="{$passwordText}" />
-          </div>
-        </div>
+        <xsl:apply-templates select="input" />
       </fieldset>
       <div class="form-actions">
         <xsl:choose>
@@ -104,6 +83,36 @@
         </xsl:choose>
       </div>
     </form>
+  </xsl:template>
+  
+  <xsl:template match="input">
+    <xsl:choose>
+      <xsl:when test="@isHidden='true'">
+        <input type="hidden" name="{@name}" value="{@value}" />
+      </xsl:when>
+      <xsl:otherwise>
+        <div>
+          <xsl:apply-templates select="." mode="controlGroupClass" />
+          <label class="control-label" for="{@name}">
+            <xsl:value-of select="concat(@label,' :')" />
+          </label>
+          <div class="controls">
+            <xsl:variable name="type">
+              <xsl:choose>
+                <xsl:when test="@isPassword='true'">
+                  <xsl:value-of select="'password'" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'text'" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            <input type="{$type}" name="{@name}" class="form-control input-large" placeholder="{@placeholder}" title="{@label}" autocorrect="off"
+              autocapitalize="off" />
+          </div>
+        </div>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="login" mode="userStatus">
@@ -131,12 +140,6 @@
         <xsl:value-of select="' has-error'" />
       </xsl:if>
     </xsl:attribute>
-  </xsl:template>
-
-  <xsl:template match="realm" mode="form">
-    <xsl:if test="login/@realmParameter">
-      <input type="hidden" name="{login/@realmParameter}" value="{@id}" />
-    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>

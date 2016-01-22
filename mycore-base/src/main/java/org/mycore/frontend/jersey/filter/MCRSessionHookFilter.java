@@ -3,6 +3,7 @@ package org.mycore.frontend.jersey.filter;
 import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSession;
@@ -18,11 +19,13 @@ import com.sun.jersey.spi.container.ResourceFilter;
 
 class MCRSessionHookFilter implements ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
     private HttpServletRequest httpRequest;
+    private HttpServletResponse httpResponse;
 
     private static final Logger LOGGER = Logger.getLogger(MCRSessionHookFilter.class);
 
-    public MCRSessionHookFilter(HttpServletRequest httpRequest) {
+    public MCRSessionHookFilter(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         this.httpRequest = httpRequest;
+        this.httpResponse = httpResponse;
     }
 
     @Override
@@ -37,7 +40,7 @@ class MCRSessionHookFilter implements ResourceFilter, ContainerRequestFilter, Co
         MCRSessionMgr.setCurrentSession(session);
         LOGGER.info(MessageFormat.format("{0} ip={1} mcr={2} user={3}", request.getPath(),
             MCRFrontendUtil.getRemoteAddr(httpRequest), session.getID(), session.getUserInformation().getUserID()));
-        MCRFrontendUtil.configureSession(session, httpRequest);
+        MCRFrontendUtil.configureSession(session, httpRequest, httpResponse);
         return request;
     }
 

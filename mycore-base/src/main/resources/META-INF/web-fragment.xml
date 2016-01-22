@@ -37,6 +37,11 @@
     <filter-class>org.mycore.frontend.filter.MCRRequestDebugFilter</filter-class>
   </filter>
 
+  <filter>
+    <filter-name>RequestAuthenticationFilter</filter-name>
+    <filter-class>org.mycore.frontend.filter.MCRRequestAuthenticationFilter</filter-class>
+  </filter>
+
   <servlet id="CreateObjectServlet">
     <servlet-name>CreateObjectServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRPersistentServlet</servlet-class>
@@ -195,6 +200,10 @@
     <servlet-name>MCRContainerLoginServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRContainerLoginServlet</servlet-class>
   </servlet>
+  <servlet id="MCRContainerLoginForm">
+    <servlet-name>MCRContainerLoginFormServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRContainerLoginFormServlet</servlet-class>
+  </servlet>
   <servlet>
     <servlet-name>MCRXSLInfoServlet</servlet-name>
     <servlet-class>org.mycore.common.xsl.MCRXSLInfoServlet</servlet-class>
@@ -206,6 +215,11 @@
 
   <filter-mapping>
     <filter-name>RequestDebugFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>RequestAuthenticationFilter</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
@@ -302,6 +316,10 @@
   <servlet-mapping>
     <servlet-name>MCRContainerLoginServlet</servlet-name>
     <url-pattern>/servlets/MCRContainerLoginServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRContainerLoginFormServlet</servlet-name>
+    <url-pattern>/servlets/MCRContainerLoginFormServlet</url-pattern>
   </servlet-mapping>
 
   <servlet id="MCRDisplayHideDerivateServlet">
@@ -550,8 +568,12 @@
   </error-page>
 
   <login-config>
-    <auth-method>DIGEST</auth-method>
+    <auth-method>FORM</auth-method>
     <realm-name>Restricted</realm-name>
+    <form-login-config>
+      <form-login-page>/servlets/MCRContainerLoginFormServlet</form-login-page>
+      <form-error-page>/authorization/login_error.xml</form-error-page>
+    </form-login-config>
   </login-config>
   <security-role>
     <description>every permitted user</description>

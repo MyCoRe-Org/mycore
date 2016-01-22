@@ -70,7 +70,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
     }
 
     protected static class ContainerUserInformation implements MCRUserInformation {
-        MCRSession session;
+        protected MCRSession session;
 
         String lastUser;
 
