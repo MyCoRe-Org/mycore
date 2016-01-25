@@ -395,6 +395,15 @@ public class MCRPersistentServlet extends MCRServlet {
             }
             throw ex;
         }
+        Properties params = new Properties();
+        Enumeration<String> e = job.getRequest().getParameterNames();
+        while (e.hasMoreElements()) {
+            String name = e.nextElement();
+            if (name.contains("XSL.")) {
+                String value = job.getRequest().getParameter(name);
+                params.put(name, value);
+            }
+        }
         switch (operation) {
             case create:
                 switch (type) {
@@ -415,7 +424,7 @@ public class MCRPersistentServlet extends MCRServlet {
                             }
                             else {
                                 job.getResponse().sendRedirect(
-                                    job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
+                                    job.getResponse().encodeRedirectURL(buildRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(), params)));
                             }
                         }
                         return;
@@ -433,7 +442,7 @@ public class MCRPersistentServlet extends MCRServlet {
                             throw new MCRException("No MCRObjectID given.");
                         } else
                             job.getResponse().sendRedirect(
-                                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
+                                job.getResponse().encodeRedirectURL(buildRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(), params)));
                         break;
                     case derivate: {
                         returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
