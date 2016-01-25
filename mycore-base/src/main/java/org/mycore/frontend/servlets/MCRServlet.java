@@ -57,7 +57,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
+import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.content.MCRJDOMContent;
@@ -230,7 +230,7 @@ public class MCRServlet extends HttpServlet {
         // store the HttpSession ID in MCRSession
         if (session.put("http.session", theSession.getId()) == null) {
             //first request
-            MCRUtils.asStream(req.getLocales())
+            MCRStreamUtils.asStream(req.getLocales())
                 .map(Locale::toString)
                 .filter(MCRTranslation.getAvailableLanguages()::contains)
                 .findFirst()

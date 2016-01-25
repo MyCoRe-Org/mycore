@@ -4,9 +4,15 @@
 package org.mycore.common;
 
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import com.google.common.collect.Iterators;
 
 /**
  * Helper methods to handle common Stream use cases.
@@ -46,6 +52,16 @@ public class MCRStreamUtils {
         Collection<T> subNodes = subNodesupplier.apply(node);
         return Stream.concat(Stream.of(node), (parallel ? subNodes.parallelStream() : subNodes.stream()).filter(filter)
             .flatMap(subNode -> flatten(subNode, subNodesupplier, parallel, filter)));
+    }
+
+    /**
+     * Transforms an Enumeration in a Stream.
+     * @param e the enumeration to transform
+     * @return a sequential, ordered Stream of unknown size
+     */
+    public static <T> Stream<T> asStream(Enumeration<T> e){
+        return StreamSupport
+            .stream(Spliterators.spliteratorUnknownSize(Iterators.forEnumeration(e), Spliterator.ORDERED), false);
     }
     
 }

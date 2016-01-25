@@ -32,7 +32,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRUtils;
+import org.mycore.common.MCRStreamUtils;
 
 /**
  * @author Thomas Scheffler
@@ -67,7 +67,7 @@ public class MCRRequestDebugFilter implements Filter {
         logCookies(req, sb);
         logRequestParameters(request, sb);
         logSessionAttributes(req, sb);
-        logHeader(MCRUtils.asStream(req.getHeaderNames()), s -> MCRUtils.asStream(req.getHeaders(s)), sb);
+        logHeader(MCRStreamUtils.asStream(req.getHeaderNames()), s -> MCRStreamUtils.asStream(req.getHeaders(s)), sb);
         return sb.append("\n\n").toString();
     }
 
@@ -126,7 +126,7 @@ public class MCRRequestDebugFilter implements Filter {
                 .ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()), ZoneId.systemDefault())
                 .toString() + "\n");
             sb.append("SESSION ATTRIBUTES: \n");
-            MCRUtils
+            MCRStreamUtils
                 .asStream(session.getAttributeNames())
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .forEachOrdered(attrName -> {
