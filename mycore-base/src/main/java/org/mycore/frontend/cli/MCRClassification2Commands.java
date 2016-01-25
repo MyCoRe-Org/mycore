@@ -368,10 +368,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "repair category with empty labels", help = "fixes all categories with no labels (adds a label with categid as @text for default lang)", order = 110)
     public static void repairEmptyLabels() {
         Session session = MCRHIBConnection.instance().getSession();
-        String deleteEmptyLabels = "delete from MCRCategoryLabels where text is null or trim(text) = ''";
+        String deleteEmptyLabels = "delete from {h-schema}MCRCategoryLabels where text is null or trim(text) = ''";
         int affected = session.createSQLQuery(deleteEmptyLabels).executeUpdate();
         LOGGER.info("Deleted " + affected + " labels.");
-        String sqlQuery = "select cat.classid,cat.categid from mcrcategory cat left outer join mcrcategorylabels label on cat.internalid = label.category where label.text is null";
+        String sqlQuery = "select cat.classid,cat.categid from {h-schema}MCRCategory cat left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where label.text is null";
         @SuppressWarnings("unchecked")
         List<Object[]> list = session.createSQLQuery(sqlQuery).list();
 
@@ -394,10 +394,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static void repairPositionInParent() {
         Session session = MCRHIBConnection.instance().getSession();
         // this SQL-query find missing numbers in positioninparent
-        String sqlQuery = "select parentid, min(cat1.positioninparent+1) from MCRCATEGORY cat1 "
-            + "where cat1.parentid is not null and not exists" + "(select 1 from MCRCATEGORY cat2 "
+        String sqlQuery = "select parentid, min(cat1.positioninparent+1) from {h-schema}MCRCategory cat1 "
+            + "where cat1.parentid is not null and not exists" + "(select 1 from {h-schema}MCRCategory cat2 "
             + "where cat2.parentid=cat1.parentid and cat2.positioninparent=(cat1.positioninparent+1))"
-            + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from MCRCATEGORY cat3 "
+            + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from {h-schema}MCRCategory cat3 "
             + "where cat3.parentid=cat1.parentid) group by cat1.parentid";
 
         for (List<Object[]> parentWithErrorsList = session.createSQLQuery(sqlQuery).list(); !parentWithErrorsList
@@ -412,10 +412,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             }
         }
 
-        sqlQuery = "select parentid, min(cat1.positioninparent-1) from MCRCATEGORY cat1 "
-            + "where cat1.parentid is not null and not exists" + "(select 1 from MCRCATEGORY cat2 "
+        sqlQuery = "select parentid, min(cat1.positioninparent-1) from {h-schema}MCRCategory cat1 "
+            + "where cat1.parentid is not null and not exists" + "(select 1 from {h-schema}MCRCategory cat2 "
             + "where cat2.parentid=cat1.parentid and cat2.positioninparent=(cat1.positioninparent-1))"
-            + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from MCRCATEGORY cat3 "
+            + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from {h-schema}MCRCategory cat3 "
             + "where cat3.parentid=cat1.parentid) and cat1.positioninparent > 0 group by cat1.parentid";
 
         while (true) {
@@ -439,7 +439,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     public static void repairCategoryWithWrongStartPos(Number parentID, Number wrongStartPositionInParent) {
         Session session = MCRHIBConnection.instance().getSession();
-        String sqlQuery = "update MCRCATEGORY set positioninparent= positioninparent -" + wrongStartPositionInParent
+        String sqlQuery = "update {h-schema}MCRCategory set positioninparent= positioninparent -" + wrongStartPositionInParent
             + "-1 where parentid=" + parentID + " and positioninparent > " + wrongStartPositionInParent;
 
         session.createSQLQuery(sqlQuery).executeUpdate();
@@ -452,7 +452,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         // at 3 the position get faulty, 5 is the min. of the position greather
         // 3
         // so the reate is 5-3 = 2
-        String sqlQuery = "update MCRCATEGORY set positioninparent=(positioninparent - (select min(positioninparent) from MCRCATEGORY where parentid="
+        String sqlQuery = "update {h-schema}MCRCategory set positioninparent=(positioninparent - (select min(positioninparent) from {h-schema}MCRCategory where parentid="
             + parentID
             + " and positioninparent > "
             + firstErrorPositionInParent
@@ -531,7 +531,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     private static void checkEmptyLabels(String classID, List<String> log) {
         Session session = MCRHIBConnection.instance().getSession();
-        String sqlQuery = "select cat.categid from MCRCategory cat left outer join MCRCategoryLabels label on cat.internalid = label.category where cat.classid='"
+        String sqlQuery = "select cat.categid from {h-schema}MCRCategory cat left outer joinf {h-schema}MCRCategoryLabels label on cat.internalid = label.category where cat.classid='"
             + classID + "' and (label.text is null or trim(label.text) = '')";
         @SuppressWarnings("unchecked")
         List<String> list = session.createSQLQuery(sqlQuery).list();
