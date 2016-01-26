@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
@@ -38,6 +37,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
+import org.mycore.util.concurrent.MCRReadWriteGuard;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -59,7 +59,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     protected List<MCRCategory> children;
 
-    protected final ReentrantReadWriteLock childrenLock = new ReentrantReadWriteLock();
+    protected final MCRReadWriteGuard childGuard = new MCRReadWriteGuard();
 
     private String defaultLang;
 
@@ -72,20 +72,18 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public List<MCRCategory> getChildren() {
-        childrenLock.readLock().lock();
-        boolean childrenPresent = true;
-        if (children == null) {
-            childrenPresent = false;
-            childrenLock.readLock().unlock();
-            setChildren(MCRCategoryDAOFactory.getInstance().getChildren(id));
-        }
-        if (childrenPresent) {
-            childrenLock.readLock().unlock();
-        }
-        return children;
+        return childGuard.lazyLoad(this::childrenNotHere, this::initChildren, () -> children);
     }
 
-    protected abstract void setChildren(List<MCRCategory> children);
+    private boolean childrenNotHere() {
+        return children == null;
+    }
+
+    private void initChildren() {
+        setChildrenUnlocked(MCRCategoryDAOFactory.getInstance().getChildren(id));
+    }
+
+    protected abstract void setChildrenUnlocked(List<MCRCategory> children);
 
     public MCRCategoryID getId() {
         return id;
@@ -110,15 +108,9 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public boolean hasChildren() {
-        childrenLock.readLock().lock();
-        try {
-            if (children != null) {
-                return children.size() != 0;
-            }
-        } finally {
-            childrenLock.readLock().unlock();
-        }
-        return MCRCategoryDAOFactory.getInstance().hasChildren(id);
+        return childGuard
+            .read(() -> Optional.ofNullable(children).map(c -> !c.isEmpty()))
+            .orElse(MCRCategoryDAOFactory.getInstance().hasChildren(id));
     }
 
     public final boolean isCategory() {

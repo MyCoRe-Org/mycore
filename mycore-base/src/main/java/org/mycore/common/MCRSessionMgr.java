@@ -26,11 +26,17 @@ package org.mycore.common;
 import static org.mycore.common.events.MCRSessionEvent.Type.created;
 import static org.mycore.common.events.MCRSessionEvent.Type.destroyed;
 
-import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.events.MCRSessionListener;
+import org.mycore.util.concurrent.MCRReadWriteGuard;
 
 /**
  * Manages sessions for a MyCoRe system. This class is backed by a ThreadLocal variable, so every Thread is guaranteed
@@ -50,7 +56,7 @@ public class MCRSessionMgr {
 
     private static List<MCRSessionListener> listeners = new ArrayList<MCRSessionListener>();
 
-    private static ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
+    private static MCRReadWriteGuard listenersGuard = new MCRReadWriteGuard();
 
     /**
      * This ThreadLocal is automatically instantiated per thread with a MyCoRe session object containing the default
@@ -177,9 +183,7 @@ public class MCRSessionMgr {
      * @see #removeSessionListener(MCRSessionListener)
      */
     public static void addSessionListener(MCRSessionListener listener) {
-        listenersLock.writeLock().lock();
-        listeners.add(listener);
-        listenersLock.writeLock().unlock();
+        listenersGuard.write(() -> listeners.add(listener));
     }
 
     /**
@@ -188,43 +192,29 @@ public class MCRSessionMgr {
      * @see #addSessionListener(MCRSessionListener)
      */
     public static void removeSessionListener(MCRSessionListener listener) {
-        listenersLock.writeLock().lock();
-        listeners.remove(listener);
-        listenersLock.writeLock().unlock();
+        listenersGuard.write(() -> listeners.remove(listener));
     }
 
     /**
      * Allows access to all MCRSessionListener instances. Mainly for internal use of MCRSession.
      */
     static List<MCRSessionListener> getListeners() {
-        return listeners;
-    }
-
-    /**
-     * Allows to lock out access to list of MCESessionListener instances. When you want to read on the list, use the
-     * readLock() and use the writeLock() if you want to modify the list. Using locks will allow a high degree of
-     * concurrent access. Mainly for internal use of MCRSession.
-     * 
-     * @see ReentrantReadWriteLock#readLock()
-     * @see ReentrantReadWriteLock#writeLock()
-     */
-    static ReentrantReadWriteLock getListenersLock() {
-        return listenersLock;
+        return listenersGuard.read(() -> listeners.stream().collect(Collectors.toList()));
     }
 
     public static void close() {
-        listenersLock.writeLock().lock();
-        Collection<MCRSession> var = sessions.values();
-        for (MCRSession session : var.toArray(new MCRSession[var.size()])) {
-            session.close();
-        }
-        Logger.getLogger(MCRSessionMgr.class).info("Removing thread locals...");
-        isSessionAttached = null;
-        theThreadLocalSession = null;
-        listeners.clear();
-        Logger.getLogger(MCRSessionMgr.class).info("...done.");
-        listenersLock.writeLock().unlock();
-        listenersLock = null;
+        listenersGuard.write(() -> {
+            Collection<MCRSession> var = sessions.values();
+            for (MCRSession session : var.toArray(new MCRSession[var.size()])) {
+                session.close();
+            }
+            Logger.getLogger(MCRSessionMgr.class).info("Removing thread locals...");
+            isSessionAttached = null;
+            theThreadLocalSession = null;
+            listeners.clear();
+            Logger.getLogger(MCRSessionMgr.class).info("...done.");
+        });
+        listenersGuard = null;
     }
 
     public static Map<String, MCRSession> getAllSessions() {

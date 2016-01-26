@@ -133,10 +133,13 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      * @param children
      *            the children to set
      */
-    @Override
     public void setChildren(List<MCRCategory> children) {
         LOGGER.debug("Set children called for " + getId() + "list'" + children.getClass().getName() + "': " + children);
-        childrenLock.writeLock().lock();
+        childGuard.write(() -> setChildrenUnlocked(children));
+    }
+
+    @Override
+    protected void setChildrenUnlocked(List<MCRCategory> children) {
         if (children instanceof PersistentList) {
             this.children = children;
         } else {
@@ -144,7 +147,6 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             newChildren.addAll(children);
             this.children = newChildren;
         }
-        childrenLock.writeLock().unlock();
     }
 
     /**

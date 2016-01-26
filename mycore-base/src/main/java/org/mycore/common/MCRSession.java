@@ -48,7 +48,6 @@ import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRSessionEvent;
-import org.mycore.common.events.MCRSessionListener;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
@@ -351,18 +350,12 @@ public class MCRSession implements Cloneable {
      *            number of concurrentThreads (passivateEvent gets 0 for singleThread)
      */
     void fireSessionEvent(MCRSessionEvent.Type type, int concurrentAccessors) {
-        List<MCRSessionListener> listeners = MCRSessionMgr.getListeners();
-        if (listeners.size() == 0) {
-            return;
-        }
         MCRSessionEvent event = new MCRSessionEvent(this, type, concurrentAccessors);
         LOGGER.debug(event);
-        MCRSessionMgr.getListenersLock().readLock().lock();
-        MCRSessionListener[] list = listeners.toArray(new MCRSessionListener[listeners.size()]);
-        MCRSessionMgr.getListenersLock().readLock().unlock();
-        for (MCRSessionListener listener : list) {
-            listener.sessionEvent(event);
-        }
+        MCRSessionMgr
+            .getListeners()
+            .stream()
+            .forEach(l -> l.sessionEvent(event));
     }
 
     public long getThisAccessTime() {
