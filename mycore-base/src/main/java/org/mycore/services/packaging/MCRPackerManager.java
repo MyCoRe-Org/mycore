@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobQueue;
 
@@ -43,10 +44,12 @@ public class MCRPackerManager {
      * @return the created MCRJob
      */
     public static MCRJob startPacking(Map<String, String> jobParameters) {
-        if (!jobParameters.containsKey("packer")) {
+        String packer = jobParameters.get("packer");
+        if (packer == null) {
             LOGGER.error("No Packer parameter found!");
             return null;
         }
+        checkPacker(packer, jobParameters);
 
         MCRJob mcrJob = new MCRJob(MCRPackerJobAction.class);
         mcrJob.setParameters(jobParameters);
@@ -56,5 +59,11 @@ public class MCRPackerManager {
         }
 
         return mcrJob;
+    }
+
+    private static void checkPacker(String packer, Map<String, String> jobParameters) {
+        MCRPacker instance = MCRConfiguration.instance().getInstanceOf("MCR.Packaging.Packer." + packer + ".Class");
+        instance.setParameter(jobParameters);
+        //TODO: verify parameters, before creating an MCRJob!
     }
 }
