@@ -41,7 +41,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.persistence.PersistenceException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
@@ -68,7 +69,7 @@ import org.xml.sax.SAXException;
  */
 public final class MCRMetadataManager {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetadataManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRCache<MCRObjectID, MCRObjectID> derivateObjectMap = new MCRCache<>(10000,
         "derivate objectid cache");
@@ -221,10 +222,10 @@ public final class MCRMetadataManager {
                 rootPath.getFileSystem().createRoot(rootPath.getOwner());
                 BasicFileAttributes attrs = Files.readAttributes(rootPath, BasicFileAttributes.class);
                 if (!(attrs.fileKey() instanceof String)) {
-                    LOGGER.error("Cannot get ID from newely created directory, as it is not a String." + rootPath);
-                } else {
-                    mcrDerivate.getDerivate().getInternals().setIFSID(attrs.fileKey().toString());
+                    throw new MCRPersistenceException(
+                        "Cannot get ID from newely created directory, as it is not a String." + rootPath);
                 }
+                mcrDerivate.getDerivate().getInternals().setIFSID(attrs.fileKey().toString());
             } else {
                 final String sourcepath = mcrDerivate.getDerivate().getInternals().getSourcePath();
                 final File f = new File(sourcepath);
@@ -234,11 +235,10 @@ public final class MCRMetadataManager {
                         importDerivate(derId.toString(), f.toPath());
                         BasicFileAttributes attrs = Files.readAttributes(rootPath, BasicFileAttributes.class);
                         if (!(attrs.fileKey() instanceof String)) {
-                            LOGGER.error("Cannot get ID from newely created directory, as it is not a String."
-                                + rootPath);
-                        } else {
-                            mcrDerivate.getDerivate().getInternals().setIFSID(attrs.fileKey().toString());
+                            throw new MCRPersistenceException(
+                                "Cannot get ID from newely created directory, as it is not a String." + rootPath);
                         }
+                        mcrDerivate.getDerivate().getInternals().setIFSID(attrs.fileKey().toString());
                     } catch (final Exception e) {
                         if (Files.exists(rootPath)) {
                             deleteDerivate(derId.toString());
@@ -344,16 +344,13 @@ public final class MCRMetadataManager {
         }
 
         // delete data from IFS
-        try {
-            deleteDerivate(mcrDerivate.getId().toString());
-            LOGGER.info("IFS entries for MCRDerivate " + mcrDerivate.getId().toString() + " are deleted.");
-        } catch (final Exception e) {
-            if (mcrDerivate.getDerivate().getInternals() != null) {
-                if (LOGGER.isDebugEnabled()) {
-                    e.printStackTrace();
-                }
-                LOGGER.warn("Error while delete for ID " + mcrDerivate.getId().toString() + " from IFS with ID "
-                    + mcrDerivate.getDerivate().getInternals().getIFSID());
+        if (mcrDerivate.getDerivate().getInternals() != null) {
+            try {
+                deleteDerivate(mcrDerivate.getId().toString());
+                LOGGER.info("IFS entries for MCRDerivate " + mcrDerivate.getId().toString() + " are deleted.");
+            } catch (final Exception e) {
+                throw new MCRPersistenceException("Error while delete for ID " + mcrDerivate.getId().toString()
+                    + " from IFS with ID " + mcrDerivate.getDerivate().getInternals().getIFSID(), e);
             }
         }
 
@@ -394,7 +391,7 @@ public final class MCRMetadataManager {
 
         // remove child from parent
         final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
-        
+
         if (parent_id != null) {
             LOGGER.debug("Parent ID = " + parent_id.toString());
             try {
@@ -405,9 +402,9 @@ public final class MCRMetadataManager {
                 } else {
                     LOGGER.warn("Unable to find parent " + parent_id + " of " + mcrObject.getId());
                 }
-            } catch (IOException ioExc) {
+            } catch (Exception exc) {
                 throw new PersistenceException("Error while deleting object. Unable to remove child "
-                    + mcrObject.getId() + " from parent " + parent_id + ".", ioExc);
+                    + mcrObject.getId() + " from parent " + parent_id + ".", exc);
             }
         }
 
