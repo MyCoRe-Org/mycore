@@ -621,8 +621,15 @@ public class MCRPersistentServlet extends MCRServlet {
     private void redirectToUploadPage(MCRServletJob job, String parentObjectID, String derivateID) throws IOException {
         MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(parentObjectID, derivateID, getCancelUrl(job));
         String fuhid = fuh.getID();
-        String page = "fileupload_commit.xml";
-
+        String page = "";
+        try {
+            MCRURIResolver.instance().resolve("webapp:/fileupload.xml");
+            page="fileupload.xml";
+        } catch (MCRException e) {
+            LOGGER.warn("Can't find fileupload.xml, now we try it with fileupload_commit.xml");
+            page="fileupload_commit.xml";
+        }
+        
         String base = MCRFrontendUtil.getBaseURL() + page;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
