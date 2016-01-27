@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.persistence.PersistenceException;
+
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
@@ -395,9 +397,18 @@ public final class MCRMetadataManager {
         
         if (parent_id != null) {
             LOGGER.debug("Parent ID = " + parent_id.toString());
-            final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
-            parent.getStructure().removeChild(mcrObject.getId());
-            MCRMetadataManager.fireUpdateEvent(parent);
+            try {
+                if (MCRXMLMetadataManager.instance().exists(parent_id)) {
+                    final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
+                    parent.getStructure().removeChild(mcrObject.getId());
+                    MCRMetadataManager.fireUpdateEvent(parent);
+                } else {
+                    LOGGER.warn("Unable to find parent " + parent_id + " of " + mcrObject.getId());
+                }
+            } catch (IOException ioExc) {
+                throw new PersistenceException("Error while deleting object. Unable to remove child "
+                    + mcrObject.getId() + " from parent " + parent_id + ".", ioExc);
+            }
         }
 
         // remove all children
