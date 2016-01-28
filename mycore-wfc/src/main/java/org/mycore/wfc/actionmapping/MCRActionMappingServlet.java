@@ -23,6 +23,7 @@
 
 package org.mycore.wfc.actionmapping;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
@@ -58,7 +59,9 @@ public class MCRActionMappingServlet extends MCRServlet {
                 String action = splitted.get(1);
                 String url = MCRURLRetriever.getURLforCollection(action, collection, true);
                 if (url != null) {
-                    response.sendRedirect(response.encodeRedirectURL(url));
+                    //MCR-1172 check if we redirect to a valid URI
+                    URI uri = URI.create(url);
+                    response.sendRedirect(response.encodeRedirectURL(uri.toString()));
                 } else {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 }
