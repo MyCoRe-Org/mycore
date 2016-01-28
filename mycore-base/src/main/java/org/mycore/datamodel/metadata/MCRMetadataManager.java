@@ -43,6 +43,7 @@ import javax.persistence.PersistenceException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
@@ -533,7 +534,11 @@ public final class MCRMetadataManager {
      */
     public static MCRDerivate retrieveMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
         try {
-            return new MCRDerivate(MCRXMLMetadataManager.instance().retrieveXML(id));
+            Document xml = MCRXMLMetadataManager.instance().retrieveXML(id);
+            if(xml == null) {
+                throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id);
+            }
+            return new MCRDerivate(xml);
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id, e);
         }
@@ -549,20 +554,25 @@ public final class MCRMetadataManager {
      */
     public static MCRObject retrieveMCRObject(final MCRObjectID id) throws MCRPersistenceException {
         try {
-            return new MCRObject(MCRXMLMetadataManager.instance().retrieveXML(id));
+            Document xml = MCRXMLMetadataManager.instance().retrieveXML(id);
+            if(xml == null) {
+                throw new MCRPersistenceException("Could not retrieve xml of object: " + id);
+            }
+            return new MCRObject(xml);
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRPersistenceException("Could not retrieve xml of object: " + id, e);
         }
     }
 
     /**
+     * @deprecated use {@link #retrieveMCRObject(MCRObjectID)} with {@link MCRObjectID#getInstance(String)} instead.
      * @return a {@link MCRObject} if there is an object with the id given or <code>null</code> otherwise
      */
+    @Deprecated
     public static MCRObject retrieveMCRObject(final String id) throws MCRPersistenceException {
         if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
             return null;
         }
-
         return retrieveMCRObject(MCRObjectID.getInstance(id));
     }
 
