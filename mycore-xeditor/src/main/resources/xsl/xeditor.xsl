@@ -19,6 +19,13 @@
   <xsl:variable name="transformer" select="transformer:getTransformer($XEditorTransformerKey)" />
   <xsl:variable name="includer" select="includer:new()" />
 
+  <!-- ========== <xed:form /> output-only ========== -->
+
+  <xsl:template match="xed:form[@method='output']">
+    <xsl:call-template name="registerAdditionalNamespaces" />
+    <xsl:apply-templates select="@*|node()" mode="xeditor" />
+  </xsl:template>
+
   <!-- ========== <xed:form /> ========== -->
 
   <xsl:template match="xed:form">
