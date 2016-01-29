@@ -17,7 +17,6 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -62,18 +61,22 @@ public class MCRXPathEvaluator {
     }
 
     public String replaceXPathOrI18n(String expression) {
+        expression = migrateLegacyI18nSyntaxToExtensionFunction(expression);
+        return evaluateXPath(expression);
+    }
+
+    private String migrateLegacyI18nSyntaxToExtensionFunction(String expression) {
         if (expression.startsWith("i18n:")) {
-            String key = expression.substring(5);
-            int pos = key.indexOf(",");
-            if (pos != -1) {
-                String xPath = key.substring(pos + 1);
-                String value = evaluateXPath(xPath);
-                key = key.substring(0, pos);
-                return MCRTranslation.translate(key, value);
+            expression = expression.substring(5);
+            if (expression.contains(",")) {
+                int pos = expression.indexOf(",");
+                String key = expression.substring(0, pos);
+                String xPath = expression.substring(pos + 1);
+                expression = "i18n:translate('" + key + "'," + xPath + ")";
             } else
-                return MCRTranslation.translate(key);
-        } else
-            return evaluateXPath(expression);
+                expression = "i18n:translate('" + expression + "')";
+        }
+        return expression;
     }
 
     public String evaluateXPath(String xPathExpression) {
