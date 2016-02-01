@@ -24,6 +24,7 @@
 package org.mycore.datamodel.common;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRBaseContent;
@@ -32,6 +33,7 @@ import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class manages all operations of the XMLTables for operations of an
@@ -142,18 +144,25 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
     }
 
     private void handleStoreEvent(MCREvent evt, MCRBase obj) {
+        String eventType = evt.getEventType();
+        MCRObjectID id = obj.getId();
         try {
-            MCRBaseContent content = new MCRBaseContent(obj);
-            if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
-                metaDataManager.update(obj.getId(), content, obj.getService().getDate("modifydate"));
-            } else if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
-                metaDataManager.create(obj.getId(), content, obj.getService().getDate("modifydate"));
-            } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
-                metaDataManager.delete(obj.getId());
+            if (MCREvent.UPDATE_EVENT.equals(eventType) || MCREvent.CREATE_EVENT.equals(eventType)) {
+                MCRBaseContent content = new MCRBaseContent(obj);
+                Date modifyDate = obj.getService().getDate("modifydate");
+                if (MCREvent.UPDATE_EVENT.equals(eventType)) {
+                    metaDataManager.update(id, content, modifyDate);
+                } else {
+                    metaDataManager.create(id, content, modifyDate);
+                }
+                evt.put("content", content);
+            } else if (MCREvent.DELETE_EVENT.equals(eventType)) {
+                metaDataManager.delete(id);
+            } else {
+                throw new IllegalArgumentException("Invalid event type " + eventType + " for object " + id);
             }
-            evt.put("content", content);
         } catch (IOException e) {
-            throw new MCRPersistenceException("Error while handling event.", e);
+            throw new MCRPersistenceException("Error while handling '" + eventType + "' event of '" + id + "'", e);
         }
     }
 
