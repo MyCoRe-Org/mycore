@@ -712,21 +712,17 @@ public final class MCRMetadataManager {
                 }
             }
         }
-        // set the parent from the original and this update
-        boolean setparent = false;
 
+        // set the parent from the original and this update
         MCRObjectID oldParentID = old.getStructure().getParentID();
         MCRObjectID newParentID = mcrObject.getStructure().getParentID();
 
-        if (oldParentID != null && (newParentID == null || !newParentID.equals(oldParentID))) {
+        if (oldParentID != null && exists(oldParentID) && (newParentID == null || !newParentID.equals(oldParentID))) {
             // remove child from the old parent
             LOGGER.debug("Parent ID = " + oldParentID);
             final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldParentID);
             parent.getStructure().removeChild(mcrObject.getId());
             MCRMetadataManager.fireUpdateEvent(parent);
-            setparent = true;
-        } else if (oldParentID == null && newParentID != null) {
-            setparent = true;
         }
 
         // set the children from the original
@@ -749,7 +745,7 @@ public final class MCRMetadataManager {
         MCRMetadataManager.fireUpdateEvent(mcrObject);
 
         // check if the parent was new set and set them
-        if (setparent) {
+        if (newParentID != null && !newParentID.equals(oldParentID)) {
             MCRObject newParent = retrieveMCRObject(newParentID);
             newParent.getStructure().addChild(
                 new MCRMetaLinkID("child", mcrObject.getId(), null, mcrObject.getLabel()));
