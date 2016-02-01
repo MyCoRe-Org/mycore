@@ -616,6 +616,9 @@ public class MCRXMLMetadataManager {
      * Checks if an object with the given MCRObjectID exists in the store.
      */
     public boolean exists(MCRObjectID mcrid) throws IOException {
+        if(mcrid == null) {
+            return false;
+        }
         return getStore(mcrid).exists(mcrid.getNumberAsInteger());
     }
 
