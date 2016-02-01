@@ -48,7 +48,7 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
         XPathFunctionContext xfc = (XPathFunctionContext) (xPath.getFunctionContext());
         xfc.registerFunction(EXTENSION_FUNCTIONS_URI, "generate-id", new MCRFunctionGenerateID());
         xfc.registerFunction(EXTENSION_FUNCTIONS_URI, "call-java", new MCRFunctionCallJava());
-        xfc.registerFunction("xalan://org.mycore.services.i18n.MCRTranslation", "translate", new MCRFunctionTranslate());
+        xfc.registerFunction(MCRConstants.getStandardNamespace("i18n").getURI(), "translate", new MCRFunctionTranslate());
         xPath.setFunctionContext(xfc);
     }
 
