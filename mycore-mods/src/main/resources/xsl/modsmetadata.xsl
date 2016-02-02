@@ -640,9 +640,18 @@
   </xsl:template>
 
   <xsl:template match="mods:identifier" mode="present">
+   	<xsl:variable name="identifier" select="document('classification:metadata:-1:children:identifier')" />
+    <xsl:variable name="type" select="./@type" />
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate(concat('component.mods.metaData.dictionary.identifier.',@type)),':')" />
+	    <xsl:choose>
+	    	<xsl:when test="not($identifier//category[@ID=$type])">
+	        	<xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.identifier.other', $type), ':')" />
+	        </xsl:when>
+	        <xsl:otherwise>
+	        	<xsl:value-of select="concat($identifier//category[@ID=$type]/label[lang($CurrentLang)]/@text, ':')" />
+	        </xsl:otherwise>
+	    </xsl:choose>
       </td>
       <td class="metavalue">
         <xsl:value-of select="." />
