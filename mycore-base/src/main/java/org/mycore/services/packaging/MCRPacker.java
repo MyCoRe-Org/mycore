@@ -16,6 +16,12 @@ public abstract class MCRPacker {
     private Map<String, String> parameter;
 
     /**
+     * should check if all required parameters are set!
+     * @return false if the parameters are invalid
+     */
+    public abstract boolean checkSetup();
+
+    /**
      * This method will be called and the MCRPacker should start packing according to the {@link #getConfiguration()} and {@link #getParameters()}!
      *
      * @throws ExecutionException

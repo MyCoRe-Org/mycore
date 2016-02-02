@@ -1,6 +1,7 @@
 package org.mycore.services.packaging;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.services.queuedjob.MCRJob;
 
 /**
  * <p>Servlet for {@link MCRPackerManager}.</p>
@@ -38,7 +40,12 @@ public class MCRPackerServlet extends MCRServlet {
 
         Map<String, String> jobParameters = resolveJobParameters(job);
 
-        MCRPackerManager.startPacking(jobParameters);
+        Optional<MCRJob> mcrJob = MCRPackerManager.startPacking(jobParameters);
+        if(!mcrJob.isPresent()){
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters for the packer!");
+            return;
+        }
+
         if (jobParameters.containsKey("redirect")) {
             String redirect = jobParameters.get("redirect");
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(redirect));

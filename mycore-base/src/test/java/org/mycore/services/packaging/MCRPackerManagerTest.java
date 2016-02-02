@@ -3,6 +3,7 @@ package org.mycore.services.packaging;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,14 +49,16 @@ public class MCRPackerManagerTest extends MCRHibTestCase {
         // add test parameter
         parameterMap.put(MCRPackerMock.TEST_PARAMETER_KEY, MCRPackerMock.TEST_VALUE);
 
-        MCRJob packerJob = MCRPackerManager.startPacking(parameterMap);
+        Optional<MCRJob> packerJob = MCRPackerManager.startPacking(parameterMap);
+
+        Assert.assertTrue("The Packer job is not present!",packerJob.isPresent());
 
         endTransaction();
         Thread.sleep(1000);
         startNewTransaction();
 
         int waitTime = 10;
-        while (waitTime > 0 && !mcrConfiguration.getBoolean(MCRPackerMock.FINISHED_PROPERTY, false)) {
+        while (waitTime > 0 && !mcrConfiguration.getBoolean(MCRPackerMock.FINISHED_PROPERTY, false) && !mcrConfiguration.getBoolean(MCRPackerMock.SETUP_CHECKED_PROPERTY, false)) {
             Thread.sleep(1000);
             waitTime -= 1;
         }

@@ -12,6 +12,13 @@ public class MCRPackerMock extends MCRPacker {
     public static final String TEST_CONFIGURATION_KEY = "testConfiguration";
     public static final String TEST_PARAMETER_KEY = "testParameter";
     public static final String FINISHED_PROPERTY = MCRPackerMock.class.toString() + ".finished";
+    public static final String SETUP_CHECKED_PROPERTY = MCRPackerMock.class.toString() + ".checked";
+
+    @Override
+    public boolean checkSetup() {
+        MCRConfiguration.instance().set(SETUP_CHECKED_PROPERTY, true);
+        return true;
+    }
 
     @Override
     public void pack() throws ExecutionException {
