@@ -48,8 +48,8 @@ public class MCRPackerJobAction extends MCRJobAction {
 
     @Override
     public final void execute() throws ExecutionException {
-        Map<String, String> packerConfiguration = getConfiguration();
         String packerId = getPackerId();
+        Map<String, String> packerConfiguration = getConfiguration(packerId);
         packerInstance = MCRConfiguration.instance().getInstanceOf(MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".Class");
 
         Map<String, String> parameters = getParameters();
@@ -69,8 +69,7 @@ public class MCRPackerJobAction extends MCRJobAction {
         return this.job.getParameters();
     }
 
-    protected final Map<String, String> getConfiguration() {
-        String packerId = getPackerId();
+    protected static final Map<String, String> getConfiguration(String packerId) {
         String packerConfigPrefix = MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".";
         return MCRConfiguration
                 .instance()

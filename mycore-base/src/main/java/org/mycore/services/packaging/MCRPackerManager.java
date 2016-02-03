@@ -67,6 +67,7 @@ public class MCRPackerManager {
     private static boolean checkPacker(String packer, Map<String, String> jobParameters) {
         MCRPacker instance = MCRConfiguration.instance().getInstanceOf("MCR.Packaging.Packer." + packer + ".Class");
         instance.setParameter(jobParameters);
+        instance.setConfiguration(MCRPackerJobAction.getConfiguration(packer));
         return instance.checkSetup();
     }
 }
