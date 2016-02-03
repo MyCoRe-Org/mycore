@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 import javax.persistence.PersistenceException;
 
@@ -176,7 +177,8 @@ public final class MCRMetadataManager {
     public static void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException, IOException {
         // exist the derivate?
         if (exists(mcrDerivate.getId())) {
-            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " allready exists, nothing done.");
+            throw new MCRPersistenceException(
+                "The derivate " + mcrDerivate.getId() + " allready exists, nothing done.");
         }
 
         if (!mcrDerivate.isValid()) {
@@ -186,8 +188,8 @@ public final class MCRMetadataManager {
         byte[] objectBackup;
         objectBackup = MCRXMLMetadataManager.instance().retrieveBLOB(objid);
         if (objectBackup == null) {
-            throw new MCRPersistenceException("Cannot find " + objid + " to attach derivate " + mcrDerivate.getId()
-                + " to it.");
+            throw new MCRPersistenceException(
+                "Cannot find " + objid + " to attach derivate " + mcrDerivate.getId() + " to it.");
         }
 
         // prepare the derivate metadata and store under the XML table
@@ -309,9 +311,8 @@ public final class MCRMetadataManager {
 
         // add the MCRObjectID to the child list in the parent object
         if (parent_id != null) {
-            parent.getStructure().addChild(
-                new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(),
-                    mcrObject.getLabel()));
+            parent.getStructure().addChild(new MCRMetaLinkID("child", mcrObject.getId(),
+                mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel()));
             MCRMetadataManager.fireUpdateEvent(parent);
         }
     }
@@ -364,15 +365,34 @@ public final class MCRMetadataManager {
      * 
      * @param mcrObject
      *            to be deleted
+     * @throws MCRActiveLinkException 
      * @throws MCRPersistenceException
      *             if persistence problem occurs
      */
     public static void delete(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
-        if (mcrObject.getId() == null) {
+        delete(mcrObject, MCRMetadataManager::removeChildObject);
+    }
+
+    /**
+     * Deletes the <code>mcrObject</code>.
+     * 
+     * @param mcrObject
+     *            the object to be deleted
+     * @param parentOperation
+     *            function to handle the parent of the object @see {@link #removeChildObject(MCRObject, MCRObjectID)}
+     * @throws MCRPersistenceException
+     *            if persistence problem occurs
+     * @throws MCRActiveLinkException
+     *            object couldn't  be deleted because its linked somewhere
+     */
+    private static void delete(final MCRObject mcrObject, BiConsumer<MCRObject, MCRObjectID> parentOperation)
+        throws MCRPersistenceException, MCRActiveLinkException {
+        MCRObjectID id = mcrObject.getId();
+        if (id == null) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
-        if (!MCRAccessManager.checkPermission(mcrObject.getId(), PERMISSION_DELETE)) {
-            throw new MCRPersistenceException("You do not have the permission to delete: " + mcrObject.getId());
+        if (!MCRAccessManager.checkPermission(id, PERMISSION_DELETE)) {
+            throw new MCRPersistenceException("You do not have the permission to delete: " + id);
         }
 
         // check for active links
@@ -380,38 +400,27 @@ public final class MCRMetadataManager {
             MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
         LOGGER.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
-            final MCRActiveLinkException activeLinks = new MCRActiveLinkException(
-                "Error while deleting object "
-                    + mcrObject.mcr_id.toString()
-                    + ". This object is still referenced by other objects and can not be removed until all links are released.");
+            final MCRActiveLinkException activeLinks = new MCRActiveLinkException("Error while deleting object " + id
+                + ". This object is still referenced by other objects and can not be removed until all links are released.");
             for (final String curSource : sources) {
-                activeLinks.addLink(curSource, mcrObject.mcr_id.toString());
+                activeLinks.addLink(curSource, id.toString());
             }
             throw activeLinks;
         }
 
         // remove child from parent
-        final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
-
-        if (parent_id != null) {
-            LOGGER.debug("Parent ID = " + parent_id.toString());
-            try {
-                if (MCRXMLMetadataManager.instance().exists(parent_id)) {
-                    final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parent_id);
-                    parent.getStructure().removeChild(mcrObject.getId());
-                    MCRMetadataManager.fireUpdateEvent(parent);
-                } else {
-                    LOGGER.warn("Unable to find parent " + parent_id + " of " + mcrObject.getId());
-                }
-            } catch (Exception exc) {
-                throw new PersistenceException("Error while deleting object. Unable to remove child "
-                    + mcrObject.getId() + " from parent " + parent_id + ".", exc);
-            }
+        final MCRObjectID parentId = mcrObject.getStructure().getParentID();
+        if (parentId != null) {
+            parentOperation.accept(mcrObject, parentId);
         }
 
         // remove all children
         for (MCRMetaLinkID child : mcrObject.getStructure().getChildren()) {
-            MCRMetadataManager.deleteMCRObject(child.getXLinkHrefID());
+            MCRMetadataManager.deleteMCRObject(child.getXLinkHrefID(), (MCRObject o, MCRObjectID p) -> {
+                /**
+                 * Do nothing with the parent, because its removed anyway.
+                 */
+            });
         }
 
         for (MCRMetaLinkID derivate : mcrObject.getStructure().getDerivates()) {
@@ -420,6 +429,35 @@ public final class MCRMetadataManager {
 
         // handle events
         fireEvent(mcrObject, MCREvent.DELETE_EVENT);
+    }
+
+    /**
+     * Helper method to remove the <code>mcrObject</code> of the given parent. This does just
+     * remove the linking between both objects.
+     * 
+     * @param mcrObject
+     *            the object (child) to remove
+     * @param
+     *            parentId the parent id
+     * @throws PersistenceException
+     *            when the child cannot be removed due persistent problems
+     */
+    private static void removeChildObject(final MCRObject mcrObject, final MCRObjectID parentId) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Parent ID = " + parentId.toString());
+        }
+        try {
+            if (MCRXMLMetadataManager.instance().exists(parentId)) {
+                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentId);
+                parent.getStructure().removeChild(mcrObject.getId());
+                MCRMetadataManager.fireUpdateEvent(parent);
+            } else {
+                LOGGER.warn("Unable to find parent " + parentId + " of " + mcrObject.getId());
+            }
+        } catch (Exception exc) {
+            throw new PersistenceException("Error while deleting object. Unable to remove child " + mcrObject.getId()
+                + " from parent " + parentId + ".", exc);
+        }
     }
 
     /**
@@ -449,8 +487,25 @@ public final class MCRMetadataManager {
      *             if object is referenced by other objects
      */
     public static void deleteMCRObject(final MCRObjectID id) throws MCRPersistenceException, MCRActiveLinkException {
+        deleteMCRObject(id, MCRMetadataManager::removeChildObject);
+    }
+
+    /**
+     * Deletes the mcr object with the given <code>id</code>.
+     * 
+     * @param id
+     *            the object to be deleted
+     * @param parentOperation
+     *            function to handle the parent of the object @see {@link #removeChildObject(MCRObject, MCRObjectID)}
+     * @throws MCRPersistenceException
+     *            if persistence problem occurs
+     * @throws MCRActiveLinkException
+     *            object couldn't  be deleted because its linked somewhere
+     */
+    private static void deleteMCRObject(final MCRObjectID id, BiConsumer<MCRObject, MCRObjectID> parentOperation)
+        throws MCRPersistenceException, MCRActiveLinkException {
         final MCRObject object = retrieveMCRObject(id);
-        MCRMetadataManager.delete(object);
+        MCRMetadataManager.delete(object, parentOperation);
     }
 
     /**
@@ -535,7 +590,7 @@ public final class MCRMetadataManager {
     public static MCRDerivate retrieveMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
         try {
             Document xml = MCRXMLMetadataManager.instance().retrieveXML(id);
-            if(xml == null) {
+            if (xml == null) {
                 throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id);
             }
             return new MCRDerivate(xml);
@@ -555,7 +610,7 @@ public final class MCRMetadataManager {
     public static MCRObject retrieveMCRObject(final MCRObjectID id) throws MCRPersistenceException {
         try {
             Document xml = MCRXMLMetadataManager.instance().retrieveXML(id);
-            if(xml == null) {
+            if (xml == null) {
                 throw new MCRPersistenceException("Could not retrieve xml of object: " + id);
             }
             return new MCRObject(xml);
@@ -638,8 +693,8 @@ public final class MCRMetadataManager {
         }
         // update the derivate
         mcrDerivate.getService().setDate("createdate", old.getService().getDate("createdate"));
-        if(!mcrDerivate.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)){
-            for(String flagCreatedBy : old.getService().getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY)){
+        if (!mcrDerivate.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
+            for (String flagCreatedBy : old.getService().getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
                 mcrDerivate.getService().addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, flagCreatedBy);
             }
         }
@@ -681,18 +736,18 @@ public final class MCRMetadataManager {
         HashMap<String, String> newlinkTitles = new HashMap<String, String>();
         HashMap<String, String> newlinkLabels = new HashMap<String, String>();
         for (MCRMetaLinkID newlinkID : mcrObject.getStructure().getDerivates()) {
-            if(newlinkID.getXLinkTitle()!=null){
+            if (newlinkID.getXLinkTitle() != null) {
                 newlinkTitles.put(newlinkID.getXLinkHref(), newlinkID.getXLinkTitle());
             }
-            if(newlinkID.getXLinkLabel()!=null){
+            if (newlinkID.getXLinkLabel() != null) {
                 newlinkLabels.put(newlinkID.getXLinkHref(), newlinkID.getXLinkLabel());
             }
         }
         mcrObject.getStructure().clearDerivates();
 
         // set the derivate data in structure
-        List <MCRMetaLinkID> linkIDs = mcrObject.getStructure().getDerivates();
-        List <MCRMetaLinkID> oldlinkIDs = old.getStructure().getDerivates();
+        List<MCRMetaLinkID> linkIDs = mcrObject.getStructure().getDerivates();
+        List<MCRMetaLinkID> oldlinkIDs = old.getStructure().getDerivates();
         for (MCRMetaLinkID oldlinkID : oldlinkIDs) {
             if (newlinkTitles.containsKey(oldlinkID.getXLinkHref())) {
                 oldlinkID.setXLinkTitle(newlinkTitles.get(oldlinkID.getXLinkHref()));
@@ -735,11 +790,11 @@ public final class MCRMetadataManager {
         if (!mcrObject.isImportMode() || mcrObject.getService().getDate("createdate") == null) {
             mcrObject.getService().setDate("createdate", old.getService().getDate("createdate"));
         }
-        if(!mcrObject.isImportMode() && !mcrObject.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)){
-            for(String flagCreatedBy : old.getService().getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY)){
+        if (!mcrObject.isImportMode() && !mcrObject.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
+            for (String flagCreatedBy : old.getService().getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
                 mcrObject.getService().addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, flagCreatedBy);
             }
-        } 
+        }
 
         // update this dataset
         MCRMetadataManager.fireUpdateEvent(mcrObject);
@@ -747,8 +802,8 @@ public final class MCRMetadataManager {
         // check if the parent was new set and set them
         if (newParentID != null && !newParentID.equals(oldParentID)) {
             MCRObject newParent = retrieveMCRObject(newParentID);
-            newParent.getStructure().addChild(
-                new MCRMetaLinkID("child", mcrObject.getId(), null, mcrObject.getLabel()));
+            newParent.getStructure()
+                .addChild(new MCRMetaLinkID("child", mcrObject.getId(), null, mcrObject.getLabel()));
             MCRMetadataManager.fireUpdateEvent(newParent);
         }
 
