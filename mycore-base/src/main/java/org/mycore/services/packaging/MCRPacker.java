@@ -5,9 +5,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRUsageException;
 
 /**
  * Base class for every Packer. You should implement {@link #pack()} and {@link #rollback()}.
+ * The will be initialized two times. One time to just call {@link #checkSetup()} and one time to {@link #pack()}
  */
 public abstract class MCRPacker {
 
@@ -17,13 +20,15 @@ public abstract class MCRPacker {
 
     /**
      * should check if all required parameters are set!
-     * @return false if the parameters are invalid
+     * @throws MCRUsageException if parameters are illegal
+     * @throws MCRAccessException if the Users doesn't have the rights to use the Packer
      */
-    public abstract boolean checkSetup();
+    public abstract void checkSetup() throws MCRUsageException, MCRAccessException;
 
     /**
-     * This method will be called and the MCRPacker should start packing according to the {@link #getConfiguration()} and {@link #getParameters()}!
-     *
+     * This method will be called and the MCRPacker should start packing according to the {@link #getConfiguration()} and {@link #getParameters()}!<br/>
+     * <b>WARNING: do all checks for parameters and user access in {@link #checkSetup()}, because the packer is already stored in the DB if {@link #pack()} is called and the pack JOB runs a System-User instead of the User who produces the call.
+     * </b>
      * @throws ExecutionException
      */
     public abstract void pack() throws ExecutionException;

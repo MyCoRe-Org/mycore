@@ -2,11 +2,12 @@ package org.mycore.services.packaging;
 
 
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobQueue;
@@ -24,7 +25,6 @@ import org.mycore.services.queuedjob.MCRJobQueue;
  * MCR.Packaging.Packer.MyPackerID.somePropertyForPacker = value
  * </code>
  * <p>
- * <p><b>The user needs the permission packer-MyPackerID to create a package!</b></p>
  *
  * @author Sebastian Hofmann (mcrshofm)
  */
@@ -43,16 +43,17 @@ public class MCRPackerManager {
      *
      * @param jobParameters the parameters which will be passed to the job. (Should include a packer)
      * @return the created MCRJob
+     * @throws MCRUsageException if invalid parameters are passed to the packer
+     * @throws MCRAccessException if the current user doesn't have the rights to use the packer(on a specific  object).
      */
-    public static Optional<MCRJob> startPacking(Map<String, String> jobParameters) {
+    public static MCRJob startPacking(Map<String, String> jobParameters) throws MCRUsageException, MCRAccessException {
         String packer = jobParameters.get("packer");
         if (packer == null) {
             LOGGER.error("No Packer parameter found!");
             return null;
         }
-        if(!checkPacker(packer, jobParameters)){
-            return Optional.empty();
-        }
+
+        checkPacker(packer, jobParameters);
 
         MCRJob mcrJob = new MCRJob(MCRPackerJobAction.class);
         mcrJob.setParameters(jobParameters);
@@ -61,13 +62,13 @@ public class MCRPackerManager {
             throw new MCRException("Could not add Job to Queue!");
         }
 
-        return Optional.of(mcrJob);
+        return mcrJob;
     }
 
-    private static boolean checkPacker(String packer, Map<String, String> jobParameters) {
+    private static void checkPacker(String packer, Map<String, String> jobParameters) throws MCRUsageException, MCRAccessException {
         MCRPacker instance = MCRConfiguration.instance().getInstanceOf("MCR.Packaging.Packer." + packer + ".Class");
         instance.setParameter(jobParameters);
         instance.setConfiguration(MCRPackerJobAction.getConfiguration(packer));
-        return instance.checkSetup();
+        instance.checkSetup();
     }
 }

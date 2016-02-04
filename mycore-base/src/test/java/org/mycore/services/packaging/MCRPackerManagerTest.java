@@ -3,7 +3,6 @@ package org.mycore.services.packaging;
 
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,9 +48,9 @@ public class MCRPackerManagerTest extends MCRHibTestCase {
         // add test parameter
         parameterMap.put(MCRPackerMock.TEST_PARAMETER_KEY, MCRPackerMock.TEST_VALUE);
 
-        Optional<MCRJob> packerJob = MCRPackerManager.startPacking(parameterMap);
+        MCRJob packerJob = MCRPackerManager.startPacking(parameterMap);
 
-        Assert.assertTrue("The Packer job is not present!",packerJob.isPresent());
+        Assert.assertNotNull("The Packer job is not present!", packerJob);
 
         endTransaction();
         Thread.sleep(1000);

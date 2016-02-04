@@ -15,9 +15,8 @@ public class MCRPackerMock extends MCRPacker {
     public static final String SETUP_CHECKED_PROPERTY = MCRPackerMock.class.toString() + ".checked";
 
     @Override
-    public boolean checkSetup() {
+    public void checkSetup() {
         MCRConfiguration.instance().set(SETUP_CHECKED_PROPERTY, true);
-        return true;
     }
 
     @Override

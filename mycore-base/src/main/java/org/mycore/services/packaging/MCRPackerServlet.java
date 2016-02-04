@@ -1,12 +1,15 @@
 package org.mycore.services.packaging;
 
+import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.mycore.access.MCRAccessManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRUsageException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.queuedjob.MCRJob;
@@ -22,29 +25,30 @@ import org.mycore.services.queuedjob.MCRJob;
 public class MCRPackerServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    protected void doGetPost(MCRServletJob job) throws Exception {
+    protected void doGetPost(MCRServletJob job) throws IOException {
         String packer = job.getRequest().getParameter("packer");
         if (packer == null || packer.isEmpty()) {
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "No or invalid 'packer' parameter!");
-            return;
-        }
-
-        String privilege = "packer-" + packer;
-        if (!MCRAccessManager.checkPermission(privilege)) {
-            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN,
-                "You don't have the privilege '" + privilege + "' to create a Package!");
-            return;
+            try {
+                job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "No or invalid 'packer' parameter!");
+            } catch (IOException e) {
+                LOGGER.error("Error while sending request error to client!", e);
+                return;
+            }
         }
 
         Map<String, String> jobParameters = resolveJobParameters(job);
 
-        Optional<MCRJob> mcrJob = MCRPackerManager.startPacking(jobParameters);
-        if(!mcrJob.isPresent()){
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters for the packer!");
-            return;
+        try {
+            MCRJob mcrJob = MCRPackerManager.startPacking(jobParameters);
+        } catch (MCRAccessException e) {
+            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, "You don't have the rights to use the Packer!");
+        } catch (MCRUsageException e) {
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Parameters: " + e.getMessage());
         }
+
 
         if (jobParameters.containsKey("redirect")) {
             String redirect = jobParameters.get("redirect");
