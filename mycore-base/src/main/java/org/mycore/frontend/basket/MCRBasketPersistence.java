@@ -28,6 +28,7 @@ import java.nio.file.Files;
 
 import org.jdom2.Document;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRPathContent;
@@ -83,8 +84,10 @@ public class MCRBasketPersistence {
      * 
      * @param basket the basket to store in a new file in a new derivate
      * @param ownerID the ID of the MCRObject owning the new derivate 
+     * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
+     * @throws MCRPersistenceException 
      */
-    public static void createDerivateWithBasket(MCRBasket basket, MCRObjectID ownerID) throws IOException {
+    public static void createDerivateWithBasket(MCRBasket basket, MCRObjectID ownerID) throws IOException, MCRPersistenceException, MCRAccessException {
         String base = ownerID.getProjectId() + "_derivate";
         MCRObjectID derivateOID = MCRObjectID.getNextFreeId(base);
         String derivateID = derivateOID.toString();
@@ -103,8 +106,9 @@ public class MCRBasketPersistence {
      * @return the empty derivate that was created.
      * @throws IOException 
      * @throws MCRPersistenceException 
+     * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
      */
-    private static MCRDerivate createNewDerivate(MCRObjectID ownerID, MCRObjectID derivateOID) throws MCRPersistenceException, IOException {
+    private static MCRDerivate createNewDerivate(MCRObjectID ownerID, MCRObjectID derivateOID) throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateOID);
         derivate.setLabel("Saved basket data for " + ownerID.toString());

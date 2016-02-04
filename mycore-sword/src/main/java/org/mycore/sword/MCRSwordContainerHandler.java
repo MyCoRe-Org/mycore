@@ -3,7 +3,10 @@ package org.mycore.sword;
 import java.util.Map;
 import java.util.Optional;
 
+import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -25,21 +28,25 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
     private MCRSwordLifecycleConfiguration lifecycleConfiguration;
 
     public DepositReceipt addObject(Deposit deposit) throws SwordError, SwordServerException {
-        final MCRSwordCollectionProvider collection = MCRSword.getCollection(this.lifecycleConfiguration.getCollection());
+        final MCRSwordCollectionProvider collection = MCRSword
+            .getCollection(this.lifecycleConfiguration.getCollection());
         final MCRObjectID idOfIngested = collection.getIngester().ingestMetadata(deposit);
         final MCRObject createdObject = (MCRObject) MCRMetadataManager.retrieve(idOfIngested);
         return collection.getMetadataProvider().provideMetadata(createdObject);
     }
 
-    public DepositReceipt addObjectWithDerivate(String objectIdString, Deposit deposit) throws SwordError, SwordServerException {
-        final MCRSwordCollectionProvider collection = MCRSword.getCollection(this.lifecycleConfiguration.getCollection());
+    public DepositReceipt addObjectWithDerivate(String objectIdString, Deposit deposit)
+        throws SwordError, SwordServerException {
+        final MCRSwordCollectionProvider collection = MCRSword
+            .getCollection(this.lifecycleConfiguration.getCollection());
         final MCRObjectID idOfIngested = collection.getIngester().ingestMetadataResources(deposit);
         final MCRObject createdObject = (MCRObject) MCRMetadataManager.retrieve(idOfIngested);
         return collection.getMetadataProvider().provideMetadata(createdObject);
     }
 
     public DepositReceipt addMetadata(MCRObject object, Deposit deposit) throws SwordError, SwordServerException {
-        final MCRSwordCollectionProvider collection = MCRSword.getCollection(this.lifecycleConfiguration.getCollection());
+        final MCRSwordCollectionProvider collection = MCRSword
+            .getCollection(this.lifecycleConfiguration.getCollection());
         collection.getIngester().updateMetadata(object, deposit, false);
         return collection.getMetadataProvider().provideMetadata(object);
     }
@@ -51,23 +58,26 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
      * @return a new {@link DepositReceipt} with the new metadata
      */
     public DepositReceipt replaceMetadata(MCRObject object, Deposit deposit) throws SwordError, SwordServerException {
-        final MCRSwordCollectionProvider collection = MCRSword.getCollection(this.lifecycleConfiguration.getCollection());
+        final MCRSwordCollectionProvider collection = MCRSword
+            .getCollection(this.lifecycleConfiguration.getCollection());
         collection.getIngester().updateMetadata(object, deposit, true);
         return collection.getMetadataProvider().provideMetadata(object);
     }
 
-    public DepositReceipt replaceMetadataAndResources(MCRObject object, Deposit deposit) throws SwordError, SwordServerException {
-        final MCRSwordCollectionProvider collection = MCRSword.getCollection(this.lifecycleConfiguration.getCollection());
+    public DepositReceipt replaceMetadataAndResources(MCRObject object, Deposit deposit)
+        throws SwordError, SwordServerException {
+        final MCRSwordCollectionProvider collection = MCRSword
+            .getCollection(this.lifecycleConfiguration.getCollection());
         collection.getIngester().updateMetadataResources(object, deposit);
         return collection.getMetadataProvider().provideMetadata(object);
     }
 
     public DepositReceipt addResources(MCRObject object, Deposit deposit) throws SwordError, SwordServerException {
-        final MCRSwordCollectionProvider collection = MCRSword.getCollection(this.lifecycleConfiguration.getCollection());
+        final MCRSwordCollectionProvider collection = MCRSword
+            .getCollection(this.lifecycleConfiguration.getCollection());
         collection.getIngester().ingestResource(object, deposit);
         return collection.getMetadataProvider().provideMetadata(object);
     }
-
 
     /**
      * This method should add metadata to the receipt. The are the more important Metadata.
@@ -75,19 +85,34 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
      * @param object the MyCoReObject
      * @param accept the accept header of the HTTP-Request
      */
-    public DepositReceipt getMetadata(String collectionString, MCRObject object, Optional<Map<String, String>> accept) throws SwordError {
+    public DepositReceipt getMetadata(String collectionString, MCRObject object, Optional<Map<String, String>> accept)
+        throws SwordError {
         return MCRSword.getCollection(collectionString).getMetadataProvider().provideMetadata(object);
     }
 
     public void deleteObject(MCRObject object) throws SwordServerException {
-        object.getStructure().getDerivates().forEach(derLink->{
-            final MCRObjectID xLinkToID = derLink.getXLinkHrefID();
-            MCRMetadataManager.deleteMCRDerivate(xLinkToID);
-        });
         try {
+            object
+                .getStructure()
+                .getDerivates()
+                .stream()
+                .map(MCRMetaLinkID::getXLinkHrefID)
+                .forEach(id -> {
+                    try {
+                        MCRMetadataManager.deleteMCRDerivate(id);
+                    } catch (Exception e) {
+                        throw new MCRException(e);
+                    }
+                });
             MCRMetadataManager.delete(object);
-        } catch (MCRActiveLinkException e) {
-            throw new SwordServerException("Error while deleting Object.",e);
+        } catch (MCRActiveLinkException | MCRAccessException | MCRException e) {
+            Throwable ex = e;
+            if (e instanceof MCRException && Optional.ofNullable(e.getCause()).map(Object::getClass)
+                .filter(MCRAccessException.class::isAssignableFrom).isPresent()) {
+                //unwrapp
+                ex = e.getCause();
+            }
+            throw new SwordServerException("Error while deleting Object.", ex);
         }
     }
 

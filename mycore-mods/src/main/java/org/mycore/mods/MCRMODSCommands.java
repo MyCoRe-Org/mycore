@@ -35,8 +35,10 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -79,7 +81,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax="load mods document from file {0} for project {1}", help="Load MODS document {0} as MyCoRe Object for project {1}", order=20)
-    public static void loadFromFile(String modsFileName, String projectID) throws JDOMException, IOException, MCRActiveLinkException, SAXException {
+    public static void loadFromFile(String modsFileName, String projectID) throws JDOMException, IOException, MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
             throw new MCRException(MessageFormat.format("File {0} is not a file.", modsFile.getAbsolutePath()));
@@ -102,7 +104,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         }
     }
 
-    private static void saveAsMyCoReObject(String projectID, Element modsRoot) throws MCRActiveLinkException {
+    private static void saveAsMyCoReObject(String projectID, Element modsRoot) throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
         MCRObject mcrObject = MCRMODSWrapper.wrapMODSDocument(modsRoot, projectID);
         mcrObject.setId(MCRObjectID.getNextFreeId(mcrObject.getId().getBase()));
         MCRMetadataManager.create(mcrObject);

@@ -36,6 +36,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
@@ -106,7 +107,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             return MCRObjectID.getInstance(derivateID);
     }
 
-    private MCRDerivate createDerivate(MCRObjectID derivateID) throws MCRPersistenceException, IOException {
+    private MCRDerivate createDerivate(MCRObjectID derivateID) throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateID);
         derivate.setLabel("data object from " + documentID);
@@ -213,7 +214,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         }
     }
 
-    private void deleteEmptyDerivate() {
+    private void deleteEmptyDerivate() throws MCRPersistenceException, MCRAccessException {
         LOGGER.warn("No files were uploaded, delete entry in database for " + derivate.getId().toString()
             + " and return:");
         MCRMetadataManager.deleteMCRDerivate(derivate.getId());

@@ -43,7 +43,9 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRFileContent;
@@ -435,9 +437,10 @@ public class MCRSimpleWorkflowManager {
      *            the ID of the metadata object
      * @throws MCRActiveLinkException
      *             if links to the object exist prior loading
+     * @throws MCRAccessException 
      */
     public final boolean commitMetadataObject(MCRObjectID ID) throws MCRActiveLinkException, MCRException,
-        SAXParseException, IOException {
+        SAXParseException, IOException, MCRAccessException {
         // commit metadata
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID + ".xml";
 
@@ -477,14 +480,16 @@ public class MCRSimpleWorkflowManager {
      * 
      * @param ID
      *            the MCRObjectID as String of the derivate object
+     * @throws MCRAccessException 
+     * @throws MCRPersistenceException 
      */
-    public final boolean commitDerivateObject(MCRObjectID ID) throws SAXParseException, IOException {
+    public final boolean commitDerivateObject(MCRObjectID ID) throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID.toString() + ".xml";
 
         return loadDerivate(ID, fn);
     }
 
-    private boolean loadDerivate(MCRObjectID objectID, String filename) throws SAXParseException, IOException {
+    private boolean loadDerivate(MCRObjectID objectID, String filename) throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
         if (MCRMetadataManager.exists(objectID)) {
             MCRDerivateCommands.updateFromFile(filename, false);
         } else {

@@ -38,6 +38,7 @@ import org.jdom2.Document;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.access.MCRAccessException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
@@ -272,11 +273,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         derivate.getDerivate().getOrCreateFileMetadata(mcrPath, urn);
         try {
             MCRMetadataManager.update(derivate);
-        } catch (MCRPersistenceException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        } catch (MCRPersistenceException | MCRAccessException | IOException e) {
             e.printStackTrace();
         }
     }

@@ -25,6 +25,7 @@ package org.mycore.datamodel.metadata.share;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -88,7 +89,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
      * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public void distributeMetadata(MCRObject parent) {
+    public void distributeMetadata(MCRObject parent) throws MCRPersistenceException, MCRAccessException {
         for (MCRMetaLinkID childId : parent.getStructure().getChildren()) {
             LOGGER.debug("Update metadata from Child " + childId);
             final MCRObject child = MCRMetadataManager.retrieveMCRObject(childId.getXLinkHrefID());

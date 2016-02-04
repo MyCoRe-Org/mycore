@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -119,7 +120,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         if (objectDerivate.deleteFileMetaData('/' + path.subpath(0, path.getNameCount()).toString())) {
             try {
                 MCRMetadataManager.update(derivate);
-            } catch (IOException e) {
+            } catch (IOException | MCRAccessException e) {
                 throw new MCRPersistenceException("Could not update derivate: " + derivateID, e);
             }
         }

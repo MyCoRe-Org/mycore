@@ -43,10 +43,12 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
@@ -752,12 +754,10 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the common data stack
      * @param job
      *            the MCRServletJob instance
+     * @throws MCRAccessException 
+     * @throws MCRPersistenceException 
      */
-    public void scopyobj(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.mysemcrid.toString(), PERMISSION_WRITE)) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + usererrorpage));
-            return;
-        }
+    public void scopyobj(MCRServletJob job, CommonData cd) throws IOException, MCRPersistenceException, MCRAccessException {
         if (cd.mysemcrid == null) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + mcriderrorpage));
             return;
@@ -939,8 +939,9 @@ public class MCRStartEditorServlet extends MCRServlet {
      * 
      * @param job
      *            the MCRServletJob instance
+     * @throws MCRAccessException 
      */
-    public void wcommit(MCRServletJob job, CommonData cd) throws IOException, SAXParseException {
+    public void wcommit(MCRServletJob job, CommonData cd) throws IOException, SAXParseException, MCRAccessException {
         org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, PERMISSION_WRITE);
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + usererrorpage));

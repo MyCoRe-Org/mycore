@@ -27,7 +27,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -91,7 +94,12 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
             if (mcrIdCheck.getNumberAsInteger() == 0) {
                 //MCR-931: check for type='host' and present parent document
                 if (!isHost(relatedItem) || object.getStructure().getParentID() == null) {
-                    MCRObjectID relatedID = createRelatedObject(relatedItem, oid);
+                    MCRObjectID relatedID;
+                    try {
+                        relatedID = createRelatedObject(relatedItem, oid);
+                    } catch (MCRAccessException e) {
+                        throw new MCRException(e);
+                    }
 
                     href = relatedID.toString();
                     LOGGER.info("Setting href of related item to " + href);
@@ -123,7 +131,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         return "host".equals(relatedItem.getAttributeValue("type"));
     }
 
-    private MCRObjectID createRelatedObject(Element relatedItem, MCRObjectID childID) {
+    private MCRObjectID createRelatedObject(Element relatedItem, MCRObjectID childID) throws MCRPersistenceException, MCRAccessException {
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
         MCRObject object = wrapper.getMCRObject();
         MCRObjectID oid = MCRObjectID.getNextFreeId(childID.getBase());

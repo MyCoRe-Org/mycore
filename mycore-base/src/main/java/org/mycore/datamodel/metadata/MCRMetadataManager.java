@@ -46,6 +46,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
@@ -173,8 +174,10 @@ public final class MCRMetadataManager {
      *            derivate instance to store
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
+     * @throws MCRAccessException if write permission to object is missing
      */
-    public static void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException, IOException {
+    public static void create(final MCRDerivate mcrDerivate)
+        throws MCRPersistenceException, IOException, MCRAccessException {
         // exist the derivate?
         if (exists(mcrDerivate.getId())) {
             throw new MCRPersistenceException(
@@ -185,6 +188,11 @@ public final class MCRMetadataManager {
             throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " is not valid.");
         }
         final MCRObjectID objid = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
+        if (!MCRAccessManager.checkPermission(objid, PERMISSION_WRITE)) {
+            throw MCRAccessException.missingPermission("Add derivate " + mcrDerivate.getId() + " to object.",
+                objid.toString(),
+                PERMISSION_WRITE);
+        }
         byte[] objectBackup;
         objectBackup = MCRXMLMetadataManager.instance().retrieveBLOB(objid);
         if (objectBackup == null) {
@@ -281,8 +289,16 @@ public final class MCRMetadataManager {
      *            object instance to store
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
+     * @throws MCRAccessException if "create-{objectType}" privilege is missing
      */
-    public static void create(final MCRObject mcrObject) throws MCRPersistenceException {
+    public static void create(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
+        String createBasePrivilege = "create-" + mcrObject.getId().getBase();
+        String createTypePrivilege = "create-" + mcrObject.getId().getTypeId();
+        if (!MCRAccessManager.checkPermission(createBasePrivilege)
+            && !MCRAccessManager.checkPermission(createTypePrivilege)) {
+            throw MCRAccessException.missingPrivilege("Create object with id " + mcrObject.getId(), createBasePrivilege,
+                createTypePrivilege);
+        }
         // exist the object?
         if (MCRMetadataManager.exists(mcrObject.getId())) {
             throw new MCRPersistenceException("The object " + mcrObject.getId() + " allready exists, nothing done.");
@@ -324,10 +340,12 @@ public final class MCRMetadataManager {
      *            to be deleted
      * @throws MCRPersistenceException
      *             if persistence problem occurs
+     * @throws MCRAccessException if delete permission is missing
      */
-    public static void delete(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+    public static void delete(final MCRDerivate mcrDerivate) throws MCRPersistenceException, MCRAccessException {
         if (!MCRAccessManager.checkPermission(mcrDerivate.getId(), PERMISSION_DELETE)) {
-            throw new MCRPersistenceException("You do not have the permission to delete: " + mcrDerivate.getId());
+            throw MCRAccessException.missingPermission("Delete derivate", mcrDerivate.getId().toString(),
+                PERMISSION_DELETE);
         }
         // remove link
         MCRObjectID metaId = null;
@@ -368,8 +386,10 @@ public final class MCRMetadataManager {
      * @throws MCRActiveLinkException 
      * @throws MCRPersistenceException
      *             if persistence problem occurs
+     * @throws MCRAccessException if delete permission is missing
      */
-    public static void delete(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
+    public static void delete(final MCRObject mcrObject)
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         delete(mcrObject, MCRMetadataManager::removeChildObject);
     }
 
@@ -384,15 +404,17 @@ public final class MCRMetadataManager {
      *            if persistence problem occurs
      * @throws MCRActiveLinkException
      *            object couldn't  be deleted because its linked somewhere
+     * @throws MCRAccessException if delete permission is missing
      */
     private static void delete(final MCRObject mcrObject, BiConsumer<MCRObject, MCRObjectID> parentOperation)
-        throws MCRPersistenceException, MCRActiveLinkException {
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRObjectID id = mcrObject.getId();
         if (id == null) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
         if (!MCRAccessManager.checkPermission(id, PERMISSION_DELETE)) {
-            throw new MCRPersistenceException("You do not have the permission to delete: " + id);
+            throw MCRAccessException.missingPermission("Delete object", mcrObject.getId().toString(),
+                PERMISSION_DELETE);
         }
 
         // check for active links
@@ -472,8 +494,9 @@ public final class MCRMetadataManager {
      *            the object ID
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
+     * @throws MCRAccessException if delete permission is missing
      */
-    public static void deleteMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
+    public static void deleteMCRDerivate(final MCRObjectID id) throws MCRPersistenceException, MCRAccessException {
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
         MCRMetadataManager.delete(derivate);
     }
@@ -485,8 +508,10 @@ public final class MCRMetadataManager {
      *                if a persistence problem is occurred
      * @throws MCRActiveLinkException
      *             if object is referenced by other objects
+     * @throws MCRAccessException if delete permission is missing
      */
-    public static void deleteMCRObject(final MCRObjectID id) throws MCRPersistenceException, MCRActiveLinkException {
+    public static void deleteMCRObject(final MCRObjectID id)
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         deleteMCRObject(id, MCRMetadataManager::removeChildObject);
     }
 
@@ -501,9 +526,10 @@ public final class MCRMetadataManager {
      *            if persistence problem occurs
      * @throws MCRActiveLinkException
      *            object couldn't  be deleted because its linked somewhere
+     * @throws MCRAccessException if delete permission is missing
      */
     private static void deleteMCRObject(final MCRObjectID id, BiConsumer<MCRObject, MCRObjectID> parentOperation)
-        throws MCRPersistenceException, MCRActiveLinkException {
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         final MCRObject object = retrieveMCRObject(id);
         MCRMetadataManager.delete(object, parentOperation);
     }
@@ -651,14 +677,17 @@ public final class MCRMetadataManager {
      * 
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
+     * @throws MCRAccessException if write permission to object or derivate is missing
      */
-    public static void update(final MCRDerivate mcrDerivate) throws MCRPersistenceException, IOException {
+    public static void update(final MCRDerivate mcrDerivate)
+        throws MCRPersistenceException, IOException, MCRAccessException {
         if (!MCRMetadataManager.exists(mcrDerivate.getId())) {
             MCRMetadataManager.create(mcrDerivate);
             return;
         }
         if (!MCRAccessManager.checkPermission(mcrDerivate.getId(), PERMISSION_WRITE)) {
-            throw new MCRPersistenceException("You do not have the permission to update: " + mcrDerivate.getId());
+            throw MCRAccessException.missingPermission("Update derivate", mcrDerivate.getId().toString(),
+                PERMISSION_WRITE);
         }
         File fileSourceDirectory = null;
         if (mcrDerivate.getDerivate().getInternals() != null
@@ -716,14 +745,17 @@ public final class MCRMetadataManager {
      *                if a persistence problem is occurred
      * @throws MCRActiveLinkException
      *             if object is created (no real update), see {@link #create(MCRObject)}
+     * @throws MCRAccessException if write permission is missing or see {@link #create(MCRObject)}
      */
-    public static void update(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
+    public static void update(final MCRObject mcrObject)
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         if (!MCRMetadataManager.exists(mcrObject.getId())) {
             MCRMetadataManager.create(mcrObject);
             return;
         }
         if (!MCRAccessManager.checkPermission(mcrObject.getId(), PERMISSION_WRITE)) {
-            throw new MCRPersistenceException("You do not have the permission to update: " + mcrObject.getId());
+            throw MCRAccessException.missingPermission("Update object.", mcrObject.getId().toString(),
+                PERMISSION_WRITE);
         }
         MCRObject old = MCRMetadataManager.retrieveMCRObject(mcrObject.getId());
 

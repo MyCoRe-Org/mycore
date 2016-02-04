@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
@@ -48,6 +47,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -70,7 +70,6 @@ import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.fileupload.MCRUploadHandlerIFS;
 import org.mycore.frontend.support.MCRObjectIDLockTable;
-import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -122,7 +121,8 @@ public class MCRPersistentServlet extends MCRServlet {
     @Override
     protected void think(MCRServletJob job) throws Exception {
         //If admin mode, do not change any data
-        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), MCRFrontendUtil.getBaseURL()))
+        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(),
+            MCRFrontendUtil.getBaseURL()))
             return;
         switch (operation) {
             case create:
@@ -252,24 +252,34 @@ public class MCRPersistentServlet extends MCRServlet {
         IOException, MCRException, SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
-        if (!MCRAccessManager.checkPermission("create-" + objectId.getBase())
-            && !MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
-            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                "You do not have \"create\" permission on " + objectId.getTypeId() + ".");
-            return null;
-        }
         //noinspection SynchronizeOnNonFinalField
-        synchronized (operation) {
-            if (objectId.getNumberAsInteger() == 0) {
-                String objId = mcrObject.getId().toString();
-                objectId = MCRObjectID.getNextFreeId(objectId.getBase());
-                if (mcrObject.getLabel().equals(objId))
-                    mcrObject.setLabel(objectId.toString());
-                mcrObject.setId(objectId);
+        try {
+            checkCreatePrivilege(objectId);
+            synchronized (operation) {
+                if (objectId.getNumberAsInteger() == 0) {
+                    String objId = mcrObject.getId().toString();
+                    objectId = MCRObjectID.getNextFreeId(objectId.getBase());
+                    if (mcrObject.getLabel().equals(objId))
+                        mcrObject.setLabel(objectId.toString());
+                    mcrObject.setId(objectId);
+                }
             }
             MCRMetadataManager.create(mcrObject);
+        } catch (MCRAccessException e) {
+            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
         return objectId;
+    }
+
+    private void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
+        String createBasePrivilege = "create-" + objectId.getBase();
+        String createTypePrivilege = "create-" + objectId.getTypeId();
+        if (!MCRAccessManager.checkPermission(createBasePrivilege)
+            && !MCRAccessManager.checkPermission(createTypePrivilege)) {
+            throw MCRAccessException.missingPrivilege("Create object with id " + objectId,
+                createBasePrivilege,
+                createTypePrivilege);
+        }
     }
 
     /**
@@ -286,19 +296,15 @@ public class MCRPersistentServlet extends MCRServlet {
      *  from {@link #getMCRObject(Document)}
      * @throws SAXParseException
      * @throws MCRException
+     * @throws MCRAccessException 
      */
     private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException,
-        MCRException, SAXParseException {
+        MCRException, SAXParseException, MCRAccessException {
         MCRObject mcrObject = getMCRObject(doc);
         LOGGER.info("ID: " + mcrObject.getId());
         try {
-            if (MCRAccessManager.checkPermission(mcrObject.getId(), PERMISSION_WRITE)) {
-                MCRMetadataManager.update(mcrObject);
-                return mcrObject.getId();
-            } else {
-                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
-                    + mcrObject.getId() + ".");
-            }
+            MCRMetadataManager.update(mcrObject);
+            return mcrObject.getId();
         } finally {
             MCRObjectIDLockTable.unlock(mcrObject.getId());
         }
@@ -311,8 +317,10 @@ public class MCRPersistentServlet extends MCRServlet {
      * @return
      *  MCRObjectID of the MyCoRe object
      * @throws SAXParseException
+     * @throws MCRAccessException 
      */
-    private MCRObjectID updateDerivateXML(Document editorSubmission) throws SAXParseException, IOException {
+    private MCRObjectID updateDerivateXML(Document editorSubmission)
+        throws SAXParseException, IOException, MCRAccessException {
         MCRObjectID objectID;
         Element root = editorSubmission.getRootElement();
         root.setAttribute("noNamespaceSchemaLocation", "datamodel-derivate.xsd", XSI_NAMESPACE);
@@ -321,10 +329,6 @@ public class MCRPersistentServlet extends MCRServlet {
         byte[] xml = new MCRJDOMContent(editorSubmission).asByteArray();
         MCRDerivate der = new MCRDerivate(xml, true);
         MCRObjectID derivateID = der.getId();
-        if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
-            throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
-                + derivateID + ".");
-        }
         // store entry of derivate xlink:title in object
         objectID = der.getDerivate().getMetaLink().getXLinkHrefID();
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
@@ -335,7 +339,7 @@ public class MCRPersistentServlet extends MCRServlet {
             MCRMetadataManager.update(obj);
         } catch (MCRPersistenceException | MCRActiveLinkException e) {
             throw new MCRPersistenceException("Can't store label of derivate " + derivateID
-                 + " in derivate list of object " + objectID + ".", e);
+                + " in derivate list of object " + objectID + ".", e);
         }
         return objectID;
     }
@@ -346,12 +350,11 @@ public class MCRPersistentServlet extends MCRServlet {
      *  MyCoRe object ID
      * @throws MCRActiveLinkException
      *  If links from other objects will fail.
+     * @throws MCRAccessException 
+     * @throws MCRPersistenceException 
      */
-    private void deleteObject(String id) throws MCRActiveLinkException {
-        if (MCRAccessManager.checkPermission(id, PERMISSION_DELETE))
-            MCRObjectCommands.delete(id);
-        else
-            throw new MCRPersistenceException("You do not have \"" + PERMISSION_DELETE + "\" permission on " + id + ".");
+    private void deleteObject(String id) throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
+        MCRObjectCommands.delete(id);
     }
 
     /**
@@ -360,12 +363,10 @@ public class MCRPersistentServlet extends MCRServlet {
      *  MyCoRe derivate ID
      * @throws MCRActiveLinkException
      * @throws MCRPersistenceException
+     * @throws MCRAccessException 
      */
-    private void deleteDerivate(String id) throws MCRPersistenceException, MCRActiveLinkException {
-        if (MCRAccessManager.checkPermission(id, PERMISSION_DELETE)) {
-            MCRDerivateCommands.delete(id);
-        } else
-            throw new MCRPersistenceException("You do not have \"" + PERMISSION_DELETE + "\" permission on " + id + ".");
+    private void deleteDerivate(String id) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+        MCRDerivateCommands.delete(id);
     }
 
     @Override
@@ -375,6 +376,9 @@ public class MCRPersistentServlet extends MCRServlet {
             return;
         }
         if (ex != null) {
+            if (ex instanceof MCRAccessException) {
+                job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
+            }
             if (ex instanceof SAXParseException) {
                 ArrayList<String> errorLog = new ArrayList<String>();
                 errorLog.add(MCRXMLParserErrorHandler.getSAXErrorMessage((SAXParseException) ex));
@@ -412,19 +416,17 @@ public class MCRPersistentServlet extends MCRServlet {
                         MCRObjectID returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
                         if (returnID == null) {
                             redirectToCreateObject(job);
-                        }
-                        else {
+                        } else {
                             if (this.appendDerivate) {
                                 String parentObjectID = returnID.toString();
                                 if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
-                                    throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
-                                        + parentObjectID + ".");
+                                    throw MCRAccessException.missingPermission("Add derivate to object.", parentObjectID, PERMISSION_WRITE);
                                 }
                                 redirectToUploadPage(job, parentObjectID, null);
-                            }
-                            else {
+                            } else {
                                 job.getResponse().sendRedirect(
-                                    job.getResponse().encodeRedirectURL(buildRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(), params)));
+                                    job.getResponse().encodeRedirectURL(buildRedirectURL(
+                                        MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(), params)));
                             }
                         }
                         return;
@@ -442,7 +444,8 @@ public class MCRPersistentServlet extends MCRServlet {
                             throw new MCRException("No MCRObjectID given.");
                         } else
                             job.getResponse().sendRedirect(
-                                job.getResponse().encodeRedirectURL(buildRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(), params)));
+                                job.getResponse().encodeRedirectURL(buildRedirectURL(
+                                    MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(), params)));
                         break;
                     case derivate: {
                         returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
@@ -452,7 +455,8 @@ public class MCRPersistentServlet extends MCRServlet {
                             return;
                         } else
                             job.getResponse().sendRedirect(
-                                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
+                                job.getResponse().encodeRedirectURL(
+                                    MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
                         break;
                     }
                     default:
@@ -508,18 +512,16 @@ public class MCRPersistentServlet extends MCRServlet {
      * </dl>
      * @param job
      * @throws IOException
+     * @throws MCRAccessException 
      */
-    private void redirectToCreateObject(MCRServletJob job) throws IOException {
+    private void redirectToCreateObject(MCRServletJob job) throws IOException, MCRAccessException {
         String projectID = getProperty(job.getRequest(), "project");
         String type = getProperty(job.getRequest(), "type");
         String layout = getProperty(job.getRequest(), "layout");
 
-        String base = projectID + "_" + type;
-        if (!(MCRAccessManager.checkPermission("create-" + base) || MCRAccessManager.checkPermission("create-" + type))) {
-            String msg = MCRTranslation.translate("component.base.error.MCRPersistentServlet.editorAccessDenied");
-            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
-            return;
-        }
+        String formattedId = MCRObjectID.formatID(projectID + "_" + type, 0);
+        MCRObjectID objectID = MCRObjectID.getInstance(formattedId);
+        checkCreatePrivilege(objectID);
         StringBuilder sb = new StringBuilder();
         sb.append("editor_form_author").append('-').append(type);
         if (layout != null && layout.length() != 0) {
@@ -528,7 +530,7 @@ public class MCRPersistentServlet extends MCRServlet {
         String form = checkFileName(sb.toString());
         Properties params = new Properties();
         params.put("cancelUrl", getCancelUrl(job));
-        params.put("mcrid", MCRObjectID.formatID(base, 0));
+        params.put("mcrid", formattedId);
         Enumeration<String> e = job.getRequest().getParameterNames();
         while (e.hasMoreElements()) {
             String name = e.nextElement();
@@ -624,12 +626,12 @@ public class MCRPersistentServlet extends MCRServlet {
         String page = "";
         try {
             MCRURIResolver.instance().resolve("webapp:/fileupload.xml");
-            page="fileupload.xml";
+            page = "fileupload.xml";
         } catch (MCRException e) {
             LOGGER.warn("Can't find fileupload.xml, now we try it with fileupload_commit.xml");
-            page="fileupload_commit.xml";
+            page = "fileupload_commit.xml";
         }
-        
+
         String base = MCRFrontendUtil.getBaseURL() + page;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);

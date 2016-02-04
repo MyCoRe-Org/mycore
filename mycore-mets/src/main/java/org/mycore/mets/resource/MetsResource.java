@@ -27,6 +27,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -99,7 +100,7 @@ public class MetsResource {
         try {
             MCRMetsLock.doUnlock(derivateId);
             return "{\"success\": true }";
-        } catch (MCRAccessException e) {
+        } catch (MCRException e) {
             return "{\"success\": false }";
         }
     }

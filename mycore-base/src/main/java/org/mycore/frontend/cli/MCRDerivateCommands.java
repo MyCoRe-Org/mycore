@@ -41,6 +41,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -104,15 +105,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param ID
      *            the ID of the MCRDerivate that should be deleted
      * @throws MCRActiveLinkException
-     *             com = new
-     *             MCRCommand("export all derivates to directory {0} with {1}",
-     *             "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivates String String"
-     *             ,
-     *             "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default."
-     *             ); command.add(com);
+     * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)} 
      */
     @MCRCommand(syntax = "delete derivate {0}", help = "The command remove a derivate with the MCRObjectID {0}", order = 30)
-    public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException {
+    public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(ID);
         MCRMetadataManager.deleteMCRDerivate(objectID);
         LOGGER.info(objectID + " deleted.");
@@ -125,9 +121,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the start ID for deleting the MCRDerivate
      * @param IDto
      *            the stop ID for deleting the MCRDerivate
+     * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)}
      */
     @MCRCommand(syntax = "delete derivate from {0} to {1}", help = "The command remove derivates in the number range between the MCRObjectID {0} and {1}.", order = 20)
-    public static void delete(String IDfrom, String IDto) throws MCRPersistenceException, MCRActiveLinkException {
+    public static void delete(String IDfrom, String IDto)
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         int from_i = 0;
         int to_i = 0;
 
@@ -216,9 +214,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
+     * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
      */
     @MCRCommand(syntax = "load derivate from file {0}", help = "The command add a derivate form the file {0} to the system.", order = 40)
-    public static boolean loadFromFile(String file) throws SAXParseException, IOException {
+    public static boolean loadFromFile(String file)
+        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
         return loadFromFile(file, true);
     }
 
@@ -229,8 +229,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
+     * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
+     * @throws MCRPersistenceException 
      */
-    public static boolean loadFromFile(String file, boolean importMode) throws SAXParseException, IOException {
+    public static boolean loadFromFile(String file, boolean importMode)
+        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -239,10 +242,13 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
+     * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
+     * @throws MCRPersistenceException 
      */
 
     @MCRCommand(syntax = "update derivate from file {0}", help = "The command update a derivate form the file {0} in the system.", order = 50)
-    public static boolean updateFromFile(String file) throws SAXParseException, IOException {
+    public static boolean updateFromFile(String file)
+        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
         return updateFromFile(file, true);
     }
 
@@ -253,8 +259,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
+     * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
      */
-    public static boolean updateFromFile(String file, boolean importMode) throws SAXParseException, IOException {
+    public static boolean updateFromFile(String file, boolean importMode)
+        throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -268,9 +276,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param importMode
      *            if true, servdates are taken from xml file
      * @throws SAXParseException
+     * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
+     * @throws MCRPersistenceException 
      */
     private static boolean processFromFile(File file, boolean update, boolean importMode) throws SAXParseException,
-        IOException {
+        IOException, MCRPersistenceException, MCRAccessException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;

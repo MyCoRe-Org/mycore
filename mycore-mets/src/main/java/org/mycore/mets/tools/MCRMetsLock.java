@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -59,9 +60,9 @@ public class MCRMetsLock {
     /**
      * Unlocks a Derivate wich was locked with the current SessionId
      * @param derivateIdString the id of the derivate
-     * @throws MCRAccessException if the session-id of locker is different from current session-id
+     * @throws MCRException if the session-id of locker is different from current session-id
      */
-    public static synchronized void doUnlock(String derivateIdString) throws MCRAccessException {
+    public static synchronized void doUnlock(String derivateIdString) throws MCRException {
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
         if (isLocked(derivateIdString)) {
             String sessionId = MCRMetsLock.metsAccessSessionTable.get(MCRObjectID.getInstance(derivateIdString));
@@ -75,7 +76,7 @@ public class MCRMetsLock {
                     "Could not unlock {0}, because the session wich locked it was : ''{1}'' "
                         + "and current sesssion is ''{2}''", derivateIdString, sessionId,
                     MCRSessionMgr.getCurrentSessionID());
-                throw new MCRAccessException(message);
+                throw new MCRException(message);
             }
         }
     }

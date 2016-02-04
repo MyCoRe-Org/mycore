@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -48,7 +49,7 @@ public class MCRMigrationCommands {
     @MCRCommand(
         syntax = "migrate author servflags for {0}",
         help = "Create missing servflags for createdby and modifiedby for object {0}. (MCR-786)", order = 10)
-    public static void addServFlags(String id) throws IOException, MCRPersistenceException, MCRActiveLinkException {
+    public static void addServFlags(String id) throws IOException, MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCRBase obj = MCRMetadataManager.retrieve(objectID);
         MCRObjectService service = obj.getService();

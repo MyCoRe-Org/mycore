@@ -44,6 +44,7 @@ import org.apache.abdera.model.Link;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -73,7 +74,7 @@ public class MCRSwordUtil {
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
     private static Logger LOGGER = Logger.getLogger(MCRSwordUtil.class);
 
-    public static MCRDerivate createDerivate(String documentID) throws MCRPersistenceException, IOException {
+    public static MCRDerivate createDerivate(String documentID) throws MCRPersistenceException, IOException, MCRAccessException {
         final String projectId = MCRObjectID.getInstance(documentID).getProjectId();
         MCRObjectID oid = MCRObjectID.getNextFreeId(projectId, "derivate");
         final String derivateID = oid.toString();

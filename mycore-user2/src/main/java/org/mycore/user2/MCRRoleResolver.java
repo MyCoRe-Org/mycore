@@ -60,7 +60,7 @@ public class MCRRoleResolver implements URIResolver {
                 groupIDs.add(MCRRoleManager.getRole(id));
             }
         } else {
-            throw new MCRAccessException("Not enough permissions! " + "Someone might have tried to call the new user form directly.");
+            throw MCRAccessException.missingPrivilege("List asignable groups for new user.", MCRUser2Constants.USER_ADMIN_PERMISSION, MCRUser2Constants.USER_CREATE_PERMISSION);
         }
 
         // Loop over all assignable groups

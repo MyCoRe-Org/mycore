@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -137,14 +138,17 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle {
 
     public void deleteMediaResource(String derivateId, String requestFilePath) throws SwordError, SwordServerException {
         if(!MCRAccessManager.checkPermission(derivateId, MCRAccessManager.PERMISSION_DELETE)){
-            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "You dont have the right to delete (from) the derivate!");
         }
 
         if (requestFilePath == null || requestFilePath.equals("/")) {
             final MCRObjectID derivateID = MCRObjectID.getInstance(derivateId);
             if (MCRMetadataManager.exists(derivateID)) {
                 final MCRDerivate mcrDerivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
-                MCRMetadataManager.delete(mcrDerivate);
+                try {
+                    MCRMetadataManager.delete(mcrDerivate);
+                } catch (MCRAccessException e) {
+                    throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, e);
+                }
             } else {
                 throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND, "The requested Object '" + requestFilePath + "' does not exists.");
             }

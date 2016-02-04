@@ -106,7 +106,7 @@ public class MCRUserResolver implements URIResolver {
     public static Document getAllUsers() throws MCRAccessException {
         LOGGER.warn("Please fix https://sourceforge.net/tracker/?func=detail&aid=3497583&group_id=92005&atid=599192");
         if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
-            throw new MCRAccessException("No permissions");
+            throw MCRAccessException.missingPrivilege("List all users.", "modify-user", "modify-contact");
         }
         List<MCRUser> users = MCRUserManager.listUsers(null, null, null);
         // Loop over all assignable group IDs

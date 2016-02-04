@@ -42,6 +42,7 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
@@ -131,10 +132,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param ID
      *            the ID of the MCRObject that should be deleted
+     * @throws MCRAccessException see {@link MCRMetadataManager#deleteMCRObject(MCRObjectID)}
+     * @throws MCRPersistenceException 
      */
     @MCRCommand(
         syntax = "delete object {0}", help = "Removes a MCRObject with the MCRObjectID {0}", order = 40)
-    public static void delete(String ID) throws MCRActiveLinkException {
+    public static void delete(String ID) throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
         MCRObjectID mcrId = MCRObjectID.getInstance(ID);
         MCRMetadataManager.deleteMCRObject(mcrId);
         LOGGER.info(mcrId + " deleted.");
@@ -288,11 +291,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
+     * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRObject)}
      */
     @MCRCommand(
         syntax = "load object from file {0}", help = "Adds a MCRObject from the file {0} to the system.", order = 60)
     public static boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException,
-        IOException {
+        IOException, MCRAccessException {
         return loadFromFile(file, true);
     }
 
@@ -303,9 +307,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
+     * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
     public static boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
-        SAXParseException, IOException {
+        SAXParseException, IOException, MCRAccessException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -314,12 +319,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
+     * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
     @MCRCommand(
         syntax = "update object from file {0}", help = "Updates a MCRObject from the file {0} in the system.",
         order = 80)
     public static boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException,
-        IOException {
+        IOException, MCRAccessException {
         return updateFromFile(file, true);
     }
 
@@ -330,9 +336,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
+     * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
     public static boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
-        SAXParseException, IOException {
+        SAXParseException, IOException, MCRAccessException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -348,9 +355,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRActiveLinkException
      * @throws SAXParseException
      * @throws MCRException
+     * @throws MCRAccessException 
      */
     private static boolean processFromFile(File file, boolean update, boolean importMode)
-        throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
+        throws MCRActiveLinkException, MCRException, SAXParseException, IOException, MCRAccessException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;
@@ -797,11 +805,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws URISyntaxException if xslFilePath is not a valid file or URL
      * @throws MCRActiveLinkException see {@link MCRMetadataManager#update(MCRObject)}
      * @throws MCRPersistenceException see {@link MCRMetadataManager#update(MCRObject)}
+     * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
     @MCRCommand(
         syntax = "xslt {0} with file {1}", help = "transforms a mycore object {0} with the given file or URL {1}",
         order = 280)
-    public static void xslt(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException, URISyntaxException, TransformerException, MCRPersistenceException, MCRActiveLinkException {
+    public static void xslt(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException, URISyntaxException, TransformerException, MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         File xslFile = new File(xslFilePath);
         URL xslURL;
         if (!xslFile.exists()) {
@@ -845,12 +854,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            object that should be attached to new parent
      * @param newParentId
      *            the ID of the new parent
+     * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
     @MCRCommand(
         syntax = "set parent of {0} to {1}",
         help = "replaces a parent of an object (first parameter) to the given new one (second parameter)", order = 300)
     public static void replaceParent(String sourceId, String newParentId) throws MCRPersistenceException,
-        MCRActiveLinkException {
+        MCRActiveLinkException, MCRAccessException {
         // child
         MCRObject sourceMCRObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(sourceId));
         // old parent

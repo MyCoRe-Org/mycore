@@ -31,6 +31,7 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.filter.Filter;
 import org.jdom2.filter.Filters;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -70,7 +71,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
      * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public void distributeMetadata(MCRObject holder) {
+    public void distributeMetadata(MCRObject holder) throws MCRPersistenceException, MCRAccessException {
         MCRMODSWrapper holderWrapper = new MCRMODSWrapper(holder);
         List<MCRMetaLinkID> children = holder.getStructure().getChildren();
         if (!children.isEmpty()) {

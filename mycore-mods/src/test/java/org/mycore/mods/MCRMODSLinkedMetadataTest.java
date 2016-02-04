@@ -19,6 +19,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.MCRPersistenceException;
@@ -72,7 +73,7 @@ public class MCRMODSLinkedMetadataTest extends MCRHibTestCase {
 
     @Test
     public void testUpdate() throws IOException, URISyntaxException, MCRPersistenceException,
-        MCRActiveLinkException, JDOMException, SAXException {
+        MCRActiveLinkException, JDOMException, SAXException, MCRAccessException {
         MCRObject seriesNew = new MCRObject(getResourceAsURL(seriesID + "-updated.xml").toURI());
         MCRMetadataManager.update(seriesNew);
         Document bookNew = MCRXMLMetadataManager.instance().retrieveXML(bookID);

@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata.share;
 
+import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
@@ -41,8 +43,10 @@ public interface MCRMetadataShareAgent {
     /**
      * updates all recipients of shareable metadata from <code>holder</code>.
      * @param holder usually the parent object that can distrivute metadata
+     * @throws MCRAccessException 
+     * @throws MCRPersistenceException 
      */
-    public void distributeMetadata(MCRObject holder);
+    public void distributeMetadata(MCRObject holder) throws MCRPersistenceException, MCRAccessException;
 
     /**
      * Include shareable metadata from <code>holder</code> before persisting <code>recipient</code>.
