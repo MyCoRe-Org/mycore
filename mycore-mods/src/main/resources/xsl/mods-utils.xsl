@@ -212,27 +212,35 @@
   </xsl:template>
 
   <xsl:template match="mods:name" mode="nameLink">
-    <xsl:variable name="gnd">
-      <xsl:if test="mods:nameIdentifier/@type = 'gnd'">
+	<xsl:variable name="nameIdentifier">
+      <xsl:if test="mods:nameIdentifier/@type">
         <xsl:value-of select="mods:nameIdentifier" />
       </xsl:if>
     </xsl:variable>
+	<xsl:variable name="nameIdentifierType">
+	  <xsl:value-of select="mods:nameIdentifier/@type" />
+	</xsl:variable>
+	
     <!-- if user is in role editor or admin, show all; other users only gets their own and published publications -->
-    <xsl:variable name="filter_query">
+    <xsl:variable name="owner">
       <xsl:choose>
-        <xsl:when test="mcrxml:isCurrentUserInRole('admin') or mcrxml:isCurrentUserInRole('editor')">state:*</xsl:when>
-        <xsl:otherwise>state:published OR createdby:<xsl:value-of select="$CurrentUser" /></xsl:otherwise>
+        <xsl:when test="mcrxml:isCurrentUserInRole('admin') or mcrxml:isCurrentUserInRole('editor')"><!--
+          -->*<!--
+        --></xsl:when>
+        <xsl:otherwise><!--
+          --><xsl:value-of select="$CurrentUser" /><!--
+        --></xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="query">
       <xsl:choose>
-        <xsl:when test="string-length($gnd)&gt;0">
-          <xsl:value-of select="concat($ServletsBaseURL,'solr/select?q=mods.gnd:', $gnd, ' AND (', $filter_query, ')')" />
+        <xsl:when test="string-length($nameIdentifier)&gt;0">
+          <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=mods.nameIdentifier:', $nameIdentifierType, '\:', $nameIdentifier, '&amp;owner=createdby:', $owner)" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="concat($ServletsBaseURL,'solr/select?q=')" />
+          <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=')" />
           <xsl:value-of select="concat('+mods.author:&quot;',mods:displayForm,'&quot;')" />
-          <xsl:value-of select="concat(' AND (', $filter_query, ')')" />
+          <xsl:value-of select="concat('&amp;owner=createdby:', $owner)" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -241,10 +249,15 @@
         <span itemprop="name">
           <xsl:value-of select="mods:displayForm" />
         </span>
-        <xsl:if test="string-length($gnd)&gt;0">
+        <xsl:if test="string-length($nameIdentifier)&gt;0">
+          <xsl:variable name="classi" select="document(concat('classification:metadata:all:children:','nameIdentifier',':',$nameIdentifierType))/mycoreclass/categories/category[@ID=$nameIdentifierType]" />
+		  <xsl:variable name="uri" select="$classi/label[@xml:lang='x-uri']/@text" />
+		  <xsl:variable name="idType" select="$classi/label[@xml:lang='de']/@text" />
           <xsl:text>&#160;</xsl:text><!-- add whitespace here -->
-          <a href="http://d-nb.info/gnd/{$gnd}" title="Link zur GND">
-            <sup>GND</sup>
+          <a href="{$uri}{$nameIdentifier}" title="Link zu {$idType}">
+            <sup>
+              <xsl:value-of select="$idType" />
+            </sup>
           </a>
         </xsl:if>
       </span>

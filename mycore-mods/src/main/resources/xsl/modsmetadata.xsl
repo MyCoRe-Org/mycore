@@ -522,11 +522,15 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="gnd">
-      <xsl:if test="starts-with(@valueURI, 'http://d-nb.info/gnd/')">
-        <xsl:value-of select="substring-after(@valueURI, 'http://d-nb.info/gnd/')" />
+   	<xsl:variable name="nameIdentifier">
+      <xsl:if test="mods:nameIdentifier/@type">
+        <xsl:value-of select="mods:nameIdentifier" />
       </xsl:if>
     </xsl:variable>
+	<xsl:variable name="nameIdentifierType">
+	<xsl:if test="string-length($nameIdentifier)&gt;0"></xsl:if>
+	  <xsl:value-of select="mods:nameIdentifier/@type" />
+	</xsl:variable>
 
     <xsl:choose>
       <xsl:when test="mods:role/mods:roleTerm='aut'">
@@ -546,10 +550,15 @@
         <xsl:value-of select="$personName" />
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:if test="string-length($gnd)&gt;0">
+    <xsl:if test="string-length($nameIdentifier)&gt;0">
+      <xsl:variable name="classi" select="document(concat('classification:metadata:all:children:','nameIdentifier',':',$nameIdentifierType))/mycoreclass/categories/category[@ID=$nameIdentifierType]" />
+	  <xsl:variable name="uri" select="$classi/label[@xml:lang='x-uri']/@text" />
+	  <xsl:variable name="idType" select="$classi/label[@xml:lang='de']/@text" />
       <xsl:text>&#160;</xsl:text><!-- add whitespace here -->
-      <a href="http://d-nb.info/gnd/{$gnd}" title="Link zur GND">
-        <sup>GND</sup>
+      <a href="{$uri}{$nameIdentifier}" title="Link zu {$idType}">
+        <sup>
+          <xsl:value-of select="$idType" />
+        </sup>
       </a>
     </xsl:if>
   </xsl:template>
