@@ -640,6 +640,7 @@ public class MCRPersistentServlet extends MCRServlet {
         params.put("XSL.target.param.2", "uploadId=" + fuhid);
         params.put("XSL.ObjectID", parentObjectID);
         params.put("mcrid", parentObjectID);
+        params.put("XSL.parentObjectID", parentObjectID);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
     }
 
