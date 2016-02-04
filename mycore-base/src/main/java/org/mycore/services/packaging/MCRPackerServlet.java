@@ -43,8 +43,11 @@ public class MCRPackerServlet extends MCRServlet {
 
         try {
             MCRJob mcrJob = MCRPackerManager.startPacking(jobParameters);
+            if(mcrJob==null){
+                job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "No packer parameter!");
+            }
         } catch (MCRAccessException e) {
-            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, "You don't have the rights to use the Packer!");
+            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } catch (MCRUsageException e) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Parameters: " + e.getMessage());
         }
