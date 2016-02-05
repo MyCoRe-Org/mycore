@@ -29,6 +29,8 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -551,8 +553,9 @@ public class MCRPersistentServlet extends MCRServlet {
      * </dl>
      * @param job
      * @throws IOException
+     * @throws ServletException 
      */
-    private void redirectToCreateDerivate(MCRServletJob job) throws IOException {
+    private void redirectToCreateDerivate(MCRServletJob job) throws IOException, ServletException {
         String parentObjectID = getProperty(job.getRequest(), "id");
         if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
             throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
@@ -575,8 +578,9 @@ public class MCRPersistentServlet extends MCRServlet {
      * If not than the user is redirected to the title change form.
      * @param job
      * @throws IOException
+     * @throws ServletException 
      */
-    private void redirectToUpdateDerivate(MCRServletJob job) throws IOException {
+    private void redirectToUpdateDerivate(MCRServletJob job) throws IOException, ServletException {
         String parentObjectID = getProperty(job.getRequest(), "objectid");
         String derivateID = getProperty(job.getRequest(), "id");
         if (parentObjectID != null) {
@@ -619,19 +623,12 @@ public class MCRPersistentServlet extends MCRServlet {
      * @param parentObjectID
      * @param derivateID
      * @throws IOException
+     * @throws ServletException 
      */
-    private void redirectToUploadPage(MCRServletJob job, String parentObjectID, String derivateID) throws IOException {
+    private void redirectToUploadPage(MCRServletJob job, String parentObjectID, String derivateID) throws IOException, ServletException {
         MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(parentObjectID, derivateID, getCancelUrl(job));
         String fuhid = fuh.getID();
-        String page = "";
-        try {
-            MCRURIResolver.instance().resolve("webapp:/fileupload.xml");
-            page = "fileupload.xml";
-        } catch (MCRException e) {
-            LOGGER.warn("Can't find fileupload.xml, now we try it with fileupload_commit.xml");
-            page = "fileupload_commit.xml";
-        }
-
+        String page = getUploadPage();
         String base = MCRFrontendUtil.getBaseURL() + page;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
@@ -642,6 +639,25 @@ public class MCRPersistentServlet extends MCRServlet {
         params.put("mcrid", parentObjectID);
         params.put("XSL.parentObjectID", parentObjectID);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+    }
+
+    private String getUploadPage() throws ServletException {
+        String modernPage = "fileupload.xml";
+        try {
+            URL pageResource = getServletContext().getResource("/" + modernPage);
+            if (pageResource == null) {
+                String deprecatedPage = "fileupload_commit.xml";
+                pageResource = getServletContext().getResource("/" + deprecatedPage);
+                if (pageResource != null) {
+                    LOGGER.warn("Could not find " + modernPage + " in webapp root, using deprecated " + deprecatedPage
+                        + " instead.");
+                    return deprecatedPage;
+                }
+            }
+        } catch (MalformedURLException e) {
+            throw new ServletException(e);
+        }
+        return modernPage; //even if it does not exist: nice 404 helps the user
     }
 
     /**
