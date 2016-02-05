@@ -158,7 +158,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ProvidingException("Error while reading tiles!", e);
         }
 
         return targetImage;
