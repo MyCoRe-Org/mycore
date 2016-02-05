@@ -579,39 +579,29 @@ public class MCRPersistentServlet extends MCRServlet {
      * @param job
      * @throws IOException
      * @throws ServletException 
+     * @throws MCRAccessException 
      */
-    private void redirectToUpdateDerivate(MCRServletJob job) throws IOException, ServletException {
+    private void redirectToUpdateDerivate(MCRServletJob job) throws IOException, ServletException, MCRAccessException {
         String parentObjectID = getProperty(job.getRequest(), "objectid");
         String derivateID = getProperty(job.getRequest(), "id");
         if (parentObjectID != null) {
             //Load additional files
             if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
-                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
-                    + parentObjectID + ".");
+                throw MCRAccessException.missingPermission("Change derivate title.", parentObjectID, PERMISSION_WRITE);
             }
             if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
-                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
-                    + derivateID + ".");
+               throw MCRAccessException.missingPermission("Change derivate title.", derivateID, PERMISSION_WRITE);
             }
             redirectToUploadPage(job, parentObjectID, derivateID);
         } else {
             //set derivate title
-            StringBuilder sb = new StringBuilder();
             Properties params = new Properties();
-            sb.append("xslStyle:mycorederivate-editor:mcrobject:").append(derivateID);
-            params.put("sourceUri", sb.toString());
+            params.put("sourceUri", "xslStyle:mycorederivate-editor:mcrobject:" + derivateID);
             params.put("cancelUrl", getCancelUrl(job));
-            sb = new StringBuilder();
-            sb.append(MCRFrontendUtil.getBaseURL());
-            try {
-                MCRURIResolver.instance().resolve("webapp:/editor_form_derivate.xed");
-                sb.append("editor_form_derivate.xed");
-            } catch (MCRException e) {
-                LOGGER.warn("Can't find editor_form_derivate.xed, now we try it with editor_form_derivate.xml");
-                sb.append("editor_form_derivate.xml");
-            }
+            String page = getWebPage("editor_form_derivate.xed", "editor_form_derivate.xml");
+            String redirectURL = MCRFrontendUtil.getBaseURL() + page;
             job.getResponse()
-                .sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
+                .sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(redirectURL, params)));
         }
     }
 
@@ -628,7 +618,7 @@ public class MCRPersistentServlet extends MCRServlet {
     private void redirectToUploadPage(MCRServletJob job, String parentObjectID, String derivateID) throws IOException, ServletException {
         MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(parentObjectID, derivateID, getCancelUrl(job));
         String fuhid = fuh.getID();
-        String page = getUploadPage();
+        String page = getWebPage("fileupload.xml", "fileupload_commit.xml");
         String base = MCRFrontendUtil.getBaseURL() + page;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
@@ -641,12 +631,10 @@ public class MCRPersistentServlet extends MCRServlet {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
     }
 
-    private String getUploadPage() throws ServletException {
-        String modernPage = "fileupload.xml";
+    private String getWebPage(String modernPage, String deprecatedPage) throws ServletException {
         try {
             URL pageResource = getServletContext().getResource("/" + modernPage);
             if (pageResource == null) {
-                String deprecatedPage = "fileupload_commit.xml";
                 pageResource = getServletContext().getResource("/" + deprecatedPage);
                 if (pageResource != null) {
                     LOGGER.warn("Could not find " + modernPage + " in webapp root, using deprecated " + deprecatedPage
