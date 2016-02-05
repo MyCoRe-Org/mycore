@@ -190,8 +190,7 @@ public final class MCRMetadataManager {
         final MCRObjectID objid = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
         if (!MCRAccessManager.checkPermission(objid, PERMISSION_WRITE)) {
             throw MCRAccessException.missingPermission("Add derivate " + mcrDerivate.getId() + " to object.",
-                objid.toString(),
-                PERMISSION_WRITE);
+                objid.toString(), PERMISSION_WRITE);
         }
         byte[] objectBackup;
         objectBackup = MCRXMLMetadataManager.instance().retrieveBLOB(objid);
@@ -438,15 +437,26 @@ public final class MCRMetadataManager {
 
         // remove all children
         for (MCRMetaLinkID child : mcrObject.getStructure().getChildren()) {
-            MCRMetadataManager.deleteMCRObject(child.getXLinkHrefID(), (MCRObject o, MCRObjectID p) -> {
+            MCRObjectID childId = child.getXLinkHrefID();
+            if (!MCRMetadataManager.exists(childId)) {
+                LOGGER.warn("Unable to remove not existing object " + childId + " of parent " + id);
+                continue;
+            }
+            MCRMetadataManager.deleteMCRObject(childId, (MCRObject o, MCRObjectID p) -> {
                 /**
                  * Do nothing with the parent, because its removed anyway.
                  */
             });
         }
 
+        // remove all derivates
         for (MCRMetaLinkID derivate : mcrObject.getStructure().getDerivates()) {
-            MCRMetadataManager.deleteMCRDerivate(derivate.getXLinkHrefID());
+            MCRObjectID derivateId = derivate.getXLinkHrefID();
+            if(!MCRMetadataManager.exists(derivateId)) {
+                LOGGER.warn("Unable to remove not existing derivate " + derivateId + " of object " + id);
+                continue;
+            }
+            MCRMetadataManager.deleteMCRDerivate(derivateId);
         }
 
         // handle events
@@ -464,7 +474,7 @@ public final class MCRMetadataManager {
      * @throws PersistenceException
      *            when the child cannot be removed due persistent problems
      */
-    private static void removeChildObject(final MCRObject mcrObject, final MCRObjectID parentId) {
+    private static void removeChildObject(final MCRObject mcrObject, final MCRObjectID parentId) throws PersistenceException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Parent ID = " + parentId.toString());
         }
