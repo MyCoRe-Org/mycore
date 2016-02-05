@@ -30,7 +30,6 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -249,27 +248,24 @@ public class MCRPersistentServlet extends MCRServlet {
      *  from {@link #getMCRObject(Document)}
      * @throws SAXParseException
      * @throws MCRException
+     * @throws MCRAccessException 
      */
     private MCRObjectID createObject(MCRServletJob job, Document doc) throws MCRActiveLinkException, JDOMException,
-        IOException, MCRException, SAXParseException {
+        IOException, MCRException, SAXParseException, MCRAccessException {
         MCRObject mcrObject = getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
         //noinspection SynchronizeOnNonFinalField
-        try {
-            checkCreatePrivilege(objectId);
-            synchronized (operation) {
-                if (objectId.getNumberAsInteger() == 0) {
-                    String objId = mcrObject.getId().toString();
-                    objectId = MCRObjectID.getNextFreeId(objectId.getBase());
-                    if (mcrObject.getLabel().equals(objId))
-                        mcrObject.setLabel(objectId.toString());
-                    mcrObject.setId(objectId);
-                }
+        checkCreatePrivilege(objectId);
+        synchronized (operation) {
+            if (objectId.getNumberAsInteger() == 0) {
+                String objId = mcrObject.getId().toString();
+                objectId = MCRObjectID.getNextFreeId(objectId.getBase());
+                if (mcrObject.getLabel().equals(objId))
+                    mcrObject.setLabel(objectId.toString());
+                mcrObject.setId(objectId);
             }
-            MCRMetadataManager.create(mcrObject);
-        } catch (MCRAccessException e) {
-            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
+        MCRMetadataManager.create(mcrObject);
         return objectId;
     }
 
@@ -554,12 +550,12 @@ public class MCRPersistentServlet extends MCRServlet {
      * @param job
      * @throws IOException
      * @throws ServletException 
+     * @throws MCRAccessException 
      */
-    private void redirectToCreateDerivate(MCRServletJob job) throws IOException, ServletException {
+    private void redirectToCreateDerivate(MCRServletJob job) throws IOException, ServletException, MCRAccessException {
         String parentObjectID = getProperty(job.getRequest(), "id");
         if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
-            throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
-                + parentObjectID + ".");
+            throw MCRAccessException.missingPermission("Add derivate.", parentObjectID, PERMISSION_WRITE);
         }
         redirectToUploadPage(job, parentObjectID, null);
     }
@@ -584,13 +580,13 @@ public class MCRPersistentServlet extends MCRServlet {
     private void redirectToUpdateDerivate(MCRServletJob job) throws IOException, ServletException, MCRAccessException {
         String parentObjectID = getProperty(job.getRequest(), "objectid");
         String derivateID = getProperty(job.getRequest(), "id");
+        if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
+            throw MCRAccessException.missingPermission("Change derivate title.", derivateID, PERMISSION_WRITE);
+        }
         if (parentObjectID != null) {
             //Load additional files
             if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
                 throw MCRAccessException.missingPermission("Change derivate title.", parentObjectID, PERMISSION_WRITE);
-            }
-            if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
-               throw MCRAccessException.missingPermission("Change derivate title.", derivateID, PERMISSION_WRITE);
             }
             redirectToUploadPage(job, parentObjectID, derivateID);
         } else {
@@ -633,14 +629,11 @@ public class MCRPersistentServlet extends MCRServlet {
 
     private String getWebPage(String modernPage, String deprecatedPage) throws ServletException {
         try {
-            URL pageResource = getServletContext().getResource("/" + modernPage);
-            if (pageResource == null) {
-                pageResource = getServletContext().getResource("/" + deprecatedPage);
-                if (pageResource != null) {
-                    LOGGER.warn("Could not find " + modernPage + " in webapp root, using deprecated " + deprecatedPage
-                        + " instead.");
-                    return deprecatedPage;
-                }
+            if (getServletContext().getResource("/" + modernPage) == null
+                && getServletContext().getResource("/" + deprecatedPage) != null) {
+                LOGGER.warn("Could not find " + modernPage + " in webapp root, using deprecated " + deprecatedPage
+                    + " instead.");
+                return deprecatedPage;
             }
         } catch (MalformedURLException e) {
             throw new ServletException(e);
