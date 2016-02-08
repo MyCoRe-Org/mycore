@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mods="http://www.loc.gov/mods/v3">
+  xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan"
+>
 
   <xsl:param name="CurrentUser" />
   <xsl:param name="ServletsBaseURL" />
@@ -9,7 +10,8 @@
     <xsl:choose>
       <xsl:when
         test="substring-after(mods:genre[@type='intern']/@valueURI,'#')='article' or
-              (mods:relatedItem/mods:genre='periodical' and mods:identifier/@type='doi')">
+              (mods:relatedItem/mods:genre='periodical' and mods:identifier/@type='doi')"
+      >
         <xsl:value-of select="'article'" />
       </xsl:when>
       <xsl:otherwise>
@@ -42,7 +44,7 @@
         <xsl:apply-templates select="." mode="mods.title.confpro" />
       </xsl:when>
       <xsl:when test="$mods-type='issue'">
-        <xsl:apply-templates select="." mode="mods.title.issue" >
+        <xsl:apply-templates select="." mode="mods.title.issue">
           <xsl:with-param name="withSubtitle" select="$withSubtitle" />
         </xsl:apply-templates>
       </xsl:when>
@@ -59,7 +61,9 @@
             </xsl:apply-templates>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]" mode="mods.printTitle">
+            <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]"
+              mode="mods.printTitle"
+            >
               <xsl:with-param name="withSubtitle" select="$withSubtitle" />
             </xsl:apply-templates>
           </xsl:otherwise>
@@ -124,14 +128,17 @@
     <xsl:param name="withSubtitle" select="false()" />
     <xsl:choose>
       <xsl:when test="mods:titleInfo/mods:title">
-        <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]" mode="mods.printTitle">
+        <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]"
+          mode="mods.printTitle"
+        >
           <xsl:with-param name="withSubtitle" select="$withSubtitle" />
         </xsl:apply-templates>
       </xsl:when>
       <xsl:when test="mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']">
         <xsl:choose>
           <xsl:when test="mods:relatedItem[@type='host']/mods:part/mods:detail[@type='issue']">
-            <xsl:value-of select="concat(mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume'],
+            <xsl:value-of
+              select="concat(mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume'],
                                          ', ',
                                          i18n:translate('component.mods.metaData.dictionary.issue'),
                                          mods:relatedItem[@type='host']/mods:part/mods:detail[@type='issue'])" />
@@ -212,30 +219,29 @@
   </xsl:template>
 
   <xsl:template match="mods:name" mode="nameLink">
-	<xsl:variable name="nameIdentifier">
-      <xsl:if test="mods:nameIdentifier/@type">
-        <xsl:value-of select="mods:nameIdentifier" />
-      </xsl:if>
+    <xsl:variable name="nameIds">
+      <xsl:call-template name="getNameIdentifiers">
+        <xsl:with-param name="entity" select="." />
+      </xsl:call-template>
     </xsl:variable>
-	<xsl:variable name="nameIdentifierType">
-	  <xsl:value-of select="mods:nameIdentifier/@type" />
-	</xsl:variable>
-	
+    <xsl:variable name="nameIdentifier" select="xalan:nodeset($nameIds)/nameIdentifier[1]" />
+  
     <!-- if user is in role editor or admin, show all; other users only gets their own and published publications -->
     <xsl:variable name="owner">
       <xsl:choose>
-        <xsl:when test="mcrxml:isCurrentUserInRole('admin') or mcrxml:isCurrentUserInRole('editor')"><!--
-          -->*<!--
-        --></xsl:when>
-        <xsl:otherwise><!--
-          --><xsl:value-of select="$CurrentUser" /><!--
-        --></xsl:otherwise>
+        <xsl:when test="mcrxml:isCurrentUserInRole('admin') or mcrxml:isCurrentUserInRole('editor')">
+          <xsl:text>*</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$CurrentUser" />
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="query">
       <xsl:choose>
-        <xsl:when test="string-length($nameIdentifier)&gt;0">
-          <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=mods.nameIdentifier:', $nameIdentifierType, '\:', $nameIdentifier, '&amp;owner=createdby:', $owner)" />
+        <xsl:when test="count($nameIdentifier) &gt; 0">
+          <xsl:value-of
+            select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=mods.nameIdentifier:', $nameIdentifier/@type, '\:', $nameIdentifier/@id, '&amp;owner=createdby:', $owner)" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=')" />
@@ -249,19 +255,43 @@
         <span itemprop="name">
           <xsl:value-of select="mods:displayForm" />
         </span>
-        <xsl:if test="string-length($nameIdentifier)&gt;0">
-          <xsl:variable name="classi" select="document(concat('classification:metadata:all:children:','nameIdentifier',':',$nameIdentifierType))/mycoreclass/categories/category[@ID=$nameIdentifierType]" />
-		  <xsl:variable name="uri" select="$classi/label[@xml:lang='x-uri']/@text" />
-		  <xsl:variable name="idType" select="$classi/label[@xml:lang='de']/@text" />
+        <xsl:if test="count($nameIdentifier) &gt; 0">
           <xsl:text>&#160;</xsl:text><!-- add whitespace here -->
-          <a href="{$uri}{$nameIdentifier}" title="Link zu {$idType}">
+          <a href="{$nameIdentifier/@uri}{$nameIdentifier/@id}" title="Link zu {$nameIdentifier/@label}">
             <sup>
-              <xsl:value-of select="$idType" />
+              <xsl:value-of select="$nameIdentifier/@label" />
             </sup>
           </a>
         </xsl:if>
       </span>
     </a>
+  </xsl:template>
+
+  <xsl:variable name="nameIdentifiers" select="document(concat('classification:metadata:all:children:','nameIdentifier'))/mycoreclass/categories" />
+
+  <xsl:template name="getNameIdentifiers">
+    <xsl:param name="entity" />
+
+    <xsl:for-each select="$nameIdentifiers/category">
+      <xsl:sort select="x-order" data-type="number" />
+      <xsl:variable name="categId" select="@ID" />
+      <xsl:if test="(string-length(label[@xml:lang='x-uri']/@text) &gt; 0) and count($entity/mods:nameIdentifier[@type = $categId]) &gt; 0">
+        <nameIdentifier>
+          <xsl:attribute name="label">
+            <xsl:value-of select="label[@xml:lang='de']/@text" />
+          </xsl:attribute>
+          <xsl:attribute name="uri">
+            <xsl:value-of select="label[@xml:lang='x-uri']/@text" />
+          </xsl:attribute>
+          <xsl:attribute name="type">
+            <xsl:value-of select="$categId" />
+          </xsl:attribute>
+          <xsl:attribute name="id">
+            <xsl:value-of select="$entity/mods:nameIdentifier[@type = $categId]/text()" />
+          </xsl:attribute>
+        </nameIdentifier>
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>
