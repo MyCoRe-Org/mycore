@@ -78,6 +78,10 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:template match="tei:hi[not(text()|*)]">
+    <!-- remove empty -->
+  </xsl:template>
+
   <xsl:template match="tei:table">
     <div class="teiTable">
       <xsl:apply-templates select="tei:row"/>
@@ -151,6 +155,10 @@
 
   <xsl:template match="tei:rdg" mode="footnotes">
     <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="tei:lb">
+    <br/>
   </xsl:template>
 
   <xsl:template match="tei:cell">
