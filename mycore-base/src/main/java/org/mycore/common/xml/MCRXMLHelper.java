@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.TransformerException;
@@ -49,10 +50,15 @@ import org.jdom2.Verifier;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * This class provides some static utility methods to deal with XML/DOM
@@ -124,6 +130,16 @@ public class MCRXMLHelper {
     }
 
     /**
+     * @see JDOMtoGSONSerializer
+     * 
+     * @param element the jdom element to serialize
+     * @return a gson object
+     */
+    public static JsonObject jsonSerialize(Element element) {
+        return JDOMtoGSONSerializer.serialize(element);
+    }
+
+    /**
      * checks whether two documents are equal.
      * 
      * This test performs a deep check across all child components of a
@@ -175,8 +191,8 @@ public class MCRXMLHelper {
         } else {
             xout.output((Document) e, bout);
         }
-        Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(
-            new MCRByteContent(bout.getBuffer(), 0, bout.size()));
+        Document xml = MCRXMLParserFactory.getNonValidatingParser()
+            .parseXML(new MCRByteContent(bout.getBuffer(), 0, bout.size()));
         return xml.getRootElement();
     }
 
@@ -234,7 +250,7 @@ public class MCRXMLHelper {
             List<Attribute> aList1 = e1.getAttributes();
             List<Attribute> aList2 = e2.getAttributes();
             if (aList1.size() != aList2.size()) {
-                if(LOGGER.isDebugEnabled()) {
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Number of attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\" for element "
                         + e1.getName());
                 }
@@ -255,7 +271,7 @@ public class MCRXMLHelper {
 
         public static boolean equivalentContent(List<Content> l1, List<Content> l2) {
             if (l1.size() != l2.size()) {
-                if(LOGGER.isDebugEnabled()) {
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Number of content list elements differ " + l1.size() + "!=" + l2.size());
                 }
                 return false;
@@ -292,5 +308,140 @@ public class MCRXMLHelper {
 
             return ns1.equals(ns2) && localName1.equals(localName2);
         }
+    }
+
+    /**
+     * Helper class to serialize jdom XML to gson JSON.
+     * <p>
+     * To support fast javascript dot property access its decided to use the underscore (_)
+     * for attributes and the dollar sign ($) for text nodes. The colon sign (:) is used for
+     * namespaces (you have to use square brackets in javascript for accessing those).
+     * </p>
+     * 
+     * <ul>
+     *   <li><b>_version</b> -> version attribute</li>
+     *   <li><b>$text</b> -> text node</li>
+     *   <li><b>_xmlns:mods</b> -> mods namespace</li>
+     *   <li><b>_mods:title</b> -> title attribute with mods namespace</li>
+     * </ul>
+     * 
+     * <b>Example</b>
+     * <pre>
+     * {
+     *   "_version": "3.0",
+     *   "_xmlns:mods": "http://www.loc.gov/mods/v3"
+     *   "mods:titleInfo": {
+     *     "mods:title": {
+     *       "$text": "hello xml serializer"
+     *     }
+     *   }
+     * }
+     * </pre>
+     * <ul>
+     *   <li><b>get the version</b> -> mods._version -> "3.0"</li>
+     *   <li><b>get the text of the title</b> -> mods["mods:titleInfo"]["mods:title"].$text -> "hello xml serializer"</li>
+     * </ul>
+     * <b>BE AWARE THAT MIXED CONTENT IS NOT SUPPORTED!</b>
+     * 
+     * @author Matthias Eichner
+     */
+    private static class JDOMtoGSONSerializer {
+
+        public static JsonObject serialize(Element element) {
+            return serializeElement(element);
+        }
+
+        private static JsonObject serializeElement(Element element) {
+            JsonObject json = new JsonObject();
+
+            // text
+            String text = element.getText();
+            if (text != null && text.trim().length() > 0) {
+                json.addProperty("$text", text);
+            }
+
+            // attributes
+            element.getAttributes().forEach(attr -> {
+                json.addProperty(getName(attr), attr.getValue());
+            });
+
+            // namespaces
+            element.getNamespacesIntroduced().forEach(ns -> {
+                json.addProperty(getName(ns), ns.getURI().toString());
+            });
+
+            // children
+            element.getChildren().stream().map(e -> new Pair<>(e.getNamespace(), e.getName())).distinct()
+                .forEach(pair -> {
+                    String name = getName(pair.y, pair.x);
+                    List<Element> children = element.getChildren(pair.y, pair.x);
+                    if (children.size() == 1) {
+                        json.add(name, serializeElement(children.get(0)));
+                    } else if (children.size() >= 2) {
+                        JsonArray arr = new JsonArray();
+                        children.forEach(child -> {
+                            arr.add(serialize(child));
+                        });
+                        json.add(name, arr);
+                    } else {
+                        throw new MCRException(
+                            "Unexcpected error while parsing children of element '" + element.getName() + "'");
+                    }
+                });
+            return json;
+        }
+
+        private static String getName(Namespace ns) {
+            StringBuffer buffer = new StringBuffer("_");
+            buffer.append("xmlns:")
+            .append(getCononicalizedPrefix(ns));
+            return buffer.toString();
+        }
+
+        private static String getName(Attribute attribute) {
+            StringBuffer buffer = new StringBuffer("_");
+            buffer.append(getName(attribute.getName(), attribute.getNamespace()));
+            return buffer.toString();
+        }
+
+        private static String getName(String name, Namespace namespace) {
+            StringBuffer buffer = new StringBuffer();
+            if (namespace != null && !namespace.getURI().equals("")) {
+                buffer.append(getCononicalizedPrefix(namespace)).append(":");
+            }
+            return buffer.append(name).toString();
+        }
+
+        private static String getCononicalizedPrefix(Namespace namespace) {
+            return MCRConstants
+                .getStandardNamespaces()
+                .parallelStream()
+                .filter(namespace::equals)
+                .findAny()
+                .map(Namespace::getPrefix)
+                .orElse(namespace.getPrefix());
+        }
+
+        private static class Pair<X, Y> {
+            public final X x;
+
+            public final Y y;
+
+            public Pair(X x, Y y) {
+                this.x = x;
+                this.y = y;
+            }
+
+            @SuppressWarnings("rawtypes")
+            @Override
+            public boolean equals(Object obj) {
+                if (obj == null && !(obj instanceof Pair)) {
+                    return false;
+                }
+                return Objects.equals(this.x, ((Pair) obj).x) && Objects.equals(this.y, ((Pair) obj).y);
+            }
+
+        }
+
     }
 }

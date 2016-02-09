@@ -23,9 +23,13 @@
 
 package org.mycore.common.xml;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +40,8 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+
+import com.google.gson.JsonObject;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -88,6 +94,30 @@ public class MCRXMLHelperTest extends MCRTestCase {
         Document doc = b.build(new ByteArrayInputStream(formattedXML.getBytes(Charset.forName("UTF-8"))));
 
         assertEquals("Elements should be equal", true, MCRXMLHelper.deepEqual(root, doc.getRootElement()));
+    }
+
+    @Test
+    public void jsonSerialize() throws Exception {
+        // simple text
+        Element e = new Element("hallo").setText("Hallo Welt");
+        JsonObject json = MCRXMLHelper.jsonSerialize(e);
+        assertEquals("Hallo Welt", json.getAsJsonPrimitive("$text").getAsString());
+        // attribute
+        e = new Element("hallo").setAttribute("hallo", "welt");
+        json = MCRXMLHelper.jsonSerialize(e);
+        assertEquals("welt", json.getAsJsonPrimitive("_hallo").getAsString());
+
+        // complex world class test
+        URL world = MCRXMLHelperTest.class.getResource("/worldclass.xml");
+        SAXBuilder builder = new SAXBuilder();
+        Document worldDocument = builder.build(world.openStream());
+        json = MCRXMLHelper.jsonSerialize(worldDocument.getRootElement());
+        assertNotNull(json);
+        assertEquals("World", json.getAsJsonPrimitive("_ID").getAsString());
+        assertEquals("http://www.w3.org/2001/XMLSchema-instance", json.getAsJsonPrimitive("_xmlns:xsi").getAsString());
+        JsonObject deLabel = json.getAsJsonArray("label").get(0).getAsJsonObject();
+        assertEquals("de", deLabel.getAsJsonPrimitive("_xml:lang").getAsString());
+        assertEquals("Staaten", deLabel.getAsJsonPrimitive("_text").getAsString());
     }
 
 }
