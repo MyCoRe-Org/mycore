@@ -30,7 +30,6 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
@@ -39,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.xml.bind.DatatypeConverter;
 
 /**
  * Represents the data URL scheme (<a href="https://tools.ietf.org/html/rfc2397">RFC2397</a>).
@@ -357,7 +354,7 @@ public class MCRDataURL implements Serializable {
             if (other.data != null) {
                 return false;
             }
-        } else if (!equals(data, other.data)) {
+        } else if (!MessageDigest.isEqual(data, other.data)) {
             return false;
         }
         if (encoding != other.encoding) {
@@ -378,17 +375,6 @@ public class MCRDataURL implements Serializable {
             return false;
         }
         return true;
-    }
-
-    private boolean equals(byte[] a, byte[] b) {
-        try {
-            final MessageDigest md = MessageDigest.getInstance("MD5");
-            final String h1 = DatatypeConverter.printHexBinary(md.digest(a));
-            final String h2 = DatatypeConverter.printHexBinary(md.digest(b));
-            return h1.equalsIgnoreCase(h2);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static String encode(final String str, final Charset charset) throws UnsupportedEncodingException {
