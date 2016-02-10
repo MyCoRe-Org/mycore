@@ -66,6 +66,11 @@ public class MCRByteContent extends MCRContent {
     }
 
     @Override
+    public void setSystemId(String systemId) {
+        this.systemId = systemId;
+    }
+
+    @Override
     public InputStream getInputStream() throws IOException {
         return new ByteArrayInputStream(bytes, offset, length);
     }
