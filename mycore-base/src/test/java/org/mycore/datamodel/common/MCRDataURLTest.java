@@ -30,8 +30,6 @@ import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
 import java.nio.charset.IllegalCharsetNameException;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -60,10 +58,10 @@ public class MCRDataURLTest extends MCRTestCase {
             "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC" };
 
     @Test
-    public void testUnserializeValid() {
+    public void testParseValid() {
         for (final String url : VALID) {
             try {
-                MCRDataURL dataURL = MCRDataURL.unserialize(url);
+                MCRDataURL dataURL = MCRDataURL.parse(url);
 
                 assertNotNull(dataURL);
             } catch (IllegalCharsetNameException | MalformedURLException e) {
@@ -73,11 +71,11 @@ public class MCRDataURLTest extends MCRTestCase {
     }
 
     @Test
-    public void testUnserializeInValid() {
+    public void testParseInValid() {
         for (final String url : INVALID) {
             boolean thrown = false;
             try {
-                MCRDataURL dataURL = MCRDataURL.unserialize(url);
+                MCRDataURL dataURL = MCRDataURL.parse(url);
                 assertNull(url + " is not null.", dataURL);
             } catch (IllegalCharsetNameException | MalformedURLException e) {
                 thrown = true;
@@ -87,11 +85,11 @@ public class MCRDataURLTest extends MCRTestCase {
     }
 
     @Test
-    public void testSerialize() {
+    public void testCompose() {
         for (final String url : VALID) {
             MCRDataURL du1;
             try {
-                du1 = MCRDataURL.unserialize(url);
+                du1 = MCRDataURL.parse(url);
                 assertNotNull(du1);
             } catch (IllegalCharsetNameException | MalformedURLException e) {
                 fail("unserialize " + url + ": " + e.getMessage());
@@ -99,19 +97,9 @@ public class MCRDataURLTest extends MCRTestCase {
             }
 
             try {
-                MCRDataURL du2 = MCRDataURL.unserialize(du1.serialize());
+                MCRDataURL du2 = MCRDataURL.parse(du1.toString());
 
-                assertEquals(du1.getEncoding(), du2.getEncoding());
-                assertEquals(du1.getMimeType(), du2.getMimeType());
-                assertEquals(du1.getParameters().size(), du2.getParameters().size());
-                assertEquals(du1.getCharset().name(), du2.getCharset().name());
-
-                Checksum csum1 = new CRC32();
-                csum1.update(du1.getData(), 0, du1.getData().length);
-                Checksum csum2 = new CRC32();
-                csum2.update(du2.getData(), 0, du2.getData().length);
-
-                assertEquals(csum1.getValue(), csum2.getValue());
+                assertEquals(du1, du2);
             } catch (IllegalCharsetNameException | MalformedURLException e) {
                 fail("serialize " + url + ": " + e.getMessage());
             }

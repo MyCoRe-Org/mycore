@@ -29,19 +29,21 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.DatatypeConverter;
+
 /**
- * Represents the data URL scheme (RFC2397).
+ * Represents the data URL scheme (<a href="https://tools.ietf.org/html/rfc2397">RFC2397</a>).
  * 
  * @author Ren\u00E9 Adler (eagle)
  *
@@ -75,13 +77,13 @@ public class MCRDataURL implements Serializable {
     private final byte[] data;
 
     /**
-     * Unserialize a {@link String} to {@link MCRDataURL}.
+     * Parse a {@link String} to {@link MCRDataURL}.
      * 
      * @param dataURL the data url string
      * @return a {@link MCRDataURL} object
      * @throws MalformedURLException
      */
-    public static final MCRDataURL unserialize(final String dataURL) throws MalformedURLException {
+    public static MCRDataURL parse(final String dataURL) throws MalformedURLException {
         final String url = dataURL.trim();
         if (url.startsWith(SCHEME)) {
             String[] parts = url.substring(SCHEME.length()).split(DATA_SEPARATOR, 2);
@@ -141,12 +143,17 @@ public class MCRDataURL implements Serializable {
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
      * @param parameters a list of paramters of data url
+     * @throws MalformedURLException 
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType,
-            final Map<String, String> parameters) {
+            final Map<String, String> parameters) throws MalformedURLException {
         this.data = data;
         this.encoding = encoding != null ? encoding : MCRDataURLEncoding.URL;
         this.mimeType = mimeType != null && !mimeType.isEmpty() ? mimeType : DEFAULT_MIMETYPE;
+
+        if (!PATTERN_MIMETYPE.matcher(this.mimeType).matches()) {
+            throw new MalformedURLException("Unknown mime type.");
+        }
 
         if (parameters != null) {
             this.parameters = Collections.unmodifiableMap(new LinkedHashMap<String, String>(
@@ -168,12 +175,18 @@ public class MCRDataURL implements Serializable {
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
      * @param charset the charset of data url
+     * @throws MalformedURLException 
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType,
-            final Charset charset) {
+            final Charset charset) throws MalformedURLException {
         this.data = data;
         this.encoding = encoding != null ? encoding : MCRDataURLEncoding.URL;
         this.mimeType = mimeType != null && !mimeType.isEmpty() ? mimeType : DEFAULT_MIMETYPE;
+
+        if (!PATTERN_MIMETYPE.matcher(this.mimeType).matches()) {
+            throw new MalformedURLException("Unknown mime type.");
+        }
+
         this.parameters = Collections.emptyMap();
         this.charset = charset != null ? charset : StandardCharsets.US_ASCII;
     }
@@ -185,9 +198,10 @@ public class MCRDataURL implements Serializable {
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
      * @param charset the charset of data url
+     * @throws MalformedURLException 
      */
-    public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType,
-            final String charset) {
+    public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType, final String charset)
+            throws MalformedURLException {
         this(data, encoding, mimeType, Charset.forName(charset));
     }
 
@@ -197,8 +211,10 @@ public class MCRDataURL implements Serializable {
      * @param data the data
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
+     * @throws MalformedURLException 
      */
-    public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType) {
+    public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType)
+            throws MalformedURLException {
         this(data, encoding, DEFAULT_MIMETYPE, StandardCharsets.US_ASCII);
     }
 
@@ -207,8 +223,9 @@ public class MCRDataURL implements Serializable {
      * 
      * @param data the data of data url
      * @param encoding the encoding of data url
+     * @throws MalformedURLException 
      */
-    public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding) {
+    public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding) throws MalformedURLException {
         this(data, encoding, DEFAULT_MIMETYPE, StandardCharsets.US_ASCII);
     }
 
@@ -216,8 +233,9 @@ public class MCRDataURL implements Serializable {
      * Constructs a new {@link MCRDataURL}.
      * 
      * @param data the data of data url
+     * @throws MalformedURLException 
      */
-    public MCRDataURL(final byte[] data) {
+    public MCRDataURL(final byte[] data) throws MalformedURLException {
         this(data, MCRDataURLEncoding.URL, DEFAULT_MIMETYPE, StandardCharsets.US_ASCII);
     }
 
@@ -257,17 +275,14 @@ public class MCRDataURL implements Serializable {
     }
 
     /**
-     * Serialize a {@link MCRDataURL} to {@link String}.
+     * Returns a {@link String} of a {@link MCRDataURL} object .
      *  
      * @return the data url as string
      * @throws MalformedURLException 
      */
-    public final String serialize() throws MalformedURLException {
+    @Override
+    public String toString() {
         StringBuffer sb = new StringBuffer(SCHEME);
-
-        if (!PATTERN_MIMETYPE.matcher(mimeType).matches()) {
-            throw new MalformedURLException("Unknown mime type.");
-        }
 
         if (!DEFAULT_MIMETYPE.equals(mimeType) || charset != StandardCharsets.US_ASCII) {
             sb.append(mimeType);
@@ -294,7 +309,7 @@ public class MCRDataURL implements Serializable {
             try {
                 sb.append(DATA_SEPARATOR + encode(new String(data, charset), charset));
             } catch (UnsupportedEncodingException e) {
-                throw new MalformedURLException("Error encoding the data. Error: " + e.getMessage());
+                throw new RuntimeException("Error encoding the data. Error: " + e.getMessage());
             }
         }
 
@@ -312,6 +327,7 @@ public class MCRDataURL implements Serializable {
         result = prime * result + ((data == null) ? 0 : data.hashCode());
         result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
         result = prime * result + ((mimeType == null) ? 0 : mimeType.hashCode());
+        result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
         return result;
     }
 
@@ -341,7 +357,7 @@ public class MCRDataURL implements Serializable {
             if (other.data != null) {
                 return false;
             }
-        } else if (!data.equals(other.data)) {
+        } else if (!equals(data, other.data)) {
             return false;
         }
         if (encoding != other.encoding) {
@@ -354,63 +370,32 @@ public class MCRDataURL implements Serializable {
         } else if (!mimeType.equals(other.mimeType)) {
             return false;
         }
+        if (parameters == null) {
+            if (other.parameters != null) {
+                return false;
+            }
+        } else if (!parameters.equals(other.parameters)) {
+            return false;
+        }
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        final int maxLen = 10;
-        StringBuilder builder = new StringBuilder();
-        builder.append("MCRDataURL [");
-        if (mimeType != null) {
-            builder.append("mimeType=");
-            builder.append(mimeType);
-            builder.append(", ");
+    private boolean equals(byte[] a, byte[] b) {
+        try {
+            final MessageDigest md = MessageDigest.getInstance("MD5");
+            final String h1 = DatatypeConverter.printHexBinary(md.digest(a));
+            final String h2 = DatatypeConverter.printHexBinary(md.digest(b));
+            return h1.equalsIgnoreCase(h2);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
-        if (parameters != null) {
-            builder.append("parameters=");
-            builder.append(toString(parameters.entrySet(), maxLen));
-            builder.append(", ");
-        }
-        if (charset != null) {
-            builder.append("charset=");
-            builder.append(charset);
-            builder.append(", ");
-        }
-        if (encoding != null) {
-            builder.append("encoding=");
-            builder.append(encoding);
-            builder.append(", ");
-        }
-        if (data != null) {
-            builder.append("data.length=");
-            builder.append(data.length);
-        }
-        builder.append("]");
-        return builder.toString();
     }
 
-    private String toString(Collection<?> collection, int maxLen) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[");
-        int i = 0;
-        for (Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
-            if (i > 0)
-                builder.append(", ");
-            builder.append(iterator.next());
-        }
-        builder.append("]");
-        return builder.toString();
-    }
-
-    private static final String encode(final String str, final Charset charset) throws UnsupportedEncodingException {
+    private static String encode(final String str, final Charset charset) throws UnsupportedEncodingException {
         return URLEncoder.encode(str, charset.name()).replace("+", "%20");
     }
 
-    private static final String decode(final String str, final Charset charset) throws UnsupportedEncodingException {
+    private static String decode(final String str, final Charset charset) throws UnsupportedEncodingException {
         return URLDecoder.decode(str.replace("%20", "+"), charset.name());
     }
 }
