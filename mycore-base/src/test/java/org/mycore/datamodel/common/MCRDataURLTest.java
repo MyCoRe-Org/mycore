@@ -113,7 +113,7 @@ public class MCRDataURLTest extends MCRTestCase {
 
                 assertEquals(csum1.getValue(), csum2.getValue());
             } catch (IllegalCharsetNameException | MalformedURLException e) {
-                fail("unserialize " + url + ": " + e.getMessage());
+                fail("serialize " + url + ": " + e.getMessage());
             }
         }
     }
