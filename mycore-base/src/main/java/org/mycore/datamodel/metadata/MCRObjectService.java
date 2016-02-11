@@ -745,11 +745,14 @@ public class MCRObjectService {
         JsonObject service = new JsonObject();
         // dates
         if(!getDates().isEmpty()) {
-            JsonArray dates = new JsonArray();
+            JsonObject dates = new JsonObject();
             getDates()
                 .stream()
-                .map(MCRMetaISO8601Date::createJSON)
-                .forEachOrdered(dates::add);
+                .forEachOrdered(date -> {
+                    JsonObject jsonDate = date.createJSON();
+                    jsonDate.remove("type");
+                    dates.add(date.getType(), jsonDate);
+                });
             service.add("dates", dates);
         }
         // rules

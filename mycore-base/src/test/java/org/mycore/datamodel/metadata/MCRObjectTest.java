@@ -15,6 +15,8 @@ import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.xml.sax.SAXParseException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 public class MCRObjectTest extends MCRTestCase {
@@ -51,8 +53,8 @@ public class MCRObjectTest extends MCRTestCase {
         JsonObject textfield = json.getAsJsonObject("metadata").getAsJsonObject("def.textfield");
         String text = textfield.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonPrimitive("text").getAsString();
         assertEquals("Invalid text metadata", "JUnit Test object 1", text);
-        //Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        //System.out.println(gson.toJson(json));
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        System.out.println(gson.toJson(json));
     }
 
     private static Document loadResourceDocument(String resource) throws MCRException, SAXParseException, IOException {

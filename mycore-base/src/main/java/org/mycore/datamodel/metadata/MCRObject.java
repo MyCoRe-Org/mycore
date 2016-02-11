@@ -169,7 +169,7 @@ final public class MCRObject extends MCRBase {
         JsonObject object = super.createJSON();
         object.add("structure", mcr_struct.createJSON());
         object.add("metadata", mcr_metadata.createJSON());
-        object.add("version", mcr_service.createJSON());
+        object.add("service", mcr_service.createJSON());
         return object;
     }
 
