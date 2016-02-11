@@ -33,6 +33,8 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class is designed to to have a basic class for all metadata. The class
  * has inside a ArrayList that holds all metaddata elements for one XML tag.
@@ -350,39 +352,20 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML Element part
      */
-    public final org.jdom2.Element createXML(boolean flag) throws MCRException {
+    public final Element createXML(boolean flag) throws MCRException {
         if (!isValid()) {
             debug();
             throw new MCRException("MCRMetaElement : The content is not valid: Tag=" + this.tag);
         }
-
-        org.jdom2.Element elm = new org.jdom2.Element(tag);
-        int j = 0;
-
-        for (MCRMetaInterface aList1 : list) {
-            if (aList1.getInherited() > 0) {
-            }
-
-            j++;
-        }
-
-        if (j == 0 && !flag) {
-            return elm;
-        }
+        Element elm = new Element(tag);
         elm.setAttribute("class", getClassName());
         elm.setAttribute("heritable", String.valueOf(heritable));
         elm.setAttribute("notinherit", String.valueOf(notinherit));
-
-        for (MCRMetaInterface aList : list) {
-            if (!flag) {
-                if (aList.getInherited() > 0) {
-                    continue;
-                }
-            }
-
-            elm.addContent(aList.createXML());
-        }
-
+        list
+            .stream()
+            .filter(metaInterface -> (flag || metaInterface.getInherited() == 0))
+            .map(MCRMetaInterface::createXML)
+            .forEachOrdered(elm::addContent);
         return elm;
     }
 
