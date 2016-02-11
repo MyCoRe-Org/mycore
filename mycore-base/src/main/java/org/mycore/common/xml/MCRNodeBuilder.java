@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.xeditor;
+package org.mycore.common.xml;
 
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +45,6 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.xml.MCRXPathBuilder;
 
 /**
  * @author Frank L\u00FCtzenkirchen

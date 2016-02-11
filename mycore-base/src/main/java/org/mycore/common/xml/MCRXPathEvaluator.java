@@ -1,4 +1,4 @@
-package org.mycore.frontend.xeditor;
+package org.mycore.common.xml;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

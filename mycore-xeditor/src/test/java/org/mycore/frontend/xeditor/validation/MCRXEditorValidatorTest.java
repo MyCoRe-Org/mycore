@@ -33,9 +33,9 @@ import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCRNodeBuilder;
 
 /**
  * @author Frank L\u00FCtzenkirchen

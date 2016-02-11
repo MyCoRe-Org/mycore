@@ -36,8 +36,8 @@ import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.frontend.xeditor.MCRNodeBuilder;
-import org.mycore.frontend.xeditor.MCRXPathEvaluator;
+import org.mycore.common.xml.MCRNodeBuilder;
+import org.mycore.common.xml.MCRXPathEvaluator;
 
 /**
  * @author Frank L\u00FCtzenkirchen

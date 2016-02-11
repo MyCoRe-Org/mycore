@@ -35,6 +35,7 @@ import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 
 /**

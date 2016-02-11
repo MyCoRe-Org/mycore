@@ -11,9 +11,9 @@ import org.mycore.common.MCRTestCase;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.xeditor.MCRBinding;
-import org.mycore.frontend.xeditor.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.tracker.MCRAddedAttribute;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;

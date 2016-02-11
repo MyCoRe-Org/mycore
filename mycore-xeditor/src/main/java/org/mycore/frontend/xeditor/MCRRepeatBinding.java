@@ -11,6 +11,7 @@ import org.jaxen.expr.Step;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
 import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
 

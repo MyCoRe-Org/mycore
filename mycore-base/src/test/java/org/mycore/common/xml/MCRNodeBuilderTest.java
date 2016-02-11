@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.xeditor;
+package org.mycore.common.xml;
 
 import static org.junit.Assert.*;
 
@@ -33,6 +33,7 @@ import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.xml.MCRNodeBuilder;
 
 /**
  * @author Frank L\u00FCtzenkirchen

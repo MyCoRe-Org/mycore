@@ -34,8 +34,6 @@
             <id>analyze</id>
             <configuration>
               <usedDependencies>
-                <!-- used by jdom 2.0.5 -->
-                <useDependency>jaxen:jaxen</useDependency>
                 <!-- used by commons-vfs -->
                 <useDependency>com.jcraft:jsch</useDependency>
                 <!-- used by svnkit -->
@@ -169,7 +167,6 @@
       <artifactId>jdom2</artifactId>
     </dependency>
     <dependency>
-      <!-- required by jdom 2.0.5 -->
       <groupId>jaxen</groupId>
       <artifactId>jaxen</artifactId>
     </dependency>
