@@ -25,6 +25,8 @@ package org.mycore.datamodel.metadata;
 
 import org.mycore.common.MCRException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This interface is designed to to have a general description of the common
  * method set of all metadata classes.
@@ -125,6 +127,13 @@ public interface MCRMetaInterface extends Cloneable {
      * @return a JDOM Element with the XML data of the metadata part
      */
     public org.jdom2.Element createXML() throws MCRException;
+
+    /**
+     * This method creates a JSON representation of the metadata part.
+     * 
+     * @return a GSON object containing the json data of the metadata part 
+     */
+    public JsonObject createJSON(); 
 
     /**
      * This method check the validation of the content of this class.

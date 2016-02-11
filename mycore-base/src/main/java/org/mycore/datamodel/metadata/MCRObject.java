@@ -36,6 +36,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.xml.sax.SAXParseException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class holds all information of a metadata object.
  * For persistence operations see methods of {@link MCRMetadataManager}.
@@ -72,7 +74,7 @@ final public class MCRObject extends MCRBase {
         mcr_metadata = new MCRObjectMetadata();
     }
 
-    public MCRObject(byte[] bytes, boolean valid) throws SAXParseException, IOException {
+    public MCRObject(byte[] bytes, boolean valid) throws SAXParseException {
         this();
         setFromXML(bytes, valid);
     }
@@ -147,6 +149,28 @@ final public class MCRObject extends MCRBase {
         elm.addContent(mcr_metadata.createXML());
         elm.addContent(mcr_service.createXML());
         return doc;
+    }
+
+    /**
+     * Creates the JSON representation of this object. Extends the {@link MCRBase#createJSON()}
+     * method with the following content:
+     * 
+     * <pre>
+     *   {
+     *     structure: {@link MCRObjectStructure#createJSON},
+     *     metadata: {@link MCRObjectMetadata#createJSON},
+     *     service: {@link MCRObjectService#createJSON},
+     *   }
+     * </pre>
+     * 
+     * @return a json gson representation of this object
+     */
+    public JsonObject createJSON() {
+        JsonObject object = super.createJSON();
+        object.add("structure", mcr_struct.createJSON());
+        object.add("metadata", mcr_metadata.createJSON());
+        object.add("version", mcr_service.createJSON());
+        return object;
     }
 
     @Override

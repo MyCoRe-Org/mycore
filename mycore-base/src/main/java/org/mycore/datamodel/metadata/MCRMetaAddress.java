@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class implements all methods for handling with the MCRMetaAddress part
  * of a metadata object. The MCRMetaAddress class represents a natural address
@@ -133,6 +135,46 @@ final public class MCRMetaAddress extends MCRMetaDefault {
         }
 
         return elm;
+    }
+
+    /**
+     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * with the following data.
+     * 
+     * <pre>
+     *   {
+     *     "country": "Deutschland",
+     *     "state": "Thüringen",
+     *     "zipcode": "07743",
+     *     "city": "Jena",
+     *     "street": "Bibliothekspl.",
+     *     "number": "2"
+     *   }
+     * </pre>
+     * 
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject obj = super.createJSON();
+        if (getCountry() != null) {
+            obj.addProperty("country", getCountry());
+        }
+        if (getState() != null) {
+            obj.addProperty("state", getState());
+        }
+        if (getZipCode() != null) {
+            obj.addProperty("zipcode", getZipCode());
+        }
+        if (getCity() != null) {
+            obj.addProperty("city", getCity());
+        }
+        if (getStreet() != null) {
+            obj.addProperty("street", getStreet());
+        }
+        if (getNumber() != null) {
+            obj.addProperty("number", getNumber());
+        }
+        return obj;
     }
 
     /**

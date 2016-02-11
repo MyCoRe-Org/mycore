@@ -42,6 +42,8 @@ import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.xml.sax.SAXParseException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class is a abstract basic class for objects in the MyCoRe Project. It is
  * the frame to produce a full functionality object.
@@ -209,7 +211,7 @@ public abstract class MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
-    protected final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException, IOException {
+    protected final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
         Document jdom = MCRXMLParserFactory.getParser(valid).parseXML(new MCRByteContent(xml));
         setFromJDOM(jdom);
     }
@@ -291,6 +293,28 @@ public abstract class MCRBase {
         }
         elm.setAttribute("version", mcr_version);
         return doc;
+    }
+
+    /**
+     * Creates the JSON representation of this object.
+     * 
+     * <pre>
+     *   {
+     *     id: "mycore_project_00000001",
+     *     label: "my mycore base object",
+     *     version: "3.0"
+     *   }
+     * </pre>
+     * 
+     */
+    public JsonObject createJSON() {
+        JsonObject base = new JsonObject();
+        base.addProperty("id", mcr_id.toString());
+        if (mcr_label != null) {
+            base.addProperty("label", mcr_label);
+        }
+        base.addProperty("version", mcr_version);
+        return base;
     }
 
     protected abstract String getRootTagName();

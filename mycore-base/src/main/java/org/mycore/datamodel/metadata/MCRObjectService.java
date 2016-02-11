@@ -26,12 +26,16 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * This class implements all methods for handling MCRObject service data. 
@@ -193,6 +197,15 @@ public class MCRObjectService {
      */
     public final int getDateSize() {
         return dates.size();
+    }
+
+    /**
+     * Returns the dates.
+     * 
+     * @return list of dates
+     */
+    protected ArrayList<MCRMetaISO8601Date> getDates() {
+        return dates;
     }
 
     /**
@@ -358,6 +371,15 @@ public class MCRObjectService {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Returns the flags as list.
+     * 
+     * @return flags as list
+     */
+    protected final List<MCRMetaLangText> getFlagsAsList() {
+        return flags;
     }
 
     /**
@@ -629,6 +651,15 @@ public class MCRObjectService {
     }
 
     /**
+     * Returns the rules.
+     * 
+     * @return list of rules
+     */
+    protected final ArrayList<MCRMetaAccessRule> getRules() {
+        return rules;
+    }
+
+    /**
      * This method create a XML stream for all structure data.
      * 
      * @exception MCRException
@@ -683,6 +714,71 @@ public class MCRObjectService {
         }
 
         return elm;
+    }
+    
+    /**
+     * Creates the JSON representation of this service.
+     * 
+     * <pre>
+     *   {
+     *      dates: [
+     *          {@link MCRMetaISO8601Date#createJSON()},
+     *          ...
+     *      ],
+     *      rules: [
+     *          {@link MCRMetaAccessRule#createJSON()},
+     *          ...
+     *      ],
+     *      flags: [
+     *          {@link MCRMetaLangText#createJSON()},
+     *          ...
+     *      ],
+     *      state: {
+     *          
+     *      }
+     *   }
+     * </pre>
+     * 
+     * @return a json gson representation of this service
+     */
+    public final JsonObject createJSON() {
+        JsonObject service = new JsonObject();
+        // dates
+        if(!getDates().isEmpty()) {
+            JsonArray dates = new JsonArray();
+            getDates()
+                .stream()
+                .map(MCRMetaISO8601Date::createJSON)
+                .forEachOrdered(dates::add);
+            service.add("dates", dates);
+        }
+        // rules
+        if(!getRules().isEmpty()) {
+            JsonArray rules = new JsonArray();
+            getRules()
+                .stream()
+                .map(MCRMetaAccessRule::createJSON)
+                .forEachOrdered(rules::add);
+            service.add("rules", rules);
+        }
+        // flags
+        if(!getFlags().isEmpty()) {
+            JsonArray flags = new JsonArray();
+            getFlagsAsList()
+                .stream()
+                .map(MCRMetaLangText::createJSON)
+                .forEachOrdered(flags::add);
+            service.add("flags", flags);
+        }
+        // state
+        Optional.ofNullable(getState()).ifPresent(stateId -> {
+            JsonObject state = new JsonObject();
+            if(stateId.getID() != null) {
+                state.addProperty("id", stateId.getID());
+            }
+            state.addProperty("rootId", stateId.getRootID());
+        });
+        return service;
     }
 
     /**

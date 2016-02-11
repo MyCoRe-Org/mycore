@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
@@ -36,6 +37,8 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRObjectMerger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
+
+import com.google.gson.JsonObject;
 
 /**
  * This class implements all methode for handling one object metadata part. This
@@ -339,6 +342,31 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     }
 
     /**
+     * Creates the JSON representation of this metadata container.
+     * 
+     * <pre>
+     *   {
+     *    "def.maintitles": {
+     *      {@link MCRMetaLangText#createJSON()}
+     *    }
+     *    "def.dates": {
+     *      {@link MCRMetaISO8601Date#createJSON()}
+     *    }
+     *    ...
+     *   }
+     * </pre>
+     * 
+     * @return a json gson representation of this metadata container
+     */
+    public JsonObject createJSON() {
+        JsonObject metadata = new JsonObject();
+        StreamSupport.stream(spliterator(), true).forEach(metaElement -> {
+            metadata.add(metaElement.getTag(), metaElement.createJSON(herited_xml));
+        });
+        return metadata;
+    }
+
+    /**
      * This methode check the validation of the content of this class. The
      * methode returns <em>true</em> if
      * <ul>
@@ -372,4 +400,5 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     public Iterator<MCRMetaElement> iterator() {
         return meta_list.iterator();
     }
+
 }

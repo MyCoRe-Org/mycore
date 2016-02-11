@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class implements all methods for handling with the
  * MCRMetaInstitutionName part of a metadata object. The MCRMetaInstitutionName
@@ -184,6 +186,31 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
         }
 
         return elm;
+    }
+
+    /**
+     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * with the following data.
+     * 
+     * <pre>
+     *   {
+     *     fullname: "library of congress",
+     *     nickname: "LOC",
+     *     property: "USA"
+     *   }
+     * </pre>
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject obj = super.createJSON();
+        obj.addProperty("fullname", fullname);
+        if(nickname != null) {
+            obj.addProperty("nickname", nickname);
+        }
+        if(property != null) {
+            obj.addProperty("property", property);
+        }
+        return obj;
     }
 
     /**

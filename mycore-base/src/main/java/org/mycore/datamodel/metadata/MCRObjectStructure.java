@@ -26,10 +26,14 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * This class implements code for the inheritance of metadata of linked objects
@@ -374,6 +378,46 @@ public class MCRObjectStructure {
     }
 
     /**
+     * Creates the JSON representation of this structure.
+     * 
+     * <pre>
+     *   {
+     *     parent: {@link MCRMetaLinkID#createJSON()},
+     *     children: [
+     *      {@link MCRMetaLinkID#createJSON()}
+     *      ...
+     *     ],
+     *     derivates: [
+     *       {@link MCRMetaLinkID#createJSON()}
+     *        ...
+     *     ]
+     *   }
+     * </pre>
+     * 
+     * @return a json gson representation of this structure
+     */
+    public JsonObject createJSON() {
+        JsonObject structure = new JsonObject();
+        // parent
+        Optional.ofNullable(getParent()).ifPresent(link -> {
+            structure.add("parent", link.createJSON());
+        });
+        // children
+        JsonArray children = new JsonArray();
+        getChildren().forEach(child -> {
+            children.add(child.createJSON());
+        });
+        structure.add("children", children);
+        // derivates
+        JsonArray derivates = new JsonArray();
+        getDerivates().forEach(derivate -> {
+            derivates.add(derivate.createJSON());
+        });
+        structure.add("derivates", derivates);
+        return structure;
+    }
+
+    /**
      * The method print all informations about this MCRObjectStructure.
      */
     public final void debug() {
@@ -423,4 +467,5 @@ public class MCRObjectStructure {
 
         return true;
     }
+
 }

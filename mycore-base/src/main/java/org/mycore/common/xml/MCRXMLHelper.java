@@ -58,7 +58,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * This class provides some static utility methods to deal with XML/DOM
@@ -132,11 +134,21 @@ public class MCRXMLHelper {
     /**
      * @see JDOMtoGSONSerializer
      * 
+     * @param content the jdom element to serialize
+     * @return a gson element
+     */
+    public static JsonElement jsonSerialize(Content content) {
+        return JDOMtoGSONSerializer.serialize(content);
+    }
+
+    /**
+     * @see JDOMtoGSONSerializer#serializeElement(Element)
+     * 
      * @param element the jdom element to serialize
      * @return a gson object
      */
     public static JsonObject jsonSerialize(Element element) {
-        return JDOMtoGSONSerializer.serialize(element);
+        return JDOMtoGSONSerializer.serializeElement(element);
     }
 
     /**
@@ -347,11 +359,28 @@ public class MCRXMLHelper {
      */
     private static class JDOMtoGSONSerializer {
 
-        public static JsonObject serialize(Element element) {
-            return serializeElement(element);
+        /**
+         * This method is capable of serializing Elements and Text nodes.
+         * Return null otherwise.
+         * 
+         * @param content the content to serialize
+         * @return the serialized content, or null if the type is not supported
+         */
+        public static JsonElement serialize(Content content) {
+            if (content instanceof Element) {
+                return serializeElement((Element) content);
+            }
+            if (content instanceof Text) {
+                return serializeText((Text) content);
+            }
+            return null;
         }
 
-        private static JsonObject serializeElement(Element element) {
+        public static JsonPrimitive serializeText(Text text) {
+            return new JsonPrimitive(text.getText());
+        }
+
+        public static JsonObject serializeElement(Element element) {
             JsonObject json = new JsonObject();
 
             // text

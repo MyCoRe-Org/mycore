@@ -29,6 +29,8 @@ import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class implements all method for handling with the MCRMetaLangText part
  * of a metadata object. The MCRMetaLangText class present a single item, which
@@ -203,6 +205,28 @@ public class MCRMetaLangText extends MCRMetaDefault {
         elm.addContent(text);
 
         return elm;
+    }
+
+    /**
+     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * with the following data.
+     * 
+     * <pre>
+     *   {
+     *     text: "Hallo Welt",
+     *     form: "plain"
+     *   }
+     * </pre>
+     * 
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject obj = super.createJSON();
+        if(getForm() != null) {
+            obj.addProperty("form", getForm());
+        }
+        obj.addProperty("text", getText());
+        return obj;
     }
 
     /**

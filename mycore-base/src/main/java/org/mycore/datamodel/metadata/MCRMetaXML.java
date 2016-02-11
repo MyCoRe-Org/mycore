@@ -32,6 +32,10 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLHelper;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
  * This class implements all method for handling with the MCRMetaLangText part
  * of a metadata object. The MCRMetaLangText class present a single item, which
@@ -100,6 +104,36 @@ public class MCRMetaXML extends MCRMetaDefault {
         elm.addContent(addedContent);
 
         return elm;
+    }
+
+    /**
+     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * with the following data.
+     * 
+     * <pre>
+     *   {
+     *     content: [
+     *       ... json objects of parsed content ...
+     *     ]
+     *   }
+     * </pre>
+     * 
+     * @see MCRXMLHelper#jsonSerialize(Element)
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject json = super.createJSON();
+        JsonArray jsonContentArray = new JsonArray();
+        getContent().forEach(content -> {
+            JsonElement jsonContent = MCRXMLHelper.jsonSerialize(content);
+            if (jsonContent == null) {
+                LOGGER.warn("Unable to serialize xml content '" + content + "' to json.");
+                return;
+            }
+            jsonContentArray.add(jsonContent);
+        });
+        json.add("content", jsonContentArray);
+        return json;
     }
 
     private static void cloneListContent(List<Content> dest, List<Content> source) {

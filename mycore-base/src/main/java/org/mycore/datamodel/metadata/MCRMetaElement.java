@@ -33,6 +33,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 /**
@@ -367,6 +368,38 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             .map(MCRMetaInterface::createXML)
             .forEachOrdered(elm::addContent);
         return elm;
+    }
+
+    /**
+     * Creates the JSON representation of this metadata element.
+     * 
+     * <pre>
+     *   {
+     *      class: 'MCRMetaLangText',
+     *      heritable: true,
+     *      notinherit: false,
+     *      data: [
+     *        {@link MCRMetaInterface#createJSON()},
+     *        ...
+     *      ]
+     *   }
+     * </pre>
+     * 
+     * @return a json gson representation of this metadata element
+     */
+    public JsonObject createJSON(boolean flag) {
+        JsonObject meta = new JsonObject();
+        meta.addProperty("class", getClassName());
+        meta.addProperty("heritable", isHeritable());
+        meta.addProperty("notinherit", notinherit);
+        JsonArray data = new JsonArray();
+        list
+            .stream()
+            .filter(metaInterface -> (flag || metaInterface.getInherited() == 0))
+            .map(MCRMetaInterface::createJSON)
+            .forEachOrdered(data::add);
+        meta.add("data", data);
+        return meta;
     }
 
     /**

@@ -37,6 +37,8 @@ import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRISO8601Format;
 
+import com.google.gson.JsonObject;
+
 /**
  * provides support for a restricted range of formats, all of which are valid
  * ISO 8601 dates and times.
@@ -100,6 +102,27 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         export = elm;
         changed = false;
         return (Element) export.clone();
+    }
+
+    /**
+     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * with the following data.
+     * 
+     * <pre>
+     *   {
+     *     date: "2016-02-08",
+     *     format: "YYYY-MM-DD"
+     *   }
+     * </pre>
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject obj = super.createJSON();
+        obj.addProperty("date", getISOString());
+        if (isoDate.getIsoFormat() != null) {
+            obj.addProperty("format", isoDate.getIsoFormat().toString());
+        }
+        return obj;
     }
 
     /*

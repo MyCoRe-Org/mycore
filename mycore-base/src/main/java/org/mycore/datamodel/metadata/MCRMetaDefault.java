@@ -33,6 +33,8 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.language.MCRLanguageFactory;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class implements any methods for handling the basic data for all
  * metadata classes of the metadata objects. The methods createXML() and
@@ -284,6 +286,29 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         }
         elm.setAttribute("inherited", Integer.toString(getInherited()));
         return elm;
+    }
+
+    /**
+     * Creates a json object in the form of:
+     * <pre>
+     *   {
+     *     lang: "de",
+     *     type: "title",
+     *     inherited: 0
+     *   }
+     * </pre>
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject obj = new JsonObject();
+        if (getLang() != null) {
+            obj.addProperty("lang", getLang());
+        }
+        if (getType() != null) {
+            obj.addProperty("type", getType());
+        }
+        obj.addProperty("inherited", getInherited());
+        return obj;
     }
 
     /**

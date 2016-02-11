@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class implements all method for handling with the MCRMetaBoolean part of
  * a metadata object. The MCRMetaBoolean class present a logical value of true
@@ -161,6 +163,24 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
         Element elm = super.createXML();
         elm.addContent(getValueToString());
         return elm;
+    }
+
+    /**
+     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * with the following data.
+     * 
+     * <pre>
+     *   {
+     *     value: true|false
+     *   }
+     * </pre>
+     * 
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject obj = super.createJSON();
+        obj.addProperty("value", getValue());
+        return obj;
     }
 
     /**

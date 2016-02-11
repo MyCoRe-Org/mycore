@@ -32,6 +32,8 @@ import org.apache.xerces.util.XMLChar;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class implements all method for generic handling with the MCRMetaLink part of a metadata object. The MCRMetaLink class present two types. At once a reference to an URL. At second a bidirectional link between two URL's. Optional you can append the reference with the label attribute. See to W3C XLink Standard for more informations.
  * <p>
@@ -350,6 +352,52 @@ public class MCRMetaLink extends MCRMetaDefault {
         }
 
         return elm;
+    }
+
+    /**
+     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * with the following data.
+     * 
+     * For linktype equals 'locator':
+     * <pre>
+     *   {
+     *     label: "MyCoRe Derivate Image",
+     *     title: "MyCoRe Derivate Image",
+     *     role: "image_reference",
+     *     href: "mycore_derivate_00000001/image.tif"
+     *   }
+     * </pre>
+     * 
+     * For all other linktypes (arc):
+     * <pre>
+     *   {
+     *     label: "Link between Issue and Person",
+     *     title: "Link between Issue and Person",
+     *     role: "link",
+     *     from: "mycore_issue_00000001",
+     *     to: "mycore_person_00000001"
+     *   }
+     * </pre>
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject obj = super.createJSON();
+        if (title != null) {
+            obj.addProperty("title", title);
+        }
+        if (label != null) {
+            obj.addProperty("label", label);
+        }
+        if (role != null) {
+            
+        }
+        if (linktype.equals("locator")) {
+            obj.addProperty("href", href);
+        } else {
+            obj.addProperty("from", from);
+            obj.addProperty("to", to);
+        }
+        return obj;
     }
 
     /**
