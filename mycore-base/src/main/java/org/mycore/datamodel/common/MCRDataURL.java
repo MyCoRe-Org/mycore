@@ -1,5 +1,5 @@
 /*
- * $Id$ 
+ * $Id$
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 /**
  * Represents the data URL scheme (<a href="https://tools.ietf.org/html/rfc2397">RFC2397</a>).
- * 
+ *
  * @author Ren\u00E9 Adler (eagle)
  *
  */
@@ -75,7 +75,7 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Parse a {@link String} to {@link MCRDataURL}.
-     * 
+     *
      * @param dataURL the data url string
      * @return a {@link MCRDataURL} object
      * @throws MalformedURLException
@@ -135,12 +135,12 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Constructs a new {@link MCRDataURL}.
-     * 
+     *
      * @param data the data
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
      * @param parameters a list of paramters of data url
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType,
             final Map<String, String> parameters) throws MalformedURLException {
@@ -167,12 +167,12 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Constructs a new {@link MCRDataURL}.
-     * 
+     *
      * @param data the data
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
      * @param charset the charset of data url
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType,
             final Charset charset) throws MalformedURLException {
@@ -190,12 +190,12 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Constructs a new {@link MCRDataURL}.
-     * 
+     *
      * @param data the data
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
      * @param charset the charset of data url
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType, final String charset)
             throws MalformedURLException {
@@ -204,11 +204,11 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Constructs a new {@link MCRDataURL}.
-     * 
+     *
      * @param data the data
      * @param encoding the encoding of data url
      * @param mimeType the mimeType of data url
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding, final String mimeType)
             throws MalformedURLException {
@@ -217,10 +217,10 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Constructs a new {@link MCRDataURL}.
-     * 
+     *
      * @param data the data of data url
      * @param encoding the encoding of data url
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data, final MCRDataURLEncoding encoding) throws MalformedURLException {
         this(data, encoding, DEFAULT_MIMETYPE, StandardCharsets.US_ASCII);
@@ -228,9 +228,9 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Constructs a new {@link MCRDataURL}.
-     * 
+     *
      * @param data the data of data url
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public MCRDataURL(final byte[] data) throws MalformedURLException {
         this(data, MCRDataURLEncoding.URL, DEFAULT_MIMETYPE, StandardCharsets.US_ASCII);
@@ -273,9 +273,9 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Returns a {@link String} of a {@link MCRDataURL} object .
-     *  
+     *
      * @return the data url as string
-     * @throws MalformedURLException 
+     * @throws RuntimeException
      */
     @Override
     public String toString() {
