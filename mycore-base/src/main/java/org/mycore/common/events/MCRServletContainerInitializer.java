@@ -23,6 +23,15 @@
 
 package org.mycore.common.events;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.xml.MCRURIResolver;
+import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
+
+import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -30,17 +39,6 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Enumeration;
 import java.util.Set;
-
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletException;
-
-import org.apache.log4j.Logger;
-import org.mycore.common.config.MCRRuntimeComponentDetector;
-import org.mycore.common.xml.MCRURIResolver;
-
-import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -61,7 +59,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         //Make sure logging is configured
         //initialize MCRURIResolver
         MCRURIResolver.init(ctx);
-        final Logger LOGGER = Logger.getLogger(MCRServletContainerInitializer.class);
+        final Logger LOGGER = LogManager.getLogger();
         if (LOGGER.isDebugEnabled()) {
             try {
                 Enumeration<URL> resources = this.getClass().getClassLoader().getResources("META-INF/web-fragment.xml");
@@ -74,10 +72,6 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
             }
             LOGGER.debug("This class is here: " + getSource(this.getClass()));
         }
-        LOGGER.info("I have these components for you: " + MCRRuntimeComponentDetector.getAllComponents());
-        LOGGER.info("I have these mycore components for you: " + MCRRuntimeComponentDetector.getMyCoReComponents());
-        LOGGER.info("I have these app modules for you: " + MCRRuntimeComponentDetector.getApplicationModules());
-        LOGGER.info("Library order: " + ctx.getAttribute(ServletContext.ORDERED_LIBS));
     }
 
     private static String getSource(final Class<? extends MCRServletContainerInitializer> clazz) {
@@ -87,7 +81,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         ProtectionDomain protectionDomain = clazz.getProtectionDomain();
         CodeSource codeSource = protectionDomain.getCodeSource();
         if (codeSource == null) {
-            Logger.getLogger(MCRServletContainerInitializer.class).warn("Cannot get CodeSource.");
+            LogManager.getLogger().warn("Cannot get CodeSource.");
             return null;
         }
         URL location = codeSource.getLocation();

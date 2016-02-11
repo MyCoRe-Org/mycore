@@ -23,19 +23,20 @@
 
 package org.mycore.common.events;
 
-import java.util.Collections;
-
-import javax.servlet.ServletContext;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.MCRRuntimeComponentDetector;
+
+import javax.servlet.ServletContext;
+import java.util.Collections;
 
 /**
  * Initializes classes that implement {@link AutoExecutable} interface that are defined via
  * <code>MCR.Startup.Class</code> property.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRStartupHandler {
@@ -46,7 +47,7 @@ public class MCRStartupHandler {
      */
     public static final String HALT_ON_ERROR = "MCR.Startup.haltOnError";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRStartupHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static interface AutoExecutable {
         /**
@@ -69,6 +70,12 @@ public class MCRStartupHandler {
         //setup configuration
         MCRConfigurationDirSetup dirSetup = new MCRConfigurationDirSetup();
         dirSetup.startUp(servletContext);
+        LOGGER.info("I have these components for you: " + MCRRuntimeComponentDetector.getAllComponents());
+        LOGGER.info("I have these mycore components for you: " + MCRRuntimeComponentDetector.getMyCoReComponents());
+        LOGGER.info("I have these app modules for you: " + MCRRuntimeComponentDetector.getApplicationModules());
+        if (servletContext != null) {
+            LOGGER.info("Library order: " + servletContext.getAttribute(ServletContext.ORDERED_LIBS));
+        }
 
         MCRConfiguration.instance().getStrings("MCR.Startup.Class", Collections.emptyList())
             .stream()
@@ -77,7 +84,7 @@ public class MCRStartupHandler {
             .sorted((o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()))
             .forEachOrdered(autoExecutable -> startExecutable(servletContext, autoExecutable));
     }
-    
+
     private static void startExecutable(ServletContext servletContext, AutoExecutable autoExecutable){
         LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
         try {
@@ -85,7 +92,7 @@ public class MCRStartupHandler {
         } catch (ExceptionInInitializerError e) {
             boolean haltOnError = servletContext.getAttribute(HALT_ON_ERROR) == null || Boolean
                 .parseBoolean((String) servletContext.getAttribute(HALT_ON_ERROR));
-            
+
             if (haltOnError) {
                 throw e;
             }
