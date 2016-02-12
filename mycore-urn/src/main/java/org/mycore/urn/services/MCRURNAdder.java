@@ -11,17 +11,14 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.jdom2.Attribute;
-import org.jdom2.Element;
+import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -32,7 +29,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.xml.sax.SAXException;
 
@@ -41,6 +37,7 @@ import org.xml.sax.SAXException;
  *
  * @author shermann
  * @author Kathleen Neumann (kkrebs)
+ * @author Frank L\u00FCtzenkirchen (fluet)
  */
 public class MCRURNAdder {
 
@@ -100,27 +97,21 @@ public class MCRURNAdder {
      * @param objectId
      *            the id of the mycore object (not to be a derivate)
      * @param xpath
-     *            only xpath without wildcards etc. will work, attributes are
-     *            allowed and so are namespaces. If there is more than one
-     *            attribute to set the attributes must be separated by an
-     *            " and ". E.g. invoking with
+     *            any absolute XPath should work, attributes are
+     *            allowed and so are namespaces. E.g. invoking with
      *              <code>
      *                  /mycoreobject/metadata/def.identifier/identifier[@type='aType']
      *              </code>
-     *            as xpath parameter will lead to the following Element<br>
+     *            as XPath parameter will lead to the following Element<br>
      *              <pre>
      * &lt;def.identifier&gt;
      *  &lt;identifier type="aType"&gt;urn:foo:bar&lt;/identifier&gt;
      * &lt;/def.identifier&gt;</pre>
      *            stored directly under /mycoreobject/metadata.<br>
-     *            Please note, only xpath starting with /mycoreobject/metadata
-     *            will be accepted.
      * @return <code>true</code> if successful, <code>false</code> otherwise
      *
-     * @deprecated doesn't work that generic, need another solution
-     *
      */
-    public boolean addURN(String objectId, String xpath) {
+    public boolean addURN(String objectId, String xPath) {
         MCRObjectID id = MCRObjectID.getInstance(objectId);
         // checking access right
         if (!(MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE) || isAllowedObject(id.getTypeId()))) {
@@ -129,7 +120,6 @@ public class MCRURNAdder {
         }
 
         MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(id);
-        MCRObjectMetadata mcrmetadata = mcrobj.getMetadata();
 
         String urn;
         try {
@@ -138,15 +128,16 @@ public class MCRURNAdder {
             LOGGER.error("Could not generate URN", e);
             return false;
         }
-        Element urnHoldingElement = createElementByXPath(xpath, urn);
-        MCRObjectMetadata urnmetadata = new MCRObjectMetadata();
-        urnmetadata.setFromDOM(urnHoldingElement);
-
+        
         try {
-            LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xpath + "]");
-            mcrmetadata.mergeMetadata(urnmetadata);
+            LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xPath + "]");
+            Document xml = mcrobj.createXML();
+            MCRNodeBuilder nb = new MCRNodeBuilder();
+            nb.buildElement(xPath, urn, xml);
+            mcrobj = new MCRObject(xml);
+            MCRMetadataManager.update(mcrobj);
         } catch (Exception ex) {
-            LOGGER.error("Updating metadata of object " + objectId + " with URN " + urn + " failed. [" + xpath + "]", ex);
+            LOGGER.error("Updating metadata of object " + objectId + " with URN " + urn + " failed. [" + xPath + "]", ex);
             return false;
         }
         try {
@@ -158,124 +149,6 @@ public class MCRURNAdder {
         }
 
         return true;
-    }
-
-    /**
-     * Creates an {@link Element} given by an xpath.
-     *
-     * @param xpath
-     *            the xpath
-     * @return an Element as specified by the given xpath
-     * @throws Exception
-     */
-    private Element createElementByXPath(String xpath, String urn) {
-        String prefix = "/mycoreobject/metadata/";
-        if (!xpath.startsWith(prefix)) {
-            throw new IllegalArgumentException("XPath does not start with '" + prefix + "'");
-        }
-
-        String[] parts = xpath.split("/");
-        /* build the element starting with metadata */
-        Element toReturn = getElement(parts[2]);
-        for (Attribute a : getAttributes(parts[2])) {
-            toReturn.setAttribute(a);
-        }
-
-        Element predecessor = toReturn;
-
-        /* add the children */
-        for (int i = 3; i < parts.length; i++) {
-            List<Attribute> attributes = getAttributes(parts[i]);
-            Element element = getElement(parts[i]);
-            for (Attribute a : attributes) {
-                element.setAttribute(a);
-            }
-
-            predecessor.addContent(element);
-            predecessor = element;
-
-            if (i == parts.length - 1) {
-                element.setText(urn);
-            }
-        }
-
-        return toReturn;
-    }
-
-    /**
-     * Creates the element name from the given string which is part of an xpath.
-     *
-     * @param s
-     *            source string, part of an xpath
-     * @return the element name
-     */
-    private Element getElement(String s) {
-        String elementNamespace = null;
-        Element toReturn = null;
-        int nsEndIndex = s.indexOf(":");
-        int attBeginIndex = s.indexOf("[");
-
-        // if true -> namespace
-        if (nsEndIndex != -1 && ((attBeginIndex > nsEndIndex) || (nsEndIndex != -1 && attBeginIndex == -1))) {
-            elementNamespace = s.substring(0, nsEndIndex);
-        }
-
-        if (elementNamespace != null && attBeginIndex == -1) {
-            toReturn = new Element(s.substring(nsEndIndex + 1), MCRConstants.getStandardNamespace(elementNamespace));
-        } else if (elementNamespace != null && attBeginIndex != -1) {
-            toReturn = new Element(s.substring(nsEndIndex + 1, attBeginIndex), MCRConstants.getStandardNamespace(elementNamespace));
-        } else if (elementNamespace == null && attBeginIndex != -1) {
-            toReturn = new Element(s.substring(0, attBeginIndex));
-        } else if (elementNamespace == null && attBeginIndex == -1) {
-            toReturn = new Element(s);
-        }
-
-        return toReturn;
-    }
-
-    /**
-     * Creates a list of {@link Attribute} from the given string which is part
-     * of an xpath.
-     *
-     * @param s
-     *            source string, part of an xpath
-     * @return a list of {@link Attribute}, or an empty list, if there are no
-     *         attributes at all
-     */
-    private List<Attribute> getAttributes(String s) {
-        List<Attribute> list = new Vector<Attribute>();
-        int beginIndex = s.indexOf("[");
-        if (beginIndex == -1) {
-            return new Vector<Attribute>();
-        }
-
-        String[] parts = s.substring(beginIndex + 1, s.indexOf("]")).split(" and ");
-
-        for (String anAttribute : parts) {
-            String attributeName = null;
-            String namespace = null;
-
-            /* examine attribute name */
-            if (anAttribute.contains(":")) {
-                // we have a namespace here -> namespace:attName=value
-                attributeName = anAttribute.substring(1, anAttribute.indexOf("=")).substring(anAttribute.indexOf(":"));
-                namespace = anAttribute.substring(1, anAttribute.indexOf(":"));
-            } else {
-                // no namespace here -> attName=value
-                attributeName = anAttribute.substring(1, anAttribute.indexOf("="));
-            }
-            /* examine attribute value */
-            String attributeValue = anAttribute.substring(anAttribute.indexOf("=") + 2, anAttribute.length() - 1);
-
-            /* create an Attribute and add it to the result list */
-            if (namespace == null) {
-                list.add(new Attribute(attributeName, attributeValue));
-            } else {
-                list.add(new Attribute(attributeName, attributeValue,
-                        namespace.equals("xml") ? Namespace.XML_NAMESPACE : MCRConstants.getStandardNamespace(namespace)));
-            }
-        }
-        return list;
     }
 
     /**
