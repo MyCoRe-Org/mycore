@@ -19,11 +19,12 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 /**
  * Class is responsible for adding urns to the metadata of a mycore object, to derivate and / or to files within a derivate.
- * For usage you have three URL parameters <code>object</code>, <code>target</code> and <code>path</code>. The <code>object</code>
+ * For usage you have three URL parameters <code>object</code>, <code>target</code>, <code>path</code> and <code>xpath</code>. The <code>object</code>
  * parameter is required and contains the objectID or derivateID. The <code>target</code> parameter provides the following cases:
  * <ul>
  *   <li>empty/missing: derivate including all files gets an urn or if object contains an objectID,
- *     urn is added to metadata at /mycoreobject/metadata/def.identifier/identifier[@type='urn']</li>
+ *     urn is added to metadata at /mycoreobject/metadata/def.identifier/identifier[@type='urn'] or xpath given
+ *     using <code>xpath</code> parameter</li>
  *   <li>file: object has to be derivateID, than the <code>path</code> parameter gives the path to file within this derivate</li>
  *   <li>derivate: generates an urn to the given derivateID</li>
  * </ul>
@@ -33,7 +34,6 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 public class MCRAddURNToObjectServlet extends MCRServlet {
     private static final Logger LOGGER = Logger.getLogger(MCRAddURNToObjectServlet.class);
 
-    /***/
     private static final long serialVersionUID = 1L;
 
     private static final String USER_ERROR_PAGE =  "editor_error_user.xml";
@@ -42,6 +42,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
     protected void doGetPost(MCRServletJob job) throws IOException {
         String object = job.getRequest().getParameter("object");
         String target = job.getRequest().getParameter("target");
+        String xpath = job.getRequest().getParameter("xpath");
 
         if (object == null) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -111,14 +112,26 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 }
             } else {
                 /* assign urn to a mycore object */
-                try {
-                    LOGGER.info("Assigning urn to object '" + object);
-                    if (!urnAdder.addURN(object)) {
-                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
-                        return;
+                if (xpath != null && xpath.length() > 0) {
+                    try {
+                        LOGGER.info("Assigning urn with xpath '" + xpath + "' to object '" + object + "'");
+                        if (!urnAdder.addURN(object, xpath)) {
+                            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
+                            return;
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Error while Assigning urn with xpath '" + xpath + "' to object '" + object + "'", e);
                     }
-                } catch (Exception e) {
-                    LOGGER.error("Error while assigning urn to object '" + object, e);
+                } else {
+                    try {
+                        LOGGER.info("Assigning urn to object '" + object);
+                        if (!urnAdder.addURN(object)) {
+                            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
+                            return;
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Error while assigning urn to object '" + object, e);
+                    }
                 }
             }
             break;
