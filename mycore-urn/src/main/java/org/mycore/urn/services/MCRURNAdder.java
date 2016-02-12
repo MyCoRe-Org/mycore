@@ -96,7 +96,7 @@ public class MCRURNAdder {
      *
      * @param objectId
      *            the id of the mycore object (not to be a derivate)
-     * @param xpath
+     * @param xPath
      *            any absolute XPath should work, attributes are
      *            allowed and so are namespaces. E.g. invoking with
      *              <code>
@@ -128,7 +128,7 @@ public class MCRURNAdder {
             LOGGER.error("Could not generate URN", e);
             return false;
         }
-        
+
         try {
             LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xPath + "]");
             Document xml = mcrobj.createXML();
