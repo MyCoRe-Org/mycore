@@ -111,41 +111,36 @@ public class MCRURNAdder {
      * @return <code>true</code> if successful, <code>false</code> otherwise
      *
      */
-    public boolean addURN(String objectId, String xPath) {
-        MCRObjectID id = MCRObjectID.getInstance(objectId);
+    public boolean addURN(String objectId, String xPath) throws Exception {
         // checking access right
-        if (!(MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE) || isAllowedObject(id.getTypeId()))) {
+        if (!MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE)) {
             LOGGER.warn("Permission denied");
             return false;
         }
 
-        MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(id);
+        MCRObjectID id = MCRObjectID.getInstance(objectId);
+        if (isAllowedObject(id.getTypeId())) {
+            MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(id);
+            String urnToAssign = this.generateURN();
 
-        String urn;
-        try {
-            urn = generateURN();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            LOGGER.error("Could not generate URN", e);
-            return false;
-        }
-
-        try {
-            LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xPath + "]");
-            Document xml = mcrobj.createXML();
-            MCRNodeBuilder nb = new MCRNodeBuilder();
-            nb.buildElement(xPath, urn, xml);
-            mcrobj = new MCRObject(xml);
-            MCRMetadataManager.update(mcrobj);
-        } catch (Exception ex) {
-            LOGGER.error("Updating metadata of object " + objectId + " with URN " + urn + " failed. [" + xPath + "]", ex);
-            return false;
-        }
-        try {
-            LOGGER.info("Assigning urn " + urn + " to object " + objectId + ".");
-            MCRURNManager.assignURN(urn, objectId);
-        } catch (Exception ex) {
-            LOGGER.error("Saving URN in database failed.", ex);
-            return false;
+            try {
+                LOGGER.info("Updating metadata of object " + objectId + " with URN " + urnToAssign + " [" + xPath + "]");
+                Document xml = mcrobj.createXML();
+                MCRNodeBuilder nb = new MCRNodeBuilder();
+                nb.buildElement(xPath, urnToAssign, xml);
+                mcrobj = new MCRObject(xml);
+                MCRMetadataManager.update(mcrobj);
+            } catch (Exception ex) {
+                LOGGER.error("Updating metadata of object " + objectId + " with URN " + urnToAssign + " failed. [" + xPath + "]", ex);
+                return false;
+            }
+            try {
+                LOGGER.info("Assigning urn " + urnToAssign + " to object " + objectId + ".");
+                MCRURNManager.assignURN(urnToAssign, objectId);
+            } catch (Exception ex) {
+                LOGGER.error("Saving URN in database failed.", ex);
+                return false;
+            }
         }
 
         return true;
