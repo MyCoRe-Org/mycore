@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision: 25642 $ $Date: 2012-12-21 11:37:10 +0100 (Fr, 21 Dez 2012) $
  *
  * This file is part of ***  M y C o R e  ***
@@ -60,7 +60,7 @@ import org.mycore.urn.services.MCRURNManager;
 /**
  * This class is responsible for the urn after an object has been deleted in the
  * database
- * 
+ *
  * @author shermann
  * @author Robert Stephan
  */
@@ -71,8 +71,8 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
     /**
      * Handles object created events. This method updates the urn store.
      * The urn is retrieved from object metadata with an XPath expression which can be configured by properties
-     * MCR.Persistence.URN.XPath.{type} or as a default MCR.Persistence.URN.XPath 
-     * 
+     * MCR.Persistence.URN.XPath.{type} or as a default MCR.Persistence.URN.XPath
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -103,7 +103,14 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
                 }
 
                 if (urn != null) {
-                    MCRURNManager.assignURN(urn, obj.getId().toString());
+                    if (MCRURNManager.getURNforDocument(obj.getId().toString()) == null) {
+                        MCRURNManager.assignURN(urn, obj.getId().toString());
+                    } else {
+                        if (!MCRURNManager.getURNforDocument(obj.getId().toString()).equals(urn)) {
+                            LOGGER.warn("URN in metadata " + urn + "isn't equals with registered URN "
+                                + MCRURNManager.getURNforDocument(obj.getId().toString()) + ", please check!" );
+                        }
+                    }
                 } else {
                     if (MCRURNManager.hasURNAssigned(obj.getId().toString())) {
                         MCRURNManager.removeURNByObjectID(obj.getId().toString());
@@ -118,7 +125,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
     /**
      * Handles object updated events
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -131,7 +138,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
     /**
      * Handles object repaired events
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -145,7 +152,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
     /**
      * Handles object deleted events. This implementation deletes the urn
      * records in the MCRURN table
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -167,7 +174,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
     /**
      * Handles derivate deleted events. This implementation deletes the urn
      * records in the MCRURN table
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der
@@ -187,7 +194,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
     /**
      * Handles derivate created events. This implementation adds the urn records in the MCRURN table
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der

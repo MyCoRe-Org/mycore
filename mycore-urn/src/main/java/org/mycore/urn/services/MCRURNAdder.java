@@ -55,96 +55,32 @@ public class MCRURNAdder {
 
         MCRObjectID id = MCRObjectID.getInstance(objectId);
         if (isAllowedObject(id.getTypeId())) {
-            MCRObject obj = MCRMetadataManager.retrieveMCRObject(id);
-            MCRMetaElement srcElement = obj.getMetadata().getMetadataElement("def.identifier");
 
-            String urnToAssign = this.generateURN();
-
-            /* objects with ppn have already the def.identifier element defined */
-            /* no ppn -> no def.identifier element, thus it has to be created */
-            if (srcElement == null) {
-                ArrayList<MCRMetaInterface> list = new ArrayList<MCRMetaInterface>();
-                srcElement = new MCRMetaElement(MCRMetaLangText.class, "def.identifier", false, true, list);
-                obj.getMetadata().setMetadataElement(srcElement);
-            }
-            // adding the urn
-            MCRMetaLangText urn = new MCRMetaLangText("identifier", "de", "urn", 0, "", urnToAssign);
-            srcElement.addMetaObject(urn);
-
-            String objId = obj.getId().toString();
-            try {
-                LOGGER.info("Updating metadata of object " + objId + " with URN " + urnToAssign + ".");
-                MCRMetadataManager.update(obj);
-            } catch (Exception ex) {
-                LOGGER.error("Updating metadata of object " + objId + " with URN " + urnToAssign + " failed.", ex);
-                return false;
-            }
-            try {
-                LOGGER.info("Assigning urn " + urnToAssign + " to object " + objId + ".");
-                MCRURNManager.assignURN(urnToAssign, objId);
-            } catch (Exception ex) {
-                LOGGER.error("Saving URN in database failed.", ex);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * This methods adds an URN to the metadata of a mycore object. The urn is
-     * stored under the given xpath in the mycore object given by its id.
-     *
-     * @param objectId
-     *            the id of the mycore object (not to be a derivate)
-     * @param xPath
-     *            any absolute XPath should work, attributes are
-     *            allowed and so are namespaces. E.g. invoking with
-     *              <code>
-     *                  /mycoreobject/metadata/def.identifier/identifier[@type='aType']
-     *              </code>
-     *            as XPath parameter will lead to the following Element<br>
-     *              <pre>
-     * &lt;def.identifier&gt;
-     *  &lt;identifier type="aType"&gt;urn:foo:bar&lt;/identifier&gt;
-     * &lt;/def.identifier&gt;</pre>
-     *            stored directly under /mycoreobject/metadata.<br>
-     * @return <code>true</code> if successful, <code>false</code> otherwise
-     *
-     */
-    public boolean addURN(String objectId, String xPath) throws Exception {
-        // checking access right
-        if (!MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE)) {
-            LOGGER.warn("Permission denied");
-            return false;
-        }
-
-        MCRObjectID id = MCRObjectID.getInstance(objectId);
-        if (isAllowedObject(id.getTypeId())) {
             MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(id);
+            String type = mcrobj.getId().getTypeId();
+
+            MCRConfiguration conf = MCRConfiguration.instance();
+            String xPathString = conf.getString("MCR.Persistence.URN.XPath." + type,
+                conf.getString("MCR.Persistence.URN.XPath", "/mycoreobject/metadata/def.identifier[@class='MCRMetaLangText']/identifier[@type='urn']"));
+
             String urnToAssign = this.generateURN();
 
             try {
-                LOGGER.info("Updating metadata of object " + objectId + " with URN " + urnToAssign + " [" + xPath + "]");
+                LOGGER.info("Updating metadata of object " + objectId + " with URN " + urnToAssign + " [" + xPathString + "]");
                 Document xml = mcrobj.createXML();
                 MCRNodeBuilder nb = new MCRNodeBuilder();
-                nb.buildElement(xPath, urnToAssign, xml);
+                nb.buildElement(xPathString, urnToAssign, xml);
                 mcrobj = new MCRObject(xml);
                 MCRMetadataManager.update(mcrobj);
             } catch (Exception ex) {
-                LOGGER.error("Updating metadata of object " + objectId + " with URN " + urnToAssign + " failed. [" + xPath + "]", ex);
-                return false;
-            }
-            try {
-                LOGGER.info("Assigning urn " + urnToAssign + " to object " + objectId + ".");
-                MCRURNManager.assignURN(urnToAssign, objectId);
-            } catch (Exception ex) {
-                LOGGER.error("Saving URN in database failed.", ex);
+                LOGGER.error("Updating metadata of object " + objectId + " with URN " + urnToAssign + " failed. [" + xPathString + "]", ex);
                 return false;
             }
         }
 
         return true;
     }
+
 
     /**
      * Method generates a single URN with attached checksum.
