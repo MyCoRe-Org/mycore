@@ -29,9 +29,11 @@
    -    Prints mods title defined by 'type' [translated|alternative|abbreviated|uniform]. If no type is given
    -    returns main title (default). The parameter 'withSubtitle' [true|false] specifies, if the subtitle
    -    sould be shown.
+   -    The parameter 'asHTML' [true|false] is used to define the output should in HTML form if one is given.
    -->
   <xsl:template mode="mods.title" match="mods:mods">
     <xsl:param name="type" select="''" />
+    <xsl:param name="asHTML" select="false()" />
     <xsl:param name="withSubtitle" select="false()" />
     <xsl:param name="position" select="''" />
 
@@ -52,11 +54,13 @@
         <xsl:choose>
           <xsl:when test="string-length($type) &gt; 0 and string-length($position) = 0">
             <xsl:apply-templates select="mods:titleInfo[@type=$type]" mode="mods.printTitle">
+              <xsl:with-param name="asHTML" select="$asHTML" />
               <xsl:with-param name="withSubtitle" select="$withSubtitle" />
             </xsl:apply-templates>
           </xsl:when>
           <xsl:when test="string-length($type) &gt; 0 and string-length($position) &gt; 0">
             <xsl:apply-templates select="mods:titleInfo[@type=$type][position()=$position]" mode="mods.printTitle">
+              <xsl:with-param name="asHTML" select="$asHTML" />
               <xsl:with-param name="withSubtitle" select="$withSubtitle" />
             </xsl:apply-templates>
           </xsl:when>
@@ -64,6 +68,7 @@
             <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]"
               mode="mods.printTitle"
             >
+              <xsl:with-param name="asHTML" select="$asHTML" />
               <xsl:with-param name="withSubtitle" select="$withSubtitle" />
             </xsl:apply-templates>
           </xsl:otherwise>
@@ -76,17 +81,45 @@
   </xsl:template>
 
   <xsl:template mode="mods.printTitle" match="mods:titleInfo">
+    <xsl:param name="asHTML" select="false()" />
     <xsl:param name="withSubtitle" select="false()" />
-    <xsl:if test="mods:nonSort">
-      <xsl:value-of select="concat(mods:nonSort, ' ')" />
-    </xsl:if>
-    <xsl:value-of select="mods:title" />
-    <xsl:if test="$withSubtitle and mods:subTitle">
-      <span class="subtitle">
-        <xsl:text> : </xsl:text>
-        <xsl:value-of select="mods:subTitle" />
-      </span>
-    </xsl:if>
+
+    <xsl:variable name="altRepGroup" select="@altRepGroup" />
+    <xsl:variable name="hasAlternateFormat" select="count(..//mods:titleInfo[(@altRepGroup = $altRepGroup) and (string-length(@altFormat) &gt; 0)]) &gt; 0" />
+
+    <xsl:choose>
+      <xsl:when test="$asHTML and $hasAlternateFormat and (string-length(@altFormat) = 0)">
+        <!-- ignore titleInfo -->
+      </xsl:when>
+      <xsl:when test="$asHTML and $hasAlternateFormat and (string-length(@altFormat) &gt; 0)">
+        <xsl:variable name="alternateContent"
+          select="document(..//mods:titleInfo[(@altRepGroup = $altRepGroup) and (string-length(@altFormat) &gt; 0)]/@altFormat)/titleInfo" />
+
+        <xsl:if test="$alternateContent/nonSort">
+          <xsl:apply-templates select="$alternateContent/nonSort" mode="copyNode" />
+          <xsl:text> </xsl:text>
+        </xsl:if>
+        <xsl:apply-templates select="$alternateContent/title" mode="copyNode" />
+        <xsl:if test="$withSubtitle and $alternateContent/subTitle">
+          <span class="subtitle">
+            <xsl:text> : </xsl:text>
+            <xsl:apply-templates select="$alternateContent/subTitle" mode="copyNode" />
+          </span>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="mods:nonSort">
+          <xsl:value-of select="concat(mods:nonSort, ' ')" />
+        </xsl:if>
+        <xsl:value-of select="mods:title" />
+        <xsl:if test="$withSubtitle and mods:subTitle">
+          <span class="subtitle">
+            <xsl:text> : </xsl:text>
+            <xsl:value-of select="mods:subTitle" />
+          </span>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template mode="mods.title.confpro" match="mods:mods">
@@ -125,12 +158,14 @@
   </xsl:template>
 
   <xsl:template mode="mods.title.issue" match="mods:mods">
+    <xsl:param name="asHTML" select="false()" />
     <xsl:param name="withSubtitle" select="false()" />
     <xsl:choose>
       <xsl:when test="mods:titleInfo/mods:title">
         <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]"
           mode="mods.printTitle"
         >
+          <xsl:with-param name="asHTML" select="$asHTML" />
           <xsl:with-param name="withSubtitle" select="$withSubtitle" />
         </xsl:apply-templates>
       </xsl:when>
@@ -164,7 +199,6 @@
         <xsl:value-of select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]/mods:subTitle" />
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
 
   <xsl:template mode="mods.internalId" match="mods:mods">
@@ -177,6 +211,35 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="'unidentified MODS document'" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--
+   -   Prints alternate format of mods abstract, tableOfContents or accessCondition.
+   -   The parameter 'asHTML' [true|false] is used to define the output should in HTML form if one is given.
+   -   Use the parameter 'filtered' [true|false] with 'true' if do some pre filtering.  
+   -->
+  <xsl:template mode="mods.printAlternateFormat" match="mods:abstract|mods:tableOfContents|mods:accessCondition">
+    <xsl:param name="asHTML" select="false()" />
+    <xsl:param name="filtered" select="false()" />
+
+    <xsl:variable name="name" select="name(.)" />
+    <xsl:variable name="localName" select="local-name(.)" />
+    <xsl:variable name="altRepGroup" select="@altRepGroup" />
+    <xsl:variable name="hasAlternateFormat" select="count(..//*[(name() = $name) and (@altRepGroup = $altRepGroup) and (string-length(@altFormat) &gt; 0)]) &gt; 0" />
+
+    <xsl:choose>
+      <xsl:when test="$asHTML and $hasAlternateFormat and not($filtered) and (string-length(@altFormat) = 0)">
+        <!-- ignore -->
+      </xsl:when>
+      <xsl:when test="$asHTML and $hasAlternateFormat and ((string-length(@altFormat) &gt; 0) or ((string-length(@altFormat) = 0) and $filtered))">
+        <xsl:variable name="alternateContent"
+          select="document(..//*[(name() = $name) and (@altRepGroup = $altRepGroup) and (string-length(@altFormat) &gt; 0)]/@altFormat)/*[name() = $localName]" />
+        <xsl:apply-templates select="$alternateContent" mode="copyNode" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="." />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -292,6 +355,10 @@
         </nameIdentifier>
       </xsl:if>
     </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="*" mode="copyNode">
+    <xsl:copy-of select="node()" />
   </xsl:template>
 
 </xsl:stylesheet>
