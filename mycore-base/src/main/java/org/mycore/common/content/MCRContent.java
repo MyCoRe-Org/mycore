@@ -55,6 +55,8 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xsl.MCRLazyStreamSource;
+import org.mycore.datamodel.common.MCRDataURL;
+import org.mycore.datamodel.common.MCRDataURLEncoding;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -260,6 +262,19 @@ public abstract class MCRContent {
      */
     public String asString() throws IOException, UnsupportedEncodingException {
         return new String(asByteArray(), getSafeEncoding());
+    }
+    
+    /**
+     * Returns content as "data:" URL.
+     * @throws IOException
+     */
+    public MCRDataURL asDataURL() throws IOException{
+        return new MCRDataURL(asByteArray(), getDataURLEncoding(), getMimeType(), getSafeEncoding());
+    }
+
+    protected MCRDataURLEncoding getDataURLEncoding() throws IOException {
+        return getMimeType().startsWith("text/") ? MCRDataURLEncoding.URL
+            : MCRDataURLEncoding.BASE64;
     }
 
     /**
