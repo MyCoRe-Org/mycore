@@ -1,6 +1,7 @@
 package org.mycore.frontend.filter;
 
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -37,15 +38,19 @@ public class MCRSecureTokenV2FilterConfig {
             LOGGER.info("Local MCRSecureToken2 support is disabled.");
         } else {
             enabled = true;
-            securedExtensions = Pattern.compile(propertyValues
-                .stream()
-                .map(s -> s.toLowerCase(Locale.ROOT))
-                .distinct()
-                .collect(Collectors.joining("|", "([^\\s]+(\\.(?i)(", "))$)")));
+            securedExtensions = getExtensionPattern(propertyValues);
             LOGGER.info("SecureTokenV2 extension pattern: " + securedExtensions);
             hashParameter = configuration.getString("MCR.SecureTokenV2.ParameterName");
             sharedSecret = configuration.getString("MCR.SecureTokenV2.SharedSecret").trim();
         }
+    }
+
+    static Pattern getExtensionPattern(Collection<String> propertyValues) {
+        return Pattern.compile(propertyValues
+            .stream()
+            .map(s -> s.toLowerCase(Locale.ROOT))
+            .distinct()
+            .collect(Collectors.joining("|", "(.+(\\.(?i)(", "))$)")));
     }
 
     public static boolean isFilterEnabled() {
