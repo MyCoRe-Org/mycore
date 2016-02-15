@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.TooManyListenersException;
 
@@ -37,6 +38,7 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
@@ -67,7 +69,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Transforms XML content using a static XSL stylesheet. The stylesheet is configured via
- * MCR.ContentTransformer.{ID}.Stylesheet
+ * <code>MCR.ContentTransformer.{ID}.Stylesheet</code>. You may choose your own instance of {@link SAXTransformerFactory} via
+ * <code>MCR.ContentTransformer.{ID}.TransformerFactoryClass</code>
  * 
  * @author Frank L\u00FCtzenkirchen
  */
@@ -91,6 +94,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static long CHECK_PERIOD = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod",
         60000);
 
+    private static final String DEFAULT_FACTORY_CLASS = MCRConfiguration.instance()
+        .getString("MCR.LayoutService.TransformerFactoryClass", null);
+
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
 
@@ -109,7 +115,14 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     public MCRXSLTransformer() {
         super();
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        setTransformerFactory(DEFAULT_FACTORY_CLASS);
+    }
+
+    public synchronized void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
+        TransformerFactory transformerFactory = Optional
+            .ofNullable(factoryClass)
+            .map(c -> TransformerFactory.newInstance(c, null))
+            .orElseGet(TransformerFactory::newInstance);
         LOGGER.info("Transformerfactory: " + transformerFactory.getClass().getName());
         transformerFactory.setURIResolver(URI_RESOLVER);
         transformerFactory.setErrorListener(MCRErrorListener.getInstance());
@@ -137,6 +150,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         String property = "MCR.ContentTransformer." + id + ".Stylesheet";
         String[] stylesheets = MCRConfiguration.instance().getString(property).split(",");
         setStylesheets(stylesheets);
+        property = "MCR.ContentTransformer." + id + ".TransformerFactory";
+        String transformerFactory = MCRConfiguration.instance().getString(property, DEFAULT_FACTORY_CLASS);
+        if (transformerFactory != null && !transformerFactory.equals(DEFAULT_FACTORY_CLASS)) {
+            setTransformerFactory(transformerFactory);
+        }
     }
 
     public void setStylesheets(String... stylesheets) {
@@ -152,7 +170,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private void checkTemplateUptodate() throws TransformerConfigurationException, SAXException {
         boolean check = System.currentTimeMillis() - modifiedChecked > CHECK_PERIOD;
         boolean useCache = MCRConfiguration.instance().getBoolean("MCR.UseXSLTemplateCache", true);
-        if(!useCache){
+        if (!useCache) {
             check = true;
             LOGGER.info("XSL template cache OFF.");
         }
