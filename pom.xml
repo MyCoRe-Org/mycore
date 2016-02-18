@@ -1081,7 +1081,7 @@
       <dependency>
         <groupId>org.mycore.sword</groupId>
         <artifactId>easy-sword2-lib</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>log4j</groupId>
