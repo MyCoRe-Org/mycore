@@ -1,0 +1,72 @@
+/**
+ * 
+ */
+package org.mycore.common.content.transformer;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Optional;
+
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRStringContent;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.xml.sax.SAXException;
+
+import com.google.gson.JsonObject;
+
+/**
+ * Uses {@link MCRXMLHelper#jsonSerialize(org.jdom2.Element)} to transform the source (must be XML) to JSON.
+ * @author Thomas Scheffler (yagee)
+ */
+public class MCRToJSONTransformer extends MCRContentTransformer {
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.content.transformer.MCRContentTransformer#transform(org.mycore.common.content.MCRContent)
+     */
+    @Override
+    public MCRContent transform(MCRContent source) throws IOException {
+        JsonObject jsonObject = toJSON(source);
+        MCRStringContent result = new MCRStringContent(jsonObject.toString());
+        result.setMimeType(getMimeType());
+        result.setEncoding(getEncoding());
+        result.setUsingSession(source.isUsingSession());
+        return result;
+    }
+
+    private static JsonObject toJSON(MCRContent source) throws IOException {
+        try {
+            Document xml = source.asXML();
+            return MCRXMLHelper.jsonSerialize(xml.getRootElement());
+        } catch (JDOMException | SAXException e) {
+            throw new MCRException(
+                "Could not generate JSON from " + source.getClass().getSimpleName() + ": " + source.getSystemId(), e);
+        }
+    }
+
+    @Override
+    public void transform(MCRContent source, OutputStream out) throws IOException {
+        JsonObject jsonObject = toJSON(source);
+        out.write(jsonObject.toString().getBytes(getEncoding()));
+    }
+
+    @Override
+    public String getMimeType() {
+        //default by RFC 4627
+        return Optional.ofNullable(super.mimeType).orElse("application/json");
+    }
+
+    @Override
+    public String getEncoding() {
+        //default by RFC 4627
+        return "UTF-8";
+    }
+
+    @Override
+    protected String getDefaultExtension() {
+        return "json";
+    }
+
+}
