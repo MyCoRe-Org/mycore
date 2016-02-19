@@ -22,6 +22,7 @@
  */
 package org.mycore.datamodel.common;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -36,8 +37,18 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.NodeList;
 
 /**
  * Represents the data URL scheme (<a href="https://tools.ietf.org/html/rfc2397">RFC2397</a>).
@@ -53,7 +64,7 @@ public class MCRDataURL implements Serializable {
 
     private static final String DEFAULT_MIMETYPE = "text/plain";
 
-    private static final Pattern PATTERN_MIMETYPE = Pattern.compile("^[a-z0-9\\-\\+]+\\/[a-z0-9\\-\\+]+$");
+    private static final Pattern PATTERN_MIMETYPE = Pattern.compile("^([a-z0-9\\-\\+]+)\\/([a-z0-9\\-\\+]+)$");
 
     private static final String CHARSET_PARAM = "charset";
 
@@ -72,6 +83,154 @@ public class MCRDataURL implements Serializable {
     private final MCRDataURLEncoding encoding;
 
     private final byte[] data;
+
+    /**
+     * Build a "data" URL for given {@link NodeList}, encoding, mime-type and charset.
+     * Should encoding be <code>null</code>, it is detect from mime-type.
+     * 
+     * @param nodeList the node list
+     * @param encoding the {@link MCRDataURLEncoding}
+     * @param mimeType the mime-type
+     * @param charset the charset
+     * @return a string with "data" URL
+     * @throws TransformerException
+     * @throws MalformedURLException
+     */
+    public static String build(final NodeList nodeList, final String encoding, final String mimeType,
+            final String charset) throws TransformerException, MalformedURLException {
+        if (nodeList.item(0).getNodeName().equals("#document")) {
+            final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            final Transformer transformer = transformerFactory.newTransformer();
+
+            MCRDataURLEncoding enc = encoding != null ? MCRDataURLEncoding.fromValue(encoding) : null;
+            String method = "xml";
+
+            final Matcher mtm = PATTERN_MIMETYPE.matcher(mimeType);
+            if (mtm.matches()) {
+                if (enc == null) {
+                    if ("text".equals(mtm.group(1))) {
+                        enc = MCRDataURLEncoding.URL;
+                    } else {
+                        enc = MCRDataURLEncoding.BASE64;
+                    }
+                }
+
+                if ("plain".equals(mtm.group(2))) {
+                    method = "text";
+                } else if ("html".equals(mtm.group(2))) {
+                    method = "html";
+                } else if ("xml|xhtml+xml".equals(mtm.group(2))) {
+                    method = "xml";
+                } else {
+                    method = null;
+                }
+            }
+
+            if (method != null) {
+                transformer.setOutputProperty(OutputKeys.METHOD, method);
+            }
+
+            transformer.setOutputProperty(OutputKeys.INDENT, "no");
+            transformer.setOutputProperty(OutputKeys.ENCODING, charset);
+
+            DOMSource source = new DOMSource(nodeList.item(0).getFirstChild());
+            ByteArrayOutputStream bao = new ByteArrayOutputStream();
+            StreamResult result = new StreamResult(bao);
+            transformer.transform(source, result);
+
+            final MCRDataURL dataURL = new MCRDataURL(bao.toByteArray(), enc, mimeType, charset);
+
+            return dataURL.toString();
+        }
+
+        return null;
+    }
+
+    /**
+     * Build a "data" URL for given {@link String}, encoding, mime-type and charset.
+     * Should encoding be <code>null</code>, it is detect from mime-type.
+     * 
+     * @param nodeList the string
+     * @param encoding the {@link MCRDataURLEncoding}
+     * @param mimeType the mime-type
+     * @param charset the charset
+     * @return a string with "data" URL
+     * @throws TransformerException
+     * @throws MalformedURLException
+     */
+    public static String build(final String str, final String encoding, final String mimeType, final String charset)
+            throws TransformerException, MalformedURLException {
+        MCRDataURLEncoding enc = encoding != null ? MCRDataURLEncoding.fromValue(encoding) : null;
+
+        final Matcher mtm = PATTERN_MIMETYPE.matcher(mimeType);
+        if (mtm.matches()) {
+            if (enc == null) {
+                if ("text".equals(mtm.group(1))) {
+                    enc = MCRDataURLEncoding.URL;
+                } else {
+                    enc = MCRDataURLEncoding.BASE64;
+                }
+            }
+        }
+
+        final MCRDataURL dataURL = new MCRDataURL(str.getBytes(Charset.forName(charset)), enc, mimeType, charset);
+
+        return dataURL.toString();
+    }
+
+    /**
+     * Build a "data" URL for given {@link NodeList}, mime-type and <code>UTF-8</code> as charset.
+     * 
+     * @param nodeList the node list
+     * @param mimeType the mime-type
+     * @return a string with "data" URL
+     * @throws TransformerException
+     * @throws MalformedURLException
+     */
+    public static String build(final NodeList nodeList, final String mimeType)
+            throws TransformerException, MalformedURLException {
+        return build(nodeList, null, mimeType, "UTF-8");
+    }
+
+    /**
+     * Build a "data" URL for given {@link String}, mime-type and <code>UTF-8</code> as charset.
+     * 
+     * @param str the string
+     * @param mimeType the mime-type
+     * @return a string with "data" URL
+     * @throws TransformerException
+     * @throws MalformedURLException
+     */
+    public static String build(final String str, final String mimeType)
+            throws TransformerException, MalformedURLException {
+        return build(str, null, mimeType, "UTF-8");
+    }
+
+    /**
+     * Build a "data" URL for given {@link NodeList} with mime-type based encoding, 
+     * <code>text/xml</code> as mime-type and <code>UTF-8</code> as charset.
+     * 
+     * @param nodeList the node list
+     * @return a string with "data" URL
+     * @throws TransformerException
+     * @throws MalformedURLException
+     */
+    public static String build(final NodeList nodeList) throws TransformerException, MalformedURLException {
+        return build(nodeList, null, "text/xml", "UTF-8");
+    }
+
+    /**
+     * Build a "data" URL for given {@link String} with mime-type based encoding, 
+     * <code>text/xml</code> as mime-type and <code>UTF-8</code> as charset.
+     * 
+     * @param str the node list
+     * @return a string with "data" URL
+     * @throws TransformerException
+     * @throws MalformedURLException
+     */
+    public static String build(final String str) throws TransformerException, MalformedURLException {
+        return build(str, null, "text/palin", "UTF-8");
+    }
 
     /**
      * Parse a {@link String} to {@link MCRDataURL}.
