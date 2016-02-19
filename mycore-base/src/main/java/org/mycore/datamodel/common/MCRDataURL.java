@@ -131,6 +131,7 @@ public class MCRDataURL implements Serializable {
             }
 
             transformer.setOutputProperty(OutputKeys.INDENT, "no");
+            transformer.setOutputProperty(OutputKeys.MEDIA_TYPE, mimeType);
             transformer.setOutputProperty(OutputKeys.ENCODING, charset);
 
             DOMSource source = new DOMSource(nodeList.item(0).getFirstChild());
