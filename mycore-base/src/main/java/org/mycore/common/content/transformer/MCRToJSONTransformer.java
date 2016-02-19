@@ -5,7 +5,6 @@ package org.mycore.common.content.transformer;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Optional;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -30,7 +29,7 @@ public class MCRToJSONTransformer extends MCRContentTransformer {
     public MCRContent transform(MCRContent source) throws IOException {
         JsonObject jsonObject = toJSON(source);
         MCRStringContent result = new MCRStringContent(jsonObject.toString());
-        result.setMimeType(getMimeType());
+        result.setMimeType(mimeType);
         result.setEncoding(getEncoding());
         result.setUsingSession(source.isUsingSession());
         return result;
@@ -53,9 +52,9 @@ public class MCRToJSONTransformer extends MCRContentTransformer {
     }
 
     @Override
-    public String getMimeType() {
+    public String getDefaultMimeType() {
         //default by RFC 4627
-        return Optional.ofNullable(super.mimeType).orElse("application/json");
+        return "application/json";
     }
 
     @Override

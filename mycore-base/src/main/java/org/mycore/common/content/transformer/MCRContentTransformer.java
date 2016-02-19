@@ -57,7 +57,7 @@ public abstract class MCRContentTransformer {
     public void init(String id) {
         String mimeProperty = "MCR.ContentTransformer." + id + ".MIMEType";
         String extensionProperty = "MCR.ContentTransformer." + id + ".FileExtension";
-        this.mimeType = MCRConfiguration.instance().getString(mimeProperty, defaultMimeType);
+        this.mimeType = MCRConfiguration.instance().getString(mimeProperty, getDefaultMimeType());
         this.fileExtension = MCRConfiguration.instance().getString(extensionProperty, getDefaultExtension());
     }
 
@@ -101,5 +101,9 @@ public abstract class MCRContentTransformer {
 
     protected String getDefaultExtension() {
         return "bin";
+    }
+    
+    protected String getDefaultMimeType() {
+        return defaultMimeType;
     }
 }
