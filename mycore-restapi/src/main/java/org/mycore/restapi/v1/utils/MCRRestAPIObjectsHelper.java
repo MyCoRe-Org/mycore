@@ -178,38 +178,6 @@ public class MCRRestAPIObjectsHelper {
 
     private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj, HttpServletRequest request)
         throws MCRRestAPIException {
-        //@TODO neu: 
-        //	  MCRPath path = MCRPath.get(derObj.getID(), "/");
-        //    Document directoryXML = MCRPathXML.getDirectoryXML(mcrPath);
-        //     ...
-        /* old XML Representation
-            <mcr_directory ID="twzji61h00vr0nl2">
-              <path>cpr_derivate_00006903</path>
-              <ownerID>cpr_derivate_00006903</ownerID>
-              <date type="lastModified" format="dd.MM.yyyy HH:mm:ss">03.05.2012 10:35:29</date>
-              <size>48463</size>
-              <numChildren>
-                <here>
-                  <directories>0</directories>
-                  <files>1</files>
-                </here>
-                <total>
-                  <directories>0</directories>
-                  <files>1</files>
-                </total>
-              </numChildren>
-              <children>
-                <child ID="uwzji61h00vr0nl2" type="file">
-                  <name>detharding_georg_christoph_pic.jpg</name>
-                  <size>48463</size>
-                  <date type="lastModified" format="dd.MM.yyyy HH:mm:ss">03.05.2012 10:35:29</date>
-                  <contentType>jpeg</contentType>
-                  <md5>b8a77e93685c22020dedab2170474dfe</md5>
-                </child>
-              </children>
-            </mcr_directory>
-         */
-
         Element eContents = new Element("contents");
         eContents.setAttribute("mycoreobject", mcrObj.getId().toString());
         eContents.setAttribute("derivate", derObj.getId().toString());
@@ -248,29 +216,7 @@ public class MCRRestAPIObjectsHelper {
             MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
             if (root != null) {
                 JsonWriter writer = new JsonWriter(sw);
-                writer.setIndent("    ");
-                writer.beginObject();
-
-                /*
-                writer.name("ownerID").value(root.getOwner());
-                writer.name("size").value(String.valueOf(root.getSize()));
-                writer.name("lastModified").value(SDF_UTC.format(root.getLastModified().getTime()));
-                String label = root.getLabel();
-                if (label != null) {
-                    writer.name("label").value(label);
-                }
-                if (root instanceof MCRDirectory) {
-                    MCRDirectory dir = (MCRDirectory) root;
-                    writer.name("total_directories").value(
-                            dir.getNumChildren(MCRDirectory.DIRECTORIES, MCRDirectory.TOTAL));
-                    writer.name("total_files").value(dir.getNumChildren(MCRDirectory.FILES, MCRDirectory.TOTAL));
-                    String baseurl = MCRFrontendUtil.getBaseURL()+MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.baseurl.path", "");
-                    if(!baseurl.endsWith("/")){baseurl+="/";}
-                    listDirectoryContentAsJson(writer, dir, baseurl+derObj.getOwnerID().toString()+"/"+derObj.getId().toString()+"/");
-                }
-                */
-                writer.endObject();
-
+                Files.walkFileTree(root, new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId()));
                 writer.close();
             }
         } catch (IOException e) {
@@ -279,6 +225,8 @@ public class MCRRestAPIObjectsHelper {
         }
         return sw.toString();
     }
+    
+    
 
     /**
      * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
