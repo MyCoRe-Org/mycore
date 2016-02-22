@@ -6,7 +6,9 @@
         <h4>
           <xed:output i18n="component.user2.admin.inputhints" />
         </h4>
-        <xed:display-validation-messages />
+        <ul>
+          <xed:display-validation-messages />
+        </ul>
       </div>
     </xed:if>
   </xed:template>
@@ -101,8 +103,8 @@
       <div class="col-md-9 row">
         <mcruser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"
           i18n.error="component.user2.admin.inputhints.username" required="true" maxlength="16" />
-        <mcruser:template name="selectInput" xpath="@realm" default="local" id="realmId" disabled="true" inline="true" colsize="sm"
-          colwidth="3" uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
+        <mcruser:template name="selectInput" xpath="@realm" default="local" id="realmId" disabled="true" inline="true" colsize="sm" colwidth="3"
+          uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
     </div>
   </xed:template>
@@ -198,7 +200,7 @@
             </div>
           </div>
         </div>
-       </xed:repeat>
-     </xed:bind>
+      </xed:repeat>
+    </xed:bind>
   </xed:template>
 </xed:template>
