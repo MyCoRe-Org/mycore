@@ -22,6 +22,8 @@
 
 package org.mycore.restapi.v1;
 
+import java.io.IOException;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -30,9 +32,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.utils.MCRRestAPIObjectsHelper;
 
 /**
@@ -137,8 +141,12 @@ public class MCRRestAPIObjects {
     @Path("/{mcrid}/derivates/{derid}")
     public Response returnDerivate(@PathParam("mcrid") String mcrid, @PathParam("derid") String derid,
         @QueryParam("style") String style) {
-        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid);
-
+        try {
+            return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid);
+        } catch (IOException e) {
+            return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
+                "Unable to display derivate content", e.getMessage()).createHttpResponse();
+        }
     }
 
     /** returns a list of derivates for a given MyCoRe Object 
@@ -154,9 +162,13 @@ public class MCRRestAPIObjects {
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @Path("/{mcrid}/derivates/{derid}/contents")
-    public Response listContents(@Context UriInfo info, @PathParam("mcrid") String mcrID,
+    public Response listContents(@Context UriInfo info, @Context Request request, @PathParam("mcrid") String mcrID,
         @PathParam("derid") String derID,
         @QueryParam("format") @DefaultValue("xml") String format) {
-        return MCRRestAPIObjectsHelper.listContents(mcrID, derID, format);
+        try {
+            return MCRRestAPIObjectsHelper.listContents(request, mcrID, derID, format);
+        } catch (IOException e) {
+            return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
+        }
     }
 }

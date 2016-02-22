@@ -26,19 +26,25 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
@@ -117,6 +123,9 @@ public class MCRRestAPIObjectsHelper {
                                 MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID))));
                         } catch (MCRException e) {
                             eDer.addContent(new Comment("Error: Derivate not found."));
+                        } catch (IOException e) {
+                            eDer.addContent(
+                                new Comment("Error: Derivate content could not be listed: " + e.getMessage()));
                         }
                     }
                 }
@@ -139,7 +148,7 @@ public class MCRRestAPIObjectsHelper {
 
     }
 
-    public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID) {
+    public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID) throws IOException {
         try {
             MCRObject mcrObj = retrieveMCRObject(pathParamMcrID);
             MCRDerivate derObj = retrieveMCRDerivate(mcrObj, pathParamDerID);
@@ -149,12 +158,7 @@ public class MCRRestAPIObjectsHelper {
 
             StringWriter sw = new StringWriter();
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-            try {
-                outputter.output(doc, sw);
-            } catch (IOException e) {
-                throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                    "Unable to display derivate content", e.getMessage()));
-            }
+            outputter.output(doc, sw);
 
             return Response.ok(sw.toString()).type("application/xml").build();
 
@@ -167,18 +171,13 @@ public class MCRRestAPIObjectsHelper {
     }
 
     private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj)
-        throws MCRRestAPIException {
+        throws IOException {
         Element eContents = new Element("contents");
         eContents.setAttribute("mycoreobject", mcrObj.getId().toString());
         eContents.setAttribute("derivate", derObj.getId().toString());
         MCRPath p = MCRPath.getPath(derObj.getId().toString(), "/");
         if (p != null) {
-            try {
-                eContents.addContent(MCRPathXML.getDirectoryXML(p).getRootElement().detach());
-            } catch (IOException e) {
-                throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                    "A problem occurred while reading the data", e.getMessage()));
-            }
+            eContents.addContent(MCRPathXML.getDirectoryXML(p).getRootElement().detach());
         }
 
         String baseURL = MCRFrontendUtil.getBaseURL()
@@ -189,34 +188,26 @@ public class MCRRestAPIObjectsHelper {
             String uri = e.getChildText("uri");
             if (uri != null) {
                 int pos = uri.lastIndexOf(":/");
-                String path = uri.substring(pos+2);
+                String path = uri.substring(pos + 2);
                 while (path.startsWith("/")) {
                     path = path.substring(1);
                 }
-                e.setAttribute("href", baseURL+path);
+                e.setAttribute("href", baseURL + path);
             }
         }
         return eContents;
     }
 
-    private static String listDerivateContentAsJson(MCRDerivate derObj) throws MCRRestAPIException {
+    private static String listDerivateContentAsJson(MCRDerivate derObj) throws IOException {
         StringWriter sw = new StringWriter();
-        try {
-
-            MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
-            if (root != null) {
-                JsonWriter writer = new JsonWriter(sw);
-                Files.walkFileTree(root, new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId()));
-                writer.close();
-            }
-        } catch (IOException e) {
-            throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                "A problem occurred while fetching the data", e.getMessage()));
+        MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
+        if (root != null) {
+            JsonWriter writer = new JsonWriter(sw);
+            Files.walkFileTree(root, new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId()));
+            writer.close();
         }
         return sw.toString();
     }
-    
-    
 
     /**
      * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
@@ -551,47 +542,61 @@ public class MCRRestAPIObjectsHelper {
             "Please contact a developer!").createHttpResponse();
     }
 
-    public static Response listContents(String mcrIDString, String derIDString, String format) {
+    public static Response listContents(Request request, String mcrIDString, String derIDString, String format)
+        throws IOException {
         try {
 
-            if (format.equals(MCRRestAPIObjects.FORMAT_JSON) || format.equals(MCRRestAPIObjects.FORMAT_XML)) {
-                //ok
-            } else {
+            if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
                 MCRRestAPIError error = MCRRestAPIError.create(Response.Status.BAD_REQUEST,
                     "The syntax of one or more query parameters is wrong.", null);
                 error.addFieldError(MCRRestAPIFieldError.create("format",
                     "Allowed values for format are 'json' or 'xml'."));
                 throw new MCRRestAPIException(error);
             }
+            //TODO: parsing jdom documents is really necessary?
             MCRObject mcrObj = retrieveMCRObject(mcrIDString);
             MCRDerivate derObj = retrieveMCRDerivate(mcrObj, derIDString);
 
-            //output as XML
-            if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
-                Document docOut = new Document(listDerivateContent(mcrObj, derObj));
-                try {
-                    StringWriter sw = new StringWriter();
-                    XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-                    xout.output(docOut, sw);
-                    return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").build();
-                } catch (IOException e) {
+            MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
+            BasicFileAttributes readAttributes = Files.readAttributes(root, BasicFileAttributes.class);
+            Date lastModified = new Date(readAttributes.lastModifiedTime().toMillis());
+            ResponseBuilder responseBuilder = request.evaluatePreconditions(lastModified);
+            if (responseBuilder != null) {
+                return responseBuilder.build();
+            }
+            switch (format) {
+                case MCRRestAPIObjects.FORMAT_XML:
+                    Document docOut = new Document(listDerivateContent(mcrObj, derObj));
+                    try (StringWriter sw = new StringWriter()) {
+                        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+                        xout.output(docOut, sw);
+                        return response(sw.toString(), "application/xml", lastModified);
+                    } catch (IOException e) {
+                        return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
+                            "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
+                    }
+                case MCRRestAPIObjects.FORMAT_JSON:
+                    if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
+                        String result = listDerivateContentAsJson(derObj);
+                        return response(result, "application/json", lastModified);
+                    }
+                default:
                     return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                        "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
-                }
+                        "Unexepected program flow termination.", "Please contact a developer!").createHttpResponse();
             }
-
-            //output as JSON
-            if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-                String result = listDerivateContentAsJson(derObj);
-                return Response.ok(result).type("application/json; charset=UTF-8").build();
-            }
-
-            return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                "Unexepected program flow termination.", "Please contact a developer!").createHttpResponse();
-
         } catch (MCRRestAPIException rae) {
             return rae.getError().createHttpResponse();
         }
+    }
+
+    private static Response response(String response, String type, Date lastModified) {
+        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
+        String mimeType = type + "; charset=UTF-8";
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setNoTransform(false);
+        cacheControl.setMaxAge(0);
+        return Response.ok(responseBytes, mimeType).lastModified(lastModified)
+            .header("Content-Length", responseBytes.length).cacheControl(cacheControl).build();
     }
 
     /**
