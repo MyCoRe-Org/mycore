@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -58,7 +57,6 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -70,7 +68,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.restapi.v1.MCRRestAPIObjects;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
@@ -92,7 +89,7 @@ public class MCRRestAPIObjectsHelper {
 
     private static SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
-    public static Response showMCRObject(String pathParamId, String queryParamStyle, HttpServletRequest request) {
+    public static Response showMCRObject(String pathParamId, String queryParamStyle) {
         try {
             MCRObject mcrObj = retrieveMCRObject(pathParamId);
             Document doc = mcrObj.createXML();
@@ -106,8 +103,6 @@ public class MCRRestAPIObjectsHelper {
             if (MCRRestAPIObjects.STYLE_DERIVATEDETAILS.equals(queryParamStyle) && eStructure != null) {
                 Element eDerObjects = eStructure.getChild("derobjects");
                 if (eDerObjects != null) {
-                    MCRSession session = MCRServlet.getSession(request);
-                    session.beginTransaction();
                     for (Element eDer : (List<Element>) eDerObjects.getChildren("derobject")) {
                         String derID = eDer.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
                         try {
@@ -119,12 +114,11 @@ public class MCRRestAPIObjectsHelper {
 
                             eDer = eDer.getChild("mycorederivate").getChild("derivate");
                             eDer.addContent(listDerivateContent(mcrObj,
-                                MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID)), request));
+                                MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID))));
                         } catch (MCRException e) {
                             eDer.addContent(new Comment("Error: Derivate not found."));
                         }
                     }
-                    session.commitTransaction();
                 }
             }
 
@@ -145,15 +139,13 @@ public class MCRRestAPIObjectsHelper {
 
     }
 
-    public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID, HttpServletRequest request) {
-        MCRSession session = MCRServlet.getSession(request);
-        session.beginTransaction();
+    public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID) {
         try {
             MCRObject mcrObj = retrieveMCRObject(pathParamMcrID);
             MCRDerivate derObj = retrieveMCRDerivate(mcrObj, pathParamDerID);
 
             Document doc = derObj.createXML();
-            doc.getRootElement().addContent(listDerivateContent(mcrObj, derObj, request));
+            doc.getRootElement().addContent(listDerivateContent(mcrObj, derObj));
 
             StringWriter sw = new StringWriter();
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
@@ -168,15 +160,13 @@ public class MCRRestAPIObjectsHelper {
 
         } catch (MCRRestAPIException e) {
             return e.getError().createHttpResponse();
-        } finally {
-            session.commitTransaction();
         }
 
         // return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "Unexepected program flow termination.",
         //       "Please contact a developer!").createHttpResponse();
     }
 
-    private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj, HttpServletRequest request)
+    private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj)
         throws MCRRestAPIException {
         Element eContents = new Element("contents");
         eContents.setAttribute("mycoreobject", mcrObj.getId().toString());
@@ -561,10 +551,7 @@ public class MCRRestAPIObjectsHelper {
             "Please contact a developer!").createHttpResponse();
     }
 
-    public static Response listContents(HttpServletRequest request, String mcrIDString, String derIDString,
-        String format) {
-        MCRSession session = MCRServlet.getSession(request);
-        session.beginTransaction();
+    public static Response listContents(String mcrIDString, String derIDString, String format) {
         try {
 
             if (format.equals(MCRRestAPIObjects.FORMAT_JSON) || format.equals(MCRRestAPIObjects.FORMAT_XML)) {
@@ -581,7 +568,7 @@ public class MCRRestAPIObjectsHelper {
 
             //output as XML
             if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
-                Document docOut = new Document(listDerivateContent(mcrObj, derObj, request));
+                Document docOut = new Document(listDerivateContent(mcrObj, derObj));
                 try {
                     StringWriter sw = new StringWriter();
                     XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
@@ -604,8 +591,6 @@ public class MCRRestAPIObjectsHelper {
 
         } catch (MCRRestAPIException rae) {
             return rae.getError().createHttpResponse();
-        } finally {
-            session.commitTransaction();
         }
     }
 

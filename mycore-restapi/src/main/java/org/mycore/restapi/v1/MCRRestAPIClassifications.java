@@ -25,7 +25,6 @@ package org.mycore.restapi.v1;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import javax.servlet.http.HttpServlet;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -44,8 +43,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.hibernate.Transaction;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -54,7 +51,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -74,8 +70,7 @@ import com.google.gson.stream.JsonWriter;
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/classifications")
-public class MCRRestAPIClassifications extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+public class MCRRestAPIClassifications {
 
     private static Logger LOGGER = Logger.getLogger(MCRRestAPIClassifications.class);
 
@@ -94,7 +89,6 @@ public class MCRRestAPIClassifications extends HttpServlet {
     @Path("/")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     public Response listClassifications(@Context UriInfo info, @QueryParam("format") @DefaultValue("json") String format) {
-        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
         if (FORMAT_XML.equals(format)) {
             StringWriter sw = new StringWriter();
 
@@ -140,7 +134,6 @@ public class MCRRestAPIClassifications extends HttpServlet {
             } catch (IOException e) {
                 //toDo
             }
-            tx.commit();
         }
         return Response.status(com.sun.jersey.api.client.ClientResponse.Status.BAD_REQUEST).build();
     }
@@ -196,12 +189,7 @@ public class MCRRestAPIClassifications extends HttpServlet {
             return Response.serverError().status(Status.BAD_REQUEST).build();
             //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Please specify parameters format and classid.");
         }
-        Transaction t1 = null;
         try {
-            Transaction tx = MCRHIBConnection.instance().getSession().getTransaction();
-            if (tx == null || !tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
-                t1 = MCRHIBConnection.instance().getSession().beginTransaction();
-            }
             MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
             if (cl == null) {
                 return MCRRestAPIError.create(Response.Status.BAD_REQUEST, "Classification not found.",
@@ -243,10 +231,6 @@ public class MCRRestAPIClassifications extends HttpServlet {
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error("Error outputting classification", e);
             //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error outputting classification");
-        } finally {
-            if (t1 != null) {
-                t1.commit();
-            }
         }
         return null;
     }

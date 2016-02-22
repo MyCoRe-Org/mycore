@@ -28,7 +28,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-import javax.servlet.http.HttpServlet;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -50,10 +49,8 @@ import org.mycore.solr.MCRSolrConstants;
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/search")
-public class MCRRestAPISearch extends HttpServlet {
+public class MCRRestAPISearch {
     private static Logger LOGGER = Logger.getLogger(MCRRestAPISearch.class);
-
-    private static final long serialVersionUID = 1L;
 
     public static final String FORMAT_JSON = "json";
 

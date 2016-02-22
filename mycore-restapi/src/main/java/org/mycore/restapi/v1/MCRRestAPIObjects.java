@@ -22,7 +22,6 @@
 
 package org.mycore.restapi.v1;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -118,9 +117,8 @@ public class MCRRestAPIObjects {
     @GET
     @Produces(MediaType.TEXT_XML)
     @Path("/{value}")
-    public Response returnMCRObject(@Context HttpServletRequest request, @PathParam("value") String id,
-        @QueryParam("style") String style) {
-        return MCRRestAPIObjectsHelper.showMCRObject(id, style, request);
+    public Response returnMCRObject(@PathParam("value") String id, @QueryParam("style") String style) {
+        return MCRRestAPIObjectsHelper.showMCRObject(id, style);
 
     }
 
@@ -137,9 +135,9 @@ public class MCRRestAPIObjects {
     @GET
     @Produces(MediaType.TEXT_XML)
     @Path("/{mcrid}/derivates/{derid}")
-    public Response returnDerivate(@Context HttpServletRequest request, @PathParam("mcrid") String mcrid,
-        @PathParam("derid") String derid, @QueryParam("style") String style) {
-        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, request);
+    public Response returnDerivate(@PathParam("mcrid") String mcrid, @PathParam("derid") String derid,
+        @QueryParam("style") String style) {
+        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid);
 
     }
 
@@ -156,9 +154,9 @@ public class MCRRestAPIObjects {
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @Path("/{mcrid}/derivates/{derid}/contents")
-    public Response listContents(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrid") String mcrID, @PathParam("derid") String derID,
+    public Response listContents(@Context UriInfo info, @PathParam("mcrid") String mcrID,
+        @PathParam("derid") String derID,
         @QueryParam("format") @DefaultValue("xml") String format) {
-        return MCRRestAPIObjectsHelper.listContents(request, mcrID, derID, format);
+        return MCRRestAPIObjectsHelper.listContents(mcrID, derID, format);
     }
 }

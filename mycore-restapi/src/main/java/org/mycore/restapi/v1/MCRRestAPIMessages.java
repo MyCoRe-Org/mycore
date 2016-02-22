@@ -31,7 +31,6 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServlet;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -62,7 +61,7 @@ import com.sun.jersey.api.client.ClientResponse;
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/messages")
-public class MCRRestAPIMessages extends HttpServlet {
+public class MCRRestAPIMessages {
     private static final long serialVersionUID = 1L;
 
     public static final String FORMAT_JSON = "json";
