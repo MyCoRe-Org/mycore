@@ -87,7 +87,7 @@ public class MCRDataURL implements Serializable {
     /**
      * Build a "data" URL for given {@link NodeList}, encoding, mime-type and charset.
      * Should encoding be <code>null</code>, it is detect from mime-type.
-     * 
+     *
      * @param nodeList the node list
      * @param encoding the {@link MCRDataURLEncoding}
      * @param mimeType the mime-type
@@ -150,8 +150,8 @@ public class MCRDataURL implements Serializable {
     /**
      * Build a "data" URL for given {@link String}, encoding, mime-type and charset.
      * Should encoding be <code>null</code>, it is detect from mime-type.
-     * 
-     * @param nodeList the string
+     *
+     * @param str the value
      * @param encoding the {@link MCRDataURLEncoding}
      * @param mimeType the mime-type
      * @param charset the charset
@@ -181,7 +181,7 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Build a "data" URL for given {@link NodeList}, mime-type and <code>UTF-8</code> as charset.
-     * 
+     *
      * @param nodeList the node list
      * @param mimeType the mime-type
      * @return a string with "data" URL
@@ -195,7 +195,7 @@ public class MCRDataURL implements Serializable {
 
     /**
      * Build a "data" URL for given {@link String}, mime-type and <code>UTF-8</code> as charset.
-     * 
+     *
      * @param str the string
      * @param mimeType the mime-type
      * @return a string with "data" URL
@@ -208,9 +208,9 @@ public class MCRDataURL implements Serializable {
     }
 
     /**
-     * Build a "data" URL for given {@link NodeList} with mime-type based encoding, 
+     * Build a "data" URL for given {@link NodeList} with mime-type based encoding,
      * <code>text/xml</code> as mime-type and <code>UTF-8</code> as charset.
-     * 
+     *
      * @param nodeList the node list
      * @return a string with "data" URL
      * @throws TransformerException
@@ -221,9 +221,9 @@ public class MCRDataURL implements Serializable {
     }
 
     /**
-     * Build a "data" URL for given {@link String} with mime-type based encoding, 
+     * Build a "data" URL for given {@link String} with mime-type based encoding,
      * <code>text/xml</code> as mime-type and <code>UTF-8</code> as charset.
-     * 
+     *
      * @param str the node list
      * @return a string with "data" URL
      * @throws TransformerException
