@@ -23,19 +23,26 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Implements methods to handle MCRMetaNumber fields of a metadata object. 
  * The MCRMetaNumber class presents a number value in decimal
- * format and optional a type and a measurement. The number can have the format
- * <em>xxxx.xxx</em> or <em>xxxx,xxx</em>. Only three digits after the dot, 
- * and nine before are stored.
+ * format and optional a type and a measurement. The input number can have the format
+ * like <em>xxxx.x</em> or <em>xxxx,xxx</em>. <br />
+ * The String output format of the numer is determined by the property
+ * <em>MCR.Metadata.MetaNumber.FractionDigits</em> and the default Locale.
+ * For more digits in fraction as defind for output the system will round the number!
  * <p>
  * &lt;tag class="MCRMetaNumber" heritable="..."&gt; <br>
- * &lt;subtag type="..." xml:lang="..." measurement="..."&gt; <br>
+ * &lt;subtag type="..." measurement="..." dimension="..."&gt; <br>
  * xxxx.xxx or xxx <br>
  * &lt;/subtag&gt; <br>
  * &lt;/tag&gt; <br>
@@ -50,70 +57,105 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     public static final int MAX_MEASUREMENT_LENGTH = 64;
 
     // MCRMetaNumber data
-    private double number;
+    private BigDecimal number;
 
     private String dimension;
 
     private String measurement;
 
     private static final Logger LOGGER = Logger.getLogger(MCRMetaNumber.class);
+    
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
+    private int FRACTION_DIGITS;
 
     /**
-     * Sets the language element to <b>en</b>, the number to zero,
-     * the measurement and the dimension to an empty string.
+     * This is the constructor. <br>
+     * Sets the number to zero, the measurement and the dimension to an empty string.
      */
     public MCRMetaNumber() {
         super();
-        number = 0.;
-    }
-
-    /**
-     * The language element was set. If the value of <em>default_lang</em> is
-     * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The dimension element was set to
-     * the value of <em>set_dimension<em>, if it is null, an empty string was set
-     * to the type element. The measurement element was set to the value of
-     * <em>set_measurement<em>, if it is null, an empty string was set
-     * to the measurement element.  The number string <em>set_number</em>
-     * was set to the number element, if it is null or not a number, a
-     * MCRException was thowed.
-     * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value >= 0
-     * @param set_dimension    the optional dimension string
-     * @param set_measurement  the optional measurement string
-     * @param set_number       the number string
-     * @exception MCRException if the set_subtag value is null or empty or if
-     *   the number string is not in a number format
-     */
-    public MCRMetaNumber(String set_subtag, int set_inherted, String set_dimension, String set_measurement, String set_number) throws MCRException {
-        this(set_subtag, set_inherted, set_dimension, set_measurement, 0.);
-        setNumber(set_number);
+        FRACTION_DIGITS = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits",3);
+        number = new BigDecimal("0");
+        dimension = "";
+        measurement = "";
     }
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
-     * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The dimension element was set to
-     * the value of <em>set_dimension<em>, if it is null, an empty string was set
-     * to the type element. The measurement element was set to the value of
-     * <em>set_measurement<em>, if it is null, an empty string was set
-     * to the measurement element.  The number <em>set_number</em>
-     * was set to the number element.
-     * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value >= 0
-     * @param set_dimension    the optional dimension string
-     * @param set_measurement  the optional measurement string
-     * @param set_number       the number value
-     * @exception MCRException if the set_subtag value is null or empty
+     * The subtag element was set to the value of <em>subtag</em>. 
+     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown. 
+     * The dimension element was set to the value of <em>dimension</em>, if it is null, 
+     * an empty string was set to the dimension element. 
+     * The measurement element was set to the value of <em>measurement</em>, if it is null, 
+     * an empty string was set to the measurement element.
+     * The number string <em>number</em> was set to the number element, if it is null, empty or not a number, a
+     * MCRException will be thown.
+     * @param subtag       the name of the subtag
+     * @param inherted     a value &gt;= 0
+     * @param dimension    the optional dimension string
+     * @param measurement  the optional measurement string
+     * @param number       the number string
+     * @exception MCRException if the subtag value is null or empty or if
+     *   the number string is not in a number format
      */
-    public MCRMetaNumber(String set_subtag, int set_inherted, String set_dimension, String set_measurement, double set_number) throws MCRException {
-        super(set_subtag, null, null, set_inherted);
-        number = set_number;
-        dimension = set_dimension;
-        measurement = set_measurement;
+    public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, String number)
+        throws MCRException {
+        super(subtag, null, null, inherted);
+        FRACTION_DIGITS = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits",3);
+        setDimension(dimension);
+        setMeasurement(measurement);
+        setNumber(number);
+    }
+
+    /**
+     * This is the constructor. <br>
+     * The subtag element was set to the value of <em>subtag</em>. 
+     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown. 
+     * The dimension element was set to the value of <em>dimension</em>, if it is null, 
+     * an empty string was set to the dimension element. 
+     * The measurement element was set to the value of <em>measurement</em>, if it is null, 
+     * an empty string was set to the measurement element.
+     * The number <em>number</em> was set to the number element, if it is null a MCRException will be thrown.
+     * @param subtag       the name of the subtag
+     * @param inherted     a value &gt;= 0
+     * @param dimension    the optional dimension string
+     * @param measurement  the optional measurement string
+     * @param number       the number string
+     * @exception MCRException if the subtag value is null or empty or if
+     *   the number string is not in a number format
+     */
+    public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, BigDecimal number)
+        throws MCRException {
+        super(subtag, null, null, inherted);
+        setDimension(dimension);
+        setMeasurement(measurement);
+        setNumber(number);
+    }
+
+    /**
+     * This is the constructor. <br>
+     * The subtag element was set to the value of <em>subtag</em>. 
+     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown. 
+     * The dimension element was set to the value of <em>dimension</em>, if it is null, 
+     * an empty string was set to the dimension element. 
+     * The measurement element was set to the value of <em>measurement</em>, if it is null, 
+     * an empty string was set to the measurement element.
+     * The number <em>number</em> was convert to the number element, if it is null a MCRException will be thrown.
+     * @param subtag       the name of the subtag
+     * @param inherted     a value &gt;= 0
+     * @param dimension    the optional dimension string
+     * @param measurement  the optional measurement string
+     * @param number       the number string
+     * @exception MCRException if the subtag value is null or empty or if
+     *   the number string is not in a number format
+     */
+    @Deprecated
+    public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, double number)
+        throws MCRException {
+        super(subtag, null, null, inherted);
+        setDimension(dimension);
+        setMeasurement(measurement);
+        setNumber(number);
     }
 
     /* (non-Javadoc)
@@ -140,40 +182,48 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * This method set the dimension, if it is null, an empty string was set to
      * the dimension element.
      * 
-     * @param set_dimension
+     * @param dimension
      *            the dimension string
      */
-    public final void setDimension(String set_dimension) {
-        dimension = set_dimension;
+    public final void setDimension(String dimension) {
+        if (dimension == null) {
+            this.dimension = "";
+        } else {
+            this.dimension = dimension;
+        }
     }
 
     /**
      * This method set the measurement, if it is null, an empty string was set
      * to the measurement element.
      * 
-     * @param set_measurement
+     * @param measurement
      *            the measurement string
      */
-    public final void setMeasurement(String set_measurement) {
-        measurement = set_measurement;
+    public final void setMeasurement(String measurement) {
+        if (measurement == null) {
+            this.measurement = "";
+        } else {
+            this.measurement = measurement;
+        }
     }
 
     /**
      * This method set the number, if it is null or not a number, a MCRException
      * was thowed.
      * 
-     * @param set_number
+     * @param number
      *            the number string
      * @exception MCRException
      *                if the number string is not in a number format
      */
-    public final void setNumber(String set_number) {
+    public final void setNumber(String number) {
         try {
-            if (set_number == null) {
+            if (number == null) {
                 throw new MCRException("Number cannot be null");
             }
-            String new_number = set_number.replace(',', '.');
-            number = Double.parseDouble(new_number);
+            String tmp_number = number.replace(',', '.');
+            this.number = new BigDecimal(tmp_number);
         } catch (NumberFormatException e) {
             throw new MCRException("The format of a number is invalid.");
         }
@@ -182,11 +232,31 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     /**
      * This method set the number.
      * 
-     * @param set_number
-     *            the number value
+     * @param number
+     *            the number value as double datatype
      */
-    public final void setNumber(double set_number) {
-        number = set_number;
+    @Deprecated
+    public final void setNumber(double number) {
+        try {
+            this.number = new BigDecimal(number);
+        } catch (NumberFormatException e) {
+            throw new MCRException("The format of a number is invalid.");
+        }
+    }
+
+    /**
+     * This method set the number, if it is null a MCRException was thowed.
+     * 
+     * @param number
+     *            the number as BigDecimal
+     * @exception MCRException
+     *                if the number string is null
+     */
+    public final void setNumber(BigDecimal number) {
+        if (number == null) {
+            throw new MCRException("Number cannot be null");
+        }
+        this.number = number;
     }
 
     /**
@@ -207,10 +277,38 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         return measurement;
     }
 
+    /**
+     * This method get the number element.
+     * 
+     * @return the number converted to a double
+     */
     public final double getNumber() {
+        return number.doubleValue();
+    }
+
+    /**
+     * This method get the number element.
+     * 
+     * @return the number as BigDecimal
+     */
+    public final BigDecimal getNumberAsBigDecimal() {
         return number;
     }
 
+    /**
+     * This method get the number element as formatted String. The number of
+     * fraction digits is defined by property MCR.Metadata.MetaNumber.FractionDigits
+     * 
+     * @return the number as formatted String
+     */
+    public final String getNumberAsString() {
+        final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
+        numberFormat.setGroupingUsed(false);
+        numberFormat.setMaximumFractionDigits(FRACTION_DIGITS);
+        numberFormat.setMinimumFractionDigits(FRACTION_DIGITS);
+        return  numberFormat.format(number);
+    }
+    
     /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
@@ -244,9 +342,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         if (measurement != null && measurement.length() != 0) {
             elm.setAttribute("measurement", measurement);
         }
-
-        elm.addContent(String.valueOf(number));
-
+        elm.addContent(getNumberAsString());
         return elm;
     }
 
@@ -263,7 +359,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         super.debugDefault();
         LOGGER.debug("Measurement        = " + measurement);
         LOGGER.debug("Dimension          = " + dimension);
-        LOGGER.debug("Value              = " + number);
+        LOGGER.debug("Value              = " + number.toPlainString());
         LOGGER.debug("");
     }
 }
