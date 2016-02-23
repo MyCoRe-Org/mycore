@@ -127,39 +127,29 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
         handleStoreEvent(evt, der);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectRepaired(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
-     */
-    @Override
-    protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        handleStoreEvent(evt, obj);
-    }
-
-    /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleDerivateRepaired(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRDerivate)
-     */
-    @Override
-    protected final void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
-        handleStoreEvent(evt, der);
-    }
-
     private void handleStoreEvent(MCREvent evt, MCRBase obj) {
         String eventType = evt.getEventType();
         MCRObjectID id = obj.getId();
         try {
-            if (MCREvent.UPDATE_EVENT.equals(eventType) || MCREvent.CREATE_EVENT.equals(eventType)) {
-                MCRBaseContent content = new MCRBaseContent(obj);
-                Date modifyDate = obj.getService().getDate("modifydate");
-                if (MCREvent.UPDATE_EVENT.equals(eventType)) {
-                    metaDataManager.update(id, content, modifyDate);
-                } else {
-                    metaDataManager.create(id, content, modifyDate);
-                }
-                evt.put("content", content);
-            } else if (MCREvent.DELETE_EVENT.equals(eventType)) {
-                metaDataManager.delete(id);
-            } else {
-                throw new IllegalArgumentException("Invalid event type " + eventType + " for object " + id);
+            switch (eventType) {
+                case MCREvent.UPDATE_EVENT:
+                case MCREvent.CREATE_EVENT:
+                    MCRBaseContent content = new MCRBaseContent(obj);
+                    Date modified = obj.getService().getDate("modifydate");
+                    switch (eventType) {
+                        case MCREvent.UPDATE_EVENT:
+                            metaDataManager.update(id, content, modified);
+                            break;
+                        case MCREvent.CREATE_EVENT:
+                            metaDataManager.create(id, content, modified);
+                            break;
+                    }
+                    evt.put("content", content);
+                    break;
+                case MCREvent.DELETE_EVENT:
+                    metaDataManager.delete(id);
+                default:
+                    throw new IllegalArgumentException("Invalid event type " + eventType + " for object " + id);
             }
         } catch (IOException e) {
             throw new MCRPersistenceException("Error while handling '" + eventType + "' event of '" + id + "'", e);
