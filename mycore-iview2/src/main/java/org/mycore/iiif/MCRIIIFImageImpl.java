@@ -2,6 +2,7 @@ package org.mycore.iiif;
 
 import java.awt.image.BufferedImage;
 
+import org.mycore.access.MCRAccessException;
 import org.mycore.iiif.model.MCRIIIFImageInformation;
 import org.mycore.iiif.model.MCRIIIFImageQuality;
 import org.mycore.iiif.model.MCRIIIFImageSourceRegion;
@@ -16,9 +17,9 @@ public interface MCRIIIFImageImpl {
                           MCRIIIFImageTargetSize targetSize,
                           MCRIIIFImageTargetRotation rotation,
                           MCRIIIFImageQuality imageQuality,
-                          String format) throws ImageNotFoundException, ProvidingException, UnsupportedFormatException;
+                          String format) throws ImageNotFoundException, ProvidingException, UnsupportedFormatException, MCRAccessException;
 
-    MCRIIIFImageInformation getInformation(String identifier) throws ImageNotFoundException, ProvidingException;
+    MCRIIIFImageInformation getInformation(String identifier) throws ImageNotFoundException, ProvidingException, MCRAccessException;
 
     MCRIIIFProfile getProfile();
 

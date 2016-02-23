@@ -15,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.MCRIIIFImageImpl;
@@ -58,6 +59,8 @@ public class MCRIIIFImageResource {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (MCRIIIFImageImpl.ProvidingException | UnsupportedEncodingException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        } catch (MCRAccessException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
     }
 
@@ -113,6 +116,8 @@ public class MCRIIIFImageResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (MCRIIIFImageImpl.ProvidingException | UnsupportedEncodingException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        } catch (MCRAccessException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
     }
 

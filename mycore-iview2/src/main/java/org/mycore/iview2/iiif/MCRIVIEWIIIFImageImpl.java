@@ -17,6 +17,8 @@ import javax.imageio.ImageReader;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.mycore.access.MCRAccessException;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -58,7 +60,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
                                  MCRIIIFImageTargetSize targetSize,
                                  MCRIIIFImageTargetRotation rotation,
                                  MCRIIIFImageQuality imageQuality,
-                                 String format) throws ImageNotFoundException, ProvidingException, UnsupportedFormatException {
+                                 String format) throws ImageNotFoundException, ProvidingException, UnsupportedFormatException, MCRAccessException {
 
 
         long resultingSize = (long) targetSize.getHeight() * targetSize.getWidth() * (imageQuality.equals(MCRIIIFImageQuality.color) ? 3 : 1);
@@ -71,6 +73,8 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
         if (!SUPPORTED_FORMATS.contains(format.toLowerCase(Locale.ENGLISH))) {
             throw new MCRIIIFImageImpl.UnsupportedFormatException(format);
         }
+
+
 
         Path tiledFile = getTiledFile(identifier);
         MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
@@ -164,7 +168,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
         return targetImage;
     }
 
-    public MCRIIIFImageInformation getInformation(String identifier) throws ImageNotFoundException, ProvidingException {
+    public MCRIIIFImageInformation getInformation(String identifier) throws ImageNotFoundException, ProvidingException, MCRAccessException {
         Path tiledFile = getTiledFile(identifier);
         MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
 
@@ -217,7 +221,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
         return tiledPictureProps;
     }
 
-    private Path getTiledFile(String identifier) throws ImageNotFoundException {
+    private Path getTiledFile(String identifier) throws ImageNotFoundException, MCRAccessException {
         String[] splittedIdentifier = identifier.split("/", 2);
 
         if (splittedIdentifier.length < 2) {
@@ -229,6 +233,10 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
 
         if (!Files.exists(MCRPath.getPath(derivate, imagePath))) {
             throw new ImageNotFoundException(identifier);
+        }
+
+        if(!MCRAccessManager.checkPermission(derivate, "view-derivate")){
+            throw MCRAccessException.missingPermission("View the file " + imagePath + " in " + derivate,derivate,"view-derivate");
         }
 
         return MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
