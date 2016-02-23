@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -33,20 +33,24 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
- * Implements methods to handle MCRMetaNumber fields of a metadata object. 
+ * <p>
+ * Implements methods to handle MCRMetaNumber fields of a metadata object.
  * The MCRMetaNumber class presents a number value in decimal
  * format and optional a type and a measurement. The input number can have the format
- * like <em>xxxx.x</em> or <em>xxxx,xxx</em>. <br />
+ * like <em>xxxx.x</em> or <em>xxxx,xxx</em>.
+ * </p>
+ * <p>
  * The String output format of the numer is determined by the property
  * <em>MCR.Metadata.MetaNumber.FractionDigits</em> and the default Locale.
  * For more digits in fraction as defind for output the system will round the number!
- * <p>
- * &lt;tag class="MCRMetaNumber" heritable="..."&gt; <br>
- * &lt;subtag type="..." measurement="..." dimension="..."&gt; <br>
- * xxxx.xxx or xxx <br>
- * &lt;/subtag&gt; <br>
- * &lt;/tag&gt; <br>
- * 
+ * </p>
+ * <pre>
+ * &lt;tag class="MCRMetaNumber" heritable="..."&gt;
+ *   &lt;subtag type="..." measurement="..." dimension="..."&gt;
+ *     xxxx.xxx or xxx
+ *   &lt;/subtag&gt;
+ * &lt;/tag&gt;
+ * </pre>
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -64,7 +68,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     private String measurement;
 
     private static final Logger LOGGER = Logger.getLogger(MCRMetaNumber.class);
-    
+
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
     private int FRACTION_DIGITS;
 
@@ -82,11 +86,11 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The subtag element was set to the value of <em>subtag</em>. 
-     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown. 
-     * The dimension element was set to the value of <em>dimension</em>, if it is null, 
-     * an empty string was set to the dimension element. 
-     * The measurement element was set to the value of <em>measurement</em>, if it is null, 
+     * The subtag element was set to the value of <em>subtag</em>.
+     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown.
+     * The dimension element was set to the value of <em>dimension</em>, if it is null,
+     * an empty string was set to the dimension element.
+     * The measurement element was set to the value of <em>measurement</em>, if it is null,
      * an empty string was set to the measurement element.
      * The number string <em>number</em> was set to the number element, if it is null, empty or not a number, a
      * MCRException will be thown.
@@ -109,11 +113,11 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The subtag element was set to the value of <em>subtag</em>. 
-     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown. 
-     * The dimension element was set to the value of <em>dimension</em>, if it is null, 
-     * an empty string was set to the dimension element. 
-     * The measurement element was set to the value of <em>measurement</em>, if it is null, 
+     * The subtag element was set to the value of <em>subtag</em>.
+     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown.
+     * The dimension element was set to the value of <em>dimension</em>, if it is null,
+     * an empty string was set to the dimension element.
+     * The measurement element was set to the value of <em>measurement</em>, if it is null,
      * an empty string was set to the measurement element.
      * The number <em>number</em> was set to the number element, if it is null a MCRException will be thrown.
      * @param subtag       the name of the subtag
@@ -134,11 +138,11 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The subtag element was set to the value of <em>subtag</em>. 
-     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown. 
-     * The dimension element was set to the value of <em>dimension</em>, if it is null, 
-     * an empty string was set to the dimension element. 
-     * The measurement element was set to the value of <em>measurement</em>, if it is null, 
+     * The subtag element was set to the value of <em>subtag</em>.
+     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown.
+     * The dimension element was set to the value of <em>dimension</em>, if it is null,
+     * an empty string was set to the dimension element.
+     * The measurement element was set to the value of <em>measurement</em>, if it is null,
      * an empty string was set to the measurement element.
      * The number <em>number</em> was convert to the number element, if it is null a MCRException will be thrown.
      * @param subtag       the name of the subtag
@@ -181,7 +185,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     /**
      * This method set the dimension, if it is null, an empty string was set to
      * the dimension element.
-     * 
+     *
      * @param dimension
      *            the dimension string
      */
@@ -196,7 +200,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     /**
      * This method set the measurement, if it is null, an empty string was set
      * to the measurement element.
-     * 
+     *
      * @param measurement
      *            the measurement string
      */
@@ -211,7 +215,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     /**
      * This method set the number, if it is null or not a number, a MCRException
      * was thowed.
-     * 
+     *
      * @param number
      *            the number string
      * @exception MCRException
@@ -231,7 +235,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This method set the number.
-     * 
+     *
      * @param number
      *            the number value as double datatype
      */
@@ -246,7 +250,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This method set the number, if it is null a MCRException was thowed.
-     * 
+     *
      * @param number
      *            the number as BigDecimal
      * @exception MCRException
@@ -261,7 +265,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This method get the dimension element.
-     * 
+     *
      * @return the dimension String
      */
     public final String getDimension() {
@@ -270,7 +274,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This method get the measurement element.
-     * 
+     *
      * @return the measurement String
      */
     public final String getMeasurement() {
@@ -279,7 +283,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This method get the number element.
-     * 
+     *
      * @return the number converted to a double
      */
     public final double getNumber() {
@@ -288,7 +292,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This method get the number element.
-     * 
+     *
      * @return the number as BigDecimal
      */
     public final BigDecimal getNumberAsBigDecimal() {
@@ -298,7 +302,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     /**
      * This method get the number element as formatted String. The number of
      * fraction digits is defined by property MCR.Metadata.MetaNumber.FractionDigits
-     * 
+     *
      * @return the number as formatted String
      */
     public final String getNumberAsString() {
@@ -308,11 +312,11 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         numberFormat.setMinimumFractionDigits(FRACTION_DIGITS);
         return  numberFormat.format(number);
     }
-    
+
     /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      */
@@ -325,9 +329,9 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     }
 
     /**
-     * This method creates an XML element containing all data in this instance, 
+     * This method creates an XML element containing all data in this instance,
      * as defined by the MyCoRe XML MCRNumber definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this instance is not valid
      * @return a JDOM Element with the XML MCRNumber part
