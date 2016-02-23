@@ -235,7 +235,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
             throw new ImageNotFoundException(identifier);
         }
 
-        if(!MCRAccessManager.checkPermission(derivate, "view-derivate")){
+        if (!MCRAccessManager.checkPermission(derivate, MCRAccessManager.PERMISSION_READ) && !MCRAccessManager.checkPermission(derivate, "view-derivate")) {
             throw MCRAccessException.missingPermission("View the file " + imagePath + " in " + derivate,derivate,"view-derivate");
         }
 
