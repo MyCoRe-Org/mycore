@@ -148,6 +148,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
                     break;
                 case MCREvent.DELETE_EVENT:
                     metaDataManager.delete(id);
+                    break;
                 default:
                     throw new IllegalArgumentException("Invalid event type " + eventType + " for object " + id);
             }
