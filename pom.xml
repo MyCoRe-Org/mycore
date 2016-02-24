@@ -29,7 +29,7 @@
     <jersey.version>1.19</jersey.version>
     <changelog.since>2015-11-06</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2015.12</changes.version>
+    <changes.version>2016.02</changes.version>
     <site.suffix />
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
