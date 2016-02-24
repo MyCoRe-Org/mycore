@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>28-SNAPSHOT</version>
+    <version>28</version>
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2015.12-SNAPSHOT</version>
+  <version>2016.02</version>
   <name>MyCoRe</name>
   <description>
     MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -63,9 +62,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2016.02</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2016.02</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2016.02</url>
   </scm>
   <profiles>
     <profile>
@@ -674,13 +673,13 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-viewer</artifactId>
-        <version>0.7-SNAPSHOT</version>
+        <version>0.7</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-model</artifactId>
-        <version>0.9-SNAPSHOT</version>
+        <version>0.9</version>
         <exclusions>
           <exclusion>
             <groupId>log4j</groupId>
@@ -691,7 +690,7 @@
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-editor-frontend</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -702,12 +701,12 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh-dataprovider</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
@@ -1081,7 +1080,7 @@
       <dependency>
         <groupId>org.mycore.sword</groupId>
         <artifactId>easy-sword2-lib</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
         <exclusions>
           <exclusion>
             <groupId>log4j</groupId>
