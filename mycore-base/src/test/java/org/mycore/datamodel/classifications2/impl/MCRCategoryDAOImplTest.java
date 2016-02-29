@@ -26,6 +26,7 @@ package org.mycore.datamodel.classifications2.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -40,10 +41,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.jdom2.Document;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +57,7 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
+import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRStringTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.xml.sax.SAXParseException;
@@ -84,7 +88,14 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
             startNewTransaction();
             MCRCategoryImpl rootNode = getRootCategoryFromSession();
             if (rootNode != null) {
-                checkLeftRightLevelValue(rootNode, 0, 0);
+                try {
+                    checkLeftRightLevelValue(rootNode, 0, 0);
+                } catch (AssertionError e) {
+                    LogManager.getLogger().error("Error while checking left, right an level values in database.");
+                    new XMLOutputter(Format.getPrettyFormat()).output(MCRCategoryTransformer.getMetaDataDocument(rootNode, false), System.out);
+                    printCategoryTable();
+                    throw e;
+                }
             }
         } finally {
             super.tearDown();
@@ -490,7 +501,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     }
 
     /**
-     * tests relink child to grantparent and removal of parent.
+     * tests relink child to grandparent and removal of parent.
      *
      */
     @Test
@@ -499,8 +510,12 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategory europe = category.getChildren().get(0);
         MCRCategory germany = europe.getChildren().get(0);
         europe.getChildren().remove(0);
+        assertNull("Germany should not have a parent right now", germany.getParent());
         category.getChildren().remove(0);
+        assertNull("Europe should not have a parent right now", europe.getParent());
         category.getChildren().add(germany);
+        assertEquals("Germany should not have world as parent right now", category.getId(),
+            germany.getParent().getId());
         DAO.replaceCategory(category);
         startNewTransaction();
         MCRCategory rootNode = getRootCategoryFromSession();
@@ -509,14 +524,14 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
             .getChildren().get(0).getLabels().size());
     }
 
-    // @Test
+    @Test
     public void replaceCategoryWithItself() {
         addWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategory germany = europe.getChildren().get(0);
         DAO.replaceCategory(germany);
         startNewTransaction();
-        MCRCategory rootNode = getRootCategoryFromSession();
+        getRootCategoryFromSession();
     }
 
     /**
@@ -601,12 +616,12 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
                     ResultSet resultSet = statement.executeQuery("SELECT * FROM MCRCategory");
                     printResultSet(resultSet, System.out);
                 } catch (SQLException e1) {
-                    Logger.getLogger(getClass()).warn("Error while querying MCRCategory", e1);
+                    LogManager.getLogger().warn("Error while querying MCRCategory", e1);
                 } finally {
                     statement.close();
                 }
             } catch (SQLException e2) {
-                Logger.getLogger(getClass()).warn("Error while querying MCRCategory", e2);
+                LogManager.getLogger().warn("Error while querying MCRCategory", e2);
             }
         });
     }

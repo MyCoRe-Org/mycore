@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -47,6 +49,7 @@ import org.hibernate.criterion.Subqueries;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRStreamUtils;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -100,13 +103,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             levelStart = parent.getLevel() + 1;
             leftStart = parent.getRight();
             if (position > parent.getChildren().size()) {
-                throw new IndexOutOfBoundsException("Cannot add category as child #" + position + ", when there are only "
+                throw new IndexOutOfBoundsException(
+                    "Cannot add category as child #" + position + ", when there are only "
                         + parent.getChildren().size() + " children.");
             }
         }
         LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes...");
         final MCRCategoryImpl wrapCategory = MCRCategoryImpl.wrapCategory(category, parent,
-                parent == null ? category.getRoot() : parent.getRoot());
+            parent == null ? category.getRoot() : parent.getRoot());
         wrapCategory.calculateLeftRightAndLevel(leftStart, levelStart);
         // always add +1 for the current node
         int nodes = 1 + (wrapCategory.getRight() - wrapCategory.getLeft()) / 2;
@@ -196,7 +200,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Query q;
         if (id.isRootID()) {
             q = getHibConnection()
-                    .getNamedQuery(CATEGRORY_CLASS.getName() + (fetchAllChildren ? ".prefetchClassQuery" : ".prefetchClassLevelQuery"));
+                .getNamedQuery(CATEGRORY_CLASS.getName()
+                    + (fetchAllChildren ? ".prefetchClassQuery" : ".prefetchClassLevelQuery"));
             if (!fetchAllChildren) {
                 q.setInteger("endlevel", childLevel);
             }
@@ -208,7 +213,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 return null;
             }
             q = getHibConnection()
-                    .getNamedQuery(CATEGRORY_CLASS.getName() + (fetchAllChildren ? ".prefetchCategQuery" : ".prefetchCategLevelQuery"));
+                .getNamedQuery(CATEGRORY_CLASS.getName()
+                    + (fetchAllChildren ? ".prefetchCategQuery" : ".prefetchCategLevelQuery"));
             if (!fetchAllChildren) {
                 q.setInteger("endlevel", category.getLevel() + childLevel);
             }
@@ -244,7 +250,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 return new MCRCategoryChildList(null, null);
             }
             Criteria c = session.createCriteria(CATEGRORY_CLASS).add(Subqueries.propertyEq("parent", DetachedCriteria
-                    .forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(getCategoryCriterion(cid))));
+                .forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID"))
+                .add(getCategoryCriterion(cid))));
             c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
             c.setCacheable(true);
             return c.list();
@@ -276,7 +283,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         try {
             Criteria c = session.createCriteria(CATEGRORY_CLASS);
             c.add(Restrictions.eq("left", LEFT_START_VALUE));
-            c.setProjection(Projections.projectionList().add(Projections.property("rootID")).add(Projections.property("categID")));
+            c.setProjection(
+                Projections.projectionList().add(Projections.property("rootID")).add(Projections.property("categID")));
             c.setCacheable(true);
             List<Object[]> result = c.list();
             List<MCRCategoryID> classIds = new ArrayList<MCRCategoryID>(result.size());
@@ -365,7 +373,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         moveCategory(id, newParentID, index);
     }
 
-    private MCRCategoryImpl getCommonAncestor(MCRHIBConnection connection, MCRCategoryImpl node1, MCRCategoryImpl node2) {
+    private MCRCategoryImpl getCommonAncestor(MCRHIBConnection connection, MCRCategoryImpl node1,
+        MCRCategoryImpl node2) {
         if (!node1.getRootID().equals(node2.getRootID())) {
             return null;
         }
@@ -414,89 +423,88 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     public Collection<MCRCategoryImpl> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
         if (!exist(newCategory.getId())) {
-            throw new IllegalArgumentException("MCRCategory can not be replaced. MCRCategoryID '" + newCategory.getId() + "' is unknown.");
+            throw new IllegalArgumentException(
+                "MCRCategory can not be replaced. MCRCategoryID '" + newCategory.getId() + "' is unknown.");
         }
         final MCRHIBConnection connection = getHibConnection();
         Session session = connection.getSession();
         MCRCategoryImpl oldCategory = getByNaturalID(session, newCategory.getId());
+        int oldLevel = oldCategory.getLevel();
+        int oldLeft = oldCategory.getLeft();
         // old Map with all Categories referenced by ID
-        Map<MCRCategoryID, MCRCategoryImpl> oldMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
-        fillIDMap(oldMap, oldCategory);
+        Map<MCRCategoryID, MCRCategoryImpl> oldMap = toMap(oldCategory);
         final MCRCategoryImpl copyDeepImpl = copyDeep(newCategory, -1);
-        MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(copyDeepImpl, oldCategory.getParent(), oldCategory.getRoot());
+        MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(copyDeepImpl, oldCategory.getParent(),
+            oldCategory.getRoot());
         // new Map with all Categories referenced by ID
-        Map<MCRCategoryID, MCRCategoryID> oldParents = new HashMap<MCRCategoryID, MCRCategoryID>();
-        for (MCRCategory category : oldMap.values()) {
-            if (category.isCategory()) {
-                oldParents.put(category.getId(), category.getParent().getId());
-            }
-        }
-        Map<MCRCategoryID, MCRCategoryImpl> newMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
-        fillIDMap(newMap, newCategoryImpl);
-        /*
-         * copy elements from the new tree to the old tree. fixes bug #1848710
-         * (Classification save fails after shifting categories)
-         * 
-         * set internalID for the new rootCategory
-         */
-        session.evict(oldCategory);
-        for (MCRCategoryImpl category : newMap.values()) {
-            MCRCategoryImpl oldValue = oldMap.get(category.getId());
-            if (oldValue != null) {
-                copyCategoryToNewTree(newCategoryImpl, category, oldValue);
-            }
-        }
-        // calculate left, right and level values
-        int diffNodes = newMap.size() - oldMap.size();
-        LOGGER.debug("Update changes classification node size by: " + diffNodes);
-        int increment = diffNodes * 2;
-        if (increment != 0 && oldCategory.isCategory()) {
-            final int left = oldCategory.getRightSiblingOrOfAncestor().getLeft();
-            final int maxLeftRight = ((MCRCategoryImpl) oldCategory.getRoot()).getRight();
-            final int right = oldCategory.getRightSiblingOrParent().getRight();
-            updateLeftRightValueMax(connection, newCategory.getId().getRootID(), left, maxLeftRight, right, maxLeftRight, increment);
-        }
-        newCategoryImpl.calculateLeftRightAndLevel(oldCategory.getLevel(), oldCategory.getLeft());
-        if (oldCategory.isCategory()) {
-            MCRCategoryImpl parent = (MCRCategoryImpl) oldCategory.getParent();
-            parent.getChildren().set(oldCategory.getPositionInParent(), newCategoryImpl);
-        }
-        // delete removed categories
-        boolean flushBeforeUpdate = false;
-        for (MCRCategoryImpl category : oldMap.values()) {
-            if (!newMap.containsKey(category.getId())) {
-                LOGGER.info("Deleting category :" + category.getId());
-                category.detachFromParent();
-                session.delete(category);
-                flushBeforeUpdate = true;
-            }
-        }
-        // update shifted categories (JUnit testCase testReplaceCategoryShiftCase)
-        fillIDMap(newMap, newCategoryImpl);
-        for (MCRCategoryImpl category : newMap.values()) {
-            if (category.isCategory() && oldParents.containsKey(category.getId())) {
-                if (!oldParents.get(category.getId()).equals(category.getParent().getId())) {
-                    LOGGER.info("updating new parent for " + category.getId());
-                    session.update(category);
-                    flushBeforeUpdate = true;
-                }
-            }
-        }
-        // important to flush here as positionInParent could collide with deleted categories
-        if (flushBeforeUpdate) {
-            //update add new categories before flush
-            for (MCRCategoryImpl category : newMap.values()) {
-                if (!oldMap.containsKey(category.getId())) {
-                    LOGGER.info("adding new parent category :" + category.getId());
-                    session.save(category);
-                }
-            }
-            session.flush();
-        }
-        session.saveOrUpdate(newCategoryImpl);
+        Map<MCRCategoryID, MCRCategoryImpl> newMap = toMap(newCategoryImpl);
+        //remove;
+        oldMap
+            .entrySet()
+            .stream()
+            .filter(c -> !newMap.containsKey(c.getKey()))
+            .map(Map.Entry::getValue)
+            .peek(MCRCategoryDAOImpl::remove)
+            .forEach(c -> LOGGER.info("remove category: " + c.getId()));
+        oldMap.clear();
+        oldMap.putAll(toMap(oldCategory));
+        //sync labels/uris;
+        MCRStreamUtils
+            .flatten(oldCategory, MCRCategory::getChildren, false)
+            .filter(c -> newMap.containsKey(c.getId()))
+            .map(MCRCategoryImpl.class::cast)
+            .map(c -> new AbstractMap.SimpleEntry<>(c, newMap.get(c.getId()))) // key: category of old version, value: category of new version
+            .peek(e -> syncLabels(e.getValue(), e.getKey())) //sync from new to old version
+            .forEach(e -> e.getKey().setURI(e.getValue().getURI()));
+        //detach all categories, we will rebuild tree structure later
+        oldMap
+            .values()
+            .stream()
+            .filter(c -> c.getInternalID() != oldCategory.getInternalID()) //do not detach root of subtree
+            .forEach(MCRCategoryImpl::detachFromParent);
+        //rebuild
+        MCRStreamUtils
+            .flatten(newCategoryImpl, MCRCategory::getChildren, false)
+            .forEachOrdered(c -> {
+                MCRCategoryImpl oldC = oldMap.get(c.getId());
+                oldC.setChildren(
+                    c
+                        .getChildren()
+                        .stream()
+                        .map(cc -> {
+                            //to categories of stored version or copy from new version
+                            MCRCategoryImpl oldCC = oldMap.get(cc.getId());
+                            if (oldCC == null) {
+                                oldCC = new MCRCategoryImpl();
+                                oldCC.setId(cc.getId());
+                                oldCC.setURI(cc.getURI());
+                                oldCC.getLabels().addAll(cc.getLabels());
+                                oldMap.put(oldCC.getId(), oldCC);
+                            }
+                            return oldCC;
+                        })
+                        .collect(Collectors.toList()));
+            });
+        oldCategory.calculateLeftRightAndLevel(oldLeft, oldLevel);
+        session.update(oldCategory);
         updateTimeStamp();
         updateLastModified(newCategory.getRoot().getId().toString());
         return newMap.values();
+    }
+
+    private static Map<MCRCategoryID, MCRCategoryImpl> toMap(MCRCategoryImpl oldCategory) {
+        return MCRStreamUtils
+            .flatten(oldCategory, MCRCategory::getChildren, false)
+            .collect(Collectors.toMap(MCRCategory::getId, MCRCategoryImpl.class::cast));
+    }
+
+    private static void remove(MCRCategoryImpl category) {
+        if (category.hasChildren()) {
+            int parentPos = category.getPositionInParent();
+            MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
+            parent.children.addAll(parentPos, category.children);
+        }
+        category.detachFromParent();
     }
 
     public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {
@@ -598,108 +606,41 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * every change to the returned MCRCategory is reflected in the database.
      */
     public static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
-        return (MCRCategoryImpl) session.byNaturalId(CATEGRORY_CLASS).setSynchronizationEnabled(false).using("rootID", id.getRootID())
-                .using("categID", id.getID()).load();
+        return (MCRCategoryImpl) session.byNaturalId(CATEGRORY_CLASS).setSynchronizationEnabled(false)
+            .using("rootID", id.getRootID())
+            .using("categID", id.getID()).load();
     }
 
-    /**
-     * copies <code>previousVersion</code> into the place of
-     * <code>category</code> in <code>newTree</code>. All changes of
-     * <code>category</code> are applied to <code>previousVersion</code>.
-     * 
-     * @param newTree
-     *            new root of MCRCategory tree
-     * @param category
-     *            new version containing all changes
-     * @param previousVersion
-     *            oldVersion allready stored in database
-     */
-    private static void copyCategoryToNewTree(MCRCategoryImpl newTree, MCRCategoryImpl category, MCRCategoryImpl previousVersion) {
-        category.setInternalID(previousVersion.getInternalID());
-        MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
-        if (parent == null || category.getId().equals(newTree.getId())) {
-            category.setInternalID(previousVersion.getInternalID());
-        } else {
-            // get new parent of modified category tree here (by parent category id)
-            parent = (MCRCategoryImpl) findCategory(newTree, category.getParent().getId());
-            int pos = category.getPositionInParent();
-            parent.getChildren().remove(pos);
-            previousVersion.detachFromParent();
-            parent.getChildren().add(pos, previousVersion);
-            // set parent here
-            previousVersion.parent = parent;
-            previousVersion.getChildren().clear();
-            previousVersion.getChildren().addAll(
-                    MCRCategoryImpl.wrapCategories(detachCategories(category.getChildren()), previousVersion, previousVersion.getRoot()));
-            for (MCRLabel newLabel : category.getLabels()) {
-                Optional<MCRLabel> label = previousVersion.getLabel(newLabel.getLang());
-                if (!label.isPresent()) {
-                    // copy new label
-                    previousVersion.getLabels().add(newLabel);
+    private static void syncLabels(MCRCategoryImpl source, MCRCategoryImpl target) {
+        for (MCRLabel newLabel : source.getLabels()) {
+            Optional<MCRLabel> label = target.getLabel(newLabel.getLang());
+            if (!label.isPresent()) {
+                // copy new label
+                target.getLabels().add(newLabel);
+            }
+            label.ifPresent(oldLabel -> {
+                if (!oldLabel.getText().equals(newLabel.getText())) {
+                    oldLabel.setText(newLabel.getText());
                 }
-                label.ifPresent(oldLabel -> {
-                    if (!oldLabel.getText().equals(newLabel.getText())) {
-                        oldLabel.setText(newLabel.getText());
-                    }
-                    if (!oldLabel.getDescription().equals(newLabel.getDescription())) {
-                        oldLabel.setDescription(newLabel.getDescription());
-                    }
-                });
-            }
-            Iterator<MCRLabel> labels = previousVersion.getLabels().iterator();
-            while (labels.hasNext()) {
-                // remove labels that are not present in new version
-                if (!category.getLabel(labels.next().getLang()).isPresent()) {
-                    labels.remove();
+                if (!oldLabel.getDescription().equals(newLabel.getDescription())) {
+                    oldLabel.setDescription(newLabel.getDescription());
                 }
+            });
+        }
+        Iterator<MCRLabel> labels = target.getLabels().iterator();
+        while (labels.hasNext()) {
+            // remove labels that are not present in new version
+            if (!source.getLabel(labels.next().getLang()).isPresent()) {
+                labels.remove();
             }
-            previousVersion.setURI(category.getURI());
-        }
-    }
-
-    /**
-     * finds a MCRCategory with <code>id</code> somewhere below
-     * <code>root</code>.
-     */
-    private static MCRCategory findCategory(MCRCategory root, MCRCategoryID id) {
-        if (root.getId().equals(id)) {
-            return root;
-        }
-        for (MCRCategory child : root.getChildren()) {
-            MCRCategory rv = findCategory(child, id);
-            if (rv != null) {
-                return rv;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * detaches all elements in list from their parent.
-     */
-    private static List<MCRCategory> detachCategories(List<MCRCategory> list) {
-        ArrayList<MCRCategory> categories = new ArrayList<MCRCategory>(list.size());
-        categories.addAll(list);
-        for (MCRCategory category : categories) {
-            if (!(category instanceof MCRCategoryImpl)) {
-                throw new IllegalArgumentException("This method just works for MCRCategoryImpl");
-            }
-            ((MCRAbstractCategoryImpl) category).detachFromParent();
-        }
-        return categories;
-    }
-
-    private static void fillIDMap(Map<MCRCategoryID, MCRCategoryImpl> map, MCRCategoryImpl category) {
-        map.put(category.getId(), category);
-        for (MCRCategory subCategory : category.getChildren()) {
-            fillIDMap(map, (MCRCategoryImpl) subCategory);
         }
     }
 
     private static Integer[] getLeftRightValues(MCRCategoryID id) {
         Session session = getHibConnection().getSession();
         Criteria c = session.createCriteria(CATEGRORY_CLASS)
-                .setProjection(Projections.projectionList().add(Projections.property("left")).add(Projections.property("right")));
+            .setProjection(
+                Projections.projectionList().add(Projections.property("left")).add(Projections.property("right")));
         c.add(getCategoryCriterion(id));
         Object[] result = (Object[]) c.uniqueResult();
         Integer[] iResult = new Integer[] { (Integer) result[0], (Integer) result[1] };
@@ -713,14 +654,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         try {
             Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.rowCount());
             c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS)
-                    .setProjection(Projections.property("internalID")).add(getCategoryCriterion(id))));
+                .setProjection(Projections.property("internalID")).add(getCategoryCriterion(id))));
             return ((Number) c.uniqueResult()).intValue();
         } finally {
             session.setFlushMode(fm);
         }
     }
 
-    private static void updateLeftRightValue(MCRHIBConnection connection, String classID, int left, final int increment) {
+    private static void updateLeftRightValue(MCRHIBConnection connection, String classID, int left,
+        final int increment) {
         LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
         Query leftQuery = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
         leftQuery.setInteger("left", left);
@@ -729,25 +671,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         int leftChanges = leftQuery.executeUpdate();
         Query rightQuery = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".updateRight");
         rightQuery.setInteger("left", left);
-        rightQuery.setInteger("increment", increment);
-        rightQuery.setString("classID", classID);
-        int rightChanges = rightQuery.executeUpdate();
-        LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
-    }
-
-    private static void updateLeftRightValueMax(MCRHIBConnection connection, String classID, int left, int maxLeft, int right, int maxRight,
-            final int increment) {
-        LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", MaxLeft=" + maxLeft + ", Right=" + right + ", MaxRight="
-                + maxRight + " increment by: " + increment);
-        Query leftQuery = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeftWithMax");
-        leftQuery.setInteger("left", left);
-        leftQuery.setInteger("max", maxLeft);
-        leftQuery.setInteger("increment", increment);
-        leftQuery.setString("classID", classID);
-        int leftChanges = leftQuery.executeUpdate();
-        Query rightQuery = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".updateRightWithMax");
-        rightQuery.setInteger("right", right);
-        rightQuery.setInteger("max", maxRight);
         rightQuery.setInteger("increment", increment);
         rightQuery.setString("classID", classID);
         int rightChanges = rightQuery.executeUpdate();

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.hibernate.collection.internal.PersistentList;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -119,7 +118,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             LOGGER.debug(sb.toString());
 
         }
-        throw new IndexOutOfBoundsException("Position -1 is not valid.");
+        throw new IndexOutOfBoundsException("Position -1 is not valid: " + getId() + " parent:" + parent.getId());
     }
 
     /**
@@ -140,13 +139,9 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     @Override
     protected void setChildrenUnlocked(List<MCRCategory> children) {
-        if (children instanceof PersistentList) {
-            this.children = children;
-        } else {
-            MCRCategoryChildList newChildren = new MCRCategoryChildList(root, this);
-            newChildren.addAll(children);
-            this.children = newChildren;
-        }
+        MCRCategoryChildList newChildren = new MCRCategoryChildList(root, this);
+        newChildren.addAll(children);
+        this.children = newChildren;
     }
 
     /**
@@ -366,6 +361,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         result = prime * result + level;
         result = prime * result + positionInParent;
         result = prime * result + right;
+        result = prime * result + getId().hashCode();
         return result;
     }
 

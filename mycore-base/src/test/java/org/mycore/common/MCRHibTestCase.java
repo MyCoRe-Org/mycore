@@ -27,16 +27,21 @@ import java.io.PrintStream;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.boot.Metadata;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.hibernate.tool.hbm2ddl.SchemaExport.Action;
+import org.hibernate.tool.schema.TargetType;
 import org.junit.After;
 import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -52,6 +57,8 @@ public abstract class MCRHibTestCase extends MCRTestCase {
     protected Transaction tx;
 
     protected MCRHIBConnection hibConnection;
+
+    private Metadata metadata;
 
     protected static void printResultSet(ResultSet resultSet, PrintStream out) throws SQLException {
         ResultSetMetaData metaData = resultSet.getMetaData();
@@ -76,7 +83,7 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         super.setUp();
         Logger.getLogger(MCRHibTestCase.class).debug("Setup hibernate");
         MCRHibernateBootstrapper
-            .setup((metadata) -> new SchemaExport((MetadataImplementor) metadata).create(true, true));
+            .setup(this::exportSchema);
         hibConnection = MCRHIBConnection.instance();
         sessionFactory = hibConnection.getSessionFactory();
         try {
@@ -89,11 +96,30 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         }
     }
 
+    public void exportSchema(Metadata metadata) {
+        exportSchema(metadata, Action.CREATE);
+        this.metadata = metadata;
+    }
+
+    public void dropSchema(Metadata metadata) {
+        exportSchema(metadata, Action.DROP);
+    }
+
+    private static void exportSchema(Metadata metadata, Action action) {
+        SchemaExport schemaExport = new SchemaExport();
+        schemaExport.execute(EnumSet.of(TargetType.DATABASE, TargetType.STDOUT), action, metadata);
+        @SuppressWarnings("unchecked")
+        List<Exception> exceptions = (List<Exception>) schemaExport.getExceptions();
+        exceptions.stream().forEach(e -> LogManager.getLogger().error("Error while updateing database schema.", e));
+    }
+
     @After
     public void tearDown() throws Exception {
         super.tearDown();
         endTransaction();
         sessionFactory.getCurrentSession().close();
+        dropSchema(metadata);
+        metadata = null;
         hibConnection = null;
         sessionFactory = null;
     }

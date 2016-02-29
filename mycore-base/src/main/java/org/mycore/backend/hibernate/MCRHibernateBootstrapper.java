@@ -26,6 +26,8 @@ package org.mycore.backend.hibernate;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.servlet.ServletContext;
@@ -40,6 +42,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.hibernate.tool.schema.TargetType;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
@@ -121,7 +124,11 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
     }
 
     public static void updateSchema(Metadata metadata) {
-        new SchemaUpdate((MetadataImplementor) metadata).execute(false, true);
+        SchemaUpdate schemaUpdate = new SchemaUpdate();
+        schemaUpdate.execute(EnumSet.of(TargetType.DATABASE), metadata);
+        @SuppressWarnings("unchecked")
+        List<Exception> exceptions = (List<Exception>) schemaUpdate.getExceptions();
+        exceptions.stream().forEach(e -> LOGGER.error("Error while updateing database schema.", e));
     }
 
     private static String getDialect(Metadata metadata) {
