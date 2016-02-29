@@ -113,20 +113,6 @@
             </configuration>
           </plugin>
           <plugin>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>verify</phase>
-                <goals>
-                  <goal>checkstyle</goal>
-                </goals>
-                <configuration>
-<!--                   <configLocation>org/mycore/checkstyle.xml</configLocation> -->
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
               <compilerArgs>
@@ -182,12 +168,6 @@
               <useJql>true</useJql>
               <columnNames>Type,Key,Summary,Assignee,Status,Resolution,Component</columnNames>
               <sortColumnNames>Type,Component,Key DESC</sortColumnNames>
-            </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <configuration>
-<!--               <configLocation>org/mycore/checkstyle.xml</configLocation> -->
             </configuration>
           </plugin>
           <plugin>
