@@ -19,6 +19,7 @@ import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.frontend.filter.MCRSecureTokenV2FilterConfig;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -33,6 +34,8 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
     private String baseURL;
 
     private String objId;
+    
+    private String derId;
 
     public MCRJSONFileVisitor(JsonWriter jw, MCRObjectID objId, MCRObjectID derId) {
         super();
@@ -42,6 +45,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
             .replace("${mcrid}", objId.toString())
             .replace("${derid}", derId.toString());
         this.objId = objId.toString();
+        this.derId = derId.toString();
     }
 
     @Override
@@ -92,7 +96,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         jw.beginObject();
         writePathInfo(file, attrs);
         jw.name("extension").value(getFileExtension(file.getFileName().toString()));
-        jw.name("href").value(baseURL + relativePath.toString());
+        jw.name("href").value(MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(MCRObjectID.getInstance(derId), relativePath.toString()));
         jw.endObject();
         return super.visitFile(file, attrs);
     }
