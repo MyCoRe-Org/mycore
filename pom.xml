@@ -1513,6 +1513,7 @@
     <module>mycore-migration-2015</module>
     <module>mycore-mods</module>
     <module>mycore-oai</module>
+    <module>mycore-pi</module>
     <module>mycore-restapi</module>
     <module>mycore-session-listing</module>
     <module>mycore-solr</module>
