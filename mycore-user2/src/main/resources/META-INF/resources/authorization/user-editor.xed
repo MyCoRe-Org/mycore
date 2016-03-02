@@ -6,9 +6,7 @@
         <h4>
           <xed:output i18n="component.user2.admin.inputhints" />
         </h4>
-        <ul>
-          <xed:display-validation-messages />
-        </ul>
+        <xed:display-validation-messages />
       </div>
     </xed:if>
   </xed:template>
