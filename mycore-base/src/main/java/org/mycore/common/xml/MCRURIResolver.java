@@ -23,12 +23,18 @@
 
 package org.mycore.common.xml;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +42,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -48,7 +55,16 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.cache.HttpCacheContext;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.cache.CacheConfig;
+import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -59,6 +75,7 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
@@ -71,6 +88,7 @@ import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -191,6 +209,10 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("chooseTemplate", new MCRChooseTemplateResolver());
         supportedSchemes.put("redirect", new MCRRedirectResolver());
         supportedSchemes.put("data", new MCRDataURLResolver());
+        MCRRESTResolver restResolver=new MCRRESTResolver();
+        supportedSchemes.put("http", restResolver);
+        supportedSchemes.put("https", restResolver);
+        supportedSchemes.put("file", new MCRFileResolver());
         return supportedSchemes;
     }
 
@@ -349,6 +371,14 @@ public final class MCRURIResolver implements URIResolver {
         return builder.build(in).getRootElement();
     }
 
+    static URI resolveURI(String href, String base) {
+        URI hrefURI = Optional.ofNullable(base)
+            .map(URI::create)
+            .map(u -> u.resolve(base))
+            .orElse(URI.create(href));
+        return hrefURI;
+    }
+
     /**
      * provides a URI -- Resolver Mapping One can implement this interface to provide additional URI schemes this
      * MCRURIResolver should handle, too. To add your mapping you have to set the
@@ -388,6 +418,123 @@ public final class MCRURIResolver implements URIResolver {
                 }
             }
             return map;
+        }
+
+    }
+    
+    private static class MCRFileResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            URI hrefURI = MCRURIResolver.resolveURI(href, base);
+            if (!hrefURI.getScheme().equals("file")){
+                throw new TransformerException("Unsupport file uri scheme: "+hrefURI.getScheme());
+            }
+            Path path = Paths.get(hrefURI);
+            StreamSource source;
+            try {
+                source = new StreamSource(Files.newInputStream(path), hrefURI.toASCIIString());
+                return source;
+            } catch (IOException e) {
+                throw new TransformerException(e);
+            }
+        }
+    }
+    
+    private static class MCRRESTResolver implements URIResolver {
+
+        private static final long MAX_OBJECT_SIZE = MCRConfiguration.instance()
+            .getLong(CONFIG_PREFIX + "REST.MaxObjectSize", 128 * 1024);
+
+        private static final int MAX_CACHE_ENTRIES = MCRConfiguration.instance()
+            .getInt(CONFIG_PREFIX + "REST.MaxCacheEntries", 1000);
+
+        private static final int REQUEST_TIMEOUT = MCRConfiguration.instance()
+            .getInt(CONFIG_PREFIX + "REST.RequestTimeout", 30000);
+
+        private CloseableHttpClient restClient;
+
+        private org.apache.logging.log4j.Logger logger;
+
+        public MCRRESTResolver() {
+            CacheConfig cacheConfig = CacheConfig.custom()
+                .setMaxObjectSize(MAX_OBJECT_SIZE)
+                .setMaxCacheEntries(MAX_CACHE_ENTRIES)
+                .build();
+            RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(REQUEST_TIMEOUT)
+                .setSocketTimeout(REQUEST_TIMEOUT)
+                .build();
+            String userAgent = MessageFormat
+                .format("MyCoRe/{0} ({1}; java {2})", MCRCoreVersion.getCompleteVersion(), MCRConfiguration.instance()
+                    .getString("MCR.NameOfProject", "undefined"), System.getProperty("java.version"));
+            this.restClient = CachingHttpClients.custom()
+                .setCacheConfig(cacheConfig)
+                .setDefaultRequestConfig(requestConfig)
+                .setUserAgent(userAgent)
+                .build();
+            MCRShutdownHandler.getInstance().addCloseable(this::close);
+            this.logger = LogManager.getLogger();
+        }
+
+        public void close() {
+            try {
+                restClient.close();
+            } catch (IOException e) {
+                LogManager.getLogger().warn("Exception while closing http client.", e);
+            }
+        }
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            URI hrefURI = MCRURIResolver.resolveURI(href, base);
+            InputStream responseStream;
+            try {
+                responseStream = getResponseStream(hrefURI);
+            } catch (IOException e) {
+                throw new TransformerException(e);
+            }
+            return new StreamSource(responseStream, hrefURI.toASCIIString());
+        }
+
+        private InputStream getResponseStream(URI hrefURI) throws IOException, ClientProtocolException {
+            HttpCacheContext context = HttpCacheContext.create();
+            HttpGet get = new HttpGet(hrefURI);
+            CloseableHttpResponse response = restClient.execute(get, context);
+            logger.debug(() -> {
+                String msg = hrefURI.toASCIIString() + ": ";
+                switch (context.getCacheResponseStatus()) {
+                    case CACHE_HIT:
+                        msg += "A response was generated from the cache with " +
+                            "no requests sent upstream";
+                        break;
+                    case CACHE_MODULE_RESPONSE:
+                        msg += "The response was generated directly by the " +
+                            "caching module";
+                        break;
+                    case CACHE_MISS:
+                        msg += "The response came from an upstream server";
+                        break;
+                    case VALIDATED:
+                        msg += "The response was generated from the cache " +
+                            "after validating the entry with the origin server";
+                        break;
+                }
+                return msg;
+            });
+            try {
+                InputStream content = response.getEntity().getContent();
+                return new FilterInputStream(content) {
+                    @Override
+                    public void close() throws IOException {
+                        super.close();
+                        response.close();
+                    }
+                };
+            } catch (Exception e) {
+                response.close();
+                throw e;
+            }
         }
 
     }
