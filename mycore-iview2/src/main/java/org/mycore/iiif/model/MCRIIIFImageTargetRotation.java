@@ -4,9 +4,9 @@ package org.mycore.iiif.model;
 public class MCRIIIFImageTargetRotation {
 
     private final boolean mirrored;
-    private final int degrees;
+    private final double degrees;
 
-    public MCRIIIFImageTargetRotation(boolean mirrored, int degrees) {
+    public MCRIIIFImageTargetRotation(boolean mirrored, double degrees) {
         this.mirrored = mirrored;
         this.degrees = degrees;
     }
@@ -15,7 +15,7 @@ public class MCRIIIFImageTargetRotation {
         return mirrored;
     }
 
-    public int getDegrees() {
+    public double getDegrees() {
         return degrees;
     }
 

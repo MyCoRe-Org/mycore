@@ -15,9 +15,9 @@ public class MCRIIIFRotationParser {
         boolean mirror = this.rotation.startsWith("!");
 
         String rotationNumberString = mirror ? this.rotation.substring(1) : this.rotation;
-        Integer rotationNumber;
+        Double rotationNumber;
         try {
-            rotationNumber = Integer.parseInt(rotationNumberString, 10);
+            rotationNumber = Double.parseDouble(rotationNumberString);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(rotationNumberString + " cannot parsed to a rotation value!");
         }
