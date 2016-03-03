@@ -45,6 +45,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +56,7 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.http.client.ClientProtocolException;
+import org.apache.http.Header;
 import org.apache.http.client.cache.HttpCacheContext;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -396,6 +397,36 @@ public final class MCRURIResolver implements URIResolver {
          */
         public Map<String, URIResolver> getURIResolverMapping();
     }
+    
+    public static interface MCRCacheableURIResolver extends URIResolver{
+        public MCRCacheableURIResponse getResponse(String href, String base) throws TransformerException;
+
+        @Override
+        default Source resolve(String href, String base) throws TransformerException {
+            return getResponse(href, base).getSource();
+        }
+         
+    }
+    
+    public static class MCRCacheableURIResponse{
+        private Source source;
+        private Supplier<Integer> hash;
+        private boolean support;
+        public MCRCacheableURIResponse(Source source, Supplier<Integer> hashSupplier, Supplier<Boolean> supportSupplier){
+            this.source=source;
+            this.hash=hashSupplier;
+            this.support=supportSupplier.get();
+        }
+        public Source getSource(){
+            return source;
+        }
+        public int getHash(){
+            return hash.get();
+        }
+        public boolean supportsHash(){
+            return support;
+        }
+    }
 
     private static class MCRModuleResolverProvider implements MCRResolverProvider {
 
@@ -441,7 +472,7 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
     
-    private static class MCRRESTResolver implements URIResolver {
+    private static class MCRRESTResolver implements MCRCacheableURIResolver {
 
         private static final long MAX_OBJECT_SIZE = MCRConfiguration.instance()
             .getLong(CONFIG_PREFIX + "REST.MaxObjectSize", 128 * 1024);
@@ -486,55 +517,68 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         @Override
-        public Source resolve(String href, String base) throws TransformerException {
+        public MCRCacheableURIResponse getResponse(String href, String base) throws TransformerException {
             URI hrefURI = MCRURIResolver.resolveURI(href, base);
             InputStream responseStream;
+            String eTag, lastModified;
             try {
-                responseStream = getResponseStream(hrefURI);
+                HttpCacheContext context = HttpCacheContext.create();
+                HttpGet get = new HttpGet(hrefURI);
+                CloseableHttpResponse response = restClient.execute(get, context);
+                logger.debug(() -> {
+                    String msg = hrefURI.toASCIIString() + ": ";
+                    switch (context.getCacheResponseStatus()) {
+                        case CACHE_HIT:
+                            msg += "A response was generated from the cache with " +
+                                "no requests sent upstream";
+                            break;
+                        case CACHE_MODULE_RESPONSE:
+                            msg += "The response was generated directly by the " +
+                                "caching module";
+                            break;
+                        case CACHE_MISS:
+                            msg += "The response came from an upstream server";
+                            break;
+                        case VALIDATED:
+                            msg += "The response was generated from the cache " +
+                                "after validating the entry with the origin server";
+                            break;
+                    }
+                    return msg;
+                });
+                eTag = Optional.ofNullable(response.getLastHeader("etag"))
+                    .map(Header::getValue)
+                    .orElse(null);
+                lastModified = Optional.ofNullable(response.getLastHeader("last-modified"))
+                    .map(Header::getValue)
+                    .orElse(null);
+              
+                try {
+                    InputStream content = response.getEntity().getContent();
+                    responseStream =  new FilterInputStream(content) {
+                        @Override
+                        public void close() throws IOException {
+                            super.close();
+                            response.close();
+                        }
+                    };
+                } catch (Exception e) {
+                    response.close();
+                    get.reset();
+                    throw e;
+                }
             } catch (IOException e) {
                 throw new TransformerException(e);
             }
-            return new StreamSource(responseStream, hrefURI.toASCIIString());
+            return new MCRCacheableURIResponse(new StreamSource(responseStream, hrefURI.toASCIIString()), () -> getHash(lastModified, eTag), () -> lastModified!=null || eTag!=null);
         }
 
-        private InputStream getResponseStream(URI hrefURI) throws IOException, ClientProtocolException {
-            HttpCacheContext context = HttpCacheContext.create();
-            HttpGet get = new HttpGet(hrefURI);
-            CloseableHttpResponse response = restClient.execute(get, context);
-            logger.debug(() -> {
-                String msg = hrefURI.toASCIIString() + ": ";
-                switch (context.getCacheResponseStatus()) {
-                    case CACHE_HIT:
-                        msg += "A response was generated from the cache with " +
-                            "no requests sent upstream";
-                        break;
-                    case CACHE_MODULE_RESPONSE:
-                        msg += "The response was generated directly by the " +
-                            "caching module";
-                        break;
-                    case CACHE_MISS:
-                        msg += "The response came from an upstream server";
-                        break;
-                    case VALIDATED:
-                        msg += "The response was generated from the cache " +
-                            "after validating the entry with the origin server";
-                        break;
-                }
-                return msg;
-            });
-            try {
-                InputStream content = response.getEntity().getContent();
-                return new FilterInputStream(content) {
-                    @Override
-                    public void close() throws IOException {
-                        super.close();
-                        response.close();
-                    }
-                };
-            } catch (Exception e) {
-                response.close();
-                throw e;
-            }
+        private static int getHash(String lastModified, String eTag) {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((eTag == null) ? 0 : eTag.hashCode());
+            result = prime * result + ((lastModified == null) ? 0 : lastModified.hashCode());
+            return result;
         }
 
     }
