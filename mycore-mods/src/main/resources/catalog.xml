@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
 
-  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-0.xsd" uri="xsd/mods-3-0.xsd" />
-  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-1.xsd" uri="xsd/mods-3-1.xsd" />
-  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-2.xsd" uri="xsd/mods-3-2.xsd" />
-  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-3.xsd" uri="xsd/mods-3-3.xsd" />
-  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-4.xsd" uri="xsd/mods-3-4.xsd" />
-  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-5.xsd" uri="xsd/mods-3-5.xsd" />
+  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-0.xsd" uri="xsd/mods-3-6.xsd" />
+  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-1.xsd" uri="xsd/mods-3-6.xsd" />
+  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-2.xsd" uri="xsd/mods-3-6.xsd" />
+  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-3.xsd" uri="xsd/mods-3-6.xsd" />
+  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-4.xsd" uri="xsd/mods-3-6.xsd" />
+  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-5.xsd" uri="xsd/mods-3-6.xsd" />
   <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd" uri="xsd/mods-3-6.xsd" />
 
 </catalog>
