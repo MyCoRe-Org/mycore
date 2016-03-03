@@ -48,13 +48,16 @@ public class MCRShutdownHandler {
      * 
      * @author Thomas Scheffler (yagee)
      */
+    @FunctionalInterface
     public static interface Closeable {
         /**
          * prepare for closing this object that implements <code>Closeable</code>. This is the first part of the closing
          * process. As a object may need database access to close cleanly this method can be used to be ahead of
          * database outtake.
          */
-        public void prepareClose();
+        default void prepareClose(){
+            //should be overwritten if needed;
+        }
 
         /**
          * cleanly closes this object that implements <code>Closeable</code>. You can provide some functionality to
@@ -66,7 +69,9 @@ public class MCRShutdownHandler {
          * Returns the priority. A Closeable with a higher priority will be closed before a Closeable with a lower
          * priority. Default priority is 5.
          */
-        public int getPriority();
+        default int getPriority(){
+            return DEFAULT_PRIORITY;
+        }
 
         /**
          * The default priority
