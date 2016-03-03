@@ -8,8 +8,7 @@ import java.net.URLEncoder;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -45,6 +44,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
     public static final String MAX_BYTES = "MCR.IIIFImage.Iview.MaxImageBytes";
 
     private static Logger LOGGER = Logger.getLogger(MCRIVIEWIIIFImageImpl.class);
+    private static final java.util.List<String> TRANSPARENT_FORMATS = MCRConfiguration.instance().getStrings("MCR.IIIFImage.Iview.TransparentFormats");
 
     private static String buildURL(String identifier) {
         try {
@@ -103,7 +103,11 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
                 break;
             case color:
             default:
-                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+                if (TRANSPARENT_FORMATS.contains(format)) {
+                    targetImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+                } else {
+                    targetImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+                }
         }
 
 
