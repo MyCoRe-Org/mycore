@@ -307,6 +307,11 @@
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-servlet</artifactId>
     </dependency>
     <dependency>
