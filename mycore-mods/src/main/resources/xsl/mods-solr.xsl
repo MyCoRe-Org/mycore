@@ -9,7 +9,7 @@
 
   <xsl:strip-space elements="mods:*" />
 
-  <xsl:template match="mycoreobject[contains(@ID,'_mods_')]">
+  <xsl:template match="mycoreobject[./metadata/def.modsContainer/modsContainer/mods:mods]">
     <xsl:apply-imports />
     <!-- classification fields from mycore-mods -->
     <xsl:apply-templates select="metadata//mods:*[@authority or @authorityURI]" />
