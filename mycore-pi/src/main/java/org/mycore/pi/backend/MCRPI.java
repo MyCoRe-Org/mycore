@@ -29,7 +29,7 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     @Column(nullable = false)
     private String mycoreID;
 
-    @Column()
+    @Column(length = 4096)
     private String additional;
 
     @Column()
