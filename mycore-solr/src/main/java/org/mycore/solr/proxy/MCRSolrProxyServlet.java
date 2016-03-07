@@ -65,8 +65,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     public static final String QUERY_HANDLER_PAR_NAME = "qt";
 
-    private static int MAX_CONNECTIONS = MCRConfiguration.instance().getInt(
-        CONFIG_PREFIX + "SelectProxy.MaxConnections");
+    private static int MAX_CONNECTIONS = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "SelectProxy.MaxConnections");
 
     private CloseableHttpClient httpClient;
 
@@ -149,8 +148,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
     /**
      * redirects to query handler by using xeditor input document
      */
-    private static void redirectToQueryHandler(Document input, HttpServletResponse resp) throws IOException,
-        TransformerException, SAXException {
+    private static void redirectToQueryHandler(Document input, HttpServletResponse resp)
+            throws IOException, TransformerException, SAXException {
         LinkedHashMap<String, String[]> parameters = new LinkedHashMap<>();
         List<Element> children = input.getRootElement().getChildren();
         for (Element param : children) {
@@ -167,16 +166,15 @@ public class MCRSolrProxyServlet extends MCRServlet {
     /**
      * used by
      */
-    private static void doRedirectToQueryHandler(HttpServletResponse resp, String queryHandlerPath,
-        Map<String, String[]> parameters) throws IOException {
-        String requestURL = MessageFormat.format("{0}solr{1}?{2}", getServletBaseURL(), queryHandlerPath,
-            getQueryString(parameters));
+    private static void doRedirectToQueryHandler(HttpServletResponse resp, String queryHandlerPath, Map<String, String[]> parameters)
+            throws IOException {
+        String requestURL = MessageFormat.format("{0}solr{1}?{2}", getServletBaseURL(), queryHandlerPath, getQueryString(parameters));
         LOGGER.info("Redirect to: " + requestURL);
         resp.sendRedirect(resp.encodeRedirectURL(requestURL));
     }
 
     private void handleQuery(MCRSolrQueryHandler queryHandler, HttpServletRequest request, HttpServletResponse resp)
-        throws IOException, TransformerException, SAXException {
+            throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandler, solrParameter);
         try {
@@ -205,8 +203,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
                         OutputStream servletOutput = resp.getOutputStream();
                         IOUtils.copy(solrResponseStream, servletOutput);
                     } else {
-                        MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod
-                            .getURI().toString(), "response");
+                        MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod.getURI().toString(),
+                                "response");
                         MCRLayoutService.instance().doLayout(request, resp, solrResponse);
                     }
                 }
@@ -239,8 +237,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      * @return a method to make the request
      */
     private static HttpGet getSolrHttpMethod(MCRSolrQueryHandler queryHandler, ModifiableSolrParams params) {
-        HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, queryHandler.getPath(),
-            params.toString()));
+        HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, queryHandler.getPath(), params.toQueryString()));
         return httpGet;
     }
 
