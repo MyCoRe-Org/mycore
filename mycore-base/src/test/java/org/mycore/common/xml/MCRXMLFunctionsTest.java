@@ -1,6 +1,7 @@
 package org.mycore.common.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -10,6 +11,11 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 public class MCRXMLFunctionsTest extends MCRTestCase {
+
+    private final static String[] HTML_STRINGS = new String[] { "<h1>Hello World!</h1>",
+            "<h1>Hell<i>o</i> World!<br /></h1>", "<h1>Hell<i>o</i> World!<br></h1>",
+            "<h1>Hell<i>o</i> World!&lt;br&gt;</h1>", "<h1>Hell<i>&ouml;</i> World!&lt;br&gt;</h1>",
+            "<h1>Hello</h1> <h2>World!</h2><br/>" };
 
     /*
      * Test method for 'org.mycore.common.xml.MCRXMLFunctions.formatISODate(String, String, String, String)'
@@ -26,8 +32,8 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     @Test
     public void getISODate() throws ParseException {
         assertEquals("1964-02-24", MCRXMLFunctions.getISODate("24.02.1964", "dd.MM.yyyy", "YYYY-MM-DD"));
-        assertEquals("Timezone was not correctly detected", "1964-02-23T22:00:00Z",
-            MCRXMLFunctions.getISODate("24.02.1964 00:00:00 +0200", "dd.MM.yyyy HH:mm:ss Z", "YYYY-MM-DDThh:mm:ssTZD"));
+        assertEquals("Timezone was not correctly detected", "1964-02-23T22:00:00Z", MCRXMLFunctions
+                .getISODate("24.02.1964 00:00:00 +0200", "dd.MM.yyyy HH:mm:ss Z", "YYYY-MM-DDThh:mm:ssTZD"));
     }
 
     /*
@@ -35,10 +41,14 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
      */
     @Test
     public void getISODateFromMCRHistoryDate() throws ParseException {
-        assertEquals("1964-02-24T00:00:00.000Z", MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "gregorian"));
-        assertEquals("1964-03-08T00:00:00.000Z", MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "julian"));
-        assertEquals("1964-02-28T00:00:00.000Z", MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02", "bis", "gregorian"));
-        assertEquals("-0100-12-31T00:00:00.000Z", MCRXMLFunctions.getISODateFromMCRHistoryDate("100 BC", "bis", "gregorian"));
+        assertEquals("1964-02-24T00:00:00.000Z",
+                MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "gregorian"));
+        assertEquals("1964-03-08T00:00:00.000Z",
+                MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "julian"));
+        assertEquals("1964-02-28T00:00:00.000Z",
+                MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02", "bis", "gregorian"));
+        assertEquals("-0100-12-31T00:00:00.000Z",
+                MCRXMLFunctions.getISODateFromMCRHistoryDate("100 BC", "bis", "gregorian"));
     }
 
     @Test
@@ -46,11 +56,13 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
         String source = "http://www.mycore.de/Space Character.test";
         String result = "http://www.mycore.de/Space%20Character.test";
         assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
-        assertEquals("URL differs,  but was already RFC 2396 conform.", result, MCRXMLFunctions.normalizeAbsoluteURL(result));
+        assertEquals("URL differs,  but was already RFC 2396 conform.", result,
+                MCRXMLFunctions.normalizeAbsoluteURL(result));
         source = "http://www.mycore.de/Hühnerstall.pdf";
         result = "http://www.mycore.de/H%C3%BChnerstall.pdf";
         assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
-        assertEquals("URL differs,  but was already RFC 2396 conform.", result, MCRXMLFunctions.normalizeAbsoluteURL(result));
+        assertEquals("URL differs,  but was already RFC 2396 conform.", result,
+                MCRXMLFunctions.normalizeAbsoluteURL(result));
     }
 
     @Test
@@ -86,4 +98,13 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
         assertEquals("Shortened text did not match", test, MCRXMLFunctions.shortenText(test, test.length()));
     }
 
+    /*
+     * Test method for 'org.mycore.common.xml.MCRXMLFunctions.stripHtml(String)'
+     */
+    @Test
+    public void stripHtml() {
+        for (final String s : HTML_STRINGS) {
+            assertFalse(MCRXMLFunctions.isHtml(MCRXMLFunctions.stripHtml(s)));
+        }
+    }
 }

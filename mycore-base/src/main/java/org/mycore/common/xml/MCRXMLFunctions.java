@@ -47,6 +47,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.xml.parsers.DocumentBuilder;
@@ -55,6 +57,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
@@ -99,6 +102,7 @@ import com.ibm.icu.util.GregorianCalendar;
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * @author shermann
+ * @author Ren\u00E9 Adler (eagle)
  */
 public class MCRXMLFunctions {
 
@@ -127,9 +131,20 @@ public class MCRXMLFunctions {
 
     private static final String DEFAULT_PORT = "80";
 
+    private final static String TAG_START = "\\<(\\w+)((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)\\>";
+    private final static String TAG_END = "\\</\\1\\>";
+    private final static String TAG_SELF_CLOSING = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)/\\>";
+    private final static String HTML_ENTITY = "&[a-zA-Z][a-zA-Z0-9]+;";
+
+    private final static Pattern TAG_PATTERN = Pattern.compile(TAG_START + "((.*))" + TAG_END, Pattern.DOTALL);
+
+    private final static Pattern HTML_MATCH_PATTERN = Pattern.compile(
+            "(" + TAG_START + ".*" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")", Pattern.DOTALL);
+
     private static final Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
 
-    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000, "Derivate display value cache");
+    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000,
+            "Derivate display value cache");
 
     /**
      * returns the given String trimmed
@@ -186,16 +201,18 @@ public class MCRXMLFunctions {
         return returns;
     }
 
-    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language) throws ParseException {
+    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language)
+            throws ParseException {
         return formatISODate(isoDate, null, simpleFormat, iso639Language);
     }
 
-    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
+    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language)
+            throws ParseException {
         return formatISODate(isoDate, isoFormat, simpleFormat, iso639Language, TimeZone.getDefault().getID());
     }
 
-    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language, String timeZone)
-            throws ParseException {
+    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language,
+            String timeZone) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("isoDate=");
             sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
@@ -210,8 +227,8 @@ public class MCRXMLFunctions {
             String formatted = mcrdate.format(simpleFormat, locale, timeZone);
             return formatted == null ? "?" + isoDate + "?" : formatted;
         } catch (RuntimeException iae) {
-            LOGGER.error("Unable to format date " + mcrdate.getISOString() + " to " + simpleFormat + " with locale " + locale
-                    + " and timezone " + timeZone, iae);
+            LOGGER.error("Unable to format date " + mcrdate.getISOString() + " to " + simpleFormat + " with locale "
+                    + locale + " and timezone " + timeZone, iae);
             return "?";
         }
     }
@@ -250,7 +267,8 @@ public class MCRXMLFunctions {
      * @param calendar_name the name if the calendar defined in MCRCalendar
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
-    public static String getISODateFromMCRHistoryDate(String date_value, String field_name, String calendar_name) throws ParseException {
+    public static String getISODateFromMCRHistoryDate(String date_value, String field_name, String calendar_name)
+            throws ParseException {
         String formatted_date = "";
         if (field_name == null || field_name.trim().length() == 0) {
             return "";
@@ -268,7 +286,8 @@ public class MCRXMLFunctions {
             if (LOGGER.isDebugEnabled()) {
                 e.printStackTrace();
             }
-            LOGGER.warn("Error while converting date string :" + date_value + " - " + use_last_value + " - " + calendar_name);
+            LOGGER.warn("Error while converting date string :" + date_value + " - " + use_last_value + " - "
+                    + calendar_name);
             return "";
         }
         return formatted_date;
@@ -369,8 +388,8 @@ public class MCRXMLFunctions {
             return new URI(url).toASCIIString();
         } catch (Exception e) {
             URL testURL = new URL(url);
-            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(),
-                    testURL.getQuery(), testURL.getRef());
+            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(),
+                    testURL.getPath(), testURL.getQuery(), testURL.getRef());
             return uri.toASCIIString();
         }
     }
@@ -408,7 +427,8 @@ public class MCRXMLFunctions {
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         MCRObjectID derId = MCRObjectID.getInstance(derivateId);
-        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30, TimeUnit.SECONDS);
+        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30,
+                TimeUnit.SECONDS);
         Boolean result;
         try {
             result = DISPLAY_DERIVATE_CACHE.getIfUpToDate(derivateId, modifiedHandle);
@@ -481,8 +501,8 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
-                + propertyName + "\"");
+        LOGGER.info("URN assignment disabled as the object type " + givenType
+                + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
         return false;
     }
 
@@ -659,11 +679,13 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isCurrentUserSuperUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getSuperUserInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation()
+                .equals(MCRSystemUserInformation.getSuperUserInstance());
     }
 
     public static boolean isCurrentUserGuestUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getGuestInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation()
+                .equals(MCRSystemUserInformation.getGuestInstance());
     }
 
     public static String getCurrentUserAttribute(String attribute) {
@@ -706,7 +728,8 @@ public class MCRXMLFunctions {
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         //fast way
         if (dao instanceof MCRCategoryDAOImpl) {
-            MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(MCRHIBConnection.instance().getSession(), categID);
+            MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(MCRHIBConnection.instance().getSession(),
+                    categID);
             //root category has level 0
             return categoryImpl.getLevel() > 1;
         }
@@ -728,7 +751,8 @@ public class MCRXMLFunctions {
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             category = dao.getCategory(categID, 0);
         } catch (Exception e) {
-            LOGGER.warn("Could not determine display name for classification id " + classificationId + " and category id " + categoryId);
+            LOGGER.warn("Could not determine display name for classification id " + classificationId
+                    + " and category id " + categoryId);
         }
 
         return category.getCurrentLabel().map(MCRLabel::getText).orElse("");
@@ -746,7 +770,8 @@ public class MCRXMLFunctions {
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             category = dao.getCategory(categID, 0);
         } catch (Exception e) {
-            LOGGER.warn("Could not determine state for classification id " + classificationId + " and category id " + categoryId);
+            LOGGER.warn("Could not determine state for classification id " + classificationId + " and category id "
+                    + categoryId);
         }
 
         return category == null ? false : true;
@@ -789,7 +814,8 @@ public class MCRXMLFunctions {
      * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID, long, TimeUnit)} with String representation.
      */
     public static String getMCRObjectID(final String derivateID, final long expire) {
-        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS).toString();
+        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS)
+                .toString();
     }
 
     /**
@@ -868,6 +894,38 @@ public class MCRXMLFunctions {
             return text;
         }
         return text.substring(0, pos - 1);
+    }
+
+    /**
+     * Return <code>true</code> if s contains HTML markup tags or entities.
+     *
+     * @param s string to test
+     * @return true if string contains HTML
+     */
+    public static boolean isHtml(final String s) {
+        boolean ret = false;
+        if (s != null) {
+            ret = HTML_MATCH_PATTERN.matcher(s).find();
+        }
+        return ret;
+    }
+
+    /**
+     * Strippes HTML tags from string.
+     * 
+     * @param s string to strip HTML tags of
+     * @return the plain text without tags
+     */
+    public static String stripHtml(final String s) {
+        StringBuffer res = new StringBuffer(s);
+
+        Matcher m;
+        while ((m = TAG_PATTERN.matcher(res.toString())).find()) {
+            res.delete(m.start(), m.end());
+            res.insert(m.start(), stripHtml(m.group(m.groupCount() - 1)));
+        }
+
+        return StringEscapeUtils.unescapeHtml(res.toString()).replaceAll(TAG_SELF_CLOSING, "");
     }
 
 }
