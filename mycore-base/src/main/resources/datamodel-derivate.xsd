@@ -5,7 +5,7 @@
   <!-- Needed as mycoreobject is incomplete but defined in mcrcommon-datamodel.xsd -->
   <xs:element name="structure" type="xs:ID" />
   <xs:element name="metadata" type="xs:ID" />
-  
+
   <xs:element name="mycorederivate">
     <xs:complexType>
       <xs:all>
@@ -101,7 +101,7 @@
   <xs:element name="fileset">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" name="file">
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="file">
           <xs:complexType>
             <xs:sequence>
               <xs:element minOccurs="0" type="xs:anyURI" name="urn" />
