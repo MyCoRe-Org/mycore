@@ -25,7 +25,6 @@ package org.mycore.backend.hibernate;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +49,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  */
 public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     // LOGGER
-    private static Logger LOGGER = Logger.getLogger(MCRHIBLinkTableStore.class);
+    private static Logger LOGGER = Logger.getLogger(MCRHIBFileMetadataStore.class);
 
     private Session getSession() {
         return MCRHIBConnection.instance().getSession();
