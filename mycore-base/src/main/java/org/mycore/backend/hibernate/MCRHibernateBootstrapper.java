@@ -24,11 +24,18 @@
 package org.mycore.backend.hibernate;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 
@@ -125,10 +132,39 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
 
     public static void updateSchema(Metadata metadata) {
         SchemaUpdate schemaUpdate = new SchemaUpdate();
-        schemaUpdate.execute(EnumSet.of(TargetType.DATABASE), metadata);
+        EnumSet<TargetType> output;
+        Path schemaUpdateLog = null;
+        try {
+            schemaUpdateLog = Files.createTempFile(Paths.get(MCRConfiguration.instance().getString("MCR.datadir")),
+                "schemaUpdate", ".log");
+            schemaUpdate.setOutputFile(schemaUpdateLog.toAbsolutePath().toString());
+            output = EnumSet.of(TargetType.DATABASE, TargetType.SCRIPT);
+        } catch (IOException e) {
+            LOGGER.info("Could not get script output for database schema update. Fallback to StdOut.", e);
+            output = EnumSet.of(TargetType.DATABASE, TargetType.STDOUT);
+        }
+        schemaUpdate.execute(output, metadata);
+        if (schemaUpdateLog != null) {
+            try {
+                log(schemaUpdateLog, LOGGER::info);
+            } catch (IOException e) {
+                LOGGER.error("Could not read schema update script: " + schemaUpdateLog, e);
+            }
+        }
         @SuppressWarnings("unchecked")
         List<Exception> exceptions = (List<Exception>) schemaUpdate.getExceptions();
         exceptions.stream().forEach(e -> LOGGER.error("Error while updateing database schema.", e));
+    }
+
+    private static void log(Path schemaUpdateLog, Consumer<String> logMethod) throws IOException {
+        if (Files.exists(schemaUpdateLog)
+            && Files.getFileAttributeView(schemaUpdateLog, BasicFileAttributeView.class).readAttributes().size() > 0)
+            logMethod.accept(
+                Files.readAllLines(schemaUpdateLog, Charset.defaultCharset())
+                    .stream()
+                    .collect(
+                        Collectors.joining(System.getProperty("line.separator"), "Performed schema update:\n", "")));
+
     }
 
     private static String getDialect(Metadata metadata) {
@@ -149,7 +185,7 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
             .getStrings("MCR.Hibernate.Mappings")
             .stream()
             .map(className -> addMapping(metadataSources, className))
-            .reduce((l,r) -> r)
+            .reduce((l, r) -> r)
             .get()
             .getMetadataBuilder()
             .applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE)
