@@ -176,6 +176,6 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public String toString() {
-        return id.toString();
+        return Optional.ofNullable(id).map(MCRCategoryID::toString).orElse(null);
     }
 }

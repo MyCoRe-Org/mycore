@@ -27,6 +27,8 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -42,6 +44,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(
     name = "label")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Embeddable
 public class MCRLabel implements Cloneable, Serializable {
 
     private static final long serialVersionUID = -843799854929361194L;
@@ -74,6 +77,7 @@ public class MCRLabel implements Cloneable, Serializable {
         setDescription(description);
     }
 
+    @Column
     public String getLang() {
         return lang;
     }
@@ -96,6 +100,7 @@ public class MCRLabel implements Cloneable, Serializable {
         this.lang = languageTag;
     }
 
+    @Column(length=4096)
     public String getText() {
         return text;
     }
@@ -113,6 +118,7 @@ public class MCRLabel implements Cloneable, Serializable {
         this.text = text;
     }
 
+    @Column(length=4096, nullable=true)
     public String getDescription() {
         if (description == null) {
             return "";

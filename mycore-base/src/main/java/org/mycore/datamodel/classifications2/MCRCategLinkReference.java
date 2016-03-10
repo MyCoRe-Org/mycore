@@ -25,6 +25,10 @@ package org.mycore.datamodel.classifications2;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 
@@ -34,12 +38,16 @@ import org.mycore.datamodel.niofs.MCRPath;
  * @version $Revision$ $Date$
  * @since 2.0
  */
+@Embeddable
 public class MCRCategLinkReference implements Serializable {
 
     private static final long serialVersionUID = -6457722746147666860L;
 
+    @Basic
     private String objectID;
 
+    @Basic
+    @Column(name="objectType", length=128)
     private String type;
 
     public MCRCategLinkReference() {

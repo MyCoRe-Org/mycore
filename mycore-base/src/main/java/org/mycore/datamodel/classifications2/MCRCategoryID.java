@@ -28,6 +28,13 @@ import java.text.MessageFormat;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Transient;
+
 import org.mycore.common.MCRException;
 
 /**
@@ -39,6 +46,8 @@ import org.mycore.common.MCRException;
  *          2008) $
  * @since 2.0
  */
+@Embeddable
+@Access(AccessType.FIELD)
 public class MCRCategoryID implements Serializable {
 
     private static final long serialVersionUID = -5672923571406252855L;
@@ -49,8 +58,12 @@ public class MCRCategoryID implements Serializable {
 
     private static final int CATEG_ID_LENGTH = 128;
 
+    @Basic
+    @Column(name = "ClassID", length = ROOT_ID_LENGTH, nullable = false, updatable = false)
     private String rootID;
 
+    @Basic
+    @Column(name = "CategID", length = CATEG_ID_LENGTH, updatable = false)
     private String ID;
 
     private MCRCategoryID() {
@@ -70,8 +83,7 @@ public class MCRCategoryID implements Serializable {
     }
 
     public static MCRCategoryID rootID(String rootID) {
-        String root = rootID.intern();
-        return new MCRCategoryID(root, null);
+        return new MCRCategoryID(rootID, "");
     }
 
     /**
@@ -91,6 +103,7 @@ public class MCRCategoryID implements Serializable {
         return new MCRCategoryID(rootId, categId);
     }
 
+    @Transient
     public boolean isRootID() {
         return ID == null || ID.equals("");
     }
@@ -104,7 +117,7 @@ public class MCRCategoryID implements Serializable {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + (ID == null || ID.length() == 0 ? 0 : ID.hashCode());
+        result = PRIME * result + (ID == null || ID.isEmpty() ? 0 : ID.hashCode());
         result = PRIME * result + (rootID == null ? 0 : rootID.hashCode());
         return result;
     }
@@ -154,13 +167,14 @@ public class MCRCategoryID implements Serializable {
      * @param id
      *            the ID to set
      */
-    void setID(String id) {
+    private void setID(String id) {
         if (id != null && id.length() > 0) {
             if (!validID.matcher(id).matches()) {
                 throw new MCRException("category ID '" + id + "' is invalid and does not match: " + validID);
             }
             if (id.length() > CATEG_ID_LENGTH) {
-                throw new MCRException(MessageFormat.format("category ID ''{0}'' is more than {1} characters long: {2}", id, CATEG_ID_LENGTH, id.length()));
+                throw new MCRException(MessageFormat.format("category ID ''{0}'' is more than {1} characters long: {2}",
+                    id, CATEG_ID_LENGTH, id.length()));
             }
         }
         ID = id;
@@ -177,13 +191,15 @@ public class MCRCategoryID implements Serializable {
      * @param rootID
      *            the rootID to set
      */
-    void setRootID(String rootID) {
+    private void setRootID(String rootID) {
         if (!validID.matcher(rootID).matches()) {
-            throw new MCRException(MessageFormat.format("classification ID ''{0}'' is invalid and does not match: {1}", rootID, validID));
+            throw new MCRException(
+                MessageFormat.format("classification ID ''{0}'' is invalid and does not match: {1}", rootID, validID));
         }
         if (rootID.length() > ROOT_ID_LENGTH) {
-            throw new MCRException(MessageFormat.format("classification ID ''{0}'' is more than {1} chracters long: {2}", rootID, ROOT_ID_LENGTH,
-                    rootID.length()));
+            throw new MCRException(MessageFormat.format(
+                "classification ID ''{0}'' is more than {1} chracters long: {2}", rootID, ROOT_ID_LENGTH,
+                rootID.length()));
         }
         this.rootID = rootID.intern();
     }

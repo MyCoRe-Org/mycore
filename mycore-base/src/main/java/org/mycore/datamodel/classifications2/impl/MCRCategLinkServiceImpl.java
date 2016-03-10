@@ -67,6 +67,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static Class<MCRCategoryLinkImpl> LINK_CLASS = MCRCategoryLinkImpl.class;
 
+    private static final String NAMED_QUERY_NAMESPACE = "MCRCategoryLink.";
+
     private static MCRCache<MCRCategoryID, MCRCategory> categCache = new MCRCache<MCRCategoryID, MCRCategory>(
         MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
         "MCRCategLinkService category cache");
@@ -85,9 +87,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         boolean restrictedByType = type != null;
         String queryName;
         if (childrenOnly) {
-            queryName = restrictedByType ? ".NumberByTypePerChildOfParentID" : ".NumberPerChildOfParentID";
+            queryName = restrictedByType ? "NumberByTypePerChildOfParentID" : "NumberPerChildOfParentID";
         } else {
-            queryName = restrictedByType ? ".NumberByTypePerClassID" : ".NumberPerClassID";
+            queryName = restrictedByType ? "NumberByTypePerClassID" : "NumberPerClassID";
         }
         Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
         Collection<MCRCategoryID> ids = childrenOnly ? getAllChildIDs(parent) : getAllCategIDs(parent);
@@ -105,7 +107,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
         LOGGER.info("parentID:" + parent.getId());
         String classID = parent.getId().getRootID();
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + queryName);
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + queryName);
         // query can take long time, please cache result
         q.setCacheable(true);
         q.setParameter("classID", classID);
@@ -127,7 +129,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     public void deleteLink(MCRCategLinkReference reference) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectID");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectID");
         q.setParameter("id", reference.getObjectID());
         q.setParameter("type", reference.getType());
         int deleted = q.executeUpdate();
@@ -155,7 +157,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             }
             objectIds.add(ref.getObjectID());
         }
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectCollection");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectCollection");
         int deleted = 0;
         for (Map.Entry<String, Collection<String>> entry : typeMap.entrySet()) {
             q.setParameterList("ids", entry.getValue());
@@ -167,35 +169,28 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategory(MCRCategoryID id) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategory");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategory");
         q.setCacheable(true);
-        q.setParameter("rootID", id.getRootID());
-        q.setParameter("categID", id.getID());
+        q.setParameter("id", id);
         return q.list();
     }
 
     @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategoryAndType");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategoryAndType");
         q.setCacheable(true);
-        q.setParameter("rootID", id.getRootID());
-        q.setParameter("categID", id.getID());
+        q.setParameter("id", id);
         q.setParameter("type", type);
         return q.list();
     }
 
     @SuppressWarnings("unchecked")
     public Collection<MCRCategoryID> getLinksFromReference(MCRCategLinkReference reference) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".categoriesByObjectID");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "categoriesByObjectID");
         q.setCacheable(true);
         q.setParameter("id", reference.getObjectID());
         q.setParameter("type", reference.getType());
-        List<Object[]> result = q.list();
-        ArrayList<MCRCategoryID> returns = new ArrayList<MCRCategoryID>(result.size());
-        for (Object[] idValues : result) {
-            returns.add(new MCRCategoryID(idValues[0].toString(), idValues[1].toString()));
-        }
-        return returns;
+        return q.list();
     }
 
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
@@ -343,7 +338,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @Override
     public boolean isInCategory(MCRCategLinkReference reference, MCRCategoryID id) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".CategoryAndObjectID");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "CategoryAndObjectID");
         q.setCacheable(true);
         q.setParameter("rootID", id.getRootID());
         q.setParameter("categID", id.getID());

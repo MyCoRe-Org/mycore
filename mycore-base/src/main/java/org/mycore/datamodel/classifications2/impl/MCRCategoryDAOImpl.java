@@ -76,6 +76,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     private static final Logger LOGGER = Logger.getLogger(MCRCategoryDAOImpl.class);
 
     private static final Class<MCRCategoryImpl> CATEGRORY_CLASS = MCRCategoryImpl.class;
+    
+    private static final String NAMED_QUERY_NAMESPACE = "MCRCategory.";
 
     private static HashMap<String, Long> LAST_MODIFIED_MAP = new HashMap<String, Long>();
 
@@ -173,7 +175,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     @SuppressWarnings("unchecked")
     @Override
     public List<MCRCategory> getCategoriesByLabel(final String lang, final String text) {
-        final Query q = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".byLabel");
+        final Query q = getHibConnection().getNamedQuery(NAMED_QUERY_NAMESPACE + "byLabel");
         q.setString("lang", lang);
         q.setString("text", text);
         q.setCacheable(true);
@@ -183,7 +185,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
         Integer[] leftRight = getLeftRightValues(baseID);
-        Query q = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".byLabelInClass");
+        Query q = getHibConnection().getNamedQuery(NAMED_QUERY_NAMESPACE + "byLabelInClass");
         q.setString("rootID", baseID.getRootID());
         q.setInteger("left", leftRight[0]);
         q.setInteger("right", leftRight[1]);
@@ -200,8 +202,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Query q;
         if (id.isRootID()) {
             q = getHibConnection()
-                .getNamedQuery(CATEGRORY_CLASS.getName()
-                    + (fetchAllChildren ? ".prefetchClassQuery" : ".prefetchClassLevelQuery"));
+                .getNamedQuery(NAMED_QUERY_NAMESPACE
+                    + (fetchAllChildren ? "prefetchClassQuery" : "prefetchClassLevelQuery"));
             if (!fetchAllChildren) {
                 q.setInteger("endlevel", childLevel);
             }
@@ -213,8 +215,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 return null;
             }
             q = getHibConnection()
-                .getNamedQuery(CATEGRORY_CLASS.getName()
-                    + (fetchAllChildren ? ".prefetchCategQuery" : ".prefetchCategLevelQuery"));
+                .getNamedQuery(NAMED_QUERY_NAMESPACE
+                    + (fetchAllChildren ? "prefetchCategQuery" : "prefetchCategLevelQuery"));
             if (!fetchAllChildren) {
                 q.setInteger("endlevel", category.getLevel() + childLevel);
             }
@@ -242,6 +244,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
         LOGGER.debug("Get children of category: " + cid);
+        if (cid==null){
+            return new MCRCategoryChildList(null, null);
+        }
         Session session = getHibConnection().getSession();
         FlushMode fm = session.getFlushMode();
         session.setFlushMode(FlushMode.MANUAL);
@@ -281,17 +286,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         FlushMode fm = session.getFlushMode();
         session.setFlushMode(FlushMode.MANUAL);
         try {
-            Criteria c = session.createCriteria(CATEGRORY_CLASS);
-            c.add(Restrictions.eq("left", LEFT_START_VALUE));
-            c.setProjection(
-                Projections.projectionList().add(Projections.property("rootID")).add(Projections.property("categID")));
-            c.setCacheable(true);
-            List<Object[]> result = c.list();
-            List<MCRCategoryID> classIds = new ArrayList<MCRCategoryID>(result.size());
-            for (Object[] cat : result) {
-                classIds.add(new MCRCategoryID(cat[0].toString(), cat[1].toString()));
-            }
-            return classIds;
+            return (List<MCRCategoryID>) session.createCriteria(CATEGRORY_CLASS)
+                .add(Restrictions.eq("left", LEFT_START_VALUE))
+                .setProjection(Projections.property("id"))
+                .setCacheable(true)
+                .list()
+                .stream()
+                .map(MCRCategoryID.class::cast)
+                .collect(Collectors.toList());
         } finally {
             session.setFlushMode(fm);
         }
@@ -384,7 +386,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (node2.getLeft() == 0) {
             return node2;
         }
-        Query q = connection.getNamedQuery(CATEGRORY_CLASS.getName() + ".commonAncestor");
+        Query q = connection.getNamedQuery(NAMED_QUERY_NAMESPACE + "commonAncestor");
         q.setMaxResults(1);
         int left = Math.min(node1.getLeft(), node2.getLeft());
         int right = Math.max(node1.getRight(), node2.getRight());
@@ -502,7 +504,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (category.hasChildren()) {
             int parentPos = category.getPositionInParent();
             MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
-            parent.children.addAll(parentPos, category.children);
+            parent.children.addAll(parentPos, category.children
+                .stream()
+                .map(MCRCategoryImpl.class::cast)
+                .collect(Collectors.toList()) //temporary list so we do not modify 'children' directly
+                .stream()
+                .peek(MCRCategoryImpl::detachFromParent)
+                .collect(Collectors.toList()));
         }
         category.detachFromParent();
     }
@@ -554,8 +562,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         LAST_MODIFIED = System.currentTimeMillis();
     }
 
-    private static Criterion getCategoryCriterion(MCRCategoryID id) {
-        return Restrictions.naturalId().set("rootID", id.getRootID()).set("categID", id.getID());
+    static Criterion getCategoryCriterion(MCRCategoryID id) {
+        return Restrictions.eq("id", id);
     }
 
     private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryImpl> list) {
@@ -606,9 +614,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * every change to the returned MCRCategory is reflected in the database.
      */
     public static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
-        return (MCRCategoryImpl) session.byNaturalId(CATEGRORY_CLASS).setSynchronizationEnabled(false)
-            .using("rootID", id.getRootID())
-            .using("categID", id.getID()).load();
+        return (MCRCategoryImpl) session.createCriteria(MCRCategoryImpl.class).add(getCategoryCriterion(id)).setCacheable(true).uniqueResult();
     }
 
     private static void syncLabels(MCRCategoryImpl source, MCRCategoryImpl target) {
@@ -664,12 +670,12 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     private static void updateLeftRightValue(MCRHIBConnection connection, String classID, int left,
         final int increment) {
         LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
-        Query leftQuery = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
+        Query leftQuery = getHibConnection().getNamedQuery(NAMED_QUERY_NAMESPACE + "updateLeft");
         leftQuery.setInteger("left", left);
         leftQuery.setInteger("increment", increment);
         leftQuery.setString("classID", classID);
         int leftChanges = leftQuery.executeUpdate();
-        Query rightQuery = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".updateRight");
+        Query rightQuery = getHibConnection().getNamedQuery(NAMED_QUERY_NAMESPACE + "updateRight");
         rightQuery.setInteger("left", left);
         rightQuery.setInteger("increment", increment);
         rightQuery.setString("classID", classID);
