@@ -25,6 +25,10 @@ package org.mycore.backend.hibernate.tables;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 /**
  * This class hold all primary keys of MCRLINKHREF
  * 
@@ -32,6 +36,7 @@ import java.io.Serializable;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
+@Embeddable
 public class MCRLINKHREFPK implements Serializable {
 
     private static final long serialVersionUID = -5838803852559721772L;
@@ -67,6 +72,8 @@ public class MCRLINKHREFPK implements Serializable {
      * 
      * @return Returns the mcrfrom.
      */
+    @Basic
+    @Column(length=64, name="MCRFROM")
     public String getMcrfrom() {
         return mcrfrom;
     }
@@ -86,6 +93,8 @@ public class MCRLINKHREFPK implements Serializable {
      * 
      * @return Returns the mcrto.
      */
+    @Basic
+    @Column(length=194, name="MCRTO")
     public String getMcrto() {
         return mcrto;
     }
@@ -105,6 +114,8 @@ public class MCRLINKHREFPK implements Serializable {
      * 
      * @return Returns the mcrtype.
      */
+    @Basic
+    @Column(length=75, name="MCRTYPE")
     public String getMcrtype() {
         return mcrtype;
     }

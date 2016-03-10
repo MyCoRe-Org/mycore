@@ -23,6 +23,11 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+
 /**
  * This class implement the data sructure of the MCRLinkHref table.
  * 
@@ -30,6 +35,7 @@ package org.mycore.backend.hibernate.tables;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
+@Entity
 public class MCRLINKHREF {
     private MCRLINKHREFPK key;
 
@@ -72,6 +78,7 @@ public class MCRLINKHREF {
      * @return returns the primary key as class MCRLINKHREFPK.
      * @hibernate.property column="Primary Key" not-null="true" update="true"
      */
+    @EmbeddedId
     public MCRLINKHREFPK getKey() {
         return key;
     }
@@ -150,8 +157,9 @@ public class MCRLINKHREF {
      * Get the attribute value.
      * 
      * @return the attr value as a String.
-     * @hibernate.property column="MCRATTR" not-null="true" update="true"
      */
+    @Basic
+    @Column(length=194, name="MCRATTR")
     public String getMcrattr() {
         return attr;
     }
