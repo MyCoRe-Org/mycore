@@ -38,7 +38,7 @@ import org.mycore.common.MCRTestCase;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRUploadServletTest extends MCRTestCase {
+public class MCRUploadHelperTest extends MCRTestCase {
 
     @Test
     public void checkPathName() {
@@ -57,9 +57,9 @@ public class MCRUploadServletTest extends MCRTestCase {
         for (String testPath : genDelimTestNames) {
             boolean failed = false;
             try {
-                MCRUploadServlet.checkPathName(testPath);
+                MCRUploadHelper.checkPathName(testPath);
             } catch (MCRException e) {
-                Logger.getLogger(MCRUploadServletTest.class).debug("Test successfully failed", e);
+                Logger.getLogger(MCRUploadHelperTest.class).debug("Test successfully failed", e);
                 failed = true;
             }
             assertTrue("Path " + testPath + " did not fail in gen-delims test.", failed);
@@ -67,9 +67,9 @@ public class MCRUploadServletTest extends MCRTestCase {
         for (String testPath : subDelimTestNames) {
             boolean failed = false;
             try {
-                MCRUploadServlet.checkPathName(testPath);
+                MCRUploadHelper.checkPathName(testPath);
             } catch (MCRException e) {
-                Logger.getLogger(MCRUploadServletTest.class).debug("Test successfully failed", e);
+                Logger.getLogger(MCRUploadHelperTest.class).debug("Test successfully failed", e);
                 failed = true;
             }
             assertTrue("Path " + testPath + " did not fail in sub-delims test.", failed);
@@ -77,9 +77,9 @@ public class MCRUploadServletTest extends MCRTestCase {
         boolean failed = false;
         String testPath = prefix + " " + suffix;
         try {
-            MCRUploadServlet.checkPathName(testPath);
+            MCRUploadHelper.checkPathName(testPath);
         } catch (MCRException e) {
-            Logger.getLogger(MCRUploadServletTest.class).info("Test failed", e);
+            Logger.getLogger(MCRUploadHelperTest.class).info("Test failed", e);
             failed = true;
         }
         assertFalse("Path " + testPath + " did fail non reserved character test.", failed);
@@ -87,9 +87,9 @@ public class MCRUploadServletTest extends MCRTestCase {
         failed = false;
         testPath = "../../" + prefix + suffix;
         try {
-            MCRUploadServlet.checkPathName(testPath);
+            MCRUploadHelper.checkPathName(testPath);
         } catch (MCRException e) {
-            Logger.getLogger(MCRUploadServletTest.class).debug("Test successfully failed", e);
+            Logger.getLogger(MCRUploadHelperTest.class).debug("Test successfully failed", e);
             failed = true;
         }
         assertTrue("Path " + testPath + " did not fail jail break test #668.", failed);

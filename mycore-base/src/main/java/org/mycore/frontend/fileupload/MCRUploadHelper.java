@@ -44,7 +44,7 @@ public abstract class MCRUploadHelper {
      * Section 2.2
      */
     private static final char[] reserverdCharacters = { ':', '?', '%', '#', '[', ']', '@', '!', '$', '&', '\'', '(',
-        ')', '*', ',', ';', '=' };
+        ')', '*', ',', ';', '=', '\'', '+' };
 
     /**
      * checks if path contains reserved URI characters or path starts or ends with whitespace. There are some characters
