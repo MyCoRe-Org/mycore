@@ -73,10 +73,6 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
         return MCRConfigurationDir.getConfigResource(getHibernateConfigResourceName());
     }
 
-    private static String getResourceName(String className) {
-        return className.replaceAll("\\.", "/") + ".hbm.xml";
-    }
-
     private static Class<?> getAnnotatedClass(String className) {
         try {
             return Class.forName(className);
@@ -193,14 +189,8 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
     }
 
     private static MetadataSources addMapping(MetadataSources metadataSources, String className) {
-        String resourceName = getResourceName(className);
-        if (MCRHibernateBootstrapper.class.getClassLoader().getResource(resourceName) != null) {
-            LOGGER.info("Add mapping: " + resourceName);
-            return metadataSources.addResource(resourceName);
-        } else {
-            LOGGER.info("Add annotated class: " + className);
-            return metadataSources.addAnnotatedClass(getAnnotatedClass(className));
-        }
+        LOGGER.info("Add annotated class: " + className);
+        return metadataSources.addAnnotatedClass(getAnnotatedClass(className));
     }
 
     private static StandardServiceRegistry getStandardRegistry(URL hibernateConfigURL) {
