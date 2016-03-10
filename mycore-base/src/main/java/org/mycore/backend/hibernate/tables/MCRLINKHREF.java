@@ -27,6 +27,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 /**
  * This class implement the data sructure of the MCRLinkHref table.
@@ -76,7 +77,6 @@ public class MCRLINKHREF {
      * This method returns the primary key.
      * 
      * @return returns the primary key as class MCRLINKHREFPK.
-     * @hibernate.property column="Primary Key" not-null="true" update="true"
      */
     @EmbeddedId
     public MCRLINKHREFPK getKey() {
@@ -97,8 +97,8 @@ public class MCRLINKHREF {
      * Get the from value.
      * 
      * @return the from value as a String.
-     * @hibernate.property column="MCRFROM" not-null="true" update="true"
      */
+    @Transient
     public String getMcrfrom() {
         return key.getMcrfrom();
     }
@@ -117,8 +117,8 @@ public class MCRLINKHREF {
      * Get the to value.
      * 
      * @return the to value as a String.
-     * @hibernate.property column="MCRTO" not-null="true" update="true"
      */
+    @Transient
     public String getMcrto() {
         return key.getMcrto();
     }
@@ -137,8 +137,8 @@ public class MCRLINKHREF {
      * Get the type value.
      * 
      * @return the type value as a String.
-     * @hibernate.property column="MCRTYPE" not-null="true" update="true"
      */
+    @Transient
     public String getMcrtype() {
         return key.getMcrtype();
     }
