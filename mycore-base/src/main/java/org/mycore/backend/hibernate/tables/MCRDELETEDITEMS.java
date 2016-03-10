@@ -6,10 +6,15 @@ package org.mycore.backend.hibernate.tables;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Basic;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+
 /**
  * @author shermann
  * @version $Revision: 13085 $ $Date: 2008-02-06 18:27:24 +0100 (Wed, 06 Feb 2008) $
  */
+@Entity
 public class MCRDELETEDITEMS implements Serializable {
 
     private static final long serialVersionUID = 206480527372771428L;
@@ -21,6 +26,7 @@ public class MCRDELETEDITEMS implements Serializable {
     /**
      * @return the userid
      */
+    @Basic
     public String getUserid() {
         return userid;
     }
@@ -35,6 +41,7 @@ public class MCRDELETEDITEMS implements Serializable {
     /**
      * @return the ip
      */
+    @Basic
     public String getIp() {
         return ip;
     }
@@ -57,6 +64,7 @@ public class MCRDELETEDITEMS implements Serializable {
     /**
      * @return the key
      */
+    @EmbeddedId
     public MCRDELETEDITEMSPK getKey() {
         return key;
     }

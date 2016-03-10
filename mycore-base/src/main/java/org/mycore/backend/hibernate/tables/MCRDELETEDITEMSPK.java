@@ -6,11 +6,16 @@ package org.mycore.backend.hibernate.tables;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 /**
  * @author shermann
  * @version $Revision: 13085 $ $Date: 2008-02-06 18:27:24 +0100 (Wed, 06 Feb 2008) $
  *
  */
+@Embeddable
 public class MCRDELETEDITEMSPK implements Serializable {
 
     private static final long serialVersionUID = -332440557096834050L;
@@ -31,6 +36,8 @@ public class MCRDELETEDITEMSPK implements Serializable {
     /**
      * @return the dateDeleted
      */
+    @Basic
+    @Column(name = "DATE_DELETED")
     public Date getDateDeleted() {
         return new Date(dateDeleted.getTime());
     }
@@ -45,6 +52,8 @@ public class MCRDELETEDITEMSPK implements Serializable {
     /**
      * @return the identifier
      */
+    @Basic
+    @Column(length = 128, name = "IDENTIFIER")
     public String getIdentifier() {
         return identifier;
     }
