@@ -3,6 +3,13 @@ package org.mycore.backend.hibernate.tables;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class MCRDNBTRANSFERRESULTS implements Serializable {
 
     /**
@@ -14,13 +21,15 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
 
     private boolean transferPackageArchived;
 
-    private String protocolType, errorMessage, deliveryRole, objectId, errorModule,tpName;
+    private String protocolType, errorMessage, deliveryRole, objectId, errorModule, tpName;
 
     private Date date;
 
     /**
      * @return the id
      */
+    @Id
+    @GeneratedValue
     public int getId() {
         return id;
     }
@@ -36,6 +45,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     /**
      * @return the transferPackageArchived
      */
+    @Basic
+    @Column(name = "TRANSFERPACKAGEARCHIVED")
     public boolean getTransferPackageArchived() {
         return transferPackageArchived;
     }
@@ -51,6 +62,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     /**
      * @return the protocolType
      */
+    @Basic
+    @Column(name = "PROTOCOLTYPE", length = 9, nullable = false)
     public String getProtocolType() {
         return protocolType;
     }
@@ -66,6 +79,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     /**
      * @return the tpName
      */
+    @Basic
+    @Column(name = "TP_NAME", length = 9, nullable = false)
     public String getTpName() {
         return tpName;
     }
@@ -80,6 +95,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     /**
      * @return the errorMessage
      */
+    @Basic
+    @Column(name = "ERRORMESSAGE", length = 1024)
     public String getErrorMessage() {
         return errorMessage;
     }
@@ -95,6 +112,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     /**
      * @return the deliveryRole
      */
+    @Basic
+    @Column(name = "DELIVERYROLE", length = 32, nullable = false)
     public String getDeliveryRole() {
         return deliveryRole;
     }
@@ -110,6 +129,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     /**
      * @return the objectId
      */
+    @Basic
+    @Column(name = "OBJECTID", length = 124)
     public String getObjectId() {
         return objectId;
     }
@@ -125,6 +146,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     /**
      * @return the errorModule
      */
+    @Basic
+    @Column(name = "ERRORMODULE", length = 64)
     public String getErrorModule() {
         return errorModule;
     }
@@ -140,6 +163,8 @@ public class MCRDNBTRANSFERRESULTS implements Serializable {
     /**
      * @return the date
      */
+    @Basic
+    @Column(name = "DATE", nullable = false)
     public Date getDate() {
         return date;
     }
