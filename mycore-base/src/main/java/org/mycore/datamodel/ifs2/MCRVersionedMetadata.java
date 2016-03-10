@@ -362,6 +362,10 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
     private long getLastRevision(boolean deleted) throws SVNException {
         SVNRepository repository = getStore().getRepository();
+        if (repository.getLatestRevision() == 0) {
+            //new repository cannot hold a revision yet (MCR-1196)
+            return -1;
+        }
         final String path = getFilePath();
         String dir = getDirectory();
         LastRevisionLogHandler lastRevisionLogHandler = new LastRevisionLogHandler(path, deleted);
