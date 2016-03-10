@@ -237,7 +237,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      * @return a method to make the request
      */
     private static HttpGet getSolrHttpMethod(MCRSolrQueryHandler queryHandler, ModifiableSolrParams params) {
-        HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, queryHandler.getPath(), params.toQueryString()));
+        HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}{2}", SERVER_URL, queryHandler.getPath(), params.toQueryString()));
         return httpGet;
     }
 
