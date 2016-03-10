@@ -107,11 +107,20 @@ public class MCRMODSWrapper {
         object.setSchema(MODS_DATAMODEL);
     }
 
+    /**
+     * @return the mods:mods Element at /metadata/def.modsContainer/modsContainer
+     */
     public Element getMODS() {
-        MCRMetaXML mx = (MCRMetaXML) (object.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElement(0));
-        for (Content content : mx.getContent())
-            if (content instanceof Element)
-                return (Element) content;
+        try {
+            MCRMetaXML mx = (MCRMetaXML) (object.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElement(0));
+            for (Content content : mx.getContent()) {
+                if (content instanceof Element) {
+                    return (Element) content;
+                }
+            }
+        } catch (NullPointerException npe) {
+            //do nothing
+        }
         return null;
     }
 
@@ -154,7 +163,12 @@ public class MCRMODSWrapper {
 
     public List<Element> getElements(String xPath) {
         try {
-            return buildXPath(xPath).evaluate(getMODS());
+            Element eMODS = getMODS();
+            if (eMODS != null) {
+                return buildXPath(xPath).evaluate(eMODS);
+            } else {
+                return Collections.<Element> emptyList();
+            }
         } catch (JDOMException ex) {
             String msg = "Could not get elements at " + xPath;
             throw new MCRException(msg, ex);

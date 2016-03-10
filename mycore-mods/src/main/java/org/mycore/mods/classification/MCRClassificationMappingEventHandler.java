@@ -79,11 +79,11 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     }
 
     private void createMapping(MCRObject obj) {
-        if (!"mods".equals(obj.getId().getTypeId())){
+        MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
+        if(mcrmodsWrapper.getMODS()==null){
             return;
         }
         // vorher alle mit generator *-mycore löschen
-        MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
         mcrmodsWrapper.getElements("//classification[contains(@generator, '" + GENERATOR_SUFFIX + "')]")
                 .stream().forEach(Element::detach);
 
@@ -101,8 +101,6 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     Element element = createdClassificationElement.orElseThrow(() -> new MCRException("Could not: " + taskMessage));
                     MCRClassMapper.assignCategory(element, mapping.getValue());
                 });
-
-
         LOGGER.debug("mapping complete.");
     }
 
