@@ -1,6 +1,5 @@
 package org.mycore.mods.classification;
 
-
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
@@ -37,7 +36,9 @@ import org.mycore.mods.MCRMODSWrapper;
 public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     public static final String GENERATOR_SUFFIX = "-mycore";
+
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationMappingEventHandler.class);
+
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     private static Map<MCRCategoryID, MCRCategoryID> getMappings(MCRCategory category) {
@@ -47,14 +48,13 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         if (labelOptional.isPresent()) {
             String label = labelOptional.get().getText();
             Stream.of(label.split("\\s"))
-                    .map(categIdString -> categIdString.split(":"))
-                    .map(categIdArr -> new MCRCategoryID(categIdArr[0], categIdArr[1]))
-                    .filter(DAO::exist)
-                    .forEach(mappingTarget -> {
-                        mappingTable.put(category.getId(), mappingTarget);
-                    });
+                .map(categIdString -> categIdString.split(":"))
+                .map(categIdArr -> new MCRCategoryID(categIdArr[0], categIdArr[1]))
+                .filter(DAO::exist)
+                .forEach(mappingTarget -> {
+                    mappingTable.put(category.getId(), mappingTarget);
+                });
         }
-
 
         return mappingTable;
     }
@@ -79,6 +79,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     }
 
     private void createMapping(MCRObject obj) {
+        if (!"mods".equals(obj.getId().getTypeId())){
+            return;
+        }
         // vorher alle mit generator *-mycore löschen
         MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
         mcrmodsWrapper.getElements("//classification[contains(@generator, '" + GENERATOR_SUFFIX + "')]")
