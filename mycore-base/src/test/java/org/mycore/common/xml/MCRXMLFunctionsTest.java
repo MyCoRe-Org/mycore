@@ -17,7 +17,8 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
             "<h1>Hell<i>o</i> World!<br /></h1>", "<h1>Hell<i>o</i> World!<br></h1>",
             "<h1>Hell<i>o</i> World!&lt;br&gt;</h1>", "<h1>Hell<i>&ouml;</i> World!&lt;br&gt;</h1>",
             "<h1>Hello</h1> <h2>World!</h2><br/>", "Hello <a href=\"http://www.mycore.de\">MyCoRe</a>!",
-            "Hello <a href='http://www.mycore.de'>MyCoRe</a>!" };
+            "Hello <a href='http://www.mycore.de'>MyCoRe</a>!",
+            "Gläser und Glaskeramiken im MgO-Al<sub>2</sub>O<sub>3</sub>-SiO<sub>2</sub>-System mit hoher Mikrohärte und hohem Elastizitätsmodul" };
 
     private final static String[] NON_HTML_STRINGS = new String[] { "Hello MyCoRe!", "a < b > c" };
 
@@ -121,7 +122,8 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     @Test
     public void stripHtml() {
         for (final String s : HTML_STRINGS) {
-            assertFalse(MCRXMLFunctions.isHtml(MCRXMLFunctions.stripHtml(s)));
+            final String stripped = MCRXMLFunctions.stripHtml(s);
+            assertFalse("Should not contains html: " + stripped, MCRXMLFunctions.isHtml(stripped));
         }
     }
 }
