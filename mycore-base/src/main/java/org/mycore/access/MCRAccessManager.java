@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -62,7 +62,7 @@ public class MCRAccessManager {
 
     /**
      * adds an access rule for an MCRObjectID to an access system.
-     * 
+     *
      * @param id
      *            the MCRObjectID of the object
      * @param permission
@@ -72,7 +72,7 @@ public class MCRAccessManager {
      * @param description
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
-     *             if an errow was occured
+     *             if an error was occurred
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
     public static void addRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
@@ -82,7 +82,7 @@ public class MCRAccessManager {
 
     /**
      * adds an access rule for an ID to an access system.
-     * 
+     *
      * @param id
      *            the ID of the object as String
      * @param permission
@@ -92,7 +92,7 @@ public class MCRAccessManager {
      * @param description
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
-     *             if an errow was occured
+     *             if an error was occurred
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
     public static void addRule(String id, String permission, org.jdom2.Element rule, String description)
@@ -102,13 +102,13 @@ public class MCRAccessManager {
 
     /**
      * removes the <code>permission</code> rule for the MCRObjectID.
-     * 
+     *
      * @param id
      *            the MCRObjectID of an object
      * @param permission
      *            the access permission for the rule
      * @throws MCRException
-     *             if an errow was occured
+     *             if an error was occurred
      * @see MCRAccessInterface#removeRule(String, String)
      */
     public static void removeRule(MCRObjectID id, String permission) throws MCRException {
@@ -117,13 +117,13 @@ public class MCRAccessManager {
 
     /**
      * removes the <code>permission</code> rule for the ID.
-     * 
+     *
      * @param id
      *            the ID of an object as String
      * @param permission
      *            the access permission for the rule
      * @throws MCRException
-     *             if an errow was occured
+     *             if an error was occurred
      * @see MCRAccessInterface#removeRule(String, String)
      */
     public static void removeRule(String id, String permission) throws MCRException {
@@ -132,11 +132,11 @@ public class MCRAccessManager {
 
     /**
      * removes all rules for the MCRObjectID.
-     * 
+     *
      * @param id
      *            the MCRObjectID of an object
      * @throws MCRException
-     *             if an errow was occured
+     *             if an error was occurred
      * @see MCRAccessInterface#removeRule(String)
      */
     public static void removeAllRules(MCRObjectID id) throws MCRException {
@@ -145,7 +145,7 @@ public class MCRAccessManager {
 
     /**
      * updates an access rule for an MCRObjectID.
-     * 
+     *
      * @param id
      *            the MCRObjectID of the object
      * @param permission
@@ -155,7 +155,7 @@ public class MCRAccessManager {
      * @param description
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
-     *             if an errow was occured
+     *             if an error was occurred
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
@@ -165,7 +165,7 @@ public class MCRAccessManager {
 
     /**
      * updates an access rule for an ID.
-     * 
+     *
      * @param id
      *            the ID of the object
      * @param permission
@@ -175,7 +175,7 @@ public class MCRAccessManager {
      * @param description
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
-     *             if an errow was occured
+     *             if an error was occurred
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(String id, String permission, org.jdom2.Element rule, String description)
@@ -185,7 +185,7 @@ public class MCRAccessManager {
 
     /**
      * determines whether the current user has the permission to perform a certain action.
-     * 
+     *
      * @param id
      *            the MCRObjectID of the object
      * @param permission
@@ -199,7 +199,7 @@ public class MCRAccessManager {
 
     /**
      * determines whether the current user has the permission to perform a certain action.
-     * 
+     *
      * @param id
      *            the MCRObjectID of the object
      * @param permission
@@ -220,7 +220,7 @@ public class MCRAccessManager {
 
     /**
      * determines whether the current user has the permission to perform a certain action.
-     * 
+     *
      * @param permission
      *            the access permission for the rule
      * @return true if the permission exist
@@ -239,7 +239,7 @@ public class MCRAccessManager {
 
     /**
      * Invalidates the permission for current user on cache.
-     *  
+     *
      * @param id the {@link MCRObjectID}
      * @param permission the access permission
      */
@@ -249,7 +249,7 @@ public class MCRAccessManager {
 
     /**
      * Invalidates the permission for current user on cache.
-     *  
+     *
      * @param permission the access permission
      */
     public static void invalidPermissionCache(String permission) {
@@ -260,7 +260,7 @@ public class MCRAccessManager {
      * checks whether the current user has the permission to read/see a derivate check is also against the mcrobject,
      * the derivate belongs to both checks must return true <br>
      * it is needed in MCRFileNodeServlet and MCRZipServlet
-     * 
+     *
      * @param derID
      *            String ID of a MyCoRe-Derivate
      * @return true if the access is allowed otherwise it return false
@@ -280,7 +280,7 @@ public class MCRAccessManager {
 
     /**
      * lists all permissions defined for the <code>id</code>.
-     * 
+     *
      * @param id
      *            the ID of the object as String
      * @return a <code>List</code> of all for <code>id</code> defined permissions
@@ -291,7 +291,7 @@ public class MCRAccessManager {
 
     /**
      * lists all permissions defined for the <code>id</code>.
-     * 
+     *
      * @param id
      *            the MCRObjectID of the object
      * @return a <code>List</code> of all for <code>id</code> defined permissions
@@ -302,7 +302,7 @@ public class MCRAccessManager {
 
     /**
      * return a rule, that allows something for everybody
-     * 
+     *
      * @return a rule, that allows something for everybody
      */
     public static Element getTrueRule() {
@@ -316,7 +316,7 @@ public class MCRAccessManager {
 
     /**
      * return a rule, that forbids something for all, but superuser
-     * 
+     *
      * @return a rule, that forbids something for all, but superuser
      */
     public static Element getFalseRule() {
@@ -330,7 +330,7 @@ public class MCRAccessManager {
 
     /**
      * return true if a rule for the id exist
-     * 
+     *
      * @param id
      *            the MCRObjectID of the object
      * @param permission

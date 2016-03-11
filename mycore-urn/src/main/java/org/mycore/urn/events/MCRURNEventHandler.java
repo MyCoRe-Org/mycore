@@ -74,7 +74,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
      * MCR.Persistence.URN.XPath.{type} or as a default MCR.Persistence.URN.XPath
      *
      * @param evt
-     *            the event that occured
+     *            the event that occurred
      * @param obj
      *            the MCRObject that caused the event
      */
@@ -127,7 +127,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
      * Handles object updated events
      *
      * @param evt
-     *            the event that occured
+     *            the event that occurred
      * @param obj
      *            the MCRObject that caused the event
      */
@@ -140,7 +140,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
      * Handles object repaired events
      *
      * @param evt
-     *            the event that occured
+     *            the event that occurred
      * @param obj
      *            the MCRObject that caused the event
      */
@@ -154,7 +154,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
      * records in the MCRURN table
      *
      * @param evt
-     *            the event that occured
+     *            the event that occurred
      * @param obj
      *            the MCRObject that caused the event
      */
@@ -176,7 +176,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
      * records in the MCRURN table
      *
      * @param evt
-     *            the event that occured
+     *            the event that occurred
      * @param der
      *            the MCRDerivate that caused the event
      */
@@ -196,7 +196,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
      * Handles derivate created events. This implementation adds the urn records in the MCRURN table
      *
      * @param evt
-     *            the event that occured
+     *            the event that occurred
      * @param der
      *            the MCRDerivate that caused the event
      */
@@ -257,7 +257,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
     /**
      * When overriding an existing file with urn, this method ensures the urn remaining in the derivate xml.
-     * */
+     */
     @Override
     protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
         //TODO handle directory structures
