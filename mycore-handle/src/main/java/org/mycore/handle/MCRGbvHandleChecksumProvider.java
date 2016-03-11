@@ -8,8 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-import org.mycore.urn.services.MCRIConcordanceTable;
-
 /**
  * Class provides functionality for calculating the checksum of a {@link MCRHandle}. 
  * 
@@ -44,114 +42,151 @@ public class MCRGbvHandleChecksumProvider {
          * get the String representation of this urn and split it. Every single
          * part of the string is one element in the array
          */
-        String[] urn = handleAsURN.split("");
+        char[] urn = handleAsURN.toCharArray();
 
         /* Convert the String into an integer representation */
         StringBuilder sourceURNConverted = new StringBuilder();
-        for (int i = 1; i < urn.length; i++) {
+        for (int i = 0; i < urn.length; i++) {
             sourceURNConverted.append(getIntegerAlias(urn[i]));
         }
         /* Split the string again to calculate the product sum */
-        urn = sourceURNConverted.toString().split("");
+        urn = sourceURNConverted.toString().toCharArray();
         int productSum = 0;
-        for (int i = 1; i < urn.length; i++) {
-            productSum += i * Integer.parseInt(urn[i]);
+        for (int i = 0; i < urn.length; i++) {
+            productSum += i * Character.getNumericValue(urn[i]);
         }
         /*
          * calculation of the ratio, dividing the productSum by the last element
          * of the converted urn
          */
-        int q = productSum / Integer.parseInt(urn[urn.length - 1]);
-        String[] arr = String.valueOf(q).split("");
-        return Integer.valueOf(arr[arr.length - 1]);
+        int q = productSum / Character.getNumericValue(urn[urn.length - 1]);
+        return q % 10;
     }
 
     /**
      * Returns the integer value for a given String
      * 
-     * @see MCRIConcordanceTable
+     * @see MCRURN.getIntegerAlias()
      * @throws IllegalArgumentException
      *             when the given String is null or its size does not equals 1
      */
-    private int getIntegerAlias(String s) throws IllegalArgumentException {
-        if (s == null || s.length() != 1)
-            throw new IllegalArgumentException("Invalid String specified: " + s);
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.A))
-            return MCRIConcordanceTable._A;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.B))
-            return MCRIConcordanceTable._B;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.C))
-            return MCRIConcordanceTable._C;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.D))
-            return MCRIConcordanceTable._D;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.E))
-            return MCRIConcordanceTable._E;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.F))
-            return MCRIConcordanceTable._F;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.G))
-            return MCRIConcordanceTable._G;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.H))
-            return MCRIConcordanceTable._H;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.I))
-            return MCRIConcordanceTable._I;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.J))
-            return MCRIConcordanceTable._J;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.K))
-            return MCRIConcordanceTable._K;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.L))
-            return MCRIConcordanceTable._L;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.M))
-            return MCRIConcordanceTable._M;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.N))
-            return MCRIConcordanceTable._N;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.O))
-            return MCRIConcordanceTable._O;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.P))
-            return MCRIConcordanceTable._P;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.Q))
-            return MCRIConcordanceTable._Q;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.R))
-            return MCRIConcordanceTable._R;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.S))
-            return MCRIConcordanceTable._S;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.T))
-            return MCRIConcordanceTable._T;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.U))
-            return MCRIConcordanceTable._U;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.V))
-            return MCRIConcordanceTable._V;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.W))
-            return MCRIConcordanceTable._W;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.X))
-            return MCRIConcordanceTable._X;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.Y))
-            return MCRIConcordanceTable._Y;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.Z))
-            return MCRIConcordanceTable._Z;
-        if (s.equalsIgnoreCase(":"))
-            return MCRIConcordanceTable._COLON;
-        if (s.equalsIgnoreCase("-"))
-            return MCRIConcordanceTable._MINUS;
-        if (s.equalsIgnoreCase("0"))
-            return MCRIConcordanceTable._0;
-        if (s.equalsIgnoreCase("1"))
-            return MCRIConcordanceTable._1;
-        if (s.equalsIgnoreCase("2"))
-            return MCRIConcordanceTable._2;
-        if (s.equalsIgnoreCase("3"))
-            return MCRIConcordanceTable._3;
-        if (s.equalsIgnoreCase("4"))
-            return MCRIConcordanceTable._4;
-        if (s.equalsIgnoreCase("5"))
-            return MCRIConcordanceTable._5;
-        if (s.equalsIgnoreCase("6"))
-            return MCRIConcordanceTable._6;
-        if (s.equalsIgnoreCase("7"))
-            return MCRIConcordanceTable._7;
-        if (s.equalsIgnoreCase("8"))
-            return MCRIConcordanceTable._8;
-        if (s.equalsIgnoreCase("9"))
-            return MCRIConcordanceTable._9;
-        throw new IllegalArgumentException("Invalid String specified: " + s);
+    private static int getIntegerAlias(char c) throws IllegalArgumentException {
+        switch (c) {
+            case '0':
+                return 1;
+            case '1':
+                return 2;
+            case '2':
+                return 3;
+            case '3':
+                return 4;
+            case '4':
+                return 5;
+            case '5':
+                return 6;
+            case '6':
+                return 7;
+            case '7':
+                return 8;
+            case '8':
+                return 9;
+            case '9':
+                return 41;
+
+            /* Letters */
+            case 'A':
+            case 'a':
+                return 18;
+            case 'B':
+            case 'b':
+                return 14;
+            case 'C':
+            case 'c':
+                return 19;
+            case 'D':
+            case 'd':
+                return 15;
+            case 'E':
+            case 'e':
+                return 16;
+            case 'F':
+            case 'f':
+                return 21;
+            case 'G':
+            case 'g':
+                return 22;
+            case 'H':
+            case 'h':
+                return 23;
+            case 'I':
+            case 'i':
+                return 24;
+            case 'J':
+            case 'j':
+                return 25;
+            case 'K':
+            case 'k':
+                return 42;
+            case 'L':
+            case 'l':
+                return 26;
+            case 'M':
+            case 'm':
+                return 27;
+            case 'N':
+            case 'n':
+                return 13;
+            case 'O':
+            case 'o':
+                return 28;
+            case 'P':
+            case 'p':
+                return 29;
+            case 'Q':
+            case 'q':
+                return 31;
+            case 'R':
+            case 'r':
+                return 12;
+            case 'S':
+            case 's':
+                return 32;
+            case 'T':
+            case 't':
+                return 33;
+            case 'U':
+            case 'u':
+                return 11;
+            case 'V':
+            case 'v':
+                return 34;
+            case 'W':
+            case 'w':
+                return 35;
+            case 'X':
+            case 'x':
+                return 36;
+            case 'Y':
+            case 'y':
+                return 37;
+            case 'Z':
+            case 'z':
+                return 38;
+
+            /* Special chars */
+            case '-':
+                return 39;
+            case ':':
+                return 17;
+            case '_':
+                return 43;
+            case '.':
+                return 47;
+            case '/':
+                return 45;
+            case '+':
+                return 49;
+        }
+        throw new IllegalArgumentException("Invalid Character specified: " + c);
     }
 }
