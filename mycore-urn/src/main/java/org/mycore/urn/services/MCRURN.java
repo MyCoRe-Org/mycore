@@ -14,6 +14,9 @@ import java.net.URI;
  * "Policy für die Vergabe von URNs im Namensraum urn:nbn:de"
  * (http://d-nb.info/1029114455/34)
  * 
+ * Use MCRURN.create(String urnBase) to create a URN from a base string and calculate the checksum
+ * and MCRURN.parse(String urn) to parse a complete URN (with checksum included).
+ * 
  * 
  * @author shermann
  * @author Robert Stephan
