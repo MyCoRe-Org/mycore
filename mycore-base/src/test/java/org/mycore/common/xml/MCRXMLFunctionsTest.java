@@ -2,6 +2,7 @@ package org.mycore.common.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -17,6 +18,8 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
             "<h1>Hell<i>o</i> World!&lt;br&gt;</h1>", "<h1>Hell<i>&ouml;</i> World!&lt;br&gt;</h1>",
             "<h1>Hello</h1> <h2>World!</h2><br/>", "Hello <a href=\"http://www.mycore.de\">MyCoRe</a>!",
             "Hello <a href='http://www.mycore.de'>MyCoRe</a>!" };
+
+    private final static String[] NON_HTML_STRINGS = new String[] { "Hello MyCoRe!", "a < b > c" };
 
     /*
      * Test method for 'org.mycore.common.xml.MCRXMLFunctions.formatISODate(String, String, String, String)'
@@ -97,6 +100,19 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
         assertEquals("Shortened text did not match", result, MCRXMLFunctions.shortenText(test, 3));
         assertEquals("Shortened text did not match", result, MCRXMLFunctions.shortenText(test, 0));
         assertEquals("Shortened text did not match", test, MCRXMLFunctions.shortenText(test, test.length()));
+    }
+
+    /*
+     * Test method for 'org.mycore.common.xml.MCRXMLFunctions.isHtml(String)'
+     */
+    @Test
+    public void isHtml() {
+        for (final String s : HTML_STRINGS) {
+            assertTrue("Should be html: " + s, MCRXMLFunctions.isHtml(s));
+        }
+        for (final String s : NON_HTML_STRINGS) {
+            assertFalse("Should not be html: " + s, MCRXMLFunctions.isHtml(s));
+        }
     }
 
     /*
