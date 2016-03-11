@@ -91,16 +91,7 @@ public class MCRXMLFunctions {
             b.append("-" + parts[i]);
         }
 
-        org.mycore.urn.services.MCRURN u = org.mycore.urn.services.MCRURN.valueOf(b.toString());
-        try {
-            LOGGER.info(urn + " modified to " + u + "[" + u.checksum() + "]");
-            u.attachChecksum();
-
-        } catch (Exception ex) {
-            LOGGER.error("Could not attach checksum to urn " + b.toString(), ex);
-            return null;
-        }
-
+        org.mycore.urn.services.MCRURN u = org.mycore.urn.services.MCRURN.create(b.toString());
         return u.toString();
     }
 

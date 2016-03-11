@@ -37,9 +37,7 @@ public class DFGURNRegistrationService extends URNRegistrationService {
         for (MCRURN urn : list) {
             // change niss
             String nissChanged = urn.toString().replace(urnProvider.getNISS(), urnProvider.getNISS() + "-dfg");
-            org.mycore.urn.services.MCRURN dfg = org.mycore.urn.services.MCRURN.valueOf(nissChanged);
-            // calculate new checksum
-            dfg.attachChecksum();
+            org.mycore.urn.services.MCRURN dfg = org.mycore.urn.services.MCRURN.create(nissChanged);
 
             // modify old urn for posting it to the epicur lite provider
             urn.getKey().setMcrurn(dfg.toString());

@@ -18,7 +18,7 @@ public class MCRURNProvider extends MCRAbstractURNProvider {
      */
     public MCRURN generateURN() {
         String urn = MCRURNManager.buildURN("Default");
-        return MCRURN.valueOf(urn);
+        return MCRURN.parse(urn);
     }
 
     /* (non-Javadoc)

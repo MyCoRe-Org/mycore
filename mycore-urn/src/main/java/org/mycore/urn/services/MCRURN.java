@@ -3,91 +3,120 @@ package org.mycore.urn.services;
 import java.net.URI;
 
 /**
- * This class represents an urn.
- *
+ * This class represents a URN in the namespace of the German National Library (DNB): 
+ * urn:nbn:de.
+ * 
+ * Attention:
+ * This implementation uses  the DNB namespace specific checksum calculation
+ * so it cannot be used for URNs in other namespaces.
+ * 
+ * The syntax is described in:
+ * "Policy für die Vergabe von URNs im Namensraum urn:nbn:de"
+ * (http://d-nb.info/1029114455/34)
+ * 
+ * 
  * @author shermann
+ * @author Robert Stephan
  */
 public class MCRURN {
-    private static final String[] DEFAULT_NAMESPACE_IDENTIFIERS = new String[] { "nbn", "de" };
 
-    final private static String DEFAULT_SCHEMA = "urn";
+    final private static String URN_PREFIX = "urn:nbn:de:";
 
-    /** the part after the schema of the urn */
-    private String[] namespaceIdentifiers;
+    /** the part after the prefix 
+     *     usually the acronym of a German library network and a library specific number number
+     *     or a project id*/
+    private String subNamespaces;
 
-    /** the part making the urn unique */
-    private String namespaceSpecificPart;
+    /** the part after the first "-" */
+    private String namespaceSpecificString;
 
     /** the checksum */
-    private int checksum;
+    private int checksum = -1;
 
     /**
-     * @param namespaceIdentifiers
-     *            [] namespace identifiers
-     * @param namespaceSpecificPart
-     *            namespace specific part of URI
+     * @param the subnamespace
+     *            after urn:nbn:de till first "-"
+     * @param namespaceSpecificString
+     *            after first "-"
      * @throws IllegalArgumentException
-     *            if one of the arguments is <code>null</code>
+     *             if one of the arguments is <code>null</code>
      */
-    public MCRURN(String[] namespaceIdentifiers, String namespaceSpecificPart) {
+    private MCRURN(String subNamespaces, String namespaceSpecificString, int checksum) {
 
-        if (namespaceIdentifiers == null || namespaceSpecificPart == null) {
+        if (subNamespaces == null || namespaceSpecificString == null) {
             throw new IllegalArgumentException("All Arguments must not be null.");
         }
-        this.namespaceIdentifiers = namespaceIdentifiers;
-        this.namespaceSpecificPart = namespaceSpecificPart;
-        this.checksum = -1;
-    }
-
-    /**
-     * @return the schema, always returns <code>urn</code>
-     */
-    public String getSchema() {
-        return MCRURN.DEFAULT_SCHEMA;
-    }
-
-    /**
-     * Creates a new urn by a given string.
-     *
-     * @param s
-     *            the string the urn should be created from
-     * @see MCRURN#normalize()
-     */
-    public static MCRURN valueOf(String s) {
-        if (s == null)
-            return null;
-        String[] parts = s.split(":");
-
-        if (!parts[0].equals(MCRURN.DEFAULT_SCHEMA))
-            return null;
-        try {
-            // just check whether URN has the correct syntax
-            URI.create(s);
-        } catch (IllegalArgumentException e) {
-            return null;
+        if (subNamespaces.startsWith(URN_PREFIX)) {
+            subNamespaces = subNamespaces.substring(URN_PREFIX.length());
         }
-        // part[0] is "urn" by default
-        String[] namespaceIdentifiersOfTheURNToBe = new String[parts.length - 2];
-        System.arraycopy(parts, 1, namespaceIdentifiersOfTheURNToBe, 0, parts.length - 2);
-
-        MCRURN toReturn = new MCRURN(namespaceIdentifiersOfTheURNToBe, parts[parts.length - 1]);
-        return toReturn;
+        this.subNamespaces = subNamespaces;
+        this.namespaceSpecificString = namespaceSpecificString;
+        this.checksum = checksum;
     }
 
     /**
-     * @return a copy of the namespace identifiers specific part.
+     * 
+     * @param the URN (complete, with checksum included)
+     * 
+     * @return the MCRURN Object
      */
-    public String getNamespaceIdentfiersSpecificPart() {
-        return new String(namespaceSpecificPart);
+    public static MCRURN parse(String urn) {
+        if (isValid(urn)) {
+            return create(urn.substring(0, urn.length() - 1));
+        } else {
+            throw new IllegalArgumentException("The given URN is invalid - maybe the checksum is wrong.");
+        }
+    }
+
+    public static boolean isValid(String urn) {
+        MCRURN result = create(urn.substring(0, urn.length() - 1));
+        char givenChecksum = urn.charAt(urn.length() - 1);
+        if (Character.isDigit(givenChecksum)) {
+            int givenChecksumInt = Character.getNumericValue(givenChecksum);
+            if (givenChecksumInt == result.getChecksum()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * @return a copy of the NamespaceIdentfiers array
+     * 
+     * @param urn the urn as String"
+     * @param namespaceSpecificString - the namespace specific string (NISS)
+     * @return
      */
-    public String[] getNamespaceIdentfiers() {
-        String[] copy = new String[namespaceIdentifiers.length];
-        System.arraycopy(namespaceIdentifiers, 0, copy, 0, namespaceIdentifiers.length);
-        return copy;
+    public static MCRURN create(String subNamespaces, String namespaceSpecificString) {
+        return new MCRURN(subNamespaces, namespaceSpecificString,
+            calculateChecksum(subNamespaces, namespaceSpecificString));
+    }
+
+    /**
+     * Creates a new urn by a given string (without checksum).
+     * The checksum will calculated and added to the URN.
+     * 
+     * @param urnBaseWithoutChecksum
+     *            the string the urn should be created from 
+     */
+    public static MCRURN create(String urnBaseWithoutChecksum) {
+        if (urnBaseWithoutChecksum == null) {
+            throw new IllegalArgumentException("The parameter cannot be null.");
+        }
+        // just check if the urn has the correct syntax
+        try {
+            URI.create(urnBaseWithoutChecksum);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+        if (!urnBaseWithoutChecksum.startsWith(URN_PREFIX)) {
+            throw new IllegalArgumentException("The URN must start with 'urn:nbn:de:'.");
+        }
+        String subNamespaces = urnBaseWithoutChecksum.substring(URN_PREFIX.length(),
+            urnBaseWithoutChecksum.indexOf("-"));
+        String namespaceSpecificString = urnBaseWithoutChecksum.substring(urnBaseWithoutChecksum.indexOf("-") + 1);
+
+        return create(subNamespaces, namespaceSpecificString);
+
     }
 
     /**
@@ -96,28 +125,14 @@ public class MCRURN {
      * For other schemas the calculated checksum may not be correct. Thus one
      * should subclass {@link org.mycore.urn.services.MCRURN} and override this
      * method.
-     *
+     * 
      * @return the calculated checksum
      * @see <a href="http://www.persistent-identifier.de/?link=316"
      *      >http://www.persistent-identifier.de/?link=316</a>
      */
-    public int checksum() {
-        if (this.checksum != -1) {
-            return this.checksum;
-        }
-        /*
-         * get the String representation of this urn and split it. Every single
-         * part of the string is one element in the array
-         */
-
-        String[] urn = toString().split("");
-
-        // since java 8 the first entry is not empty as it used to be in previous java versions
-        if (urn[0].length() == 0) {
-            String[] intermediate = new String[urn.length - 1];
-            System.arraycopy(urn, 1, intermediate, 0, intermediate.length);
-            urn = intermediate;
-        }
+    public static int calculateChecksum(String subNamespaces, String namespaceSpecificString) {
+        String urnbase = URN_PREFIX + subNamespaces + "-" + namespaceSpecificString;
+        char[] urn = urnbase.toCharArray();
 
         /* Convert the String into an integer representation */
         StringBuilder sourceURNConverted = new StringBuilder();
@@ -125,160 +140,145 @@ public class MCRURN {
             sourceURNConverted.append(getIntegerAlias(urn[i - 1]));
         }
         /* Split the string again to calculate the product sum */
-        urn = sourceURNConverted.toString().split("");
-
-        // since java 8 the first entry is not empty as it used to be in previous java versions
-        if (urn[0].length() == 0) {
-            String[] intermediate = new String[urn.length - 1];
-            System.arraycopy(urn, 1, intermediate, 0, intermediate.length);
-            urn = intermediate;
-        }
+        urn = sourceURNConverted.toString().toCharArray();
 
         int productSum = 0;
         for (int i = 1; i <= urn.length; i++) {
-            productSum += i * Integer.parseInt(urn[i - 1]);
+            productSum += i * Character.getNumericValue(urn[i - 1]);
         }
         /*
          * calculation of the ratio, dividing the productSum by the last element
          * of the converted urn
          */
-        float q = productSum / Integer.parseInt(urn[urn.length - 1]);
-        this.checksum = (int) (Math.floor(q)) % 10;
-        return this.checksum;
+        int q = productSum / Character.getNumericValue(urn[urn.length - 1]);
+
+        return q % 10;
     }
 
     /**
-     * Returns the integer value for a given String
-     *
-     * @see MCRIConcordanceTable
+     * Returns the integer value for a given String for checksum calculation
+     * 
      * @throws IllegalArgumentException
-     *             when the given String is null or its size does not equals 1
+     *             when the given char is not allowed
      */
-    private int getIntegerAlias(String s) throws IllegalArgumentException {
-        if (s == null || s.length() != 1)
-            throw new IllegalArgumentException("Invalid String specified: " + s);
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.A))
-            return MCRIConcordanceTable._A;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.B))
-            return MCRIConcordanceTable._B;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.C))
-            return MCRIConcordanceTable._C;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.D))
-            return MCRIConcordanceTable._D;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.E))
-            return MCRIConcordanceTable._E;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.F))
-            return MCRIConcordanceTable._F;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.G))
-            return MCRIConcordanceTable._G;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.H))
-            return MCRIConcordanceTable._H;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.I))
-            return MCRIConcordanceTable._I;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.J))
-            return MCRIConcordanceTable._J;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.K))
-            return MCRIConcordanceTable._K;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.L))
-            return MCRIConcordanceTable._L;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.M))
-            return MCRIConcordanceTable._M;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.N))
-            return MCRIConcordanceTable._N;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.O))
-            return MCRIConcordanceTable._O;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.P))
-            return MCRIConcordanceTable._P;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.Q))
-            return MCRIConcordanceTable._Q;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.R))
-            return MCRIConcordanceTable._R;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.S))
-            return MCRIConcordanceTable._S;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.T))
-            return MCRIConcordanceTable._T;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.U))
-            return MCRIConcordanceTable._U;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.V))
-            return MCRIConcordanceTable._V;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.W))
-            return MCRIConcordanceTable._W;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.X))
-            return MCRIConcordanceTable._X;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.Y))
-            return MCRIConcordanceTable._Y;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.Z))
-            return MCRIConcordanceTable._Z;
-        if (s.equalsIgnoreCase(":"))
-            return MCRIConcordanceTable._COLON;
-        if (s.equalsIgnoreCase("-"))
-            return MCRIConcordanceTable._MINUS;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.PLUS))
-            return MCRIConcordanceTable._PLUS;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.SLASH))
-            return MCRIConcordanceTable._SLASH;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.DOT))
-            return MCRIConcordanceTable._DOT;
-        if (s.equalsIgnoreCase(MCRIConcordanceTable.UNDERSCORE))
-            return MCRIConcordanceTable._UNDERSCORE;
-        if (s.equalsIgnoreCase("0"))
-            return MCRIConcordanceTable._0;
-        if (s.equalsIgnoreCase("1"))
-            return MCRIConcordanceTable._1;
-        if (s.equalsIgnoreCase("2"))
-            return MCRIConcordanceTable._2;
-        if (s.equalsIgnoreCase("3"))
-            return MCRIConcordanceTable._3;
-        if (s.equalsIgnoreCase("4"))
-            return MCRIConcordanceTable._4;
-        if (s.equalsIgnoreCase("5"))
-            return MCRIConcordanceTable._5;
-        if (s.equalsIgnoreCase("6"))
-            return MCRIConcordanceTable._6;
-        if (s.equalsIgnoreCase("7"))
-            return MCRIConcordanceTable._7;
-        if (s.equalsIgnoreCase("8"))
-            return MCRIConcordanceTable._8;
-        if (s.equalsIgnoreCase("9"))
-            return MCRIConcordanceTable._9;
-        throw new IllegalArgumentException("Invalid String specified: " + s);
-    }
+    private static int getIntegerAlias(char c) throws IllegalArgumentException {
+        switch (c) {
+            case '0':
+                return 1;
+            case '1':
+                return 2;
+            case '2':
+                return 3;
+            case '3':
+                return 4;
+            case '4':
+                return 5;
+            case '5':
+                return 6;
+            case '6':
+                return 7;
+            case '7':
+                return 8;
+            case '8':
+                return 9;
+            case '9':
+                return 41;
 
-    /**
-     * Checks whether the URN has a checksum attached or not. Use this method
-     * after a an URN has been created through {@link MCRURN#valueOf(String)}.
-     *
-     * @return <code>true</code> if the last digit of the urn is a valid
-     *         checksum <code>false</code> otherwise.
-     */
-    public boolean hasChecksumAttached() {
-        String toValidate = this.toString();
-        String[] singleLetters = toValidate.split("");
-        String lastLetter = singleLetters[singleLetters.length - 1];
-        int chk = -1;
-        try {
-            chk = Integer.valueOf(lastLetter);
-        } catch (Exception ex) {
-            // checksum must end with an integer
-            return false;
-        }
-        String toTest = toValidate.substring(0, toValidate.length() - 1);
-        try {
-            return MCRURN.valueOf(toTest).checksum() == chk;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+            /* Letters */
+            case 'A':
+            case 'a':
+                return 18;
+            case 'B':
+            case 'b':
+                return 14;
+            case 'C':
+            case 'c':
+                return 19;
+            case 'D':
+            case 'd':
+                return 15;
+            case 'E':
+            case 'e':
+                return 16;
+            case 'F':
+            case 'f':
+                return 21;
+            case 'G':
+            case 'g':
+                return 22;
+            case 'H':
+            case 'h':
+                return 23;
+            case 'I':
+            case 'i':
+                return 24;
+            case 'J':
+            case 'j':
+                return 25;
+            case 'K':
+            case 'k':
+                return 42;
+            case 'L':
+            case 'l':
+                return 26;
+            case 'M':
+            case 'm':
+                return 27;
+            case 'N':
+            case 'n':
+                return 13;
+            case 'O':
+            case 'o':
+                return 28;
+            case 'P':
+            case 'p':
+                return 29;
+            case 'Q':
+            case 'q':
+                return 31;
+            case 'R':
+            case 'r':
+                return 12;
+            case 'S':
+            case 's':
+                return 32;
+            case 'T':
+            case 't':
+                return 33;
+            case 'U':
+            case 'u':
+                return 11;
+            case 'V':
+            case 'v':
+                return 34;
+            case 'W':
+            case 'w':
+                return 35;
+            case 'X':
+            case 'x':
+                return 36;
+            case 'Y':
+            case 'y':
+                return 37;
+            case 'Z':
+            case 'z':
+                return 38;
 
-    /**
-     * Removes the checksum from the urn, if any
-     *
-     * @see MCRURN#valueOf(String)
-     */
-    public void normalize() {
-        if (!this.hasChecksumAttached())
-            return;
-        namespaceSpecificPart = namespaceSpecificPart.substring(0, namespaceSpecificPart.length() - 1);
+            /* Special chars */
+            case '-':
+                return 39;
+            case ':':
+                return 17;
+            case '_':
+                return 43;
+            case '.':
+                return 47;
+            case '/':
+                return 45;
+            case '+':
+                return 49;
+        }
+        throw new IllegalArgumentException("Invalid Character specified: " + c);
     }
 
     /**
@@ -286,38 +286,18 @@ public class MCRURN {
      */
     @Override
     public String toString() {
-        if (namespaceIdentifiers == null || namespaceSpecificPart == null)
-            return null;
-        StringBuilder urn = new StringBuilder();
-        urn.append(MCRURN.DEFAULT_SCHEMA);
-        for (String namespaceIdentifier : namespaceIdentifiers) {
-            urn.append(":" + namespaceIdentifier);
-        }
-        urn.append(":" + namespaceSpecificPart);
-        return urn.toString();
+        return URN_PREFIX + subNamespaces + "-" + namespaceSpecificString + Integer.toString(checksum);
     }
 
-    public static String[] getDefaultNamespaceIdentifiers() {
-
-        String[] arr = new String[MCRURN.DEFAULT_NAMESPACE_IDENTIFIERS.length];
-        for (int i = 0; i < MCRURN.DEFAULT_NAMESPACE_IDENTIFIERS.length; i++) {
-            arr[i] = new String(MCRURN.DEFAULT_NAMESPACE_IDENTIFIERS[i]);
-        }
-        return arr;
+    public String getSubNamespaces() {
+        return subNamespaces;
     }
 
-    /**
-     * Generates the checksum and permanently attaches the checksum to the urn.
-     * That means if the {@link MCRURN#toString()} is called the checksum will
-     * be the last digit.
-     *
-     * @return <code>true</code> if the checksum was attached,
-     *         <code>false</code> otherwise
-     * @see MCRURN#hasChecksumAttached()
-     */
-    public boolean attachChecksum() {
-        this.checksum = checksum();
-        this.namespaceSpecificPart += String.valueOf(this.checksum);
-        return true;
+    public String getNamespaceSpecificString() {
+        return namespaceSpecificString;
+    }
+
+    public int getChecksum() {
+        return checksum;
     }
 }

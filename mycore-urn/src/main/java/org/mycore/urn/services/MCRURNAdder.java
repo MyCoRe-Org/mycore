@@ -21,9 +21,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
-import org.mycore.datamodel.metadata.MCRMetaElement;
-import org.mycore.datamodel.metadata.MCRMetaInterface;
-import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -91,8 +88,8 @@ public class MCRURNAdder {
     private String generateURN() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         MCRIURNProvider urnProvider = this.getURNProvider();
         MCRURN myURN = urnProvider.generateURN();
-        String myURNString = myURN.toString() + myURN.checksum();
-        return myURNString;
+        return myURN.toString();
+        
     }
 
     /**
@@ -136,7 +133,7 @@ public class MCRURNAdder {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new MCRException("Could not get URN Provider.", e);
         }
-        MCRURN parentURN = MCRURN.valueOf(derivate.getDerivate().getURN());
+        MCRURN parentURN = MCRURN.parse(derivate.getDerivate().getURN());
 
         Collections.sort(files);
         /* generate the urn based on the parent urn */
@@ -145,7 +142,7 @@ public class MCRURNAdder {
         for (int i = 0; i < urnToSet.length; i++) {
             MCRPath currentFile = files.get(i);
             MCRURN currentURN = urnToSet[i];
-            String urnString = currentURN.toString() + currentURN.checksum();
+            String urnString = currentURN.toString();
             LOGGER.info("Assigning urn " + urnString + " to " + currentFile);
             /* save the urn in the database here */
             try {
@@ -190,7 +187,6 @@ public class MCRURNAdder {
             throw new MCRException("Could not get URN Provider.", e);
         }
         MCRURN parentURN = urnProvider.generateURN();
-        parentURN.attachChecksum();
 
         /*
          * save the base urn in the database this will be the urn for the
@@ -200,7 +196,7 @@ public class MCRURNAdder {
             LOGGER.info("Assigning urn " + parentURN.toString() + " to " + derivate.getId().toString());
             MCRURNManager.assignURN(parentURN.toString(), derivate.getId().toString(), null, null);
         } catch (Exception ex) {
-            LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate " + derivate.getId().toString()
+            LOGGER.error("Assigning base urn " + parentURN.toString() + " to derivate " + derivate.getId().toString()
                     + " failed.", ex);
             return false;
         }
@@ -231,12 +227,11 @@ public class MCRURNAdder {
         }
 
         MCRIURNProvider provider = getURNProvider();
-        MCRURN base = MCRURN.valueOf(objectDerivate.getURN());
+        MCRURN base = MCRURN.parse(objectDerivate.getURN());
         int fileCount = getFilesWithURNCount(derivate) + 1;
         MCRURN[] u = provider.generateURN(1, base, derivate.getId().getNumberAsString() + "-" + fileCount);
         MCRURN urn = u[0];
-        urn.attachChecksum();
-
+        
         LOGGER.info("Assigning urn " + urn + " to " + path);
         MCRURNManager.assignURN(urn.toString(), derivateId, path);
         objectDerivate.getOrCreateFileMetadata(path).setUrn(urn.toString());

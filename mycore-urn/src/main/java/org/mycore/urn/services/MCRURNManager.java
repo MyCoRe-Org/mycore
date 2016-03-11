@@ -25,11 +25,9 @@ package org.mycore.urn.services;
 
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.urn.hibernate.MCRURN;
@@ -63,102 +61,25 @@ import org.mycore.urn.hibernate.MCRURN;
  * MCR.URN.SubNamespace.Essen.Prefix=urn.nbn.de:hbz:465-
  * 
  * @author Frank Lützenkirchen
+ * @author Robert Stephan
  */
 public class MCRURNManager {
 
     /** The MCRURNStore implementation to use */
     private static MCRURNStore store;
 
-    /** The table of character codes for calculating the checksum */
-    private static Properties codes;
-
-    private static final Logger LOGGER = Logger.getLogger(MCRURNManager.class);
+   private static final Logger LOGGER = Logger.getLogger(MCRURNManager.class);
 
     static {
         try {
-            codes = new Properties();
-            codes.put("0", "1");
-            codes.put("1", "2");
-            codes.put("2", "3");
-            codes.put("3", "4");
-            codes.put("4", "5");
-            codes.put("5", "6");
-            codes.put("6", "7");
-            codes.put("7", "8");
-            codes.put("8", "9");
-            codes.put("9", "41");
-            codes.put("a", "18");
-            codes.put("b", "14");
-            codes.put("c", "19");
-            codes.put("d", "15");
-            codes.put("e", "16");
-            codes.put("f", "21");
-            codes.put("g", "22");
-            codes.put("h", "23");
-            codes.put("i", "24");
-            codes.put("j", "25");
-            codes.put("k", "42");
-            codes.put("l", "26");
-            codes.put("m", "27");
-            codes.put("n", "13");
-            codes.put("o", "28");
-            codes.put("p", "29");
-            codes.put("q", "31");
-            codes.put("r", "12");
-            codes.put("s", "32");
-            codes.put("t", "33");
-            codes.put("u", "11");
-            codes.put("v", "34");
-            codes.put("w", "35");
-            codes.put("x", "36");
-            codes.put("y", "37");
-            codes.put("z", "38");
-            codes.put("-", "39");
-            codes.put("+", "49");
-            codes.put(":", "17");
-            codes.put("/", "45");
-            codes.put("_", "43");
-            codes.put(".", "47");
-
+  
             store = (MCRURNStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
         } catch (Throwable t) {
             // TODO: handle exception
             LOGGER.error("Init error: ", t);
         }
     }
-
-    /**
-     * Calculates the checksum for the given urn:nbn:de. The algorithm is
-     * specified by the "Carmen AP-4" project.
-     * 
-     * @return the checksum for the given urn:nbn:de
-     */
-    public static String buildChecksum(String urn) {
-        StringBuilder buffer = new StringBuilder();
-
-        for (int i = 0; i < urn.length(); i++) {
-            String character = urn.substring(i, i + 1);
-            if (!codes.containsKey(character)) {
-                String msg = "URN \"" + urn + "\" contains illegal character: '" + character + "'";
-                throw new MCRConfigurationException(msg);
-            }
-            buffer.append(codes.getProperty(character));
-        }
-
-        String digits = buffer.toString();
-        long sum = 0;
-        long digit = 0;
-
-        for (int i = 0; i < digits.length(); i++) {
-            digit = Long.parseLong(digits.substring(i, i + 1));
-            sum += digit * (i + 1);
-        }
-
-        String quotient = String.valueOf(sum / digit);
-
-        return quotient.substring(quotient.length() - 1);
-    }
-
+  
     /** A map from configID to MCRNissBuilder objects */
     private static Hashtable<String, MCRNISSBuilder> builders = new Hashtable<String, MCRNISSBuilder>();
 
@@ -177,8 +98,7 @@ public class MCRURNManager {
 
         StringBuilder buffer = new StringBuilder(prefix);
         buffer.append(niss);
-        buffer.append(buildChecksum(buffer.toString()));
-        return buffer.toString();
+        return org.mycore.urn.services.MCRURN.create(buffer.toString()).toString();
     }
 
     /**
@@ -208,13 +128,7 @@ public class MCRURNManager {
      * correct.
      */
     public static boolean isValid(String urn) {
-        if (urn == null || urn.length() < 14 || !urn.startsWith("urn:nbn:") || !urn.equalsIgnoreCase(urn)) {
-            return false;
-        } else {
-            String start = urn.substring(0, urn.length() - 1);
-            String check = buildChecksum(start);
-            return urn.endsWith(check);
-        }
+        return org.mycore.urn.services.MCRURN.isValid(urn);
     }
 
     /** Returns true if the given urn is assigned to a document ID */
