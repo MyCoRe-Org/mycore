@@ -27,9 +27,12 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -42,6 +45,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
  * @since 2.0
  */
 @Entity
+@Table(name = "MCRCategoryLink", uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "category", "objectID", "objectType" }) })
 @NamedQueries({
     @NamedQuery(name = "MCRCategoryLink.ObjectIDByCategory", query = "SELECT objectReference.objectID FROM MCRCategoryLinkImpl WHERE category.id=:id"),
     @NamedQuery(name = "MCRCategoryLink.deleteByObjectCollection", query = "DELETE FROM MCRCategoryLinkImpl WHERE objectReference.objectID IN (:ids) and objectReference.type=:type"),
@@ -95,6 +100,7 @@ class MCRCategoryLinkImpl implements MCRCategoryLink {
     int id;
 
     @ManyToOne(targetEntity = MCRCategoryImpl.class)
+    @JoinColumn(name = "category")
     private MCRCategory category;
 
     @Embedded
