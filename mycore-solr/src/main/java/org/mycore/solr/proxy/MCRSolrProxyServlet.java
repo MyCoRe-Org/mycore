@@ -168,7 +168,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      */
     private static void doRedirectToQueryHandler(HttpServletResponse resp, String queryHandlerPath, Map<String, String[]> parameters)
             throws IOException {
-        String requestURL = MessageFormat.format("{0}solr{1}{2}", getServletBaseURL(), queryHandlerPath, getQueryString(parameters).toQueryString());
+        String requestURL = MessageFormat.format("{0}solr{1}{2}", getServletBaseURL(), queryHandlerPath, toSolrParams(parameters).toQueryString());
         LOGGER.info("Redirect to: " + requestURL);
         resp.sendRedirect(resp.encodeRedirectURL(requestURL));
     }
@@ -252,7 +252,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
             // good old way
             solrParameter = request.getParameterMap();
         }
-        return getQueryString(solrParameter);
+        return toSolrParams(solrParameter);
     }
 
     @Override
@@ -295,7 +295,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         super.destroy();
     }
 
-    private static ModifiableSolrParams getQueryString(Map<String, String[]> parameters) {
+    private static ModifiableSolrParams toSolrParams(Map<String, String[]> parameters) {
         // to maintain order
         LinkedHashMap<String, String[]> copy = new LinkedHashMap<String, String[]>(parameters);
         ModifiableSolrParams solrParams = new ModifiableSolrParams(copy);
