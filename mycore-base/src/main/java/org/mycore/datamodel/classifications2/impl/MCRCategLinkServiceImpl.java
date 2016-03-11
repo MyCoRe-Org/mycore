@@ -23,8 +23,6 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
@@ -230,7 +228,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
         if (category == null) {
-            return hasLinksForClassification(category);
+            return hasLinksForClassifications();
         }
 
         MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(
@@ -245,7 +243,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return boolMap;
     }
 
-    private Map<MCRCategoryID, Boolean> hasLinksForClassification(MCRCategory category) {
+    @SuppressWarnings("unchecked")
+    private Map<MCRCategoryID, Boolean> hasLinksForClassifications() {
         HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>() {
             private static final long serialVersionUID = 1L;
 
@@ -255,20 +254,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 return haslink == null ? false : haslink;
             }
         };
-
-        Session session = MCRHIBConnection.instance().getSession();
-        String queryString = MessageFormat.format(
-            "select distinct node.rootID from {0} as node, {1} as link where node.internalID=link.category",
-            MCRCategoryImpl.class.getCanonicalName(), MCRCategoryLinkImpl.class.getCanonicalName());
-        Query queryHasLink = session.createQuery(queryString);
-        @SuppressWarnings("unchecked")
-        List<String> categList = queryHasLink.list();
-
-        for (String rootID : categList) {
-            MCRCategoryID categoryID = MCRCategoryID.rootID(rootID);
-            boolMap.put(categoryID, true);
-        }
-
+        Query linkedClassifications = MCRHIBConnection.instance()
+            .getNamedQuery(NAMED_QUERY_NAMESPACE + "linkedClassifications");
+        ((List<String>) linkedClassifications.list())
+            .stream()
+            .map(MCRCategoryID::rootID)
+            .forEach(id -> boolMap.put(id, true));
         return boolMap;
     }
 
@@ -280,7 +271,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return boolMap;
     }
 
-    private void storeHasLinkValues(HashMap<MCRCategoryID, Boolean> boolMap, BitSet internalIds, MCRCategoryImpl parent) {
+    private void storeHasLinkValues(HashMap<MCRCategoryID, Boolean> boolMap, BitSet internalIds,
+        MCRCategoryImpl parent) {
         final int internalID = parent.getInternalID();
         if (internalID < internalIds.size() && internalIds.get(internalID)) {
             addParentHasValues(boolMap, parent);

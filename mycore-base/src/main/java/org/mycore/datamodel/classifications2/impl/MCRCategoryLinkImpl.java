@@ -91,7 +91,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
         + "    AND cattree.id.rootID=:rootID"
         + "    AND cat.id.rootID=:rootID"
         + "    AND cat.id.ID=:categID"
-        + "    AND cattree.left BETWEEN cat.left AND cat.right")
+        + "    AND cattree.left BETWEEN cat.left AND cat.right"),
+    @NamedQuery(name = "MCRCategoryLink.linkedClassifications", query = "SELECT distinct node.id.rootID from MCRCategoryImpl as node, MCRCategoryLinkImpl as link where node.internalID=link.category")
 })
 class MCRCategoryLinkImpl implements MCRCategoryLink {
 
