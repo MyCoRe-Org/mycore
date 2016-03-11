@@ -33,7 +33,7 @@ import org.mycore.common.config.MCRConfiguration;
 /**
  * Builds a new, unique NISS based on the current date and/or time
  * in combination with a counter. The date/time can be formatted with
- * a Java SimpleDateFormat pattern, the counter ca be formatted with
+ * a Java SimpleDateFormat pattern, the counter can be formatted with
  * a Java DecimalFormat pattern. The property "NISSPattern" is used
  * for configuring the instance. Example configuration:
  *

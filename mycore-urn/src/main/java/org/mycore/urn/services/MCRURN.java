@@ -4,7 +4,7 @@ import java.net.URI;
 
 /**
  * This class represents an urn.
- * 
+ *
  * @author shermann
  */
 public class MCRURN {
@@ -23,11 +23,11 @@ public class MCRURN {
 
     /**
      * @param namespaceIdentifiers
-     *            [] Namespace identifiers
+     *            [] namespace identifiers
      * @param namespaceSpecificPart
-     *            namespace specific part of the uri
+     *            namespace specific part of URI
      * @throws IllegalArgumentException
-     *             if one of the arguments is <code>null</code>
+     *            if one of the arguments is <code>null</code>
      */
     public MCRURN(String[] namespaceIdentifiers, String namespaceSpecificPart) {
 
@@ -48,7 +48,7 @@ public class MCRURN {
 
     /**
      * Creates a new urn by a given string.
-     * 
+     *
      * @param s
      *            the string the urn should be created from
      * @see MCRURN#normalize()
@@ -61,7 +61,7 @@ public class MCRURN {
         if (!parts[0].equals(MCRURN.DEFAULT_SCHEMA))
             return null;
         try {
-            // just check wether the urn has the correct syntax
+            // just check whether URN has the correct syntax
             URI.create(s);
         } catch (IllegalArgumentException e) {
             return null;
@@ -75,7 +75,7 @@ public class MCRURN {
     }
 
     /**
-     * @return a copy of the namespace identfiers specific part.
+     * @return a copy of the namespace identifiers specific part.
      */
     public String getNamespaceIdentfiersSpecificPart() {
         return new String(namespaceSpecificPart);
@@ -96,11 +96,10 @@ public class MCRURN {
      * For other schemas the calculated checksum may not be correct. Thus one
      * should subclass {@link org.mycore.urn.services.MCRURN} and override this
      * method.
-     * 
+     *
      * @return the calculated checksum
-     * @see <a href="http://www.persistent-identifier.de/?link=316">http://www.
-
-     *      persistent-identifier.de/?link=316</a>
+     * @see <a href="http://www.persistent-identifier.de/?link=316"
+     *      >http://www.persistent-identifier.de/?link=316</a>
      */
     public int checksum() {
         if (this.checksum != -1) {
@@ -150,7 +149,7 @@ public class MCRURN {
 
     /**
      * Returns the integer value for a given String
-     * 
+     *
      * @see MCRIConcordanceTable
      * @throws IllegalArgumentException
      *             when the given String is null or its size does not equals 1
@@ -248,7 +247,7 @@ public class MCRURN {
     /**
      * Checks whether the URN has a checksum attached or not. Use this method
      * after a an URN has been created through {@link MCRURN#valueOf(String)}.
-     * 
+     *
      * @return <code>true</code> if the last digit of the urn is a valid
      *         checksum <code>false</code> otherwise.
      */
@@ -273,7 +272,7 @@ public class MCRURN {
 
     /**
      * Removes the checksum from the urn, if any
-     * 
+     *
      * @see MCRURN#valueOf(String)
      */
     public void normalize() {
@@ -298,7 +297,6 @@ public class MCRURN {
         return urn.toString();
     }
 
-    /***/
     public static String[] getDefaultNamespaceIdentifiers() {
 
         String[] arr = new String[MCRURN.DEFAULT_NAMESPACE_IDENTIFIERS.length];
@@ -312,7 +310,7 @@ public class MCRURN {
      * Generates the checksum and permanently attaches the checksum to the urn.
      * That means if the {@link MCRURN#toString()} is called the checksum will
      * be the last digit.
-     * 
+     *
      * @return <code>true</code> if the checksum was attached,
      *         <code>false</code> otherwise
      * @see MCRURN#hasChecksumAttached()
