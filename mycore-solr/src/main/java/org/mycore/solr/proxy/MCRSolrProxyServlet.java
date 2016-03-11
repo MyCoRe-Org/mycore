@@ -168,7 +168,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      */
     private static void doRedirectToQueryHandler(HttpServletResponse resp, String queryHandlerPath, Map<String, String[]> parameters)
             throws IOException {
-        String requestURL = MessageFormat.format("{0}solr{1}?{2}", getServletBaseURL(), queryHandlerPath, getQueryString(parameters));
+        String requestURL = MessageFormat.format("{0}solr{1}{2}", getServletBaseURL(), queryHandlerPath, getQueryString(parameters).toQueryString());
         LOGGER.info("Redirect to: " + requestURL);
         resp.sendRedirect(resp.encodeRedirectURL(requestURL));
     }
