@@ -104,7 +104,9 @@ public class MCRMODSWrapper {
 
     public MCRMODSWrapper(MCRObject object) {
         this.object = object;
-        object.setSchema(MODS_DATAMODEL);
+        if(object.getSchema()==null || object.getSchema().isEmpty()){
+            object.setSchema(MODS_DATAMODEL);
+        }
     }
 
     /**
