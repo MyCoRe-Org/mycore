@@ -132,7 +132,6 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                             LogManager.getLogger().error("Could not add " + u + " to current classloader.", e);
                         }
                     });
-                    System.out.println("ClassPath: " + Stream.of(((URLClassLoader) classLoader).getURLs()).map(URL::toString).collect(Collectors.joining("\n")));
                 } catch (NoSuchMethodException | SecurityException e) {
                     LogManager.getLogger(MCRConfigurationInputStream.class)
                         .warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
