@@ -18,8 +18,7 @@ import org.mycore.services.queuedjob.MCRJob;
  * <p>Servlet for {@link MCRPackerManager}.</p>
  * <p>
  * <p>You can pass a <code>redirect</code> parameter to the servlet!</p>
- * <p><b>The user needs the privilege packer-MyPackerID to create a package!</b></p>
- *
+ * <p>The rights you need to start a Packer depends on the implementation!</p>
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRPackerServlet extends MCRServlet {

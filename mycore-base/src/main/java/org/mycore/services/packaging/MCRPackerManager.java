@@ -40,7 +40,7 @@ public class MCRPackerManager {
 
     /**
      * Creates and starts a new PackagingJob.
-     *
+     * <p>The rights you need to start a Packer depends on the implementation!</p>
      * @param jobParameters the parameters which will be passed to the job. (Should include a packer)
      * @return the created MCRJob
      * @throws MCRUsageException if invalid parameters are passed to the packer
