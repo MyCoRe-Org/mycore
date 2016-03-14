@@ -4,8 +4,13 @@ package org.mycore.pi.doi;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,13 +26,18 @@ import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIRegistrationService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.xml.sax.SAXException;
 
+/**
+ *
+ */
 public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigitalObjectIdentifier> {
 
     public static final Namespace DATACITE_NAMESPACE = Namespace.getNamespace("datacite", "http://datacite.org/schema/kernel-3");
@@ -88,6 +98,12 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         MCRDataciteClient dataciteClient = getDataciteClient();
         dataciteClient.storeMetadata(dataciteDocument);
 
+        List<Map.Entry<String, URI>> entryList = new ArrayList<>();
+
+        if (obj instanceof MCRObject) {
+            insertFirstDerivate((MCRObject) obj, entryList);
+        }
+
         URI registeredURI;
         try {
             registeredURI = new URI(this.registerURL + "/receive/" + obj.getId().toString());
@@ -96,7 +112,26 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             throw new MCRException("Base-URL seems to be invalid!", e);
         }
 
+        dataciteClient.setMediaList(newDOI, entryList);
+
         return newDOI;
+    }
+
+    private void insertFirstDerivate(MCRObject obj, List<Map.Entry<String, URI>> entryList) {
+        MCRObject mcrObject = obj;
+        Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(mcrObject.getId(), 1, TimeUnit.MINUTES).stream().findFirst();
+        derivateIdOptional.ifPresent(derivateId -> {
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
+            String mainDoc = derivate.getDerivate().getInternals().getMainDoc();
+            MCRPath mainDocumentPath = MCRPath.getPath(derivateId.toString(), mainDoc);
+            try {
+                String contentType = Files.probeContentType(mainDocumentPath);
+                contentType = contentType == null ? "" : contentType;
+                entryList.add(new AbstractMap.SimpleEntry<String, URI>("application/octet-stream", new URI(this.registerURL + "/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDoc)));
+            } catch (IOException | URISyntaxException e) {
+                LOGGER.error("Error while detecting the file to register!", e);
+            }
+        });
     }
 
     private MCRDataciteClient getDataciteClient() {
