@@ -2,7 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport"
   xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcr="http://www.mycore.org/"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xalan xlink mcr mcrxsl i18n acl mods mcrmods"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3"
+  exclude-result-prefixes="xalan xlink mcr mcrxsl i18n acl mods mcrmods"
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.Mods.SherpaRomeo.ApiKey" select="''" />
@@ -62,74 +63,74 @@
   </xsl:template>
 
   <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued|mods:dateCaptured|mods:dateModified" mode="present">
-  	<xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name()))" />
-  	<xsl:if test="not(@point='end' and (preceding-sibling::*[name(current())=name()][@point='start']  or following-sibling::*[name(current())=name()][@point='start']))">
-		<tr>
-			<td valign="top" class="metaname">
-				<xsl:value-of select="concat($label,':')" />
-			</td>
-			<td class="metavalue">
-				<xsl:if test="local-name()='dateIssued'">
-					<meta property="datePublished">
-						<xsl:attribute name="content">
-			              <xsl:value-of select="." />
-			            </xsl:attribute>
-					</meta>
-				</xsl:if>
-				<xsl:apply-templates select="." mode="rangeDate"/>
-			</td>
-		</tr>
-	</xsl:if>
+    <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name()))" />
+    <xsl:if test="not(@point='end' and (preceding-sibling::*[name(current())=name()][@point='start']  or following-sibling::*[name(current())=name()][@point='start']))">
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat($label,':')" />
+      </td>
+      <td class="metavalue">
+        <xsl:if test="local-name()='dateIssued'">
+          <meta property="datePublished">
+            <xsl:attribute name="content">
+                    <xsl:value-of select="." />
+                  </xsl:attribute>
+          </meta>
+        </xsl:if>
+        <xsl:apply-templates select="." mode="rangeDate"/>
+      </td>
+    </tr>
+  </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="mods:dateCreated|mods:dateIssued|mods:dateCaptured|mods:dateModified" mode="rangeDate">
-	<xsl:choose>
-		<xsl:when 
-		test="@point='start' and (following-sibling::*[name(current())=name()][@point='end'] or preceding-sibling::*[name(current())=name()][@point='end'])">
-			<xsl:apply-templates select="." mode="formatDate" />
-			<xsl:value-of select="' - '" />
-			<xsl:apply-templates select="preceding-sibling::*[name(current())=name()][@point='end']" mode="formatDate" />
-			<xsl:apply-templates select="following-sibling::*[name(current())=name()][@point='end']" mode="formatDate" />
-		</xsl:when>
-		<xsl:when 
-		test="@point='start' and not(following-sibling::*[name(current())=name()][@point='end'] or preceding-sibling::*[name(current())=name()][@point='end'])">
-			<xsl:apply-templates select="." mode="formatDate" />
-			<xsl:value-of select="' - '" />
-		</xsl:when>
-		<xsl:when 
-		test="@point='end' and not(following-sibling::*[name(current())=name()][@point='start'] or preceding-sibling::*[name(current())=name()][@point='start'])">
-			<xsl:value-of select="' - '" />
-			<xsl:apply-templates select="." mode="formatDate" />
-		</xsl:when>
-		<xsl:otherwise>
-			<xsl:apply-templates select="." mode="formatDate" />
-		</xsl:otherwise>
-	</xsl:choose>
+  <xsl:choose>
+    <xsl:when
+    test="@point='start' and (following-sibling::*[name(current())=name()][@point='end'] or preceding-sibling::*[name(current())=name()][@point='end'])">
+      <xsl:apply-templates select="." mode="formatDate" />
+      <xsl:value-of select="' - '" />
+      <xsl:apply-templates select="preceding-sibling::*[name(current())=name()][@point='end']" mode="formatDate" />
+      <xsl:apply-templates select="following-sibling::*[name(current())=name()][@point='end']" mode="formatDate" />
+    </xsl:when>
+    <xsl:when
+    test="@point='start' and not(following-sibling::*[name(current())=name()][@point='end'] or preceding-sibling::*[name(current())=name()][@point='end'])">
+      <xsl:apply-templates select="." mode="formatDate" />
+      <xsl:value-of select="' - '" />
+    </xsl:when>
+    <xsl:when
+    test="@point='end' and not(following-sibling::*[name(current())=name()][@point='start'] or preceding-sibling::*[name(current())=name()][@point='start'])">
+      <xsl:value-of select="' - '" />
+      <xsl:apply-templates select="." mode="formatDate" />
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:apply-templates select="." mode="formatDate" />
+    </xsl:otherwise>
+  </xsl:choose>
   </xsl:template>
 
   <xsl:template match="mods:dateOther" mode="rangeDate">
-  	<xsl:choose>
-		<xsl:when 
-		test="@point='start' and (following-sibling::*[name(current())=name()][@point='end'][@type=current()/@type] or preceding-sibling::*[name(current())=name()][@point='end'][@type=current()/@type])">
-			<xsl:apply-templates select="." mode="formatDate" />
-			<xsl:value-of select="' - '" />
-			<xsl:apply-templates select="preceding-sibling::*[name(current())=name()][@point='end'][@type=current()/@type]" mode="formatDate" />
-			<xsl:apply-templates select="following-sibling::*[name(current())=name()][@point='end'][@type=current()/@type]" mode="formatDate" />
-		</xsl:when>
-		<xsl:when 
-		test="@point='start' and not(following-sibling::*[name(current())=name()][@point='end'][@type=current()/@type] or preceding-sibling::*[name(current())=name()][@point='end'][@type=current()/@type])">
-			<xsl:apply-templates select="." mode="formatDate" />
-			<xsl:value-of select="' - '" />
-		</xsl:when>
-		<xsl:when 
-		test="@point='end' and not(following-sibling::*[name(current())=name()][@point='start'][@type=current()/@type] or preceding-sibling::*[name(current())=name()][@point='start'][@type=current()/@type])">
-			<xsl:value-of select="' - '" />
-			<xsl:apply-templates select="." mode="formatDate" />
-		</xsl:when>
-		<xsl:otherwise>
-			<xsl:apply-templates select="." mode="formatDate" />
-		</xsl:otherwise>
-  	</xsl:choose>
+    <xsl:choose>
+    <xsl:when
+    test="@point='start' and (following-sibling::*[name(current())=name()][@point='end'][@type=current()/@type] or preceding-sibling::*[name(current())=name()][@point='end'][@type=current()/@type])">
+      <xsl:apply-templates select="." mode="formatDate" />
+      <xsl:value-of select="' - '" />
+      <xsl:apply-templates select="preceding-sibling::*[name(current())=name()][@point='end'][@type=current()/@type]" mode="formatDate" />
+      <xsl:apply-templates select="following-sibling::*[name(current())=name()][@point='end'][@type=current()/@type]" mode="formatDate" />
+    </xsl:when>
+    <xsl:when
+    test="@point='start' and not(following-sibling::*[name(current())=name()][@point='end'][@type=current()/@type] or preceding-sibling::*[name(current())=name()][@point='end'][@type=current()/@type])">
+      <xsl:apply-templates select="." mode="formatDate" />
+      <xsl:value-of select="' - '" />
+    </xsl:when>
+    <xsl:when
+    test="@point='end' and not(following-sibling::*[name(current())=name()][@point='start'][@type=current()/@type] or preceding-sibling::*[name(current())=name()][@point='start'][@type=current()/@type])">
+      <xsl:value-of select="' - '" />
+      <xsl:apply-templates select="." mode="formatDate" />
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:apply-templates select="." mode="formatDate" />
+    </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued|mods:dateCaptured|mods:dateModified" mode="formatDate">
@@ -522,15 +523,15 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-   	<xsl:variable name="nameIdentifier">
+     <xsl:variable name="nameIdentifier">
       <xsl:if test="mods:nameIdentifier/@type">
         <xsl:value-of select="mods:nameIdentifier" />
       </xsl:if>
     </xsl:variable>
-	<xsl:variable name="nameIdentifierType">
-	<xsl:if test="string-length($nameIdentifier)&gt;0"></xsl:if>
-	  <xsl:value-of select="mods:nameIdentifier/@type" />
-	</xsl:variable>
+  <xsl:variable name="nameIdentifierType">
+  <xsl:if test="string-length($nameIdentifier)&gt;0"></xsl:if>
+    <xsl:value-of select="mods:nameIdentifier/@type" />
+  </xsl:variable>
 
     <xsl:choose>
       <xsl:when test="mods:role/mods:roleTerm='aut'">
@@ -552,8 +553,8 @@
     </xsl:choose>
     <xsl:if test="string-length($nameIdentifier)&gt;0">
       <xsl:variable name="classi" select="document(concat('classification:metadata:all:children:','nameIdentifier',':',$nameIdentifierType))/mycoreclass/categories/category[@ID=$nameIdentifierType]" />
-	  <xsl:variable name="uri" select="$classi/label[@xml:lang='x-uri']/@text" />
-	  <xsl:variable name="idType" select="$classi/label[@xml:lang='de']/@text" />
+    <xsl:variable name="uri" select="$classi/label[@xml:lang='x-uri']/@text" />
+    <xsl:variable name="idType" select="$classi/label[@xml:lang='de']/@text" />
       <xsl:text>&#160;</xsl:text><!-- add whitespace here -->
       <a href="{$uri}{$nameIdentifier}" title="Link zu {$idType}">
         <sup>
@@ -649,18 +650,18 @@
   </xsl:template>
 
   <xsl:template match="mods:identifier" mode="present">
-   	<xsl:variable name="identifier" select="document('classification:metadata:-1:children:identifier')" />
+     <xsl:variable name="identifier" select="document('classification:metadata:-1:children:identifier')" />
     <xsl:variable name="type" select="./@type" />
     <tr>
       <td valign="top" class="metaname">
-	    <xsl:choose>
-	    	<xsl:when test="not($identifier//category[@ID=$type])">
-	        	<xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.identifier.other', $type), ':')" />
-	        </xsl:when>
-	        <xsl:otherwise>
-	        	<xsl:value-of select="concat($identifier//category[@ID=$type]/label[lang($CurrentLang)]/@text, ':')" />
-	        </xsl:otherwise>
-	    </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="not($identifier//category[@ID=$type])">
+            <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.identifier.other', $type), ':')" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($identifier//category[@ID=$type]/label[lang($CurrentLang)]/@text, ':')" />
+          </xsl:otherwise>
+      </xsl:choose>
       </td>
       <td class="metavalue">
         <xsl:value-of select="." />
@@ -685,7 +686,7 @@
     <tr>
       <td valign="top" class="metaname">
         <xsl:choose>
-          <xsl:when test="contains(.,'PPN=')">
+          <xsl:when test="contains(.,'ppn') or contains(.,'PPN')">
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.identifier.ppn'),':')" />
           </xsl:when>
           <xsl:otherwise>
@@ -696,9 +697,12 @@
       <td class="metavalue">
         <xsl:variable name="link" select="." />
         <xsl:choose>
-          <xsl:when test="contains(.,'PPN=')">
+          <xsl:when test="contains(.,'ppn') or contains(.,'PPN')">
             <a href="{$link}">
-              <xsl:value-of select="substring-after($link, 'PPN=')" />
+              <xsl:choose>
+                <xsl:when test="contains(., 'PPN=')"><xsl:value-of select="substring-after($link, 'PPN=')" /></xsl:when>
+                <xsl:otherwise><xsl:value-of select="substring-after($link, ':ppn:')"/></xsl:otherwise>
+              </xsl:choose>
             </a>
           </xsl:when>
           <xsl:when test="@type='doi' and not(contains($link,'http'))">
