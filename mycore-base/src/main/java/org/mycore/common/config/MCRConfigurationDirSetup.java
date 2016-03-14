@@ -32,6 +32,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -106,26 +108,31 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
     }
 
     private void loadExternalLibs() {
+        File resourceDir = MCRConfigurationDir.getConfigFile("resources");
         File libDir = MCRConfigurationDir.getConfigFile("lib");
         if (libDir != null && libDir.isDirectory()) {
             File[] listFiles = libDir
                 .listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
-            if (listFiles.length > 0) {
+            if (listFiles.length > 0 || resourceDir != null) {
                 ClassLoader classLoader = this.getClass().getClassLoader();
                 Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
                 try {
                     Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
                     addUrlMethod.setAccessible(true);
-                    for (File jarFile : listFiles) {
-                        LOGGER.info("Adding to CLASSPATH: " + jarFile);
+                    Stream<File> toClassPath = Stream.of(listFiles);
+                    if (resourceDir.isDirectory()) {
+                        toClassPath = Stream.concat(Stream.of(resourceDir), toClassPath);
+                    }
+                    toClassPath.map(File::toURI).forEach(u -> {
+                        System.out.println("Adding to CLASSPATH: " + u);
                         try {
-                            addUrlMethod.invoke(classLoader, jarFile.toURI().toURL());
+                            addUrlMethod.invoke(classLoader, u.toURL());
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
                             | MalformedURLException e) {
-                            LogManager.getLogger().error("Could not add " + jarFile + " to current classloader.", e);
-                            return;
+                            LogManager.getLogger().error("Could not add " + u + " to current classloader.", e);
                         }
-                    }
+                    });
+                    System.out.println("ClassPath: " + Stream.of(((URLClassLoader) classLoader).getURLs()).map(URL::toString).collect(Collectors.joining("\n")));
                 } catch (NoSuchMethodException | SecurityException e) {
                     LogManager.getLogger(MCRConfigurationInputStream.class)
                         .warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
