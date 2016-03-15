@@ -7,8 +7,8 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
-import org.mycore.backend.hibernate.tables.MCRDELETEDITEMSPK;
+import org.mycore.backend.jpa.deleteditems.MCRDELETEDITEMS;
+import org.mycore.backend.jpa.deleteditems.MCRDELETEDITEMSPK;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;

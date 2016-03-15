@@ -1,9 +1,9 @@
 <entity-mappings>
-  <entity class="org.mycore.backend.hibernate.tables.MCRACCESS" />
-  <entity class="org.mycore.backend.hibernate.tables.MCRACCESSRULE" />
-  <entity class="org.mycore.backend.hibernate.tables.MCRLINKHREF" />
-  <entity class="org.mycore.backend.hibernate.tables.MCRDELETEDITEMS" />
-  <entity class="org.mycore.backend.hibernate.tables.MCRDNBTRANSFERRESULTS" />
+  <entity class="org.mycore.backend.jpa.access.MCRACCESS" />
+  <entity class="org.mycore.backend.jpa.access.MCRACCESSRULE" />
+  <entity class="org.mycore.backend.jpa.links.MCRLINKHREF" />
+  <entity class="org.mycore.backend.jpa.deleteditems.MCRDELETEDITEMS" />
+  <entity class="org.mycore.backend.jpa.dnbtransfer.MCRDNBTRANSFERRESULTS" />
   <entity class="org.mycore.datamodel.classifications2.impl.MCRCategoryImpl" />
   <entity class="org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl" />
   <entity class="org.mycore.services.queuedjob.MCRJob" />

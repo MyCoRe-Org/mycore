@@ -33,8 +33,8 @@ import org.apache.log4j.Logger;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.mycore.backend.hibernate.tables.MCRLINKHREF;
-import org.mycore.backend.hibernate.tables.MCRLINKHREFPK;
+import org.mycore.backend.jpa.links.MCRLINKHREF;
+import org.mycore.backend.jpa.links.MCRLINKHREFPK;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRLinkTableInterface;
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mycore.backend.hibernate.tables;
+package org.mycore.backend.jpa.deleteditems;
 
 import java.io.Serializable;
 import java.util.Date;

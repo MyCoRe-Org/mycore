@@ -39,9 +39,9 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
-import org.mycore.backend.hibernate.tables.MCRACCESS;
-import org.mycore.backend.hibernate.tables.MCRACCESSPK;
-import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
+import org.mycore.backend.jpa.access.MCRACCESS;
+import org.mycore.backend.jpa.access.MCRACCESSPK;
+import org.mycore.backend.jpa.access.MCRACCESSRULE;
 
 /**
  * Hibernate implementation of acceess store to manage access rights

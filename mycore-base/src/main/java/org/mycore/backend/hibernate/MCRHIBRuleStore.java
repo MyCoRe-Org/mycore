@@ -37,7 +37,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRRuleStore;
-import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
+import org.mycore.backend.jpa.access.MCRACCESSRULE;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 

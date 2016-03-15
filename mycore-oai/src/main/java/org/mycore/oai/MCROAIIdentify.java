@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
+import org.mycore.backend.jpa.deleteditems.MCRDELETEDITEMS;
 import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.FriendsDescription;

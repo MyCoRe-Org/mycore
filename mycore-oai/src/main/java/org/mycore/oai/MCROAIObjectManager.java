@@ -34,7 +34,7 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
+import org.mycore.backend.jpa.deleteditems.MCRDELETEDITEMS;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;

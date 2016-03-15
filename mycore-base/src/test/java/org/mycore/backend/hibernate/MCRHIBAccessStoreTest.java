@@ -36,9 +36,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
-import org.mycore.backend.hibernate.tables.MCRACCESS;
-import org.mycore.backend.hibernate.tables.MCRACCESSPK;
-import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
+import org.mycore.backend.jpa.access.MCRACCESS;
+import org.mycore.backend.jpa.access.MCRACCESSPK;
+import org.mycore.backend.jpa.access.MCRACCESSRULE;
 import org.mycore.common.MCRHibTestCase;
 
 /**

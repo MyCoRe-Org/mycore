@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.backend.hibernate.tables;
+package org.mycore.backend.jpa.links;
 
 import java.io.Serializable;
 

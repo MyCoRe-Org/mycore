@@ -11,7 +11,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
+import org.mycore.backend.jpa.deleteditems.MCRDELETEDITEMS;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.pmh.Identify.DeletedRecordPolicy;
 import org.mycore.oai.pmh.MetadataFormat;

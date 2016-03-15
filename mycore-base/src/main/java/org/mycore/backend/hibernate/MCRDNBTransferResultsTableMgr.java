@@ -8,7 +8,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.mycore.backend.hibernate.tables.MCRDNBTRANSFERRESULTS;
+import org.mycore.backend.jpa.dnbtransfer.MCRDNBTRANSFERRESULTS;
 import org.mycore.common.MCRPersistenceException;
 
 /**

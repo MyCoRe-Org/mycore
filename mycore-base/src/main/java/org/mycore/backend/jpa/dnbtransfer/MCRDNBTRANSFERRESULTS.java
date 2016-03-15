@@ -1,4 +1,4 @@
-package org.mycore.backend.hibernate.tables;
+package org.mycore.backend.jpa.dnbtransfer;
 
 import java.io.Serializable;
 import java.util.Date;
