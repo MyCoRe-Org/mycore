@@ -1,5 +1,6 @@
 package org.mycore.common;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.sql.ResultSet;
@@ -41,13 +42,17 @@ public class MCRJPATestCase extends MCRTestCase {
         t.print(out);
     }
 
-    private static void exportSchema(String action) {
+    private static void exportSchema(String action) throws IOException {
         Map<String, Object> schemaProperties = new HashMap<>();
-        StringWriter output = new StringWriter();
         schemaProperties.put("javax.persistence.schema-generation.database.action", action);
-        schemaProperties.put("javax.persistence.schema-generation.scripts.action", action);
-        schemaProperties.put("javax.persistence.schema-generation.scripts." + action + "-target", output);
-        Persistence.generateSchema(MCRJPABootstrapper.PERSISTENCE_UNIT_NAME, schemaProperties);
+        try (StringWriter output = new StringWriter()) {
+            if (LogManager.getLogger().isDebugEnabled()) {
+                schemaProperties.put("javax.persistence.schema-generation.scripts.action", action);
+                schemaProperties.put("javax.persistence.schema-generation.scripts." + action + "-target", output);
+            }
+            Persistence.generateSchema(MCRJPABootstrapper.PERSISTENCE_UNIT_NAME, schemaProperties);
+            LogManager.getLogger().debug(() -> "invoked '" + action + "' sql script:\n" + output.toString());
+        }
     }
 
     @Before()
@@ -69,11 +74,11 @@ public class MCRJPATestCase extends MCRTestCase {
         }
     }
 
-    public void exportSchema() {
+    public void exportSchema() throws IOException {
         exportSchema("create");
     }
 
-    public void dropSchema() {
+    public void dropSchema() throws IOException {
         exportSchema("drop");
     }
 
