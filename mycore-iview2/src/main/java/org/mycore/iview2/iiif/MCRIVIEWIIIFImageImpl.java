@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.FileSystem;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -17,10 +17,8 @@ import javax.imageio.ImageReader;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.MCRIIIFImageImpl;
 import org.mycore.iiif.model.MCRIIIFFeatures;
@@ -31,7 +29,6 @@ import org.mycore.iiif.model.MCRIIIFImageTargetRotation;
 import org.mycore.iiif.model.MCRIIIFImageTargetSize;
 import org.mycore.iiif.model.MCRIIIFImageTileInformation;
 import org.mycore.iiif.model.MCRIIIFProfile;
-import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
 
@@ -45,7 +42,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
 
     private static Logger LOGGER = Logger.getLogger(MCRIVIEWIIIFImageImpl.class);
     private static final java.util.List<String> TRANSPARENT_FORMATS = MCRConfiguration.instance().getStrings("MCR.IIIFImage.Iview.TransparentFormats");
-
+    private static final MCRTileFileProvider TILE_FILE_PROVIDER = MCRConfiguration.instance().getInstanceOf("MCR.IIIFImage.Iview.TileFileProvider", new MCRDefaultTileFileProvider());
     private static String buildURL(String identifier) {
         try {
             return MCRFrontendUtil.getBaseURL() + "rsc/iiif/image/" + URLEncoder.encode(identifier, "UTF-8");
@@ -76,7 +73,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
 
 
 
-        Path tiledFile = getTiledFile(identifier);
+        Path tiledFile = TILE_FILE_PROVIDER.getTiledFile(identifier);
         MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
 
         int sourceWidth = region.getX2() - region.getX1();
@@ -135,7 +132,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
                 x2Tile = (int) Math.ceil(x2 / 256),
                 y2Tile = (int) Math.ceil(y2 / 256);
 
-        try (FileSystem zipFileSystem = MCRIView2Tools.getFileSystem(getTiledFile(identifier))) {
+        try (FileSystem zipFileSystem = MCRIView2Tools.getFileSystem(TILE_FILE_PROVIDER.getTiledFile(identifier))) {
             Path rootPath = zipFileSystem.getPath("/");
 
             Graphics2D graphics = targetImage.createGraphics();
@@ -173,7 +170,7 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
     }
 
     public MCRIIIFImageInformation getInformation(String identifier) throws ImageNotFoundException, ProvidingException, MCRAccessException {
-        Path tiledFile = getTiledFile(identifier);
+        Path tiledFile = TILE_FILE_PROVIDER.getTiledFile(identifier);
         MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
 
         MCRIIIFImageInformation imageInformation = new MCRIIIFImageInformation(DEFAULT_CONTEXT, buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight());
@@ -224,27 +221,5 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
         }
         return tiledPictureProps;
     }
-
-    private Path getTiledFile(String identifier) throws ImageNotFoundException, MCRAccessException {
-        String[] splittedIdentifier = identifier.split("/", 2);
-
-        if (splittedIdentifier.length < 2) {
-            throw new ImageNotFoundException(identifier);
-        }
-
-        String derivate = splittedIdentifier[0];
-        String imagePath = splittedIdentifier[1];
-
-        if (!Files.exists(MCRPath.getPath(derivate, imagePath))) {
-            throw new ImageNotFoundException(identifier);
-        }
-
-        if (!MCRAccessManager.checkPermission(derivate, MCRAccessManager.PERMISSION_READ) && !MCRAccessManager.checkPermission(derivate, "view-derivate")) {
-            throw MCRAccessException.missingPermission("View the file " + imagePath + " in " + derivate,derivate,"view-derivate");
-        }
-
-        return MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
-    }
-
 
 }
