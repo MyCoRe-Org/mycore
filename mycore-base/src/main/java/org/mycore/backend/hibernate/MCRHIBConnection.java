@@ -23,11 +23,12 @@
 
 package org.mycore.backend.hibernate;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
+
+import javax.persistence.EntityManager;
+import javax.persistence.metamodel.EntityType;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
@@ -36,37 +37,20 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.stat.Statistics;
-import org.hibernate.type.BooleanType;
-import org.hibernate.type.DateType;
-import org.hibernate.type.DoubleType;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
-import org.hibernate.type.TimeType;
-import org.hibernate.type.TimestampType;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
 /**
  * Class for hibernate connection to selected database
  * 
  * @author Thomas Scheffler (yagee)
  */
-public class MCRHIBConnection implements Closeable {
-    private SessionFactory sessionFactory;
-
+public class MCRHIBConnection {
     static MCRHIBConnection SINGLETON;
 
     private static Logger LOGGER = Logger.getLogger(MCRHIBConnection.class);
-
-    private static String DIALECT;
-
-    private static MetadataImplementor metadata;
 
     @Override
     protected void finalize() throws Throwable {
@@ -83,14 +67,13 @@ public class MCRHIBConnection implements Closeable {
 
     public static boolean isEnabled() {
         return MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)
-            && instance().sessionFactory != null;
+            && MCREntityManagerProvider.getEntityManagerFactory() != null;
     }
 
     /**
      * This method initializes the connection to the database
      */
     protected MCRHIBConnection() throws MCRPersistenceException {
-        MCRShutdownHandler.getInstance().addCloseable(this);
     }
 
     /**
@@ -99,11 +82,11 @@ public class MCRHIBConnection implements Closeable {
      * @return Session current session object
      */
     public Session getSession() {
-        Session session = sessionFactory.getCurrentSession();
+        EntityManager currentEntityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        Session session = currentEntityManager.unwrap(Session.class);
         if (!session.isOpen()) {
-            LOGGER.warn(MessageFormat.format("Hibernate session {0} is closed, generating new session",
+            LOGGER.warn(MessageFormat.format("Hibernate session {0} is closed.",
                 Integer.toHexString(session.hashCode())));
-            session = sessionFactory.openSession();
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageFormat.format("Returning session: {0} open: {1}",
@@ -112,8 +95,13 @@ public class MCRHIBConnection implements Closeable {
         return session;
     }
 
+    public SessionFactory getSessionFactory() {
+        return MCREntityManagerProvider.getEntityManagerFactory().unwrap(SessionFactory.class);
+    }
+
+    @Deprecated
     public Metadata getMetadata() {
-        return metadata;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -123,10 +111,16 @@ public class MCRHIBConnection implements Closeable {
      *            sql-table name as string
      * @return boolean
      */
+    @Deprecated
     public boolean containsMapping(String tablename) {
-        return metadata.getEntityBindings()
+        return MCREntityManagerProvider
+            .getEntityManagerFactory()
+            .getMetamodel()
+            .getEntities()
             .stream()
-            .filter(p -> p.getTable().getName().equals(tablename))
+            .map(EntityType::getJavaType)
+            .map(Class::getName)
+            .filter(tablename::equals)
             .findFirst()
             .isPresent();
     }
@@ -138,116 +132,19 @@ public class MCRHIBConnection implements Closeable {
      *            typename as string
      * @return hibernate type
      */
+    @Deprecated
     public org.hibernate.type.Type getHibType(String type) {
-        if (type.equals("integer")) {
-            return new IntegerType();
-        } else if (type.equals("date")) {
-            return new DateType();
-        } else if (type.equals("time")) {
-            return new TimeType();
-        } else if (type.equals("timestamp")) {
-            return new TimestampType();
-        } else if (type.equals("decimal")) {
-            return new DoubleType();
-        } else if (type.equals("boolean")) {
-            return new BooleanType();
-        } else {
-            return new StringType();
-        }
+        throw new UnsupportedOperationException();
     }
 
-    public void prepareClose() {
-        // nothing to be done to prepare close()
-    }
-
-    public void close() {
-        if (sessionFactory == null) {
-            return;
-        }
-        LOGGER.debug("Closing hibernate sessions.");
-        sessionFactory.close();
-        sessionFactory = null;
-        SINGLETON = null;
-    }
-
+    @Deprecated
     public void handleStatistics(Statistics stats) throws FileNotFoundException, IOException {
-        File statsFile = new File(MCRConfiguration.instance().getString("MCR.Save.FileSystem"), "hibernatestats.xml");
-        Document doc = new Document(new Element("hibernatestats"));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("connectCount", String.valueOf(stats.getConnectCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("flushCount", String.valueOf(stats.getFlushCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("transactionCount", String.valueOf(stats.getTransactionCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("successfulTransactionCount",
-                String.valueOf(stats.getSuccessfulTransactionCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("sessionCloseCount", String.valueOf(stats.getSessionCloseCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("QueryExecutionCount",
-                String.valueOf(stats.getQueryExecutionCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("QueryExecutionMaxTime",
-                String.valueOf(stats.getQueryExecutionMaxTime())));
-        if (stats.getQueryExecutionMaxTimeQueryString() != null) {
-            doc.getRootElement().addContent(
-                new Element("longestQuery").setAttribute("value", stats.getQueryExecutionMaxTimeQueryString()));
-        }
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("CollectionFetchCount",
-                String.valueOf(stats.getCollectionFetchCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("CollectionLoadCount",
-                String.valueOf(stats.getCollectionLoadCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("CollectionRecreateCount",
-                String.valueOf(stats.getCollectionRecreateCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("CollectionRemoveCount",
-                String.valueOf(stats.getCollectionRemoveCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("CollectionUpdateCount",
-                String.valueOf(stats.getCollectionUpdateCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityDeleteCount", String.valueOf(stats.getEntityDeleteCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityFetchCount", String.valueOf(stats.getEntityFetchCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityLoadCount", String.valueOf(stats.getEntityLoadCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityInsertCount", String.valueOf(stats.getEntityInsertCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityUpdateCount", String.valueOf(stats.getEntityUpdateCount())));
-        doc.getRootElement()
-            .addContent(
-                new Element("metric").setAttribute("queryCacheHitCount",
-                    String.valueOf(stats.getQueryCacheHitCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("queryCacheMissCount",
-                String.valueOf(stats.getQueryCacheMissCount())));
-        doc.getRootElement().addContent(addStringArray(new Element("queries"), "query", "value", stats.getQueries()));
-        FileOutputStream fileOutputStream = new FileOutputStream(statsFile);
-        try {
-            new XMLOutputter(Format.getPrettyFormat()).output(doc, fileOutputStream);
-        } finally {
-            fileOutputStream.close();
-        }
+        throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public Element addStringArray(Element base, String tagName, String attrName, String[] values) {
-        for (String value : values) {
-            base.addContent(new Element(tagName).setAttribute(attrName, value));
-        }
-        return base;
-    }
-
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -257,27 +154,8 @@ public class MCRHIBConnection implements Closeable {
      * @return Query defined in mapping
      */
     public Query getNamedQuery(String name) {
-        if (DIALECT != null) {
-            String dialectQueryName = name + "." + DIALECT;
-            if (metadata.getNamedNativeQueryDefinition(dialectQueryName) != null) {
-                LOGGER.debug("Using query named:" + dialectQueryName);
-                return getSession().getNamedQuery(dialectQueryName);
-            }
-        } else {
-            LOGGER.debug("Dialect specific queries are not enabled");
-        }
         LOGGER.debug("Using query named:" + name);
         return getSession().getNamedQuery(name);
     }
 
-    @Override
-    public int getPriority() {
-        return Integer.MIN_VALUE;
-    }
-
-    static void init(SessionFactory sessionFactory, MetadataImplementor metadata, String dialect) {
-        instance().sessionFactory = sessionFactory;
-        instance().metadata = metadata;
-        instance().DIALECT = dialect;
-    }
 }

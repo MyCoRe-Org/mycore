@@ -23,136 +23,15 @@
  **/
 package org.mycore.common;
 
-import java.io.PrintStream;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.boot.Metadata;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
-import org.hibernate.tool.hbm2ddl.SchemaExport;
-import org.hibernate.tool.hbm2ddl.SchemaExport.Action;
-import org.hibernate.tool.schema.TargetType;
-import org.junit.After;
-import org.junit.Before;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.hibernate.MCRHibernateBootstrapper;
-
 /**
  * @author Thomas Scheffler (yagee) Need to insert some things here
  */
-public abstract class MCRHibTestCase extends MCRTestCase {
+public abstract class MCRHibTestCase extends MCRJPATestCase {
 
-    protected SessionFactory sessionFactory;
 
-    protected Transaction tx;
-
-    protected MCRHIBConnection hibConnection;
-
-    private Metadata metadata;
-
-    protected static void printResultSet(ResultSet resultSet, PrintStream out) throws SQLException {
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        int columns = metaData.getColumnCount();
-        Table t = new Table(columns);
-        for (int i = 1; i <= columns; i++) {
-            t.addValue(metaData.getColumnName(i));
-        }
-        while (resultSet.next()) {
-            for (int i = 1; i <= columns; i++) {
-                String value = resultSet.getString(i);
-                t.addValue(value != null ? value : "null");
-            }
-        }
-        t.print(out);
-    }
-
-    @Before()
     @Override
     public void setUp() throws Exception {
-        // Configure logging etc.
         super.setUp();
-        Logger.getLogger(MCRHibTestCase.class).debug("Setup hibernate");
-        MCRHibernateBootstrapper
-            .setup(this::exportSchema);
-        hibConnection = MCRHIBConnection.instance();
-        sessionFactory = hibConnection.getSessionFactory();
-        try {
-            Logger.getLogger(MCRHibTestCase.class).debug("Prepare hibernate test", new RuntimeException());
-            beginTransaction();
-            sessionFactory.getCurrentSession().clear();
-        } catch (RuntimeException e) {
-            Logger.getLogger(MCRHibTestCase.class).error("Error while setting up hibernate JUnit test.", e);
-            throw e;
-        }
-    }
-
-    public void exportSchema(Metadata metadata) {
-        exportSchema(metadata, Action.CREATE);
-        this.metadata = metadata;
-    }
-
-    public void dropSchema(Metadata metadata) {
-        exportSchema(metadata, Action.DROP);
-    }
-
-    private static void exportSchema(Metadata metadata, Action action) {
-        SchemaExport schemaExport = new SchemaExport();
-        schemaExport.execute(EnumSet.of(TargetType.DATABASE, TargetType.STDOUT), action, metadata);
-        @SuppressWarnings("unchecked")
-        List<Exception> exceptions = (List<Exception>) schemaExport.getExceptions();
-        exceptions.stream().forEach(e -> LogManager.getLogger().error("Error while updateing database schema.", e));
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-        endTransaction();
-        sessionFactory.getCurrentSession().close();
-        dropSchema(metadata);
-        metadata = null;
-        hibConnection = null;
-        sessionFactory = null;
-    }
-
-    protected void beginTransaction() {
-        Session currentSession = sessionFactory.getCurrentSession();
-        tx = currentSession.beginTransaction();
-    }
-
-    protected void endTransaction() throws HibernateException {
-        if (tx != null && tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
-            try {
-                tx.commit();
-            } catch (HibernateException e) {
-                tx.rollback();
-                throw e;
-            }
-        }
-    }
-
-    protected void startNewTransaction() {
-        endTransaction();
-        beginTransaction();
-        // clear from cache
-        sessionFactory.getCurrentSession().clear();
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("log4j.logger.org.hibernate", "WARN");
-        testProperties.put("log4j.logger.org.hsqldb", "WARN");
-        return testProperties;
     }
 
 }

@@ -38,14 +38,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Transaction;
-import org.hibernate.TransactionException;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -99,7 +98,7 @@ public class MCRSession implements Cloneable {
 
     private boolean dataBaseAccess;
 
-    private ThreadLocal<Transaction> transaction = new ThreadLocal<Transaction>();
+    private ThreadLocal<EntityTransaction> transaction = new ThreadLocal<>();
     
     private ThreadLocal<MCRServletJob> servletJob = new ThreadLocal<>();
 
@@ -371,20 +370,9 @@ public class MCRSession implements Cloneable {
      */
     public void beginTransaction() {
         if (dataBaseAccess) {
-            Transaction newTransaction;
-            try {
-                newTransaction = MCRHIBConnection.instance().getSession().beginTransaction();
-            } catch (TransactionException e) {
-                //fix for MCR-902
-                if (e.getMessage().equals("Already have an associated managed connection")) {
-                    LOGGER.warn("Stalled connection detected, while starting new transaction");
-                } else {
-                    LOGGER.warn("Error while starting new transaction", e);
-                }
-                MCRHIBConnection.instance().getSession().close();
-                newTransaction = MCRHIBConnection.instance().getSession().beginTransaction();
-            }
-            transaction.set(newTransaction);
+            EntityTransaction entityTransaction = MCREntityManagerProvider.getCurrentEntityManager().getTransaction();
+            entityTransaction.begin();
+            transaction.set(entityTransaction);
         }
     }
 
@@ -395,7 +383,7 @@ public class MCRSession implements Cloneable {
         if (isTransactionActive()) {
             transaction.get().commit();
             beginTransaction();
-            MCRHIBConnection.instance().getSession().clear();
+            MCREntityManagerProvider.getCurrentEntityManager().clear();
             transaction.get().commit();
             transaction.remove();
         }
@@ -408,7 +396,7 @@ public class MCRSession implements Cloneable {
     public void rollbackTransaction() {
         if (isTransactionActive()) {
             transaction.get().rollback();
-            MCRHIBConnection.instance().getSession().close();
+            MCREntityManagerProvider.getCurrentEntityManager().close();
             transaction.remove();
         }
     }
@@ -423,9 +411,9 @@ public class MCRSession implements Cloneable {
             return false;
         }
         if (transaction.get() == null) {
-            transaction.set(MCRHIBConnection.instance().getSession().getTransaction());
+            transaction.set(MCREntityManagerProvider.getCurrentEntityManager().getTransaction());
         }
-        return transaction.get() != null && transaction.get().getStatus().isOneOf(TransactionStatus.ACTIVE);
+        return transaction.get() != null && transaction.get().isActive();
     }
 
     public StackTraceElement[] getConstructingStackTrace() {

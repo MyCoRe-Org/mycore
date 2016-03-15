@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.content.MCRVFSContent;
@@ -90,7 +91,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         assertEquals("Link count does not match.", testLinks.size(),
-            sessionFactory.getCurrentSession().createCriteria(MCRCategoryLinkImpl.class).list().size());
+            MCRHIBConnection.instance().getSession().createCriteria(MCRCategoryLinkImpl.class).list().size());
     }
 
     /**
@@ -101,7 +102,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLink(LONDON_REFERENCE);
-        assertEquals("Link count does not match.", testLinks.size() - 1, sessionFactory.getCurrentSession()
+        assertEquals("Link count does not match.", testLinks.size() - 1, MCRHIBConnection.instance().getSession()
             .createCriteria(MCRCategoryLinkImpl.class).list().size());
     }
 
@@ -113,7 +114,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLinks(Arrays.asList(LONDON_REFERENCE, ENGLAND_REFERENCE));
-        assertEquals("Link count does not match.", testLinks.size() - 2, sessionFactory.getCurrentSession()
+        assertEquals("Link count does not match.", testLinks.size() - 2, MCRHIBConnection.instance().getSession()
             .createCriteria(MCRCategoryLinkImpl.class).list().size());
     }
 

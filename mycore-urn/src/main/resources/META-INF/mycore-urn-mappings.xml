@@ -1,0 +1,3 @@
+<entity-mappings>
+  <entity class="org.mycore.urn.hibernate.MCRURN" />
+</entity-mappings>

@@ -53,9 +53,9 @@ public class MCRShutdownServer {
 
     public static void main(String[] args) throws IOException, SAXException {
         Map<String, String> properties = getConnectionProperties();
-        String dbURL = properties.get("connection.url");
-        String user = properties.get("connection.user");
-        String pwd = properties.get("connection.password");
+        String dbURL = properties.get("javax.persistence.jdbc.url");
+        String user = properties.get("javax.persistence.jdbc.user");
+        String pwd = properties.get("javax.persistence.jdbc.password");
         try (Connection con = DriverManager.getConnection(dbURL, user, pwd);
             Statement statement = con.createStatement()) {
             statement.execute("SHUTDOWN");
@@ -70,9 +70,10 @@ public class MCRShutdownServer {
     }
 
     private static Map<String, String> getConnectionProperties() throws IOException, SAXException {
-        URL hibernateCfg = MCRConfigurationDir.getConfigResource(MCRHibernateBootstrapper.getHibernateConfigResourceName());
+        String resourceName = "META-INF/persistence.xml";
+        URL hibernateCfg = MCRConfigurationDir.getConfigResource(resourceName);
         if (hibernateCfg == null) {
-            throw new IOException("Could not find 'hibernate.cfg.xml'");
+            throw new IOException("Could not find '" + resourceName + "'");
         }
         PropertyHandler propertyHandler = new PropertyHandler(XMLReaderFactory.createXMLReader());
         propertyHandler.parse(hibernateCfg.toString());
@@ -80,16 +81,11 @@ public class MCRShutdownServer {
     }
 
     private static class PropertyHandler extends XMLFilterImpl {
-        String property;
-
-        StringBuilder value;
 
         HashMap<String, String> properties;
 
         public PropertyHandler(XMLReader parent) {
             super(parent);
-            this.property = null;
-            this.value = new StringBuilder();
             this.properties = new HashMap<>();
         }
 
@@ -100,28 +96,18 @@ public class MCRShutdownServer {
         @Override
         public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
             if (localName.equals("property")) {
-                property = atts.getValue("", "name");
+                String property = atts.getValue("", "name");
+                String value = atts.getValue("", "value");
+                properties.put(property, value);
             }
         }
 
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
-            if (localName.equals("property")) {
-                if (value.length() == 0) {
-                    //System.err.println(System.currentTimeMillis() + " No value found for property: " + property);
-                } else {
-                    properties.put(property, value.toString().trim());
-                }
-                property = null;
-                value.setLength(0);
-            }
         }
 
         @Override
         public void characters(char[] ch, int start, int length) throws SAXException {
-            if (property != null) {
-                value.append(ch, start, length);
-            }
         }
 
         @Override

@@ -276,7 +276,7 @@
                 <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-                <link>http://docs.jboss.org/hibernate/core/4.3/javadocs/</link>
+                <link>http://docs.jboss.org/hibernate/core/5.1/javadocs/</link>
                 <link>http://lucene.apache.org/solr/5_5_0/solr-solrj/</link>
               </links>
             </configuration>
@@ -537,7 +537,7 @@
               <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-              <link>http://docs.jboss.org/hibernate/core/4.3/javadocs/</link>
+              <link>http://docs.jboss.org/hibernate/core/5.1/javadocs/</link>
               <link>http://lucene.apache.org/solr/5_5_0/solr-solrj/</link>
             </links>
           </configuration>
@@ -942,6 +942,12 @@
             <artifactId>xml-apis</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-entitymanager</artifactId>
+        <version>${hibernate.version}</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>

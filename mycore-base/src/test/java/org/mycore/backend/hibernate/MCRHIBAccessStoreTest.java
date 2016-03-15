@@ -66,8 +66,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         if (ACCESS_STORE == null) {
             ACCESS_STORE = new MCRHIBAccessStore();
         }
-        sessionFactory.getCurrentSession().save(TRUE_RULE);
-        sessionFactory.getCurrentSession().save(FALSE_RULE);
+        MCRHIBConnection.instance().getSession().save(TRUE_RULE);
+        MCRHIBConnection.instance().getSession().save(FALSE_RULE);
         startNewTransaction();
 
     }
@@ -102,7 +102,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
         startNewTransaction();
-        assertNotNull(sessionFactory.getCurrentSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
+        assertNotNull(MCRHIBConnection.instance().getSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
     }
 
     private MCRRuleMapping addRuleMapping(final String objID, final String permission, final String rid) {
@@ -144,7 +144,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         startNewTransaction();
         ACCESS_STORE.deleteAccessDefinition(ruleMapping);
         startNewTransaction();
-        assertNull(sessionFactory.getCurrentSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
+        assertNull(MCRHIBConnection.instance().getSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
     }
 
     /**
@@ -160,7 +160,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         ruleMapping.setRuleId(FALSE_RULE.getRid());
         ACCESS_STORE.updateAccessDefinition(ruleMapping);
         startNewTransaction();
-        MCRACCESS access = (MCRACCESS) sessionFactory.getCurrentSession().get(MCRACCESS.class,
+        MCRACCESS access = (MCRACCESS) MCRHIBConnection.instance().getSession().get(MCRACCESS.class,
             new MCRACCESSPK(permission, objID));
         assertEquals(FALSE_RULE, access.getRule());
     }

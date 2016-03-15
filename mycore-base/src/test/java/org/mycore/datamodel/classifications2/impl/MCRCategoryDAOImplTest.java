@@ -50,6 +50,7 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.content.MCRVFSContent;
@@ -117,7 +118,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategoryImpl rootCategory = getRootCategoryFromSession();
         assertEquals("Child category count does not match.", category.getChildren().size(), rootCategory.getChildren()
             .size());
-        long allNodes = ((Number) sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class)
+        long allNodes = ((Number) MCRHIBConnection.instance().getSession().createCriteria(MCRCategoryImpl.class)
             .setProjection(Projections.rowCount()).uniqueResult()).longValue();
         // category + india
         assertEquals("Complete category count does not match.", countNodes(category) + 1, allNodes);
@@ -557,7 +558,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     }
 
     private MCRCategoryImpl getRootCategoryFromSession() {
-        return (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class,
+        return (MCRCategoryImpl) MCRHIBConnection.instance().getSession().get(MCRCategoryImpl.class,
             ((MCRCategoryImpl) category).getInternalID());
     }
 
@@ -608,7 +609,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     }
 
     private void printCategoryTable() {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = MCRHIBConnection.instance().getSession();
         session.doWork(connection -> {
             try {
                 Statement statement = connection.createStatement();

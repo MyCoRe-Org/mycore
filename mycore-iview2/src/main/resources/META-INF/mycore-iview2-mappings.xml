@@ -1,0 +1,3 @@
+<entity-mappings>
+  <entity class="org.mycore.iview2.services.MCRTileJob" />
+</entity-mappings>
