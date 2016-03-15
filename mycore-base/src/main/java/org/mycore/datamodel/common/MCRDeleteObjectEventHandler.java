@@ -6,7 +6,7 @@ package org.mycore.datamodel.common;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.mycore.backend.hibernate.MCRDeletedItemManager;
+import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -85,7 +85,7 @@ public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         try {
             LOGGER.info("Saving deletion information for object " + obj.getId());
-            MCRDeletedItemManager.getInstance().addEntry(obj.getId().toString(), new Date());
+            MCRDeletedItemManager.addEntry(obj.getId().toString(), new Date());
         } catch (Exception ex) {
             LOGGER.error(ex);
         }
@@ -103,7 +103,7 @@ public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
         try {
             LOGGER.info("Saving deletion information for derivate " + derivate.getId());
-            MCRDeletedItemManager.getInstance().addEntry(derivate.getId().toString(), new Date());
+            MCRDeletedItemManager.addEntry(derivate.getId().toString(), new Date());
         } catch (Exception ex) {
             LOGGER.error(ex);
         }
