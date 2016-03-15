@@ -26,6 +26,7 @@ package org.mycore.datamodel.classifications2.impl;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -97,7 +98,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
 class MCRCategoryLinkImpl implements MCRCategoryLink {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
     @ManyToOne(targetEntity = MCRCategoryImpl.class)
