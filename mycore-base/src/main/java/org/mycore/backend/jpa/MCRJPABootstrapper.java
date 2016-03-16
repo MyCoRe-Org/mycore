@@ -5,6 +5,7 @@ package org.mycore.backend.jpa;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,36 +44,30 @@ public class MCRJPABootstrapper implements AutoExecutable {
         initializeJPA();
         Metamodel metamodel = MCREntityManagerProvider.getEntityManagerFactory().getMetamodel();
         checkHibernateMappingConfig(metamodel);
-        LogManager.getLogger().info("Mapping these entities: " + metamodel
-            .getEntities()
-            .stream()
-            .map(EntityType::getJavaType)
-            .map(Class::getName)
-            .collect(Collectors.toList()));
+        LogManager.getLogger().info("Mapping these entities: " + metamodel.getEntities().stream()
+                .map(EntityType::getJavaType).map(Class::getName).collect(Collectors.toList()));
         MCRShutdownHandler.getInstance().addCloseable(new MCRJPAShutdownProcessor());
     }
 
     public static void initializeJPA() {
-        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+        initializeJPA(null);
+    }
+
+    public static void initializeJPA(Map<?, ?> properties) {
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME,
+                properties);
         MCREntityManagerProvider.init(entityManagerFactory);
     }
 
     private void checkHibernateMappingConfig(Metamodel metamodel) {
-        Set<String> mappedEntities = metamodel
-            .getEntities()
-            .stream()
-            .map(EntityType::getJavaType)
-            .map(Class::getName)
-            .collect(Collectors.toSet());
-        List<String> unMappedEntities = MCRConfiguration
-            .instance()
-            .getStrings("MCR.Hibernate.Mappings", Collections.emptyList())
-            .stream()
-            .filter(cName -> !mappedEntities.contains(cName))
-            .collect(Collectors.toList());
+        Set<String> mappedEntities = metamodel.getEntities().stream().map(EntityType::getJavaType).map(Class::getName)
+                .collect(Collectors.toSet());
+        List<String> unMappedEntities = MCRConfiguration.instance()
+                .getStrings("MCR.Hibernate.Mappings", Collections.emptyList()).stream()
+                .filter(cName -> !mappedEntities.contains(cName)).collect(Collectors.toList());
         if (!unMappedEntities.isEmpty()) {
             throw new MCRException(
-                "JPA Mapping is inclomplete. Could not find a mapping for these classes: " + unMappedEntities);
+                    "JPA Mapping is inclomplete. Could not find a mapping for these classes: " + unMappedEntities);
         }
     }
 
