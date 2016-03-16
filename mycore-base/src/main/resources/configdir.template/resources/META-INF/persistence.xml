@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<persistence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+  version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
+  <persistence-unit name="MyCoRe" transaction-type="RESOURCE_LOCAL">
+    <!-- http://stackoverflow.com/questions/3211138/jpa-eclipselink-how-to-change-default-schema -->
+    <!-- 
+    <mapping-file>META-INF/mycore-jpa-defaults.xml</mapping-file>
+     -->
+    <!-- http://stackoverflow.com/questions/15026302/multiple-jars-single-persistence-unit-solution -->
+    <mapping-file>META-INF/mycore-base-mappings.xml</mapping-file>
+    <mapping-file>META-INF/mycore-handle-mappings.xml</mapping-file>
+    <mapping-file>META-INF/mycore-ifs-mappings.xml</mapping-file>
+    <mapping-file>META-INF/mycore-iview2-mappings.xml</mapping-file>
+    <mapping-file>META-INF/mycore-pi-mappings.xml</mapping-file>
+    <mapping-file>META-INF/mycore-urn-mappings.xml</mapping-file>
+    <mapping-file>META-INF/mycore-user2-mappings.xml</mapping-file>
+    <properties>
+      <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+      <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE" />
+      <!--  PostgreSQL -->
+      <!--
+      <property name="javax.persistence.jdbc.driver">org.postgresql.Driver</property>
+      <property name="javax.persistence.jdbc.url">jdbc:postgresql://127.0.0.1/mycore</property>
+      -->
+      <!-- MySQL -->
+      <!--
+      <property name="javax.persistence.jdbc.driver">com.mysql.jdbc.Driver</property>
+      <property name="javax.persistence.jdbc.url">jdbc:mysql://127.0.0.1/mycore?useUnicode=true&amp;characterEncoding=UTF-8</property>
+      -->
+      <!-- DB2 -->
+      <!--
+      <property name="javax.persistence.jdbc.driver">com.ibm.db2.jcc.DB2Driver</property>
+      <property name="javax.persistence.jdbc.url">jdbc:db2://localhost:50000/mycore</property>
+      -->
+      <property name="javax.persistence.jdbc.user" value="sa" />
+      <property name="javax.persistence.jdbc.password" value="" />
+      <!-- any jpa provider properties (still require hibernate) -->
+      <property name="hibernate.cache.use_second_level_cache" value="false" />
+      <property name="hibernate.hbm2ddl.auto" value="update" />
+      <!-- Set batch_size to "0" in case of SQL batch Errors -->
+      <property name="hibernate.jdbc.batch_size" value="2000" />
+      <property name="hibernate.default_batch_fetch_size" value="100" />
+      <!-- Echo all executed SQL to stdout -->
+      <property name="hibernate.show_sql" value="false" />
+
+      <!-- second-level cache  -->
+      <!-- disabled -->
+      <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.internal.NoCachingRegionFactory" />
+      <property name="hibernate.cache.use_second_level_cache" value="false" />
+      <property name="hibernate.cache.use_query_cache" value="false"/>
+      <!-- net/sf/ehcache/hibernate/Provider -->
+      <!--
+      <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory />
+      <property name="hibernate.cache.use_second_level_cache" value="true" />
+      <property name="hibernate.cache.use_query_cache" value="true" />
+      -->
+      <!-- more human readable cache entries -->
+      <!-- <property name="hibernate.cache.use_structured_entries" value="true" /> -->
+      <!-- do not read to often from db just to save a few write operations -->
+      <!-- <property name="hibernate.cache.use_minimal_puts" value="false" /> -->
+    </properties>
+  </persistence-unit>
+</persistence>
