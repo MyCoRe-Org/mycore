@@ -27,11 +27,12 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -107,36 +108,58 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         }
     }
 
-    private void loadExternalLibs() {
+    public static void loadExternalLibs() {
         File resourceDir = MCRConfigurationDir.getConfigFile("resources");
+        if (resourceDir == null) {
+            //no configuration dir exists
+            return;
+        }
+        ClassLoader classLoader = MCRConfigurationDir.class.getClassLoader();
+        if (!(classLoader instanceof URLClassLoader)) {
+            System.err.println(classLoader.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
+            return;
+        }
         File libDir = MCRConfigurationDir.getConfigFile("lib");
-        if (libDir != null && libDir.isDirectory()) {
+        Set<URL> currentCPElements = Stream.of(((URLClassLoader) classLoader).getURLs()).collect(Collectors.toSet());
+        Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
+        try {
+            Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            addUrlMethod.setAccessible(true);
+            getFileStream(resourceDir, libDir)
+                .map(File::toURI)
+                .map(u -> {
+                    try {
+                        return u.toURL();
+                    } catch (Exception e) {
+                        // should never happen for "file://" URIS
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .filter(u -> !currentCPElements.contains(u))
+                .forEach(u -> {
+                    System.out.println("Adding to CLASSPATH: " + u);
+                    try {
+                        addUrlMethod.invoke(classLoader, u);
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        LOGGER.error("Could not add " + u + " to current classloader.", e);
+                    }
+                });
+        } catch (NoSuchMethodException | SecurityException e) {
+            LogManager.getLogger(MCRConfigurationInputStream.class)
+                .warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
+        }
+    }
+
+    private static Stream<File> getFileStream(File resourceDir, File libDir) {
+        Stream<File> toClassPath = Stream.of(resourceDir);
+        if (libDir.isDirectory()) {
             File[] listFiles = libDir
                 .listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
-            if (listFiles.length > 0 || resourceDir != null) {
-                ClassLoader classLoader = this.getClass().getClassLoader();
-                Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
-                try {
-                    Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-                    addUrlMethod.setAccessible(true);
-                    Stream<File> toClassPath = Stream.of(listFiles);
-                    if (resourceDir.isDirectory()) {
-                        toClassPath = Stream.concat(Stream.of(resourceDir), toClassPath);
-                    }
-                    toClassPath.map(File::toURI).forEach(u -> {
-                        System.out.println("Adding to CLASSPATH: " + u);
-                        try {
-                            addUrlMethod.invoke(classLoader, u.toURL());
-                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                            | MalformedURLException e) {
-                            LogManager.getLogger().error("Could not add " + u + " to current classloader.", e);
-                        }
-                    });
-                } catch (NoSuchMethodException | SecurityException e) {
-                    LogManager.getLogger(MCRConfigurationInputStream.class)
-                        .warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
-                }
+            if (listFiles.length != 0) {
+                toClassPath = Stream.concat(toClassPath, Stream.of(listFiles));
             }
         }
+        return toClassPath;
     }
 }
