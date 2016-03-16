@@ -25,7 +25,6 @@ package org.mycore.common.events;
 
 import java.util.Collections;
 
-import javax.persistence.PersistenceException;
 import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
@@ -80,19 +79,19 @@ public class MCRStartupHandler {
         }
 
         MCRConfiguration.instance().getStrings("MCR.Startup.Class", Collections.emptyList()).stream()
-                .map(MCRStartupHandler::getAutoExecutable)
-                //reverse ordering: highest priority first
-                .sorted((o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()))
-                .forEachOrdered(autoExecutable -> startExecutable(servletContext, autoExecutable));
+            .map(MCRStartupHandler::getAutoExecutable)
+            //reverse ordering: highest priority first
+            .sorted((o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()))
+            .forEachOrdered(autoExecutable -> startExecutable(servletContext, autoExecutable));
     }
 
     private static void startExecutable(ServletContext servletContext, AutoExecutable autoExecutable) {
         LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
         try {
             autoExecutable.startUp(servletContext);
-        } catch (ExceptionInInitializerError | PersistenceException e) {
-            boolean haltOnError = servletContext.getAttribute(HALT_ON_ERROR) == null
-                    || Boolean.parseBoolean((String) servletContext.getAttribute(HALT_ON_ERROR));
+        } catch (ExceptionInInitializerError | RuntimeException e) {
+            boolean haltOnError = servletContext == null || servletContext.getAttribute(HALT_ON_ERROR) == null
+                || Boolean.parseBoolean((String) servletContext.getAttribute(HALT_ON_ERROR));
 
             if (haltOnError) {
                 throw e;
