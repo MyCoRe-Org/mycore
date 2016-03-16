@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.backend.hibernate;
+package org.mycore.backend.jpa.access;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -31,13 +31,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRRuleStore;
-import org.mycore.backend.jpa.access.MCRACCESSRULE;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 
@@ -46,12 +47,13 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 /**
- * Hibernate implementation for RuleStore, storing access rules
+ * JPA implementation for RuleStore, storing access rules
  * 
  * @author Arne Seifert
+ * @author Thomas Scheffler (yagee)
  */
-public class MCRHIBRuleStore extends MCRRuleStore {
-    private static final Logger LOGGER = Logger.getLogger(MCRHIBRuleStore.class);
+public class MCRJPARuleStore extends MCRRuleStore {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static int CACHE_SIZE = MCRConfiguration.instance().getInt("MCR.AccessPool.CacheSize", 2048);
 

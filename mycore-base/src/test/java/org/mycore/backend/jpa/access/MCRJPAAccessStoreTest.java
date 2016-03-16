@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.backend.hibernate;
+package org.mycore.backend.jpa.access;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -36,9 +36,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.access.MCRACCESS;
 import org.mycore.backend.jpa.access.MCRACCESSPK;
 import org.mycore.backend.jpa.access.MCRACCESSRULE;
+import org.mycore.backend.jpa.access.MCRJPAAccessStore;
 import org.mycore.common.MCRHibTestCase;
 
 /**
@@ -46,13 +48,13 @@ import org.mycore.common.MCRHibTestCase;
  * 
  * @version $Revision$ $Date$
  */
-public class MCRHIBAccessStoreTest extends MCRHibTestCase {
+public class MCRJPAAccessStoreTest extends MCRHibTestCase {
 
     private static final MCRACCESSRULE TRUE_RULE = getTrueRule();
 
     private static final MCRACCESSRULE FALSE_RULE = getFalseRule();
 
-    private static MCRHIBAccessStore ACCESS_STORE;
+    private static MCRJPAAccessStore ACCESS_STORE;
 
     /*
      * (non-Javadoc)
@@ -64,7 +66,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
     public void setUp() throws Exception {
         super.setUp();
         if (ACCESS_STORE == null) {
-            ACCESS_STORE = new MCRHIBAccessStore();
+            ACCESS_STORE = new MCRJPAAccessStore();
         }
         MCRHIBConnection.instance().getSession().save(TRUE_RULE);
         MCRHIBConnection.instance().getSession().save(FALSE_RULE);
@@ -94,7 +96,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#createAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#createAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
      */
     @Test
     public void createAccessDefinition() {
@@ -118,7 +120,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getRuleID(String, String)}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#getRuleID(String, String)}.
      */
     @Test
     public void getRuleID() {
@@ -134,7 +136,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#deleteAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#deleteAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
      */
     @Test
     public void deleteAccessDefinition() {
@@ -149,7 +151,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#updateAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#updateAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
      */
     @Test
     public void updateAccessDefinition() {
@@ -167,7 +169,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getAccessDefinition(java.lang.String, java.lang.String)}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#getAccessDefinition(java.lang.String, java.lang.String)}.
      */
     @Test
     public void getAccessDefinition() {
@@ -187,7 +189,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getMappedObjectId(java.lang.String)}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#getMappedObjectId(java.lang.String)}.
      */
     @Test
     public void getMappedObjectId() {
@@ -202,7 +204,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getPoolsForObject(java.lang.String)}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#getPoolsForObject(java.lang.String)}.
      */
     @Test
     public void getPoolsForObject() {
@@ -217,7 +219,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getDatabasePools()}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#getDatabasePools()}.
      */
     @Test
     public void getDatabasePools() {
@@ -232,7 +234,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#existsRule(java.lang.String, java.lang.String)}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#existsRule(java.lang.String, java.lang.String)}.
      */
     @Test
     public void existsRule() {
@@ -246,7 +248,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getDistinctStringIDs()}.
+     * {@link org.mycore.backend.jpa.access.MCRJPAAccessStore#getDistinctStringIDs()}.
      */
     @Test
     public void getDistinctStringIDs() {

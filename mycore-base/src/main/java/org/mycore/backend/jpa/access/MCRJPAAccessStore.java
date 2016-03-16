@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.backend.hibernate;
+package org.mycore.backend.jpa.access;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -30,7 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -39,20 +40,19 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
-import org.mycore.backend.jpa.access.MCRACCESS;
-import org.mycore.backend.jpa.access.MCRACCESSPK;
-import org.mycore.backend.jpa.access.MCRACCESSRULE;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 
 /**
- * Hibernate implementation of acceess store to manage access rights
+ * JPA implementation of acceess store to manage access rights
  * 
  * @author Arne Seifert
+ * @author Thomas Scheffler (yagee)
  * 
  */
-public class MCRHIBAccessStore extends MCRAccessStore {
+public class MCRJPAAccessStore extends MCRAccessStore {
     private final DateFormat dateFormat = new SimpleDateFormat(sqlDateformat, Locale.ROOT);
 
-    private static final Logger LOGGER = Logger.getLogger(MCRHIBAccessStore.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public String getRuleID(String objID, String ACPool) {
