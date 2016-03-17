@@ -176,6 +176,7 @@
               select="concat(mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume'],
                                          ', ',
                                          i18n:translate('component.mods.metaData.dictionary.issue'),
+                                         ' ',
                                          mods:relatedItem[@type='host']/mods:part/mods:detail[@type='issue'])" />
           </xsl:when>
           <xsl:otherwise>
@@ -308,7 +309,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=')" />
-          <xsl:value-of select="concat('+mods.author:&quot;',mods:displayForm,'&quot;')" />
+          <xsl:value-of select="concat('+mods.name:&quot;',mods:displayForm,'&quot;')" />
           <xsl:value-of select="concat('&amp;owner=createdby:', $owner)" />
         </xsl:otherwise>
       </xsl:choose>
