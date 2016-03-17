@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -12,12 +13,14 @@ import javax.persistence.UniqueConstraint;
 import org.mycore.common.MCRCoreVersion;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "type"})})
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "identifier", "type" }) })
 public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
+
+    private static final long serialVersionUID = 234168232792525611L;
 
     // unique constraint für identifier type
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)
@@ -55,6 +58,7 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     }
 
     public MCRPI(String identifier, String type, String mycoreID, String additional, String service, Date registered) {
+        this();
         this.identifier = identifier;
         this.type = type;
         this.mycoreID = mycoreID;
