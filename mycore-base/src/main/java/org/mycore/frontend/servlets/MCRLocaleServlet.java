@@ -7,9 +7,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRJSONUtils;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.resources.MCRLocaleResource;
@@ -25,7 +25,7 @@ public class MCRLocaleServlet extends HttpServlet {
 
     private static final String CHARSET = MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8");
 
-    private static final Logger LOGGER = Logger.getLogger(MCRLocaleServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private int cacheTime;
 
@@ -52,39 +52,48 @@ public class MCRLocaleServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // remove leading /
-        String pathInfo = req.getPathInfo().startsWith("/") ? req.getPathInfo().substring(1) : req.getPathInfo();
-
-        String[] pathParts = pathInfo.split("/");
-        String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        int realPathIndex = 0;
-
-        boolean hasFirstPart = pathParts.length > 0;
-        if (!hasFirstPart) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "No first Parameter found!");
+        String returnValue;
+        String lang = getLang(req.getPathInfo());
+        if (lang.length() < 2) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "\"type\" parameter and language is undefined");
+            return;
         }
-
-        boolean isFirstPartLanguage = MCRTranslation.getAvailableLanguages().contains(pathParts[0]);
-        if (isFirstPartLanguage) {
-            lang = pathParts[0];
-            realPathIndex++;
-        }
-
-        writeResult(resp, lang, pathParts[realPathIndex]);
-    }
-
-    private void writeResult(HttpServletResponse resp, String lang, String key) throws IOException {
-        MCRFrontendUtil.writeCacheHeaders(resp, (long) cacheTime, startUpTime, true);
-        resp.setCharacterEncoding(CHARSET);
+        String key = getKey(req.getPathInfo());
         if (key.endsWith("*")) {
+            returnValue = handlePrefetch(key.substring(0, key.length() - 1), lang);
             resp.setContentType("text/json");
-            resp.getWriter().print(handlePrefetch(key.substring(0, key.length() - 1), lang));
         } else {
+            returnValue = handleGetI18n(key, lang);
             resp.setContentType("text/plain");
-            resp.getWriter().print(handleGetI18n(key, lang));
         }
+        MCRFrontendUtil.writeCacheHeaders(resp, (long) cacheTime, startUpTime, true);
+
+        resp.setCharacterEncoding(CHARSET);
+        resp.getWriter().print(returnValue);
     }
 
+    private String getKey(String pathInfo) {
+        int pos = pathInfo.indexOf('/', 1);
+        String key = pathInfo.substring(pos + 1);
+        LOGGER.info("Getting translations for key " + key);
+        return key;
+    }
+
+    protected static String getLang(String pathInfo) {
+        StringBuilder lang = new StringBuilder(pathInfo.length());
+        boolean running = true;
+        for (int i = (pathInfo.charAt(0) == '/') ? 1 : 0; (i < pathInfo.length() && running); i++) {
+            switch (pathInfo.charAt(i)) {
+                case '/':
+                    running = false;
+                    break;
+                default:
+                    lang.append(pathInfo.charAt(i));
+                    break;
+            }
+        }
+        return lang.toString();
+    }
 
     private String handleGetI18n(String label, String lang) {
         return MCRTranslation.translate(label, MCRTranslation.getLocale(lang));
