@@ -4,6 +4,11 @@
   <xsd:import schemaLocation="xml-2001.xsd" namespace="http://www.w3.org/XML/1998/namespace" />
   <xsd:import schemaLocation="xlink-2008-06.xsd" namespace="http://www.w3.org/1999/xlink" />
 
+  <xsd:simpleType name="varchar-4096">
+    <xsd:restriction base="xsd:normalizedString">
+      <xsd:maxLength value="4096" />
+    </xsd:restriction>
+  </xsd:simpleType>
   <xsd:simpleType name="varchar-255">
     <xsd:restriction base="xsd:normalizedString">
       <xsd:maxLength value="255" />
@@ -45,8 +50,8 @@
     <xsd:simpleContent>
       <xsd:extension base="xsd:string">
         <xsd:attribute ref="xml:lang" />
-        <xsd:attribute use="required" type="varchar-255" name="text" />
-        <xsd:attribute type="varchar-255" name="description" />
+        <xsd:attribute use="required" type="varchar-4096" name="text" />
+        <xsd:attribute type="varchar-4096" name="description" />
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
