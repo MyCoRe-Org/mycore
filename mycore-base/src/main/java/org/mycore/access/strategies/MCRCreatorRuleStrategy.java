@@ -145,7 +145,7 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
         return BASE_STRATEGY.hasRuleMapping(id, permission) || isCreatorRuleAvailable(id, permission);
     }
 
-    private boolean isCreatorRuleAvailable(String id, String permission) {
+    public boolean isCreatorRuleAvailable(String id, String permission) {
         if (MCRAccessManager.PERMISSION_WRITE.equals(permission)) {
             MCRObjectID mcrObjectId = null;
             try {
