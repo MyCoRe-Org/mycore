@@ -96,13 +96,20 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     /* I actually don't like this, because the type of handler and parameters are hard-coded */
     private MCRUploadHandler createUploadHandler(HttpServletRequest req) {
         String parentObjectID = req.getParameter("parentObjectID");
-        String derivateID = req.getParameter("derivateID");
+        String derivateID = getSubmittedDerivateID(req);
 
-        LOGGER.info("Create missing upload handler for " + parentObjectID + " derivateID " + derivateID );
+        LOGGER.info("Create missing upload handler for " + parentObjectID + " derivateID " + derivateID);
         guardAgainstMissingPermissions(parentObjectID, derivateID);
 
         String cancelUrl = req.getParameter("cancelUrl");
         return new MCRUploadHandlerIFS(parentObjectID, derivateID, cancelUrl);
+    }
+
+    private String getSubmittedDerivateID(HttpServletRequest req) {
+        String derivateID = req.getParameter("derivateID");
+        if ((derivateID != null) && derivateID.trim().isEmpty())
+            derivateID = null;
+        return derivateID;
     }
 
     private void guardAgainstMissingPermissions(String parentObjectID, String derivateID) {
@@ -110,7 +117,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
             throw new MCRPersistenceException(
                 "You do not have \"" + PERMISSION_WRITE + "\" permission on " + parentObjectID + ".");
 
-        if (derivateID != null && !MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE))
+        if ((derivateID != null) && !MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE))
             throw new MCRPersistenceException(
                 "You do not have \"" + PERMISSION_WRITE + "\" permission on " + derivateID + ".");
     }
