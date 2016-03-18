@@ -95,6 +95,22 @@ public class MCRMODSWrapper {
         wrapper.setMODS(modsDefinition);
         return wrapper.getMCRObject();
     }
+    
+    /**
+     * returns true if the given MCRObject can handle MODS metadata
+     * @param obj - the MCRObject
+     * @return true, if mods is supported
+     */
+    public static boolean isSupported(MCRObject obj) {
+        if (MODS_OBJECT_TYPE.equals(obj.getId().getTypeId())) {
+            return true;
+        }
+        if (obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
+            && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElementByName(MODS_CONTAINER) != null) {
+            return true;
+        }
+        return false;
+    }
 
     private MCRObject object;
 

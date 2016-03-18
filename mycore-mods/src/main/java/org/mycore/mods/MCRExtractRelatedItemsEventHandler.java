@@ -74,8 +74,9 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
     private final static Logger LOGGER = Logger.getLogger(MCRExtractRelatedItemsEventHandler.class);
 
     private void extractRelatedItems(final MCREvent evt, final MCRObject object) {
-        if (!isMODS(object))
+        if (!MCRMODSWrapper.isSupported(object)){
             return;
+        }
 
         Element mods = new MCRMODSWrapper(object).getMODS();
         MCRObjectID oid = object.getId();
@@ -121,10 +122,6 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
                 }
             }
         }
-    }
-
-    private boolean isMODS(MCRObject obj) {
-        return "mods".equals(obj.getId().getTypeId());
     }
 
     private boolean isHost(Element relatedItem) {

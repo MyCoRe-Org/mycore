@@ -52,11 +52,11 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleObjectCreated(final MCREvent evt, final MCRObject obj) {
-        if (!getSupportedObjectType().equals(obj.getId().getTypeId())) {
+        if (!MCRMODSWrapper.isSupported(obj)) {
             return;
         }
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(obj);
-        final HashSet<MCRCategoryID> categories = new HashSet(modsWrapper.getMcrCategoryIDs());
+        final HashSet<MCRCategoryID> categories = new HashSet<>(modsWrapper.getMcrCategoryIDs());
         if (!categories.isEmpty()) {
             final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId());
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
@@ -78,16 +78,12 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         }
     }
 
-    protected String getSupportedObjectType() {
-        return "mods";
-    }
-
-    /* (non-Javadoc)
+   /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase#handleObjectUpdated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     protected void handleObjectUpdated(final MCREvent evt, final MCRObject obj) {
-        if (!getSupportedObjectType().equals(obj.getId().getTypeId())) {
+        if (!MCRMODSWrapper.isSupported(obj)) {
             return;
         }
         handleObjectCreated(evt, obj);
