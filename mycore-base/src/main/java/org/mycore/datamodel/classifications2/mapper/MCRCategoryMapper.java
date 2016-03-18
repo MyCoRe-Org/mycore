@@ -41,8 +41,9 @@ public class MCRCategoryMapper extends MCRCategoryMapperBase {
 
     protected String getMappingRule(MCRCategoryID categoryID) {
         MCRCategory category = DAO.getCategory(categoryID, 0);
-        MCRLabel label = category.getLabel("x-mapper")
-            .orElseThrow(() -> new MCRException("Category " + category + " does not hav a label for 'x-mapper'."));
+        //"x-mapper" was used in previous versions of mycore
+        MCRLabel label = category.getLabel("x-mapping").orElse(category.getLabel("x-mapper")
+            .orElseThrow(() -> new MCRException("Category " + category + " does not hav a label for 'x-mapping'.")));
         return label.getText();
     }
 
