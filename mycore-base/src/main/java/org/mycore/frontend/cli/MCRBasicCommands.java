@@ -161,8 +161,6 @@ public class MCRBasicCommands {
                 createSampleConfigFile(f.trim());
             }
         }
-        
-        createSampleConfigFile("hibernate.cfg.xml");
     }
 
     private static boolean createDirectory(File directory) {
