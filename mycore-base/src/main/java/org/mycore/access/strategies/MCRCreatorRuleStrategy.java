@@ -62,10 +62,11 @@ import com.google.common.cache.LoadingCache;
  *
  * @version $Revision$ $Date$
  */
-public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
+public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Logger LOGGER = Logger.getLogger(MCRCreatorRuleStrategy.class);
 
-    private static final String SUBMITTED_CATEGORY = MCRConfiguration.instance().getString("MCR.Access.Strategy.SubmittedCategory", "state:submitted");
+    private static final String SUBMITTED_CATEGORY = MCRConfiguration.instance()
+        .getString("MCR.Access.Strategy.SubmittedCategory", "state:submitted");
 
     private static final String CREATOR_ROLE = MCRConfiguration.instance().getString("MCR.Access.Strategy.CreatorRole",
         "submitter");
@@ -108,31 +109,8 @@ public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
         if (id == null || id.length() == 0 || permission == null || permission.length() == 0) {
             return false;
         }
-        if (!MCRAccessManager.PERMISSION_WRITE.equals(permission)) {
-            //if not checking for write permission, use base strategy
-            return BASE_STRATEGY.checkPermission(id, permission);
-        }
         //our decoration for write permission
-        if (BASE_STRATEGY.checkPermission(id, permission)) {
-            return true;
-        }
-        MCRObjectID mcrObjectId = null;
-        try {
-            mcrObjectId = MCRObjectID.getInstance(id);
-            MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
-            if (currentUser.isUserInRole(CREATOR_ROLE) && objectStatusIsSubmitted(mcrObjectId)) {
-                if (isCurrentUserCreator(mcrObjectId, currentUser)) {
-                    return true;
-                }
-            }
-        } catch (RuntimeException e) {
-            if (mcrObjectId == null) {
-                LOGGER.debug("id is not a valid object ID", e);
-            } else {
-                LOGGER.warn("Eror while checking permission.", e);
-            }
-        }
-        return false;
+        return BASE_STRATEGY.checkPermission(id, permission) || isCreatorRuleAvailable(id, permission);
     }
 
     private static boolean objectStatusIsSubmitted(MCRObjectID mcrObjectID) {
@@ -160,5 +138,32 @@ public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
             LOGGER.error("Error while getting creator information.", e);
             return false;
         }
+    }
+
+    @Override
+    public boolean hasRuleMapping(String id, String permission) {
+        return BASE_STRATEGY.hasRuleMapping(id, permission) || isCreatorRuleAvailable(id, permission);
+    }
+
+    private boolean isCreatorRuleAvailable(String id, String permission) {
+        if (MCRAccessManager.PERMISSION_WRITE.equals(permission)) {
+            MCRObjectID mcrObjectId = null;
+            try {
+                mcrObjectId = MCRObjectID.getInstance(id);
+                MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
+                if (currentUser.isUserInRole(CREATOR_ROLE) && objectStatusIsSubmitted(mcrObjectId)) {
+                    if (isCurrentUserCreator(mcrObjectId, currentUser)) {
+                        return true;
+                    }
+                }
+            } catch (RuntimeException e) {
+                if (mcrObjectId == null) {
+                    LOGGER.debug("id is not a valid object ID", e);
+                } else {
+                    LOGGER.warn("Eror while checking permission.", e);
+                }
+            }
+        }
+        return false;
     }
 }

@@ -46,10 +46,12 @@ import org.mycore.access.MCRAccessManager;
  * 
  * @version $Revision: 26482 $ $Date: 2013-03-13 10:16:11 +0100 (Mi, 13. Mär 2013) $
  */
-public class MCRObjectBaseStrategy implements MCRAccessCheckStrategy {
+public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Logger LOGGER = Logger.getLogger(MCRObjectBaseStrategy.class);
 
     private static final Pattern BASE_PATTERN = Pattern.compile("([^_]*_[^_]*)_*");
+
+    private final MCRObjectTypeStrategy typeStrategy = new MCRObjectTypeStrategy();
 
     /*
      * (non-Javadoc)
@@ -66,11 +68,15 @@ public class MCRObjectBaseStrategy implements MCRAccessCheckStrategy {
             return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
         }
         String objectBase = getObjectBase(id);
-        if (objectBase != null && MCRAccessManager.getAccessImpl().hasRule("default_" + objectBase, permission)) {
+        if (hasBasePermission(objectBase, permission)) {
             LOGGER.debug("using access rule defined for object base.");
             return MCRAccessManager.getAccessImpl().checkPermission("default_" + objectBase, permission);
         }
         return MCRObjectTypeStrategy.checkObjectTypePermission(id, permission);
+    }
+
+    private boolean hasBasePermission(String objectBase, String permission) {
+        return objectBase != null && MCRAccessManager.getAccessImpl().hasRule("default_" + objectBase, permission);
     }
 
     private static String getObjectBase(String id) {
@@ -79,6 +85,11 @@ public class MCRObjectBaseStrategy implements MCRAccessCheckStrategy {
             return m.group(1);
         }
         return null;
+    }
+
+    @Override
+    public boolean hasRuleMapping(String id, String permission) {
+        return hasBasePermission(getObjectBase(id), permission) || typeStrategy.hasRuleMapping(id, permission);
     }
 
 }

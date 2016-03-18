@@ -35,7 +35,7 @@ import org.mycore.access.MCRAccessManager;
  * 
  * @version $Revision$ $Date$
  */
-public class MCRObjectIDStrategy implements MCRAccessCheckStrategy {
+public class MCRObjectIDStrategy implements MCRCombineableAccessCheckStrategy {
 
     /*
      * (non-Javadoc)
@@ -45,6 +45,11 @@ public class MCRObjectIDStrategy implements MCRAccessCheckStrategy {
      */
     public boolean checkPermission(String id, String permission) {
         return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
+    }
+
+    @Override
+    public boolean hasRuleMapping(String id, String permission) {
+        return MCRAccessManager.hasRule(id, permission);
     }
 
 }

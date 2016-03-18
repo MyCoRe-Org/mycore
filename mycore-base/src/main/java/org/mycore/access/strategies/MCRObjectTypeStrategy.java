@@ -44,12 +44,14 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * 
  * @version $Revision$ $Date$
  */
-public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
+public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Pattern TYPE_PATTERN = Pattern.compile("[^_]*_([^_]*)_[0-9]*");
 
     private static final Logger LOGGER = Logger.getLogger(MCRObjectIDStrategy.class);
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+
+    private static MCRObjectIDStrategy idStrategy = new MCRObjectIDStrategy();
 
     /*
      * (non-Javadoc)
@@ -58,21 +60,25 @@ public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
      *      java.lang.String)
      */
     public boolean checkPermission(String id, String permission) {
-        if (MCRAccessManager.getAccessImpl().hasRule(id, permission)) {
+        if (idStrategy.hasRuleMapping(id, permission)) {
             LOGGER.debug("using access rule defined for object.");
-            return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
+            return idStrategy.checkPermission(id, permission);
         }
         return checkObjectTypePermission(id, permission);
     }
 
     public static boolean checkObjectTypePermission(String id, String permission) {
         String objectType = getObjectType(id);
-        if (objectType != null && MCRAccessManager.getAccessImpl().hasRule("default_" + objectType, permission)) {
+        if (hasTypePermission(objectType, permission)) {
             LOGGER.debug("using access rule defined for object type.");
             return MCRAccessManager.getAccessImpl().checkPermission("default_" + objectType, permission);
         }
         LOGGER.debug("using system default access rule.");
         return MCRAccessManager.getAccessImpl().checkPermission("default", permission);
+    }
+
+    private static boolean hasTypePermission(String objectType, String permission) {
+        return objectType != null && MCRAccessManager.getAccessImpl().hasRule("default_" + objectType, permission);
     }
 
     private static String getObjectType(String id) {
@@ -92,6 +98,12 @@ public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean hasRuleMapping(String id, String permission) {
+        return idStrategy.hasRuleMapping(id, permission) || hasTypePermission(getObjectType(id), permission)
+            || MCRAccessManager.hasRule("default", permission);
     }
 
 }
