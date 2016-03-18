@@ -94,7 +94,6 @@ public class MCRURN {
      * This method returns the primary key.
      * 
      * @return returns the primary key as class MCRURNPK.
-     * @hibernate.property column="Primary Key" not-null="true" update="true"
      */
     public MCRURNPK getKey() {
         return key;
@@ -114,7 +113,6 @@ public class MCRURN {
      * Get the object ID value.
      * 
      * @return the object ID value as a String.
-     * @hibernate.property column="MCRID" not-null="true" update="true"
      */
     public String getId() {
         return key.getMcrid();
@@ -134,7 +132,6 @@ public class MCRURN {
      * Get the URN value.
      * 
      * @return the URN value as a String.
-     * @hibernate.property column="MCRURN" not-null="true" update="true"
      */
     public String getURN() {
         return key.getMcrurn();
