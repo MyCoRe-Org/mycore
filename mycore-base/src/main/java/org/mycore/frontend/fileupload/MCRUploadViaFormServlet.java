@@ -87,7 +87,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     private MCRUploadHandler getUploadHandler(HttpServletRequest req) {
         String uploadId = req.getParameter("uploadId");
 
-        if (uploadId != null)
+        if ((uploadId != null) && !uploadId.isEmpty())
             return MCRUploadHandlerManager.getHandler(uploadId);
         else
             return createUploadHandler(req);
@@ -97,9 +97,11 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     private MCRUploadHandler createUploadHandler(HttpServletRequest req) {
         String parentObjectID = req.getParameter("parentObjectID");
         String derivateID = req.getParameter("derivateID");
-        String cancelUrl = req.getParameter("cancelUrl");
 
+        LOGGER.info("Create missing upload handler for " + parentObjectID + " derivateID " + derivateID );
         guardAgainstMissingPermissions(parentObjectID, derivateID);
+
+        String cancelUrl = req.getParameter("cancelUrl");
         return new MCRUploadHandlerIFS(parentObjectID, derivateID, cancelUrl);
     }
 
