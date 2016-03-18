@@ -25,12 +25,11 @@ package org.mycore.frontend.fileupload;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -68,10 +67,11 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws Exception {
         guardWebsiteCurrentlyReadOnly();
 
-        MCRUploadHandler handler = getUploadHandler(job.getRequest());
+        MCRRequestParameters rp = new MCRRequestParameters(job.getRequest());
+        MCRUploadHandler handler = getUploadHandler(rp);
         LOGGER.info("UploadHandler form based file upload for ID " + handler.getID());
 
-        List<FileItem> files = new MCRRequestParameters(job.getRequest()).getFileList();
+        List<FileItem> files = getUploadedFiles(rp);
         handleUploadedFiles(handler, files);
 
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(handler.getRedirectURL()));
@@ -79,34 +79,42 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         handler.unregister();
     }
 
+    private List<FileItem> getUploadedFiles(MCRRequestParameters rp) {
+        List<FileItem> files = new ArrayList<FileItem>();
+        for (FileItem file : rp.getFileList())
+            if (file.getSize() > 0)
+                files.add(file);
+        return files;
+    }
+
     private void guardWebsiteCurrentlyReadOnly() throws IOException {
         if (MCRWebsiteWriteProtection.isActive())
             throw new RuntimeException("System is currently in read-only mode");
     }
 
-    private MCRUploadHandler getUploadHandler(HttpServletRequest req) {
-        String uploadId = req.getParameter("uploadId");
+    private MCRUploadHandler getUploadHandler(MCRRequestParameters rp) {
+        String uploadId = rp.getParameter("uploadId");
 
         if ((uploadId != null) && !uploadId.isEmpty())
             return MCRUploadHandlerManager.getHandler(uploadId);
         else
-            return createUploadHandler(req);
+            return createUploadHandler(rp);
     }
 
     /* I actually don't like this, because the type of handler and parameters are hard-coded */
-    private MCRUploadHandler createUploadHandler(HttpServletRequest req) {
-        String parentObjectID = req.getParameter("parentObjectID");
-        String derivateID = getSubmittedDerivateID(req);
+    private MCRUploadHandler createUploadHandler(MCRRequestParameters rp) {
+        String parentObjectID = rp.getParameter("parentObjectID");
+        String derivateID = getSubmittedDerivateID(rp);
 
         LOGGER.info("Create missing upload handler for " + parentObjectID + " derivateID " + derivateID);
         guardAgainstMissingPermissions(parentObjectID, derivateID);
 
-        String cancelUrl = req.getParameter("cancelUrl");
+        String cancelUrl = rp.getParameter("cancelUrl");
         return new MCRUploadHandlerIFS(parentObjectID, derivateID, cancelUrl);
     }
 
-    private String getSubmittedDerivateID(HttpServletRequest req) {
-        String derivateID = req.getParameter("derivateID");
+    private String getSubmittedDerivateID(MCRRequestParameters rp) {
+        String derivateID = rp.getParameter("derivateID");
         if ((derivateID != null) && derivateID.trim().isEmpty())
             derivateID = null;
         return derivateID;
