@@ -72,7 +72,9 @@ public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionB
             String key = e.nextElement();
             if (key.equals(MCRServlet.ATTR_MYCORE_SESSION)) {
                 MCRSession mcrSession = MCRSessionMgr.getSession((String)httpSession.getAttribute(key));
-                mcrSession.close();
+                if(mcrSession!=null){
+                    mcrSession.close();
+                }
                 // remove reference in httpSession
                 httpSession.removeAttribute(key);
             }
