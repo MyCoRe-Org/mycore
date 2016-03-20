@@ -3,21 +3,21 @@ package org.mycore.urn.services;
 import java.net.URI;
 
 /**
- * This class represents a URN in the namespace of the German National Library (DNB): 
+ * This class represents a URN in the namespace of the German National Library (DNB):
  * urn:nbn:de.
- * 
+ *
  * Attention:
  * This implementation uses  the DNB namespace specific checksum calculation
  * so it cannot be used for URNs in other namespaces.
- * 
+ *
  * The syntax is described in:
  * "Policy für die Vergabe von URNs im Namensraum urn:nbn:de"
  * (http://d-nb.info/1029114455/34)
- * 
+ *
  * Use MCRURN.create(String urnBase) to create a URN from a base string and calculate the checksum
  * and MCRURN.parse(String urn) to parse a complete URN (with checksum included).
- * 
- * 
+ *
+ *
  * @author shermann
  * @author Robert Stephan
  */
@@ -25,7 +25,7 @@ public class MCRURN {
 
     final private static String URN_PREFIX = "urn:nbn:de:";
 
-    /** the part after the prefix 
+    /** the part after the prefix
      *     usually the acronym of a German library network and a library specific number number
      *     or a project id*/
     private String subNamespaces;
@@ -58,9 +58,9 @@ public class MCRURN {
     }
 
     /**
-     * 
-     * @param the URN (complete, with checksum included)
-     * 
+     *
+     * @param urn the URN as string (complete, with checksum included)
+     *
      * @return the MCRURN Object
      */
     public static MCRURN parse(String urn) {
@@ -84,10 +84,9 @@ public class MCRURN {
     }
 
     /**
-     * 
-     * @param urn the urn as String"
+     *
+     * @param subNamespaces
      * @param namespaceSpecificString - the namespace specific string (NISS)
-     * @return
      */
     public static MCRURN create(String subNamespaces, String namespaceSpecificString) {
         return new MCRURN(subNamespaces, namespaceSpecificString,
@@ -97,9 +96,9 @@ public class MCRURN {
     /**
      * Creates a new urn by a given string (without checksum).
      * The checksum will calculated and added to the URN.
-     * 
+     *
      * @param urnBaseWithoutChecksum
-     *            the string the urn should be created from 
+     *            the string the urn should be created from
      */
     public static MCRURN create(String urnBaseWithoutChecksum) {
         if (urnBaseWithoutChecksum == null) {
@@ -128,7 +127,7 @@ public class MCRURN {
      * For other schemas the calculated checksum may not be correct. Thus one
      * should subclass {@link org.mycore.urn.services.MCRURN} and override this
      * method.
-     * 
+     *
      * @return the calculated checksum
      * @see <a href="http://www.persistent-identifier.de/?link=316"
      *      >http://www.persistent-identifier.de/?link=316</a>
@@ -160,7 +159,7 @@ public class MCRURN {
 
     /**
      * Returns the integer value for a given String for checksum calculation
-     * 
+     *
      * @throws IllegalArgumentException
      *             when the given char is not allowed
      */
