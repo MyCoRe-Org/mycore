@@ -29,7 +29,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
@@ -48,8 +47,6 @@ import org.mycore.common.MCRSystemUserInformation;
 public class MCRJobThread implements Runnable {
     protected MCRJob job = null;
 
-    private static SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
-
     private static Logger LOGGER = Logger.getLogger(MCRJobThread.class);
 
     public MCRJobThread(MCRJob job) {
@@ -59,7 +56,7 @@ public class MCRJobThread implements Runnable {
     public void run() {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        Session session = sessionFactory.getCurrentSession();
+        Session session = MCRHIBConnection.instance().getSession();
         Transaction transaction = session.beginTransaction();
         try {
             Class<? extends MCRJobAction> actionClass = job.getAction();
@@ -68,9 +65,9 @@ public class MCRJobThread implements Runnable {
 
             try {
                 job.setStart(new Date());
-                
+
                 action.execute();
-                
+
                 job.setFinished(new Date());
                 job.setStatus(MCRJobStatus.FINISHED);
             } catch (ExecutionException ex) {
