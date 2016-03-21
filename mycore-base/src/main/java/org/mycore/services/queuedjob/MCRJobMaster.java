@@ -36,7 +36,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
@@ -52,7 +51,6 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
  * @author Ren\u00E9 Adler
  */
 public class MCRJobMaster implements Runnable, Closeable {
-    private static final SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
     private static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
@@ -183,7 +181,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                         if (!running)
                             break;
 
-                        Session session = sessionFactory.getCurrentSession();
+                        Session session = MCRHIBConnection.instance().getSession();
                         Transaction transaction = session.beginTransaction();
                         MCRJob job = null;
                         MCRJobAction action = null;
