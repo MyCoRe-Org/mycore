@@ -112,8 +112,8 @@ class MCRSessionContext implements MCRSessionListener {
      * Closes Session if Session is still open.
      */
     private void autoCloseSession(EntityManager currentEntityManager) {
-        if (currentEntityManager != null && currentEntityManager.isOpen()) {
-            LOGGER.debug("Autoclosing current hibernate Session");
+        if (currentEntityManager != null && currentEntityManager.isOpen() && hibernateSessionIsOpen(currentEntityManager)) {
+            LOGGER.debug("Autoclosing current JPA EntityManager");
             currentEntityManager.close();
         }
     }
