@@ -136,7 +136,7 @@ public class MCRMODSWrapper {
                     return (Element) content;
                 }
             }
-        } catch (NullPointerException npe) {
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
             //do nothing
         }
         return null;
