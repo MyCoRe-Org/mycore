@@ -24,7 +24,9 @@ package org.mycore.restapi.v1;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
@@ -59,6 +61,8 @@ public class MCRRestAPISearch extends HttpServlet {
 
     public static final String FORMAT_XML = "xml";
 
+    public static final String FORMAT_CSV = "csv";
+
     /**
      * see http://wiki.apache.org/solr/CommonQueryParameters for syntax of parameters
      * 
@@ -78,28 +82,39 @@ public class MCRRestAPISearch extends HttpServlet {
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
-        MediaType.TEXT_PLAIN + ";charset=ISO-8859-1" })
+        MediaType.TEXT_PLAIN + ";charset=ISO-8859-1", MediaType.TEXT_PLAIN + ";charset=UTF-8" })
     public Response search(@Context UriInfo info, @QueryParam("q") String query, @QueryParam("sort") String sort,
-        @QueryParam("wt") @DefaultValue("xml") String wt, @QueryParam("rows") String start, @QueryParam("row") String rows) {
+        @QueryParam("wt") @DefaultValue("xml") String wt, @QueryParam("start") String start,
+        @QueryParam("rows") String rows, @QueryParam("fq") String fq, @QueryParam("fl") String fl) {
 
         StringBuffer url = new StringBuffer(MCRSolrConstants.SERVER_URL);
         url.append("/select?");
-        if (query != null) {
-            url.append("&q=").append(query);
-        }
-        if (sort != null) {
-            url.append("&sort=").append(sort);
-        }
-        if (wt != null) {
-            url.append("&wt=").append(wt);
-        }
-        if (start != null) {
-            url.append("&start=").append(start);
-        }
-        if (rows != null) {
-            url.append("&rows=").append(rows);
-        }
 
+        try {
+            if (query != null) {
+                url.append("&q=").append(URLEncoder.encode(query, "UTF-8"));
+            }
+            if (sort != null) {
+                url.append("&sort=").append(URLEncoder.encode(sort, "UTF-8"));
+            }
+            if (wt != null) {
+                url.append("&wt=").append(wt);
+            }
+            if (start != null) {
+                url.append("&start=").append(start);
+            }
+            if (rows != null) {
+                url.append("&rows=").append(rows);
+            }
+            if (fq != null) {
+                url.append("&fq=").append(URLEncoder.encode(fq, "UTF-8"));
+            }
+            if (fl != null) {
+                url.append("&fl=").append(URLEncoder.encode(fl, "UTF-8"));
+            }
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error(e);
+        }
         try (InputStream is = new URL(url.toString()).openStream()) {
             try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
                 String text = scanner.useDelimiter("\\A").next();
@@ -107,10 +122,12 @@ public class MCRRestAPISearch extends HttpServlet {
                 switch (wt) {
                     case FORMAT_XML:
                         return Response.ok(text).type("application/xml; charset=UTF-8").build();
-                        //break;
+                    //break;
                     case FORMAT_JSON:
                         return Response.ok(text).type("application/json; charset=UTF-8").build();
-                        //break;
+                    //break;
+                    case FORMAT_CSV:
+                        return Response.ok(text).type("text/comma-separated-values; charset=UTF-8").build();
                     default:
                         return Response.ok(text).type("text").build();
                 }
@@ -118,7 +135,7 @@ public class MCRRestAPISearch extends HttpServlet {
         } catch (IOException e) {
             LOGGER.error(e);
         }
-  
+
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 }
