@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -68,8 +69,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategoryLink.";
 
     private static MCRCache<MCRCategoryID, MCRCategory> categCache = new MCRCache<MCRCategoryID, MCRCategory>(
-        MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
-        "MCRCategLinkService category cache");
+            MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
+            "MCRCategLinkService category cache");
 
     private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -231,8 +232,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             return hasLinksForClassifications();
         }
 
-        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(
-            category.getRoot().getId(), -1);
+        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance()
+                .getCategory(category.getRoot().getId(), -1);
         if (rootImpl == null) {
             //Category does not exist, so it has no links
             return getNoLinksMap(category);
@@ -255,11 +256,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             }
         };
         Query linkedClassifications = MCRHIBConnection.instance()
-            .getNamedQuery(NAMED_QUERY_NAMESPACE + "linkedClassifications");
-        ((List<String>) linkedClassifications.list())
-            .stream()
-            .map(MCRCategoryID::rootID)
-            .forEach(id -> boolMap.put(id, true));
+                .getNamedQuery(NAMED_QUERY_NAMESPACE + "linkedClassifications");
+        ((List<String>) linkedClassifications.list()).stream().map(MCRCategoryID::rootID)
+                .forEach(id -> boolMap.put(id, true));
         return boolMap;
     }
 
@@ -272,7 +271,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private void storeHasLinkValues(HashMap<MCRCategoryID, Boolean> boolMap, BitSet internalIds,
-        MCRCategoryImpl parent) {
+            MCRCategoryImpl parent) {
         final int internalID = parent.getInternalID();
         if (internalID < internalIds.size() && internalIds.get(internalID)) {
             addParentHasValues(boolMap, parent);
@@ -286,7 +285,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private void addParentHasValues(HashMap<MCRCategoryID, Boolean> boolMap, MCRCategory parent) {
         boolMap.put(parent.getId(), true);
-        if (parent.isCategory() && !boolMap.get(parent.getParent().getId())) {
+        if (parent.isCategory() && !Optional.ofNullable(boolMap.get(parent.getParent().getId())).orElse(false)) {
             addParentHasValues(boolMap, parent.getParent());
         }
     }
