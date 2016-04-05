@@ -164,10 +164,7 @@ public class MCRLinkTableManager {
         try {
             persistenceclass.create(from, to, type, attr);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                e.printStackTrace();
-            }
-            logger.warn("An error occured while adding a dataset from the reference link table, adding not succesful.");
+            logger.warn("An error occured while adding a dataset from the reference link table, adding not succesful.", e);
         }
     }
 
@@ -196,11 +193,8 @@ public class MCRLinkTableManager {
         try {
             persistenceclass.delete(from, null, null);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                e.printStackTrace();
-            }
             logger.warn("An error occured while deleting a dataset from the" + from
-                    + " reference link table, deleting could be not succesful.");
+                    + " reference link table, deleting could be not succesful.", e);
         }
     }
 
@@ -222,8 +216,7 @@ public class MCRLinkTableManager {
         try {
             persistenceclass.delete(from, to, type);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.warn("An error occured while deleting a dataset from the" + " reference link table, deleting is not succesful.");
+            logger.warn("An error occured while deleting a dataset from the" + " reference link table, deleting is not succesful.", e);
         }
     }
 
@@ -255,7 +248,7 @@ public class MCRLinkTableManager {
         try {
             return persistenceclass.countTo(null, to, null, null);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references of " + to + ".");
+            logger.warn("An error occured while searching for references of " + to + ".", e);
         }
 
         return 0;
@@ -291,7 +284,7 @@ public class MCRLinkTableManager {
             }
             return persistenceclass.countTo(null, to, null, restriction);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references of " + to + ".");
+            logger.warn("An error occured while searching for references of " + to + ".", e);
         }
 
         return 0;
@@ -351,7 +344,7 @@ public class MCRLinkTableManager {
         try {
             return persistenceclass.getSourcesOf(to, null);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references to " + to + ".");
+            logger.warn("An error occured while searching for references to " + to + ".", e);
             return Collections.emptyList();
         }
     }
@@ -394,7 +387,7 @@ public class MCRLinkTableManager {
         try {
             return persistenceclass.getSourcesOf(to, type);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references to " + to + " with " + type + ".");
+            logger.warn("An error occured while searching for references to " + to + " with " + type + ".", e);
             return Collections.emptyList();
         }
     }
@@ -421,7 +414,7 @@ public class MCRLinkTableManager {
             }
             return ll;
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references to " + to + ".");
+            logger.warn("An error occured while searching for references to " + to + ".", e);
             return ll;
         }
     }
@@ -465,7 +458,7 @@ public class MCRLinkTableManager {
         try {
             return persistenceclass.getDestinationsOf(from, type);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references from " + from + ".");
+            logger.warn("An error occured while searching for references from " + from + ".", e);
             return Collections.emptyList();
         }
     }
