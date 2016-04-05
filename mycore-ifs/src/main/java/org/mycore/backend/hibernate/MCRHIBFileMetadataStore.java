@@ -121,7 +121,9 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         fs.setNumchdf(NUMCHDF);
         fs.setNumchtd(NUMCHTD);
         fs.setNumchtf(NUMCHTF);
-        session.saveOrUpdate(fs);
+        if (!session.contains(fs)){
+            session.saveOrUpdate(fs);
+        }
     }
 
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException {
@@ -190,7 +192,6 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
             node.getPid(), node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(),
             node.getStorageid(), node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(),
             node.getNumchtd(), node.getNumchtf());
-        getSession().evict(node);
         return filesystemNode;
     }
 
