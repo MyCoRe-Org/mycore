@@ -34,9 +34,12 @@ package org.mycore.common;
  *
  */
 public interface MCRUserInformation {
-    
-    public static final String ATT_PRIMARY_GROUP="primaryGroup";
-    public static final String ATT_REAL_NAME="realName";
+
+    public static final String ATT_PRIMARY_GROUP = "primaryGroup";
+
+    public static final String ATT_REAL_NAME = "realName";
+
+    public static final String ATT_EMAIL = "eMail";
 
     /**
      * The UserID is the information that is used in <em>user</em> clauses of the ACL System.
@@ -47,7 +50,7 @@ public interface MCRUserInformation {
      * The role information is used in <em>group</em> clauses of the ACL System.
      */
     public boolean isUserInRole(String role);
-    
+
     /**
      * Get additional attributes if they are provided by the underlying user system
      * @param attribute user attribute name

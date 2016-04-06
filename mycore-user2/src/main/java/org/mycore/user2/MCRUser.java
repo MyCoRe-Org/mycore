@@ -78,13 +78,13 @@ import org.mycore.user2.utils.MCRUserNameConverter;
  */
 @Entity
 @Access(AccessType.PROPERTY)
-@Table(name = "MCRUser", uniqueConstraints = @UniqueConstraint(columnNames = { "userName", "realmID" }) )
+@Table(name = "MCRUser", uniqueConstraints = @UniqueConstraint(columnNames = { "userName", "realmID" }))
 // TODO use @Cacheable instead
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @XmlRootElement(name = "user")
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributesMap",
-        "password" })
+    "password" })
 public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     private static final long serialVersionUID = 3378645055646901800L;
 
@@ -521,10 +521,14 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      */
     @Override
     public String getUserAttribute(String attribute) {
-        if (MCRUserInformation.ATT_REAL_NAME.equals(attribute)) {
-            return getRealName();
+        switch (attribute) {
+            case MCRUserInformation.ATT_REAL_NAME:
+                return getRealName();
+            case MCRUserInformation.ATT_EMAIL:
+                return getEMailAddress();
+            default:
+                return getAttributes().get(attribute);
         }
-        return getAttributes().get(attribute);
     }
 
     @Override
@@ -540,7 +544,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return the attributes
      */
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "MCRUserAttr", joinColumns = @JoinColumn(name = "id") )
+    @CollectionTable(name = "MCRUserAttr", joinColumns = @JoinColumn(name = "id"))
     @MapKeyColumn(name = "name", length = 128)
     @Column(name = "value", length = 255)
     public Map<String, String> getAttributes() {
