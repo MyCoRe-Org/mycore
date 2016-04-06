@@ -176,4 +176,9 @@ public class MCRLINKHREFPK implements Serializable {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "MCRLINKHREFPK [mcrfrom=" + mcrfrom + ", mcrto=" + mcrto + ", mcrtype=" + mcrtype + "]";
+    }
+
  }
