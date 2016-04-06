@@ -242,6 +242,10 @@
     <url-pattern>/servlets/MCRUploadViaAppletServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>MCRUploadViaAppletServlet</servlet-name>
+    <url-pattern>/servlets/MCRUploadServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>MCRZipServlet</servlet-name>
     <url-pattern>/servlets/MCRZipServlet</url-pattern>
   </servlet-mapping>
