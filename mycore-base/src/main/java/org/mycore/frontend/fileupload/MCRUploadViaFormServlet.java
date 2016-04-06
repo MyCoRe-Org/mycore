@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision: 34120 $ $Date: 2015-12-02 23:16:17 +0100 (Mi, 02 Dez 2015) $
  *
  * This file is part of ***  M y C o R e  ***
@@ -40,6 +40,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
+import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -48,12 +49,12 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 /**
  * This servlet handles form based file upload.
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @version $Revision: 34120 $ $Date: 2015-12-02 23:16:17 +0100 (Mi, 02 Dez 2015) $
- * 
+ *
  * @see org.mycore.frontend.fileupload.MCRUploadHandler
  */
 
@@ -67,7 +68,8 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws Exception {
         guardWebsiteCurrentlyReadOnly();
 
-        MCRRequestParameters rp = new MCRRequestParameters(job.getRequest());
+        MCREditorSubmission sub = (MCREditorSubmission) job.getRequest().getAttribute("MCREditorSubmission");
+        MCRRequestParameters rp = sub == null ? new MCRRequestParameters(job.getRequest()) : sub.getParameters();
         MCRUploadHandler handler = getUploadHandler(rp);
         LOGGER.info("UploadHandler form based file upload for ID " + handler.getID());
 
