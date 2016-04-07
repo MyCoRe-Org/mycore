@@ -6,7 +6,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -30,8 +29,6 @@ import org.mycore.imagetiler.MCRTiledPictureProps;
 public class MCRTilingAction implements Runnable {
     protected MCRTileJob tileJob = null;
 
-    private static SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
-
     private static Logger LOGGER = Logger.getLogger(MCRTilingAction.class);
 
     /**
@@ -51,7 +48,7 @@ public class MCRTilingAction implements Runnable {
         }
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        final Session session = sessionFactory.getCurrentSession();
+        final Session session = MCRHIBConnection.instance().getSession();
         Transaction transaction = null;
         try {
             MCRTileEventHandler tileEventHandler = new MCRTileEventHandler() {
