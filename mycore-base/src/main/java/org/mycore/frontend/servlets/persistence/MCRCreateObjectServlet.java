@@ -52,8 +52,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response)
-        throws MCRAccessException, ServletException, MCRActiveLinkException, SAXParseException, JDOMException,
-        IOException {
+            throws MCRAccessException, ServletException, MCRActiveLinkException, SAXParseException, JDOMException, IOException {
         Document editorSubmission = MCRPersistenceHelper.getEditorSubmission(request, false);
         MCRObjectID objectID;
         if (editorSubmission != null) {
@@ -74,7 +73,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
     void displayResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //return to object itself if created, else call editor form
         MCRObjectID returnID = (MCRObjectID) request.getAttribute(OBJECT_ID_KEY);
-        if (returnID == null) {
+        if (returnID.getNumberAsInteger() == 0) {
             redirectToCreateObject(request, response);
         } else {
             Properties params = MCRPersistenceHelper.getXSLProperties(request);
@@ -82,12 +81,10 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
                 params.put("id", returnID.toString());
                 params.put("cancelURL", MCRPersistenceHelper.getCancelUrl(request));
                 response.sendRedirect(
-                    response.encodeRedirectURL(buildRedirectURL(
-                        MCRFrontendUtil.getBaseURL() + "servlets/derivate/create", params)));
+                        response.encodeRedirectURL(buildRedirectURL(MCRFrontendUtil.getBaseURL() + "servlets/derivate/create", params)));
             } else {
-                response.sendRedirect(
-                    response.encodeRedirectURL(buildRedirectURL(
-                        MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(), params)));
+                response.sendRedirect(response
+                        .encodeRedirectURL(buildRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(), params)));
             }
         }
     }
@@ -108,8 +105,8 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
      * @throws MCRException
      * @throws MCRAccessException 
      */
-    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException,
-        IOException, MCRException, SAXParseException, MCRAccessException {
+    private MCRObjectID createObject(Document doc)
+            throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException, MCRAccessException {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
         //noinspection SynchronizeOnNonFinalField
@@ -130,11 +127,8 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
     private void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
         String createBasePrivilege = "create-" + objectId.getBase();
         String createTypePrivilege = "create-" + objectId.getTypeId();
-        if (!MCRAccessManager.checkPermission(createBasePrivilege)
-            && !MCRAccessManager.checkPermission(createTypePrivilege)) {
-            throw MCRAccessException.missingPrivilege("Create object with id " + objectId,
-                createBasePrivilege,
-                createTypePrivilege);
+        if (!MCRAccessManager.checkPermission(createBasePrivilege) && !MCRAccessManager.checkPermission(createTypePrivilege)) {
+            throw MCRAccessException.missingPrivilege("Create object with id " + objectId, createBasePrivilege, createTypePrivilege);
         }
     }
 
@@ -154,8 +148,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
      * @throws IOException
      * @throws ServletException 
      */
-    private void redirectToCreateObject(HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+    private void redirectToCreateObject(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         MCRObjectID objectID = (MCRObjectID) request.getAttribute(OBJECT_ID_KEY);
         StringBuilder sb = new StringBuilder();
         sb.append("editor_form_author").append('-').append(objectID.getTypeId());
@@ -164,7 +157,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
             sb.append('-').append(layout);
         }
         String base_name = sb.toString();
-        String form = MCRPersistenceHelper.getWebPage(getServletContext(), base_name+".xed", base_name+".xml");
+        String form = MCRPersistenceHelper.getWebPage(getServletContext(), base_name + ".xed", base_name + ".xml");
         Properties params = new Properties();
         params.put("cancelUrl", MCRPersistenceHelper.getCancelUrl(request));
         params.put("mcrid", objectID.toString());
@@ -174,8 +167,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
             String value = request.getParameter(name);
             params.put(name, value);
         }
-        response.sendRedirect(
-            response.encodeRedirectURL(buildRedirectURL(MCRFrontendUtil.getBaseURL() + form, params)));
+        response.sendRedirect(response.encodeRedirectURL(buildRedirectURL(MCRFrontendUtil.getBaseURL() + form, params)));
     }
 
 }
