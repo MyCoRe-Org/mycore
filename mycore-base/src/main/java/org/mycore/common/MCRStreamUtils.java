@@ -31,9 +31,9 @@ public class MCRStreamUtils {
      */
     public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodeSupplier, boolean parallel) {
         Collection<T> subNodes = subNodeSupplier.apply(node);
-        return Stream.concat(Stream.of(node), (parallel ? subNodes.parallelStream() : subNodes.stream()).flatMap(subNode -> flatten(subNode, subNodeSupplier, parallel)));
+        return Stream.concat(Stream.of(node), (parallel ? subNodes.parallelStream() : subNodes.stream())
+            .flatMap(subNode -> flatten(subNode, subNodeSupplier, parallel)));
     }
-
 
     /**
      * Example:
@@ -59,9 +59,18 @@ public class MCRStreamUtils {
      * @param e the enumeration to transform
      * @return a sequential, ordered Stream of unknown size
      */
-    public static <T> Stream<T> asStream(Enumeration<T> e){
+    public static <T> Stream<T> asStream(Enumeration<T> e) {
         return StreamSupport
             .stream(Spliterators.spliteratorUnknownSize(Iterators.forEnumeration(e), Spliterator.ORDERED), false);
     }
-    
+
+    /**
+     * Concats any number of Streams not just 2 as in {@link Stream#concat(Stream, Stream)}.
+     * @since 2016.04
+     */
+    @SafeVarargs
+    public static <T> Stream<T> concat(Stream<T>... streams) {
+        return Stream.of(streams).reduce(Stream::concat).orElse(Stream.empty());
+    }
+
 }
