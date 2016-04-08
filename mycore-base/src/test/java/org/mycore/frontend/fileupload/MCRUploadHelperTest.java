@@ -26,73 +26,90 @@ package org.mycore.frontend.fileupload;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.text.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.MCRTestCase;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
+@RunWith(Parameterized.class)
 public class MCRUploadHelperTest extends MCRTestCase {
+    static String prefix = "junit";
+
+    static String suffix = "test..file";
+
+    static String[] genDelims = new String[] { ":", "?", "#", "[", "]", "@" };
+
+    static String[] subDelims = new String[] { "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
+
+    private static final String[] WINDOWS_RESERVED_CHARS = { "<", ">", ":", "\"", "|", "?", "*" };
+
+    private static final String[] RESERVED_NAMES = { "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8",
+        "com9", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9", "con", "nul", "prn", "aux" };
+
+    @Parameter(0)
+    public String path;
+
+    @Parameter(1)
+    public Class<? extends Exception> expectedException;
+
+    @Parameters
+    public static Iterable<Object[]> data() {
+        return Stream.concat(toParameter(validNames(), null),
+            toParameter(invalidNames(), MCRException.class))::iterator;
+    }
+
+    private static Stream<String> invalidNames() {
+        return MCRStreamUtils.concat(
+            Stream.of(RESERVED_NAMES),
+            validNames().map(s -> "../" + s),
+            validNames().map(s -> "./" + s),
+            validNames().map(s -> "/" + s),
+            validNames().map(s -> "foo//" + s),
+            MCRStreamUtils.concat(IntStream.range(0, 32).mapToObj(i -> "" + (char) i),
+                Stream.of(WINDOWS_RESERVED_CHARS),
+                Stream.concat(Stream.of(genDelims), Stream.of(subDelims)).distinct().map(c -> prefix + c + suffix)));
+    }
+
+    private static Stream<String> validNames() {
+        return Stream.of(prefix + " " + suffix, prefix + suffix, "." + prefix + suffix);
+    }
+
+    private static Stream<Object[]> toParameter(Stream<String> input, Class<? extends Exception> exp) {
+        return input.map(s -> new Object[] { s, exp });
+    }
 
     @Test
     public void checkPathName() {
-        String prefix = "junit";
-        String suffix = "test..file";
-        String[] genDelims = new String[] { ":", "?", "#", "[", "]", "@" };
-        String[] subDelims = new String[] { "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
-        List<String> genDelimTestNames = new ArrayList<String>(genDelims.length);
-        for (String delim : genDelims) {
-            genDelimTestNames.add(prefix + delim + suffix);
-        }
-        List<String> subDelimTestNames = new ArrayList<String>(subDelims.length);
-        for (String delim : subDelims) {
-            subDelimTestNames.add(prefix + delim + suffix);
-        }
-        for (String testPath : genDelimTestNames) {
-            boolean failed = false;
-            try {
-                MCRUploadHelper.checkPathName(testPath);
-            } catch (MCRException e) {
-                Logger.getLogger(MCRUploadHelperTest.class).debug("Test successfully failed", e);
-                failed = true;
-            }
-            assertTrue("Path " + testPath + " did not fail in gen-delims test.", failed);
-        }
-        for (String testPath : subDelimTestNames) {
-            boolean failed = false;
-            try {
-                MCRUploadHelper.checkPathName(testPath);
-            } catch (MCRException e) {
-                Logger.getLogger(MCRUploadHelperTest.class).debug("Test successfully failed", e);
-                failed = true;
-            }
-            assertTrue("Path " + testPath + " did not fail in sub-delims test.", failed);
-        }
-        boolean failed = false;
-        String testPath = prefix + " " + suffix;
         try {
-            MCRUploadHelper.checkPathName(testPath);
-        } catch (MCRException e) {
-            Logger.getLogger(MCRUploadHelperTest.class).info("Test failed", e);
-            failed = true;
+            MCRUploadHelper.checkPathName(path);
+            if (expectedException != null) {
+                throw new AssertionError(
+                    "Expected test to throw instance of " + expectedException.getName() + " for path=\"" + path + "\"");
+            }
+        } catch (RuntimeException e) {
+            if (expectedException == null || !expectedException.isAssignableFrom(e.getClass())) {
+                throw e;
+            }
         }
-        assertFalse("Path " + testPath + " did fail non reserved character test.", failed);
-        //http://sourceforge.net/p/mycore/bugs/668/
-        failed = false;
-        testPath = "../../" + prefix + suffix;
-        try {
-            MCRUploadHelper.checkPathName(testPath);
-        } catch (MCRException e) {
-            Logger.getLogger(MCRUploadHelperTest.class).debug("Test successfully failed", e);
-            failed = true;
-        }
-        assertTrue("Path " + testPath + " did not fail jail break test #668.", failed);
     }
 
 }

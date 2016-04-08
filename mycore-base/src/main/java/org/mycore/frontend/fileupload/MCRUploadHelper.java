@@ -23,6 +23,12 @@
 
 package org.mycore.frontend.fileupload;
 
+import java.io.File;
+import java.util.Locale;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -39,12 +45,21 @@ public abstract class MCRUploadHelper {
 
     private final static Logger LOGGER = Logger.getLogger(MCRUploadHelper.class);
 
+    private final static Pattern PATH_SEPERATOR = Pattern.compile(Pattern.quote(File.separator.replace('\\', '/')));
+
     /**
      * reserved URI characters should not be in uploaded filenames. See RFC3986,
      * Section 2.2
      */
-    private static final char[] reserverdCharacters = { ':', '?', '%', '#', '[', ']', '@', '!', '$', '&', '\'', '(',
-        ')', '*', ',', ';', '=', '\'', '+' };
+    private static final String reserverdCharacters = new String(new char[]{ ':', '?', '%', '#', '[', ']', '@', '!', '$', '&', '\'', '(',
+        ')', '*', ',', ';', '=', '\'', '+' });
+
+    private static final String WINDOWS_RESERVED_CHARS = "<>:\"|?*";
+
+    private static final String[] RESERVED_NAMES = { "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8",
+        "com9", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9", "con", "nul", "prn", "aux" };
+
+    private static final int SAVE_LENGTH = Stream.of(RESERVED_NAMES).mapToInt(String::length).max().getAsInt();
 
     /**
      * checks if path contains reserved URI characters or path starts or ends with whitespace. There are some characters
@@ -57,17 +72,70 @@ public abstract class MCRUploadHelper {
      *             if path contains reserved character
      */
     static void checkPathName(String path) throws MCRException {
-        for (char c : reserverdCharacters)
-            if (path.contains("" + c))
-                throw new MCRException("File path " + path + " contains reserved character: '" + c + "'");
-
         if (path.contains("../") || path.contains("..\\"))
             throw new MCRException("File path " + path + " may not contain \"../\".");
 
-        String fileName = getFileName(path);
-        if (!fileName.equals(fileName.trim())) {
-            throw new MCRException("File name '" + fileName + "' may not start or end with whitespace character.");
+        splitPath(path).forEach(pathElement -> {
+            checkNotEmpty(path, pathElement);
+            checkOnlyDots(path, pathElement);
+            checkTrimmed(pathElement);
+            checkEndsWithDot(pathElement);
+            checkReservedNames(pathElement);
+            checkInvalidCharacters(pathElement);
+        });
+    }
+
+    private static Stream<String> splitPath(String path) {
+        return PATH_SEPERATOR.splitAsStream(path);
+    }
+
+    private static void checkNotEmpty(String path, String pathElement) {
+        if (pathElement.isEmpty()) {
+            throw new MCRException("Path " + path + " contains empty path elements.");
         }
+    }
+
+    private static void checkOnlyDots(String path, String pathElement) {
+        if (!pathElement.chars().filter(c -> c != '.').findAny().isPresent()) {
+            throw new MCRException("Path " + path + " contains invalid path element: " + pathElement);
+        }
+    }
+
+    private static void checkTrimmed(String pathElement) {
+        if (pathElement.trim().length() != pathElement.length()) {
+            throw new MCRException(
+                "Path element '" + pathElement + "' may not start or end with whitespace character.");
+        }
+    }
+
+    private static void checkEndsWithDot(String pathElement) {
+        if (pathElement.charAt(pathElement.length() - 1) == '.') {
+            throw new MCRException("Path element " + pathElement + " may not end with '.'");
+        }
+    }
+
+    private static void checkReservedNames(String pathElement) {
+        if (pathElement.length() <= SAVE_LENGTH) {
+            String lcPathElement = pathElement.toLowerCase(Locale.ROOT);
+            if (Stream.of(RESERVED_NAMES).filter(lcPathElement::equals).findAny().isPresent()) {
+                throw new MCRException("Path element " + pathElement + " is an illegal Windows file name.");
+            }
+        }
+    }
+
+    private static void checkInvalidCharacters(String pathElement) {
+        if (getOSIllegalCharacterStream(pathElement).findAny().isPresent()) {
+            throw new MCRException("Path element " + pathElement + " contains illegal characters: "
+                + getOSIllegalCharacterStream(pathElement)
+                    .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append));
+        }
+    }
+
+    private static IntStream getOSIllegalCharacterStream(String path) {
+        //https://msdn.microsoft.com/en-us/library/aa365247.aspx
+        return path
+            .chars()
+            .filter(c -> c < '\u0020' || WINDOWS_RESERVED_CHARS.indexOf(c) != -1 || reserverdCharacters.indexOf(c) != -1);
     }
 
     static String getFileName(String path) {
