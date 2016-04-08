@@ -337,19 +337,8 @@
       </xsl:when>
       <xsl:otherwise>
         <a href="{$linkTo}" itemprop="url">
-          <xsl:variable name="shorter" select="mcrxsl:shortenText($displayText, 70)" />
           <span itemprop="name">
-            <xsl:choose>
-              <xsl:when test="string-length($displayText) != string-length($shorter)">
-                <xsl:attribute name="title">
-                <xsl:value-of select="$displayText" />
-              </xsl:attribute>
-                <xsl:value-of select="$shorter" />
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$displayText" />
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="$displayText" />
           </span>
         </a>
       </xsl:otherwise>
