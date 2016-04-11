@@ -29,7 +29,10 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
 /**
@@ -37,6 +40,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
  * MyCoReObject and also added a state service flag using classification defined in
  * "MCR.Metadata.Service.State.Classification.ID" (default "state") and category defined in
  * "MCR.Metadata.Service.State.Category.Default" (default "submitted").
+ * If the state changes in an update event of an MCRObject the state gets propagated to all of it's derivates.
  *
  * @author Robert Stephan
  * @author Thomas Scheffler (yagee)
@@ -55,6 +59,9 @@ public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         if (!obj.isImportMode()) {
             handleUpdated(obj.getService());
+            if (isStateChanged((MCRObject) evt.get(MCREvent.OBJECT_OLD_KEY), obj)) {
+                updateDerivateState(obj);
+            }
         }
     }
 
@@ -92,6 +99,30 @@ public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
         objectService.removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
         objectService.addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY,
             MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+    }
+
+    private static boolean isStateChanged(MCRObject oldVersion, MCRObject obj) {
+        MCRCategoryID newState = obj.getService().getState();
+        return newState != null && oldVersion != null && !newState.equals(oldVersion.getService().getState());
+    }
+
+    private static void updateDerivateState(MCRObject obj) {
+        MCRCategoryID state = obj.getService().getState();
+        obj
+            .getStructure()
+            .getDerivates()
+            .stream()
+            .map(MCRMetaLinkID::getXLinkHrefID)
+            .forEach(id -> updateDerivateState(id, state));
+    }
+
+    private static void updateDerivateState(MCRObjectID derID, MCRCategoryID state) {
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derID);
+        MCRCategoryID oldState = derivate.getService().getState();
+        if (!state.equals(oldState)) {
+            derivate.getService().setState(state);
+            MCRMetadataManager.updateMCRDerivateXML(derivate);
+        }
     }
 
 }
