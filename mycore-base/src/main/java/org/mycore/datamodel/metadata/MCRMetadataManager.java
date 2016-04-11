@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
@@ -208,7 +209,7 @@ public final class MCRMetadataManager {
         }
 
         // handle events
-        fireEvent(mcrDerivate, MCREvent.CREATE_EVENT);
+        fireEvent(mcrDerivate, null, MCREvent.CREATE_EVENT);
 
         // add the link to metadata
         final MCRMetaLinkID der = new MCRMetaLinkID();
@@ -322,7 +323,7 @@ public final class MCRMetadataManager {
         }
 
         // handle events
-        fireEvent(mcrObject, MCREvent.CREATE_EVENT);
+        fireEvent(mcrObject, null, MCREvent.CREATE_EVENT);
 
         // add the MCRObjectID to the child list in the parent object
         if (parent_id != null) {
@@ -374,7 +375,7 @@ public final class MCRMetadataManager {
         }
 
         // handle events
-        fireEvent(mcrDerivate, MCREvent.DELETE_EVENT);
+        fireEvent(mcrDerivate, null, MCREvent.DELETE_EVENT);
     }
 
     /**
@@ -452,7 +453,7 @@ public final class MCRMetadataManager {
         // remove all derivates
         for (MCRMetaLinkID derivate : mcrObject.getStructure().getDerivates()) {
             MCRObjectID derivateId = derivate.getXLinkHrefID();
-            if(!MCRMetadataManager.exists(derivateId)) {
+            if (!MCRMetadataManager.exists(derivateId)) {
                 LOGGER.warn("Unable to remove not existing derivate " + derivateId + " of object " + id);
                 continue;
             }
@@ -460,7 +461,7 @@ public final class MCRMetadataManager {
         }
 
         // handle events
-        fireEvent(mcrObject, MCREvent.DELETE_EVENT);
+        fireEvent(mcrObject, null, MCREvent.DELETE_EVENT);
     }
 
     /**
@@ -474,7 +475,8 @@ public final class MCRMetadataManager {
      * @throws PersistenceException
      *            when the child cannot be removed due persistent problems
      */
-    private static void removeChildObject(final MCRObject mcrObject, final MCRObjectID parentId) throws PersistenceException {
+    private static void removeChildObject(final MCRObject mcrObject, final MCRObjectID parentId)
+        throws PersistenceException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Parent ID = " + parentId.toString());
         }
@@ -565,7 +567,7 @@ public final class MCRMetadataManager {
      */
     public static void fireRepairEvent(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
         // handle events
-        fireEvent(mcrDerivate, MCREvent.REPAIR_EVENT);
+        fireEvent(mcrDerivate, null, MCREvent.REPAIR_EVENT);
     }
 
     /**
@@ -592,7 +594,7 @@ public final class MCRMetadataManager {
             }
         }
         // handle events
-        fireEvent(mcrObject, MCREvent.REPAIR_EVENT);
+        fireEvent(mcrObject, null, MCREvent.REPAIR_EVENT);
     }
 
     /**
@@ -612,7 +614,7 @@ public final class MCRMetadataManager {
             i--;
         }
         // handle events
-        fireEvent(mcrObject, MCREvent.UPDATE_EVENT);
+        fireEvent(mcrObject, retrieveMCRObject(mcrObject.getId()), MCREvent.UPDATE_EVENT);
     }
 
     /**
@@ -877,7 +879,7 @@ public final class MCRMetadataManager {
         if (!mcrDerivate.isImportMode() || mcrDerivate.getService().getDate("modifydate") == null) {
             mcrDerivate.getService().setDate("modifydate");
         }
-        fireEvent(mcrDerivate, MCREvent.UPDATE_EVENT);
+        fireEvent(mcrDerivate, retrieveMCRDerivate(mcrDerivate.getId()), MCREvent.UPDATE_EVENT);
     }
 
     /**
@@ -927,19 +929,21 @@ public final class MCRMetadataManager {
         } finally {
             // delete from the XML table
             // handle events
-            fireEvent(mcrDerivate, MCREvent.DELETE_EVENT);
+            fireEvent(mcrDerivate, null, MCREvent.DELETE_EVENT);
         }
     }
 
-    private static void fireEvent(MCRBase base, String eventType) {
+    private static void fireEvent(MCRBase base, MCRBase oldBase, String eventType) {
         boolean objectEvent = base instanceof MCRObject;
         String type = objectEvent ? MCREvent.OBJECT_TYPE : MCREvent.DERIVATE_TYPE;
         final MCREvent evt = new MCREvent(type, eventType);
         if (objectEvent) {
-            evt.put("object", base);
+            evt.put(MCREvent.OBJECT_KEY, base);
         } else {
-            evt.put("derivate", base);
+            evt.put(MCREvent.DERIVATE_KEY, base);
         }
+        Optional.ofNullable(oldBase)
+            .ifPresent(b -> evt.put(objectEvent ? MCREvent.OBJECT_OLD_KEY : MCREvent.DERIVATE_OLD_KEY, b));
         if (MCREvent.DELETE_EVENT.equals(eventType)) {
             MCREventManager.instance().handleEvent(evt, MCREventManager.BACKWARD);
         } else {

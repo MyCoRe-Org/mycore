@@ -63,6 +63,14 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
 
     final static public String FILEATTR_KEY = PATH_TYPE + ":attr";
 
+    final static public String OBJECT_KEY = "object";
+
+    final static public String OBJECT_OLD_KEY = "object.old";
+
+    final static public String DERIVATE_KEY = "derivate";
+
+    final static public String DERIVATE_OLD_KEY = "derivate.old";
+
     /** The object type like object or file * */
     private String objType;
 
