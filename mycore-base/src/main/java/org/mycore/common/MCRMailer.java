@@ -460,7 +460,7 @@ public class MCRMailer extends MCRServlet {
             }
         }
 
-        LOGGER.info("Sending e-mail to " + mail.to.get(0));
+        LOGGER.info("Sending e-mail to " + mail.to);
         Transport.send(msg);
     }
 
