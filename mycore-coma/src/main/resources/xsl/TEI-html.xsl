@@ -1,6 +1,18 @@
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0"
+                xmlns:mml="http://www.w3.org/1998/Math/MathML"
+                version="1.0">
 
   <xsl:output method="html" indent="no" />
+
+  <xsl:template match="*" mode="nsRemove">
+    <xsl:element name="{local-name()}">
+      <xsl:apply-templates select="@* | node()" mode="nsRemove" />
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="@*" mode="nsRemove">
+    <xsl:copy />
+  </xsl:template>
 
   <xsl:template match="tei:TEI">
     <div>
@@ -47,6 +59,12 @@
     <h1>
       <xsl:value-of select="$headerContent"/>
     </h1>
+  </xsl:template>
+
+  <xsl:template match="mml:math">
+    <math>
+      <xsl:apply-templates mode="nsRemove" />
+    </math>
   </xsl:template>
 
   <xsl:template match="tei:p">
@@ -218,7 +236,15 @@
 
     <xsl:if test="contains($rend, 'color(')">
       <xsl:variable name="colorCode" select="substring-before(substring-after($rend, 'color('),')')"/>
-      <xsl:value-of select="concat('color:',$colorCode,';')"/>
+      <xsl:variable name="firstChar" select="substring($colorCode,1,1)" />
+      <xsl:choose>
+        <xsl:when test="$firstChar='#'">
+          <xsl:value-of select="concat('color:',$colorCode,';')" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat('color:#',$colorCode,';')" />
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
 
   </xsl:template>
