@@ -105,7 +105,9 @@ public class MCRJPATestCase extends MCRTestCase {
             try {
                 tx.commit();
             } catch (RollbackException e) {
-                tx.rollback();
+                if (tx.isActive()) {
+                    tx.rollback();
+                }
                 throw e;
             }
         }
