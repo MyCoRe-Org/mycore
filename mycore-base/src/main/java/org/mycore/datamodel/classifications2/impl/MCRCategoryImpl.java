@@ -39,9 +39,11 @@ import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -67,26 +69,41 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @since 2.0
  */
 @Entity
-@Table(name = "MCRCategory", uniqueConstraints = { @UniqueConstraint(columnNames = { "ClassID", "CategID" }) })
+@Table(
+    name = "MCRCategory",
+    indexes = { @Index(columnList = "ClassID, leftValue" , name="ClassLeft") }, //should be unique, but JUnit tests fail reight now
+    uniqueConstraints = { 
+        @UniqueConstraint(columnNames = { "ClassID", "CategID" }, name="ClassCategUnique")}
+    )
 @NamedQueries({
     @NamedQuery(name = "MCRCategory.updateLeft", query = "UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.id.rootID= :classID AND cat.left >= :left"),
     @NamedQuery(name = "MCRCategory.updateRight", query = "UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.id.rootID= :classID AND cat.right >= :left"),
     @NamedQuery(name = "MCRCateogry.commonAncestor", query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:rootID AND cat.left < :left AND cat.right > :right ORDER BY cat.left DESC"),
     @NamedQuery(name = "MCRCategory.byLabelInClass", query = "FROM MCRCategoryImpl as cat "
-        + "INNER JOIN cat.labels as label "
-        + "  WHERE cat.id.rootID=:rootID AND "
-        + "    cat.left BETWEEN :left and :right AND "
-        + "    label.lang=:lang AND "
-        + "    label.text=:text"),
+            + "INNER JOIN cat.labels as label "
+            + "  WHERE cat.id.rootID=:rootID AND "
+            + "    cat.left BETWEEN :left and :right AND "
+            + "    label.lang=:lang AND "
+            + "    label.text=:text"),
     @NamedQuery(name = "MCRCategory.byLabel", query = "FROM MCRCategoryImpl as cat "
-        + "  INNER JOIN cat.labels as label "
-        + "  WHERE label.lang=:lang AND "
-        + "    label.text=:text"),
-    @NamedQuery(name = "MCRCategory.prefetchClassQuery", query = "SELECT DISTINCT cat FROM MCRCategoryImpl as cat LEFT JOIN FETCH cat.labels as label WHERE cat.id.rootID=:classID ORDER BY cat.left"),
-    @NamedQuery(name = "MCRCategory.prefetchClassLevelQuery", query = "SELECT DISTINCT cat FROM MCRCategoryImpl as cat LEFT JOIN FETCH cat.labels as label WHERE cat.id.rootID=:classID AND cat.level <= :endlevel ORDER BY cat.left"),
-    @NamedQuery(name = "MCRCategory.prefetchCategQuery", query = "SELECT DISTINCT cat FROM MCRCategoryImpl as cat LEFT JOIN FETCH cat.labels as label WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left and :right ORDER BY cat.left"),
-    @NamedQuery(name = "MCRCategory.prefetchCategLevelQuery", query = "SELECT DISTINCT cat FROM MCRCategoryImpl as cat LEFT JOIN FETCH cat.labels as label WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left and :right AND cat.level <= :endlevel ORDER BY cat.left")
+            + "  INNER JOIN cat.labels as label "
+            + "  WHERE label.lang=:lang AND "
+            + "    label.text=:text"),
+    @NamedQuery(
+        name="MCRCategory.prefetchClassQuery",
+        query = MCRCategoryDTO.SELECT + " WHERE cat.id.rootID=:classID ORDER BY cat.left"),
+    @NamedQuery(
+        name="MCRCategory.prefetchClassLevelQuery",
+        query = MCRCategoryDTO.SELECT + " WHERE cat.id.rootID=:classID AND cat.level <= :endlevel ORDER BY cat.left"
+        ),
+    @NamedQuery(
+        name="MCRCategory.prefetchCategQuery",
+        query = MCRCategoryDTO.SELECT + " WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left AND :right ORDER BY cat.left"),
+    @NamedQuery(
+        name="MCRCategory.prefetchCategLevelQuery",
+        query = MCRCategoryDTO.SELECT + " WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left AND :right AND cat.level <= :endlevel ORDER BY cat.left")
 })
+
 @Access(AccessType.PROPERTY)
 public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializable {
 
@@ -153,15 +170,17 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     @Override
-    @OneToMany(targetEntity = MCRCategoryImpl.class, cascade = { CascadeType.ALL }, mappedBy = "parent")
+    @OneToMany(targetEntity = MCRCategoryImpl.class, cascade = {
+        CascadeType.ALL }, mappedBy = "parent")
     @OrderColumn(name = "positionInParent")
     public List<MCRCategory> getChildren() {
         return super.getChildren();
     }
 
     @Override
-    @ElementCollection
-    @CollectionTable(name = "MCRCategoryLabels", joinColumns = @JoinColumn(name = "category") )
+    @ElementCollection(fetch=FetchType.LAZY)
+    @CollectionTable(name = "MCRCategoryLabels", joinColumns = @JoinColumn(name = "category"), uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "category", "lang" }) })
     public Set<MCRLabel> getLabels() {
         return super.getLabels();
     }
@@ -256,7 +275,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      */
     public void setPositionInParent(int positionInParent) {
         LOGGER.debug("Set position called for " + getId() + " with: " + positionInParent + " was: "
-            + this.positionInParent);
+            + this.positionInParent, new RuntimeException("DEBUG"));
         this.positionInParent = positionInParent;
     }
 

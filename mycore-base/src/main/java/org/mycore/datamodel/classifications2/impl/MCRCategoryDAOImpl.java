@@ -35,6 +35,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
@@ -47,6 +49,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStreamUtils;
@@ -76,7 +79,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     private static final Logger LOGGER = Logger.getLogger(MCRCategoryDAOImpl.class);
 
     private static final Class<MCRCategoryImpl> CATEGRORY_CLASS = MCRCategoryImpl.class;
-    
+
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategory.";
 
     private static HashMap<String, Long> LAST_MODIFIED_MAP = new HashMap<String, Long>();
@@ -197,42 +200,37 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     @SuppressWarnings("unchecked")
     public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
-        Session session = getHibConnection().getSession();
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         final boolean fetchAllChildren = childLevel < 0;
-        Query q;
+        javax.persistence.Query q;
         if (id.isRootID()) {
-            q = getHibConnection()
-                .getNamedQuery(NAMED_QUERY_NAMESPACE
-                    + (fetchAllChildren ? "prefetchClassQuery" : "prefetchClassLevelQuery"));
+            q = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE
+                + (fetchAllChildren ? "prefetchClassQuery" : "prefetchClassLevelQuery"));
             if (!fetchAllChildren) {
-                q.setInteger("endlevel", childLevel);
+                q.setParameter("endlevel", childLevel);
             }
-            q.setString("classID", id.getRootID());
+            q.setParameter("classID", id.getRootID());
         } else {
             //normal category
-            MCRCategoryImpl category = getByNaturalID(session, id);
+            MCRCategoryImpl category = getByNaturalID(getHibConnection().getSession(), id);
             if (category == null) {
                 return null;
             }
-            q = getHibConnection()
-                .getNamedQuery(NAMED_QUERY_NAMESPACE
-                    + (fetchAllChildren ? "prefetchCategQuery" : "prefetchCategLevelQuery"));
+            q = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE
+                + (fetchAllChildren ? "prefetchCategQuery" : "prefetchCategLevelQuery"));
             if (!fetchAllChildren) {
-                q.setInteger("endlevel", category.getLevel() + childLevel);
+                q.setParameter("endlevel", category.getLevel() + childLevel);
             }
-            q.setString("classID", id.getRootID());
-            q.setInteger("left", category.getLeft());
-            q.setInteger("right", category.getRight());
+            q.setParameter("classID", id.getRootID());
+            q.setParameter("left", category.getLeft());
+            q.setParameter("right", category.getRight());
         }
-        List<MCRCategoryImpl> result = q.list();
+        List<MCRCategoryDTO> result = q.getResultList();
         if (result.isEmpty()) {
             LOGGER.warn("Could not load category: " + id);
             return null;
         }
         MCRCategoryImpl categoryImpl = buildCategoryFromPrefetchedList(result);
-        if (!fetchAllChildren) {
-            categoryImpl = copyDeep(categoryImpl, childLevel);
-        }
         return categoryImpl;
     }
 
@@ -244,7 +242,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
         LOGGER.debug("Get children of category: " + cid);
-        if (cid==null){
+        if (cid == null) {
             return new MCRCategoryChildList(null, null);
         }
         Session session = getHibConnection().getSession();
@@ -490,7 +488,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         oldCategory.calculateLeftRightAndLevel(oldLeft, oldLevel);
         session.update(oldCategory);
         updateTimeStamp();
-        updateLastModified(newCategory.getRoot().getId().toString());
+        updateLastModified(newCategory.getId().getRootID());
         return newMap.values();
     }
 
@@ -566,12 +564,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return Restrictions.eq("id", id);
     }
 
-    private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryImpl> list) {
-        MCRCategoryImpl baseCat = list.iterator().next();
-        int size = list.size();
-        for (int i = size - 1; i >= 0; i--) {
-            MCRCategoryImpl currentCat = list.get(i);
-            currentCat.getChildren();
+    private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list) {
+        MCRCategoryImpl baseCat = null, predecessor = null;
+        for (MCRCategoryDTO entry : list) {
+            predecessor = entry.merge(predecessor);
+            if (baseCat == null) {
+                baseCat = predecessor;
+            }
         }
         return baseCat;
     }
@@ -614,7 +613,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * every change to the returned MCRCategory is reflected in the database.
      */
     public static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
-        return (MCRCategoryImpl) session.createCriteria(MCRCategoryImpl.class).add(getCategoryCriterion(id)).setCacheable(true).uniqueResult();
+        return (MCRCategoryImpl) session.createCriteria(MCRCategoryImpl.class).add(getCategoryCriterion(id))
+            .setCacheable(true).uniqueResult();
     }
 
     private static void syncLabels(MCRCategoryImpl source, MCRCategoryImpl target) {
