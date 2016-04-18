@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -92,9 +91,9 @@ import org.mycore.datamodel.classifications2.MCRLabel;
     @NamedQuery(name = "MCRCategory.prefetchClassLevelQuery", query = MCRCategoryDTO.SELECT
         + " WHERE cat.id.rootID=:classID AND cat.level <= :endlevel ORDER BY cat.left"),
     @NamedQuery(name = "MCRCategory.prefetchCategQuery", query = MCRCategoryDTO.SELECT
-        + " WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left AND :right OR cat.left=0 ORDER BY cat.left"),
+        + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) ORDER BY cat.left"),
     @NamedQuery(name = "MCRCategory.prefetchCategLevelQuery", query = MCRCategoryDTO.SELECT
-        + " WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left AND :right OR cat.left=0 AND cat.level <= :endlevel ORDER BY cat.left")
+        + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) AND cat.level <= :endlevel ORDER BY cat.left")
 })
 
 @Access(AccessType.PROPERTY)
