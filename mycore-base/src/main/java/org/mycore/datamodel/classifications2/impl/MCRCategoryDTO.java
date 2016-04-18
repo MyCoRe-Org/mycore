@@ -2,6 +2,7 @@ package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -82,7 +83,7 @@ public class MCRCategoryDTO {
 
     @Override
     public String toString() {
-        return String.format(
+        return String.format(Locale.ROOT,
             "MCRCategoryDTO [internalID=%s, id=%s, uri=%s, leftValue=%s, level=%s, rightValue=%s, lang=%s, text=%s, description=%s]",
             internalID, id, uri, leftValue, level, rightValue, lang, text, description);
     }
