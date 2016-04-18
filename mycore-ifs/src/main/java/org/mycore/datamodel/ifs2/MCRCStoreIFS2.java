@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
@@ -241,7 +242,15 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         MCRFileCollection slot = getSlot(storageID);
         int pos = storageID.indexOf("/") + 1;
         String path = storageID.substring(pos);
-        return (MCRFile) (slot.getNodeByPath(path));
+        return Optional
+            .ofNullable(slot.getNodeByPath(path))
+            .map(MCRFile.class::cast)
+            .orElseThrow(() -> getIOException(slot, path, storageID));
+    }
+    
+    private IOException getIOException(MCRFileCollection slot, String path, String storageID) {
+        return new IOException(
+            "Could not find path '" + path + "' in file collection '" + slot.getID() + "' for storageID: " + storageID);
     }
 
     @Override
