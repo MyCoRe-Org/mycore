@@ -37,7 +37,8 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
@@ -76,7 +77,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static long LAST_MODIFIED = System.currentTimeMillis();
 
-    private static final Logger LOGGER = Logger.getLogger(MCRCategoryDAOImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Class<MCRCategoryImpl> CATEGRORY_CLASS = MCRCategoryImpl.class;
 
@@ -230,7 +231,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             LOGGER.warn("Could not load category: " + id);
             return null;
         }
-        MCRCategoryImpl categoryImpl = buildCategoryFromPrefetchedList(result);
+        MCRCategoryImpl categoryImpl = buildCategoryFromPrefetchedList(result, id);
         return categoryImpl;
     }
 
@@ -564,15 +565,17 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return Restrictions.eq("id", id);
     }
 
-    private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list) {
-        MCRCategoryImpl baseCat = null, predecessor = null;
+    private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list, MCRCategoryID returnID) {
+        LOGGER.debug(() -> "using prefetched list: "+list.toString()); 
+        MCRCategoryImpl predecessor = null;
         for (MCRCategoryDTO entry : list) {
             predecessor = entry.merge(predecessor);
-            if (baseCat == null) {
-                baseCat = predecessor;
-            }
         }
-        return baseCat;
+        return MCRStreamUtils.flatten(predecessor.getRoot(), MCRCategory::getChildren, true)
+            .filter(c -> c.getId().equals(returnID))
+            .findFirst()
+            .map(MCRCategoryImpl.class::cast)
+            .orElseThrow(() -> new MCRException("Could not find " + returnID + " in database result."));
     }
 
     private static MCRCategoryImpl copyDeep(MCRCategory category, int level) {

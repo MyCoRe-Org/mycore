@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -69,39 +70,31 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @since 2.0
  */
 @Entity
-@Table(
-    name = "MCRCategory",
-    indexes = { @Index(columnList = "ClassID, leftValue" , name="ClassLeft") }, //should be unique, but JUnit tests fail reight now
-    uniqueConstraints = { 
-        @UniqueConstraint(columnNames = { "ClassID", "CategID" }, name="ClassCategUnique")}
-    )
+@Table(name = "MCRCategory", indexes = { @Index(columnList = "ClassID, leftValue", name = "ClassLeft") }, //should be unique, but JUnit tests fail reight now
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "ClassID", "CategID" }, name = "ClassCategUnique") })
 @NamedQueries({
     @NamedQuery(name = "MCRCategory.updateLeft", query = "UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.id.rootID= :classID AND cat.left >= :left"),
     @NamedQuery(name = "MCRCategory.updateRight", query = "UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.id.rootID= :classID AND cat.right >= :left"),
     @NamedQuery(name = "MCRCateogry.commonAncestor", query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:rootID AND cat.left < :left AND cat.right > :right ORDER BY cat.left DESC"),
     @NamedQuery(name = "MCRCategory.byLabelInClass", query = "FROM MCRCategoryImpl as cat "
-            + "INNER JOIN cat.labels as label "
-            + "  WHERE cat.id.rootID=:rootID AND "
-            + "    cat.left BETWEEN :left and :right AND "
-            + "    label.lang=:lang AND "
-            + "    label.text=:text"),
+        + "INNER JOIN cat.labels as label "
+        + "  WHERE cat.id.rootID=:rootID AND "
+        + "    cat.left BETWEEN :left and :right AND "
+        + "    label.lang=:lang AND "
+        + "    label.text=:text"),
     @NamedQuery(name = "MCRCategory.byLabel", query = "FROM MCRCategoryImpl as cat "
-            + "  INNER JOIN cat.labels as label "
-            + "  WHERE label.lang=:lang AND "
-            + "    label.text=:text"),
-    @NamedQuery(
-        name="MCRCategory.prefetchClassQuery",
-        query = MCRCategoryDTO.SELECT + " WHERE cat.id.rootID=:classID ORDER BY cat.left"),
-    @NamedQuery(
-        name="MCRCategory.prefetchClassLevelQuery",
-        query = MCRCategoryDTO.SELECT + " WHERE cat.id.rootID=:classID AND cat.level <= :endlevel ORDER BY cat.left"
-        ),
-    @NamedQuery(
-        name="MCRCategory.prefetchCategQuery",
-        query = MCRCategoryDTO.SELECT + " WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left AND :right ORDER BY cat.left"),
-    @NamedQuery(
-        name="MCRCategory.prefetchCategLevelQuery",
-        query = MCRCategoryDTO.SELECT + " WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left AND :right AND cat.level <= :endlevel ORDER BY cat.left")
+        + "  INNER JOIN cat.labels as label "
+        + "  WHERE label.lang=:lang AND "
+        + "    label.text=:text"),
+    @NamedQuery(name = "MCRCategory.prefetchClassQuery", query = MCRCategoryDTO.SELECT
+        + " WHERE cat.id.rootID=:classID ORDER BY cat.left"),
+    @NamedQuery(name = "MCRCategory.prefetchClassLevelQuery", query = MCRCategoryDTO.SELECT
+        + " WHERE cat.id.rootID=:classID AND cat.level <= :endlevel ORDER BY cat.left"),
+    @NamedQuery(name = "MCRCategory.prefetchCategQuery", query = MCRCategoryDTO.SELECT
+        + " WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left AND :right OR cat.left=0 ORDER BY cat.left"),
+    @NamedQuery(name = "MCRCategory.prefetchCategLevelQuery", query = MCRCategoryDTO.SELECT
+        + " WHERE cat.id.rootID=:classID AND cat.left BETWEEN :left AND :right OR cat.left=0 AND cat.level <= :endlevel ORDER BY cat.left")
 })
 
 @Access(AccessType.PROPERTY)
@@ -178,7 +171,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     @Override
-    @ElementCollection(fetch=FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "MCRCategoryLabels", joinColumns = @JoinColumn(name = "category"), uniqueConstraints = {
         @UniqueConstraint(columnNames = { "category", "lang" }) })
     public Set<MCRLabel> getLabels() {
@@ -294,6 +287,9 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      */
     public void setRoot(MCRCategory root) {
         this.root = root;
+        if (children != null) {
+            setChildren(children);
+        }
     }
 
     static Collection<MCRCategoryImpl> wrapCategories(Collection<? extends MCRCategory> categories, MCRCategory parent,

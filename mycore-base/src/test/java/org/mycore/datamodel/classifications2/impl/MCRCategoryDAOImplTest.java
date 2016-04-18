@@ -234,6 +234,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategory subCategory = DAO.getCategory(origSubCategory.getId(), 0);
         assertNotNull("Did not return ", subCategory);
         assertEquals("ObjectIDs did not match", origSubCategory.getId(), subCategory.getId());
+        assertNotNull("Root category may not null.", subCategory.getRoot());
+        assertEquals("Root does not match", origSubCategory.getRoot().getId(), subCategory.getRoot().getId());
     }
 
     @Test

@@ -60,14 +60,14 @@ public class MCRCategoryDTO {
         MCRCategoryImpl cat = new MCRCategoryImpl();
         cat.setInternalID(internalID);
         cat.setURI(uri);
-        cat.setChildren(new ArrayList<>());
         cat.setId(id);
-        cat.setLeft(leftValue);
-        cat.setRight(rightValue);
-        cat.setLevel(level);
         if (cat.getId().isRootID()) {
             cat.setRoot(cat);
         }
+        cat.setLeft(leftValue);
+        cat.setRight(rightValue);
+        cat.setLevel(level);
+        cat.setChildren(new ArrayList<>());
         return appendLabel(cat);
     }
 
@@ -78,6 +78,13 @@ public class MCRCategoryDTO {
             cat.getLabels().add(label);
         }
         return cat;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "MCRCategoryDTO [internalID=%s, id=%s, uri=%s, leftValue=%s, level=%s, rightValue=%s, lang=%s, text=%s, description=%s]",
+            internalID, id, uri, leftValue, level, rightValue, lang, text, description);
     }
 
 }
