@@ -383,5 +383,73 @@
   <xsl:template match="*" mode="copyNode">
     <xsl:copy-of select="node()" />
   </xsl:template>
+  
+    <xsl:template name="mods.seperateName">
+    <xsl:param name="displayForm" />
+    <xsl:choose>
+      <xsl:when test="contains($displayForm, ',')">
+        <mods:namePart type="family">
+          <xsl:value-of select="normalize-space(substring-before($displayForm, ','))" />
+        </mods:namePart>
+        <xsl:variable name="modsNames">
+          <xsl:call-template name="mods.tokenizeName">
+            <xsl:with-param name="name" select="normalize-space(substring-after($displayForm, ','))" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="modsNameParts" select="xalan:nodeset($modsNames)" />
+        <xsl:for-each select="$modsNameParts/namePart">
+          <mods:namePart type="given">
+            <xsl:value-of select="." />
+          </mods:namePart>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="contains($displayForm, ' ')">
+        <xsl:variable name="modsNames">
+          <xsl:call-template name="mods.tokenizeName">
+            <xsl:with-param name="name" select="normalize-space($displayForm)" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="modsNameParts" select="xalan:nodeset($modsNames)" />
+        <xsl:for-each select="$modsNameParts/namePart">
+          <mods:namePart>
+            <xsl:choose>
+              <xsl:when test="position()!=last()">
+                <xsl:attribute name="type">
+                  <xsl:value-of select="'given'" />
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="type">
+                  <xsl:value-of select="'family'" />
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+            <xsl:value-of select="." />
+          </mods:namePart>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="mods.tokenizeName">
+    <xsl:param name="name" />
+    <xsl:param name="delimiter" select="' '" />
+    <xsl:choose>
+      <xsl:when test="$delimiter and contains($name, $delimiter)">
+        <namePart>
+          <xsl:value-of select="substring-before($name,$delimiter)" />
+        </namePart>
+        <xsl:call-template name="mods.tokenizeName">
+          <xsl:with-param name="name" select="substring-after($name,$delimiter)" />
+          <xsl:with-param name="delimiter" select="$delimiter" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <namePart>
+          <xsl:value-of select="$name" />
+        </namePart>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
 </xsl:stylesheet>

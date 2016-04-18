@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="xalan">
+	<xsl:include href="mods-utils.xsl"/>
+	
 	<!-- standard copy template -->
   <xsl:template match="@*|node()">
     <xsl:copy>
@@ -33,73 +35,6 @@
         <!-- bibutils does not detect article on RIS or Endnote export -->
         <mods:genre>academic journal</mods:genre>
       </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="mods.seperateName">
-    <xsl:param name="displayForm" />
-    <xsl:choose>
-      <xsl:when test="contains($displayForm, ',')">
-        <mods:namePart type="family">
-          <xsl:value-of select="normalize-space(substring-before($displayForm, ','))" />
-        </mods:namePart>
-        <xsl:variable name="modsNames">
-          <xsl:call-template name="mods.tokenizeName">
-            <xsl:with-param name="name" select="normalize-space(substring-after($displayForm, ','))" />
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="modsNameParts" select="xalan:nodeset($modsNames)" />
-        <xsl:for-each select="$modsNameParts/namePart">
-          <mods:namePart type="given">
-            <xsl:value-of select="." />
-          </mods:namePart>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test="concat($displayForm, ' ')">
-        <xsl:variable name="modsNames">
-          <xsl:call-template name="mods.tokenizeName">
-            <xsl:with-param name="name" select="normalize-space(substring-after($displayForm, ','))" />
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="modsNameParts" select="xalan:nodeset($modsNames)" />
-        <xsl:for-each select="$modsNameParts/namePart">
-          <mods:namePart>
-            <xsl:choose>
-              <xsl:when test="position()!=last()">
-                <xsl:attribute name="type">
-                  <xsl:value-of select="'given'" />
-                </xsl:attribute>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:attribute name="type">
-                  <xsl:value-of select="'family'" />
-                </xsl:attribute>
-              </xsl:otherwise>
-            </xsl:choose>
-            <xsl:value-of select="." />
-          </mods:namePart>
-        </xsl:for-each>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-  <xsl:template name="mods.tokenizeName">
-    <xsl:param name="name" />
-    <xsl:param name="delimiter" select="' '" />
-    <xsl:choose>
-      <xsl:when test="$delimiter and contains($name, $delimiter)">
-        <namePart>
-          <xsl:value-of select="substring-before($name,$delimiter)" />
-        </namePart>
-        <xsl:call-template name="mods.tokenizeName">
-          <xsl:with-param name="name" select="substring-after($name,$delimiter)" />
-          <xsl:with-param name="delimiter" select="$delimiter" />
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <namePart>
-          <xsl:value-of select="$name" />
-        </namePart>
-      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 </xsl:stylesheet>
