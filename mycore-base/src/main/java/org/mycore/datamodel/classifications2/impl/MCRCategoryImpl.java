@@ -69,7 +69,8 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @since 2.0
  */
 @Entity
-@Table(name = "MCRCategory", indexes = { @Index(columnList = "ClassID, leftValue", name = "ClassLeft") }, //should be unique, but JUnit tests fail reight now
+@Table(name = "MCRCategory", 
+    indexes = { @Index(columnList = "ClassID, leftValue, rightValue", name = "ClassLeftRight") }, //(classId, left) should be unique, but JUnit tests fail right now
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "ClassID", "CategID" }, name = "ClassCategUnique") })
 @NamedQueries({
@@ -93,7 +94,9 @@ import org.mycore.datamodel.classifications2.MCRLabel;
     @NamedQuery(name = "MCRCategory.prefetchCategQuery", query = MCRCategoryDTO.SELECT
         + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) ORDER BY cat.left"),
     @NamedQuery(name = "MCRCategory.prefetchCategLevelQuery", query = MCRCategoryDTO.SELECT
-        + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) AND cat.level <= :endlevel ORDER BY cat.left")
+        + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) AND cat.level <= :endlevel ORDER BY cat.left"),
+    @NamedQuery(name = "MCRCategory.leftRightLevelQuery", query = MCRCategoryDTO.LRL_SELECT + " WHERE cat.id=:categID "),
+    @NamedQuery(name = "MCRCategory.parentQuery", query = MCRCategoryDTO.SELECT + " WHERE cat.id.rootID=:classID AND (cat.left < :left AND cat.right > :right OR cat.id.ID=:categID) ORDER BY cat.left")
 })
 
 @Access(AccessType.PROPERTY)

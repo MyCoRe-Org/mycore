@@ -17,6 +17,10 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 public class MCRCategoryDTO {
     public static final String SELECT = "select new org.mycore.datamodel.classifications2.impl.MCRCategoryDTO(cat.internalID, cat.URI, cat.id, cat.left, cat.right, cat.level, labels.lang, labels.text, labels.description) from MCRCategoryImpl cat LEFT OUTER JOIN cat.labels labels";
 
+    public static final String CAT_SELECT = "select new org.mycore.datamodel.classifications2.impl.MCRCategoryDTO(cat.internalID, cat.URI, cat.id, cat.left, cat.right, cat.level) from MCRCategoryImpl cat";
+
+    public static final String LRL_SELECT = "select new org.mycore.datamodel.classifications2.impl.MCRCategoryDTO(cat.left, cat.right, cat.level) from MCRCategoryImpl cat";
+
     int internalID;
 
     URI uri;
@@ -29,15 +33,24 @@ public class MCRCategoryDTO {
 
     public MCRCategoryDTO(int internalID, URI uri, MCRCategoryID id, int leftValue, int rightValue,
         int level, String lang, String text, String description) {
-        this.internalID = internalID;
-        this.uri = uri;
-        this.id = id;
-        this.leftValue = leftValue;
-        this.rightValue = rightValue;
-        this.level = level;
+        this(internalID, uri, id, leftValue, rightValue, level);
         this.lang = lang;
         this.text = text;
         this.description = description;
+    }
+
+    public MCRCategoryDTO(int internalID, URI uri, MCRCategoryID id, int leftValue, int rightValue,
+        int level) {
+        this(leftValue, rightValue, level);
+        this.internalID = internalID;
+        this.uri = uri;
+        this.id = id;
+    }
+
+    public MCRCategoryDTO(int leftValue, int rightValue, int level) {
+        this.leftValue = leftValue;
+        this.rightValue = rightValue;
+        this.level = level;
     }
 
     public MCRCategoryImpl merge(MCRCategoryImpl predecessor) {

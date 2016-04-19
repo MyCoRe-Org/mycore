@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -188,11 +189,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
-        Integer[] leftRight = getLeftRightValues(baseID);
+        MCRCategoryDTO leftRight = getLeftRightLevelValues(baseID);
         Query q = getHibConnection().getNamedQuery(NAMED_QUERY_NAMESPACE + "byLabelInClass");
         q.setString("rootID", baseID.getRootID());
-        q.setInteger("left", leftRight[0]);
-        q.setInteger("right", leftRight[1]);
+        q.setInteger("left", leftRight.leftValue);
+        q.setInteger("right", leftRight.rightValue);
         q.setString("lang", lang);
         q.setString("text", text);
         q.setCacheable(true);
@@ -213,18 +214,18 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             q.setParameter("classID", id.getRootID());
         } else {
             //normal category
-            MCRCategoryImpl category = getByNaturalID(getHibConnection().getSession(), id);
-            if (category == null) {
+            MCRCategoryDTO leftRightLevel = getLeftRightLevelValues(id);
+            if (leftRightLevel == null) {
                 return null;
             }
             q = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE
                 + (fetchAllChildren ? "prefetchCategQuery" : "prefetchCategLevelQuery"));
             if (!fetchAllChildren) {
-                q.setParameter("endlevel", category.getLevel() + childLevel);
+                q.setParameter("endlevel", leftRightLevel.level + childLevel);
             }
             q.setParameter("classID", id.getRootID());
-            q.setParameter("left", category.getLeft());
-            q.setParameter("right", category.getRight());
+            q.setParameter("left", leftRightLevel.leftValue);
+            q.setParameter("right", leftRightLevel.rightValue);
         }
         List<MCRCategoryDTO> result = q.getResultList();
         if (result.isEmpty()) {
@@ -265,13 +266,21 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public List<MCRCategory> getParents(MCRCategoryID id) {
-        // TODO: Make use of left and right value here
-        Session session = getHibConnection().getSession();
-        List<MCRCategory> parents = new ArrayList<MCRCategory>();
-        MCRCategory category = getByNaturalID(session, id);
-        if (category == null) {
+        MCRCategoryDTO leftRight = getLeftRightLevelValues(id);
+        if (leftRight == null) {
             return null;
         }
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        javax.persistence.Query parentQuery = entityManager
+            .createNamedQuery(NAMED_QUERY_NAMESPACE + "parentQuery")
+            .setParameter("classID", id.getRootID())
+            .setParameter("categID", id.getID())
+            .setParameter("left", leftRight.leftValue)
+            .setParameter("right", leftRight.rightValue);
+        @SuppressWarnings("unchecked")
+        List<MCRCategoryDTO> resultList = parentQuery.getResultList();
+        MCRCategory category = buildCategoryFromPrefetchedList(resultList, id);
+        List<MCRCategory> parents = new ArrayList<MCRCategory>();
         while (category.getParent() != null) {
             category = category.getParent();
             parents.add(category);
@@ -566,7 +575,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list, MCRCategoryID returnID) {
-        LOGGER.debug(() -> "using prefetched list: "+list.toString()); 
+        LOGGER.debug(() -> "using prefetched list: " + list.toString());
         MCRCategoryImpl predecessor = null;
         for (MCRCategoryDTO entry : list) {
             predecessor = entry.merge(predecessor);
@@ -645,15 +654,16 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
     }
 
-    private static Integer[] getLeftRightValues(MCRCategoryID id) {
-        Session session = getHibConnection().getSession();
-        Criteria c = session.createCriteria(CATEGRORY_CLASS)
-            .setProjection(
-                Projections.projectionList().add(Projections.property("left")).add(Projections.property("right")));
-        c.add(getCategoryCriterion(id));
-        Object[] result = (Object[]) c.uniqueResult();
-        Integer[] iResult = new Integer[] { (Integer) result[0], (Integer) result[1] };
-        return iResult;
+    private static MCRCategoryDTO getLeftRightLevelValues(MCRCategoryID id) {
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        javax.persistence.Query leftRightQuery = entityManager
+            .createNamedQuery(NAMED_QUERY_NAMESPACE + "leftRightLevelQuery");
+        leftRightQuery.setParameter("categID", id);
+        try {
+            return (MCRCategoryDTO) leftRightQuery.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     private static int getNumberOfChildren(MCRCategoryID id) {
