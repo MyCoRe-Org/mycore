@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="xalan">
+<xsl:stylesheet version="1.0" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:include href="mods-utils.xsl"/>
 	
 	<!-- standard copy template -->
@@ -14,7 +14,7 @@
     <xsl:copy>
       <xsl:copy-of select="@*" />
       <xsl:apply-templates />
-      <xsl:if test="not(mods:namePart[type='family']) and mods:displayForm">
+      <xsl:if test="not(mods:namePart[@type='family']) and mods:displayForm">
         <xsl:call-template name="mods.seperateName">
           <xsl:with-param name="displayForm" select="mods:displayForm" />
         </xsl:call-template>
