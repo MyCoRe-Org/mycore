@@ -44,7 +44,6 @@ import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
@@ -241,28 +240,20 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @see org.mycore.datamodel.classifications2.MCRClassificationService#getChildren(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
-    @SuppressWarnings("unchecked")
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
         LOGGER.debug("Get children of category: " + cid);
-        if (cid == null) {
-            return new MCRCategoryChildList(null, null);
-        }
-        Session session = getHibConnection().getSession();
-        FlushMode fm = session.getFlushMode();
-        session.setFlushMode(FlushMode.MANUAL);
-        try {
-            if (!exist(cid)) {
-                return new MCRCategoryChildList(null, null);
-            }
-            Criteria c = session.createCriteria(CATEGRORY_CLASS).add(Subqueries.propertyEq("parent", DetachedCriteria
-                .forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID"))
-                .add(getCategoryCriterion(cid))));
-            c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-            c.setCacheable(true);
-            return c.list();
-        } finally {
-            session.setFlushMode(fm);
-        }
+        return Optional.ofNullable(cid)
+            .map(id -> getCategory(id, 1))
+            .map(MCRCategory::getChildren)
+            .map(l -> l
+                .parallelStream()
+                .collect(Collectors.toList()) //temporary copy for detachFromParent
+                .parallelStream()
+                .map(MCRCategoryImpl.class::cast)
+                .peek(MCRCategoryImpl::detachFromParent)
+                .map(MCRCategory.class::cast)
+                .collect(Collectors.toList()))
+            .orElse(new MCRCategoryChildList(null, null));
     }
 
     public List<MCRCategory> getParents(MCRCategoryID id) {
