@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -39,6 +40,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -111,7 +113,8 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         LOGGER.info("Create missing upload handler for " + parentObjectID + " derivateID " + derivateID);
         guardAgainstMissingPermissions(parentObjectID, derivateID);
 
-        String cancelUrl = rp.getParameter("cancelUrl");
+        String cancelUrl = Optional.ofNullable(rp.getParameter("cancelUrl"))
+            .orElseGet(() -> MCRFrontendUtil.getBaseURL() + "receive/" + parentObjectID);
         return new MCRUploadHandlerIFS(parentObjectID, derivateID, cancelUrl);
     }
 

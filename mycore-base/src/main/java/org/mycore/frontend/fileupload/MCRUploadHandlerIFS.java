@@ -34,6 +34,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
+import java.util.Objects;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessException;
@@ -76,9 +77,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     public MCRUploadHandlerIFS(String documentID, String derivateID, String returnURL) {
         super();
-        this.url = returnURL;
-        this.derivateID = derivateID;
-        this.documentID = documentID;
+        this.url = Objects.requireNonNull(returnURL, "Return URL may not be 'null'.");
+        this.derivateID = Objects.requireNonNull(derivateID, "Derivate ID may not be 'null'.");
+        this.documentID = Objects.requireNonNull(documentID, "Document ID may not be 'null'.");
     }
 
     @Override
