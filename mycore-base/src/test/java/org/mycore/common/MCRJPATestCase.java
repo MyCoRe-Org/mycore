@@ -102,13 +102,17 @@ public class MCRJPATestCase extends MCRTestCase {
     protected void endTransaction() throws HibernateException {
         EntityTransaction tx = entityManager.getTransaction();
         if (tx != null && tx.isActive()) {
-            try {
-                tx.commit();
-            } catch (RollbackException e) {
-                if (tx.isActive()) {
-                    tx.rollback();
+            if (tx.getRollbackOnly()) {
+                tx.rollback();
+            } else {
+                try {
+                    tx.commit();
+                } catch (RollbackException e) {
+                    if (tx.isActive()) {
+                        tx.rollback();
+                    }
+                    throw e;
                 }
-                throw e;
             }
         }
     }
