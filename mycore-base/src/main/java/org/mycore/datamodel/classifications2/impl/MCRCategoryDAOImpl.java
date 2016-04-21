@@ -38,6 +38,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.FlushModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -395,67 +396,74 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 "MCRCategory can not be replaced. MCRCategoryID '" + newCategory.getId() + "' is unknown.");
         }
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRCategoryImpl oldCategory = getByNaturalID(entityManager, newCategory.getId());
-        int oldLevel = oldCategory.getLevel();
-        int oldLeft = oldCategory.getLeft();
-        // old Map with all Categories referenced by ID
-        Map<MCRCategoryID, MCRCategoryImpl> oldMap = toMap(oldCategory);
-        final MCRCategoryImpl copyDeepImpl = copyDeep(newCategory, -1);
-        MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(copyDeepImpl, oldCategory.getParent(),
-            oldCategory.getRoot());
-        // new Map with all Categories referenced by ID
-        Map<MCRCategoryID, MCRCategoryImpl> newMap = toMap(newCategoryImpl);
-        //remove;
-        oldMap
-            .entrySet()
-            .stream()
-            .filter(c -> !newMap.containsKey(c.getKey()))
-            .map(Map.Entry::getValue)
-            .peek(MCRCategoryDAOImpl::remove)
-            .forEach(c -> LOGGER.info("remove category: " + c.getId()));
-        oldMap.clear();
-        oldMap.putAll(toMap(oldCategory));
-        //sync labels/uris;
-        MCRStreamUtils
-            .flatten(oldCategory, MCRCategory::getChildren, false)
-            .filter(c -> newMap.containsKey(c.getId()))
-            .map(MCRCategoryImpl.class::cast)
-            .map(c -> new AbstractMap.SimpleEntry<>(c, newMap.get(c.getId()))) // key: category of old version, value: category of new version
-            .peek(e -> syncLabels(e.getValue(), e.getKey())) //sync from new to old version
-            .forEach(e -> e.getKey().setURI(e.getValue().getURI()));
-        //detach all categories, we will rebuild tree structure later
-        oldMap
-            .values()
-            .stream()
-            .filter(c -> c.getInternalID() != oldCategory.getInternalID()) //do not detach root of subtree
-            .forEach(MCRCategoryImpl::detachFromParent);
-        //rebuild
-        MCRStreamUtils
-            .flatten(newCategoryImpl, MCRCategory::getChildren, false)
-            .forEachOrdered(c -> {
-                MCRCategoryImpl oldC = oldMap.get(c.getId());
-                oldC.setChildren(
-                    c
-                        .getChildren()
-                        .stream()
-                        .map(cc -> {
-                            //to categories of stored version or copy from new version
-                            MCRCategoryImpl oldCC = oldMap.get(cc.getId());
-                            if (oldCC == null) {
-                                oldCC = new MCRCategoryImpl();
-                                oldCC.setId(cc.getId());
-                                oldCC.setURI(cc.getURI());
-                                oldCC.getLabels().addAll(cc.getLabels());
-                                oldMap.put(oldCC.getId(), oldCC);
-                            }
-                            return oldCC;
-                        })
-                        .collect(Collectors.toList()));
-            });
-        oldCategory.calculateLeftRightAndLevel(oldLeft, oldLevel);
-        updateTimeStamp();
-        updateLastModified(newCategory.getId().getRootID());
-        return newMap.values();
+        FlushModeType fm = entityManager.getFlushMode();
+        entityManager.setFlushMode(FlushModeType.COMMIT);
+        try {
+            MCRCategoryImpl oldCategory = getByNaturalID(entityManager, newCategory.getId());
+            int oldLevel = oldCategory.getLevel();
+            int oldLeft = oldCategory.getLeft();
+            // old Map with all Categories referenced by ID
+            Map<MCRCategoryID, MCRCategoryImpl> oldMap = toMap(oldCategory);
+            final MCRCategoryImpl copyDeepImpl = copyDeep(newCategory, -1);
+            MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(copyDeepImpl, oldCategory.getParent(),
+                oldCategory.getRoot());
+            // new Map with all Categories referenced by ID
+            Map<MCRCategoryID, MCRCategoryImpl> newMap = toMap(newCategoryImpl);
+            //remove;
+            oldMap
+                .entrySet()
+                .stream()
+                .filter(c -> !newMap.containsKey(c.getKey()))
+                .map(Map.Entry::getValue)
+                .peek(MCRCategoryDAOImpl::remove)
+                .forEach(c -> LOGGER.info("remove category: " + c.getId()));
+            oldMap.clear();
+            oldMap.putAll(toMap(oldCategory));
+            //sync labels/uris;
+            MCRStreamUtils
+                .flatten(oldCategory, MCRCategory::getChildren, false)
+                .filter(c -> newMap.containsKey(c.getId()))
+                .map(MCRCategoryImpl.class::cast)
+                .map(c -> new AbstractMap.SimpleEntry<>(c, newMap.get(c.getId()))) // key: category of old version, value: category of new version
+                .peek(e -> syncLabels(e.getValue(), e.getKey())) //sync from new to old version
+                .forEach(e -> e.getKey().setURI(e.getValue().getURI()));
+            //detach all categories, we will rebuild tree structure later
+            oldMap
+                .values()
+                .stream()
+                .filter(c -> c.getInternalID() != oldCategory.getInternalID()) //do not detach root of subtree
+                .forEach(MCRCategoryImpl::detachFromParent);
+            //rebuild
+            MCRStreamUtils
+                .flatten(newCategoryImpl, MCRCategory::getChildren, false)
+                .forEachOrdered(c -> {
+                    MCRCategoryImpl oldC = oldMap.get(c.getId());
+                    oldC.setChildren(
+                        c
+                            .getChildren()
+                            .stream()
+                            .map(cc -> {
+                                //to categories of stored version or copy from new version
+                                MCRCategoryImpl oldCC = oldMap.get(cc.getId());
+                                if (oldCC == null) {
+                                    oldCC = new MCRCategoryImpl();
+                                    oldCC.setId(cc.getId());
+                                    oldCC.setURI(cc.getURI());
+                                    oldCC.getLabels().addAll(cc.getLabels());
+                                    oldMap.put(oldCC.getId(), oldCC);
+                                }
+                                return oldCC;
+                            })
+                            .collect(Collectors.toList()));
+                });
+            oldCategory.calculateLeftRightAndLevel(oldLeft, oldLevel);
+            updateTimeStamp();
+            updateLastModified(newCategory.getId().getRootID());
+            return newMap.values();
+        } finally {
+            entityManager.flush();
+            entityManager.setFlushMode(fm);
+        }
     }
 
     private static Map<MCRCategoryID, MCRCategoryImpl> toMap(MCRCategoryImpl oldCategory) {
