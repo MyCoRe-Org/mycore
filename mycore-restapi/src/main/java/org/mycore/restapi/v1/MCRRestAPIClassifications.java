@@ -151,10 +151,13 @@ public class MCRRestAPIClassifications {
      *      - nonempty - hide empty categories
      * @param style
      * 	a ';'-separated list of values, possible keys are:
-     *   	- 'checkboxtree'    - create a json syntax which can be used as input for a dojo checkboxtree;
-     *      - 'checked'   - together with 'checkboxtree' all checkboxed will be checked
-     *
-     *
+     *   	- 'checkboxtree' - create a json syntax which can be used as input for a dojo checkboxtree;
+     *      - 'checked'   - (together with 'checkboxtree') all checkboxed will be checked
+     *      - 'jstree' - create a json syntax which can be used as input for a jsTree
+     *      - 'opened' - (together with 'jstree') - all nodes will be opened
+     *      - 'disabled' - (together with 'jstree') - all nodes will be disabled
+     *      - 'selected' - (together with 'jstree') - all nodes will be selected
+     * @param callback used for JSONP - wrap json result into a Javascript function named by callback parameter
      * @return a Jersey Response object
      */
     @GET
@@ -163,8 +166,9 @@ public class MCRRestAPIClassifications {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     public Response showObject(@PathParam("classID") String classID,
         @QueryParam("format") @DefaultValue("xml") String format,
-        @QueryParam("filter") @DefaultValue("") String filter, @QueryParam("style") @DefaultValue("") String style) {
-
+        @QueryParam("filter") @DefaultValue("") String filter, 
+        @QueryParam("style") @DefaultValue("") String style, 
+        @QueryParam("callback") @DefaultValue("") String callback){
         String rootCateg = null;
         String lang = null;
         boolean filterNonEmpty = false;
@@ -221,7 +225,13 @@ public class MCRRestAPIClassifications {
 
             if (FORMAT_JSON.equals(format)) {
                 String json = writeJSON(eRoot, lang, style);
-                return Response.ok(json).type("application/json; charset=UTF-8").build();
+                //eventually: allow Cross Site Requests: .header("Access-Control-Allow-Origin", "*")
+                if(callback.length()>0){
+                    return Response.ok(callback+"("+json+")").type("application/javascript; charset=UTF-8").build();
+                }
+                else{
+                    return Response.ok(json).type("application/json; charset=UTF-8").build();
+                }
             }
 
             if (FORMAT_XML.equals(format)) {
@@ -274,19 +284,26 @@ public class MCRRestAPIClassifications {
             if (lang == null) {
                 lang = "de";
             }
-            if (eRoot.equals(eRoot.getDocument().getRootElement())) {
-                eRoot = eRoot.getChild("categories");
+            writer.beginObject();
+            writer.name("identifier").value(eRoot.getAttributeValue("ID"));
+            for(Element eLabel: eRoot.getChildren("label")){
+                if(lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                    writer.name("label").value(eLabel.getAttributeValue("text"));
+                }
             }
-            writer.beginObject(); // {
-            writer.name("identifier").value("ID");
-            writer.name("label").value("ID");
             writer.name("items");
 
-            writeChildrenAsJSONCBTree(eRoot, writer, lang, style.contains("checked"));
-            writer.endObject(); // }
-        } else {
+            writeChildrenAsJSONCBTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("checked"));
+            writer.endObject();
+        } else if(style.contains("jstree")){
+            if (lang == null) {
+                lang = "de";
+            }
+            writeChildrenAsJSONJSTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("opened"), style.contains("disabled"), style.contains("selected"));
+        }
+        else {
             writer.beginObject(); // {
-            writer.name("ID").value("ID");
+            writer.name("ID").value(eRoot.getAttributeValue("ID"));
             writer.name("label");
             writer.beginArray();
             for (Element eLabel : eRoot.getChildren("label")) {
@@ -377,6 +394,52 @@ public class MCRRestAPIClassifications {
             if (e.getChildren("category").size() > 0) {
                 writer.name("children");
                 writeChildrenAsJSONCBTree(e, writer, lang, checked);
+            }
+            writer.endObject();
+        }
+        writer.endArray();
+    }
+    
+    /**
+     * output children in JSON format used as input for a jsTree
+     *
+     * @param eParent - the parent xml element
+     * @param writer - the JSON writer
+     * @param lang - the language to be filtered or null if all languages should be displayed
+     * @param opened - true, if all leaf nodes should be displayed
+     * @param disabled - true, if all nodes should be disabled
+     * @param selected - true, if all node should be selected
+     *
+     * @throws IOException
+     */
+    private static void writeChildrenAsJSONJSTree(Element eParent, JsonWriter writer, String lang, boolean opened, boolean disabled, boolean selected)
+        throws IOException {
+        writer.beginArray();
+        for (Element e : eParent.getChildren("category")) {
+            writer.beginObject();
+            writer.name("id").value(e.getAttributeValue("ID"));
+            for (Element eLabel : e.getChildren("label")) {
+                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                    writer.name("text").value(eLabel.getAttributeValue("text"));
+                }
+            }
+            if(opened || disabled || selected){
+                writer.name("state");
+                writer.beginObject();
+                if(opened){
+                    writer.name("opened").value(true);
+                }
+                if(disabled){
+                    writer.name("disabled").value(true);
+                }
+                if(selected){
+                    writer.name("selected").value(true);
+                }
+                writer.endObject();
+            }
+            if (e.getChildren("category").size() > 0) {
+                writer.name("children");
+                writeChildrenAsJSONJSTree(e, writer, lang, opened, disabled, selected);
             }
             writer.endObject();
         }
