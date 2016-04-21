@@ -33,23 +33,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.FlushMode;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -69,8 +63,6 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  */
 public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
-    private static MCRHIBConnection HIB_CONNECTION_INSTANCE;
-
     private static final int LEVEL_START_VALUE = 0;
 
     private static final int LEFT_START_VALUE = 0;
@@ -78,8 +70,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     private static long LAST_MODIFIED = System.currentTimeMillis();
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final Class<MCRCategoryImpl> CATEGRORY_CLASS = MCRCategoryImpl.class;
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategory.";
 
@@ -99,13 +89,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         int leftStart = LEFT_START_VALUE;
         int levelStart = LEVEL_START_VALUE;
-        Session session = getHibConnection().getSession();
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         //we do direct DB manipulation, so flush and clear session first
-        session.flush();
-        session.clear();
+        entityManager.flush();
+        entityManager.clear();
         MCRCategoryImpl parent = null;
         if (parentID != null) {
-            parent = getByNaturalID(session, parentID);
+            parent = getByNaturalID(entityManager, parentID);
             levelStart = parent.getLevel() + 1;
             leftStart = parent.getRight();
             if (position > parent.getChildren().size()) {
@@ -124,14 +114,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (parentID != null) {
             final int increment = nodes * 2;
             if (position < 0) {
-                updateLeftRightValue(getHibConnection(), parentID.getRootID(), leftStart, increment);
+                updateLeftRightValue(entityManager, parentID.getRootID(), leftStart, increment);
                 parent.getChildren().add(category);
             } else {
                 parent.getChildren().add(position, category);
                 parent.calculateLeftRightAndLevel(parent.getLeft(), parent.getLevel());
             }
         }
-        session.save(category);
+        entityManager.persist(category);
         LOGGER.info("Category " + category.getId() + " saved.");
         updateTimeStamp();
 
@@ -140,24 +130,23 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public void deleteCategory(MCRCategoryID id) {
-        final MCRHIBConnection connection = getHibConnection();
-        Session session = connection.getSession();
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         LOGGER.debug("Will get: " + id);
-        MCRCategoryImpl category = getByNaturalID(session, id);
+        MCRCategoryImpl category = getByNaturalID(entityManager, id);
         if (category == null) {
             throw new MCRPersistenceException("Category " + id + " was not found. Delete aborted.");
         }
         LOGGER.debug("Will delete: " + category.getId());
         MCRCategory parent = category.parent;
         category.detachFromParent();
-        session.delete(category);
+        entityManager.remove(category);
         if (parent != null) {
             LOGGER.debug("Left: " + category.getLeft() + " Right: " + category.getRight());
             // always add +1 for the currentNode
             int nodes = 1 + (category.getRight() - category.getLeft()) / 2;
             final int increment = nodes * -2;
             // decrement left and right values by nodes
-            updateLeftRightValue(connection, category.getRootID(), category.getLeft(), increment);
+            updateLeftRightValue(entityManager, category.getRootID(), category.getLeft(), increment);
         }
         updateTimeStamp();
         updateLastModified(category.getRootID());
@@ -169,41 +158,36 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * @see org.mycore.datamodel.classifications2.MCRCategoryDAO#exist(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
     public boolean exist(MCRCategoryID id) {
-        Criteria criteria = getHibConnection().getSession().createCriteria(CATEGRORY_CLASS);
-        criteria.setProjection(Projections.rowCount()).add(getCategoryCriterion(id));
-        criteria.setCacheable(true);
-        Number result = (Number) criteria.uniqueResult();
-        return result != null && result.intValue() > 0;
+        return getLeftRightLevelValues(MCREntityManagerProvider.getCurrentEntityManager(), id) != null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<MCRCategory> getCategoriesByLabel(final String lang, final String text) {
-        final Query q = getHibConnection().getNamedQuery(NAMED_QUERY_NAMESPACE + "byLabel");
-        q.setString("lang", lang);
-        q.setString("text", text);
-        q.setCacheable(true);
-        return q.list();
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        return cast(entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "byLabel", MCRCategoryImpl.class)
+            .setParameter("lang", lang)
+            .setParameter("text", text)
+            .getResultList());
     }
 
-    @SuppressWarnings("unchecked")
     public List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
-        MCRCategoryDTO leftRight = getLeftRightLevelValues(baseID);
-        Query q = getHibConnection().getNamedQuery(NAMED_QUERY_NAMESPACE + "byLabelInClass");
-        q.setString("rootID", baseID.getRootID());
-        q.setInteger("left", leftRight.leftValue);
-        q.setInteger("right", leftRight.rightValue);
-        q.setString("lang", lang);
-        q.setString("text", text);
-        q.setCacheable(true);
-        return q.list();
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategoryDTO leftRight = getLeftRightLevelValues(entityManager, baseID);
+        return cast(entityManager
+            .createNamedQuery(NAMED_QUERY_NAMESPACE + "byLabelInClass", MCRCategoryImpl.class)
+            .setParameter("rootID", baseID.getRootID())
+            .setParameter("left", leftRight.leftValue)
+            .setParameter("right", leftRight.rightValue)
+            .setParameter("lang", lang)
+            .setParameter("text", text)
+            .getResultList());
     }
 
     @SuppressWarnings("unchecked")
     public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         final boolean fetchAllChildren = childLevel < 0;
-        javax.persistence.Query q;
+        Query q;
         if (id.isRootID()) {
             q = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE
                 + (fetchAllChildren ? "prefetchClassQuery" : "prefetchClassLevelQuery"));
@@ -213,7 +197,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             q.setParameter("classID", id.getRootID());
         } else {
             //normal category
-            MCRCategoryDTO leftRightLevel = getLeftRightLevelValues(id);
+            MCRCategoryDTO leftRightLevel = getLeftRightLevelValues(entityManager, id);
             if (leftRightLevel == null) {
                 return null;
             }
@@ -257,12 +241,12 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public List<MCRCategory> getParents(MCRCategoryID id) {
-        MCRCategoryDTO leftRight = getLeftRightLevelValues(id);
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategoryDTO leftRight = getLeftRightLevelValues(entityManager, id);
         if (leftRight == null) {
             return null;
         }
-        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
-        javax.persistence.Query parentQuery = entityManager
+        Query parentQuery = entityManager
             .createNamedQuery(NAMED_QUERY_NAMESPACE + "parentQuery")
             .setParameter("classID", id.getRootID())
             .setParameter("categID", id.getID())
@@ -281,81 +265,65 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     @SuppressWarnings("unchecked")
     public List<MCRCategoryID> getRootCategoryIDs() {
-        Session session = getHibConnection().getSession();
-        FlushMode fm = session.getFlushMode();
-        session.setFlushMode(FlushMode.MANUAL);
-        try {
-            return (List<MCRCategoryID>) session.createCriteria(CATEGRORY_CLASS)
-                .add(Restrictions.eq("left", LEFT_START_VALUE))
-                .setProjection(Projections.property("id"))
-                .setCacheable(true)
-                .list()
-                .stream()
-                .map(MCRCategoryID.class::cast)
-                .collect(Collectors.toList());
-        } finally {
-            session.setFlushMode(fm);
-        }
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        return entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "rootIds").getResultList();
     }
 
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getRootCategories() {
-        Session session = getHibConnection().getSession();
-        Criteria c = session.createCriteria(CATEGRORY_CLASS);
-        c.add(Restrictions.eq("left", LEFT_START_VALUE));
-        c.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        c.setCacheable(true);
-        List<MCRCategoryImpl> result = c.list();
-        List<MCRCategory> classes = new ArrayList<MCRCategory>(result.size());
-        for (MCRCategoryImpl cat : result) {
-            classes.add(copyDeep(cat, 0));
-        }
-        return classes;
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        List<MCRCategoryDTO> resultList = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "rootCategs")
+            .getResultList();
+        BiConsumer<List<MCRCategory>, MCRCategoryImpl> merge = (l, c) -> {
+            MCRCategoryImpl last = (MCRCategoryImpl) l.get(l.size() - 1);
+            if (last.getInternalID() != c.getInternalID()) {
+                l.add(c);
+            } else {
+                last.getLabels().addAll(c.getLabels());
+            }
+        };
+        return resultList.parallelStream()
+            .map(c -> c.merge(null))
+            .collect(Collector.of(ArrayList::new,
+                (ArrayList<MCRCategory> l, MCRCategoryImpl c) -> {
+                    if (l.isEmpty()) {
+                        l.add(c);
+                    } else {
+                        merge.accept(l, c);
+                    }
+                }, (l, r) -> {
+                    if (l.isEmpty()) {
+                        return r;
+                    }
+                    if (r.isEmpty()) {
+                        return l;
+                    }
+                    MCRCategoryImpl first = (MCRCategoryImpl) r.get(0);
+                    merge.accept(l, first);
+                    l.addAll(r.subList(1, r.size()));
+                    return l;
+                }));
     }
 
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
-        if (baseID.isRootID()) {
-            return getCategory(baseID, childLevel);
-        }
-        Session session = getHibConnection().getSession();
-        FlushMode fm = session.getFlushMode();
-        session.setFlushMode(FlushMode.MANUAL);
-        try {
-            List<MCRCategory> parents = getParents(baseID);
-            if (parents == null || parents.size() == 0) {
-                return null;
-            }
-
-            List<MCRCategoryImpl> parentsCopy = new ArrayList<MCRCategoryImpl>(parents.size());
-            for (int i = parents.size() - 1; i >= 0; i--) {
-                parentsCopy.add(copyDeep(parents.get(i), 0));
-            }
-
-            if (parentsCopy.size() == 0) {
-                return null;
-            }
-
-            MCRCategoryImpl root = parentsCopy.get(0);
-            for (int i = 1; i < parentsCopy.size(); i++) {
-                parentsCopy.get(i).setRoot(root);
-                parentsCopy.get(i).setParent(parentsCopy.get(i - 1));
-            }
-            MCRCategoryImpl node = getByNaturalID(session, baseID);
-            // prepare a temporary copy for the deepCopy process
-            MCRCategoryImpl tempCopy = new MCRCategoryImpl();
-            tempCopy.setInternalID(node.getInternalID());
-            tempCopy.setId(node.getId());
-            tempCopy.setLabels(node.getLabels());
-            tempCopy.setLevel(node.getLevel());
-            tempCopy.children = node.children;
-            tempCopy.root = root;
-            // attach deep node copy to its parent
-            copyDeep(tempCopy, childLevel).setParent(parentsCopy.get(parentsCopy.size() - 1));
-            // return root node
-            return root;
-        } finally {
-            session.setFlushMode(fm);
-        }
+        return Optional.ofNullable(getCategory(baseID, childLevel))
+            .map(c -> {
+                if (baseID.isRootID()) {
+                    return c;
+                }
+                List<MCRCategory> parents = getParents(baseID);
+                MCRCategory parent = parents.get(0);
+                c.getChildren()
+                    .stream()
+                    .collect(Collectors.toList())
+                    .stream()
+                    .map(MCRCategoryImpl.class::cast)
+                    .peek(MCRCategoryImpl::detachFromParent)
+                    .forEachOrdered(parent.getChildren()::add);
+                // return root node
+                return parents.get(parents.size() - 1);
+            })
+            .orElse(null);
     }
 
     /*
@@ -366,15 +334,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public boolean hasChildren(MCRCategoryID cid) {
         // SELECT * FROM MCRCATEGORY WHERE PARENTID=(SELECT INTERNALID FROM
         // MCRCATEGORY WHERE rootID=cid.getRootID() and ID...);
-        return getNumberOfChildren(cid) > 0;
+        return getNumberOfChildren(MCREntityManagerProvider.getCurrentEntityManager(), cid) > 0;
     }
 
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID) {
-        int index = getNumberOfChildren(newParentID);
+        int index = getNumberOfChildren(MCREntityManagerProvider.getCurrentEntityManager(), newParentID);
         moveCategory(id, newParentID, index);
     }
 
-    private MCRCategoryImpl getCommonAncestor(MCRHIBConnection connection, MCRCategoryImpl node1,
+    private MCRCategoryImpl getCommonAncestor(EntityManager connection, MCRCategoryImpl node1,
         MCRCategoryImpl node2) {
         if (!node1.getRootID().equals(node2.getRootID())) {
             return null;
@@ -385,23 +353,22 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (node2.getLeft() == 0) {
             return node2;
         }
-        Query q = connection.getNamedQuery(NAMED_QUERY_NAMESPACE + "commonAncestor");
+        Query q = connection.createNamedQuery(NAMED_QUERY_NAMESPACE + "commonAncestor");
         q.setMaxResults(1);
         int left = Math.min(node1.getLeft(), node2.getLeft());
         int right = Math.max(node1.getRight(), node2.getRight());
-        q.setInteger("left", left);
-        q.setInteger("right", right);
-        q.setString("rootID", node1.getRootID());
-        return (MCRCategoryImpl) q.uniqueResult();
+        q.setParameter("left", left);
+        q.setParameter("right", right);
+        q.setParameter("rootID", node1.getRootID());
+        return getSingleResult(q);
     }
 
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
-        final MCRHIBConnection connection = getHibConnection();
-        Session session = connection.getSession();
-        MCRCategoryImpl subTree = getByNaturalID(session, id);
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategoryImpl subTree = getByNaturalID(entityManager, id);
         MCRCategoryImpl oldParent = (MCRCategoryImpl) subTree.getParent();
-        MCRCategoryImpl newParent = getByNaturalID(session, newParentID);
-        MCRCategoryImpl commonAncestor = getCommonAncestor(connection, oldParent, newParent);
+        MCRCategoryImpl newParent = getByNaturalID(entityManager, newParentID);
+        MCRCategoryImpl commonAncestor = getCommonAncestor(entityManager, oldParent, newParent);
         subTree.detachFromParent();
         LOGGER.debug("Add subtree to new Parent at index: " + index);
         newParent.getChildren().add(index, subTree);
@@ -412,8 +379,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public MCRCategory removeLabel(MCRCategoryID id, String lang) {
-        Session session = getHibConnection().getSession();
-        MCRCategoryImpl category = getByNaturalID(session, id);
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategoryImpl category = getByNaturalID(entityManager, id);
         category.getLabel(lang).ifPresent(oldLabel -> {
             category.getLabels().remove(oldLabel);
             updateTimeStamp();
@@ -427,9 +394,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             throw new IllegalArgumentException(
                 "MCRCategory can not be replaced. MCRCategoryID '" + newCategory.getId() + "' is unknown.");
         }
-        final MCRHIBConnection connection = getHibConnection();
-        Session session = connection.getSession();
-        MCRCategoryImpl oldCategory = getByNaturalID(session, newCategory.getId());
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategoryImpl oldCategory = getByNaturalID(entityManager, newCategory.getId());
         int oldLevel = oldCategory.getLevel();
         int oldLeft = oldCategory.getLeft();
         // old Map with all Categories referenced by ID
@@ -487,7 +453,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                         .collect(Collectors.toList()));
             });
         oldCategory.calculateLeftRightAndLevel(oldLeft, oldLevel);
-        session.update(oldCategory);
         updateTimeStamp();
         updateLastModified(newCategory.getId().getRootID());
         return newMap.values();
@@ -515,11 +480,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {
-        Session session = getHibConnection().getSession();
-        MCRCategoryImpl category = getByNaturalID(session, id);
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategoryImpl category = getByNaturalID(entityManager, id);
         category.getLabel(label.getLang()).ifPresent(category.getLabels()::remove);
         category.getLabels().add(label);
-        session.update(category);
         updateTimeStamp();
         updateLastModified(category.getRootID());
         return category;
@@ -527,29 +491,27 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     @Override
     public MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
-        Session session = getHibConnection().getSession();
-        MCRCategoryImpl category = getByNaturalID(session, id);
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategoryImpl category = getByNaturalID(entityManager, id);
         category.setLabels(labels);
-        session.update(category);
         updateTimeStamp();
         updateLastModified(category.getRootID());
         return category;
     }
 
     public MCRCategory setURI(MCRCategoryID id, URI uri) {
-        Session session = getHibConnection().getSession();
-        MCRCategoryImpl category = getByNaturalID(session, id);
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRCategoryImpl category = getByNaturalID(entityManager, id);
         category.setURI(uri);
-        session.update(category);
         updateTimeStamp();
         updateLastModified(category.getRootID());
         return category;
     }
 
     public void repairLeftRightValue(String classID) {
-        final Session session = MCRHIBConnection.instance().getSession();
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         final MCRCategoryID rootID = MCRCategoryID.rootID(classID);
-        MCRCategoryImpl classification = MCRCategoryDAOImpl.getByNaturalID(session, rootID);
+        MCRCategoryImpl classification = MCRCategoryDAOImpl.getByNaturalID(entityManager, rootID);
         classification.calculateLeftRightAndLevel(0, 0);
     }
 
@@ -559,10 +521,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static void updateTimeStamp() {
         LAST_MODIFIED = System.currentTimeMillis();
-    }
-
-    static Criterion getCategoryCriterion(MCRCategoryID id) {
-        return Restrictions.eq("id", id);
     }
 
     private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list, MCRCategoryID returnID) {
@@ -615,9 +573,12 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * every change to the returned MCRCategory is reflected in the database.
      */
-    public static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
-        return (MCRCategoryImpl) session.createCriteria(MCRCategoryImpl.class).add(getCategoryCriterion(id))
-            .setCacheable(true).uniqueResult();
+    public static MCRCategoryImpl getByNaturalID(EntityManager entityManager, MCRCategoryID id) {
+        TypedQuery<MCRCategoryImpl> naturalIDQuery = entityManager
+            .createNamedQuery(NAMED_QUERY_NAMESPACE + "byNaturalId", MCRCategoryImpl.class)
+            .setParameter("classID", id.getRootID())
+            .setParameter("categID", id.getID());
+        return getSingleResult(naturalIDQuery);
     }
 
     private static void syncLabels(MCRCategoryImpl source, MCRCategoryImpl target) {
@@ -645,53 +606,35 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
     }
 
-    private static MCRCategoryDTO getLeftRightLevelValues(MCRCategoryID id) {
-        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
-        javax.persistence.Query leftRightQuery = entityManager
-            .createNamedQuery(NAMED_QUERY_NAMESPACE + "leftRightLevelQuery");
-        leftRightQuery.setParameter("categID", id);
-        try {
-            return (MCRCategoryDTO) leftRightQuery.getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+    private static MCRCategoryDTO getLeftRightLevelValues(EntityManager entityManager, MCRCategoryID id) {
+        return getSingleResult(entityManager
+            .createNamedQuery(NAMED_QUERY_NAMESPACE + "leftRightLevelQuery")
+            .setParameter("categID", id));
     }
 
-    private static int getNumberOfChildren(MCRCategoryID id) {
-        Session session = getHibConnection().getSession();
-        FlushMode fm = session.getFlushMode();
-        session.setFlushMode(FlushMode.MANUAL);
-        try {
-            Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.rowCount());
-            c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS)
-                .setProjection(Projections.property("internalID")).add(getCategoryCriterion(id))));
-            return ((Number) c.uniqueResult()).intValue();
-        } finally {
-            session.setFlushMode(fm);
-        }
+    private static int getNumberOfChildren(EntityManager entityManager, MCRCategoryID id) {
+        return getSingleResult(entityManager
+            .createNamedQuery(NAMED_QUERY_NAMESPACE + "childCount")
+            .setParameter("classID", id.getRootID())
+            .setParameter("categID", id.getID()));
     }
 
-    private static void updateLeftRightValue(MCRHIBConnection connection, String classID, int left,
+    private static void updateLeftRightValue(EntityManager entityManager, String classID, int left,
         final int increment) {
         LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
-        Query leftQuery = getHibConnection().getNamedQuery(NAMED_QUERY_NAMESPACE + "updateLeft");
-        leftQuery.setInteger("left", left);
-        leftQuery.setInteger("increment", increment);
-        leftQuery.setString("classID", classID);
+        Query leftQuery = entityManager
+            .createNamedQuery(NAMED_QUERY_NAMESPACE + "updateLeft")
+            .setParameter("left", left)
+            .setParameter("increment", increment)
+            .setParameter("classID", classID);
         int leftChanges = leftQuery.executeUpdate();
-        Query rightQuery = getHibConnection().getNamedQuery(NAMED_QUERY_NAMESPACE + "updateRight");
-        rightQuery.setInteger("left", left);
-        rightQuery.setInteger("increment", increment);
-        rightQuery.setString("classID", classID);
+        Query rightQuery = entityManager
+            .createNamedQuery(NAMED_QUERY_NAMESPACE + "updateRight")
+            .setParameter("left", left)
+            .setParameter("increment", increment)
+            .setParameter("classID", classID);
         int rightChanges = rightQuery.executeUpdate();
         LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
-    }
-
-    private static MCRHIBConnection getHibConnection() {
-        if (HIB_CONNECTION_INSTANCE == null) {
-            HIB_CONNECTION_INSTANCE = MCRHIBConnection.instance();
-        }
-        return HIB_CONNECTION_INSTANCE;
     }
 
     /**
@@ -713,5 +656,20 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             return long1;
         }
         return -1;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T getSingleResult(Query query) {
+        try {
+            return (T) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    private static List<MCRCategory> cast(List<MCRCategoryImpl> list) {
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        List<MCRCategory> temp = (List) list;
+        return temp;
     }
 }

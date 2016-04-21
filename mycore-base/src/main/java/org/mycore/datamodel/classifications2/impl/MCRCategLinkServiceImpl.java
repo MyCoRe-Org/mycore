@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -40,6 +42,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
@@ -101,8 +104,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (!childrenOnly) {
             parent = parent.getRoot();
         } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
-            final Session session = MCRHIBConnection.instance().getSession();
-            parent = MCRCategoryDAOImpl.getByNaturalID(session, parent.getId());
+            parent = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), parent.getId());
         }
         LOGGER.info("parentID:" + parent.getId());
         String classID = parent.getId().getRootID();
@@ -193,9 +195,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
-        Session session = HIB_CONNECTION_INSTANCE.getSession();
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         for (MCRCategoryID categID : categories) {
-            final MCRCategory category = getMCRCategory(session, categID);
+            final MCRCategory category = getMCRCategory(entityManager, categID);
             if (category == null) {
                 throw new MCRPersistenceException("Could not link to unknown category " + categID);
             }
@@ -209,17 +211,17 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 debugMessage.append("to ").append(objectReference);
                 LOGGER.debug(debugMessage.toString());
             }
-            session.save(link);
+            entityManager.persist(link);
             LOGGER.debug("===DONE: " + link.id);
         }
     }
 
-    private static MCRCategory getMCRCategory(Session session, MCRCategoryID categID) {
+    private static MCRCategory getMCRCategory(EntityManager entityManager, MCRCategoryID categID) {
         MCRCategory categ = categCache.getIfUpToDate(categID, DAO.getLastModified());
         if (categ != null) {
             return categ;
         }
-        categ = MCRCategoryDAOImpl.getByNaturalID(session, categID);
+        categ = MCRCategoryDAOImpl.getByNaturalID(entityManager, categID);
         if (categ == null) {
             return null;
         }

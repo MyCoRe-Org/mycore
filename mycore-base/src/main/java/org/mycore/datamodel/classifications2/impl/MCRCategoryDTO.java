@@ -25,7 +25,7 @@ public class MCRCategoryDTO {
 
     URI uri;
 
-    private MCRCategoryID id;
+    MCRCategoryID id;
 
     int leftValue, level, rightValue;
 
@@ -99,6 +99,10 @@ public class MCRCategoryDTO {
         return String.format(Locale.ROOT,
             "MCRCategoryDTO [internalID=%s, id=%s, uri=%s, leftValue=%s, level=%s, rightValue=%s, lang=%s, text=%s, description=%s]",
             internalID, id, uri, leftValue, level, rightValue, lang, text, description);
+    }
+
+    public int getInternalID() {
+        return internalID;
     }
 
 }

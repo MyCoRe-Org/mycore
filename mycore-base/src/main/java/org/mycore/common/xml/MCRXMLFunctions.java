@@ -61,7 +61,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRCalendar;
@@ -729,15 +729,14 @@ public class MCRXMLFunctions {
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         //fast way
         if (dao instanceof MCRCategoryDAOImpl) {
-            MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(MCRHIBConnection.instance().getSession(),
+            MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(),
                     categID);
             //root category has level 0
             return categoryImpl.getLevel() > 1;
         }
         //default way
-        List<MCRCategory> parents = dao.getParents(categID);
         //parents at least holds root category:
-        return parents.size() > 1;
+        return dao.getParents(categID).size() > 1;
     }
 
     /**
