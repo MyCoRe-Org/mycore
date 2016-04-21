@@ -81,7 +81,7 @@ public class MCRRestAPISearch {
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1", MediaType.TEXT_PLAIN + ";charset=UTF-8" })
     public Response search(@Context UriInfo info, @QueryParam("q") String query, @QueryParam("sort") String sort,
         @QueryParam("wt") @DefaultValue("xml") String wt, @QueryParam("start") String start,
-        @QueryParam("rows") String rows, @QueryParam("fq") String fq, @QueryParam("fl") String fl) {
+        @QueryParam("rows") String rows, @QueryParam("fq") String fq, @QueryParam("fl") String fl, @QueryParam("json.wrf") String jsonWrf) {
 
         StringBuffer url = new StringBuffer(MCRSolrConstants.SERVER_URL);
         url.append("/select?");
@@ -107,6 +107,9 @@ public class MCRRestAPISearch {
             }
             if (fl != null) {
                 url.append("&fl=").append(URLEncoder.encode(fl, "UTF-8"));
+            }
+            if(jsonWrf!=null){
+                url.append("&json.wrf=").append(jsonWrf);
             }
         } catch (UnsupportedEncodingException e) {
             LOGGER.error(e);
