@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -88,46 +90,51 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (exist(category.getId())) {
             throw new MCRException("Cannot add category. A category with ID " + category.getId() + " already exists");
         }
-        int leftStart = LEFT_START_VALUE;
-        int levelStart = LEVEL_START_VALUE;
-        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
-        //we do direct DB manipulation, so flush and clear session first
-        entityManager.flush();
-        entityManager.clear();
-        MCRCategoryImpl parent = null;
-        if (parentID != null) {
-            parent = getByNaturalID(entityManager, parentID);
-            levelStart = parent.getLevel() + 1;
-            leftStart = parent.getRight();
-            if (position > parent.getChildren().size()) {
-                throw new IndexOutOfBoundsException(
-                    "Cannot add category as child #" + position + ", when there are only "
-                        + parent.getChildren().size() + " children.");
+        return withoutFlush(MCREntityManagerProvider.getCurrentEntityManager(), false, entityManager -> {
+            //we do direct DB manipulation, so flush and clear session first
+            entityManager.flush();
+            entityManager.clear();
+            int leftStart = LEFT_START_VALUE;
+            int levelStart = LEVEL_START_VALUE;
+            MCRCategoryImpl parent = null;
+            if (parentID != null) {
+                parent = getByNaturalID(entityManager, parentID);
+                levelStart = parent.getLevel() + 1;
+                leftStart = parent.getRight();
+                if (position > parent.getChildren().size()) {
+                    throw new IndexOutOfBoundsException(
+                        "Cannot add category as child #" + position + ", when there are only "
+                            + parent.getChildren().size() + " children.");
+                }
             }
-        }
-        LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes...");
-        final MCRCategoryImpl wrapCategory = MCRCategoryImpl.wrapCategory(category, parent,
-            parent == null ? category.getRoot() : parent.getRoot());
-        wrapCategory.calculateLeftRightAndLevel(leftStart, levelStart);
-        // always add +1 for the current node
-        int nodes = 1 + (wrapCategory.getRight() - wrapCategory.getLeft()) / 2;
-        LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: " + nodes);
-        if (parentID != null) {
-            final int increment = nodes * 2;
-            if (position < 0) {
+            LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes...");
+            final MCRCategoryImpl wrapCategory = MCRCategoryImpl.wrapCategory(category, parent,
+                parent == null ? category.getRoot() : parent.getRoot());
+            wrapCategory.calculateLeftRightAndLevel(leftStart, levelStart);
+            // always add +1 for the current node
+            int nodes = 1 + (wrapCategory.getRight() - wrapCategory.getLeft()) / 2;
+            LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: " + nodes);
+            if (parentID != null) {
+                final int increment = nodes * 2;
+                int parentLeft = parent.getLeft();
                 updateLeftRightValue(entityManager, parentID.getRootID(), leftStart, increment);
-                parent.getChildren().add(category);
-            } else {
-                parent.getChildren().add(position, category);
-                parent.calculateLeftRightAndLevel(parent.getLeft(), parent.getLevel());
+                entityManager.flush();
+                if (position < 0) {
+                    parent.getChildren().add(category);
+                } else {
+                    parent.getChildren().add(position, category);
+                }
+                parent.calculateLeftRightAndLevel(Integer.MAX_VALUE / 2, parent.getLevel());
+                entityManager.flush();
+                parent.calculateLeftRightAndLevel(parentLeft, parent.getLevel());
             }
-        }
-        entityManager.persist(category);
-        LOGGER.info("Category " + category.getId() + " saved.");
-        updateTimeStamp();
+            entityManager.persist(category);
+            LOGGER.info("Category " + category.getId() + " saved.");
+            updateTimeStamp();
 
-        updateLastModified(category.getRoot().getId().toString());
-        return parent;
+            updateLastModified(category.getRoot().getId().toString());
+            return parent;
+        });
     }
 
     public void deleteCategory(MCRCategoryID id) {
@@ -343,7 +350,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         moveCategory(id, newParentID, index);
     }
 
-    private MCRCategoryImpl getCommonAncestor(EntityManager connection, MCRCategoryImpl node1,
+    private MCRCategoryImpl getCommonAncestor(EntityManager entityManager, MCRCategoryImpl node1,
         MCRCategoryImpl node2) {
         if (!node1.getRootID().equals(node2.getRootID())) {
             return null;
@@ -354,29 +361,35 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (node2.getLeft() == 0) {
             return node2;
         }
-        Query q = connection.createNamedQuery(NAMED_QUERY_NAMESPACE + "commonAncestor");
-        q.setMaxResults(1);
         int left = Math.min(node1.getLeft(), node2.getLeft());
         int right = Math.max(node1.getRight(), node2.getRight());
-        q.setParameter("left", left);
-        q.setParameter("right", right);
-        q.setParameter("rootID", node1.getRootID());
+        Query q = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "commonAncestor")
+            .setMaxResults(1)
+            .setParameter("left", left)
+            .setParameter("right", right)
+            .setParameter("rootID", node1.getRootID());
         return getSingleResult(q);
     }
 
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
-        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRCategoryImpl subTree = getByNaturalID(entityManager, id);
-        MCRCategoryImpl oldParent = (MCRCategoryImpl) subTree.getParent();
-        MCRCategoryImpl newParent = getByNaturalID(entityManager, newParentID);
-        MCRCategoryImpl commonAncestor = getCommonAncestor(entityManager, oldParent, newParent);
-        subTree.detachFromParent();
-        LOGGER.debug("Add subtree to new Parent at index: " + index);
-        newParent.getChildren().add(index, subTree);
-        subTree.parent = newParent;
-        commonAncestor.calculateLeftRightAndLevel(commonAncestor.getLeft(), commonAncestor.getLevel());
-        updateTimeStamp();
-        updateLastModified(id.getRootID());
+        withoutFlush(MCREntityManagerProvider.getCurrentEntityManager(), true, e -> {
+            MCRCategoryImpl subTree = getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), id);
+            MCRCategoryImpl oldParent = (MCRCategoryImpl) subTree.getParent();
+            MCRCategoryImpl newParent = getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), newParentID);
+            MCRCategoryImpl commonAncestor = getCommonAncestor(MCREntityManagerProvider.getCurrentEntityManager(),
+                oldParent, newParent);
+            subTree.detachFromParent();
+            LOGGER.debug("Add subtree to new Parent at index: " + index);
+            newParent.getChildren().add(index, subTree);
+            subTree.parent = newParent;
+            MCREntityManagerProvider.getCurrentEntityManager().flush();
+            int left = commonAncestor.getLeft();
+            commonAncestor.calculateLeftRightAndLevel(Integer.MAX_VALUE / 2, commonAncestor.getLevel());
+            e.flush();
+            commonAncestor.calculateLeftRightAndLevel(left, commonAncestor.getLevel());
+            updateTimeStamp();
+            updateLastModified(id.getRootID());
+        });
     }
 
     public MCRCategory removeLabel(MCRCategoryID id, String lang) {
@@ -395,11 +408,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             throw new IllegalArgumentException(
                 "MCRCategory can not be replaced. MCRCategoryID '" + newCategory.getId() + "' is unknown.");
         }
-        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
-        FlushModeType fm = entityManager.getFlushMode();
-        entityManager.setFlushMode(FlushModeType.COMMIT);
-        try {
-            MCRCategoryImpl oldCategory = getByNaturalID(entityManager, newCategory.getId());
+        return withoutFlush(MCREntityManagerProvider.getCurrentEntityManager(), true, em -> {
+            MCRCategoryImpl oldCategory = getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(),
+                newCategory.getId());
             int oldLevel = oldCategory.getLevel();
             int oldLeft = oldCategory.getLeft();
             // old Map with all Categories referenced by ID
@@ -456,14 +467,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                             })
                             .collect(Collectors.toList()));
                 });
+            oldCategory.calculateLeftRightAndLevel(Integer.MAX_VALUE / 2, oldLevel);
+            em.flush();
             oldCategory.calculateLeftRightAndLevel(oldLeft, oldLevel);
             updateTimeStamp();
             updateLastModified(newCategory.getId().getRootID());
             return newMap.values();
-        } finally {
-            entityManager.flush();
-            entityManager.setFlushMode(fm);
-        }
+        });
     }
 
     private static Map<MCRCategoryID, MCRCategoryImpl> toMap(MCRCategoryImpl oldCategory) {
@@ -680,5 +690,26 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         @SuppressWarnings({ "unchecked", "rawtypes" })
         List<MCRCategory> temp = (List) list;
         return temp;
+    }
+
+    private static <T> T withoutFlush(EntityManager entityManager, boolean flushAtEnd,
+        Function<EntityManager, T> task) {
+        FlushModeType fm = entityManager.getFlushMode();
+        entityManager.setFlushMode(FlushModeType.COMMIT);
+        try {
+            return task.apply(entityManager);
+        } finally {
+            entityManager.setFlushMode(fm);
+            if (flushAtEnd) {
+                entityManager.flush();
+            }
+        }
+    }
+
+    private static void withoutFlush(EntityManager entityManager, boolean flushAtEnd, Consumer<EntityManager> task) {
+        withoutFlush(entityManager, flushAtEnd, e -> {
+            task.accept(e);
+            return null;
+        });
     }
 }

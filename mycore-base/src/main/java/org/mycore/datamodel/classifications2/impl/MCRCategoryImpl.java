@@ -71,11 +71,14 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 @Entity
 @Table(name = "MCRCategory", 
     indexes = { 
-        @Index(columnList = "ClassID, leftValue, rightValue", name = "ClassLeftRight"), //(classId, left) should be unique, but JUnit tests fail right now
+        @Index(columnList = "ClassID, leftValue, rightValue", name = "ClassLeftRight"),
         @Index(columnList = "leftValue", name = "ClassesRoot")
     }, 
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "ClassID", "CategID" }, name = "ClassCategUnique") })
+        @UniqueConstraint(columnNames = { "ClassID", "CategID" }, name = "ClassCategUnique"),
+        @UniqueConstraint(columnNames = { "ClassID", "leftValue" }, name = "ClassLeftUnique"),
+        @UniqueConstraint(columnNames = { "ClassID", "rightValue" }, name = "ClassRightUnique") }
+    )
 @NamedQueries({
     @NamedQuery(name = "MCRCategory.updateLeft", query = "UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.id.rootID= :classID AND cat.left >= :left"),
     @NamedQuery(name = "MCRCategory.updateRight", query = "UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.id.rootID= :classID AND cat.right >= :left"),
