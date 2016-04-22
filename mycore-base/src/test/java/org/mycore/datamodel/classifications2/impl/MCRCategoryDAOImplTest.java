@@ -88,9 +88,11 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         try {
             startNewTransaction();
             MCRCategoryImpl rootNode = getRootCategoryFromSession();
+            MCRCategoryImpl rootNode2 = (MCRCategoryImpl) DAO.getCategory(category.getId(), -1);
             if (rootNode != null) {
                 try {
                     checkLeftRightLevelValue(rootNode, 0, 0);
+                    checkLeftRightLevelValue(rootNode2, 0, 0);
                 } catch (AssertionError e) {
                     LogManager.getLogger().error("Error while checking left, right an level values in database.");
                     new XMLOutputter(Format.getPrettyFormat()).output(MCRCategoryTransformer.getMetaDataDocument(rootNode, false), System.out);

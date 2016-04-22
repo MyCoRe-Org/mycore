@@ -485,6 +485,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 .collect(Collectors.toList()));
         }
         category.detachFromParent();
+        MCREntityManagerProvider.getCurrentEntityManager().remove(category);
     }
 
     public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {
