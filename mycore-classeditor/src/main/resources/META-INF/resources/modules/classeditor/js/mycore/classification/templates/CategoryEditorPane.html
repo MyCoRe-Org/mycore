@@ -9,7 +9,7 @@
 		<tr>
 			<td class="categoryEditorDescription">URL</td>
 			<td class="categoryEditorValue">
-				<input data-dojo-type="dijit.form.ValidationTextBox" data-dojo-attach-point="urlEditor" data-dojo-props="regExp: '(https?:\/\/)?[\\w-\.]+[\.]+[\\w-:]+[\/\\w-]+', disabled: true" />
+				<input data-dojo-type="dijit.form.ValidationTextBox" data-dojo-attach-point="urlEditor" data-dojo-props="regExp: '(https?:\/\/)?[\\w-\.]+[\.]+[\\w-:]+[\\w-\/.?=&#]*', disabled: true" />
 			</td>
 		</tr>
 		<tr data-dojo-attach-point="classIdRow">
