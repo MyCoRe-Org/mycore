@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan"
-  exclude-result-prefixes="i18n mcrxml xalan">
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  exclude-result-prefixes="i18n mcrxml xalan xlink">
 
   <xsl:param name="CurrentUser" />
   <xsl:param name="ServletsBaseURL" />
@@ -217,7 +218,7 @@
   <!--
    -   Prints alternate format of mods abstract, tableOfContents or accessCondition.
    -   The parameter 'asHTML' [true|false] is used to define the output should in HTML form if one is given.
-   -   Use the parameter 'filtered' [true|false] with 'true' if do some pre filtering.  
+   -   Use the parameter 'filtered' [true|false] with 'true' if do some pre filtering.
    -->
   <xsl:template mode="mods.printAlternateFormat" match="mods:abstract|mods:tableOfContents|mods:accessCondition">
     <xsl:param name="asHTML" select="false()" />
@@ -260,9 +261,9 @@
 
   <!--Template for access conditions -->
   <xsl:template match="mods:accessCondition" mode="cc-logo">
-    <xsl:variable name="licenseVersion" select="'3.0'" />
-    <!-- like cc_by-nc-sa: remove the 'cc_' -->
-    <xsl:variable name="licenseString" select="substring-after(normalize-space(.),'cc_')" />
+    <!-- split category ID e.g "cc_by_4.0" -->
+    <xsl:variable name="licenseVersion" select="substring-after(substring-after(@xlink:href, '#cc_'), '_')" />
+    <xsl:variable name="licenseString" select="substring-before(substring-after(@xlink:href, '#cc_'), '_')" />
     <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
       <img src="//i.creativecommons.org/l/{$licenseString}/{$licenseVersion}/88x31.png" />
     </a>
@@ -270,7 +271,7 @@
 
   <xsl:template match="mods:accessCondition" mode="cc-text">
     <!-- like cc_by-nc-sa: remove the 'cc_' -->
-    <xsl:variable name="licenseString" select="substring-after(normalize-space(.),'cc_')" />
+    <xsl:variable name="licenseString" select="substring-before(substring-after(@xlink:href, '#cc_'), '_')" />
     <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.cc.30.', $licenseString))" />
   </xsl:template>
 
@@ -289,7 +290,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="nameIdentifier" select="xalan:nodeset($nameIds)/nameIdentifier[1]" />
-  
+
     <!-- if user is in role editor or admin, show all; other users only gets their own and published publications -->
     <xsl:variable name="owner">
       <xsl:choose>
@@ -384,7 +385,7 @@
   <xsl:template match="*" mode="copyNode">
     <xsl:copy-of select="node()" />
   </xsl:template>
-  
+
     <xsl:template name="mods.seperateName">
     <xsl:param name="displayForm" />
     <xsl:choose>
@@ -431,7 +432,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="mods.tokenizeName">
     <xsl:param name="name" />
     <xsl:param name="delimiter" select="' '" />
