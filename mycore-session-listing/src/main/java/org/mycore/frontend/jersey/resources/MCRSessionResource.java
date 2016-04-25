@@ -34,14 +34,14 @@ public class MCRSessionResource {
     /**
      * Lists all {@link MCRSession}'s in json format.
      * 
-     * @param resolveHostName (false) if the host names are resolved. Resolving host names takes some
+     * @param resolveHostname (false) if the host names are resolved. Resolving host names takes some
      *          time, so this is deactivated by default
      * @return list of sessions
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("list")
-    public Response list(@DefaultValue("false") @QueryParam("resolveHostName") Boolean resolveHostName) {
+    public Response list(@DefaultValue("false") @QueryParam("resolveHostname") Boolean resolveHostname) {
         // check permissions
         MCRJerseyUtil.checkPermission("manage-sessions");
 
@@ -51,7 +51,7 @@ public class MCRSessionResource {
         // generate json
         JsonArray rootJSON = new JsonArray();
         for (MCRSession session : sessions) {
-            JsonObject sessionJSON = generateSessionJSON(session, resolveHostName);
+            JsonObject sessionJSON = generateSessionJSON(session, resolveHostname);
             rootJSON.add(sessionJSON);
         }
         return Response.status(Status.OK).entity(rootJSON.toString()).build();
@@ -61,10 +61,10 @@ public class MCRSessionResource {
      * Builds the session JSON object.
      * 
      * @param session the session to represent in JSON format
-     * @param resolveHostName if host names should be resolved, adds the property 'hostName'
+     * @param resolveHostname if host names should be resolved, adds the property 'hostName'
      * @return a gson JsonObject containing all session information
      */
-    private JsonObject generateSessionJSON(MCRSession session, boolean resolveHostName) {
+    private JsonObject generateSessionJSON(MCRSession session, boolean resolveHostname) {
         JsonObject sessionJSON = new JsonObject();
 
         String userID = session.getUserInformation().getUserID();
@@ -73,10 +73,10 @@ public class MCRSessionResource {
         sessionJSON.addProperty("id", session.getID());
         sessionJSON.addProperty("login", userID);
         sessionJSON.addProperty("ip", ip);
-        if (resolveHostName) {
-            String hostName = resolveHostName(ip);
-            if (hostName != null) {
-                sessionJSON.addProperty("hostName", hostName);
+        if (resolveHostname) {
+            String hostname = resolveHostName(ip);
+            if (hostname != null) {
+                sessionJSON.addProperty("hostname", hostname);
             }
         }
         String userRealName = session.getUserInformation().getUserAttribute(MCRUserInformation.ATT_REAL_NAME);
