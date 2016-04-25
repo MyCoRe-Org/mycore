@@ -113,7 +113,12 @@ public class MCRViewerConfiguration {
         if (i == -1) {
             return null;
         }
-        return requestURI.substring(requestURI.lastIndexOf("/", i) + 1, i + 18);
+        int start = requestURI.lastIndexOf("/", i) + 1;
+        int end = requestURI.indexOf("/", i);
+        if (end == -1) {
+            return requestURI.substring(start);
+        }
+        return requestURI.substring(start, end);
     }
 
     /**
@@ -124,12 +129,16 @@ public class MCRViewerConfiguration {
      * @return path to the file
      */
     public static String getFilePath(HttpServletRequest request) {
-        String pathInfo = request.getPathInfo();
-        int i = pathInfo.indexOf("_derivate_");
+        String requestURI = request.getRequestURI();
+        int i = requestURI.indexOf("_derivate_");
         if (i == -1) {
             return null;
         }
-        return pathInfo.substring(i + 18);
+        int start = requestURI.indexOf("/", i);
+        if (start == -1) {
+            return "";
+        }
+        return requestURI.substring(start);
     }
 
     /**
@@ -239,7 +248,8 @@ public class MCRViewerConfiguration {
         public MCRIViewClientXMLConfiguration() {
         }
 
-        public MCRIViewClientXMLConfiguration(Multimap<ResourceType, String> resources, Map<String, Object> properties) {
+        public MCRIViewClientXMLConfiguration(Multimap<ResourceType, String> resources,
+            Map<String, Object> properties) {
             this.resources = resources;
             this.properties = properties;
         }
