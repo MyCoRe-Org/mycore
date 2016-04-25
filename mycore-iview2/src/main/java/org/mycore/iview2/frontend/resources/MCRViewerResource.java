@@ -79,13 +79,8 @@ public class MCRViewerResource {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, errorMessage);
         }
 
-        MCRViewerConfigurationStrategy configurationStrategy;
-        if (MCRConfiguration.instance().getString("MCR.Module-iview2.configuration.strategy", null) != null) {
-            configurationStrategy = MCRConfiguration.instance().getInstanceOf(
-                    "MCR.Module-iview2.configuration.strategy");
-        } else {
-            configurationStrategy = new MCRViewerDefaultConfigurationStrategy();
-        }
+        MCRViewerConfigurationStrategy configurationStrategy = MCRConfiguration.instance()
+            .getInstanceOf("MCR.Module-iview2.configuration.strategy", new MCRViewerDefaultConfigurationStrategy());
         MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(configurationStrategy.get(req)));
         return MCRLayoutService.instance().getTransformedContent(req, resp, source);
     }
