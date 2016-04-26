@@ -124,9 +124,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
         try {
-            BasicFileAttributeView fileAttributeView = Files.getFileAttributeView(path, BasicFileAttributeView.class);
             MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance()
-                .getIndexHandler(path, fileAttributeView.readAttributes(), MCRSolrClientFactory.getSolrClient()), false);
+                .getIndexHandler(path, attrs, MCRSolrClientFactory.getSolrClient()), false);
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for file " + path.toString(), ex);
         }
