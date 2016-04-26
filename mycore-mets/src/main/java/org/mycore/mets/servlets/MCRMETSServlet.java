@@ -43,6 +43,8 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -59,6 +61,7 @@ public class MCRMETSServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRMETSServlet.class);
+
     public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration.instance().getBoolean("MCR.Mets.storeMetsOnGenerate");
 
     private boolean useExpire;
@@ -75,16 +78,21 @@ public class MCRMETSServlet extends MCRServlet {
         MCRPath rootPath = MCRPath.getPath(derivate, "/");
 
         if (!Files.isDirectory(rootPath)) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                MessageFormat.format("Derivate {0} does not exist.", derivate));
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format("Derivate {0} does not exist.", derivate));
             return;
         }
         request.setAttribute("XSL.derivateID", derivate);
         Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivate);
         if (linkList.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, MessageFormat.format(
-                "Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivate));
-            return;
+            MCRDerivate derivate2 = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
+            MCRObjectID ownerID = derivate2.getOwnerID();
+            if (ownerID != null && ownerID.toString().length() != 0) {
+                linkList.add(ownerID.toString());
+            } else {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        MessageFormat.format("Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivate));
+                return;
+            }
         }
         request.setAttribute("XSL.objectID", linkList.iterator().next());
         response.setContentType("text/xml");
@@ -95,8 +103,7 @@ public class MCRMETSServlet extends MCRServlet {
         long start = System.currentTimeMillis();
         MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivate);
         MCRLayoutService.instance().doLayout(request, response, metsContent);
-        LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took "
-            + (System.currentTimeMillis() - start) + " ms");
+        LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took " + (System.currentTimeMillis() - start) + " ms");
     }
 
     /**
@@ -107,8 +114,15 @@ public class MCRMETSServlet extends MCRServlet {
 
         try {
             job.getRequest().setAttribute("XSL.derivateID", derivate);
-            job.getRequest().setAttribute("XSL.objectID",
-                MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
+            String objectid = MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next();
+
+            if (objectid == null || objectid.length() == 0) {
+                MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
+                MCRObjectID ownerID = derObj.getOwnerID();
+                objectid = ownerID.toString();
+            }
+
+            job.getRequest().setAttribute("XSL.objectID", objectid);
         } catch (Exception x) {
             LOGGER.warn("Unable to set \"XSL.objectID\" attribute to current request", x);
         }
@@ -123,10 +137,9 @@ public class MCRMETSServlet extends MCRServlet {
             if (metsExists) {
                 ignoreNodes.add(metsPath);
             }
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(derivate, "/"), ignoreNodes)
-                .asDocument();
+            Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(derivate, "/"), ignoreNodes).asDocument();
 
-            if(!metsExists && STORE_METS_ON_GENERATE) {
+            if (!metsExists && STORE_METS_ON_GENERATE) {
                 MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivate));
             }
 
@@ -160,12 +173,12 @@ public class MCRMETSServlet extends MCRServlet {
         boolean running = true;
         for (int i = (pathInfo.charAt(0) == '/') ? 1 : 0; (i < pathInfo.length() && running); i++) {
             switch (pathInfo.charAt(i)) {
-                case '/':
-                    running = false;
-                    break;
-                default:
-                    ownerID.append(pathInfo.charAt(i));
-                    break;
+            case '/':
+                running = false;
+                break;
+            default:
+                ownerID.append(pathInfo.charAt(i));
+                break;
             }
         }
         return ownerID.toString();
