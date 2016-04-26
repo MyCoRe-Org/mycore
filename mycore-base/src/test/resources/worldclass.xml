@@ -13,6 +13,18 @@
         <label xml:lang="en" text="Germany" />
         <label xml:lang="fr" text="Allemagne" />
         <label xml:lang="es" text="Alemania" />
+        <category ID="Thuringia">
+          <label xml:lang="de" text="Thüringen" />
+          <label xml:lang="en" text="Thuringia" />
+          <label xml:lang="fr" text="Thuringe" />
+          <label xml:lang="es" text="Turinga" />
+        </category>
+        <category ID="Saxony">
+          <label xml:lang="de" text="Saxen" />
+          <label xml:lang="en" text="Saxony" />
+          <label xml:lang="fr" text="Saxe" />
+          <label xml:lang="es" text="Sajonia" />
+        </category>
       </category>
       <category ID="UK">
         <label xml:lang="de" text="Vereinigtes Königreich" />

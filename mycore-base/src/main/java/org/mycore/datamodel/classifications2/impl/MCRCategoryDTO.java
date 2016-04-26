@@ -67,6 +67,7 @@ public class MCRCategoryDTO {
             parent = parent.getParent();
         }
         parent.getChildren().add(cat);
+        cat.setLevel(level); //is reset to parent.level+1 in step before
         return cat;
     }
 

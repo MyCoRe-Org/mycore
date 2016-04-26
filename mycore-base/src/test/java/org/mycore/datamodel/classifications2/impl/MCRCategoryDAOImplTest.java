@@ -39,6 +39,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -53,6 +54,7 @@ import org.junit.Test;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -95,7 +97,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
                     checkLeftRightLevelValue(rootNode2, 0, 0);
                 } catch (AssertionError e) {
                     LogManager.getLogger().error("Error while checking left, right an level values in database.");
-                    new XMLOutputter(Format.getPrettyFormat()).output(MCRCategoryTransformer.getMetaDataDocument(rootNode, false), System.out);
+                    new XMLOutputter(Format.getPrettyFormat())
+                        .output(MCRCategoryTransformer.getMetaDataDocument(rootNode, false), System.out);
                     printCategoryTable();
                     throw e;
                 }
@@ -223,7 +226,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
             category.getChildren().size(), rootCategory.getChildren().size());
         assertEquals(
             "Children of Level 1 do not know that they are at the first level.\n"
-                + MCRStringTransformer.getString(rootCategory), 1, origSubCategory.getLevel());
+                + MCRStringTransformer.getString(rootCategory),
+            1, origSubCategory.getLevel());
         MCRCategory europe = DAO.getCategory(category.getChildren().get(0).getId(), -1);
         assertFalse("No children present in " + europe.getId(), europe.getChildren().isEmpty());
         europe = DAO.getCategory(category.getChildren().get(0).getId(), 1);
@@ -238,13 +242,19 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("ObjectIDs did not match", origSubCategory.getId(), subCategory.getId());
         assertNotNull("Root category may not null.", subCategory.getRoot());
         assertEquals("Root does not match", origSubCategory.getRoot().getId(), subCategory.getRoot().getId());
+        MCRCategory germanyResource = find(category, "Germany").get();
+        MCRCategory germanyDB = DAO.getCategory(germanyResource.getId(), 1);
+        printCategoryTable();
+        assertEquals("Children of Level 1 do not match", germanyResource.getChildren().size(), germanyDB.getChildren()
+            .size());
     }
 
     @Test
     public void getChildren() {
         addWorldClassification();
         List<MCRCategory> children = DAO.getChildren(category.getId());
-        assertEquals("Did not get all children of :" + category.getId(), category.getChildren().size(), children.size());
+        assertEquals("Did not get all children of :" + category.getId(), category.getChildren().size(),
+            children.size());
         for (int i = 0; i < children.size(); i++) {
             assertEquals("Category IDs of children do not match.", category.getChildren().get(i).getId(),
                 children.get(i).getId());
@@ -629,6 +639,14 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
                 LogManager.getLogger().warn("Error while querying MCRCategory", e2);
             }
         });
+    }
+
+    private Optional<MCRCategory> find(MCRCategory base, String id) {
+        MCRCategoryID lookFor = new MCRCategoryID(base.getId().getRootID(), id);
+        return MCRStreamUtils
+            .flatten(base, MCRCategory::getChildren, false)
+            .filter(c -> c.getId().equals(lookFor))
+            .findAny();
     }
 
 }
