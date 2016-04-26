@@ -1,9 +1,9 @@
 package org.mycore.frontend.jersey.resources;
 
+import java.awt.Color;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -46,14 +46,12 @@ public class MCRSessionResource {
         MCRJerseyUtil.checkPermission("manage-sessions");
 
         // get all sessions
-        Collection<MCRSession> sessions = new ArrayList<MCRSession>(MCRSessionMgr.getAllSessions().values());
-
-        // generate json
-        JsonArray rootJSON = new JsonArray();
-        for (MCRSession session : sessions) {
-            JsonObject sessionJSON = generateSessionJSON(session, resolveHostname);
-            rootJSON.add(sessionJSON);
-        }
+        JsonArray rootJSON = MCRSessionMgr
+            .getAllSessions()
+            .values()
+            .parallelStream()
+            .map(s -> generateSessionJSON(s, resolveHostname))
+            .collect(JsonArray::new, JsonArray::add, (l, r) -> l.addAll(r));
         return Response.status(Status.OK).entity(rootJSON.toString()).build();
     }
 
@@ -64,7 +62,7 @@ public class MCRSessionResource {
      * @param resolveHostname if host names should be resolved, adds the property 'hostName'
      * @return a gson JsonObject containing all session information
      */
-    private JsonObject generateSessionJSON(MCRSession session, boolean resolveHostname) {
+    private static JsonObject generateSessionJSON(MCRSession session, boolean resolveHostname) {
         JsonObject sessionJSON = new JsonObject();
 
         String userID = session.getUserInformation().getUserID();
@@ -96,7 +94,7 @@ public class MCRSessionResource {
      * @param ip the ip to resolve
      * @return the host name or null if the ip couldn't be resolved
      */
-    private String resolveHostName(String ip) {
+    private static String resolveHostName(String ip) {
         try {
             InetAddress inetAddress = InetAddress.getByName(ip);
             return inetAddress.getHostName();
@@ -112,24 +110,20 @@ public class MCRSessionResource {
      * @param session session
      * @return json array containing all {@link StackTraceElement} as json
      */
-    private JsonElement buildStacktrace(MCRSession session) {
+    private static JsonElement buildStacktrace(MCRSession session) {
         JsonObject containerJSON = new JsonObject();
-        StringBuffer hashBuffer = new StringBuffer();
         JsonArray stacktraceJSON = new JsonArray();
-        for (StackTraceElement stackTraceElement : session.getConstructingStackTrace()) {
+        StackTraceElement[] constructingStackTrace = session.getConstructingStackTrace();
+        for (StackTraceElement stackTraceElement : constructingStackTrace) {
             // build json
             JsonObject lineJSON = new JsonObject();
-            String className = stackTraceElement.getClassName();
-            int lineNumber = stackTraceElement.getLineNumber();
-            lineJSON.addProperty("class", className);
+            lineJSON.addProperty("class", stackTraceElement.getClassName());
             lineJSON.addProperty("file", stackTraceElement.getFileName());
             lineJSON.addProperty("method", stackTraceElement.getMethodName());
-            lineJSON.addProperty("line", lineNumber);
+            lineJSON.addProperty("line", stackTraceElement.getLineNumber());
             stacktraceJSON.add(lineJSON);
-            // hash
-            hashBuffer.append(className).append(lineNumber);
         }
-        containerJSON.addProperty("color", hashToColor(hashBuffer.toString().hashCode()));
+        containerJSON.addProperty("color", hashToColor(Arrays.hashCode(constructingStackTrace)));
         containerJSON.add("stacktrace", stacktraceJSON);
         return containerJSON;
     }
@@ -140,18 +134,9 @@ public class MCRSessionResource {
      * @param hashCode the hash code to convert
      * @return a hex color code as string
      */
-    private String hashToColor(int hashCode) {
-        int r = (hashCode & 0xFF0000) >> 16;
-        int g = (hashCode & 0x00FF00) >> 8;
-        int b = hashCode & 0x0000FF;
-        String hexR = Integer.toHexString(r);
-        String hexG = Integer.toHexString(g);
-        String hexB = Integer.toHexString(b);
-        hexR = ("00" + hexR).substring(hexR.length());
-        hexG = ("00" + hexG).substring(hexG.length());
-        hexB = ("00" + hexB).substring(hexB.length());
-        return new StringBuilder("#").append(hexR).append(hexG)
-            .append(hexB).toString();
+    private static String hashToColor(int hashCode) {
+        Color c = new Color(hashCode);
+        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
     }
 
 }
