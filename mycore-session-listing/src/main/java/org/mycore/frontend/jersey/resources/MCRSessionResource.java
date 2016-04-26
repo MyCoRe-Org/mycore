@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Locale;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -136,7 +137,7 @@ public class MCRSessionResource {
      */
     private static String hashToColor(int hashCode) {
         Color c = new Color(hashCode);
-        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+        return String.format(Locale.ROOT, "#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
     }
 
 }
