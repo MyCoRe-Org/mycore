@@ -51,7 +51,7 @@ public class MCRSessionResource {
             .values()
             .parallelStream()
             .map(s -> generateSessionJSON(s, resolveHostname))
-            .collect(JsonArray::new, JsonArray::add, (l, r) -> l.addAll(r));
+            .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
         return Response.status(Status.OK).entity(rootJSON.toString()).build();
     }
 
