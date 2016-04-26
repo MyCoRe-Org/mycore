@@ -23,9 +23,7 @@
 
 package org.mycore.solr.index;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
