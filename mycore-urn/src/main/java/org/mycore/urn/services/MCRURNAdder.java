@@ -170,7 +170,7 @@ public class MCRURNAdder {
      * @param derivateId
      *          the id of the derivate
      */
-    public boolean addURNToDerivate(String derivateId) throws IOException, JDOMException, SAXException {
+    public boolean addURNToDerivate(String derivateId) throws IOException, JDOMException, SAXException, MCRException {
         MCRObjectID id = MCRObjectID.getInstance(derivateId);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
 

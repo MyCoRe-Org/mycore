@@ -6,17 +6,19 @@ package org.mycore.urn.services;
 import java.util.List;
 import java.util.Vector;
 
+import org.mycore.common.MCRException;
+
 
 /**
  * @author shermann
  * 
  */
-public class MCRURNProvider extends MCRAbstractURNProvider {
+public class MCRURNProvider extends MCRAbstractURNProvider  {
 
     /* (non-Javadoc)
      * @see fsu.archiv.mycore.urn.IURNProvider#generateURN()
      */
-    public MCRURN generateURN() {
+    public MCRURN generateURN() throws MCRException {
         String urn = MCRURNManager.buildURN("Default");
         return MCRURN.parse(urn);
     }

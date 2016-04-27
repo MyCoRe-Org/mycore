@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -39,7 +40,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
     private static final String USER_ERROR_PAGE =  "editor_error_user.xml";
 
     @Override
-    protected void doGetPost(MCRServletJob job) throws IOException {
+    protected void doGetPost(MCRServletJob job) throws IOException, MCRException {
         String object = job.getRequest().getParameter("object");
         String target = job.getRequest().getParameter("target");
 
@@ -56,8 +57,9 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
 
         // checking if URN already assigned
         if (MCRURNManager.hasURNAssigned(object) && !"file".equals(target)) {
-            LOGGER.error("Error while assigning urn to object '" + object + "'. It already has an urn.");
-            return;
+            //LOGGER.error("Error while assigning urn to object '" + object + "'. It already has an urn.");
+            throw new MCRException("Error while assigning urn to object '" + object + "'. It already has an urn.");
+            //return;
         }
 
         // set default target if not given
@@ -79,7 +81,8 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
 
                 urnAdder.addURNToSingleFile(object, path);
             } catch (Exception e) {
-                LOGGER.error("Error while assigning urn to single file", e);
+                //LOGGER.error("Error while assigning urn to single file", e);
+                throw new MCRException("Error while assigning urn to single file",e);
             }
             break;
         case "derivate":
@@ -91,10 +94,12 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                         return;
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Error while assigning urn to derivate '" + object + "'", e);
+                    //LOGGER.error("Error while assigning urn to derivate '" + object + "'", e);
+                    throw new MCRException("Error while assigning urn to derivate '" + object + "'", e);
                 }
             } else {
-                LOGGER.error("Error while assigning urn to derivate '" + object + "'. No derivateID given.");
+                //LOGGER.error("Error while assigning urn to derivate '" + object + "'. No derivateID given.");
+                throw new MCRException("Error while assigning urn to derivate '" + object + "'. No derivateID given.");
             }
             break;
         default:
@@ -107,7 +112,8 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                         return;
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Error while assigning urn to derivate '" + object + "'", e);
+                    //LOGGER.error("Error while assigning urn to derivate '" + object + "'", e);
+                	throw new MCRException("Error while assigning urn to derivate '" + object + "'",e);
                 }
             } else {
                 /* assign urn to a mycore object */
@@ -118,7 +124,8 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                         return;
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Error while assigning urn to object '" + object, e);
+                    //LOGGER.error("Error while assigning urn to object '" + object, e);
+                    throw new MCRException("Error while assigning urn to object '" + object,e);
                 }
             }
             break;

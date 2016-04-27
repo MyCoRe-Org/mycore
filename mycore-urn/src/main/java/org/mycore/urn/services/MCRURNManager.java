@@ -27,6 +27,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -108,7 +109,7 @@ public class MCRURNManager {
      *            the ID of a subnamespace configuration in mycore.properties
      * @return the complete URN including prefix, niss and calculated checksum
      */
-    public static synchronized String buildURN(String configID) {
+    public static synchronized String buildURN(String configID) throws MCRException {
         String base = "MCR.URN.SubNamespace." + configID + ".";
 
         MCRNISSBuilder builder = builders.get(configID);
@@ -121,9 +122,14 @@ public class MCRURNManager {
 
         String urn = null;
         String niss = null;
+        String niss2 = null;
         do {
             niss = builder.buildNISS();
+            if (niss.equals(niss2)) { // The niss doest'n change (missing counter?)
+            	throw new MCRException("Could not get unique NISS for URN.");
+            }
             urn = buildURN(configID, niss);
+            niss2=niss;
         } while (isAssigned(urn));
         return urn;
     }
