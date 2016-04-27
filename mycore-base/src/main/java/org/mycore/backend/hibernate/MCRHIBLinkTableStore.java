@@ -89,10 +89,17 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
         EntityManager entityMananger = MCREntityManagerProvider.getCurrentEntityManager();
         LOGGER.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
-        MCRLINKHREF linkHref = new MCRLINKHREF();
-        linkHref.setKey(getKey(from, to, type));
-        linkHref.setMcrattr(attr);
-        entityMananger.merge(linkHref);
+
+        MCRLINKHREFPK key = getKey(from, to, type);
+        MCRLINKHREF linkHref = entityMananger.find(MCRLINKHREF.class, key);
+        if (linkHref != null) {
+            linkHref.setMcrattr(attr);
+        } else {
+            linkHref = new MCRLINKHREF();
+            linkHref.setKey(key);
+            linkHref.setMcrattr(attr);
+            entityMananger.persist(linkHref);
+        }
     }
 
     private static MCRLINKHREFPK getKey(String from, String to, String type) {
@@ -209,8 +216,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     public Collection<String> getSourcesOf(String to, String type) {
         Session session = getSession();
         StringBuilder querySB = new StringBuilder("select key.mcrfrom from ").append(classname).append(" where MCRTO='")
-            .append(to).append(
-                "'");
+            .append(to).append("'");
         if (type != null && type.trim().length() > 0) {
             querySB.append(" and MCRTYPE = '").append(type).append("'");
         }
@@ -234,8 +240,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     public Collection<String> getDestinationsOf(String source, String type) {
         Session session = getSession();
         StringBuilder querySB = new StringBuilder("select key.mcrto from ").append(classname).append(" where MCRFROM='")
-            .append(source)
-            .append("'");
+            .append(source).append("'");
         if (type != null && type.trim().length() != 0) {
             querySB.append(" and MCRTYPE = '").append(type).append("'");
         }
