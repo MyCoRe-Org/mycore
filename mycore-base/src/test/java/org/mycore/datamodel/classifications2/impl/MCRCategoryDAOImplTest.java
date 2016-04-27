@@ -37,6 +37,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -644,7 +645,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     private Optional<MCRCategory> find(MCRCategory base, String id) {
         MCRCategoryID lookFor = new MCRCategoryID(base.getId().getRootID(), id);
         return MCRStreamUtils
-            .flatten(base, MCRCategory::getChildren, false)
+            .flatten(base, MCRCategory::getChildren, Collection::stream)
             .filter(c -> c.getId().equals(lookFor))
             .findAny();
     }

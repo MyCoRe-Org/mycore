@@ -432,7 +432,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             oldMap.putAll(toMap(oldCategory));
             //sync labels/uris;
             MCRStreamUtils
-                .flatten(oldCategory, MCRCategory::getChildren, false)
+                .flatten(oldCategory, MCRCategory::getChildren, Collection::stream)
                 .filter(c -> newMap.containsKey(c.getId()))
                 .map(MCRCategoryImpl.class::cast)
                 .map(c -> new AbstractMap.SimpleEntry<>(c, newMap.get(c.getId()))) // key: category of old version, value: category of new version
@@ -446,7 +446,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 .forEach(MCRCategoryImpl::detachFromParent);
             //rebuild
             MCRStreamUtils
-                .flatten(newCategoryImpl, MCRCategory::getChildren, false)
+                .flatten(newCategoryImpl, MCRCategory::getChildren, Collection::stream)
                 .forEachOrdered(c -> {
                     MCRCategoryImpl oldC = oldMap.get(c.getId());
                     oldC.setChildren(
@@ -478,7 +478,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static Map<MCRCategoryID, MCRCategoryImpl> toMap(MCRCategoryImpl oldCategory) {
         return MCRStreamUtils
-            .flatten(oldCategory, MCRCategory::getChildren, false)
+            .flatten(oldCategory, MCRCategory::getChildren, Collection::stream)
             .collect(Collectors.toMap(MCRCategory::getId, MCRCategoryImpl.class::cast));
     }
 
@@ -548,7 +548,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         for (MCRCategoryDTO entry : list) {
             predecessor = entry.merge(predecessor);
         }
-        return MCRStreamUtils.flatten(predecessor.getRoot(), MCRCategory::getChildren, true)
+        return MCRStreamUtils.flatten(predecessor.getRoot(), MCRCategory::getChildren, Collection::parallelStream)
             .filter(c -> c.getId().equals(returnID))
             .findFirst()
             .map(MCRCategoryImpl.class::cast)

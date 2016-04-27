@@ -28,11 +28,27 @@ public class MCRStreamUtils {
      * @param parallel if the returned Stream should be parallel
      * @see #flatten(Object, Function, boolean, Predicate)
      * @since 2015.12
+     * @deprecated use {@link #flatten(Object, Function, Function)} instead
      */
     public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodeSupplier, boolean parallel) {
-        Collection<T> subNodes = subNodeSupplier.apply(node);
-        return Stream.concat(Stream.of(node), (parallel ? subNodes.parallelStream() : subNodes.stream())
-            .flatMap(subNode -> flatten(subNode, subNodeSupplier, parallel)));
+        return flatten(node, subNodeSupplier, parallel ? Collection::parallelStream : Collection::stream);
+    }
+
+    /**
+     * Short circuit for calling <code>flatten(node, subNodeSupplier, subNodeSupplier, t -&gt; true)</code>
+     * @param node node that holds kind-of subtree.
+     * @param subNodeSupplier a function that delivers subtree items of next level
+     * @param streamProvider a function that makes a Stream of a Collection<T>, usually <code>Collection::stream</code> or <code>Collection::parallelStream</code>
+     * @see #flatten(Object, Function, Function, Predicate)
+     * @since 2016.04
+     */
+    public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodeSupplier,
+        Function<Collection<T>, Stream<T>> streamProvider) {
+        return Stream
+            .concat(Stream.of(node), subNodeSupplier
+                .andThen(streamProvider)
+                .apply(node)
+                .flatMap(subNode -> flatten(subNode, subNodeSupplier, streamProvider)));
     }
 
     /**
@@ -42,16 +58,38 @@ public class MCRStreamUtils {
      *   Stream&lt;MCRCategory&gt; parentCategories = flatten(foo, MCRCategory::getChildren, true, MCRCategory::hasChildren);
      * </pre>
      * @param node first node the stream is made of
-     * @param subNodesupplier a function that delivers subtree items of next level
+     * @param subNodeSupplier a function that delivers subtree items of next level
      * @param parallel if the returned Stream should be parallel
      * @param filter a predicate that filters the element of the next level
      * @since 2015.12
+     * @deprecated use {@link #flatten(Object, Function, Function, Predicate)} instead
      */
-    public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodesupplier, boolean parallel,
+    public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodeSupplier, boolean parallel,
         Predicate<T> filter) {
-        Collection<T> subNodes = subNodesupplier.apply(node);
-        return Stream.concat(Stream.of(node), (parallel ? subNodes.parallelStream() : subNodes.stream()).filter(filter)
-            .flatMap(subNode -> flatten(subNode, subNodesupplier, parallel, filter)));
+        return flatten(node, subNodeSupplier, parallel ? Collection::parallelStream : Collection::stream, filter);
+    }
+
+    /**
+     * Example:
+     * <pre>
+     *   MCRCategory foo = MCRCategoryDAOFactory.getInstance().getCategory(MCRCategoryID.rootID("foo"), -1);
+     *   Stream&lt;MCRCategory&gt; parentCategories = flatten(foo, MCRCategory::getChildren, true, MCRCategory::hasChildren);
+     * </pre>
+     * @param node first node the stream is made of
+     * @param subNodeSupplier a function that delivers subtree items of next level
+     * @param streamProvider a function that makes a Stream of a Collection<T>, usually <code>Collection::stream</code> or <code>Collection::parallelStream</code>
+     * @param filter a predicate that filters the element of the next level
+     * @since 2016.04
+     */
+    public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodeSupplier,
+        Function<Collection<T>, Stream<T>> streamProvider,
+        Predicate<T> filter) {
+        return Stream
+            .concat(Stream.of(node), subNodeSupplier
+                .andThen(streamProvider)
+                .apply(node)
+                .filter(filter)
+                .flatMap(subNode -> flatten(subNode, subNodeSupplier, streamProvider, filter)));
     }
 
     /**
