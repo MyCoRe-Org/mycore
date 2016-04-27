@@ -62,8 +62,6 @@ public class MCRNISSBuilderDateCounter implements MCRNISSBuilder {
 
     private String lastDate;
 
-    private String lastNISS;
-
     private int counter = 1;
 
     private SimpleDateFormat fmtDate;
@@ -105,28 +103,25 @@ public class MCRNISSBuilderDateCounter implements MCRNISSBuilder {
     public synchronized String buildNISS() {
         String niss;
 
-        do {
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-            if (fmtDate != null) {
-                Calendar now = new GregorianCalendar();
-                String date = fmtDate.format(now.getTime());
-                sb.append(date);
+        if (fmtDate != null) {
+            Calendar now = new GregorianCalendar();
+            String date = fmtDate.format(now.getTime());
+            sb.append(date);
 
-                if (!date.equals(lastDate)) {
-                    lastDate = date;
-                    counter = 1; // reset counter, new date
-                }
+            if (!date.equals(lastDate)) {
+                lastDate = date;
+                counter = 1; // reset counter, new date
             }
+        }
 
-            if (fmtCount != null) {
-                sb.append(fmtCount.format(counter++));
-            }
+        if (fmtCount != null) {
+            sb.append(fmtCount.format(counter++));
+        }
 
-            niss = sb.toString();
-        } while (niss.equals(lastNISS));
-
-        lastNISS = niss;
+        niss = sb.toString();
+        
         return niss;
     }
 }
