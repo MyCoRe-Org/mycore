@@ -3,6 +3,7 @@
  */
 package org.mycore.frontend.support;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -42,6 +43,11 @@ public class MCRSecureTokenV2 {
         this.ipAddress = Objects.requireNonNull(ipAddress, "'ipAddress' may not be null");
         this.sharedSecret = Objects.requireNonNull(sharedSecret, "'sharedSecret' may not be null");
         this.queryParameters = queryParameters;
+        try {
+            this.contentPath = new URI(null, null, this.contentPath, null).getRawPath();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
         buildHash();
     }
 
