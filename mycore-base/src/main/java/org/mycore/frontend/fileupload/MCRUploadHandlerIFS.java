@@ -75,6 +75,12 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     protected MCRPath rootDir;
 
+    public MCRUploadHandlerIFS(String documentID, String derivateID) {
+        super();
+        this.documentID = Objects.requireNonNull(documentID, "Document ID may not be 'null'.");
+        this.derivateID = derivateID;
+    }
+
     public MCRUploadHandlerIFS(String documentID, String derivateID, String returnURL) {
         super();
         this.url = Objects.requireNonNull(returnURL, "Return URL may not be 'null'.");
