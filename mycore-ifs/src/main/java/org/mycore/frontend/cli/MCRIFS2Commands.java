@@ -62,12 +62,12 @@ public class MCRIFS2Commands {
     public static void repairMcrdataXmlForProject(String content_store, String project_id) {
         ArrayList<String> derivates = getDetivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
-            repairMcrdataXmlForDreivate(content_store, derivate);
+            repairMcrdataXmlForDerivate(content_store, derivate);
         }
     }
 
     @MCRCommand(syntax = "repair mcrdata.xml in content store {0} for derivate {1}", help = "repair the entries in mcrdata.xml with data from content store {0} for derivate {1}")
-    public static void repairMcrdataXmlForDreivate(String content_store, String derivate_id) {
+    public static void repairMcrdataXmlForDerivate(String content_store, String derivate_id) {
         LOGGER.info("Start repair of mcrdata.xml for derivate " + derivate_id + " in store " + content_store);
         // check input;
         MCRObjectID mcr_derivate_id;
@@ -100,15 +100,15 @@ public class MCRIFS2Commands {
         LOGGER.info("Start check of MCRFSNODES for project " + project_id);
         ArrayList<String> derivates = getDetivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
-            checkMCRFSNODESForDreivate(content_store, derivate);
+            checkMCRFSNODESForDerivate(content_store, derivate);
         }
         LOGGER.info("Stop check of MCRFSNODES for project " + project_id);
     }
 
     @MCRCommand(syntax = "check mcrfsnodes of content store {0} for derivate {1}", help = "check the entries of MCRFSNODES with data from content store {0} for derivate {1}")
-    public static void checkMCRFSNODESForDreivate(String content_store, String derivate_id) {
+    public static void checkMCRFSNODESForDerivate(String content_store, String derivate_id) {
         LOGGER.info("Start check of MCRFSNODES for derivate " + derivate_id);
-        fixMCRFSNODESForDreivate(content_store, derivate_id, true);
+        fixMCRFSNODESForDerivate(content_store, derivate_id, true);
         LOGGER.info("Stop check of MCRFSNODES for derivate " + derivate_id);
     }
 
@@ -117,19 +117,19 @@ public class MCRIFS2Commands {
         LOGGER.info("Start repair of MCRFSNODES for project " + project_id);
         ArrayList<String> derivates = getDetivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
-            repairMCRFSNODESForDreivate(content_store, derivate);
+            repairMCRFSNODESForDerivate(content_store, derivate);
         }
         LOGGER.info("Stop repair of MCRFSNODES for project " + project_id);
     }
 
     @MCRCommand(syntax = "repair mcrfsnodes of content store {0} for derivate {1}", help = "repair the entries of MCRFSNODES with data from content store {0} for derivate {1}")
-    public static void repairMCRFSNODESForDreivate(String content_store, String derivate_id) {
+    public static void repairMCRFSNODESForDerivate(String content_store, String derivate_id) {
         LOGGER.info("Start repair of MCRFSNODES for derivate " + derivate_id);
-        fixMCRFSNODESForDreivate(content_store, derivate_id, false);
+        fixMCRFSNODESForDerivate(content_store, derivate_id, false);
         LOGGER.info("Stop repair of MCRFSNODES for derivate " + derivate_id);
     }
 
-    private static void fixMCRFSNODESForDreivate(String content_store, String derivate_id, boolean check_only) {
+    private static void fixMCRFSNODESForDerivate(String content_store, String derivate_id, boolean check_only) {
         // check input
         MCRObjectID mcr_derivate_id;
         try {
