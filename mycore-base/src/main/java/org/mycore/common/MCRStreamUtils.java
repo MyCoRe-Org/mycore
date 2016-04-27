@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.common;
 
@@ -16,7 +16,7 @@ import com.google.common.collect.Iterators;
 
 /**
  * Helper methods to handle common Stream use cases.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRStreamUtils {
@@ -38,7 +38,7 @@ public class MCRStreamUtils {
      * Short circuit for calling <code>flatten(node, subNodeSupplier, subNodeSupplier, t -&gt; true)</code>
      * @param node node that holds kind-of subtree.
      * @param subNodeSupplier a function that delivers subtree items of next level
-     * @param streamProvider a function that makes a Stream of a Collection<T>, usually <code>Collection::stream</code> or <code>Collection::parallelStream</code>
+     * @param streamProvider a function that makes a Stream of a Collection&lt;T&gt;, usually <code>Collection::stream</code> or <code>Collection::parallelStream</code>
      * @see #flatten(Object, Function, Function, Predicate)
      * @since 2016.04
      */
@@ -77,7 +77,7 @@ public class MCRStreamUtils {
      * </pre>
      * @param node first node the stream is made of
      * @param subNodeSupplier a function that delivers subtree items of next level
-     * @param streamProvider a function that makes a Stream of a Collection<T>, usually <code>Collection::stream</code> or <code>Collection::parallelStream</code>
+     * @param streamProvider a function that makes a Stream of a Collection&lt;T&gt;, usually <code>Collection::stream</code> or <code>Collection::parallelStream</code>
      * @param filter a predicate that filters the element of the next level
      * @since 2016.04
      */
