@@ -29,9 +29,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.links.MCRLINKHREF;
 import org.mycore.backend.jpa.links.MCRLINKHREFPK;
 import org.mycore.common.MCRPersistenceException;
@@ -84,13 +87,12 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         if (attr == null || (attr = attr.trim()).length() == 0) {
             attr = "";
         }
-
+        EntityManager entityMananger = MCREntityManagerProvider.getCurrentEntityManager();
         LOGGER.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
-        Session session = getSession();
-        MCRLINKHREF l = new MCRLINKHREF();
-        l.setKey(getKey(from, to, type));
-        l.setMcrattr(attr);
-        session.save(l);
+        MCRLINKHREF linkHref = new MCRLINKHREF();
+        linkHref.setKey(getKey(from, to, type));
+        linkHref.setMcrattr(attr);
+        entityMananger.merge(linkHref);
     }
 
     private static MCRLINKHREFPK getKey(String from, String to, String type) {
