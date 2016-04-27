@@ -75,6 +75,16 @@ public class MCRMODSEmbargoUtils {
      * @param objectId the {@link MCRObjectID}
      * @return the embargo or <code>null</code>
      */
+    public static String getEmbargo(final String objectId) {
+        return getEmbargo(MCRObjectID.getInstance(objectId));
+    }
+
+    /**
+     * Returns the embargo or <code>null</code> if none is set or is allowed to read.
+     * 
+     * @param objectId the {@link MCRObjectID}
+     * @return the embargo or <code>null</code>
+     */
     public static String getEmbargo(final MCRObjectID objectId) {
         if (!isReadAllowed(objectId)) {
             String embargo = getCachedEmbargo(objectId);
