@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -38,28 +38,28 @@ import org.mycore.urn.hibernate.MCRURN;
  * class handles URNs from the german subnamespace of NBN (national
  * bibliographic number), these URNs all start with urn:nbn:de:... More
  * information on persistent identifiers can be found at
- * 
+ *
  * http://www.persistent-identifier.de/
- * 
+ *
  * URNs are described by RFC 2141 and have the following syntax:
  * urn:[NID]:[SNID]-[NISS][Checksum] NID = namespace ID, in this implementation
  * always "nbn:de" SNID = subnamespace ID, a unique identifier for an
  * organization or public library that creates and assigns URNs within its
  * subnamespace NISS = namespace-specific string, a unique ID Checksum: all
  * nbn:de URNs end with one digit that is a checksum
- * 
+ *
  * Example: urn:nbn:de:465-miless-20060622-213404-0017
- * 
+ *
  * A MyCoRe systen can generate URNs for more than one subnamespace. There must
  * be one or more configurations that control the prefix (subnamespace) of
  * generated URNs and the algorithm used to build new NISS within that
  * subnamespace. Each configuration has a unique "subnamespace configuration ID"
  * in mycore.properties, and optional additional properties depending on the
  * implementation.
- * 
+ *
  * MCR.URN.SubNamespace.[ConfigID].Prefix=[URNPrefix], for example
  * MCR.URN.SubNamespace.Essen.Prefix=urn.nbn.de:hbz:465-
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Robert Stephan
  */
@@ -72,20 +72,20 @@ public class MCRURNManager {
 
     static {
         try {
-  
+
             store = (MCRURNStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
         } catch (Throwable t) {
             // TODO: handle exception
             LOGGER.error("Init error: ", t);
         }
     }
-  
+
     /** A map from configID to MCRNissBuilder objects */
     private static Hashtable<String, MCRNISSBuilder> builders = new Hashtable<String, MCRNISSBuilder>();
 
     /**
      * Builds a URN with a custom, given NISS.
-     * 
+     *
      * @param configID
      *            the ID of a subnamespace configuration in mycore.properties
      * @param niss
@@ -103,7 +103,7 @@ public class MCRURNManager {
 
     /**
      * Builds a URN using a MCRNISSBuilder object.
-     * 
+     *
      * @param configID
      *            the ID of a subnamespace configuration in mycore.properties
      * @return the complete URN including prefix, niss and calculated checksum
@@ -119,8 +119,13 @@ public class MCRURNManager {
             builders.put(configID, builder);
         }
 
-        String niss = builder.buildNISS();
-        return buildURN(configID, niss);
+        String urn = null;
+        String niss = null;
+        do {
+            niss = builder.buildNISS();
+            urn = buildURN(configID, niss);
+        } while (isAssigned(urn));
+        return urn;
     }
 
     /**
@@ -148,15 +153,15 @@ public class MCRURNManager {
         return store.hasURNAssigned(objId);
     }
 
-    /** 
-     * Assigns the given urn to the given derivate ID 
-     * @param urn 
+    /**
+     * Assigns the given urn to the given derivate ID
+     * @param urn
      *      the urn to assign
-     * @param derivateID 
+     * @param derivateID
      *      the id of the derivate
-     * @param path 
+     * @param path
      *      the path of the derivate in the internal filesystem
-     * @param filename 
+     * @param filename
      *      the filename
      */
     public static void assignURN(String urn, String derivateID, String path, String filename) {
@@ -167,13 +172,13 @@ public class MCRURNManager {
         assignURN(urn, path.getOwner(), path.getOwnerRelativePath());
     }
 
-    /** 
-     * Assigns the given urn to the given derivate ID 
-     * @param urn 
+    /**
+     * Assigns the given urn to the given derivate ID
+     * @param urn
      *      the urn to assign
-     * @param derivateID 
+     * @param derivateID
      *      the id of the derivate
-     * @param path 
+     * @param path
      *      the path of the derivate in the internal filesystem including file name
      */
     public static void assignURN(String urn, String derivateID, String path) {
@@ -183,7 +188,7 @@ public class MCRURNManager {
 
     /**
      * Retrieves the URN that is assigned to the given document ID
-     * 
+     *
      * @return the urn, or null if no urn is assigned to this ID
      */
     public static String getURNforDocument(String documentID) {
@@ -218,7 +223,7 @@ public class MCRURNManager {
 
     /**
      * Retrieves the document ID that is assigned to the given urn
-     * 
+     *
      * @return the ID, or null if no ID is assigned to this urn
      */
     public static String getDocumentIDforURN(String urn) {
@@ -243,15 +248,11 @@ public class MCRURNManager {
      * Create and Assign a new URN to the given Document
      * Ensure that new created URNs do not allready exist in URN store
      * @param documentID a MCRID
-     * @param configID - the configurationID of the URN Builder 
+     * @param configID - the configurationID of the URN Builder
      * @return the URN
      */
     public static synchronized String buildAndAssignURN(String documentID, String configID) {
-        String urn = null;
-        do {
-            urn = buildURN(configID);
-        } while (isAssigned(urn));
-
+        String urn = buildURN(configID);
         assignURN(urn, documentID);
         return urn;
     }
