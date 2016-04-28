@@ -258,6 +258,11 @@ public class MCRURNManager {
      * @return the URN
      */
     public static synchronized String buildAndAssignURN(String documentID, String configID) {
+        if(hasURNAssigned(documentID)){
+            String urn = getURNforDocument(documentID);
+            LOGGER.warn("Returning the already assign URN: "+ urn + " for document "+documentID+".");
+            return urn;
+        }
         String urn = buildURN(configID);
         assignURN(urn, documentID);
         return urn;
