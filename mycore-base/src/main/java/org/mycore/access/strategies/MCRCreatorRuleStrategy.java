@@ -23,8 +23,6 @@
 
 package org.mycore.access.strategies;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
@@ -36,13 +34,8 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.common.MCRCreatorCache;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 /**
  *
@@ -66,37 +59,14 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
     private static final Logger LOGGER = Logger.getLogger(MCRCreatorRuleStrategy.class);
 
     private static final String SUBMITTED_CATEGORY = MCRConfiguration.instance()
-        .getString("MCR.Access.Strategy.SubmittedCategory", "state:submitted");
+            .getString("MCR.Access.Strategy.SubmittedCategory", "state:submitted");
 
     private static final String CREATOR_ROLE = MCRConfiguration.instance().getString("MCR.Access.Strategy.CreatorRole",
-        "submitter");
+            "submitter");
 
     private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
     private static final MCRObjectTypeStrategy BASE_STRATEGY = new MCRObjectTypeStrategy();
-
-    private static LoadingCache<MCRObjectID, String> CREATOR_CACHE = CacheBuilder.newBuilder().weakKeys()
-        .maximumSize(5000).build(new CacheLoader<MCRObjectID, String>() {
-
-            @Override
-            public String load(MCRObjectID mcrObjectID) throws Exception {
-                MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
-                List<MCRMetadataVersion> versions = metadataManager.listRevisions(mcrObjectID);
-                if (versions != null && !versions.isEmpty()) {
-                    Collections.reverse(versions); //newest revision first
-                    for (MCRMetadataVersion version : versions) {
-                        //time machine: go back in history
-                        if (version.getType() == MCRMetadataVersion.CREATED) {
-                            LOGGER.info("Found creator " + version.getUser() + " in revision " + version.getRevision()
-                                + " of " + mcrObjectID);
-                            return version.getUser();
-                        }
-                    }
-                }
-                LOGGER.info("Could not get creator information.");
-                return null;
-            }
-        });
 
     /*
      * (non-Javadoc)
@@ -132,7 +102,7 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
 
     private static boolean isCurrentUserCreator(MCRObjectID mcrObjectID, MCRUserInformation currentUser) {
         try {
-            String creator = CREATOR_CACHE.get(mcrObjectID);
+            String creator = MCRCreatorCache.getCreator(mcrObjectID);
             return currentUser.getUserID().equals(creator);
         } catch (ExecutionException e) {
             LOGGER.error("Error while getting creator information.", e);

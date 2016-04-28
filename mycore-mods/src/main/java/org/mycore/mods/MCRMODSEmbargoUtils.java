@@ -27,12 +27,15 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.common.MCRCreatorCache;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -66,7 +69,7 @@ public class MCRMODSEmbargoUtils {
         }
 
         return MCRAccessManager.checkPermission(objectId, MCRAccessManager.PERMISSION_READ)
-                && MCRAccessManager.checkPermission(POOLPRIVILEGE_EMBARGO);
+                && (MCRAccessManager.checkPermission(POOLPRIVILEGE_EMBARGO) || isCurrentUserCreator(objectId));
     }
 
     /**
@@ -124,6 +127,16 @@ public class MCRMODSEmbargoUtils {
             return ed.isAfter(now);
         } catch (DateTimeException ex) {
             return embargoDate.compareTo(MCRISO8601Date.now().getISOString()) > 0;
+        }
+    }
+
+    private static boolean isCurrentUserCreator(final MCRObjectID objectId) {
+        try {
+            final String creator = MCRCreatorCache.getCreator(objectId);
+            return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(creator);
+        } catch (ExecutionException e) {
+            LOGGER.error("Error while getting creator information.", e);
+            return false;
         }
     }
 }
