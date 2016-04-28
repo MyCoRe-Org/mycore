@@ -2,6 +2,7 @@ package org.mycore.user2.login;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,13 +32,18 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
+        for (String attribute: Collections.list(req.getAttributeNames())){
+        	LOGGER.info("received "+attribute+": " + req.getAttribute(attribute)); 
+        }
         String msg = null;
-
+        
         String uid = (String) req.getAttribute("uid");
         String userId = uid != null ? uid : req.getRemoteUser();
+        LOGGER.info("received uid: " + uid);
+        LOGGER.info("received userId: " + userId);
 
         if (userId != null) {
-            final String realmId = userId.contains("@") ? userId.substring(userId.indexOf("@") + 1) : null;
+            final String realmId = userId.contains("@") ? userId.substring(userId.indexOf("@") + 1) : "shibboleth";
             if (realmId != null && MCRRealmFactory.getRealm(realmId) != null) {
                 userId = realmId != null ? userId.replace("@" + realmId, "") : userId;
 
