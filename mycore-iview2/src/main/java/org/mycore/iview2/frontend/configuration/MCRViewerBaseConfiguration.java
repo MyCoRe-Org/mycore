@@ -5,6 +5,7 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
@@ -37,6 +38,7 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         setProperty("i18nURL", MCRServlet.getServletBaseURL() + "MCRLocaleServlet/{lang}/component.iview2.*");
         setProperty("derivateURL", MCRServlet.getServletBaseURL() + "MCRFileNodeServlet/" + getDerivate(request) + "/");
         setProperty("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+        setProperty("adminMail", MCRConfiguration.instance().getString("MCR.Mail.Sender"));
 
         final String canvasOverviewEnabled = MCRIView2Tools.getIView2Property("canvas.overview.enabled");
         if(canvasOverviewEnabled != null){
