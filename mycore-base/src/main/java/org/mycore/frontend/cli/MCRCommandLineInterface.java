@@ -184,7 +184,9 @@ public class MCRCommandLineInterface {
         MCRSessionMgr.setCurrentSession(session);
 
         try {
+            session.beginTransaction();
             List<String> commandsReturned = knownCommands.invokeCommand(expandCommand(command));
+            session.commitTransaction();
             addCommandsToQueue(commandsReturned);
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
