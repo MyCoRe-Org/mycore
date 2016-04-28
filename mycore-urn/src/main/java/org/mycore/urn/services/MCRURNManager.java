@@ -126,7 +126,7 @@ public class MCRURNManager {
         do {
             niss = builder.buildNISS();
             if (niss.equals(niss2)) { // The niss doest'n change (missing counter?)
-            	throw new MCRException("Could not get unique NISS for URN.");
+            	throw new MCRException("Could not get unique NISS for URN. Possible reason: Missing counter in NISS Pattern.");
             }
             urn = buildURN(configID, niss);
             niss2=niss;
