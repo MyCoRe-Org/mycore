@@ -33,9 +33,9 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -62,12 +62,10 @@ import org.mycore.common.xml.MCRURIResolver;
  */
 public class MCRCommandLineInterface {
 
-    static Logger logger = Logger.getLogger(MCRCommandLineInterface.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The name of the system */
     private static String system = null;
-
-    private static boolean hibernateEnabled;
 
     /** A queue of commands waiting to be executed */
     protected static Vector<String> commandQueue = new Vector<String>();
@@ -80,6 +78,8 @@ public class MCRCommandLineInterface {
 
     private static MCRCommandManager knownCommands;
 
+    private static ThreadLocal<String> sessionId = new ThreadLocal<>();
+
     /**
      * The main method that either shows up an interactive command prompt or
      * reads a file containing a list of commands to be processed
@@ -89,7 +89,8 @@ public class MCRCommandLineInterface {
         //BUG: try to track down https://bamboo.mycore.de/browse/DP-TEST-234
         if (MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", null) == null) {
             try {
-                MCRConfiguration.instance().store(System.err, "I'm going die soon, this should be my gravestone quote:");
+                MCRConfiguration.instance().store(System.err,
+                    "I'm going die soon, this should be my gravestone quote:");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -162,11 +163,12 @@ public class MCRCommandLineInterface {
     }
 
     private static void initSession() {
-        hibernateEnabled = MCRHIBConnection.isEnabled();
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setCurrentIP("127.0.0.1");
         session.setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
         MCRSessionMgr.setCurrentSession(session);
+        sessionId.set(session.getID());
+        MCRSessionMgr.releaseCurrentSession();
     }
 
     /**
@@ -178,17 +180,15 @@ public class MCRCommandLineInterface {
      */
     protected static void processCommand(String command) {
 
-        MCRSession session = MCRSessionMgr.getCurrentSession();
+        MCRSession session = MCRSessionMgr.getSession(sessionId.get());
+        MCRSessionMgr.setCurrentSession(session);
 
         try {
-            session.beginTransaction();
             List<String> commandsReturned = knownCommands.invokeCommand(expandCommand(command));
-            session.commitTransaction();
             addCommandsToQueue(commandsReturned);
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
             rollbackTransaction(session);
-
             if (SKIP_FAILED_COMMAND) {
                 saveFailedCommand(command);
             } else {
@@ -198,7 +198,7 @@ public class MCRCommandLineInterface {
                 }
             }
         } finally {
-            clearSession(session);
+            MCRSessionMgr.releaseCurrentSession();
         }
     }
 
@@ -213,17 +213,9 @@ public class MCRCommandLineInterface {
         StrSubstitutor strSubstitutor = new StrSubstitutor(MCRConfiguration.instance().getPropertiesMap());
         String expandedCommand = strSubstitutor.replace(command);
         if (!expandedCommand.equals(command)) {
-            logger.info(command + " --> " + expandedCommand);
+            LOGGER.info(command + " --> " + expandedCommand);
         }
         return expandedCommand;
-    }
-
-    private static void clearSession(MCRSession session) {
-        if (hibernateEnabled && !session.isTransactionActive()) {
-            session.beginTransaction();
-            MCRHIBConnection.instance().getSession().clear();
-            session.commitTransaction();
-        }
     }
 
     private static void rollbackTransaction(MCRSession session) {
@@ -300,10 +292,10 @@ public class MCRCommandLineInterface {
      *            the filename
      */
     public static void show(String fname) throws Exception {
-        AtomicInteger ln=new AtomicInteger();
+        AtomicInteger ln = new AtomicInteger();
         System.out.println();
         Files.readAllLines(Paths.get(fname), Charset.defaultCharset())
-            .forEach(l->System.out.printf(Locale.ROOT,"%04d: %s",ln.incrementAndGet(),l));
+            .forEach(l -> System.out.printf(Locale.ROOT, "%04d: %s", ln.incrementAndGet(), l));
         System.out.println();
     }
 
