@@ -187,15 +187,27 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     }
 
     @Test
-    public void deleteCategory() {
+    public void deleteRootCategory() {
         addWorldClassification();
-        DAO.deleteCategory(category.getId());
+        testDelete(category);
+    }
+
+    @Test
+    public void deleteSubCategory() {
+        addWorldClassification();
+        MCRCategory deleteCategory = category.getChildren().get(0);
+        assertTrue("Sub category does not exist.", DAO.exist(deleteCategory.getId()));
+        testDelete(deleteCategory);
+    }
+
+    private void testDelete(MCRCategory deleteCategory) {
+        DAO.deleteCategory(deleteCategory.getId());
         startNewTransaction();
         // check if classification is present
-        assertFalse("Category is not deleted: " + category.getId(), DAO.exist(category.getId()));
+        assertFalse("Category is not deleted: " + deleteCategory.getId(), DAO.exist(deleteCategory.getId()));
         // check if any subcategory is present
-        assertFalse("Category is not deleted: " + category.getChildren().get(0).getId(),
-            DAO.exist(category.getChildren().get(0).getId()));
+        assertFalse("Category is not deleted: " + deleteCategory.getChildren().get(0).getId(),
+            DAO.exist(deleteCategory.getChildren().get(0).getId()));
     }
 
     @Test

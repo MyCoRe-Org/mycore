@@ -149,6 +149,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         category.detachFromParent();
         entityManager.remove(category);
         if (parent != null) {
+            entityManager.flush();
             LOGGER.debug("Left: " + category.getLeft() + " Right: " + category.getRight());
             // always add +1 for the currentNode
             int nodes = 1 + (category.getRight() - category.getLeft()) / 2;
@@ -640,20 +641,22 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static void updateLeftRightValue(EntityManager entityManager, String classID, int left,
         final int increment) {
-        LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
-        Query leftQuery = entityManager
-            .createNamedQuery(NAMED_QUERY_NAMESPACE + "updateLeft")
-            .setParameter("left", left)
-            .setParameter("increment", increment)
-            .setParameter("classID", classID);
-        int leftChanges = leftQuery.executeUpdate();
-        Query rightQuery = entityManager
-            .createNamedQuery(NAMED_QUERY_NAMESPACE + "updateRight")
-            .setParameter("left", left)
-            .setParameter("increment", increment)
-            .setParameter("classID", classID);
-        int rightChanges = rightQuery.executeUpdate();
-        LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
+        withoutFlush(entityManager, true, e -> {
+            LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
+            Query leftQuery = e
+                .createNamedQuery(NAMED_QUERY_NAMESPACE + "updateLeft")
+                .setParameter("left", left)
+                .setParameter("increment", increment)
+                .setParameter("classID", classID);
+            int leftChanges = leftQuery.executeUpdate();
+            Query rightQuery = e
+                .createNamedQuery(NAMED_QUERY_NAMESPACE + "updateRight")
+                .setParameter("left", left)
+                .setParameter("increment", increment)
+                .setParameter("classID", classID);
+            int rightChanges = rightQuery.executeUpdate();
+            LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
+        });
     }
 
     /**
