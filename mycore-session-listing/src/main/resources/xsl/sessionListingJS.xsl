@@ -35,14 +35,8 @@
         <table id="sessionListingTable" class="table">
           <tr>
             <th>
-              Login
+              Login (Name)
               <a href="javascript:mycore.session.listing.sortByLogin()">
-                <i class="fa fa-sort "></i>
-              </a>
-            </th>
-            <th>
-              Name
-              <a href="javascript:mycore.session.listing.sortByName()">
                 <i class="fa fa-sort "></i>
               </a>
             </th>
@@ -65,8 +59,8 @@
               </a>
             </th>
             <th>
-              angemeldet seit
-              <a href="javascript:mycore.session.listing.sortByLoginTime()">
+              letzter Zugriff vor
+              <a href="javascript:mycore.session.listing.sortByTimeSinceLastAccess()">
                 <i class="fa fa-sort "></i>
               </a>
             </th>

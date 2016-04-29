@@ -36,8 +36,7 @@ mycore.session.listing = {
     contentDiv.removeClass("hidden");
 
     var dateOptions = {
-        weekday: "long", year: "numeric", month: "short",
-        day: "numeric", hour: "2-digit", minute: "2-digit"
+        year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
     };
     var locale = "de-DE";
 
@@ -47,12 +46,11 @@ mycore.session.listing = {
     // print table
     for(var session of mycore.session.listing.filteredSessions) {
       var tr = $("<tr id='" + session.id + "' class='table-session-entry'>" +
-          "<td>" + session.login + "</td>" +
-          "<td>" + (session.realName != null ? session.realName : "") + "</td>" +
+          "<td>" + session.login + (session.realName != null ? (" (" + session.realName + ")") : "") +  "</td>" +
           "<td>" + session.ip + (session.hostname != null ? ("(" + session.hostname + ")") : "") + "</td>" +
           "<td>" + new Date(session.createTime).toLocaleDateString(locale, dateOptions) + "</td>" +
           "<td>" + new Date(session.lastAccessTime).toLocaleDateString(locale, dateOptions)  + "</td>" +
-          "<td>" + new Date(session.loginTime).toLocaleDateString(locale, dateOptions)  + "</td>" +
+          "<td>" + ((new Date().getTime() - session.lastAccessTime) / (1000 * 60)).toFixed(2) + " Minuten" + "</td>" +
           "<td align='center'>" +
             "<div style='height: 15px; width: 15px; background-color: " + session.constructingStacktrace.color + "; border: 1px solid #999; cursor: pointer;'" +
             		  " onclick='mycore.session.listing.showStacktrace(\"" + session.id + "\");'" +
@@ -94,16 +92,6 @@ mycore.session.listing = {
     mycore.session.listing.render();
   },
 
-  sortByName: function() {
-    mycore.session.listing.filteredSessions.sort(function(s1, s2) {
-      if(s1.realName == null || s2.realName == null) {
-        return 0;
-      }
-      return s1.realName.localeCompare(s2.realName);
-    });
-    mycore.session.listing.render();
-  },
-
   sortByIP: function() {
     mycore.session.listing.filteredSessions.sort(function(s1, s2) {
       return s1.ip.localeCompare(s2.ip);
@@ -124,10 +112,11 @@ mycore.session.listing = {
     });
     mycore.session.listing.render();
   },
-  
-  sortByLoginTime: function() {
+
+  sortByTimeSinceLastAccess: function() {
+    var currentTime = newDate().getTime();
     mycore.session.listing.filteredSessions.sort(function(s1, s2) {
-      return s1.loginTime - s2.loginTime;
+      return (currentTime - s1.lastAccessTime) - (currentTime - s2.lastAccessTime);
     });
     mycore.session.listing.render();
   },
