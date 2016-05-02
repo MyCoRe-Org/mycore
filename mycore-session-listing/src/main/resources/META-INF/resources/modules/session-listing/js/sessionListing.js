@@ -108,7 +108,7 @@ mycore.session.listing = {
   
   sortByLastAccess: function() {
     mycore.session.listing.filteredSessions.sort(function(s1, s2) {
-      return s1.lastAccessTime - s2.lastAccessTime;
+      return s2.lastAccessTime - s1.lastAccessTime;
     });
     mycore.session.listing.render();
   },
