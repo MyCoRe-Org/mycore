@@ -114,7 +114,7 @@ mycore.session.listing = {
   },
 
   sortByTimeSinceLastAccess: function() {
-    var currentTime = newDate().getTime();
+    var currentTime = new Date().getTime();
     mycore.session.listing.filteredSessions.sort(function(s1, s2) {
       return (currentTime - s1.lastAccessTime) - (currentTime - s2.lastAccessTime);
     });
