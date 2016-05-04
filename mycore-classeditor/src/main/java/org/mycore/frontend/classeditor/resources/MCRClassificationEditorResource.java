@@ -3,8 +3,8 @@ package org.mycore.frontend.classeditor.resources;
 import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -13,12 +13,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
@@ -302,8 +300,8 @@ public class MCRClassificationEditorResource {
             boolean isAdded = isAdded(jsonObject);
             if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
                 // an added category already exist -> throw conflict error
-                throw new WebApplicationException(Response.status(Status.CONFLICT)
-                    .entity(buildJsonError("duplicateID", mcrCategoryID)).build());
+                throw new WebApplicationException(
+                    Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID)).build());
             }
 
             MCRCategoryID newParentID = category.getParentID();
@@ -389,36 +387,26 @@ public class MCRClassificationEditorResource {
     @GET
     @Path("filter/{text}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response filter(@PathParam("text") String text) throws SolrServerException, IOException {
+    public Response filter(@PathParam("text") String text) {
         SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
-        List<List<String>> ids = MCRSolrSearchUtils.list(solrClient, "*" + text + "*",
-            new MCRSolrSearchUtils.DocumentHandler<List<String>>() {
-                @Override
-                public List<String> getResult(SolrDocument document) {
-                    List<String> ids = new ArrayList<String>();
-                    ids.add(document.getFirstValue("id").toString());
-                    Collection<Object> fieldValues = document.getFieldValues("ancestors");
-                    if (fieldValues != null) {
-                        for (Object anc : fieldValues) {
-                            ids.add(anc.toString());
-                        }
-                    }
-                    return ids;
-                }
+        ModifiableSolrParams p = new ModifiableSolrParams();
+        p.set("q", "*" + text + "*");
+        p.set("fl", "id,ancestors");
 
-                @Override
-                public String fl() {
-                    return "id,ancestors";
-                }
-            });
-        Set<String> idSet = new HashSet<>();
-        for (List<String> internalList : ids) {
-            idSet.addAll(internalList);
-        }
         JsonArray docList = new JsonArray();
-        for (String id : idSet) {
-            docList.add(new JsonPrimitive(id));
-        }
+        MCRSolrSearchUtils.stream(solrClient, p).flatMap(document -> {
+            List<String> ids = new ArrayList<String>();
+            ids.add(document.getFirstValue("id").toString());
+            Collection<Object> fieldValues = document.getFieldValues("ancestors");
+            if (fieldValues != null) {
+                for (Object anc : fieldValues) {
+                    ids.add(anc.toString());
+                }
+            }
+            return ids.stream();
+        }).distinct().map(id -> new JsonPrimitive(id)).forEach(jp -> {
+            docList.add(jp);
+        });
         return Response.ok().entity(docList.toString()).build();
     }
 
