@@ -588,6 +588,23 @@ public class MCRRestAPIObjectsHelper {
             return rae.getError().createHttpResponse();
         }
     }
+    
+    public static String retrieveMaindocURL(String mcrIDString, String derIDString) throws IOException {
+        try {
+            MCRObject mcrObj = retrieveMCRObject(mcrIDString);
+            MCRDerivate derObj = retrieveMCRDerivate(mcrObj, derIDString);
+            String maindoc = derObj.getDerivate().getInternals().getMainDoc();
+
+            String baseURL = MCRFrontendUtil.getBaseURL()
+                + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
+            baseURL = baseURL.replace("${mcrid}", mcrObj.getId().toString()).replace("${derid}",
+                derObj.getId().toString());
+
+            return baseURL + maindoc;
+        } catch (MCRRestAPIException rae) {
+            return null;
+        }
+    }
 
     private static Response response(String response, String type, Date lastModified) {
         byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);

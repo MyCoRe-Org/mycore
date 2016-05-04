@@ -23,6 +23,8 @@
 package org.mycore.restapi.v1;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -170,5 +172,25 @@ public class MCRRestAPIObjects {
         } catch (IOException e) {
             return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
         }
+    }
+    
+    /** redirects to the maindoc of the given derivate 
+    *
+    * No Parameter
+    * 
+    */
+    @GET
+    @Path("/{mcrid}/derivates/{derid}/open")
+    public Response listContents(@Context UriInfo info, @Context Request request, 
+        @PathParam("mcrid") String mcrID, @PathParam("derid") String derID){
+        try {
+            String url = MCRRestAPIObjectsHelper.retrieveMaindocURL(mcrID,  derID);
+            if(url!=null){
+                return Response.seeOther(new URI(url)).build();
+            }
+        } catch (IOException | URISyntaxException e) {
+            return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "A problem occurred while opening maindoc from derivate "+derID, e.getMessage()).createHttpResponse();
+        }
+        return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "A problem occurred while opening maindoc from derivate "+derID, "").createHttpResponse();
     }
 }
