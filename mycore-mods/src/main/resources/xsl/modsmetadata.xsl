@@ -2,8 +2,9 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport"
   xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcr="http://www.mycore.org/"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:daia="http://ws.gbv.de/daia/"
-  exclude-result-prefixes="xalan xlink mcr mcrxsl i18n acl mods mcrmods daia"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:ns1="http://rdfs.org/ns/void#"
+  exclude-result-prefixes="xalan xlink mcr mcrxsl i18n acl mods mcrmods rdf ns1"
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.Mods.SherpaRomeo.ApiKey" select="''" />
@@ -705,17 +706,10 @@
                     <xsl:value-of select="$link" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:variable name="daia">
-                      <!-- as workaround use daia xml, since rdf/xml for ppn uri works, see https://github.com/gbv/gbvdoc/issues/13 -->
-                      <xsl:value-of select="document(concat('http://daia.gbv.de/?id=',$link,'&amp;format=xml'))/daia:daia/daia:document/@href" />
-                    </xsl:variable>
+                    <xsl:variable name="uriResolved" select="document(concat($link,'?format=xml'))/rdf:RDF/rdf:Description/ns1:page/@rdf:resource" />
                     <xsl:choose>
-                      <xsl:when test="string-length($daia) &gt; 0">
-                        <xsl:value-of select="$daia" />
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$link" />
-                      </xsl:otherwise>
+                      <xsl:when test="string-length($uriResolved) &gt; 0"><xsl:value-of select="$uriResolved" /></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$link" /></xsl:otherwise>
                     </xsl:choose>
                   </xsl:otherwise>
                 </xsl:choose>
