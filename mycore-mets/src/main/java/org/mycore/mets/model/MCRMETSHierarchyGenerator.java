@@ -165,7 +165,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
                     directories.put(path, attrs);
                 } else {
                     String contentType = MCRContentTypes.probeContentType(path);
-                    if(contentType.startsWith("image")) {
+                    if (contentType.startsWith("image")) {
                         files.put(path, attrs);
                     }
                 }
@@ -268,7 +268,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
                         if (physicalDiv != null) {
                             String physicalDivId = physicalDiv.getId();
                             List<String> logChildDivIDs = this.structLinkMap.get(physicalDivId);
-                            if(logChildDivIDs == null){
+                            if (logChildDivIDs == null) {
                                 logChildDivIDs = new ArrayList<>();
                             }
 
@@ -304,7 +304,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         // has link
         String logicalDivId = logicalDiv.getId();
         for (List<String> logivalDivIDs : structLinkMap.values()) {
-            if(logivalDivIDs.contains(logicalDivId)){
+            if (logivalDivIDs.contains(logicalDivId)) {
                 return true;
             }
         }
@@ -379,20 +379,16 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             // return if its no derivate
             if (!(mi instanceof MCRMetaDerivateLink))
                 continue;
-            // return if the href is null
-            String href = ((MCRMetaDerivateLink) mi).getXLinkHref();
-            if (href == null)
+            MCRMetaDerivateLink link = (MCRMetaDerivateLink) mi;
+            if (!this.mcrDer.getId().equals(MCRObjectID.getInstance(link.getOwner())))
                 continue;
-            // return if the href doesn't contain the split slash
-            int indexOfSlash = href.indexOf("/");
-            if (indexOfSlash == -1)
-                continue;
-            // return if its the wrong derivate
-            String derIdAsString = href.substring(0, indexOfSlash);
-            if (!this.mcrDer.getId().equals(MCRObjectID.getInstance(derIdAsString)))
-                continue;
-            // finally get the linked file
-            return href.substring(indexOfSlash + 1);
+            // get the linked file
+            try {
+                return link.getPath();
+            } catch (URISyntaxException uriExc) {
+                LOGGER.warn("Unable to get linked file for " + mcrObj.getId()
+                    + " because the link path is not URI decodable " + link.getXLinkHref(), uriExc);
+            }
         }
         return null;
     }

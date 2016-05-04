@@ -1,5 +1,7 @@
 package org.mycore.datamodel.metadata;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCRMetaDerivateLink extends MCRMetaLink {
@@ -29,6 +32,11 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     public void setLinkToFile(MCRPath file) {
         String owner = file.getOwner();
         String path = file.subpath(0, file.getNameCount() - 1).toString();
+        try {
+            path = MCRXMLFunctions.encodeURIPath(path);
+        } catch (URISyntaxException uriExc) {
+            LOGGER.warn("Unable to encode URI path " + path, uriExc);
+        }
         super.href = owner + '/' + path;
     }
 
@@ -61,13 +69,55 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         return elm;
     }
 
-    public MCRPath getLinkedFile() {
+    /**
+     * Returns the owner of this derivate link. In most cases this is
+     * the derivate id itself.
+     * 
+     * @return the owner of this derivate link.
+     */
+    public String getOwner() {
         int index = super.href.indexOf('/');
-        if (index < 0)
+        if (index < 0) {
             return null;
-        String owner = super.href.substring(0, index);
-        String path = super.href.substring(index);
-        return MCRPath.getPath(owner, path);
+        }
+        return super.href.substring(0, index);
+    }
+
+    /**
+     * Returns the URI decoded path of this derivate link. Use {@link #getRawPath()}
+     * if you want the URI encoded path.
+     * 
+     * @return path of this derivate link
+     * @throws URISyntaxException the path couldn't be decoded
+     */
+    public String getPath() throws URISyntaxException {
+        return new URI(getRawPath()).getPath();
+    }
+
+    /**
+     * Returns the raw path of this derivate link. Be aware that
+     * this path is URI encoded. Use {@link #getPath()} if you want
+     * the URI decoded path.
+     * 
+     * @return URI encoded path
+     */
+    public String getRawPath() {
+        int index = super.href.indexOf('/');
+        if (index < 0) {
+            return null;
+        }
+        return super.href.substring(index);
+    }
+
+    /**
+     * Returns the {@link MCRPath} to this derivate link.
+     * 
+     * @return path to this derivate link
+     * @throws URISyntaxException the path part of this derivate link couldn't be decoded because
+     *           its an invalid URI
+     */
+    public MCRPath getLinkedFile() throws URISyntaxException {
+        return MCRPath.getPath(getOwner(), getPath());
     }
 
     @Override
@@ -75,11 +125,17 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         if (!super.isValid()) {
             return false;
         }
-        MCRPath linkedFile = getLinkedFile();
-        if (linkedFile == null || !Files.exists(linkedFile)) {
-            LOGGER.warn("File not found: " + super.href);
+        try {
+            MCRPath linkedFile = getLinkedFile();
+            if (linkedFile == null || !Files.exists(linkedFile)) {
+                LOGGER.warn("File not found: " + super.href);
+                return false;
+            }
+        } catch (Exception exc) {
+            LOGGER.warn("Unable to validate derivate link " + getXLinkHref(), exc);
             return false;
         }
         return true;
     }
+
 }
