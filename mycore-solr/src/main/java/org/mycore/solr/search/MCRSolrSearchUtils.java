@@ -178,7 +178,7 @@ public abstract class MCRSolrSearchUtils {
 
         @Override
         public int characteristics() {
-            return Spliterator.SIZED | Spliterator.SUBSIZED | Spliterator.CONCURRENT;
+            return Spliterator.SIZED | Spliterator.SUBSIZED | Spliterator.ORDERED;
         }
     }
 
