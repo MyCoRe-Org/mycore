@@ -705,8 +705,18 @@
                     <xsl:value-of select="$link" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <!-- as workaround use daia xml, since rdf/xml for ppn uri works, see https://github.com/gbv/gbvdoc/issues/13 -->
-                    <xsl:value-of select="document(concat('http://daia.gbv.de/?id=',$link,'&amp;format=xml'))/daia:daia/daia:document/@href" />
+                    <xsl:variable name="daia">
+                      <!-- as workaround use daia xml, since rdf/xml for ppn uri works, see https://github.com/gbv/gbvdoc/issues/13 -->
+                      <xsl:value-of select="document(concat('http://daia.gbv.de/?id=',$link,'&amp;format=xml'))/daia:daia/daia:document/@href" />
+                    </xsl:variable>
+                    <xsl:choose>
+                      <xsl:when test="string-length($daia) &gt; 0">
+                        <xsl:value-of select="$daia" />
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$link" />
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:attribute>
