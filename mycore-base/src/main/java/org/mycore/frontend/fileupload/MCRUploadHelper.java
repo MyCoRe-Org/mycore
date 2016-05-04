@@ -24,8 +24,10 @@
 package org.mycore.frontend.fileupload;
 
 import java.io.File;
+import java.nio.CharBuffer;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -127,7 +129,9 @@ public abstract class MCRUploadHelper {
         if (getOSIllegalCharacterStream(pathElement).findAny().isPresent()) {
             throw new MCRException("Path element " + pathElement + " contains illegal characters: "
                 + getOSIllegalCharacterStream(pathElement)
-                    .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append));
+                    .mapToObj(Character::toChars)
+                    .map(CharBuffer::wrap)
+                    .collect(Collectors.joining("', '","'","'")));
         }
     }
 
