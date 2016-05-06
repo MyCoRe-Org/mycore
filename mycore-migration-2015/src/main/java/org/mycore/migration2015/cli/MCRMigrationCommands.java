@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -145,11 +146,12 @@ public class MCRMigrationCommands {
 
         // store the mcr object if its changed
         if (changedObject) {
-            try {
-                MCRMetadataManager.update(new MCRObject(xml));
-            } catch (MCRPersistenceException | MCRActiveLinkException | MCRAccessException e) {
-                LOGGER.error("Unable to fix derivate link of " + objectID + " because storing went wrong", e);
-            }
+            // we use MCRXMLMetadataMananger because we don't want to validate the old mcr object
+            MCRXMLMetadataManager.instance().update(objectID, xml, new Date());
+            // manually fire update event
+            MCRObject newObject = MCRMetadataManager.retrieveMCRObject(objectID);
+            newObject.setImportMode(true);
+            MCRMetadataManager.fireUpdateEvent(newObject);
         }
     }
 
