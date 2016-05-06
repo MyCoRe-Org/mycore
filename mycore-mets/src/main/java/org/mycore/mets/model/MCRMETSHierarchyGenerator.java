@@ -1,7 +1,6 @@
 package org.mycore.mets.model;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -12,17 +11,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaElement;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -247,10 +248,9 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      */
     private void createLogicalStruct(MCRObject parentObject, LogicalDiv parentLogicalDiv) {
         // run through all children
-        List<MCRMetaLinkID> links = getChildren(parentObject);
-        for (int i = 0; i < links.size(); i++) {
-            MCRMetaLinkID linkId = links.get(i);
-            MCRObjectID childId = MCRObjectID.getInstance(linkId.getXLinkHref());
+        List<MCRObjectID> childrenIds = getChildren(parentObject);
+        for (int i = 0; i < childrenIds.size(); i++) {
+            MCRObjectID childId = childrenIds.get(i);
             MCRObject childObject = MCRMetadataManager.retrieveMCRObject(childId);
             // create new logical sub div
             String id = "log_" + childId.toString();
@@ -258,38 +258,35 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             // add to parent
             parentLogicalDiv.add(logicalChildDiv);
             // check if a derivate link exists and get the linked file
-            String linkedFile = getLinkedFile(childObject);
-            if (linkedFile != null) {
-                try {
-                    String uriEncodedFile = new URI(null, linkedFile, null).toString();
-                    String fileId = getFileId(uriEncodedFile);
-                    if (fileId != null) {
-                        PhysicalSubDiv physicalDiv = getPhysicalDiv(fileId);
-                        if (physicalDiv != null) {
-                            String physicalDivId = physicalDiv.getId();
-                            List<String> logChildDivIDs = this.structLinkMap.get(physicalDivId);
-                            if (logChildDivIDs == null) {
-                                logChildDivIDs = new ArrayList<>();
-                            }
-
-                            logChildDivIDs.add(logicalChildDiv.getId());
-                            this.structLinkMap.put(physicalDivId, logChildDivIDs);
-                        }
+            Optional<String> linkedFileOptional = getLinkedFile(childObject);
+            linkedFileOptional.flatMap(linkedFile -> getFileId(linkedFile)).ifPresent(fileId -> {
+                PhysicalSubDiv physicalDiv = getPhysicalDiv(fileId);
+                if (physicalDiv != null) {
+                    String physicalDivId = physicalDiv.getId();
+                    List<String> logChildDivIDs = this.structLinkMap.get(physicalDivId);
+                    if (logChildDivIDs == null) {
+                        logChildDivIDs = new ArrayList<>();
                     }
-                } catch (Exception exc) {
-                    LOGGER.error("", exc);
+                    logChildDivIDs.add(logicalChildDiv.getId());
+                    this.structLinkMap.put(physicalDivId, logChildDivIDs);
                 }
-            }
+            });
             // do recursive call for children
             createLogicalStruct(childObject, logicalChildDiv);
         }
     }
 
     /**
-     * Get children objects from parentObject
+     * Returns all children id's of this MCRObject.
+     * 
+     * @param parentObject the mycore object
      */
-    protected List<MCRMetaLinkID> getChildren(MCRObject parentObject) {
-        return parentObject.getStructure().getChildren();
+    protected List<MCRObjectID> getChildren(MCRObject parentObject) {
+        return parentObject.getStructure()
+            .getChildren()
+            .stream()
+            .map(link -> MCRObjectID.getInstance(link.getXLinkHref()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -339,14 +336,22 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         return structLink;
     }
 
-    private String getFileId(String uriEncodedLinkedFile) {
-        if (uriEncodedLinkedFile == null)
-            return null;
+    /**
+     * Runs through all USE="MASTER" files and tries to find the corresponding
+     * mets:file @ID.
+     * 
+     * @param uriEncodedLinkedFile the file to find
+     * @return the fileSec @ID
+     */
+    private Optional<String> getFileId(String uriEncodedLinkedFile) {
         FileGrp masterGroup = this.fileSection.getFileGroup(FileGrp.USE_MASTER);
-        for (File f : masterGroup.getFileList())
-            if (uriEncodedLinkedFile.equals(f.getFLocat().getHref()))
-                return f.getId();
-        return null;
+        return masterGroup.getFileList().stream().filter(file -> {
+            String href = file.getFLocat().getHref();
+            boolean equals = href.equals(uriEncodedLinkedFile);
+            boolean equalsWithoutSlash = uriEncodedLinkedFile.startsWith("/")
+                && href.equals(uriEncodedLinkedFile.substring(1));
+            return equals || equalsWithoutSlash;
+        }).map(File::getId).findFirst();
     }
 
     /**
@@ -366,31 +371,22 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     }
 
     /**
-     * Returns the file name of a derivate link.
+     * Returns the URI encoded file path of the first derivate link.
      * 
      * @param mcrObj object which contains the derivate link
      */
-    protected String getLinkedFile(MCRObject mcrObj) {
+    protected Optional<String> getLinkedFile(MCRObject mcrObj) {
         MCRMetaElement me = mcrObj.getMetadata().getMetadataElement(getEnclosingDerivateLinkName());
         // no derivate link
-        if (me == null)
-            return null;
-        for (Object mi : me) {
-            // return if its no derivate
-            if (!(mi instanceof MCRMetaDerivateLink))
-                continue;
-            MCRMetaDerivateLink link = (MCRMetaDerivateLink) mi;
-            if (!this.mcrDer.getId().equals(MCRObjectID.getInstance(link.getOwner())))
-                continue;
-            // get the linked file
-            try {
-                return link.getPath();
-            } catch (URISyntaxException uriExc) {
-                LOGGER.warn("Unable to get linked file for " + mcrObj.getId()
-                    + " because the link path is not URI decodable " + link.getXLinkHref(), uriExc);
-            }
+        if (me == null) {
+            return Optional.empty();
         }
-        return null;
+        return StreamSupport.stream(me.spliterator(), false)
+            .filter(metaInterface -> metaInterface instanceof MCRMetaDerivateLink)
+            .map(MCRMetaDerivateLink.class::cast)
+            .filter(link -> this.mcrDer.getId().equals(MCRObjectID.getInstance(link.getOwner())))
+            .map(MCRMetaDerivateLink::getRawPath)
+            .findFirst();
     }
 
     /**
