@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -32,6 +33,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -95,13 +97,12 @@ public class MCRMigrationCommands {
 
     @MCRCommand(syntax = "fix invalid derivate links {0} for {1}", help = "Fixes the paths of all derivate links "
         + "({0} -> xpath -> e.g. /mycoreobject/metadata/derivateLinks/derivateLink) for object {1}. (MCR-1267)", order = 15)
-    public static void fixDerivateLinks(String xpath, String id) {
+    public static void fixDerivateLinks(String xpath, String id) throws IOException, JDOMException, SAXException {
         // get mcr object
         MCRObjectID objectID = MCRObjectID.getInstance(id);
-        MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
 
         // find derivate links
-        Document xml = mcrObject.createXML();
+        Document xml = MCRXMLMetadataManager.instance().retrieveXML(objectID);
         Element mcrObjectXML = xml.getRootElement();
         XPathExpression<Element> expression = XPathFactory.instance().compile(xpath, Filters.element());
         List<Element> derivateLinkElements = expression.evaluate(mcrObjectXML);
