@@ -83,14 +83,38 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     @Override
     public synchronized Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
         long startTime = System.currentTimeMillis();
+        String derivateId = dir.getOwner();
+        setup(derivateId);
+        Mets mets = createMets(dir, ignoreNodes);
+        LOGGER.info(
+            "mets creation for derivate " + derivateId + " took " + (System.currentTimeMillis() - startTime) + "ms!");
+        return mets;
+    }
+
+    /**
+     * Initializes the derivate and the root object.
+     * 
+     * @param derivateId the derivate id to setup
+     */
+    protected void setup(String derivateId) {
         // get derivate
-        MCRObjectID derId = MCRObjectID.getInstance(dir.getOwner());
+        MCRObjectID derId = MCRObjectID.getInstance(derivateId);
         this.mcrDer = MCRMetadataManager.retrieveMCRDerivate(derId);
         // get mycore object
         MCRObjectID objId = this.mcrDer.getDerivate().getMetaLink().getXLinkHrefID();
         this.rootObj = MCRMetadataManager.retrieveMCRObject(objId);
+    }
 
-        LOGGER.info("create mets for derivate " + derId.toString() + "...");
+    /**
+     * Does the mets creation.
+     * 
+     * @param dir
+     * @param ignoreNodes
+     * @return
+     * @throws IOException
+     */
+    protected Mets createMets(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
+        LOGGER.info("create mets for derivate " + this.mcrDer.getId().toString() + "...");
 
         this.structLinkMap = new HashMap<String, List<String>>();
 
@@ -110,10 +134,6 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         mets.addStructMap(this.physicalStructMap);
         mets.addStructMap(this.logicalStructMap);
         mets.setStructLink(this.structLink);
-
-        LOGGER.info("mets creation for derivate " + derId.toString() + " took "
-            + (System.currentTimeMillis() - startTime) + "ms!");
-
         return mets;
     }
 
