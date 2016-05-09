@@ -38,7 +38,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exc) {
-        LOGGER.error(exc);
+        LOGGER.warn(() -> "Error while processing request " + request.getRequestURI(), exc);
         Response response = getResponse(exc);
         if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
             // try to return a html error page
@@ -49,10 +49,13 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
                 int status = response.getStatus();
                 String source = exc.getStackTrace().length > 0 ? exc.getStackTrace()[0].toString() : null;
                 Document errorPageDocument = MCRErrorServlet.buildErrorPage(exc.getMessage(), status,
-                                                                            request.getRequestURI(), null, source, exc);
+                    request.getRequestURI(), null, source, exc);
                 MCRContent result = MCRJerseyUtil.transform(errorPageDocument, request);
-                return Response.serverError().entity(result.getInputStream())
-                               .type(MediaType.valueOf(result.getMimeType())).status(status).build();
+                return Response.serverError()
+                    .entity(result.getInputStream())
+                    .type(MediaType.valueOf(result.getMimeType()))
+                    .status(status)
+                    .build();
             } catch (Exception transformException) {
                 return Response.status(Status.INTERNAL_SERVER_ERROR).entity(transformException).build();
             } finally {
