@@ -1,5 +1,7 @@
 package org.mycore.frontend.jersey.resources;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
@@ -26,6 +28,8 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
+    private static Logger LOGGER = LogManager.getLogger();
+
     @Context
     HttpHeaders headers;
 
@@ -34,6 +38,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exc) {
+        LOGGER.error(exc);
         Response response = getResponse(exc);
         if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
             // try to return a html error page
