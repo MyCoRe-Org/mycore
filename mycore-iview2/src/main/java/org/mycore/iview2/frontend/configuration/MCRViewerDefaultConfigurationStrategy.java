@@ -24,7 +24,7 @@ public class MCRViewerDefaultConfigurationStrategy implements MCRViewerConfigura
     protected boolean isPDF(HttpServletRequest request) {
         // well, this is the best test to check the type, for sure!
         String filePath = MCRViewerConfiguration.getFilePath(request);
-        return filePath.toLowerCase(Locale.ROOT).endsWith(".pdf");
+        return filePath != null && filePath.toLowerCase(Locale.ROOT).endsWith(".pdf");
     }
 
     protected MCRViewerConfiguration getPDF(HttpServletRequest request) {
