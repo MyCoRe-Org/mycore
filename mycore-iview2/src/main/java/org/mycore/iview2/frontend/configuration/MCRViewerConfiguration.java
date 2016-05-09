@@ -111,7 +111,8 @@ public class MCRViewerConfiguration {
     }
 
     /**
-     * Helper method to get the derivate id of the given request.
+     * Helper method to get the derivate id of the given request. Returns null
+     * if no derivate identifier could be found in the request object.
      * 
      * @param request http request
      * @return the derivate id embedded in the path of the request

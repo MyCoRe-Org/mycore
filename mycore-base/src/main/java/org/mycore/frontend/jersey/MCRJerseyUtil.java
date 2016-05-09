@@ -16,6 +16,7 @@ import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
 
 /**
  * Contains some jersey utility methods.
@@ -53,14 +54,14 @@ public abstract class MCRJerseyUtil {
      * @return mycore object id
      */
     public static MCRObjectID getID(String id) {
-        MCRObjectID mcrId;
+        MCRObjectID mcrId = null;
         try {
             mcrId = MCRObjectID.getInstance(id);
+            if (!MCRMetadataManager.exists(mcrId)) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
         } catch (MCRException mcrExc) {
-            throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity("invalid mycore id").build());
-        }
-        if (!MCRMetadataManager.exists(mcrId)) {
-            throw new WebApplicationException(Status.NOT_FOUND);
+            throwException(Status.BAD_REQUEST, "invalid mycore id '" + id + "'");
         }
         return mcrId;
     }
@@ -117,6 +118,18 @@ public abstract class MCRJerseyUtil {
         if (!MCRAccessManager.checkPermission(permission)) {
             throw new WebApplicationException(Response.status(Status.UNAUTHORIZED).build());
         }
+    }
+
+    /**
+     * Throws a {@link WebApplicationException} with status and message.
+     * This exception will be handled by the {@link MCRJerseyExceptionMapper}.
+     * @see http://stackoverflow.com/questions/29414041/exceptionmapper-for-webapplicationexceptions-thrown-with-entity
+     * 
+     * @param status the http return status
+     * @param message the message to print
+     */
+    public static void throwException(Status status, String message) {
+        throw new WebApplicationException(new MCRException(message), status);
     }
 
     /**
