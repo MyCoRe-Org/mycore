@@ -60,11 +60,11 @@ public class MCRViewerConfiguration {
 
     private static boolean DEBUG_MODE;
     
-    private static Pattern FILEPATH_PATTERN;
+    private static Pattern REQUEST_PATH_PATTERN;
 
     static {
         DEBUG_MODE = Boolean.parseBoolean(MCRIView2Tools.getIView2Property("DeveloperMode", "false"));
-        FILEPATH_PATTERN = Pattern.compile(".*/\\w+_derivate_\\d+(/.*)");
+        REQUEST_PATH_PATTERN = Pattern.compile(".*/(\\w+_derivate_\\d+)(/.*)?");
     }
 
     public MCRViewerConfiguration() {
@@ -117,17 +117,12 @@ public class MCRViewerConfiguration {
      * @return the derivate id embedded in the path of the request
      */
     public static String getDerivate(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        int i = requestURI.indexOf("_derivate_");
-        if (i == -1) {
+        try {
+            return getFromPath(request.getPathInfo(), 1);
+        } catch(Exception exc) {
+            LOGGER.warn("Unable to get the derivate id of request " + request.getRequestURI());
             return null;
         }
-        int start = requestURI.lastIndexOf("/", i) + 1;
-        int end = requestURI.indexOf("/", i);
-        if (end == -1) {
-            return requestURI.substring(start);
-        }
-        return requestURI.substring(start, end);
     }
 
     /**
@@ -138,15 +133,25 @@ public class MCRViewerConfiguration {
      * @return path to the file or null if the path couldn't be retrieved
      */
     public static String getFilePath(HttpServletRequest request) {
-        String pathInfo = request.getPathInfo();
-        Matcher matcher = FILEPATH_PATTERN.matcher(pathInfo);
+        try {
+            return getFromPath(request.getPathInfo(), 2);
+        } catch(Exception exc) {
+            LOGGER.warn("Unable to get the file path of request " + request.getRequestURI());
+            return null;
+        }
+    }
+
+    /**
+     * Gets the group from the {@link #REQUEST_PATH_PATTERN}.
+     * 
+     * @param path uri decoded path
+     * @param groupNumber the group number which should be returnd
+     * @return the value of the regular expression group
+     */
+    private static String getFromPath(String path, int groupNumber) {
+        Matcher matcher = REQUEST_PATH_PATTERN.matcher(path);
         if (matcher.find()) {
-            try {
-                return matcher.group(1);
-            } catch (Exception exc) {
-                LOGGER.warn("Unable to get file path of request " + request.getRequestURI());
-                return null;
-            }
+            return matcher.group(groupNumber);
         }
         return null;
     }
