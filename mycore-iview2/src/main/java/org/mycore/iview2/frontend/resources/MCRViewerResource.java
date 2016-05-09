@@ -43,7 +43,7 @@ public class MCRViewerResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @Path("{derivate}/{path: [^?]+}")
+    @Path("{derivate}{path: (/[^?#]*)?}")
     public void show(@Context HttpServletRequest request, @Context HttpServletResponse response,
                      @Context ServletContext context, @Context ServletConfig config) throws Exception {
         MCRContent content = getContent(request, response);
