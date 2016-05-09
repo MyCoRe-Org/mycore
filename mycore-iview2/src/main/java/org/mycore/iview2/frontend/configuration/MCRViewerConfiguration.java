@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
@@ -22,6 +24,8 @@ import javax.xml.bind.annotation.XmlValue;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRXMLContent;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -44,6 +48,8 @@ import com.google.gson.JsonSerializer;
  */
 public class MCRViewerConfiguration {
 
+    private static Logger LOGGER = LogManager.getLogger(MCRViewerConfiguration.class);
+
     public static enum ResourceType {
         script, css
     }
@@ -53,9 +59,12 @@ public class MCRViewerConfiguration {
     private Map<String, Object> properties;
 
     private static boolean DEBUG_MODE;
+    
+    private static Pattern FILEPATH_PATTERN;
 
     static {
         DEBUG_MODE = Boolean.parseBoolean(MCRIView2Tools.getIView2Property("DeveloperMode", "false"));
+        FILEPATH_PATTERN = Pattern.compile(".*/\\w+_derivate_\\d+(/.*)");
     }
 
     public MCRViewerConfiguration() {
@@ -122,23 +131,24 @@ public class MCRViewerConfiguration {
     }
 
     /**
-     * Helper method to get the path to the start file. The path is not
-     * url encoded.
+     * Helper method to get the path to the start file. The path is
+     * URI decoded and starts with a slash.
      * 
      * @param request http request
-     * @return path to the file
+     * @return path to the file or null if the path couldn't be retrieved
      */
     public static String getFilePath(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        int i = requestURI.indexOf("_derivate_");
-        if (i == -1) {
-            return null;
+        String pathInfo = request.getPathInfo();
+        Matcher matcher = FILEPATH_PATTERN.matcher(pathInfo);
+        if (matcher.find()) {
+            try {
+                return matcher.group(1);
+            } catch (Exception exc) {
+                LOGGER.warn("Unable to get file path of request " + request.getRequestURI());
+                return null;
+            }
         }
-        int start = requestURI.indexOf("/", i);
-        if (start == -1) {
-            return "";
-        }
-        return requestURI.substring(start);
+        return null;
     }
 
     /**
