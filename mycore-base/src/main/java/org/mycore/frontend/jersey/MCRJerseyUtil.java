@@ -123,7 +123,7 @@ public abstract class MCRJerseyUtil {
     /**
      * Throws a {@link WebApplicationException} with status and message.
      * This exception will be handled by the {@link MCRJerseyExceptionMapper}.
-     * @see http://stackoverflow.com/questions/29414041/exceptionmapper-for-webapplicationexceptions-thrown-with-entity
+     * See <a href="http://stackoverflow.com/questions/29414041/exceptionmapper-for-webapplicationexceptions-thrown-with-entity">stackoverflow</a>.
      * 
      * @param status the http return status
      * @param message the message to print
