@@ -29,7 +29,7 @@ abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
             FileTime creationTime = localFileAttributes.creationTime(); //unavailable in IFS1
             FileTime lastModified = FileTime.fromMillis(file.getLastModified().getTimeInMillis());
             if (lastModified.compareTo(creationTime) < 0) {
-                LOGGER.warn("lastModified time is before creation time: " + node.toPath().toString());
+                LOGGER.debug("lastModified time is before creation time: " + node.toPath().toString());
             }
             FileTime lastAccessTime = localFileAttributes.lastAccessTime(); //unavailable in IFS1
             if (localFileAttributes.size() != file.getSize()) {
