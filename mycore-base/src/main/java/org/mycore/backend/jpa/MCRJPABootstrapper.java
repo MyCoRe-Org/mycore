@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.metamodel.EntityType;
@@ -17,9 +16,6 @@ import javax.persistence.metamodel.Metamodel;
 import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
-import org.hibernate.Session;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.internal.SessionFactoryImpl;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
