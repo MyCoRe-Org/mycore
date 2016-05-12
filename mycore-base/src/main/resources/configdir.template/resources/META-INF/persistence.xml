@@ -21,6 +21,9 @@
       <!--
       <property name="javax.persistence.jdbc.driver">org.postgresql.Driver</property>
       <property name="javax.persistence.jdbc.url">jdbc:postgresql://127.0.0.1/mycore</property>
+      <property name="hibernate.dialect" value="org.mycore.backend.hibernate.dialects.MCRPostgreSQL94Dialect" />
+      <property name="hibernate.dialect" value="org.mycore.backend.hibernate.dialects.MCRPostgreSQL92Dialect" />
+      <property name="hibernate.dialect" value="org.mycore.backend.hibernate.dialects.MCRPostgreSQL9Dialect" />
       -->
       <!-- MySQL -->
       <!--
