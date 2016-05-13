@@ -3,6 +3,8 @@
  */
 package org.mycore.backend.hibernate;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -48,15 +50,22 @@ public class MCRHibernateConfigHelper {
             session.doWork(connection -> {
                 String updateStmt = Stream.of("ClassLeftUnique", "ClassRightUnique")
                     .flatMap(idx -> Stream.of("drop constraint if exists " + idx,
-                        MessageFormat.format("add constraint {0} unique (ClassID, {1}Value) deferrable initially deferred",
-                            idx, idx.substring("Class".length(), idx.length() - ("Unique".length())).toLowerCase(Locale.ROOT))))
-                    .collect(Collectors.joining(", ", "alter table if exists " + qualifiedTableName + " ", ""));
+                        MessageFormat.format(
+                            "add constraint {0} unique (ClassID, {1}Value) deferrable initially deferred",
+                            idx, idx.substring("Class".length(), idx.length() - ("Unique".length()))
+                                .toLowerCase(Locale.ROOT))))
+                    .collect(Collectors.joining(", ", getAlterTableString(connection) + qualifiedTableName + " ", ""));
                 try (Statement stmt = connection.createStatement()) {
-                    LogManager.getLogger().info("Fixing PostgreSQL Schema for " + qualifiedTableName + ":\n" + updateStmt);
+                    LogManager.getLogger()
+                        .info("Fixing PostgreSQL Schema for " + qualifiedTableName + ":\n" + updateStmt);
                     stmt.execute(updateStmt);
                 }
             });
         }
+    }
+
+    private static String getAlterTableString(Connection connection) throws SQLException {
+        return connection.getMetaData().getDatabaseMinorVersion() < 2 ? "alter table " : "alter table if exists ";
     }
 
 }
