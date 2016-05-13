@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.hibernate.HibernateException;
 import org.junit.After;
 import org.junit.Before;
+import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRJPABootstrapper;
 
@@ -63,6 +64,7 @@ public class MCRJPATestCase extends MCRTestCase {
         Logger.getLogger(MCRHibTestCase.class).debug("Setup JPA");
         MCRJPABootstrapper.initializeJPA();
         exportSchema();
+        MCRHibernateConfigHelper.checkEntityManagerFactoryConfiguration(MCREntityManagerProvider.getEntityManagerFactory());
         try {
             LogManager.getLogger().debug("Prepare hibernate test", new RuntimeException());
             entityManager = MCREntityManagerProvider.getCurrentEntityManager();
