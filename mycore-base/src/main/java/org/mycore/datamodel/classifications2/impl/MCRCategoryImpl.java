@@ -179,6 +179,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     @OneToMany(targetEntity = MCRCategoryImpl.class, cascade = {
         CascadeType.ALL }, mappedBy = "parent")
     @OrderColumn(name = "positionInParent")
+    @Access(AccessType.FIELD)
     public List<MCRCategory> getChildren() {
         return super.getChildren();
     }
@@ -200,6 +201,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     @ManyToOne(optional = true, targetEntity = MCRCategoryImpl.class)
     @JoinColumn(name = "parentID")
+    @Access(AccessType.FIELD)
     public MCRCategory getParent() {
         return super.getParent();
     }
