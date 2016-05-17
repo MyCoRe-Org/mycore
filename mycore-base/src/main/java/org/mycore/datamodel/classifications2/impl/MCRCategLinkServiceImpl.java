@@ -72,8 +72,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategoryLink.";
 
     private static MCRCache<MCRCategoryID, MCRCategory> categCache = new MCRCache<MCRCategoryID, MCRCategory>(
-            MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
-            "MCRCategLinkService category cache");
+        MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
+        "MCRCategLinkService category cache");
 
     private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -104,7 +104,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (!childrenOnly) {
             parent = parent.getRoot();
         } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
-            parent = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), parent.getId());
+            parent = DAO.getCategory(parent.getId(), 0);
         }
         LOGGER.info("parentID:" + parent.getId());
         String classID = parent.getId().getRootID();
@@ -196,24 +196,28 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
-        for (MCRCategoryID categID : categories) {
-            final MCRCategory category = getMCRCategory(entityManager, categID);
-            if (category == null) {
-                throw new MCRPersistenceException("Could not link to unknown category " + categID);
-            }
-            MCRCategoryLinkImpl link = new MCRCategoryLinkImpl(category, objectReference);
-            if (LOGGER.isDebugEnabled()) {
-                MCRCategory linkedCategory = link.getCategory();
-                StringBuilder debugMessage = new StringBuilder("Adding Link from ").append(linkedCategory.getId());
-                if (linkedCategory instanceof MCRCategoryImpl) {
-                    debugMessage.append("(").append(((MCRCategoryImpl) linkedCategory).getInternalID()).append(") ");
+        categories
+            .stream()
+            .distinct()
+            .forEach(categID -> {
+                final MCRCategory category = getMCRCategory(entityManager, categID);
+                if (category == null) {
+                    throw new MCRPersistenceException("Could not link to unknown category " + categID);
                 }
-                debugMessage.append("to ").append(objectReference);
-                LOGGER.debug(debugMessage.toString());
-            }
-            entityManager.persist(link);
-            LOGGER.debug("===DONE: " + link.id);
-        }
+                MCRCategoryLinkImpl link = new MCRCategoryLinkImpl(category, objectReference);
+                if (LOGGER.isDebugEnabled()) {
+                    MCRCategory linkedCategory = link.getCategory();
+                    StringBuilder debugMessage = new StringBuilder("Adding Link from ").append(linkedCategory.getId());
+                    if (linkedCategory instanceof MCRCategoryImpl) {
+                        debugMessage.append("(").append(((MCRCategoryImpl) linkedCategory).getInternalID())
+                            .append(") ");
+                    }
+                    debugMessage.append("to ").append(objectReference);
+                    LOGGER.debug(debugMessage.toString());
+                }
+                entityManager.persist(link);
+                LOGGER.debug("===DONE: " + link.id);
+            });
     }
 
     private static MCRCategory getMCRCategory(EntityManager entityManager, MCRCategoryID categID) {
@@ -221,7 +225,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (categ != null) {
             return categ;
         }
-        categ = MCRCategoryDAOImpl.getByNaturalID(entityManager, categID);
+        categ = DAO.getCategory(categID, 0);
         if (categ == null) {
             return null;
         }
@@ -235,7 +239,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
 
         MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance()
-                .getCategory(category.getRoot().getId(), -1);
+            .getCategory(category.getRoot().getId(), -1);
         if (rootImpl == null) {
             //Category does not exist, so it has no links
             return getNoLinksMap(category);
@@ -258,9 +262,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             }
         };
         Query linkedClassifications = MCRHIBConnection.instance()
-                .getNamedQuery(NAMED_QUERY_NAMESPACE + "linkedClassifications");
+            .getNamedQuery(NAMED_QUERY_NAMESPACE + "linkedClassifications");
         ((List<String>) linkedClassifications.list()).stream().map(MCRCategoryID::rootID)
-                .forEach(id -> boolMap.put(id, true));
+            .forEach(id -> boolMap.put(id, true));
         return boolMap;
     }
 
@@ -273,7 +277,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private void storeHasLinkValues(HashMap<MCRCategoryID, Boolean> boolMap, BitSet internalIds,
-            MCRCategoryImpl parent) {
+        MCRCategoryImpl parent) {
         final int internalID = parent.getInternalID();
         if (internalID < internalIds.size() && internalIds.get(internalID)) {
             addParentHasValues(boolMap, parent);
