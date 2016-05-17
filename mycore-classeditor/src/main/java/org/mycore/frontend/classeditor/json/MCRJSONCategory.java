@@ -102,10 +102,6 @@ public class MCRJSONCategory implements MCRCategory {
         return category.getLabel(lang);
     }
 
-    public void setPositionInParent(int positionInParent) {
-        category.setPositionInParent(positionInParent);
-    }
-
     private MCRCategoryID parentID;
 
     public void setParentID(MCRCategoryID parentID) {

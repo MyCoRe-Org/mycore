@@ -56,6 +56,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.MCRStreamUtils;
+import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -107,6 +108,17 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         } finally {
             super.tearDown();
         }
+    }
+
+    @Test
+    public void testLicenses() throws Exception {
+        Document xml = MCRXMLParserFactory.getParser()
+            .parseXML(new MCRURLContent(new URL("http://mycore.de/classifications/mir_licenses.xml")));
+        MCRCategory licenses = MCRXMLTransformer.getCategory(xml);
+        DAO.addCategory(null, licenses);
+        MCRCategoryID cc_30 = new MCRCategoryID(licenses.getId().getRootID(), "cc_3.0");
+        DAO.deleteCategory(cc_30);
+        startNewTransaction();
     }
 
     @Test
@@ -176,13 +188,15 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     public void addCategoryToPosition() {
         addWorldClassification();
         MCRCategoryImpl america = new MCRCategoryImpl();
-        america.setId(new MCRCategoryID(category.getId().getRootID(), "America"));
+        MCRCategoryID categoryID = new MCRCategoryID(category.getId().getRootID(), "America");
+        america.setId(categoryID);
         america.setLabels(new HashSet<MCRLabel>());
         america.getLabels().add(new MCRLabel("de", "Amerika", null));
         america.getLabels().add(new MCRLabel("en", "America", null));
-        america.setPositionInParent(1); // should be between europe and asia
-        DAO.addCategory(category.getId(), america);
+        DAO.addCategory(category.getId(), america, 1);
         startNewTransaction();
+        america = MCRCategoryDAOImpl.getByNaturalID(entityManager, america.getId());
+        assertNotNull(categoryID + " was not added to database.", america);
         assertEquals("invalid position in parent", 1, america.getPositionInParent());
     }
 

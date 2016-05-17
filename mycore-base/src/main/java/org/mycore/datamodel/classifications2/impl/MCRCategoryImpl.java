@@ -117,7 +117,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     private static Logger LOGGER = Logger.getLogger(MCRCategoryImpl.class);
 
-    private int left, right, positionInParent = -1, internalID;
+    private int left, right, internalID;
 
     int level;
 
@@ -147,15 +147,15 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         return level;
     }
 
-    @Column(name = "positionInParent")
+    @Transient
     public int getPositionInParent() {
-        LOGGER.debug("getposition called for " + getId() + " with: " + positionInParent);
+        LOGGER.debug("getposition called for " + getId());
         if (parent == null) {
             LOGGER.debug("getposition called with no parent set.");
-            return positionInParent;
+            return - 1;
         }
         try {
-            int position = parent.getChildren().indexOf(this);
+            int position = getParent().getChildren().indexOf(this);
             if (position == -1) {
                 // sometimes indexOf does not find this instance so we need to
                 // check for the ID here to
@@ -279,16 +279,6 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     public void setLevel(int level) {
         this.level = level;
-    }
-
-    /**
-     * @param positionInParent
-     *            the positionInParent to set
-     */
-    public void setPositionInParent(int positionInParent) {
-        LOGGER.debug("Set position called for " + getId() + " with: " + positionInParent + " was: "
-            + this.positionInParent, new RuntimeException("DEBUG"));
-        this.positionInParent = positionInParent;
     }
 
     /**
@@ -468,7 +458,6 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         result = prime * result + internalID;
         result = prime * result + left;
         result = prime * result + level;
-        result = prime * result + positionInParent;
         result = prime * result + right;
         result = prime * result + getId().hashCode();
         return result;
@@ -488,8 +477,6 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         if (left != other.left)
             return false;
         if (level != other.level)
-            return false;
-        if (positionInParent != other.positionInParent)
             return false;
         if (right != other.right)
             return false;
