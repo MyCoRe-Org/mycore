@@ -52,6 +52,11 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
             deserializedCateg.setParentID(parentId);
         }
         
+        JsonElement positionJsonElem = categJsonObject.get(POSITION);
+        if(positionJsonElem != null){
+            deserializedCateg.setPositionInParent(positionJsonElem.getAsInt());
+        }
+
         JsonElement labelSetWrapperElem = categJsonObject.get(LABELS);
         if (labelSetWrapperElem != null) {
             MCRLabelSetWrapper labelSetWrapper = context.deserialize(labelSetWrapperElem, MCRLabelSetWrapper.class);

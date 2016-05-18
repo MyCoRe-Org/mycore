@@ -18,6 +18,8 @@ public class MCRJSONCategory implements MCRCategory {
     private MCRCategoryImpl category;
 
     private Boolean hasChildren = null;
+    
+    private int positionInParent;
 
     public void setParent(MCRCategory parent) {
         category.setParent(parent);
@@ -59,7 +61,11 @@ public class MCRJSONCategory implements MCRCategory {
     }
 
     public int getPositionInParent() {
-        return category.getPositionInParent();
+        return positionInParent;
+    }
+
+    public void setPositionInParent(int positionInParent) {
+        this.positionInParent = positionInParent;
     }
 
     public MCRCategoryID getId() {

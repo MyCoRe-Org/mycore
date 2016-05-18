@@ -148,7 +148,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     @Transient
-    public int getPositionInParent() {
+    int getPositionInParent() {
         LOGGER.debug("getposition called for " + getId());
         if (parent == null) {
             LOGGER.debug("getposition called with no parent set.");
