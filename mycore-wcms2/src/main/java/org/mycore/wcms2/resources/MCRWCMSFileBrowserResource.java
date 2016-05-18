@@ -65,8 +65,23 @@ public class MCRWCMSFileBrowserResource {
     
     @GET
     @Path("gui/{filename:.*}")
-    public InputStream getResources(@PathParam("filename") String filename){
-        return getClass().getResourceAsStream("/META-INF/resources/modules/wcms2/" + filename);
+    public Response getResources(@PathParam("filename") String filename){
+        if (filename.endsWith(".js")) {
+            return Response.ok(getClass()
+                .getResourceAsStream("/META-INF/resources/modules/wcms2/" + filename))
+                .header("Content-Type", "application/javascript")
+                .build();
+        }
+        
+        if (filename.endsWith(".css")) {
+            return Response.ok(getClass()
+                .getResourceAsStream("/META-INF/resources/modules/wcms2/" + filename))
+                .header("Content-Type", "text/css")
+                .build();
+        }
+        return Response.ok(getClass()
+            .getResourceAsStream("/META-INF/resources/modules/wcms2/" + filename))
+            .build();
     }
     
     @GET
@@ -120,7 +135,7 @@ public class MCRWCMSFileBrowserResource {
 
     @GET
     @Path("/files")
-    public String getFiles(@QueryParam("path") String path) throws IOException{
+    public String getFiles(@QueryParam("path") String path, @QueryParam("type") String type) throws IOException{
         File dir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
         JsonObject jsonObj = new JsonObject();
         JsonArray jsonArray = new JsonArray();
@@ -128,7 +143,7 @@ public class MCRWCMSFileBrowserResource {
         if (fileArray != null){
             for(File file : fileArray){
                 String mimetype =  Files.probeContentType(file.toPath());
-                if (mimetype != null && mimetype.split("/")[0].equals("image")){
+                if (mimetype != null && ((type.equals("images") && mimetype.split("/")[0].equals("image")) || (!type.equals("images") && !mimetype.split("/")[1].contains("xml")))){
                     JsonObject fileJsonObj = new JsonObject();
                     fileJsonObj.addProperty("name", file.getName());
                     fileJsonObj.addProperty("path",context.getContextPath() + path +  "/" + file.getName());
@@ -174,7 +189,7 @@ public class MCRWCMSFileBrowserResource {
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String getUpload(@FormDataParam("upload") InputStream inputStream, @FormDataParam("upload") FormDataContentDisposition header, @QueryParam("CKEditorFuncNum") int funcNum, @QueryParam("href") String href ){
+    public String getUpload(@FormDataParam("upload") InputStream inputStream, @FormDataParam("upload") FormDataContentDisposition header, @QueryParam("CKEditorFuncNum") int funcNum, @QueryParam("href") String href, @QueryParam("type") String type, @QueryParam("basehref") String basehref){
         String path = "";
         try {
             path = saveFile(inputStream, href + "/" + header.getFileName());
@@ -182,7 +197,10 @@ public class MCRWCMSFileBrowserResource {
             e.printStackTrace();
             return "";
         }
-        return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'" + path.substring(path.lastIndexOf("/") + 1, path.length()) +  "', '');</script>";
+        if (type.equals("images")) {
+            return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'" + path.substring(path.lastIndexOf("/") + 1, path.length()) +  "', '');</script>";
+        }
+        return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'" + basehref + path.substring(path.lastIndexOf("/") + 1, path.length()) +  "', '');</script>";
     }
     
     protected String saveFile(InputStream inputStream, String path) throws IOException {

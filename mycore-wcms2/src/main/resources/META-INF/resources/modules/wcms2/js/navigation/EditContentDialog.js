@@ -222,8 +222,10 @@ wcms.navigation.EditContentDialog = function() {
 			basicEntities: true,
 			allowedContent: true,
 			autoParagraph: false,
-			filebrowserImageBrowseUrl: context + '/rsc/wcms2/filebrowser?href=' + folderHref,
-		  	filebrowserImageUploadUrl: context + '/rsc/wcms2/filebrowser/upload?href=' + folderHref,
+			filebrowserBrowseUrl: context + '/rsc/wcms2/filebrowser?href=' + folderHref + "&type=files" + "&basehref=" + context + folderHref + "/",
+			filebrowserUploadUrl: context + '/rsc/wcms2/filebrowser/upload?href=' + folderHref + "&type=files" + "&basehref=" + context + folderHref + "/",
+			filebrowserImageBrowseUrl: context + '/rsc/wcms2/filebrowser?href=' + folderHref + "&type=images",
+		  	filebrowserImageUploadUrl: context + '/rsc/wcms2/filebrowser/upload?href=' + folderHref + "&type=images",
 		  	baseHref: context + folderHref + "/"
 		}, contentData);
 	}

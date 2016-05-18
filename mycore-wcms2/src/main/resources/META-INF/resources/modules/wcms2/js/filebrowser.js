@@ -1,5 +1,7 @@
 var WCMS2FileBrowser = function(){
 	var currentPath = "";
+	var type = "files";
+	var baseHref = "";
 	var qpara = [], hash;
 	var i18nKeys =[];
 
@@ -30,7 +32,12 @@ var WCMS2FileBrowser = function(){
 				if (funcNum == undefined){
 					funcNum = 1;
 				}
-				window.opener.CKEDITOR.tools.callFunction(funcNum, getRelativePath($(this).data("path")) + $(this).siblings("h5.file-title").html());
+				if (type == "images") {
+					window.opener.CKEDITOR.tools.callFunction(funcNum, getRelativePath($(this).data("path")) + $(this).siblings("h5.file-title").html());					
+				}
+				else{
+					window.opener.CKEDITOR.tools.callFunction(funcNum, baseHref + getRelativePath($(this).data("path")) + $(this).siblings("h5.file-title").html());
+				}
 				window.close();
 			});
 			
@@ -119,9 +126,9 @@ var WCMS2FileBrowser = function(){
 			});
 						
 			readQueryParameter();
-			var href = qpara["href"];
-			if (href == undefined) href = "";
-			currentPath = href;
+			currentPath = qpara["href"] != undefined ? qpara["href"] : "";
+			type = qpara["type"] != undefined ? qpara["type"] : "files";
+			baseHref = qpara["basehref"] != undefined ? qpara["basehref"] : "";
 			jQuery.getJSON("../../servlets/MCRLocaleServlet/" + qpara["langCode"] + "/component.wcms.navigation.fileBrowser.*", function(data) { 
 				i18nKeys = data;
 				$("#folder-label").html(geti18n("component.wcms.navigation.fileBrowser.folder"));
@@ -150,7 +157,7 @@ var WCMS2FileBrowser = function(){
 	
 	function getFiles(path) {
 		$.ajax({
-			url: "filebrowser/files?path=" + path,
+			url: "filebrowser/files?path=" + path + "&type=" + type,
 			type: "GET",
 			dataType: "json",
 			success: function(data) {
@@ -316,6 +323,7 @@ var WCMS2FileBrowser = function(){
 				}
 				else{
 					$(file).find("div.file-image-cotainer").append("<span class='glyphicon glyphicon-file file-file'></span>");
+					$(file).find("div.file-image-cotainer").data("path", path);
 				}
 				$(file).find("h5.file-title").html(node.name);
 				$(file).find("h5.file-title").attr("title",node.name);
