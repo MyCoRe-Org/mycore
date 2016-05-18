@@ -30,6 +30,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -42,6 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
@@ -53,6 +55,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.MCRStreamUtils;
@@ -119,6 +122,27 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategoryID cc_30 = new MCRCategoryID(licenses.getId().getRootID(), "cc_3.0");
         DAO.deleteCategory(cc_30);
         startNewTransaction();
+    }
+
+    @Test
+    public void testClassEditorBatch() throws Exception {
+        Document xml = MCRXMLParserFactory.getParser()
+            .parseXML(new MCRURLContent(new URL("http://mycore.de/classifications/nameIdentifier.xml")));
+        MCRCategory nameIdentifier = MCRXMLTransformer.getCategory(xml);
+        MCRCategory secondCateg = nameIdentifier.getChildren().get(1);
+        DAO.addCategory(null, nameIdentifier);
+        startNewTransaction();
+        assertTrue(secondCateg.getId() + " should exist.", DAO.exist(secondCateg.getId()));
+        //re-set labels
+        DAO.setLabels(secondCateg.getId(), secondCateg.getLabels().stream().collect(Collectors.toSet()));
+        //re-set URI
+        DAO.setURI(secondCateg.getId(), secondCateg.getURI());
+        //move to new index
+        DAO.moveCategory(secondCateg.getId(), secondCateg.getParent().getId(), 0);
+        startNewTransaction();
+        MCRCategoryImpl copyOfDB = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(),
+            secondCateg.getId());
+        assertNotNull(secondCateg.getId() + " must hav a parent.", copyOfDB.getParent());
     }
 
     @Test
