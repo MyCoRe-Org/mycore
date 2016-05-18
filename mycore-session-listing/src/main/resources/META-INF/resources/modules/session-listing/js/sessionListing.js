@@ -50,7 +50,6 @@ mycore.session.listing = {
           "<td>" + session.ip + (session.hostname != null ? ("(" + session.hostname + ")") : "") + "</td>" +
           "<td>" + new Date(session.createTime).toLocaleDateString(locale, dateOptions) + "</td>" +
           "<td>" + new Date(session.lastAccessTime).toLocaleDateString(locale, dateOptions)  + "</td>" +
-          "<td>" + ((new Date().getTime() - session.lastAccessTime) / (1000 * 60)).toFixed(2) + " Minuten" + "</td>" +
           "<td align='center'>" +
             "<div style='height: 15px; width: 15px; background-color: " + session.constructingStacktrace.color + "; border: 1px solid #999; cursor: pointer;'" +
             		  " onclick='mycore.session.listing.showStacktrace(\"" + session.id + "\");'" +
