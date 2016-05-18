@@ -41,16 +41,19 @@ import org.xml.sax.SAXException;
 public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigitalObjectIdentifier> {
 
     public static final Namespace DATACITE_NAMESPACE = Namespace.getNamespace("datacite", "http://datacite.org/schema/kernel-3");
+    public static final String TEST_PREFIX = "UseTestPrefix";
     private static final Logger LOGGER = LogManager.getLogger();
     private static final String TYPE = "doi";
-    public static final String TEST_PREFIX = "UseTestPrefix";
-
     private String username;
     private String password;
     private String transformer;
     private String host;
     private String registerURL;
     private boolean useTestPrefix = false;
+
+    public String getRegisterURL() {
+        return registerURL;
+    }
 
     public MCRDOIRegistrationService(String serviceID) {
         super(serviceID, TYPE);
@@ -98,12 +101,6 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         MCRDataciteClient dataciteClient = getDataciteClient();
         dataciteClient.storeMetadata(dataciteDocument);
 
-        List<Map.Entry<String, URI>> entryList = new ArrayList<>();
-
-        if (obj instanceof MCRObject) {
-            insertFirstDerivate((MCRObject) obj, entryList);
-        }
-
         URI registeredURI;
         try {
             registeredURI = new URI(this.registerURL + "/receive/" + obj.getId().toString());
@@ -112,12 +109,19 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             throw new MCRException("Base-URL seems to be invalid!", e);
         }
 
+        List<Map.Entry<String, URI>> entryList = getMediaList((MCRObject) obj);
         dataciteClient.setMediaList(newDOI, entryList);
 
         return newDOI;
     }
 
-    private void insertFirstDerivate(MCRObject obj, List<Map.Entry<String, URI>> entryList) {
+    /**
+     * Builds a list with with right content types and media urls assigned of a specific Object
+     * @param obj the object
+     * @return a list of entrys Media-Type, URL
+     */
+    public List<Map.Entry<String, URI>> getMediaList(MCRObject obj) {
+        List<Map.Entry<String, URI>> entryList = new ArrayList<>();
         MCRObject mcrObject = obj;
         Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(mcrObject.getId(), 1, TimeUnit.MINUTES).stream().findFirst();
         derivateIdOptional.ifPresent(derivateId -> {
@@ -132,9 +136,10 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
                 LOGGER.error("Error while detecting the file to register!", e);
             }
         });
+        return entryList;
     }
 
-    private MCRDataciteClient getDataciteClient() {
+    public MCRDataciteClient getDataciteClient() {
         return new MCRDataciteClient(host, username, password, false, this.useTestPrefix);
     }
 

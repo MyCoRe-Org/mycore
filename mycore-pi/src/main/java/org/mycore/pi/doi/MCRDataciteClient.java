@@ -255,7 +255,7 @@ public class MCRDataciteClient {
     }
 
     public URI resolveDOI(final MCRDigitalObjectIdentifier doiParam) throws MCRPersistentIdentifierException {
-        MCRDigitalObjectIdentifier doi = isTestPrefix() ? doiParam.toTestPrefix() : doiParam;
+        MCRDigitalObjectIdentifier doi = doiParam;
 
         URI requestURI = getRequestURI("/doi/" + doi.asString());
         HttpGet get = new HttpGet(requestURI);
