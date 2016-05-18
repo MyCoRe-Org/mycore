@@ -45,6 +45,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
@@ -126,6 +128,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     @Test
     public void testClassEditorBatch() throws Exception {
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         Document xml = MCRXMLParserFactory.getParser()
             .parseXML(new MCRURLContent(new URL("http://mycore.de/classifications/nameIdentifier.xml")));
         MCRCategory nameIdentifier = MCRXMLTransformer.getCategory(xml);
@@ -136,11 +139,11 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         //re-set labels
         DAO.setLabels(secondCateg.getId(), secondCateg.getLabels().stream().collect(Collectors.toSet()));
         //re-set URI
-        DAO.setURI(secondCateg.getId(), secondCateg.getURI());
+        entityManager.detach(DAO.setURI(secondCateg.getId(), secondCateg.getURI()));
         //move to new index
         DAO.moveCategory(secondCateg.getId(), secondCateg.getParent().getId(), 0);
         startNewTransaction();
-        MCRCategoryImpl copyOfDB = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(),
+        MCRCategoryImpl copyOfDB = MCRCategoryDAOImpl.getByNaturalID(entityManager,
             secondCateg.getId());
         assertNotNull(secondCateg.getId() + " must hav a parent.", copyOfDB.getParent());
     }
