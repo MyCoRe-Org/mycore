@@ -104,7 +104,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (!childrenOnly) {
             parent = parent.getRoot();
         } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
-            parent = DAO.getCategory(parent.getId(), 0);
+            parent = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), parent.getId());
         }
         LOGGER.info("parentID:" + parent.getId());
         String classID = parent.getId().getRootID();
@@ -225,7 +225,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (categ != null) {
             return categ;
         }
-        categ = DAO.getCategory(categID, 0);
+        categ = MCRCategoryDAOImpl.getByNaturalID(entityManager, categID);
         if (categ == null) {
             return null;
         }
@@ -257,8 +257,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
             @Override
             public Boolean get(Object key) {
-                Boolean haslink = super.get(key);
-                return haslink == null ? false : haslink;
+                return Optional.ofNullable(super.get(key)).orElse(Boolean.FALSE);
             }
         };
         Query linkedClassifications = MCRHIBConnection.instance()
