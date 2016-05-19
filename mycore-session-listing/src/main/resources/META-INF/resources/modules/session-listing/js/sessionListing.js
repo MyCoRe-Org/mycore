@@ -6,6 +6,11 @@ mycore.session.listing = {
   sessions: [],
   filteredSessions: [],
   baseURL: null,
+  
+  sortCriteria: {
+	  criteria: null,
+	  asc : true
+  },
 
   init(baseURL) {
     mycore.session.listing.baseURL = baseURL;
@@ -26,6 +31,19 @@ mycore.session.listing = {
         container.html("Loading error: " + err.statusText);
       }
     });
+  },
+  
+  sortSessions: function(criteria, sortFunction){
+	  var sc=mycore.session.listing.sortCriteria;
+	  if (criteria === sc.criteria){
+		  sc.asc = !sc.asc;
+	  } else {
+		  sc.criteria = criteria;
+		  sc.asc = true;
+	  }
+	  return mycore.session.listing.filteredSessions.sort(function(a, b){
+		  return sortFunction(sc.asc?a:b,sc.asc?b:a);
+	  });
   },
 
   render: function() {
@@ -67,10 +85,7 @@ mycore.session.listing = {
     var stacktrace = session.constructingStacktrace.stacktrace;
     var content = "";
     for(var line of stacktrace) {
-      var div = "<div>";
-      div += line.class + "." + line.method + " (" + line.file + ":" + line.line + ")";
-      div += "</div>";
-      content += div;
+      content += line.class + "." + line.method + " (" + line.file + ":" + line.line + ")\n";
     }
     dialog.html(content);
   },
@@ -85,44 +100,36 @@ mycore.session.listing = {
   },
   
   sortByLogin: function() {
-    mycore.session.listing.filteredSessions.sort(function(s1, s2) {
-      return s1.login.localeCompare(s2.login);
+    mycore.session.listing.sortSessions("login",function(a1,a2){
+      return a1.login.localeCompare(a2.login);
     });
     mycore.session.listing.render();
   },
 
   sortByIP: function() {
-    mycore.session.listing.filteredSessions.sort(function(s1, s2) {
-      return s1.ip.localeCompare(s2.ip);
+    mycore.session.listing.sortSessions("ip",function(a1,a2){
+      return a1.ip.localeCompare(a2.ip);
     });
     mycore.session.listing.render();
   },
 
   sortByFirstAccess: function() {
-    mycore.session.listing.filteredSessions.sort(function(s1, s2) {
-      return s1.createTime - s2.createTime;
+    mycore.session.listing.sortSessions("createTime",function(a1,a2){
+      return a1.createTime - a2.createTime;
     });
     mycore.session.listing.render();
   },
   
   sortByLastAccess: function() {
-    mycore.session.listing.filteredSessions.sort(function(s1, s2) {
-      return s2.lastAccessTime - s1.lastAccessTime;
-    });
-    mycore.session.listing.render();
-  },
-
-  sortByTimeSinceLastAccess: function() {
-    var currentTime = new Date().getTime();
-    mycore.session.listing.filteredSessions.sort(function(s1, s2) {
-      return (currentTime - s1.lastAccessTime) - (currentTime - s2.lastAccessTime);
+    mycore.session.listing.sortSessions("lastAccess",function(a1,a2){
+      return a1.lastAccessTime - a2.lastAccessTime;
     });
     mycore.session.listing.render();
   },
 
   sortByStacktrace: function() {
-    mycore.session.listing.filteredSessions.sort(function(s1, s2) {
-      return s1.constructingStacktrace.color.localeCompare(s2.constructingStacktrace.color);
+    mycore.session.listing.sortSessions("stackTrace",function(a1,a2){
+      return a1.constructingStacktrace.color.localeCompare(a2.constructingStacktrace.color);
     });
     mycore.session.listing.render();
   },
