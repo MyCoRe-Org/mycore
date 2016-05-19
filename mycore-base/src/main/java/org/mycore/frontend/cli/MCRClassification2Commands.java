@@ -42,7 +42,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom2.Document;
 import org.jdom2.output.Format;
@@ -74,7 +75,7 @@ import org.xml.sax.SAXParseException;
  */
 @MCRCommandGroup(name = "Classification Commands")
 public class MCRClassification2Commands extends MCRAbstractCommands {
-    private static Logger LOGGER = Logger.getLogger(MCRClassification2Commands.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -134,14 +135,16 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
     @MCRCommand(syntax = "update classification from file {0}", help = "The command updates a classification from file {0} to the system.", order = 20)
-    public static List<String> updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
+    public static List<String> updateFromFile(String filename)
+        throws URISyntaxException, MCRException, SAXParseException,
         IOException {
         String fileURL = Paths.get(filename).toAbsolutePath().normalize().toUri().toURL().toString();
         return Collections.singletonList("update classification from url " + fileURL);
     }
 
     @MCRCommand(syntax = "update classification from url {0}", help = "The command updates a classification from URL {0} to the system.", order = 25)
-    public static void updateFromURL(String fileURL) throws SAXParseException, MalformedURLException, URISyntaxException {
+    public static void updateFromURL(String fileURL)
+        throws SAXParseException, MalformedURLException, URISyntaxException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URL(fileURL)));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
@@ -397,7 +400,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         String sqlQuery = "select parentid, min(cat1.positioninparent+1) from {h-schema}MCRCategory cat1 "
             + "where cat1.parentid is not null and not exists" + "(select 1 from {h-schema}MCRCategory cat2 "
             + "where cat2.parentid=cat1.parentid and cat2.positioninparent=(cat1.positioninparent+1))"
-            + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from {h-schema}MCRCategory cat3 "
+            + "and cat1.positioninparent not in "
+            + "(select max(cat3.positioninparent) from {h-schema}MCRCategory cat3 "
             + "where cat3.parentid=cat1.parentid) group by cat1.parentid";
 
         for (List<Object[]> parentWithErrorsList = session.createSQLQuery(sqlQuery).list(); !parentWithErrorsList
@@ -415,7 +419,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         sqlQuery = "select parentid, min(cat1.positioninparent-1) from {h-schema}MCRCategory cat1 "
             + "where cat1.parentid is not null and not exists" + "(select 1 from {h-schema}MCRCategory cat2 "
             + "where cat2.parentid=cat1.parentid and cat2.positioninparent=(cat1.positioninparent-1))"
-            + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from {h-schema}MCRCategory cat3 "
+            + "and cat1.positioninparent not in "
+            + "(select max(cat3.positioninparent) from {h-schema}MCRCategory cat3 "
             + "where cat3.parentid=cat1.parentid) and cat1.positioninparent > 0 group by cat1.parentid";
 
         while (true) {
@@ -439,7 +444,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     public static void repairCategoryWithWrongStartPos(Number parentID, Number wrongStartPositionInParent) {
         Session session = MCRHIBConnection.instance().getSession();
-        String sqlQuery = "update {h-schema}MCRCategory set positioninparent= positioninparent -" + wrongStartPositionInParent
+        String sqlQuery = "update {h-schema}MCRCategory set positioninparent= positioninparent -"
+            + wrongStartPositionInParent
             + "-1 where parentid=" + parentID + " and positioninparent > " + wrongStartPositionInParent;
 
         session.createSQLQuery(sqlQuery).executeUpdate();
@@ -486,6 +492,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static void checkClassification(String id) {
         LOGGER.info("Checking classifcation " + id);
         ArrayList<String> log = new ArrayList<String>();
+        LOGGER.info(id + ": checking for missing parentID");
+        checkMissingParent(id, log);
         LOGGER.info(id + ": checking for empty labels");
         checkEmptyLabels(id, log);
         if (log.isEmpty()) {
@@ -506,7 +514,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         }
     }
 
-    private static int checkLeftRightAndLevel(MCRCategoryImpl category, int leftStart, int levelStart, List<String> log) {
+    private static int checkLeftRightAndLevel(MCRCategoryImpl category, int leftStart, int levelStart,
+        List<String> log) {
         int curValue = leftStart;
         final int nextLevel = levelStart + 1;
         if (leftStart != category.getLeft())
@@ -539,5 +548,28 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         for (String categIDString : list) {
             log.add("EMPTY lables for category " + new MCRCategoryID(classID, categIDString));
         }
+    }
+
+    private static void checkMissingParent(String classID, List<String> log) {
+        Session session = MCRHIBConnection.instance().getSession();
+        String sqlQuery = "select cat.categid from {h-schema}MCRCategory cat WHERE cat.classid='"
+            + classID + "' and cat.level > 0 and cat.parentID is NULL";
+        @SuppressWarnings("unchecked")
+        List<String> list = session.createSQLQuery(sqlQuery).list();
+
+        for (String categIDString : list) {
+            log.add("parentID is null for category " + new MCRCategoryID(classID, categIDString));
+        }
+    }
+
+    @MCRCommand(syntax = "repair missing parent for classification {0}", help = "restores parentID from information in the given classification, if left right values are correct", order = 130)
+    public static void repairMissingParent(String classID) {
+        Session session = MCRHIBConnection.instance().getSession();
+        String sqlQuery = "update {h-schema}MCRCategory cat set cat.parentID=(select parent.internalID from {h-schema}MCRCategory parent WHERE parent.classid='"
+            + classID
+            + "' and parent.leftValue<cat.leftValue and parent.rightValue>cat.rightValue and parent.level=(cat.level-1)) WHERE cat.classid='"
+            + classID + "' and cat.level > 0 and cat.parentID is NULL";
+        int updates = session.createSQLQuery(sqlQuery).executeUpdate();
+        LOGGER.info(() -> "Repaired " + updates + " parentID columns for classification " + classID);
     }
 }
