@@ -78,6 +78,12 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
 
         res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testOneArg',name[2])");
         assertEquals("n2", res);
+
+        res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testTwoArgs',string(name[1]/@id),string(note[1]/@href))");
+        assertEquals("true", res);
+
+        res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testTwoArgs',string(name[2]/@id),string(note[1]/@href))");
+        assertEquals("false", res);
     }
 
     public static String testNoArgs() {
@@ -86,6 +92,11 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
 
     public static String testOneArg(List<Element> nodes) {
         return nodes.get(0).getAttributeValue("id");
+    }
+    
+    public static boolean testTwoArgs(String id, String href)
+    {
+        return id.equals(href.substring(1));
     }
 
     @Test
