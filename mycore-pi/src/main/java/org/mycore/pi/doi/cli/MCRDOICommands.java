@@ -4,6 +4,7 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -115,8 +117,19 @@ public class MCRDOICommands {
                 MCRObjectID objectID = MCRObjectID.getInstance(idString);
                 if (MCRMetadataManager.exists(objectID)) {
                     MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
-                    List<Map.Entry<String, URI>> entryList = registrationService.getMediaList(obj);
-                    dataciteClient.setMediaList(doi, entryList);
+                    List<Map.Entry<String, URI>> newMediaList = registrationService.getMediaList(obj);
+                    List<Map.Entry<String, URI>> oldMediaList = dataciteClient.getMediaList(doi);
+
+                    HashMap<String, URI> newHashMap = new HashMap<>();
+
+                    newMediaList.forEach(e -> newHashMap.put(e.getKey(), e.getValue()));
+                    oldMediaList.forEach(e -> {
+                        if (!newHashMap.containsKey(e.getKey())) {
+                            newHashMap.put(e.getKey(), newMediaList.stream().findFirst().orElseThrow(() -> new MCRException("new media list is empty (this should not happen)")).getValue());
+                        }
+                    });
+
+                    dataciteClient.setMediaList(doi, newMediaList);
                     LOGGER.info("Updated media-list of " + doiString);
                 } else {
                     LOGGER.info("Object " + objectID.toString() + " does not exist in this application!");
