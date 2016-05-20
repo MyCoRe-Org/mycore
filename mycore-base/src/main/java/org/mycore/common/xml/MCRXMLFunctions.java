@@ -61,7 +61,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRCalendar;
@@ -78,8 +77,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -720,16 +717,8 @@ public class MCRXMLFunctions {
 
     public static boolean hasParentCategory(String classificationId, String categoryId) {
         MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-        //fast way
-        if (dao instanceof MCRCategoryDAOImpl) {
-            MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), categID);
-            //root category has level 0
-            return categoryImpl.getLevel() > 1;
-        }
-        //default way
-        //parents at least holds root category:
-        return dao.getParents(categID).size() > 1;
+        //root category has level 0
+        return !categID.isRootID() && MCRCategoryDAOFactory.getInstance().getCategory(categID, 0).getLevel() > 1;
     }
 
     /**
