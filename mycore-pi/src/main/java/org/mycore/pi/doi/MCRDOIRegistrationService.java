@@ -22,8 +22,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -135,7 +133,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
                 String contentType = Files.probeContentType(mainDocumentPath);
                 contentType = contentType == null ? "application/octet-stream" : contentType;
                 // TODO: maybe add link to viewer if PDF or other supported format
-                entryList.add(new AbstractMap.SimpleEntry<String, URI>(contentType, new URI(this.registerURL + MCRXMLFunctions.encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDocumentPath))));
+                entryList.add(new AbstractMap.SimpleEntry<String, URI>(contentType, new URI(this.registerURL + MCRXMLFunctions.encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDoc))));
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Error while detecting the file to register!", e);
             }
