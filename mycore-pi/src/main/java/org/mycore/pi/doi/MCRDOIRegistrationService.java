@@ -4,6 +4,7 @@ package org.mycore.pi.doi;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -131,7 +132,8 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             try {
                 String contentType = Files.probeContentType(mainDocumentPath);
                 contentType = contentType == null ? "" : contentType;
-                entryList.add(new AbstractMap.SimpleEntry<String, URI>("application/octet-stream", new URI(this.registerURL + "/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDoc)));
+                // TODO: maybe add link to viewer if PDF or other supported format
+                entryList.add(new AbstractMap.SimpleEntry<String, URI>("application/octet-stream", new URI(this.registerURL + "/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + URLEncoder.encode(mainDoc, "UTF-8"))));
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Error while detecting the file to register!", e);
             }
