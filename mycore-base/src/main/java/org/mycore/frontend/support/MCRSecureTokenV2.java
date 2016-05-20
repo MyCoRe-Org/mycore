@@ -3,7 +3,6 @@
  */
 package org.mycore.frontend.support;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
