@@ -129,7 +129,7 @@ public class MCRDOICommands {
                         }
                     });
 
-                    dataciteClient.setMediaList(doi, newMediaList);
+                    dataciteClient.setMediaList(doi, newHashMap.entrySet().stream().collect(Collectors.toList()));
                     LOGGER.info("Updated media-list of " + doiString);
                 } else {
                     LOGGER.info("Object " + objectID.toString() + " does not exist in this application!");
