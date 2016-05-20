@@ -8,16 +8,22 @@
       <!-- hsqldb -->
       <!-- <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
       <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:mycore" /> -->
-      
+
+      <!-- postgres -->
+<!--       <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" /> -->
+<!--       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/postgres" /> -->
       <!-- h2 -->
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:mycore" />
-      
-      <property name="javax.persistence.jdbc.user" value="sa" />
-      <property name="javax.persistence.jdbc.password" value="" />
+
+      <property name="javax.persistence.jdbc.user" value="postgres" />
+      <property name="javax.persistence.jdbc.password" value="junit" />
       <property name="hibernate.cache.use_second_level_cache" value="false" />
       <property name="hibernate.jdbc.batch_size" value="0" />
       <property name="hibernate.show_sql" value="false" />
+      <property name="hibernate.format_sql" value="true" />
+      <!-- We better always test with defined schema -->
+      <property name="hibernate.default_schema" value="junit" />
 
       <!-- hikari -->
       <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider" />

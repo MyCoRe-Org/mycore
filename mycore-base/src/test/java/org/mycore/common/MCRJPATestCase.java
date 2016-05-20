@@ -8,15 +8,17 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.RollbackException;
 
 import org.apache.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.hibernate.HibernateException;
 import org.junit.After;
 import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
@@ -64,7 +66,8 @@ public class MCRJPATestCase extends MCRTestCase {
         Logger.getLogger(MCRHibTestCase.class).debug("Setup JPA");
         MCRJPABootstrapper.initializeJPA();
         exportSchema();
-        MCRHibernateConfigHelper.checkEntityManagerFactoryConfiguration(MCREntityManagerProvider.getEntityManagerFactory());
+        MCRHibernateConfigHelper
+            .checkEntityManagerFactoryConfiguration(MCREntityManagerProvider.getEntityManagerFactory());
         try {
             LogManager.getLogger().debug("Prepare hibernate test", new RuntimeException());
             entityManager = MCREntityManagerProvider.getCurrentEntityManager();
@@ -77,11 +80,41 @@ public class MCRJPATestCase extends MCRTestCase {
     }
 
     public void exportSchema() throws IOException {
+        doSchemaOperation(schema -> "create schema " + schema);
         exportSchema("create");
+    }
+
+    private void doSchemaOperation(Function<String, String> schemaFunction) {
+        EntityManager currentEntityManager = MCREntityManagerProvider.getCurrentEntityManager();
+        EntityTransaction transaction = currentEntityManager.getTransaction();
+        try {
+            transaction.begin();
+            getDefaultSchema().ifPresent(
+                schemaFunction
+                    .andThen(currentEntityManager::createNativeQuery)
+                    .andThen(Query::executeUpdate)::apply);
+        } finally {
+            if (transaction.isActive()) {
+                if (transaction.getRollbackOnly()) {
+                    transaction.rollback();
+                } else {
+                    transaction.commit();
+                }
+            }
+        }
+    }
+
+    private Optional<String> getDefaultSchema() {
+        return Optional.ofNullable(MCREntityManagerProvider
+            .getEntityManagerFactory()
+            .getProperties()
+            .get("hibernate.default_schema"))
+            .map(Object::toString);
     }
 
     public void dropSchema() throws IOException {
         exportSchema("drop");
+        doSchemaOperation(schema -> "drop schema " + schema);
     }
 
     public MCRJPATestCase() {
@@ -101,7 +134,7 @@ public class MCRJPATestCase extends MCRTestCase {
         entityManager.getTransaction().begin();
     }
 
-    protected void endTransaction() throws HibernateException {
+    protected void endTransaction() {
         EntityTransaction tx = entityManager.getTransaction();
         if (tx != null && tx.isActive()) {
             if (tx.getRollbackOnly()) {
