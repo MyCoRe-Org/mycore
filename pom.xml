@@ -968,7 +968,7 @@
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-hikaricp</artifactId>
         <version>${hibernate.version}</version>
-        <scope>runtime</scope>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.ant</groupId>
@@ -1159,6 +1159,11 @@
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
         <version>1.9.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>9.4.1208</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
