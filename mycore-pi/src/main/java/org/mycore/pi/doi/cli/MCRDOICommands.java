@@ -27,7 +27,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 public class MCRDOICommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final String REPAIR_MEDIALIST_OF_0_AND_SEVICE_1 = "repair medialist of {0} and sevice {1}";
+    private static final String REPAIR_MEDIALIST_OF_0_AND_SERVICE_1 = "repair medialist of {0} and service {1}";
 
 
     @MCRCommand(syntax = "repair registered dois {0}", help = "Contacts the Registration Service and inserts all registered DOIs to the Database. It also updates all media files. The Service ID{0} is the id from the configuration.", order = 10)
@@ -87,7 +87,7 @@ public class MCRDOICommands {
             return doiList.stream()
                     .filter(doi -> !doi.getPrefix().equals(MCRDigitalObjectIdentifier.TEST_DOI_PREFIX))
                     .map(MCRDigitalObjectIdentifier::asString)
-                    .map(doiStr -> MessageFormat.format(REPAIR_MEDIALIST_OF_0_AND_SEVICE_1, doiStr, serviceID))
+                    .map(doiStr -> MessageFormat.format(REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, doiStr, serviceID))
                     .collect(Collectors.toList());
         } catch (MCRPersistentIdentifierException e) {
             LOGGER.error("Error while receiving DOI list from Registration-Service!", e);
@@ -97,7 +97,7 @@ public class MCRDOICommands {
     }
 
 
-    @MCRCommand(syntax = REPAIR_MEDIALIST_OF_0_AND_SEVICE_1, help = "Sends new media list to Datacite. {0} is the DOI. The Service ID{1} is the id from the configuration.")
+    @MCRCommand(syntax = REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, help = "Sends new media list to Datacite. {0} is the DOI. The Service ID{1} is the id from the configuration.")
     public static void updateMediaListForDOI(String doiString, String serviceID) {
         MCRDOIRegistrationService registrationService = new MCRDOIRegistrationService(serviceID);
 

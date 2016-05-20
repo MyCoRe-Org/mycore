@@ -4,7 +4,6 @@ package org.mycore.pi.doi;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -131,9 +131,9 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             MCRPath mainDocumentPath = MCRPath.getPath(derivateId.toString(), mainDoc);
             try {
                 String contentType = Files.probeContentType(mainDocumentPath);
-                contentType = contentType == null ? "" : contentType;
+                contentType = contentType == null ? "application/octet-stream" : contentType;
                 // TODO: maybe add link to viewer if PDF or other supported format
-                entryList.add(new AbstractMap.SimpleEntry<String, URI>("application/octet-stream", new URI(this.registerURL + "/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + URLEncoder.encode(mainDoc, "UTF-8"))));
+                entryList.add(new AbstractMap.SimpleEntry<String, URI>(contentType, new URI(this.registerURL + MCRXMLFunctions.encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/"))));
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Error while detecting the file to register!", e);
             }
