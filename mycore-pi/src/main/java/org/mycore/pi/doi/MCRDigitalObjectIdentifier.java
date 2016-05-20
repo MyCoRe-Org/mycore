@@ -9,7 +9,7 @@ import org.mycore.pi.MCRPersistentIdentifier;
 public class MCRDigitalObjectIdentifier implements MCRPersistentIdentifier {
 
 
-    static final String TEST_DOI_PREFIX = "10.5072";
+    public static final String TEST_DOI_PREFIX = "10.5072";
     private String prefix;
     private String suffix;
 
