@@ -3,8 +3,10 @@ package org.mycore.frontend.jersey.resources;
 import java.awt.Color;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -50,6 +52,8 @@ public class MCRSessionResource {
         JsonArray rootJSON = MCRSessionMgr
             .getAllSessions()
             .values()
+            .stream()
+            .collect(Collectors.toCollection(ArrayList::new)) //copy to work on
             .parallelStream()
             .map(s -> generateSessionJSON(s, resolveHostname))
             .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
