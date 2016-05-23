@@ -22,6 +22,8 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -123,8 +125,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
      */
     public List<Map.Entry<String, URI>> getMediaList(MCRObject obj) {
         List<Map.Entry<String, URI>> entryList = new ArrayList<>();
-        MCRObject mcrObject = obj;
-        Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(mcrObject.getId(), 1, TimeUnit.MINUTES).stream().findFirst();
+        Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(obj.getId(), 1, TimeUnit.MINUTES).stream().findFirst();
         derivateIdOptional.ifPresent(derivateId -> {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
             String mainDoc = derivate.getDerivate().getInternals().getMainDoc();
@@ -133,7 +134,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
                 String contentType = Files.probeContentType(mainDocumentPath);
                 contentType = contentType == null ? "application/octet-stream" : contentType;
                 // TODO: maybe add link to viewer if PDF or other supported format
-                entryList.add(new AbstractMap.SimpleEntry<String, URI>(contentType, new URI(this.registerURL + MCRXMLFunctions.encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDoc))));
+                entryList.add(new AbstractMap.SimpleEntry<>(contentType, new URI(this.registerURL + MCRXMLFunctions.encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDoc))));
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Error while detecting the file to register!", e);
             }
@@ -160,12 +161,21 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     }
 
     @Override
-    public void onDelete(MCRDigitalObjectIdentifier doi, MCRBase obj) throws MCRPersistentIdentifierException {
-        throw new MCRPersistentIdentifierException("Object should not be deleted!");
+    public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+        if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
+            LOGGER.warn("SuperUser deletes object " + obj.getId().toString() + " with registered doi " + doi.asString() + ". Try to set DOI inactive.");
+            try {
+                getDataciteClient().deleteMetadata(doi);
+            } catch (MCRPersistentIdentifierException e) {
+                LOGGER.error("Error while setting " + doi.asString() + " inactive! Delete of object should continue!");
+            }
+        } else {
+            throw new MCRPersistentIdentifierException("Object should not be deleted! (It has a registered DOI)");
+        }
     }
 
     @Override
-    public void onUpdate(MCRDigitalObjectIdentifier doi, MCRBase obj) throws MCRPersistentIdentifierException {
+    public void update(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
         Document datacite = transformToDatacite(doi, obj);
         MCRDataciteClient dataciteClient = getDataciteClient();
         dataciteClient.deleteMetadata(doi);

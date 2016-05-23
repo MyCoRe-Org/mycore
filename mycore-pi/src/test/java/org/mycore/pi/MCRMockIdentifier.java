@@ -12,4 +12,7 @@ public class MCRMockIdentifier implements MCRPersistentIdentifier {
     public String asString() {
         return this.text;
     }
+
+    public static final String MOCK_SCHEME = "MOCK:";
+
 }

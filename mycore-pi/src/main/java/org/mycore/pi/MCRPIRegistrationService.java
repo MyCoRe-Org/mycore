@@ -104,16 +104,35 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     protected abstract T registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException;
 
-    /**
-     * Maybe deletes information in the registration service document deletes
-     *
-     * @param identifier which is assigned to the object
-     * @param obj        which will be deleted
-     * @throws MCRPersistentIdentifierException
-     */
-    public abstract void onDelete(T identifier, MCRBase obj) throws MCRPersistentIdentifierException;
+    protected final void onDelete(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+        delete(identifier, obj, additional);
+        MCRPersistentIdentifierManager.delete(obj.getId().toString(), getType(), this.getRegistrationServiceID());
+    }
 
-    public abstract void onUpdate(T identifier, MCRBase obj) throws MCRPersistentIdentifierException;
+    protected final void onUpdate(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+        update(identifier, obj, additional);
+    }
+
+    /**
+     * Should handle deletion of a Object with the PI.
+     * E.g. The {@link org.mycore.pi.doi.MCRDOIRegistrationService} sets the active flag in Datacite datacentre to false.
+     * @param identifier the Identifier
+     * @param obj the deleted object
+     * @param additional
+     * @throws MCRPersistentIdentifierException to abort deletion of the object  or if something went wrong. (E.G. {@link org.mycore.pi.doi.MCRDOIRegistrationService} throws if not superuser tries to delete the object)
+     */
+    protected abstract void delete(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException;
+
+    /**
+     * Should handle updates of a Object with the PI.
+     * E.g. The {@link org.mycore.pi.doi.MCRDOIRegistrationService} sends the updated metadata to the Datacite datacentre.
+     * @param identifier the Identifier
+     * @param obj the deleted object
+     * @param additional
+     * @throws MCRPersistentIdentifierException to abort update of the object or if something went wrong.
+     */
+    protected abstract void update(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException;
+
 
     public boolean isRegistered(MCRObjectID id, String additional) {
         return ((Number)MCRHIBConnection.instance()

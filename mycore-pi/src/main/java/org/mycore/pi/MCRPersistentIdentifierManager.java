@@ -59,6 +59,19 @@ public class MCRPersistentIdentifierManager {
                 .hashCode();
     }
 
+    public static void delete(String objectID, String type, String service) {
+        Criteria criteria = getObjectCriteria(objectID);
+
+        addTypeRestriction(type, criteria);
+        if (service != null) {
+            criteria.add(Restrictions.eq("service", service));
+        }
+
+        MCRPI piEntry = (MCRPI) criteria.uniqueResult();
+        MCRHIBConnection.instance()
+                .getSession().delete(piEntry);
+    }
+
     public static List<MCRPIRegistrationInfo> getList(int from, int count) {
         return getList(null, from, count);
     }
@@ -78,19 +91,27 @@ public class MCRPersistentIdentifierManager {
     private static Criteria getTypeCriteria(String type) {
         Criteria criteria = getCriteria();
 
+        addTypeRestriction(type, criteria);
+        return criteria;
+    }
+
+    private static void addTypeRestriction(String type, Criteria criteria) {
         if (type != null) {
             criteria.add(Restrictions.eq("type", type));
         }
-        return criteria;
     }
 
     private static Criteria getObjectCriteria(String objectID){
         Criteria criteria = getCriteria();
 
+        addObjectRestriction(objectID, criteria);
+        return criteria;
+    }
+
+    private static void addObjectRestriction(String objectID, Criteria criteria) {
         if (objectID != null) {
             criteria.add(Restrictions.eq("mycoreID", objectID));
         }
-        return criteria;
     }
 
     private static Criteria getCriteria() {
