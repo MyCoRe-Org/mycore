@@ -57,6 +57,15 @@ mycore.session.listing = {
         year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
     };
     var locale = "de-DE";
+    var sc=mycore.session.listing.sortCriteria;    
+    $("#sessionListingTable th i")
+    	.removeClass("fa-sort fa-sort-asc fa-sort-desc")
+    	.addClass(function(){
+			if ($(this).parents("th").data("criteria")===sc.criteria){
+				return sc.asc? "fa-sort-asc":"fa-sort-desc";
+			}
+			return "fa-sort";
+    	});
 
     // empty table
     $(".table-session-entry").remove();

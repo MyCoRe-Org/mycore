@@ -44,35 +44,25 @@
 
         <table id="sessionListingTable" class="table">
           <tr>
-            <th>
+            <th data-criteria="login" role="button" tabindex="0" onclick="mycore.session.listing.sortByLogin()">
               <xsl:value-of select="i18n:translate('component.session-listing.login')" />
-              <a href="javascript:mycore.session.listing.sortByLogin()">
-                <i class="fa fa-sort "></i>
-              </a>
+              <i class="fa fa-sort "></i>
             </th>
-            <th>
+            <th data-criteria="ip" role="button" tabindex="0" onclick="mycore.session.listing.sortByIP()">
               <xsl:value-of select="i18n:translate('component.session-listing.ip')" />
-              <a href="javascript:mycore.session.listing.sortByIP()">
-                <i class="fa fa-sort "></i>
-              </a>
+              <i class="fa fa-sort "></i>
             </th>
-            <th>
+            <th data-criteria="createTime" role="button" tabindex="0" onclick="mycore.session.listing.sortByFirstAccess()">
               <xsl:value-of select="i18n:translate('component.session-listing.firstAccess')" />
-              <a href="javascript:mycore.session.listing.sortByFirstAccess()">
-                <i class="fa fa-sort "></i>
-              </a>
+              <i class="fa fa-sort "></i>
             </th>
-            <th>
+            <th data-criteria="lastAccess" role="button" tabindex="0" onclick="mycore.session.listing.sortByLastAccess()">
               <xsl:value-of select="i18n:translate('component.session-listing.lastAccess')" />
-              <a href="javascript:mycore.session.listing.sortByLastAccess()">
-                <i class="fa fa-sort "></i>
-              </a>
+              <i class="fa fa-sort "></i>
             </th>
-            <th>
+            <th data-criteria="stackTrace" role="button" tabindex="0" onclick="mycore.session.listing.sortByStacktrace()">
               Stacktrace
-              <a href="javascript:mycore.session.listing.sortByStacktrace()">
-                <i class="fa fa-sort "></i>
-              </a>
+              <i class="fa fa-sort "></i>
             </th>
           </tr>
         </table>
