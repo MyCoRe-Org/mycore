@@ -22,7 +22,13 @@ mycore.session.listing = {
     $.get(mycore.session.listing.baseURL + "rsc/session/list?resolveHostname=" + resolveHostname).done(function(sessions) {
       mycore.session.listing.sessions = sessions;
       mycore.session.listing.filteredSessions = sessions.slice();
-      mycore.session.listing.render();
+      var sc=mycore.session.listing.sortCriteria;
+      if (sc.criteria !== null){
+    	  sc.asc=!sc.asc;
+          $("#sessionListingTable th[data-criteria='"+sc.criteria+"']").click();
+      } else {
+    	  mycore.session.listing.render();
+      }
     }).fail(function(err) {
       console.log(err);
       if(err.status == 401) {
