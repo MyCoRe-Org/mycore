@@ -59,7 +59,7 @@ public class MCRMigrationCommands {
         throws IOException, MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCRBase obj = MCRMetadataManager.retrieve(objectID);
-        MCRObjectService service = obj.getService);
+        MCRObjectService service = obj.getService();
         if (!service.isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) { //the egg
             MCRVersionedMetadata versionedMetadata = MCRXMLMetadataManager.instance().getVersionedMetaData(objectID);
             String createUser = null, modifyUser = null;
