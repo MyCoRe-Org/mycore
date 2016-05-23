@@ -26,6 +26,7 @@ package org.mycore.common;
 import static org.mycore.common.events.MCRSessionEvent.Type.activated;
 import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -59,6 +60,9 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @version $Revision$ $Date$
  */
 public class MCRSession implements Cloneable {
+
+    private static final URI defaultURI = URI.create("");
+
     /** A map storing arbitrary session data * */
     private Map<Object, Object> map = new Hashtable<Object, Object>();
 
@@ -99,10 +103,12 @@ public class MCRSession implements Cloneable {
     private boolean dataBaseAccess;
 
     private ThreadLocal<EntityTransaction> transaction = new ThreadLocal<>();
-    
+
     private ThreadLocal<MCRServletJob> servletJob = new ThreadLocal<>();
 
     private StackTraceElement[] constructingStackTrace;
+
+    private Optional<URI> firstURI = Optional.empty();
 
     private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<Throwable>();
 
@@ -283,16 +289,19 @@ public class MCRSession implements Cloneable {
     public long getLastAccessedTime() {
         return lastAccessTime;
     }
-    
-    public void setServletJob(MCRServletJob job){
+
+    public void setServletJob(MCRServletJob job) {
+        if (!firstURI.isPresent()) {
+            firstURI = Optional.of(URI.create(job.getRequest().getRequestURI()));
+        }
         servletJob.set(job);
     }
-    
+
     /**
      * Returns this thread current HttpServletRequest.
      * Does not work in a Thread that does not handle the current request or in CLI.
      */
-    public Optional<HttpServletRequest> getServletRequest(){
+    public Optional<HttpServletRequest> getServletRequest() {
         return Optional.ofNullable(servletJob.get()).map(MCRServletJob::getRequest);
     }
 
@@ -300,7 +309,7 @@ public class MCRSession implements Cloneable {
      * Returns this thread current HttpServletResponse.
      * Does not work in a Thread that does not handle the current request or in CLI.
      */
-    public Optional<HttpServletResponse> getServletResponse(){
+    public Optional<HttpServletResponse> getServletResponse() {
         return Optional.ofNullable(servletJob.get()).map(MCRServletJob::getResponse);
     }
 
@@ -335,6 +344,9 @@ public class MCRSession implements Cloneable {
             fireSessionEvent(passivated, concurrentAccess.decrementAndGet());
         } else {
             LOGGER.debug("deactivate currentThreadCount: " + currentThreadCount.get().get());
+        }
+        if (!firstURI.isPresent()) {
+            firstURI = Optional.of(defaultURI);
         }
         servletJob.remove();
     }
@@ -418,6 +430,10 @@ public class MCRSession implements Cloneable {
 
     public StackTraceElement[] getConstructingStackTrace() {
         return constructingStackTrace;
+    }
+
+    public Optional<URI> getFirstURI() {
+        return firstURI;
     }
 
     /**

@@ -98,6 +98,13 @@ mycore.session.listing = {
     dialog.empty();
     var session = mycore.session.listing.getSession(id);
     var stacktrace = session.constructingStacktrace.stacktrace;
+    var header = dialog.parents(".modal-dialog").find(".modal-header");
+    if (session.firstURI != null){
+    	header.find(".modal-title").html(session.firstURI);
+    	header.show();
+    } else {
+    	header.hide();
+    }
     var content = "";
     for(var line of stacktrace) {
       content += line.class + "." + line.method + " (" + line.file + ":" + line.line + ")\n";
