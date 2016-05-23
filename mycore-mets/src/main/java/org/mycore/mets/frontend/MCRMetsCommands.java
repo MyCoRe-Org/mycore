@@ -31,14 +31,14 @@ import org.mycore.mets.tools.MCRMetsSave;
 import org.mycore.mets.validator.METSValidator;
 import org.mycore.mets.validator.validators.ValidationException;
 
-@MCRCommandGroup(name = "MCR Mets Commands")
+@MCRCommandGroup(name = "Mets Commands")
 public class MCRMetsCommands extends MCRAbstractCommands {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMetsCommands.class);
 
-	public static ConcurrentLinkedQueue<String> invalidMetsQueue = new ConcurrentLinkedQueue<>();
+    public static ConcurrentLinkedQueue<String> invalidMetsQueue = new ConcurrentLinkedQueue<>();
 
-	@MCRCommand(syntax = "validate selected mets", help = "validates all mets.xml of selected derivates", order = 10)
+    @MCRCommand(syntax = "validate selected mets", help = "validates all mets.xml of selected derivates", order = 10)
     public static void validateSelectedMets() {
         List<String> selectedObjectIDs = MCRObjectCommands.getSelectedObjectIDs();
 
@@ -51,10 +51,10 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                     InputStream metsIS = content.getInputStream();
                     METSValidator mv = new METSValidator(metsIS);
                     List<ValidationException> validationExceptionList = mv.validate();
-					if (validationExceptionList.size() > 0) {
-						invalidMetsQueue.add(objectID);
-					}
-					for (ValidationException validationException : validationExceptionList) {
+                    if (validationExceptionList.size() > 0) {
+                        invalidMetsQueue.add(objectID);
+                    }
+                    for (ValidationException validationException : validationExceptionList) {
                         LOGGER.error(validationException.getMessage());
                     }
                 } catch (IOException e) {
@@ -67,77 +67,77 @@ public class MCRMetsCommands extends MCRAbstractCommands {
         }
     }
 
-	@MCRCommand(syntax = "try fix invalid mets", help = "This Command can be used to fix invalid mets files that was found in any validate selected mets runs.", order = 15)
-	public static void fixInvalidMets() {
-		String selectedObjectID;
-		while ((selectedObjectID = invalidMetsQueue.poll()) != null) {
-			LOGGER.info("Try to fix METS of " + selectedObjectID);
-			MCRPath metsFile = MCRPath.getPath(selectedObjectID, "/mets.xml");
-			SAXBuilder saxBuilder = new SAXBuilder();
-			Document metsDocument;
-			try (InputStream metsInputStream = Files.newInputStream(metsFile)) {
-				metsDocument = saxBuilder.build(metsInputStream);
-			} catch (IOException | JDOMException e) {
-				LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not parse mets.xml!", selectedObjectID), e);
-				return;
-			}
+    @MCRCommand(syntax = "try fix invalid mets", help = "This Command can be used to fix invalid mets files that was found in any validate selected mets runs.", order = 15)
+    public static void fixInvalidMets() {
+        String selectedObjectID;
+        while ((selectedObjectID = invalidMetsQueue.poll()) != null) {
+            LOGGER.info("Try to fix METS of " + selectedObjectID);
+            MCRPath metsFile = MCRPath.getPath(selectedObjectID, "/mets.xml");
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document metsDocument;
+            try (InputStream metsInputStream = Files.newInputStream(metsFile)) {
+                metsDocument = saxBuilder.build(metsInputStream);
+            } catch (IOException | JDOMException e) {
+                LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not parse mets.xml!", selectedObjectID), e);
+                return;
+            }
 
-			MCRMetsSimpleModel mcrMetsSimpleModel;
-			try {
-				mcrMetsSimpleModel = MCRXMLSimpleModelConverter.fromXML(metsDocument);
-			} catch (Exception e) {
-				LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not convert to SimpleModel!", selectedObjectID), e);
-				return;
-			}
+            MCRMetsSimpleModel mcrMetsSimpleModel;
+            try {
+                mcrMetsSimpleModel = MCRXMLSimpleModelConverter.fromXML(metsDocument);
+            } catch (Exception e) {
+                LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not convert to SimpleModel!", selectedObjectID), e);
+                return;
+            }
 
-			Document newMets = MCRSimpleModelXMLConverter.toXML(mcrMetsSimpleModel);
-			XMLOutputter xmlOutputter = new XMLOutputter();
-			try (OutputStream os = Files.newOutputStream(metsFile)) {
-				xmlOutputter.output(newMets, os);
-			} catch (IOException e) {
-				LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not write mets to derivate.", selectedObjectID));
-			}
-		}
-	}
+            Document newMets = MCRSimpleModelXMLConverter.toXML(mcrMetsSimpleModel);
+            XMLOutputter xmlOutputter = new XMLOutputter();
+            try (OutputStream os = Files.newOutputStream(metsFile)) {
+                xmlOutputter.output(newMets, os);
+            } catch (IOException e) {
+                LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not write mets to derivate.", selectedObjectID));
+            }
+        }
+    }
 
-	@MCRCommand(syntax = "add mets files for derivate {0}", help = "", order = 20)
-	public static void addMetsFileForDerivate(String derivateID) {
-		MCRPath metsFile = MCRPath.getPath(derivateID, "/mets.xml");
-		if (!Files.exists(metsFile)) {
-			try {
-	            LOGGER.debug("Start MCRMETSGenerator for derivate " + derivateID);
-				HashSet<MCRPath> ignoreNodes = new HashSet<MCRPath>();
-				Document mets = MCRMETSGenerator.getGenerator()
-						.getMETS(MCRPath.getPath(derivateID, "/"), ignoreNodes)
-						.asDocument();
-				MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivateID));
-	            LOGGER.debug("Stop MCRMETSGenerator for derivate " + derivateID);
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				LOGGER.error("Can't create mets file for derivate "
-						+ derivateID);
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-				LOGGER.error("Can't create mets file for derivate "
-						+ derivateID);
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-				LOGGER.error("Can't create mets file for derivate "
-						+ derivateID);
-			} catch (IOException e) {
-				e.printStackTrace();
-				LOGGER.error("Can't create mets file for derivate "
-						+ derivateID);
-			}
-		}
-	}
-	
-	@MCRCommand(syntax = "add mets files for project id {0}", help = "", order = 30)
-	public static void addMetsFileForProjectID(String projectID) {
-		MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
-		List <String> dervate_list = manager.listIDsForBase(projectID + "_derivate");
-		for (String derivateID : dervate_list) {
-			addMetsFileForDerivate(derivateID);
-		}
-	}
+    @MCRCommand(syntax = "add mets files for derivate {0}", help = "", order = 20)
+    public static void addMetsFileForDerivate(String derivateID) {
+        MCRPath metsFile = MCRPath.getPath(derivateID, "/mets.xml");
+        if (!Files.exists(metsFile)) {
+            try {
+                LOGGER.debug("Start MCRMETSGenerator for derivate " + derivateID);
+                HashSet<MCRPath> ignoreNodes = new HashSet<MCRPath>();
+                Document mets = MCRMETSGenerator.getGenerator()
+                        .getMETS(MCRPath.getPath(derivateID, "/"), ignoreNodes)
+                        .asDocument();
+                MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivateID));
+                LOGGER.debug("Stop MCRMETSGenerator for derivate " + derivateID);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                LOGGER.error("Can't create mets file for derivate "
+                        + derivateID);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                LOGGER.error("Can't create mets file for derivate "
+                        + derivateID);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+                LOGGER.error("Can't create mets file for derivate "
+                        + derivateID);
+            } catch (IOException e) {
+                e.printStackTrace();
+                LOGGER.error("Can't create mets file for derivate "
+                        + derivateID);
+            }
+        }
+    }
+
+    @MCRCommand(syntax = "add mets files for project id {0}", help = "", order = 30)
+    public static void addMetsFileForProjectID(String projectID) {
+        MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
+        List <String> dervate_list = manager.listIDsForBase(projectID + "_derivate");
+        for (String derivateID : dervate_list) {
+            addMetsFileForDerivate(derivateID);
+        }
+    }
 }

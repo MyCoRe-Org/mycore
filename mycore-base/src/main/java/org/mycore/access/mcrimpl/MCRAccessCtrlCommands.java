@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -32,16 +32,16 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 /**
  * This class provides a set of commands for the org.mycore.access package which
  * can be used by the command line interface. (creates sql tables, run queries
- * 
+ *
  * @author Arne Seifert
  */
-@MCRCommandGroup(name="MCR Access Control Commands")
+@MCRCommandGroup(name="Access Control Commands")
 public class MCRAccessCtrlCommands extends MCRAbstractCommands {
     public static Logger logger = Logger.getLogger(MCRAccessCtrlCommands.class.getName());
 
     /**
      * validates access for given object and given permission
-     * 
+     *
      * @param objid
      *            internal database ruleid
      * @param permission

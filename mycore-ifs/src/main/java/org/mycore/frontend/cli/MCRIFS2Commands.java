@@ -1,6 +1,6 @@
 /*
  * $Revision: 27557 $ $Date: 2013-08-02 15:57:50 +0200 (Fr, 02. Aug 2013) $
- * 
+ *
  * This file is part of M y C o R e See http://www.mycore.de/ for details. This
  * program is free software; you can use it, redistribute it and / or modify it
  * under the terms of the GNU General Public License (GPL) as published by the
@@ -53,7 +53,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 
-@MCRCommandGroup(name = "IFS2 Maintenance")
+@MCRCommandGroup(name = "IFS2 Maintenance Commands")
 public class MCRIFS2Commands {
 
     private static Logger LOGGER = LogManager.getLogger();

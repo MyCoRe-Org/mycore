@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
  * @author Thomas Scheffler (yagee)
  *
  */
-@MCRCommandGroup(name="MCR MODS Commands")
+@MCRCommandGroup(name="MODS Commands")
 public class MCRMODSCommands extends MCRAbstractCommands {
 
     public static final String MODS_V3_XSD_URI = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";

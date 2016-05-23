@@ -76,14 +76,14 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * "delete by Query ..." can be deleted - "select ..." and "delete selected ..." supply the same behaviour in 2 commands
  * - "list objects matching ..." can be deleted - "select ..." and "list selected" supply the same behaviour in 2
  * commands
- * 
+ *
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @author Robert Stephan
  * @version $Revision$ $Date$
  */
 @MCRCommandGroup(
-    name = "MCRObject Commands")
+    name = "Object Commands")
 public class MCRObjectCommands extends MCRAbstractCommands {
     private static final String EXPORT_OBJECT_TO_DIRECTORY_COMMAND = "export object {0} to directory {1} with {2}";
 
@@ -112,7 +112,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Delete all MCRObject from the datastore for a given type.
-     * 
+     *
      * @param type
      *            the type of the MCRObjects that should be deleted
      */
@@ -129,11 +129,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Delete a MCRObject from the datastore.
-     * 
+     *
      * @param ID
      *            the ID of the MCRObject that should be deleted
      * @throws MCRAccessException see {@link MCRMetadataManager#deleteMCRObject(MCRObjectID)}
-     * @throws MCRPersistenceException 
+     * @throws MCRPersistenceException
      */
     @MCRCommand(
         syntax = "delete object {0}", help = "Removes a MCRObject with the MCRObjectID {0}", order = 40)
@@ -145,12 +145,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Delete MCRObject's form ID to ID from the datastore.
-     * 
+     *
      * @param IDfrom
      *            the start ID for deleting the MCRObjects
      * @param IDto
      *            the stop ID for deleting the MCRObjects
-     * @return 
+     * @return
      */
     @MCRCommand(
         syntax = "delete object from {0} to {1}",
@@ -180,7 +180,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Load MCRObject's from all XML files in a directory in proper order (respecting parent-child-relationships).
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      */
@@ -194,7 +194,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Update MCRObject's from all XML files in a directory in proper order (respecting parent-child-relationships).
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      */
@@ -208,7 +208,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Load MCRObject's from all XML files in a directory.
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      */
@@ -221,7 +221,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Update MCRObject's from all XML files in a directory.
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      */
@@ -288,7 +288,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Load a MCRObjects from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRObject)}
@@ -302,7 +302,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Load a MCRObjects from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @param importMode
@@ -316,7 +316,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Update a MCRObject's from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
@@ -331,7 +331,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Update a MCRObject's from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @param importMode
@@ -345,7 +345,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Load or update an MCRObject's from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @param update
@@ -355,7 +355,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRActiveLinkException
      * @throws SAXParseException
      * @throws MCRException
-     * @throws MCRAccessException 
+     * @throws MCRAccessException
      */
     private static boolean processFromFile(File file, boolean update, boolean importMode)
         throws MCRActiveLinkException, MCRException, SAXParseException, IOException, MCRAccessException {
@@ -395,7 +395,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Shows the next free MCRObjectIDs.
-     * 
+     *
      * @param base
      *            the base String of the MCRObjectID
      */
@@ -410,7 +410,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Shows the last used MCRObjectIDs.
-     * 
+     *
      * @param base
      *            the base String of the MCRObjectID
      */
@@ -425,7 +425,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Export an MCRObject to a file named <em>MCRObjectID</em> .xml in a directory. The method use the converter
      * stylesheet mcr_<em>style</em>_object.xsl.
-     * 
+     *
      * @param ID
      *            the ID of the MCRObject to be save.
      * @param dirname
@@ -445,7 +445,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * Save any MCRObject's to files named <em>MCRObjectID</em> .xml in a directory. The saving starts with fromID and
      * runs to toID. ID's they was not found will skiped. The method use the converter stylesheet mcr_<em>style</em>
      * _object.xsl.
-     * 
+     *
      * @param fromID
      *            the ID of the MCRObject from be save.
      * @param toID
@@ -501,7 +501,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Save all MCRObject's to files named <em>MCRObjectID</em> .xml in a <em>dirname</em>directory for the data type
      * <em>type</em>. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
-     * 
+     *
      * @param type
      *            the MCRObjectID type
      * @param dirname
@@ -521,7 +521,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Save all MCRObject's to files named <em>MCRObjectID</em> .xml in a <em>dirname</em>directory for the data base
      * <em>project_type</em>. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
-     * 
+     *
      * @param base
      *            the MCRObjectID base
      * @param dirname
@@ -554,7 +554,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * The method search for a stylesheet mcr_<em>style</em>_object.xsl and build the transformer. Default is
      * <em>mcr_save-object.xsl</em>.
-     * 
+     *
      * @param style
      *            the style attribute for the transformer stylesheet
      * @return the transformer
@@ -610,7 +610,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * <li>If it get an exception while store the native data without check, ACÖ's and transformation it return a
      * warning and false.</li>
      * </ul>
-     * 
+     *
      * @param dir
      *            the file instance to store
      * @param trans
@@ -650,7 +650,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Get the next free MCRObjectID for the given MCRObjectID base.
-     * 
+     *
      * @param base
      *            the MCRObjectID base string
      */
@@ -667,7 +667,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Get the last used MCRObjectID for the given MCRObjectID base.
-     * 
+     *
      * @param base
      *            the MCRObjectID base string
      */
@@ -699,7 +699,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * List revisions of an MyCoRe Object.
-     * 
+     *
      * @param id
      *            id of MyCoRe Object
      */
@@ -770,26 +770,26 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * <p>
      * To use this command create a new xsl file and copy following xslt code into it.
      * </p>
-     * 
+     *
      * <pre>
      * {@code
      * <?xml version="1.0" encoding="utf-8"?>
      * <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-     * 
+     *
      *   <xsl:template match='@*|node()'>
      *     <!-- default template: just copy -->
      *     <xsl:copy>
      *       <xsl:apply-templates select='@*|node()' />
      *     </xsl:copy>
      *   </xsl:template>
-     * 
+     *
      * </xsl:stylesheet>
      * }
      * </pre>
      * <p>
      * Insert a new template match, for example:
      * </p>
-     * 
+     *
      * <pre>
      * {@code
      * <xsl:template match="metadata/mainTitle/@heritable">
@@ -797,7 +797,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * </xsl:template>
      * }
      * </pre>
-     * 
+     *
      * @param objectId
      *            object to transform
      * @param xslFilePath
@@ -849,7 +849,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Moves object to new parent.
-     * 
+     *
      * @param sourceId
      *            object that should be attached to new parent
      * @param newParentId
@@ -908,7 +908,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Check the derivate links in objects of MCR base ID for existing. It looks to the XML store on the disk to get all
      * object IDs.
-     * 
+     *
      * @param base_id
      *            the base part of a MCRObjectID e.g. DocPortal_document
      */
@@ -960,7 +960,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * The method start the repair of the metadata search for a given MCRObjectID type.
-     * 
+     *
      * @param type
      *            the MCRObjectID type
      */
@@ -991,7 +991,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * The method start the repair of the metadata search for a given MCRObjectID as String.
-     * 
+     *
      * @param id
      *            the MCRObjectID as String
      */

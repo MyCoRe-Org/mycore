@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.solr.commands;
 
@@ -23,11 +23,11 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
 
 /**
  * Class provides useful solr related commands.
- * 
+ *
  * @author shermann
  */
 @MCRCommandGroup(
-    name = "MCR SOLR Commands")
+    name = "SOLR Commands")
 public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(

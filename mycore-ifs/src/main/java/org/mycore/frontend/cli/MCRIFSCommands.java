@@ -69,7 +69,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.Attributes2Impl;
 
-@MCRCommandGroup(name = "IFS Maintenance")
+@MCRCommandGroup(name = "IFS Maintenance Commands")
 public class MCRIFSCommands {
     private static final String ELEMENT_FILE = "file";
 
@@ -618,7 +618,7 @@ public class MCRIFSCommands {
     }
 
     /**
-     * 
+     *
      * @param baseURI
      * @param currentFile
      * @param storageIds

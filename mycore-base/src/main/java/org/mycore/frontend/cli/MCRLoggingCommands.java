@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.frontend.cli;
 
@@ -10,10 +10,10 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
 /**
  * Use this class to change log levels of java packages and classes.
- * 
+ *
  * @author shermann
  */
-@MCRCommandGroup(name="Logging")
+@MCRCommandGroup(name="Logging Commands")
 public class MCRLoggingCommands extends MCRAbstractCommands {
 
     private static final Logger LOGGER = Logger.getLogger(MCRLoggingCommands.class);
@@ -28,8 +28,8 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
      *            level
      */
     @MCRCommand(syntax="change log level of {0} to {1}",
-    		help="{0} the package or class name for which to change the log level, {1} the log level to set. If the log level cannot be read it is set to DEBUG by default.",
-    		order=10)
+            help="{0} the package or class name for which to change the log level, {1} the log level to set. If the log level cannot be read it is set to DEBUG by default.",
+            order=10)
     synchronized public static void changeLogLevel(String name, String logLevelToSet) {
         LOGGER.info("Setting log level for \"" + name + "\" to \"" + logLevelToSet + "\"");
 

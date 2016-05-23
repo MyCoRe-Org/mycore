@@ -71,7 +71,7 @@ import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
  *
  */
 
-@MCRCommandGroup(name = "MCR IView2 Tile Commands")
+@MCRCommandGroup(name = "IView2 Tile Commands")
 public class MCRIView2Commands extends MCRAbstractCommands {
     private static final Logger LOGGER = Logger.getLogger(MCRIView2Commands.class);
 

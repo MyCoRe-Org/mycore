@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision: 23424 $ $Date: 2012-02-02 22:53:29 +0100 (Do, 02 Feb 2012) $
  *
  * This file is part of ***  M y C o R e  ***
@@ -60,11 +60,11 @@ import org.xml.sax.SAXParseException;
 /**
  * This class provides a set of commands for the org.mycore.user2 management which can be used by the command line
  * interface.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 @MCRCommandGroup(
-    name = "MCR User Commands")
+    name = "User Commands")
 public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRUserCommands.class.getName());
@@ -74,7 +74,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This command changes the user of the session context to a new user.
-     * 
+     *
      * @param user
      *            the new user ID
      * @param password
@@ -95,7 +95,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This command changes the user of the session context to a new user.
-     * 
+     *
      * @param user
      *            the new user ID
      */
@@ -159,7 +159,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This method invokes {@link MCRRoleManager#deleteRole(String)} and permanently removes a role from the system.
-     * 
+     *
      * @param roleID
      *            the ID of the role which will be deleted
      */
@@ -188,7 +188,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * Loads XML from a user and looks for roles currently not present in the system and creates them.
-     * 
+     *
      * @param fileName
      *            a valid user XML file
      */
@@ -208,7 +208,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This method invokes MCRUserMgr.deleteUser() and permanently removes a user from the system.
-     * 
+     *
      * @param userID
      *            the ID of the user which will be deleted
      */
@@ -220,7 +220,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This method invokes MCRUserMgr.enableUser() that enables a user
-     * 
+     *
      * @param userID
      *            the ID of the user which will be enabled
      */
@@ -236,7 +236,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * A given XML file containing user data with cleartext passwords must be converted prior to loading the user data
      * into the system. This method reads all user objects in the given XML file, encrypts the passwords and writes them
      * back to a file with name original-file-name_encrypted.xml.
-     * 
+     *
      * @param oldFile
      *            the filename of the user data input
      * @param newFile
@@ -268,7 +268,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This method invokes MCRUserMgr.disableUser() that disables a user
-     * 
+     *
      * @param userID
      *            the ID of the user which will be enabled
      */
@@ -311,7 +311,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /**
      * This command takes a userID and file name as a parameter, retrieves the user from MCRUserMgr as JDOM document and
      * export this to the given file.
-     * 
+     *
      * @param userID
      *            ID of the user to be saved
      * @param filename
@@ -380,7 +380,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /**
      * This command takes a file name as a parameter, creates the MCRUser instances stores it in the database if it does
      * not exists.
-     * 
+     *
      * @param filename
      *            Name of the file to import user from
      */
@@ -397,7 +397,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /**
      * This method invokes MCRUserMgr.retrieveUser() and then works with the retrieved user object to change the
      * password.
-     * 
+     *
      * @param userID
      *            the ID of the user for which the password will be set
      */
@@ -414,7 +414,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /**
      * This method invokes {@link MCRRoleManager#getRole(String)} and then works with the retrieved role object to get
      * an XML-Representation.
-     * 
+     *
      * @param roleID
      *            the ID of the role for which the XML-representation is needed
      */
@@ -441,7 +441,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /**
      * This method invokes MCRUserMgr.retrieveUser() and then works with the retrieved user object to get an
      * XML-Representation.
-     * 
+     *
      * @param userID
      *            the ID of the user for which the XML-representation is needed
      */
@@ -466,7 +466,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * Check the file name
-     * 
+     *
      * @param filename
      *            the filename of the user data input
      * @return true if the file name is okay
@@ -490,7 +490,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This method invokes MCRUserMgr.createUser() with data from a file.
-     * 
+     *
      * @param filename
      *            the filename of the user data input
      */
@@ -501,7 +501,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This method invokes MCRUserMgr.updateUser() with data from a file.
-     * 
+     *
      * @param filename
      *            the filename of the user data input
      * @throws SAXParseException
@@ -526,7 +526,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This method adds a user as a member to a role
-     * 
+     *
      * @param userID
      *            the ID of the user which will be a member of the role represented by roleID
      * @param roleID
@@ -547,7 +547,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This method removes a member user from a role
-     * 
+     *
      * @param userID
      *            the ID of the user which will be removed from the role represented by roleID
      * @param roleID
@@ -568,7 +568,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This method just saves a JDOM document to a file automatically closes {@link OutputStream}.
-     * 
+     *
      * @param mcrUser
      *            the JDOM XML document to be printed
      * @param outFile

@@ -1,6 +1,6 @@
 /*
  * $Revision$ $Date$
- * 
+ *
  * This file is part of M y C o R e See http://www.mycore.de/ for details. This
  * program is free software; you can use it, redistribute it and / or modify it
  * under the terms of the GNU General Public License (GPL) as published by the
@@ -65,13 +65,13 @@ import org.xml.sax.SAXParseException;
 /**
  * Provides static methods that implement commands for the MyCoRe command line
  * interface.
- * 
+ *
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date: 2010-10-29 15:17:03 +0200 (Fri, 29 Oct
  *          2010) $
  */
-@MCRCommandGroup(name = "MCR Derivate Commands")
+@MCRCommandGroup(name = "Derivate Commands")
 public class MCRDerivateCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRDerivateCommands.class.getName());
@@ -101,11 +101,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Delete an MCRDerivate from the datastore.
-     * 
+     *
      * @param ID
      *            the ID of the MCRDerivate that should be deleted
      * @throws MCRActiveLinkException
-     * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)} 
+     * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)}
      */
     @MCRCommand(syntax = "delete derivate {0}", help = "The command remove a derivate with the MCRObjectID {0}", order = 30)
     public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
@@ -116,7 +116,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Delete MCRDerivates form ID to ID from the datastore.
-     * 
+     *
      * @param IDfrom
      *            the start ID for deleting the MCRDerivate
      * @param IDto
@@ -149,7 +149,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Loads MCRDerivates from all XML files in a directory.
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      */
@@ -160,7 +160,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Updates MCRDerivates from all XML files in a directory.
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      */
@@ -171,7 +171,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Loads or updates MCRDerivates from all XML files in a directory.
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      * @param update
@@ -211,7 +211,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Loads an MCRDerivates from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
@@ -224,13 +224,13 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Loads an MCRDerivates from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
-     * @throws MCRPersistenceException 
+     * @throws MCRPersistenceException
      */
     public static boolean loadFromFile(String file, boolean importMode)
         throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
@@ -239,11 +239,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Updates an MCRDerivates from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
-     * @throws MCRPersistenceException 
+     * @throws MCRPersistenceException
      */
 
     @MCRCommand(syntax = "update derivate from file {0}", help = "The command update a derivate form the file {0} in the system.", order = 50)
@@ -254,7 +254,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Updates an MCRDerivates from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @param importMode
@@ -268,7 +268,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Loads or updates an MCRDerivates from an XML file.
-     * 
+     *
      * @param file
      *            the location of the xml file
      * @param update
@@ -277,7 +277,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws SAXParseException
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRDerivate)}
-     * @throws MCRPersistenceException 
+     * @throws MCRPersistenceException
      */
     private static boolean processFromFile(File file, boolean update, boolean importMode) throws SAXParseException,
         IOException, MCRPersistenceException, MCRAccessException {
@@ -340,7 +340,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * directory under them named <em>MCRObjectID</em>. The IFS-Attribute of the
      * derivate files aren't saved, for reloading purpose after deleting a
      * derivate in the datastore
-     * 
+     *
      * @param ID
      *            the ID of the MCRDerivate to be save.
      * @param dirname
@@ -356,7 +356,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * directory with <em>dirname</em> and store the derivate objects in a
      * directory under them named <em>MCRObjectID</em>. The method use the
      * converter stylesheet mcr_<em>style</em>_object.xsl.
-     * 
+     *
      * @param ID
      *            the ID of the MCRDerivate to be save.
      * @param dirname
@@ -375,7 +375,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * saving starts with fromID and runs to toID. ID's they was not found will
      * skiped. The method use the converter stylesheet mcr_<em>style</em>
      * _object.xsl.
-     * 
+     *
      * @param fromID
      *            the ID of the MCRObject from be save.
      * @param toID
@@ -441,7 +441,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * The command look for all derivates in the application and build export
      * commands.
-     * 
+     *
      * @param dirname
      *            the filename to store the object
      * @param style
@@ -468,7 +468,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * The command look for all derivates starts with project name in the
      * application and build export commands.
-     * 
+     *
      * @param dirname
      *            the filename to store the object
      * @param style
@@ -602,7 +602,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * The method start the repair the content search index for one.
-     * 
+     *
      * @param id
      *            the MCRObjectID as String
      */
@@ -615,10 +615,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * This is a recursive method to start an event handler for each file.
-     * 
+     *
      * @param thisnode
      *            a IFS nod (file or directory)
-     * @throws IOException 
+     * @throws IOException
      */
     private static void doForChildren(Path rootPath) throws IOException {
         Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
@@ -657,7 +657,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * The method sychronize the xlink:label of the mycorederivate with the
      * xlink:label of the derivate reference of mycoreobject.
-     * 
+     *
      * @param id
      *            the MCRObjectID as String
      */
@@ -754,7 +754,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Check the object links in derivates of MCR base ID for existing. It looks to the XML store on the disk to get all object IDs.
-     * 
+     *
      * @param base_id
      *            the base part of a MCRObjectID e.g. DocPortal_derivate
      */
