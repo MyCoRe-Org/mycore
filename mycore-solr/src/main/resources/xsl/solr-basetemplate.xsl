@@ -128,10 +128,10 @@
       </field>
     </xsl:if>
     <xsl:for-each select="label">
-      <xsl:apply-templates select="@text|@description" mode="category" />
+      <xsl:apply-templates select="@text" mode="category" />
     </xsl:for-each>
   </xsl:template>
-  <xsl:template match="@text|@description" mode="category">
+  <xsl:template match="@text" mode="category">
     <field name="allMeta">
       <xsl:value-of select="." />
     </field>
