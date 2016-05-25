@@ -163,12 +163,13 @@ public class MCRRestAPIObjects {
 
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    @Path("/{mcrid}/derivates/{derid}/contents")
+    @Path("/{mcrid}/derivates/{derid}/contents{path:(/.*)*}")
     public Response listContents(@Context UriInfo info, @Context Request request, @PathParam("mcrid") String mcrID,
-        @PathParam("derid") String derID,
-        @QueryParam("format") @DefaultValue("xml") String format) {
+        @PathParam("derid") String derID, @PathParam("path") @DefaultValue("/") String path,
+        @QueryParam("format") @DefaultValue("xml") String format,
+        @QueryParam("depth") @DefaultValue("-1") int depth){
         try {
-            return MCRRestAPIObjectsHelper.listContents(request, mcrID, derID, format);
+            return MCRRestAPIObjectsHelper.listContents(request, mcrID, derID, format, path, depth);
         } catch (IOException e) {
             return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
         }

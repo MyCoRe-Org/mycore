@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -36,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -169,13 +171,21 @@ public class MCRRestAPIObjectsHelper {
         // return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "Unexepected program flow termination.",
         //       "Please contact a developer!").createHttpResponse();
     }
-
+    
     private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj)
+        throws IOException {
+        return listDerivateContent(mcrObj, derObj, "");
+    }
+
+    private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj, String deriPath)
         throws IOException {
         Element eContents = new Element("contents");
         eContents.setAttribute("mycoreobject", mcrObj.getId().toString());
         eContents.setAttribute("derivate", derObj.getId().toString());
-        MCRPath p = MCRPath.getPath(derObj.getId().toString(), "/");
+        if(!deriPath.endsWith("/")){
+            deriPath+="/";
+        }
+        MCRPath p = MCRPath.getPath(derObj.getId().toString(), deriPath);
         if (p != null) {
             eContents.addContent(MCRPathXML.getDirectoryXML(p).getRootElement().detach());
         }
@@ -198,12 +208,16 @@ public class MCRRestAPIObjectsHelper {
         return eContents;
     }
 
-    private static String listDerivateContentAsJson(MCRDerivate derObj) throws IOException {
+    private static String listDerivateContentAsJson(MCRDerivate derObj, String path, int depth) throws IOException {
         StringWriter sw = new StringWriter();
         MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
+        root = MCRPath.toMCRPath(root.resolve(path));
+        if (depth == -1) {
+            depth = Integer.MAX_VALUE;
+        }
         if (root != null) {
             JsonWriter writer = new JsonWriter(sw);
-            Files.walkFileTree(root, new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId()));
+            Files.walkFileTree(root, EnumSet.noneOf(FileVisitOption.class), depth, new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId()));
             writer.close();
         }
         return sw.toString();
@@ -542,7 +556,7 @@ public class MCRRestAPIObjectsHelper {
             "Please contact a developer!").createHttpResponse();
     }
 
-    public static Response listContents(Request request, String mcrIDString, String derIDString, String format)
+    public static Response listContents(Request request, String mcrIDString, String derIDString, String format, String path, int depth)
         throws IOException {
         try {
 
@@ -566,7 +580,7 @@ public class MCRRestAPIObjectsHelper {
             }
             switch (format) {
                 case MCRRestAPIObjects.FORMAT_XML:
-                    Document docOut = new Document(listDerivateContent(mcrObj, derObj));
+                    Document docOut = new Document(listDerivateContent(mcrObj, derObj, path));
                     try (StringWriter sw = new StringWriter()) {
                         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
                         xout.output(docOut, sw);
@@ -577,7 +591,7 @@ public class MCRRestAPIObjectsHelper {
                     }
                 case MCRRestAPIObjects.FORMAT_JSON:
                     if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-                        String result = listDerivateContentAsJson(derObj);
+                        String result = listDerivateContentAsJson(derObj, path, depth);
                         return response(result, "application/json", lastModified);
                     }
                 default:
