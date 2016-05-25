@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
 import javax.servlet.ServletContext;
@@ -42,7 +43,17 @@ public class MCRJPABootstrapper implements AutoExecutable {
 
     @Override
     public void startUp(ServletContext servletContext) {
-        initializeJPA();
+        try {
+            initializeJPA();
+        } catch (PersistenceException e) {
+            //fix for MCR-1236
+            if (MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)) {
+                LogManager.getLogger()
+                    .error(() -> "Could not initialize JPA. Database access is disabled in this session.", e);
+                MCRConfiguration.instance().set("MCR.Persistence.Database.Enable", false);
+            }
+            return;
+        }
         Metamodel metamodel = MCREntityManagerProvider.getEntityManagerFactory().getMetamodel();
         checkHibernateMappingConfig(metamodel);
         LogManager.getLogger().info("Mapping these entities: " + metamodel
