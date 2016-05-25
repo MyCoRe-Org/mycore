@@ -22,6 +22,10 @@
 
 package org.mycore.restapi.v1;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -31,16 +35,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.utils.MCRRestAPIObjectsHelper;
 
 /**
  * REST API methods to retrieve objects and derivates.
- * 
+ *
  * @author Robert Stephan
- * 
+ *
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/objects")
@@ -55,20 +61,20 @@ public class MCRRestAPIObjects {
 
     public static final String SORT_DESC = "desc";
 
-    /** returns a list of mcrObjects 
+    /** returns a list of mcrObjects
      *
      * Parameter
      * ---------
      * filter - parameter with filters as colon-separated key-value-pairs, pair separator is semicolon, allowed values are
      *     * project - the MyCoRe ProjectID - first Part of a MyCoRe ID
-     *     * type - the MyCoRe ObjectType - middle Part of a MyCoRe ID 
-     *     * lastModifiedBefore - last modified date in UTC is lesser than or equals to given value 
+     *     * type - the MyCoRe ObjectType - middle Part of a MyCoRe ID
+     *     * lastModifiedBefore - last modified date in UTC is lesser than or equals to given value
      *     * lastModifiedAfter - last modified date in UTC is greater than or equals to given value;
-     * 
+     *
      * sort - sortfield and sortorder combined by ':'
      *     * sortfield = ID | lastModified
-     *     * sortorder = asc | desc 
-     * 
+     *     * sortorder = asc | desc
+     *
      * format - parameter for return format, values are
      *     * xml (default value)
      *     * json
@@ -82,14 +88,14 @@ public class MCRRestAPIObjects {
         return MCRRestAPIObjectsHelper.listObjects(info, format, filter, sort);
     }
 
-    /** returns a list of derivates for a given MyCoRe Object 
+    /** returns a list of derivates for a given MyCoRe Object
      *
      * Parameter
      * ---------
      * sort - sortfield and sortorder combined by ':'
      *     * sortfield = ID | lastModified
-     *     * sortorder = asc | desc 
-     * 
+     *     * sortorder = asc | desc
+     *
      * format - parameter for return format, values are
      *     * xml (default value)
      *     * json
@@ -108,13 +114,13 @@ public class MCRRestAPIObjects {
     /**
      * returns a single object in XML Format
      * @param an object identifier of syntax [id] or [prefix]:[id]
-     * 
+     *
      * Allowed Prefixes are "mcr"
      * "mcr" is the default prefix for MyCoRe IDs.
-     * 
+     *
      * @param style allowed values are "derivatedetails"
      * derivate details will be integrated into the output.
-     * 
+     *
      * @return
      */
     @GET
@@ -129,13 +135,13 @@ public class MCRRestAPIObjects {
     /**
      * returns a single object in XML Format
      * @param an object identifier of syntax [id] or [prefix]:[id]
-     * 
+     *
      * Allowed Prefixes are "mcr"
      * "mcr" is the default prefix for MyCoRe IDs.
-     * 
+     *
      * @param style allowed values are "derivatedetails"
      * derivate details will be integrated into the output.
-     * 
+     *
      * @return
      */
     @GET
@@ -147,11 +153,11 @@ public class MCRRestAPIObjects {
 
     }
 
-    /** returns a list of derivates for a given MyCoRe Object 
+    /** returns a list of derivates for a given MyCoRe Object
     *
     * Parameter
     * ---------
-    * 
+    *
     * format - parameter for return format, values are
     *     * xml (default value)
     *     * json
@@ -164,5 +170,25 @@ public class MCRRestAPIObjects {
         @PathParam("mcrid") String mcrID, @PathParam("derid") String derID,
         @QueryParam("format") @DefaultValue("xml") String format) {
         return MCRRestAPIObjectsHelper.listContents(request, mcrID, derID, format);
+    }
+
+    /** redirects to the maindoc of the given derivate
+    *
+    * No Parameter
+    *
+    */
+    @GET
+    @Path("/{mcrid}/derivates/{derid}/open")
+    public Response listContents(@Context UriInfo info, @Context Request request,
+        @PathParam("mcrid") String mcrID, @PathParam("derid") String derID){
+        try {
+            String url = MCRRestAPIObjectsHelper.retrieveMaindocURL(mcrID,  derID);
+            if(url!=null){
+                return Response.seeOther(new URI(url)).build();
+            }
+        } catch (IOException | URISyntaxException e) {
+            return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "A problem occurred while opening maindoc from derivate "+derID, e.getMessage()).createHttpResponse();
+        }
+        return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "A problem occurred while opening maindoc from derivate "+derID, "").createHttpResponse();
     }
 }

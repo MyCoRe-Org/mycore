@@ -674,6 +674,23 @@ public class MCRRestAPIObjectsHelper {
             session.commitTransaction();
         }
     }
+    
+    public static String retrieveMaindocURL(String mcrIDString, String derIDString) throws IOException {
+        try {
+            MCRObject mcrObj = retrieveMCRObject(mcrIDString);
+            MCRDerivate derObj = retrieveMCRDerivate(mcrObj, derIDString);
+            String maindoc = derObj.getDerivate().getInternals().getMainDoc();
+
+            String baseURL = MCRFrontendUtil.getBaseURL()
+                + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
+            baseURL = baseURL.replace("${mcrid}", mcrObj.getId().toString()).replace("${derid}",
+                derObj.getId().toString());
+
+            return baseURL + maindoc;
+        } catch (MCRRestAPIException rae) {
+            return null;
+        }
+    }
 
     /**
      * validates the given String if it matches the UTC syntax or the beginning of it
