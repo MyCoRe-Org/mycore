@@ -25,9 +25,6 @@ package org.mycore.restapi.v1;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -46,6 +43,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.stream.JsonWriter;
@@ -62,8 +60,6 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 @Path("/v1/messages")
 public class MCRRestAPIMessages {
-    private static final long serialVersionUID = 1L;
-
     public static final String FORMAT_JSON = "json";
 
     public static final String FORMAT_XML = "xml";
@@ -89,19 +85,20 @@ public class MCRRestAPIMessages {
         Locale locale = Locale.forLanguageTag(lang);
         String[] check = filter.split(";");
 
-        SortedProperties data = new SortedProperties();
+        Properties data = MCRConfiguration.sortProperties(null);
         for (String prefix : check) {
             data.putAll(MCRTranslation.translatePrefix(prefix, locale));
         }
+        
         try {
             if (FORMAT_PROPERTY.equals(format)) {
-                StringWriter sw = new StringWriter();
-                data.store(sw, "MyCoRe Messages (charset='ISO-8859-1')");
-                return Response.ok(sw.toString().getBytes("ISO-8859-1")).type("text/plain; charset=ISO-8859-1").build();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                data.store(baos, "MyCoRe Messages (charset='ISO-8859-1')");
+                return Response.ok(baos.toByteArray()).type("text/plain; charset=ISO-8859-1").build();
             }
             if (FORMAT_XML.equals(format)) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                data.storeToXML(baos, "# MyCoRe Messages");
+                data.storeToXML(baos, "MyCoRe Messages");
                 return Response.ok(baos.toString("UTF-8")).type("application/xml; charset=UTF-8").build();
             }
             if (FORMAT_JSON.equals(format)) {
@@ -176,30 +173,5 @@ public class MCRRestAPIMessages {
             //toDo
         }
         return Response.status(ClientResponse.Status.BAD_REQUEST).build();
-    }
-
-    /** 
-     * A helper class which extends properties.
-     * They will be exported ordered by key.
-     * 
-     * @author Robert Stephan
-     *
-     */
-    class SortedProperties extends Properties {
-        private static final long serialVersionUID = 1L;
-
-        /**
-           * Overrides, called by the store method.
-           */
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        public synchronized Enumeration keys() {
-            Enumeration keysEnum = super.keys();
-            ArrayList keyList = new ArrayList();
-            while (keysEnum.hasMoreElements()) {
-                keyList.add(keysEnum.nextElement());
-            }
-            Collections.sort(keyList);
-            return Collections.enumeration(keyList);
-        }
     }
 }
