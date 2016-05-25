@@ -23,8 +23,11 @@
  **/
 package org.mycore.services.i18n;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -47,6 +50,7 @@ import javax.xml.parsers.DocumentBuilder;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -75,6 +79,10 @@ public class MCRTranslation {
     private static Properties DEPRECATED_MAPPING = loadProperties();
 
     private static Set<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
+    
+    static{
+        debug();
+    }
 
     /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
@@ -390,5 +398,26 @@ public class MCRTranslation {
         return baseName.contains(".") ? ResourceBundle.getBundle(baseName, locale) : ResourceBundle.getBundle(
             "stacked:" + baseName, locale, CONTROL);
     }
-
+    
+    /**
+     * output the current message properties to configuration directory
+     */
+    private static void debug(){
+        for(String lang: MCRTranslation.getAvailableLanguages()){
+            ResourceBundle rb = MCRTranslation.getResourceBundle("messages", MCRTranslation.getLocale(lang));
+            Properties props = MCRConfiguration.sortProperties(null);
+            Enumeration<String> keys = rb.getKeys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                props.put(key, rb.getString(key));
+            }
+            File resolvedMsgFile = MCRConfigurationDir.getConfigFile("messages_"+lang +".resolved.properties");
+            try (OutputStream os = new FileOutputStream(resolvedMsgFile)) {
+                props.store(os, "MyCoRe Messages for Locale "+lang);
+                
+            } catch (IOException e) {
+                LOGGER.warn("Could not store resolved properties to " + resolvedMsgFile.getAbsolutePath(), e);
+            }
+        }
+    }
 }
