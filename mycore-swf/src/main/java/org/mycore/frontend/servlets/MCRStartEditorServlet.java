@@ -31,7 +31,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -57,9 +56,6 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaElement;
-import org.mycore.datamodel.metadata.MCRMetaInterface;
-import org.mycore.datamodel.metadata.MCRMetaNBN;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -68,7 +64,6 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
-import org.mycore.urn.services.MCRURNManager;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -349,53 +344,6 @@ public class MCRStartEditorServlet extends MCRServlet {
         params.put("step", cd.mystep);
         params.put("remcrid", cd.myremcrid.toString());
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
-    }
-
-    /**
-     * The method add a new NBN to the dataset with type <b>document</b> or
-     * <b>disshab</b>. The access right is writedb.
-     * 
-     * @param job
-     *            the MCRServletJob instance
-     */
-    public void saddnbn(MCRServletJob job, CommonData cd) throws Exception {
-        // access right
-        if (!MCRAccessManager.checkPermission(cd.mysemcrid, PERMISSION_WRITE)) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + usererrorpage));
-            return;
-        }
-        if (cd.mysemcrid == null) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + mcriderrorpage));
-            return;
-        }
-        // check type
-        if (cd.mytype.equals("document") || cd.mytype.equals("disshab")) {
-            MCRObject obj = MCRMetadataManager.retrieveMCRObject(cd.mysemcrid);
-            MCRMetaElement elm = obj.getMetadata().getMetadataElement("nbns");
-            if (elm == null) {
-                String urn = MCRURNManager.buildURN("UBL");
-                MCRMetaNBN nbn = new MCRMetaNBN("nbn", 0, urn);
-                ArrayList<MCRMetaInterface> list = new ArrayList<MCRMetaInterface>();
-                elm = new MCRMetaElement(MCRMetaNBN.class, "nbns", true, false, list);
-                elm.addMetaObject(nbn);
-                obj.getMetadata().setMetadataElement(elm);
-                try {
-                    MCRMetadataManager.update(obj);
-                    MCRURNManager.assignURN(urn, obj.getId().toString());
-                } catch (MCRActiveLinkException e) {
-                    LOGGER.warn("Can't store NBN for " + cd.mysemcrid);
-                    e.printStackTrace();
-                }
-                LOGGER.info("Add the NBN " + urn);
-            } else {
-                LOGGER.warn("The NBN already exists for " + cd.mysemcrid);
-            }
-
-        }
-        // back to the metadata view
-        StringBuilder sb = new StringBuilder();
-        sb.append(MCRFrontendUtil.getBaseURL()).append("receive/").append(cd.mysemcrid);
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
 
     /**

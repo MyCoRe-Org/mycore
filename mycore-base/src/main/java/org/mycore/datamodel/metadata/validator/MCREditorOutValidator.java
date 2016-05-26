@@ -169,7 +169,6 @@ public class MCREditorOutValidator {
         map.put(MCRMetaAccessRule.class.getSimpleName(), getObjectCheckInstance(MCRMetaAccessRule.class));
         map.put(MCRMetaClassification.class.getSimpleName(), new MCRMetaClassificationCheck());
         map.put(MCRMetaHistoryDate.class.getSimpleName(), new MCRMetaHistoryDateCheck());
-        addDeprecatedMetaValidators(map);
         Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX + "class.");
         for (Entry<String, String> entry : props.entrySet()) {
             try {
@@ -188,18 +187,6 @@ public class MCREditorOutValidator {
             }
         }
         return map;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void addDeprecatedMetaValidators(Map<String, MCREditorMetadataValidator> map) {
-        try {
-            map.put("MCRMetaNBN", getObjectCheckInstance((Class<? extends MCRMetaInterface>) Class.forName("org.mycore.datamodel.metadata.MCRMetaNBN")));
-            map.put("MCRMetaISBN", getObjectCheckInstance((Class<? extends MCRMetaInterface>) Class.forName("org.mycore.datamodel.metadata.MCRMetaISBN")));
-        } catch (ClassNotFoundException e) {
-            LOGGER.error(
-                "MCRMetaNBN and MCRMetaISBN were marked deprecated. Could not found those classes anymore. Please remove this code.",
-                e);
-        }
     }
 
     @SuppressWarnings("unchecked")
