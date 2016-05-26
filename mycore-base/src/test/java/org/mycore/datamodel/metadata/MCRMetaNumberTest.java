@@ -38,7 +38,6 @@ import org.jdom2.Text;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration;
@@ -46,12 +45,12 @@ import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaNumber.
+ * It tests again the ENGLISH Locale
  * 
  * @author Jens Kupferschmidt
  * @version $Revision: 28698 $ $Date: 2013-12-19 15:22:40 +0100 (Do, 19. Dez 2013) $
  *
  */
-@Ignore("fix MCR-1268 before activating this test again")
 public class MCRMetaNumberTest extends MCRTestCase {
     private static Logger LOGGER;
 
@@ -68,21 +67,21 @@ public class MCRMetaNumberTest extends MCRTestCase {
     public void numberTransformation () {
         MCRMetaNumber meta_number = new MCRMetaNumber("number", 0, null, null, "0,1");
         String number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "0,100", number_string);
+        assertEquals("datamodel", "0.100", number_string);
         meta_number = new MCRMetaNumber("number", 0, null, null, "0.10");
         number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "0,100", number_string);
+        assertEquals("datamodel", "0.100", number_string);
         meta_number = new MCRMetaNumber("number", 0, null, null, "12345,6789");
         number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "12345,679", number_string);
+        assertEquals("datamodel", "12345.679", number_string);
         // geo data
         MCRConfiguration.instance().set("MCR.Metadata.MetaNumber.FractionDigits",8);
-        meta_number = new MCRMetaNumber("number", 0, null, null, "123,45678999");
+        meta_number = new MCRMetaNumber("number", 0, null, null, "123.45678999");
         number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "123,45678999", number_string);
+        assertEquals("datamodel", "123.45678999", number_string);
         meta_number = new MCRMetaNumber("number", 0, null, null, "-123,45678999");
         number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "-123,45678999", number_string);
+        assertEquals("datamodel", "-123.45678999", number_string);
     }
 
     @Test
@@ -93,7 +92,7 @@ public class MCRMetaNumberTest extends MCRTestCase {
         imported.setAttribute("inherited", "0");
         imported.setAttribute("dimension", "width");
         imported.setAttribute("measurement", "cm");
-        imported.addContent(new Text("0,100"));
+        imported.addContent(new Text("0.100"));
         meta_number.setFromDOM(imported);
         Element exported = meta_number.createXML();
         print_data(imported, exported);

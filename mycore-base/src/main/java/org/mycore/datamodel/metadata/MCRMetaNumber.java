@@ -36,13 +36,25 @@ import org.mycore.common.config.MCRConfiguration;
  * <p>
  * Implements methods to handle MCRMetaNumber fields of a metadata object.
  * The MCRMetaNumber class presents a number value in decimal
- * format and optional a type and a measurement. The input number can have the format
- * like <em>xxxx.x</em> or <em>xxxx,xxx</em>.
+ * format and optional a dimension type and a measurement. The input number can have the format
+ * like <em>xxxx</em>, <em>xxxx.x</em> or <em>xxxx,xxx</em>.
  * </p>
  * <p>
- * The String output format of the numer is determined by the property
- * <em>MCR.Metadata.MetaNumber.FractionDigits</em> and the default Locale.
- * For more digits in fraction as defind for output the system will round the number!
+ * The length of the dimension type is limited by the property <em>MCR.Metadata.MetaNumber.DimensionLength</em>.
+ * The default length is defined in MAX_DIMENSION_LENGTH = 128.
+ * </p>
+ * <p>
+ * The length of the measurement type is limited by the property <em>MCR.Metadata.MetaNumber.MeasurementLength</em>.
+ * The default length is defined in MAX_MEASURE_LENGTH = 64.
+ * </p>
+ * <p>
+ * The String output format of the number is determined by the property
+ * <em>MCR.Metadata.MetaNumber.FractionDigits</em>, default is DEFAULT_FRACTION_DIGITS = 3, and the ENGLISH Locale.
+ * For more digits in fraction as defined in property <em>MCR.Metadata.MetaNumber.FractionDigits</em> 
+ * will be round the output!
+ * </p>
+ * <p>
+ * For transforming the dot of the ENGLISH locale to other Characters use the tools of your layout process.
  * </p>
  * <pre>
  * &lt;tag class="MCRMetaNumber" heritable="..."&gt;
@@ -51,16 +63,18 @@ import org.mycore.common.config.MCRConfiguration;
  *   &lt;/subtag&gt;
  * &lt;/tag&gt;
  * </pre>
+ * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 final public class MCRMetaNumber extends MCRMetaDefault {
-    /** The length of the attributes * */
+
     public static final int MAX_DIMENSION_LENGTH = 128;
 
     public static final int MAX_MEASUREMENT_LENGTH = 64;
 
-    // MCRMetaNumber data
+    public static final int DEFAULT_FRACTION_DIGITS = 3;
+
     private BigDecimal number;
 
     private String dimension;
@@ -70,7 +84,16 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     private static final Logger LOGGER = Logger.getLogger(MCRMetaNumber.class);
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
+
     private int FRACTION_DIGITS;
+    private int DIMENSION_LENGTH;
+    private int MEASUREMENT_LENGTH;
+
+    private void loadProperties() {
+        FRACTION_DIGITS = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits", DEFAULT_FRACTION_DIGITS);
+        DIMENSION_LENGTH = CONFIG.getInt("MCR.Metadata.MetaNumber.DimensionLength", MAX_DIMENSION_LENGTH);
+        MEASUREMENT_LENGTH = CONFIG.getInt("MCR.Metadata.MetaNumber.MeasurementLength", MAX_MEASUREMENT_LENGTH);
+    }
 
     /**
      * This is the constructor. <br>
@@ -78,7 +101,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     public MCRMetaNumber() {
         super();
-        FRACTION_DIGITS = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits",3);
+        loadProperties();
         number = new BigDecimal("0");
         dimension = "";
         measurement = "";
@@ -103,9 +126,9 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *   the number string is not in a number format
      */
     public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, String number)
-        throws MCRException {
+            throws MCRException {
         super(subtag, null, null, inherted);
-        FRACTION_DIGITS = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits",3);
+        loadProperties();
         setDimension(dimension);
         setMeasurement(measurement);
         setNumber(number);
@@ -129,8 +152,9 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *   the number string is not in a number format
      */
     public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, BigDecimal number)
-        throws MCRException {
+            throws MCRException {
         super(subtag, null, null, inherted);
+        loadProperties();
         setDimension(dimension);
         setMeasurement(measurement);
         setNumber(number);
@@ -155,8 +179,9 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     @Deprecated
     public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, double number)
-        throws MCRException {
+            throws MCRException {
         super(subtag, null, null, inherted);
+        loadProperties();
         setDimension(dimension);
         setMeasurement(measurement);
         setNumber(number);
@@ -168,15 +193,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     @Override
     public boolean isValid() {
         if (!super.isValid()) {
-            return false;
-        }
-
-        if (dimension != null && dimension.length() > MAX_DIMENSION_LENGTH) {
-            LOGGER.warn(getSubTag() + ": dimension is too long: " + dimension.length());
-            return false;
-        }
-        if (measurement != null && measurement.length() > MAX_MEASUREMENT_LENGTH) {
-            LOGGER.warn(getSubTag() + ": measurement is too long: " + measurement.length());
             return false;
         }
         return true;
@@ -193,7 +209,12 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         if (dimension == null) {
             this.dimension = "";
         } else {
-            this.dimension = dimension;
+            if (dimension.length() > DIMENSION_LENGTH) {
+                this.dimension = dimension.substring(DIMENSION_LENGTH);
+                LOGGER.warn(getSubTag() + ": dimension is too long: " + dimension.length());
+            } else {
+                this.dimension = dimension;
+            }
         }
     }
 
@@ -208,20 +229,25 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         if (measurement == null) {
             this.measurement = "";
         } else {
-            this.measurement = measurement;
+            if (measurement.length() > MEASUREMENT_LENGTH) {
+                this.measurement = measurement.substring(MEASUREMENT_LENGTH);
+                LOGGER.warn(getSubTag() + ": measurement is too long: " + measurement.length());
+            } else {
+                this.measurement = measurement;
+            }
         }
     }
 
     /**
      * This method set the number, if it is null or not a number, a MCRException
-     * was thowed.
+     * will be throw.
      *
      * @param number
      *            the number string
      * @exception MCRException
      *                if the number string is not in a number format
      */
-    public final void setNumber(String number) {
+    public final void setNumber(String number) throws MCRException {
         try {
             if (number == null) {
                 throw new MCRException("Number cannot be null");
@@ -241,22 +267,18 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     @Deprecated
     public final void setNumber(double number) {
-        try {
-            this.number = new BigDecimal(number);
-        } catch (NumberFormatException e) {
-            throw new MCRException("The format of a number is invalid.");
-        }
+        this.number = new BigDecimal(number);
     }
 
     /**
-     * This method set the number, if it is null a MCRException was thowed.
+     * This method set the number, if it is null a MCRException will be throw.
      *
      * @param number
      *            the number as BigDecimal
      * @exception MCRException
      *                if the number string is null
      */
-    public final void setNumber(BigDecimal number) {
+    public final void setNumber(BigDecimal number) throws MCRException {
         if (number == null) {
             throw new MCRException("Number cannot be null");
         }
@@ -286,6 +308,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *
      * @return the number converted to a double
      */
+    @Deprecated
     public final double getNumber() {
         return number.doubleValue();
     }
@@ -301,16 +324,17 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * This method get the number element as formatted String. The number of
-     * fraction digits is defined by property MCR.Metadata.MetaNumber.FractionDigits
+     * fraction digits is defined by property <em>MCR.Metadata.MetaNumber.FractionDigits</em>.
+     * The default is 3 fraction digits.
      *
      * @return the number as formatted String
      */
     public final String getNumberAsString() {
-        final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
+        final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.ENGLISH);
         numberFormat.setGroupingUsed(false);
         numberFormat.setMaximumFractionDigits(FRACTION_DIGITS);
         numberFormat.setMinimumFractionDigits(FRACTION_DIGITS);
-        return  numberFormat.format(number);
+        return numberFormat.format(number);
     }
 
     /**
@@ -323,8 +347,8 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     @Override
     public final void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
-        measurement = element.getAttributeValue("measurement");
-        dimension = element.getAttributeValue("dimension");
+        setMeasurement(element.getAttributeValue("measurement"));
+        setDimension(element.getAttributeValue("dimension"));
         setNumber(element.getTextTrim());
     }
 
