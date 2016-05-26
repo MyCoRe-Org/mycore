@@ -79,10 +79,6 @@ public class MCRTranslation {
     private static Properties DEPRECATED_MAPPING = loadProperties();
 
     private static Set<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
-    
-    static{
-        debug();
-    }
 
     /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
@@ -167,8 +163,7 @@ public class MCRTranslation {
         } catch (MissingResourceException mre) {
             // try to get new key if 'label' is deprecated
             if (!DEPRECATED_MESSAGES_PRESENT) {
-                LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES
-                    + "' to check for depreacted I18N keys.");
+                LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "' to check for depreacted I18N keys.");
             } else if (DEPRECATED_MAPPING.keySet().contains(label)) {
                 String newLabel = DEPRECATED_MAPPING.getProperty(label);
                 try {
@@ -306,26 +301,26 @@ public class MCRTranslation {
         } else {
             for (int i = 0; i < masked.length(); i++) {
                 switch (masked.charAt(i)) {
-                    case ';':
-                        if (mask) {
-                            buf.append(';');
-                            mask = false;
-                        } else {
-                            a.add(buf.toString());
-                            buf.setLength(0);
-                        }
-                        break;
-                    case '\\':
-                        if (mask) {
-                            buf.append('\\');
-                            mask = false;
-                        } else {
-                            mask = true;
-                        }
-                        break;
-                    default:
-                        buf.append(masked.charAt(i));
-                        break;
+                case ';':
+                    if (mask) {
+                        buf.append(';');
+                        mask = false;
+                    } else {
+                        a.add(buf.toString());
+                        buf.setLength(0);
+                    }
+                    break;
+                case '\\':
+                    if (mask) {
+                        buf.append('\\');
+                        mask = false;
+                    } else {
+                        mask = true;
+                    }
+                    break;
+                default:
+                    buf.append(masked.charAt(i));
+                    break;
                 }
             }
             a.add(buf.toString());
@@ -355,8 +350,7 @@ public class MCRTranslation {
     static Properties loadProperties() {
         Properties deprecatedMapping = new Properties();
         try {
-            final InputStream propertiesStream = MCRTranslation.class
-                .getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
+            final InputStream propertiesStream = MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
             if (propertiesStream == null) {
                 LOGGER.warn("Could not find resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.");
                 return deprecatedMapping;
@@ -395,15 +389,15 @@ public class MCRTranslation {
     }
 
     public static ResourceBundle getResourceBundle(String baseName, Locale locale) {
-        return baseName.contains(".") ? ResourceBundle.getBundle(baseName, locale) : ResourceBundle.getBundle(
-            "stacked:" + baseName, locale, CONTROL);
+        return baseName.contains(".") ? ResourceBundle.getBundle(baseName, locale)
+                : ResourceBundle.getBundle("stacked:" + baseName, locale, CONTROL);
     }
-    
+
     /**
      * output the current message properties to configuration directory
      */
-    private static void debug(){
-        for(String lang: MCRTranslation.getAvailableLanguages()){
+    private static void debug() {
+        for (String lang : MCRTranslation.getAvailableLanguages()) {
             ResourceBundle rb = MCRTranslation.getResourceBundle("messages", MCRTranslation.getLocale(lang));
             Properties props = MCRConfiguration.sortProperties(null);
             Enumeration<String> keys = rb.getKeys();
@@ -411,10 +405,10 @@ public class MCRTranslation {
                 String key = keys.nextElement();
                 props.put(key, rb.getString(key));
             }
-            File resolvedMsgFile = MCRConfigurationDir.getConfigFile("messages_"+lang +".resolved.properties");
+            File resolvedMsgFile = MCRConfigurationDir.getConfigFile("messages_" + lang + ".resolved.properties");
             try (OutputStream os = new FileOutputStream(resolvedMsgFile)) {
-                props.store(os, "MyCoRe Messages for Locale "+lang);
-                
+                props.store(os, "MyCoRe Messages for Locale " + lang);
+
             } catch (IOException e) {
                 LOGGER.warn("Could not store resolved properties to " + resolvedMsgFile.getAbsolutePath(), e);
             }
