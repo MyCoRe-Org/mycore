@@ -223,7 +223,7 @@
   <xs:element name="servacl">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="condition" />
+        <xs:any processContents="skip" />
       </xs:sequence>
       <xs:attribute name="permission" use="required" type="xs:string" />
       <xs:attributeGroup ref="notInherited" />
