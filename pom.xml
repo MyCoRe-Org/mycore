@@ -675,7 +675,7 @@
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-editor-frontend</artifactId>
-        <version>0.2</version>
+        <version>0.3-SNAPSHOT</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
