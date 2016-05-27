@@ -131,7 +131,7 @@ public class MCRWCMSContentManager {
      * 
      */
     public void save(JsonArray items) {
-        XMLOutputter out = new XMLOutputter(Format.getCompactFormat().setEncoding("UTF-8"));
+        XMLOutputter out = new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
         for (JsonElement e : items) {
             if (!e.isJsonObject()) {
                 LOGGER.warn("Invalid json element in items " + e);
