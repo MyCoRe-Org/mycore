@@ -132,9 +132,8 @@ public class MCRMediaSourceProvider {
             java.nio.file.Path absolutePath = fileStore.getPhysicalPath(mcrPath);
             java.nio.file.Path relativePath = fileStore.getBaseDirectory().relativize(absolutePath);
             LogManager.getLogger().info("{} -> {} -> {}", mcrPath, absolutePath, relativePath);
-            return MCRXMLFunctions
-                .encodeURIPath(relativePath.toString().replaceAll(relativePath.getFileSystem().getSeparator(), "/"));
-        } catch (IOException | URISyntaxException e) {
+            return relativePath.toString();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
