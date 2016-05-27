@@ -67,7 +67,7 @@
     <!-- keep mods:name fields for legacy reasons -->
     <xsl:for-each select=".//mods:name">
       <field name="mods.name">
-        <xsl:for-each select="mods:displayForm | mods:namePart[@type!='date'] | text()">
+        <xsl:for-each select="mods:displayForm | mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
           <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
         </xsl:for-each>
       </field>

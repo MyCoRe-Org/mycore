@@ -309,16 +309,16 @@
             select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=mods.nameIdentifier:', $nameIdentifier/@type, '\:', $nameIdentifier/@id, '&amp;owner=createdby:', $owner)" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=')" />
-          <xsl:value-of select="concat('+mods.name:&quot;',mods:displayForm,'&quot;')" />
-          <xsl:value-of select="concat('&amp;owner=createdby:', $owner)" />
+          <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=', '+mods.name:&quot;')" />
+          <xsl:apply-templates select="." mode="nameString" />
+          <xsl:value-of select="concat('&quot;', '&amp;owner=createdby:', $owner)" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <a itemprop="creator" href="{$query}">
       <span itemscope="itemscope" itemtype="http://schema.org/Person">
         <span itemprop="name">
-          <xsl:value-of select="mods:displayForm" />
+			<xsl:apply-templates select="." mode="nameString" />
         </span>
         <xsl:if test="count($nameIdentifier) &gt; 0">
           <xsl:text>&#160;</xsl:text><!-- add whitespace here -->
@@ -366,7 +366,16 @@
           <xsl:value-of select="mods:displayForm" />
         </xsl:when>
         <xsl:when test="mods:namePart[not(@type)]">
-          <xsl:value-of select="mods:namePart[not(@type)]" />
+	        <xsl:for-each select="mods:namePart[not(@type)]">
+	        	 <xsl:choose>
+	              <xsl:when test="position() = 1">
+	                <xsl:value-of select="text()"/>
+	              </xsl:when>
+	              <xsl:otherwise>
+	                <xsl:value-of select="concat(' ', text())"/>
+	              </xsl:otherwise>
+	            </xsl:choose>
+	        </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="mods:namePart[@type='family']" />
