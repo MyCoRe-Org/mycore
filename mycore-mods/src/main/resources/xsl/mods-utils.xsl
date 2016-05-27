@@ -43,10 +43,14 @@
 
     <xsl:choose>
       <xsl:when test="$mods-type='confpro' or $mods-type='proceedings'">
-        <xsl:apply-templates select="." mode="mods.title.confpro" />
+        <xsl:apply-templates select="." mode="mods.title.confpro">
+          <xsl:with-param name="asHTML" select="$asHTML" />
+          <xsl:with-param name="withSubtitle" select="$withSubtitle" />
+        </xsl:apply-templates>
       </xsl:when>
       <xsl:when test="$mods-type='issue'">
         <xsl:apply-templates select="." mode="mods.title.issue">
+          <xsl:with-param name="asHTML" select="$asHTML" />
           <xsl:with-param name="withSubtitle" select="$withSubtitle" />
         </xsl:apply-templates>
       </xsl:when>
@@ -122,9 +126,15 @@
   </xsl:template>
 
   <xsl:template mode="mods.title.confpro" match="mods:mods">
+    <xsl:param name="asHTML" select="false()" />
+    <xsl:param name="withSubtitle" select="false()" />
     <xsl:choose>
       <xsl:when test="mods:titleInfo/mods:title">
-        <xsl:value-of select="mods:titleInfo/mods:title[1]" />
+        <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]"
+          mode="mods.printTitle">
+          <xsl:with-param name="asHTML" select="$asHTML" />
+          <xsl:with-param name="withSubtitle" select="$withSubtitle" />
+        </xsl:apply-templates>
       </xsl:when>
       <xsl:when test="mods:name[@type='conference']">
         <xsl:variable name="completeTitle">
