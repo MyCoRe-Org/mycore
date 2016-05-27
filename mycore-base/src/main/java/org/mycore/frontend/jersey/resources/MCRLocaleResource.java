@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.services.i18n.MCRTranslation;
 
 @Path("locale")
@@ -53,7 +54,7 @@ public class MCRLocaleResource {
      * @return json array of all languages available
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
     @Path("languages")
     public String languages() {
         Set<String> availableLanguages = MCRTranslation.getAvailableLanguages();
@@ -68,7 +69,7 @@ public class MCRLocaleResource {
      * @return json object containing all keys and their corresponding translation
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
     @Path("translate/{lang}/{key: .*\\*}")
     public String translateJSON(@PathParam("lang") String lang, @PathParam("key") String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
@@ -82,7 +83,7 @@ public class MCRLocaleResource {
      * @return json object containing all keys and their corresponding translation in current language
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
     @Path("translate/{key: .*\\*}")
     public String translateJSONDefault(@PathParam("key") String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);

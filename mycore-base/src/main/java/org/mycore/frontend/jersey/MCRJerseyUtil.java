@@ -25,6 +25,8 @@ import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
  */
 public abstract class MCRJerseyUtil {
 
+    public static final String APPLICATION_JSON_UTF8 = "application/json;charset=utf-8";
+
     /**
      * Transforms a jdom document to a <code>MCRContent</code> via the <code>MCRLayoutService</code>.
      * 
