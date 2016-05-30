@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -56,11 +58,11 @@ public class MCRBasicCommands {
         MCRCommandLineInterface.output("The following commands can be used:");
         MCRCommandLineInterface.output("");
 
-        for (List<org.mycore.frontend.cli.MCRCommand> commands : MCRCommandManager.getKnownCommands().values()) {
-            for (org.mycore.frontend.cli.MCRCommand command : commands) {
-                MCRCommandLineInterface.output(command.getSyntax());
-            }
-        }
+        MCRCommandManager
+                .getKnownCommands().entrySet().stream().forEach(e -> {
+                    outputGroup(e.getKey());
+                    e.getValue().forEach(org.mycore.frontend.cli.MCRCommand::outputHelp);
+                });
     }
 
     /**
@@ -69,23 +71,32 @@ public class MCRBasicCommands {
      * @param pattern
      *            the command, or a fragment of it
      */
-
     @MCRCommand(syntax = "help {0}", help = "Show the help text for the commands beginning with {0}.", order = 10)
     public static void listKnownCommandsBeginningWithPrefix(String pattern) {
-        boolean foundMatchingCommand = false;
+        TreeMap<String, List<org.mycore.frontend.cli.MCRCommand>> matchingCommands = MCRCommandManager
+                .getKnownCommands().entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().stream()
+                        .filter(cmd -> cmd.getSyntax().contains(pattern) || cmd.getHelpText().contains(pattern))
+                        .collect(Collectors.toList()), (k, v) -> k, TreeMap::new));
 
-        for (List<org.mycore.frontend.cli.MCRCommand> commands : MCRCommandManager.getKnownCommands().values()) {
-            for (org.mycore.frontend.cli.MCRCommand command : commands) {
-                if (command.getSyntax().contains(pattern)) {
-                    command.outputHelp();
-                    foundMatchingCommand = true;
-                }
-            }
-        }
+        matchingCommands.entrySet().removeIf(e -> e.getValue().isEmpty());
 
-        if (!foundMatchingCommand) {
+        if (matchingCommands.isEmpty()) {
             MCRCommandLineInterface.output("Unknown command:" + pattern);
+        } else {
+            MCRCommandLineInterface.output("");
+            
+            matchingCommands.forEach((grp, cmds) -> {
+                outputGroup(grp);
+                cmds.forEach(org.mycore.frontend.cli.MCRCommand::outputHelp);
+            });
         }
+    }
+
+    private static void outputGroup(String group) {
+        MCRCommandLineInterface.output(group);
+        MCRCommandLineInterface.output(new String(new char[70]).replace("\0", "-"));
+        MCRCommandLineInterface.output("");
     }
 
     @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.", order = 30)
@@ -144,7 +155,7 @@ public class MCRBasicCommands {
         ArrayList<File> directories = new ArrayList<>(3);
         directories.add(configurationDirectory);
         for (String dir : MCRConfiguration.instance().getString("MCR.ConfigurationDirectory.template.directories", "")
-            .split(",")) {
+                .split(",")) {
             if (!dir.trim().isEmpty()) {
                 directories.add(new File(configurationDirectory, dir.trim()));
             }
@@ -154,9 +165,9 @@ public class MCRBasicCommands {
                 break;
             }
         }
-        
+
         for (String f : MCRConfiguration.instance().getString("MCR.ConfigurationDirectory.template.files", "")
-            .split(",")) {
+                .split(",")) {
             if (!f.trim().isEmpty()) {
                 createSampleConfigFile(f.trim());
             }
@@ -189,7 +200,7 @@ public class MCRBasicCommands {
             throw new IOException("Could not create directory for file: " + targetFile);
         }
         try (InputStream templateResource = classLoader.getResourceAsStream("configdir.template/" + path);
-            FileOutputStream fout = new FileOutputStream(targetFile)) {
+                FileOutputStream fout = new FileOutputStream(targetFile)) {
             if (templateResource == null) {
                 throw new IOException("Could not find template for " + path);
             }
