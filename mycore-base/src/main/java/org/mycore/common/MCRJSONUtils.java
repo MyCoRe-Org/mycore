@@ -23,7 +23,9 @@
 
 package org.mycore.common;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.mycore.services.i18n.MCRTranslation;
@@ -46,8 +48,13 @@ public class MCRJSONUtils {
         return ja;
     }
 
-    public static String getTranslations(String prefix, String lang) {
-        Map<String, String> transMap = MCRTranslation.translatePrefix(prefix, MCRTranslation.getLocale(lang));
+    public static String getTranslations(String prefixes, String lang) {
+        Map<String, String> transMap = new HashMap<>();
+
+        Arrays.stream(prefixes.split(","))
+                .map(currentPrefix->MCRTranslation.translatePrefix(currentPrefix.substring(0,currentPrefix.length()-1), MCRTranslation.getLocale(lang)))
+                .forEach(transMap::putAll);
+
         Gson gson = new Gson();
         return gson.toJson(transMap);
     }

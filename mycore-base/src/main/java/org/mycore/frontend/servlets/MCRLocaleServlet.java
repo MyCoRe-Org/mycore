@@ -60,7 +60,7 @@ public class MCRLocaleServlet extends HttpServlet {
         }
         String key = getKey(req.getPathInfo());
         if (key.endsWith("*")) {
-            returnValue = handlePrefetch(key.substring(0, key.length() - 1), lang);
+            returnValue = handlePrefetch(key, lang);
             resp.setContentType("text/json");
         } else {
             returnValue = handleGetI18n(key, lang);

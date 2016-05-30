@@ -73,7 +73,7 @@ public class MCRLocaleResource {
     @Path("translate/{lang}/{key: .*\\*}")
     public String translateJSON(@PathParam("lang") String lang, @PathParam("key") String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
-        return MCRJSONUtils.getTranslations(key.substring(0, key.length() - 1), lang);
+        return MCRJSONUtils.getTranslations(key, lang);
     }
 
     /**

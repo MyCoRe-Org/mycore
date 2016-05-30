@@ -35,7 +35,7 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         setProperty("doctype", getDocType(request));
         boolean mobile = isMobile(request);
         setProperty("mobile", mobile);
-        setProperty("i18nURL", MCRServlet.getServletBaseURL() + "MCRLocaleServlet/{lang}/component.iview2.*");
+        setProperty("i18nURL", MCRFrontendUtil.getBaseURL(request)+ "rsc/locale/translate/{lang}/component.mets.*,component.iview2.*");
         setProperty("derivateURL", MCRServlet.getServletBaseURL() + "MCRFileNodeServlet/" + getDerivate(request) + "/");
         setProperty("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
         setProperty("adminMail", MCRConfiguration.instance().getString("MCR.Mail.Sender"));
