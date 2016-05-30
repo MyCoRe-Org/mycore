@@ -64,12 +64,11 @@ var WCMS2FileBrowser = function(){
 			});
 			
 			$("body").on("mouseenter", ".file", function() {
-				var icon = $("<span class='glyphicon glyphicon-remove button button-remove'></span>");
-				$(this).append(icon);
+				$(this).find(".wcms2-image-button").removeClass("hidden");
 			});
 			
 			$("body").on("mouseleave", ".file", function() {
-				$(this).find(".button-remove").remove();
+				$(this).find(".wcms2-image-button").addClass("hidden");
 			});
 			
 			$("body").on("click", ".button-remove", function() {
@@ -124,6 +123,15 @@ var WCMS2FileBrowser = function(){
 			$("body").on("click", "#hide-drag-drop-info", function() {
 				$("#drag-and-drop-info").hide();
 			});
+			
+			$("body").on("click", ".wcms2-lightbox", function(evt) {
+			    evt.preventDefault();
+			    showLightbox($(this));
+			});
+			
+			$("body").on("click", "#wcms2-lightbox-close", function() {
+			    hideLightbox();
+			});
 						
 			readQueryParameter();
 			currentPath = qpara["href"] != undefined ? qpara["href"] : "";
@@ -139,6 +147,28 @@ var WCMS2FileBrowser = function(){
 			});
 		}
 	}
+		
+	function showLightbox(elm) {
+	    loadImage($(elm).attr("data-url"));
+	}
+	
+	function loadImage(imgSrc) {
+	    var image = new Image();
+	    image.onload = function() {
+	        $("#wcms2-lightbox-img").remove();
+	        $(image).attr("id", "wcms2-lightbox-img");
+	        $("#wcms2-lightbox-content").prepend(image);
+	        $("#wcms2-lightbox").css("display", "block");
+	        $("html").css("overflow", "hidden");
+	    }
+	    image.src = imgSrc;
+	}
+	
+	function hideLightbox() {
+	    $("#wcms2-lightbox").css("display", "none");
+	    $("html").css("overflow", "auto");
+	}
+	  
 	function getFolders() {
 		$.ajax({
 			url: "filebrowser/folder",
@@ -320,6 +350,9 @@ var WCMS2FileBrowser = function(){
 					$(file).find("div.file-image-cotainer").append("<img class='file-image'></img>");
 					$(file).find("img.file-image").attr("src",node.path);
 					$(file).find("div.file-image-cotainer").data("path", path);
+					$(file).append("<span class='glyphicon glyphicon-remove button button-remove wcms2-image-button hidden'></span>");
+					$(file).append("<span class='glyphicon glyphicon-fullscreen wcms2-lightbox wcms2-image-button hidden' aria-hidden='true'></span>");
+					$(file).find("span.wcms2-lightbox").attr("data-url", node.path);
 				}
 				else{
 					$(file).find("div.file-image-cotainer").append("<span class='glyphicon glyphicon-file file-file'></span>");
