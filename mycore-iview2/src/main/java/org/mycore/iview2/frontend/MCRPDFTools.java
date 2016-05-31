@@ -23,30 +23,19 @@
 
 package org.mycore.iview2.frontend;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import org.apache.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.mycore.common.content.MCRContent;
+import org.mycore.tools.MCRPNGTools;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.apache.pdfbox.exceptions.CryptographyException;
-import org.apache.pdfbox.io.RandomAccess;
-import org.apache.pdfbox.io.RandomAccessBuffer;
-import org.apache.pdfbox.pdfparser.PDFParser;
-import org.apache.pdfbox.pdfviewer.PageDrawer;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.mycore.common.content.MCRContent;
-import org.mycore.tools.MCRPNGTools;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -66,40 +55,18 @@ class MCRPDFTools implements AutoCloseable {
     }
 
     static BufferedImage getThumbnail(Path pdfFile, int thumbnailSize, boolean centered) throws IOException {
-        PDDocument pdf = getPDDocument(pdfFile);
-        if (pdf.isEncrypted()) {
-            try {
-                pdf.decrypt("");
-            } catch (CryptographyException e) {
-                LOGGER.error("PDF document: " + pdfFile + " is encrypted.");
-                return null;
-            }
-            pdf.setAllSecurityToBeRemoved(true);
-        }
-        BufferedImage level1Image;
+        InputStream fileIS = Files.newInputStream(pdfFile);
+        PDDocument pdf = PDDocument.load(fileIS);
+        PDFRenderer pdfRenderer = new PDFRenderer(pdf);
+        BufferedImage level1Image = pdfRenderer.renderImage(0);
         int imageType = BufferedImage.TYPE_INT_ARGB;
-        try {
-            PDDocumentCatalog documentCatalog = pdf.getDocumentCatalog();
-            @SuppressWarnings("unchecked")
-            List<PDPage> pages = documentCatalog.getAllPages();
 
-            PDPage page = (PDPage) pages.get(0);
-            page.findCropBox();
-            PDRectangle renderBox = page.getCropBox(); //may not be available but is prefered
-            if (renderBox == null) {
-                renderBox = page.getTrimBox(); //should always be available
-            }
-            Dimension dimension = renderBox.createDimension();
-            Dimension targetDimension = scaleDimension(dimension, thumbnailSize);
-            level1Image = renderPage(page, renderBox, targetDimension, BufferedImage.TYPE_INT_RGB);
-        } finally {
-            pdf.close();
-        }
         if (!centered) {
             return level1Image;
         }
         final double width = level1Image.getWidth();
         final double height = level1Image.getHeight();
+        LOGGER.info("new PDFBox: " + width + "x" + height);
         LOGGER.info("temporary image dimensions: " + width + "x" + height);
         final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
         final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
@@ -118,74 +85,6 @@ class MCRPDFTools implements AutoCloseable {
             (int) Math.ceil(height), null);
         bg.dispose();
         return bicubic;
-    }
-
-    private static PDDocument getPDDocument(Path pdfFile) throws IOException {
-        InputStream input = Files.newInputStream(pdfFile);
-        RandomAccess rafi = new RandomAccessBuffer();
-        PDFParser parser = new PDFParser(input, rafi);
-        parser.parse();
-        return parser.getPDDocument();
-    }
-
-    private static Dimension scaleDimension(Dimension source, int maxDim) {
-        double scale = (source.height < source.width) ? maxDim / source.getWidth() : maxDim / source.getHeight();
-        Dimension returns = new Dimension();
-        returns.setSize(source.getWidth() * scale, source.getHeight() * scale);
-        return returns;
-    }
-
-    private static BufferedImage renderPage(PDPage page, PDRectangle renderBox, Dimension targetDimension, int imageType)
-        throws IOException {
-        BufferedImage retval = null;
-        Dimension sourceDimension = new Dimension();
-        sourceDimension.setSize(renderBox.getWidth(), renderBox.getHeight());
-        double scaling = Math.max(targetDimension.getHeight() / sourceDimension.getHeight(), targetDimension.getWidth()
-            / sourceDimension.getWidth());
-        int rotationAngle = page.findRotation();
-        // normalize the rotation angle
-        if (rotationAngle < 0) {
-            rotationAngle += 360;
-        } else if (rotationAngle >= 360) {
-            rotationAngle -= 360;
-        }
-        // swap width and height
-        if (rotationAngle == 90 || rotationAngle == 270) {
-            retval = new BufferedImage(targetDimension.height, targetDimension.width, imageType);
-        } else {
-            retval = new BufferedImage(targetDimension.width, targetDimension.height, imageType);
-        }
-        Graphics2D graphics = (Graphics2D) retval.getGraphics();
-        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        graphics.setBackground(TRANSPARENT_WHITE);
-        graphics.clearRect(0, 0, retval.getWidth(), retval.getHeight());
-        if (rotationAngle != 0) {
-            int translateX = 0;
-            int translateY = 0;
-            switch (rotationAngle) {
-                case 90:
-                    translateX = retval.getWidth();
-                    break;
-                case 270:
-                    translateY = retval.getHeight();
-                    break;
-                case 180:
-                    translateX = retval.getWidth();
-                    translateY = retval.getHeight();
-                    break;
-                default:
-                    break;
-            }
-            graphics.translate(translateX, translateY);
-            graphics.rotate((float) Math.toRadians(rotationAngle));
-        }
-        graphics.scale(scaling, scaling);
-        PageDrawer drawer = new PageDrawer();
-        drawer.drawPage(graphics, page, sourceDimension);
-        drawer.dispose();
-        graphics.dispose();
-        return retval;
-
     }
 
     MCRContent getThumnail(Path pdfFile, BasicFileAttributes attrs, int thumbnailSize, boolean centered)
