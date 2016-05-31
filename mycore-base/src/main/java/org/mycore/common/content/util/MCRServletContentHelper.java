@@ -28,6 +28,7 @@ import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -561,14 +562,31 @@ public abstract class MCRServletContentHelper {
      */
     private static void copy(final MCRContent content, final ServletOutputStream out, final Range range,
         final int inputBufferSize, final int outputBufferSize) throws IOException {
+        if (content.getReadableByteChannel() instanceof SeekableByteChannel) {
+            SeekableByteChannel seekableByteChannel = (SeekableByteChannel) content.getReadableByteChannel();
+            seekableByteChannel.position(range.start);
+            long bytesToCopy = range.end - range.start+1;
+            while (bytesToCopy > 0) {
+                ByteBuffer byteBuffer;
+                if (bytesToCopy > (long) MCRServletContentHelper.DEFAULT_BUFFER_SIZE) {
+                    byteBuffer = ByteBuffer.allocate(MCRServletContentHelper.DEFAULT_BUFFER_SIZE);
+                } else {
+                    byteBuffer = ByteBuffer.allocate((int) bytesToCopy);
+                }
 
-        try (final InputStream resourceInputStream = content.getInputStream();
-            final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
-                : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
-            endCurrentTransaction();
-            final IOException exception = copyRange(in, out, 0, range.start, range.end, outputBufferSize);
-            if (exception != null) {
-                throw exception;
+                int bytesRead = seekableByteChannel.read(byteBuffer);
+                bytesToCopy -= bytesRead;
+                out.write(byteBuffer.array());
+            }
+        } else {
+            try (final InputStream resourceInputStream = content.getInputStream();
+                 final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
+                         : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
+                endCurrentTransaction();
+                final IOException exception = copyRange(in, out, 0, range.start, range.end, outputBufferSize);
+                if (exception != null) {
+                    throw exception;
+                }
             }
         }
     }
@@ -593,7 +611,7 @@ public abstract class MCRServletContentHelper {
         final long bytesToRead = end - start + 1;
         final long skip = start - inPosition;
         try {
-            final long copied = IOUtils.copyLarge(in, out, skip, bytesToRead, new byte[outputBufferSize]);
+            final long copied = copyLarge(in, out, skip, bytesToRead, new byte[outputBufferSize]);
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("Served bytes:" + copied);
             }
@@ -604,6 +622,38 @@ public abstract class MCRServletContentHelper {
             return e;
         }
         return null;
+    }
+
+    public static long copyLarge(InputStream input, OutputStream output, long inputOffset, long length, byte[] buffer) throws IOException {
+        if (inputOffset > 0L) {
+            long bytesToSkip = inputOffset;
+            while (bytesToSkip > 0) {
+                bytesToSkip -= input.skip(bytesToSkip);
+            }
+        }
+
+        if (length == 0L) {
+            return 0L;
+        } else {
+            int bufferLength = buffer.length;
+            int bytesToRead = bufferLength;
+            if (length > 0L && length < (long) bufferLength) {
+                bytesToRead = (int) length;
+            }
+
+            long totalRead = 0L;
+
+            int read;
+            while (bytesToRead > 0 && -1 != (read = input.read(buffer, 0, bytesToRead))) {
+                output.write(buffer, 0, read);
+                totalRead += (long) read;
+                if (length > 0L) {
+                    bytesToRead = (int) Math.min(length - totalRead, (long) bufferLength);
+                }
+            }
+
+            return totalRead;
+        }
     }
 
     /**
