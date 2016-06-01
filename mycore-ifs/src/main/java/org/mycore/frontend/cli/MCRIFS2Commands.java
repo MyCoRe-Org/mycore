@@ -261,7 +261,7 @@ public class MCRIFS2Commands {
     private static void fixFileEntry(File node, String content_store, String derivate_id, String storage_base,
         boolean check_only) {
         LOGGER.debug("fixFileEntry : name = " + node.getName());
-        String storageid = node.getAbsolutePath().substring(storage_base.length());
+        String storageid = node.getAbsolutePath().substring(storage_base.length()).replace("\\", "/");
         LOGGER.debug("fixFileEntry : storageid = " + storageid);
         int counter = 0;
         String id = "";
