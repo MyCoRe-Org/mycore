@@ -29,6 +29,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
@@ -53,22 +54,23 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     synchronized protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        //need to delete to handle nested documents
-        this.handleObjectDeleted(evt, obj);
+        if (this.useNestedDocuments()) {
+            this.handleObjectDeleted(evt, obj);
+        }
         this.handleMCRBaseCreated(evt, obj);
     }
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        //need to delete to handle nested documents
-        this.handleObjectDeleted(evt, obj);
+        if (this.useNestedDocuments()) {
+            this.handleObjectDeleted(evt, obj);
+        }
         this.handleMCRBaseCreated(evt, obj);
     }
 
     @Override
     synchronized protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRSolrIndexer.deleteById(obj.getId()
-            .toString());
+        MCRSolrIndexer.deleteById(obj.getId().toString());
     }
 
     @Override
@@ -78,15 +80,17 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate derivate) {
-        //need to delete to handle nested documents
-        this.handleDerivateDeleted(evt, derivate);
+        if (this.useNestedDocuments()) {
+            this.handleDerivateDeleted(evt, derivate);
+        }
         this.handleMCRBaseCreated(evt, derivate);
     }
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate derivate) {
-        //need to delete to handle nested documents
-        this.handleDerivateDeleted(evt, derivate);
+        if (this.useNestedDocuments()) {
+            this.handleDerivateDeleted(evt, derivate);
+        }
         this.handleMCRBaseCreated(evt, derivate);
     }
 
@@ -99,20 +103,19 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         long tStart = System.currentTimeMillis();
         try {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId()
-                    .toString() + "\" for indexing");
+                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing");
             }
             MCRContent content = (MCRContent) evt.get("content");
             if (content == null) {
                 content = new MCRBaseContent(objectOrDerivate);
             }
-            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance()
-                .getIndexHandler(content, objectOrDerivate.getId());
+            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(content,
+                objectOrDerivate.getId());
             indexHandler.setCommitWithin(1000);
             MCRSolrIndexer.submitIndexHandler(indexHandler, false);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId()
-                    .toString() + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
+                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString()
+                    + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
             }
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for object " + objectOrDerivate, ex);
@@ -122,8 +125,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
         try {
-            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance()
-                .getIndexHandler(path, attrs, MCRSolrClientFactory.getSolrClient()), false);
+            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
+                MCRSolrClientFactory.getSolrClient()), false);
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for file " + path.toString(), ex);
         }
@@ -136,8 +139,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {
-        UpdateResponse updateResponse = MCRSolrIndexer.deleteById(file.toUri()
-            .toString());
+        UpdateResponse updateResponse = MCRSolrIndexer.deleteById(file.toUri().toString());
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Deleted file " + file + ". Response:" + updateResponse);
         }
@@ -157,4 +159,15 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     protected void handleObjectIndex(MCREvent evt, MCRObject obj) {
         handleObjectUpdated(evt, obj);
     }
+
+    /**
+     * Checks if the application uses nested documents. If so, each reindex requires
+     * an extra deletion. Using nested documents slows the solr index performance.
+     * 
+     * @return true if nested documents are used, otherwise false
+     */
+    protected boolean useNestedDocuments() {
+        return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
+    }
+
 }
