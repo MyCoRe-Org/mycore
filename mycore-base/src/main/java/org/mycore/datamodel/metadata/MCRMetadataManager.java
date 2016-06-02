@@ -57,6 +57,8 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRMarkManager;
+import org.mycore.datamodel.common.MCRMarkManager.Operation;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
@@ -343,39 +345,46 @@ public final class MCRMetadataManager {
      * @throws MCRAccessException if delete permission is missing
      */
     public static void delete(final MCRDerivate mcrDerivate) throws MCRPersistenceException, MCRAccessException {
-        if (!MCRAccessManager.checkPermission(mcrDerivate.getId(), PERMISSION_DELETE)) {
-            throw MCRAccessException.missingPermission("Delete derivate", mcrDerivate.getId().toString(),
+        MCRObjectID id = mcrDerivate.getId();
+        if (!MCRAccessManager.checkPermission(id, PERMISSION_DELETE)) {
+            throw MCRAccessException.missingPermission("Delete derivate", id.toString(),
                 PERMISSION_DELETE);
         }
+        // mark for deletion
+        MCRMarkManager.instance().mark(id, Operation.DELETE);
+
         // remove link
         MCRObjectID metaId = null;
         try {
             metaId = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
-            if (MCRMetadataManager.removeDerivateFromObject(metaId, mcrDerivate.getId())) {
+            if (MCRMetadataManager.removeDerivateFromObject(metaId, id)) {
                 LOGGER.info(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} is deleted.", metaId,
-                    mcrDerivate.getId()));
+                    id));
             } else {
                 LOGGER.warn(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} could not be deleted.",
-                    metaId, mcrDerivate.getId()));
+                    metaId, id));
             }
         } catch (final Exception e) {
-            LOGGER.warn("Can't delete link for MCRDerivate " + mcrDerivate.getId() + " from MCRObject " + metaId
+            LOGGER.warn("Can't delete link for MCRDerivate " + id + " from MCRObject " + metaId
                 + ". Error ignored.");
         }
 
         // delete data from IFS
         if (mcrDerivate.getDerivate().getInternals() != null) {
             try {
-                deleteDerivate(mcrDerivate.getId().toString());
-                LOGGER.info("IFS entries for MCRDerivate " + mcrDerivate.getId().toString() + " are deleted.");
+                deleteDerivate(id.toString());
+                LOGGER.info("IFS entries for MCRDerivate " + id.toString() + " are deleted.");
             } catch (final Exception e) {
-                throw new MCRPersistenceException("Error while delete for ID " + mcrDerivate.getId().toString()
+                throw new MCRPersistenceException("Error while delete for ID " + id.toString()
                     + " from IFS with ID " + mcrDerivate.getDerivate().getInternals().getIFSID(), e);
             }
         }
 
         // handle events
         fireEvent(mcrDerivate, null, MCREvent.DELETE_EVENT);
+        
+        // remove mark
+        MCRMarkManager.instance().remove(id);
     }
 
     /**
@@ -430,6 +439,9 @@ public final class MCRMetadataManager {
             throw activeLinks;
         }
 
+        // mark for deletion
+        MCRMarkManager.instance().mark(id, Operation.DELETE);
+
         // remove child from parent
         final MCRObjectID parentId = mcrObject.getStructure().getParentID();
         if (parentId != null) {
@@ -462,6 +474,9 @@ public final class MCRMetadataManager {
 
         // handle events
         fireEvent(mcrObject, null, MCREvent.DELETE_EVENT);
+
+        // remove mark
+        MCRMarkManager.instance().remove(id);
     }
 
     /**
@@ -693,12 +708,17 @@ public final class MCRMetadataManager {
      */
     public static void update(final MCRDerivate mcrDerivate)
         throws MCRPersistenceException, IOException, MCRAccessException {
-        if (!MCRMetadataManager.exists(mcrDerivate.getId())) {
+        MCRObjectID id = mcrDerivate.getId();
+        // check deletion mark
+        if(MCRMarkManager.instance().isMarkedForDeletion(id)) {
+            return;
+        }
+        if (!MCRMetadataManager.exists(id)) {
             MCRMetadataManager.create(mcrDerivate);
             return;
         }
-        if (!MCRAccessManager.checkPermission(mcrDerivate.getId(), PERMISSION_WRITE)) {
-            throw MCRAccessException.missingPermission("Update derivate", mcrDerivate.getId().toString(),
+        if (!MCRAccessManager.checkPermission(id, PERMISSION_WRITE)) {
+            throw MCRAccessException.missingPermission("Update derivate", id.toString(),
                 PERMISSION_WRITE);
         }
         File fileSourceDirectory = null;
@@ -707,12 +727,12 @@ public final class MCRMetadataManager {
             fileSourceDirectory = new File(mcrDerivate.getDerivate().getInternals().getSourcePath());
 
             if (!fileSourceDirectory.exists()) {
-                LOGGER.warn(mcrDerivate.getId() + ": the directory " + fileSourceDirectory + " was not found.");
+                LOGGER.warn(id + ": the directory " + fileSourceDirectory + " was not found.");
                 fileSourceDirectory = null;
             }
         }
         // get the old Item
-        MCRDerivate old = MCRMetadataManager.retrieveMCRDerivate(mcrDerivate.getId());
+        MCRDerivate old = MCRMetadataManager.retrieveMCRDerivate(id);
 
         // remove the old link to metadata
         MCRMetaLinkID oldLink = old.getDerivate().getMetaLink();
@@ -722,13 +742,13 @@ public final class MCRMetadataManager {
             MCRObjectID newMetadataObjectID = newLink.getXLinkHrefID();
             if (!oldMetadataObjectID.equals(newLink.getXLinkHrefID())) {
                 try {
-                    MCRMetadataManager.removeDerivateFromObject(oldMetadataObjectID, mcrDerivate.getId());
+                    MCRMetadataManager.removeDerivateFromObject(oldMetadataObjectID, id);
                 } catch (final MCRException e) {
                     LOGGER.warn(e.getMessage(), e);
                 }
             }
             // add the link to metadata
-            final MCRMetaLinkID der = new MCRMetaLinkID("derobject", mcrDerivate.getId(), null, mcrDerivate.getLabel(),
+            final MCRMetaLinkID der = new MCRMetaLinkID("derobject", id, null, mcrDerivate.getLabel(),
                 newLink.getXLinkRole());
             addOrUpdateDerivateToObject(newMetadataObjectID, der);
         }
@@ -744,7 +764,7 @@ public final class MCRMetadataManager {
 
         // update to IFS
         if (fileSourceDirectory != null) {
-            MCRPath rootPath = MCRPath.getPath(mcrDerivate.getId().toString(), "/");
+            MCRPath rootPath = MCRPath.getPath(id.toString(), "/");
             Files.walkFileTree(fileSourceDirectory.toPath(), new MCRTreeCopier(fileSourceDirectory.toPath(), rootPath));
         }
 
@@ -761,15 +781,20 @@ public final class MCRMetadataManager {
      */
     public static void update(final MCRObject mcrObject)
         throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
-        if (!MCRMetadataManager.exists(mcrObject.getId())) {
+        MCRObjectID id = mcrObject.getId();
+        // check deletion mark
+        if(MCRMarkManager.instance().isMarkedForDeletion(id)) {
+            return;
+        }
+        if (!MCRMetadataManager.exists(id)) {
             MCRMetadataManager.create(mcrObject);
             return;
         }
-        if (!MCRAccessManager.checkPermission(mcrObject.getId(), PERMISSION_WRITE)) {
-            throw MCRAccessException.missingPermission("Update object.", mcrObject.getId().toString(),
+        if (!MCRAccessManager.checkPermission(id, PERMISSION_WRITE)) {
+            throw MCRAccessException.missingPermission("Update object.", id.toString(),
                 PERMISSION_WRITE);
         }
-        MCRObject old = MCRMetadataManager.retrieveMCRObject(mcrObject.getId());
+        MCRObject old = MCRMetadataManager.retrieveMCRObject(id);
 
         // save the order of derivates and clean the structure
         mcrObject.getStructure().clearChildren();
@@ -820,7 +845,7 @@ public final class MCRMetadataManager {
             // remove child from the old parent
             LOGGER.debug("Parent ID = " + oldParentID);
             final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldParentID);
-            parent.getStructure().removeChild(mcrObject.getId());
+            parent.getStructure().removeChild(id);
             MCRMetadataManager.fireUpdateEvent(parent);
         }
 
@@ -847,14 +872,14 @@ public final class MCRMetadataManager {
         if (newParentID != null && !newParentID.equals(oldParentID)) {
             MCRObject newParent = retrieveMCRObject(newParentID);
             newParent.getStructure()
-                .addChild(new MCRMetaLinkID("child", mcrObject.getId(), null, mcrObject.getLabel()));
+                .addChild(new MCRMetaLinkID("child", id, null, mcrObject.getLabel()));
             MCRMetadataManager.fireUpdateEvent(newParent);
         }
 
         // update all children
         boolean updatechildren = shareableMetadataChanged(mcrObject, old);
         if (updatechildren) {
-            MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(mcrObject.getId());
+            MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(id);
             metadataShareAgent.distributeMetadata(mcrObject);
         }
     }
