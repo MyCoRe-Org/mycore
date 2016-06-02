@@ -68,7 +68,7 @@ return declare("mycore.classification.LinkDialog", [Dialog, _Templated, _Setting
 				if(i % 2 == 0) {
 					tr = domConstruct.create("tr", {}, this.linkTable);
 				}
-				domConstruct.place("<td><a href='/receive/" + docs[i] + "'>" + docs[i] + "</a></td>", tr); 
+				domConstruct.place("<td><a target='_blank' href='" + this.settings.webAppBaseURL + "receive/" + docs[i] + "'>" + docs[i] + "</a></td>", tr); 
 			}
 		}
 		this.updateToolbar();
