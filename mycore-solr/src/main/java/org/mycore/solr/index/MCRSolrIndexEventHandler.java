@@ -34,9 +34,12 @@ import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 
@@ -81,7 +84,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate derivate) {
         if (this.useNestedDocuments()) {
-            this.handleDerivateDeleted(evt, derivate);
+            MCRSolrIndexer.deleteById(derivate.getId().toString());
         }
         this.handleMCRBaseCreated(evt, derivate);
     }
@@ -89,14 +92,14 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate derivate) {
         if (this.useNestedDocuments()) {
-            this.handleDerivateDeleted(evt, derivate);
+            MCRSolrIndexer.deleteById(derivate.getId().toString());
         }
         this.handleMCRBaseCreated(evt, derivate);
     }
 
     @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
-        MCRSolrIndexer.deleteById(derivate.getId().toString());
+        MCRSolrIndexer.deleteDerivate(derivate.getId().toString());
     }
 
     synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
@@ -139,6 +142,9 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {
+        if (isMarkedForDeletion(file)) {
+            return;
+        }
         UpdateResponse updateResponse = MCRSolrIndexer.deleteById(file.toUri().toString());
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Deleted file " + file + ". Response:" + updateResponse);
@@ -168,6 +174,30 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
      */
     protected boolean useNestedDocuments() {
         return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
+    }
+
+    /**
+     * Returns the derivate identifier for the given path.
+     * 
+     * @param path the path
+     * @return the derivate identifier
+     */
+    protected MCRObjectID getDerivateId(Path path) {
+        MCRPath mcrPath = MCRPath.toMCRPath(path);
+        return MCRObjectID.getInstance(mcrPath.getOwner());
+    }
+
+    /**
+     * Checks if the derivate is marked for deletion.
+     * 
+     * @param path
+     */
+    protected boolean isMarkedForDeletion(Path path) {
+        MCRObjectID derivateId = getDerivateId(path);
+        if (MCRMarkManager.instance().isMarkedForDeletion(derivateId)) {
+            return true;
+        }
+        return false;
     }
 
 }

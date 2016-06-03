@@ -149,14 +149,16 @@ public class MCRSolrIndexer {
             LOGGER.debug("Deleting \"" + Arrays.asList(solrIDs) + "\" from solr");
             UpdateRequest req = new UpdateRequest();
             //delete all documents rooted at this id
-            StringBuilder deleteQuery = new StringBuilder("_root_:(");
-            for (String solrID : solrIDs) {
-                deleteQuery.append('"');
-                deleteQuery.append(MCRSolrUtils.escapeSearchValue(solrID));
-                deleteQuery.append("\" ");
+            if(useNestedDocuments()) {
+                StringBuilder deleteQuery = new StringBuilder("_root_:(");
+                for (String solrID : solrIDs) {
+                    deleteQuery.append('"');
+                    deleteQuery.append(MCRSolrUtils.escapeSearchValue(solrID));
+                    deleteQuery.append("\" ");
+                }
+                deleteQuery.setCharAt(deleteQuery.length() - 1, ')');
+                req.deleteByQuery(deleteQuery.toString());
             }
-            deleteQuery.setCharAt(deleteQuery.length() - 1, ')');
-            req.deleteByQuery(deleteQuery.toString());
             //for document without nested
             req.deleteById(Arrays.asList(solrIDs));
             if (LOGGER.isDebugEnabled()) {
@@ -173,6 +175,51 @@ public class MCRSolrIndexer {
         operations.addTime(end - start);
         return updateResponse;
 
+    }
+
+    /**
+     * Convenient method to delete a derivate and all its files at once.
+     * 
+     * @param id the derivate id
+     * @return the solr response
+     */
+    public static UpdateResponse deleteDerivate(String id) {
+        if (id == null) {
+            return null;
+        }
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        UpdateResponse updateResponse = null;
+        long start = System.currentTimeMillis();
+        try {
+            LOGGER.debug("Deleting derivate \"" + id + "\" from solr");
+            UpdateRequest req = new UpdateRequest();
+            StringBuilder deleteQuery = new StringBuilder();
+            deleteQuery.append("id:").append(id).append(" ");
+            deleteQuery.append("derivateID:").append(id);
+            if (useNestedDocuments()) {
+                deleteQuery.append(" ").append("_root_:").append(id);
+            }
+            req.deleteByQuery(deleteQuery.toString());
+            updateResponse = req.process(solrClient);
+            solrClient.commit();
+        } catch (Exception e) {
+            LOGGER.error("Error deleting document from solr", e);
+        }
+        long end = System.currentTimeMillis();
+        MCRSolrIndexStatistic operations = MCRSolrIndexStatisticCollector.operations;
+        operations.addDocument(1);
+        operations.addTime(end - start);
+        return updateResponse;
+    }
+
+    /**
+     * Checks if the application uses nested documents. Using nested documents requires
+     * additional queries and slows performance.
+     * 
+     * @return true if nested documents are used, otherwise false
+     */
+    protected static boolean useNestedDocuments() {
+        return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
     }
 
     /**
