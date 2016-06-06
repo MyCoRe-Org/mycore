@@ -19,4 +19,9 @@
     <servlet-name>MyCoRe REST API v1</servlet-name>
     <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
+  <filter-mapping>
+    <filter-name>MCRUserAgentFilter</filter-name>
+    <servlet-name>MyCoRe REST API v1</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
 </web-fragment>
