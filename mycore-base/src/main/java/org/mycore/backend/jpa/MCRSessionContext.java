@@ -29,7 +29,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -49,7 +50,7 @@ import org.mycore.common.events.MCRSessionListener;
  */
 class MCRSessionContext implements MCRSessionListener {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSessionContext.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private EntityManagerFactory factory;
 
@@ -67,7 +68,7 @@ class MCRSessionContext implements MCRSessionListener {
         switch (event.getType()) {
             case activated:
                 if (event.getConcurrentAccessors() <= 1) {
-                    LOGGER.debug("First Thread to access " + mcrSession);
+                    LOGGER.debug(() -> "First Thread to access " + mcrSession);
                 }
                 break;
             case passivated:
@@ -112,7 +113,8 @@ class MCRSessionContext implements MCRSessionListener {
      * Closes Session if Session is still open.
      */
     private void autoCloseSession(EntityManager currentEntityManager) {
-        if (currentEntityManager != null && currentEntityManager.isOpen() && hibernateSessionIsOpen(currentEntityManager)) {
+        if (currentEntityManager != null && currentEntityManager.isOpen()
+            && hibernateSessionIsOpen(currentEntityManager)) {
             LOGGER.debug("Autoclosing current JPA EntityManager");
             currentEntityManager.close();
         }
@@ -122,8 +124,10 @@ class MCRSessionContext implements MCRSessionListener {
         // creates a new one
         LOGGER.debug("Obtaining new entity manager.");
         EntityManager entityManager = factory.createEntityManager();
-        LOGGER.debug("Returning entity manager with transaction: " + entityManager.getTransaction());
-        LOGGER.debug("Session is open: " + entityManager.unwrap(Session.class).isOpen());
+        LOGGER.debug(() -> "Returning entity manager with "
+            + (entityManager.getTransaction().isActive() ? "active" : "non-active")
+            + " transaction.");
+        LOGGER.debug(() -> "Session is open: " + entityManager.unwrap(Session.class).isOpen());
         context.set(entityManager);
         return entityManager;
     }
