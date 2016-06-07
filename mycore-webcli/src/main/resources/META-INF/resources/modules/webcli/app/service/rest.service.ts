@@ -22,7 +22,11 @@ export class RESTService {
 
   constructor(private http: Http) {
     var loc = window.location;
-    this.socketURL = "ws://" + loc.host + this.getBasePath(loc.pathname) + this.socketURL;
+    var protocol = "ws://";
+    if (location.protocol == "https:"){
+      protocol = "wss://";
+    }
+    this.socketURL = protocol + loc.host + this.getBasePath(loc.pathname) + this.socketURL;
     this.openSocketConnection();
   }
 
