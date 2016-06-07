@@ -57,17 +57,17 @@
   </filter-mapping>
 
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRQLSearchServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRSolrSearchServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>

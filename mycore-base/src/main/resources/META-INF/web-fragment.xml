@@ -23,7 +23,7 @@
   </filter>
 
   <filter>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <filter-class>org.mycore.frontend.filter.MCRUserAgentFilter</filter-class>
   </filter>
 
@@ -192,22 +192,22 @@
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRFileNodeServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRBasketServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRObjectServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>

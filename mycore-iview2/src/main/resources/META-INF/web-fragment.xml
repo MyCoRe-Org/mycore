@@ -43,12 +43,12 @@
   </servlet-mapping>
   
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRTileCombineServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRThumbnailServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
