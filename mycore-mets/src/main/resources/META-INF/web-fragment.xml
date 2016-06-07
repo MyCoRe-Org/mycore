@@ -15,7 +15,7 @@
   </servlet-mapping>
 
   <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
+    <filter-name>MCRUserAgentFilter</filter-name>
     <servlet-name>MCRMETSServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
