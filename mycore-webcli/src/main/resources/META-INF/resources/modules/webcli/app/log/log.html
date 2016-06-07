@@ -1,0 +1,8 @@
+<div class="col-xs-12 web-cli-log">
+  <pre class="web-cli-log-pre web-cli-pre">
+    <template ngFor let-logEntry [ngForOf]="log" let-i="index"><!--
+    --><br *ngIf="i != 0">{{logEntry.logLevel}}: {{logEntry.message}}<!--
+    --><br *ngIf="logEntry.exception">{{logEntry.exception}}<!--
+    --></template><!--
+  --></pre>
+</div>

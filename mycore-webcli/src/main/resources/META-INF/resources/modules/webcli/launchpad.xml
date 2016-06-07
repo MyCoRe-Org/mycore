@@ -7,7 +7,7 @@
         <h1>MyCoRe WebCLI launch pad</h1>
         <p>
           <input class="btn btn-primary btn-lg" id="launchButton" type="button" value="Start"
-            onclick="window.open('start.xml','','width=1200,height=900,resizable,locationbar=false,menubar=false,personalbar=false,toolbar=false');" />
+            onclick="window.open('../../rsc/WebCLI/','','width=1200,height=900,resizable,locationbar=false,menubar=false,personalbar=false,toolbar=false');" />
         </p>
       </div>
     </div>

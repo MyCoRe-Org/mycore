@@ -1,0 +1,122 @@
+import {Injectable} from '@angular/core';
+import {Http, Response} from '@angular/http';
+import {Commands} from '../commands/commands';
+import {Log} from '../log/log';
+import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
+
+@Injectable()
+export class RESTService {
+  socketURL: string = "/WebCLISocket";
+  socket = null;
+  retryCounter: number = 0;
+  private _currentCommandList = new Subject<Commands[]>();
+  private _currentLog = new Subject<Log>();
+  private _currentQueue = new Subject<String[]>();
+  private _currentCommand = new Subject<String>();
+
+  currentCommandList = this._currentCommandList.asObservable();
+  currentLog = this._currentLog.asObservable();
+  currentQueue = this._currentQueue.asObservable();
+  currentCommand = this._currentCommand.asObservable();
+
+  constructor(private http: Http) {
+    var loc = window.location;
+    this.socketURL = "ws://" + loc.host + this.getBasePath(loc.pathname) + this.socketURL;
+    this.openSocketConnection();
+  }
+
+  getCommands() {
+    var message = {
+      type: "getKnownCommands"
+    }
+    this.sendMessage(JSON.stringify(message));
+  }
+
+  executeCommand(command: string) {
+    if (command != undefined && command != "") {
+      var message = {
+        type: "run",
+        command: command
+      }
+      this.sendMessage(JSON.stringify(message));
+    }
+  }
+
+  startLogging() {
+    var message = {
+      type: "startLog"
+    }
+    this.sendMessage(JSON.stringify(message));
+  }
+
+  stopLogging() {
+    var message = {
+      type: "stopLog"
+    }
+    this.sendMessage(JSON.stringify(message));
+  }
+
+  private sendMessage(message: String) {
+    if (message == "") {
+      return;
+    }
+    this.retryCounter++;
+    if (this.socket.readyState === 1) {
+      this.retryCounter = 0;
+      this.socket.send(message);
+      return;
+    }
+    if (this.socket == undefined || this.socket.readyState === 3) {
+      if (this.retryCounter < 5) {
+        this.openSocketConnection();
+        this.sendMessage(message);
+      }
+      return;
+    }
+    if (this.socket.readyState === 0 || this.socket.readyState === 2) {
+      if (this.retryCounter < 5) {
+        setTimeout(() => this.sendMessage(message), 500);
+      }
+      return;
+    }
+  }
+
+  private openSocketConnection() {
+    this.socket = new WebSocket(this.socketURL);
+    this.socket.onmessage = event => {
+      if (event.data == "noPermission"){
+        console.log("You don't have permission to use the MyCoRe WebCLI!");
+        alert("You don't have permission to use the MyCoRe WebCLI!");
+        this.retryCounter = 5;
+        return;
+      }
+      var message = JSON.parse(event.data);
+      if (message.type == "getKnownCommands"){
+        this._currentCommandList.next(<Commands[]> JSON.parse(message.return).commands);
+      }
+      if (message.type == "log"){
+        if(message.return != "") {
+          this._currentLog.next(<Log> JSON.parse(message.return));
+        }
+      }
+      if (message.type == "commandQueue"){
+        if(message.return != "") {
+          this._currentQueue.next(<String[]> JSON.parse(message.return));
+        }
+        else {
+          this._currentQueue.next(new Array<String>());
+        }
+      }
+      if (message.type == "currentCommand"){
+          this._currentCommand.next(message.return);
+      }
+    }
+  }
+
+  private getBasePath(path: String) {
+    var pathArray = location.pathname.split("/")
+    pathArray.splice(-3);
+    return pathArray.join("/");
+  }
+}

@@ -1,17 +1,214 @@
-@import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css";
-@import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/resources/dojo.css"
+@import url(https://fonts.googleapis.com/css?family=Roboto);
 html, body {
-	width: 100%;
-	height: 100%;
+  font-family: 'Roboto', sans-serif;
 }
 
-.webcliEditorIcon {
-    background-image: url('../images/webcli.gif'); /* editor icons sprite image */
-    background-repeat: no-repeat;
-    width: 18px;
-    height: 18px;
-    text-align: center;
+.navbar-brand {
+  padding-top: 0.5rem;
+  padding-bottom: 0;
 }
-.webcliEditorIconPause { background-position: 0px; }
-.webcliEditorIconStop { background-position: -18px; }
-.webcliEditorIconPlay { background-position: -36px; }
+
+#command-input {
+  padding: 10px;
+}
+
+#command-input input {
+  border-top: 0;
+  border-left: 0;
+  border-radius: 0;
+  border-right: 0;
+  line-height: 1.50rem;
+}
+
+#command-input input:focus {
+  border-bottom-color: #373a3c;
+}
+
+#command-input button {
+  border-radius: 0;
+  border: 0;
+  margin-left: 20px;
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+  color: #eceeef;
+  background-color: #373a3c;
+}
+
+.navbar {
+  border-radius: 0;
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+}
+
+.nav-item {
+  cursor: pointer;
+}
+
+#log {
+  padding-bottom: 0;
+}
+
+div.web-cli-log{
+  height: calc(100% - 232px);
+  overflow: auto;
+  padding-right: 0;
+}
+
+div.web-cli-queue{
+  height: calc(100% - 232px);
+  overflow: auto;
+  padding-right: 0;
+}
+
+pre.web-cli-pre{
+  text-indent: -69px;
+  margin-bottom: -40px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 15px;
+  height: 100%;
+}
+
+.row {
+  width: 100%;
+  margin: 0;
+}
+
+#exCollapsingNavbar .row {
+  padding: 5px;
+}
+
+.loader {
+  height: 4px;
+  width: 100%;
+  margin-top: 5px;
+  position: relative;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.loader:before{
+  display: block;
+  position: absolute;
+  content: "";
+  left: -200px;
+  width: 200px;
+  height: 4px;
+  background-color: #373a3c;
+  -webkit-animation: loading 5s linear infinite;
+          animation: loading 5s linear infinite;
+}
+
+@-webkit-keyframes loading {
+    from {left: -30%; width: 30%;}
+    50% {width: 30%;}
+    70% {width: 70%;}
+    80% {left: 50%;}
+    95% {left: 120%;}
+    to {left: 100%;}
+}
+
+@keyframes loading {
+    from {left: -30%; width: 30%;}
+    50% {width: 30%;}
+    70% {width: 70%;}
+    80% {left: 50%;}
+    95% {left: 120%;}
+    to {left: 100%;}
+}
+
+.loader-no-animation {
+  height: 4px;
+  width: 100%;
+  margin-top: 5px;
+  position: relative;
+  overflow: hidden;
+  background-color: #373a3c;
+}
+
+#current-command {
+  padding: 20px 10px;
+}
+
+#current-command-running {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/*Override Bootstrap*/
+
+.nav-tabs .nav-item.active .nav-link, .nav-tabs .nav-item.active .nav-link:focus, .nav-tabs .nav-item.active .nav-link.hover, .nav-tabs .nav-item.open .nav-link, .nav-tabs .nav-item.open .nav-link:focus, .nav-tabs .nav-item.open .nav-link:hover, .nav-tabs .nav-link:hover {
+  color: #373a3c;
+  border-bottom: solid 2px #373a3c;
+}
+
+.nav-tabs .nav-link {
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 2px solid transparent;;
+  padding-bottom: 0.6em;
+  color: #999999;
+}
+
+.nav-tabs .nav-item + .nav-item {
+  margin: 0;
+}
+
+#current-command .current-command-label {
+  color: #999999
+}
+
+.bg-inverse label {
+  color: rgba(255,255,255,.5);
+}
+
+/*multiDropDown*/
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px;
+    border-radius: 0 6px 6px 6px;
+    overflow-x: auto;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+    display: block;
+}
+
+.dropdown-submenu>a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+    left: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
+}

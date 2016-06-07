@@ -174,7 +174,7 @@ public class MCRCommand {
      * 
      * @return the help text as String
      */
-    protected String getHelpText() {
+    public String getHelpText() {
         return help;
     }
 

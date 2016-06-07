@@ -1,0 +1,6 @@
+<li *ngFor="let command of commandList" class="dropdown-submenu" (mouseover)="onHoverSubmenu($event)">
+  <a class="dropdown-item" href="#" onclick='return false;'>{{command.name}}</a>
+  <ul class="dropdown-menu" *ngIf="command.commands">
+    <li *ngFor="let com of command.commands"><a class="dropdown-item" href="#" (click)="onSelect(com.command)" onclick='return false;' title="{{com.help}}">{{com.command}}</a></li>
+  </ul>
+</li>

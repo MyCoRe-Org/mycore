@@ -1,0 +1,16 @@
+<div class="collapse" id="exCollapsingNavbar">
+  <div class="bg-inverse p-a-1">
+      <div class="form-group row">
+        <label class="form-control-label col-xs-2">Log History Size:</label>
+        <div class="col-xs-2">
+          <input type="text" class="form-control" [(ngModel)]="settings.historySize" (change)="onHistoryChange()">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="form-control-label col-xs-2">AutoScroll Logs:</label>
+        <div class="col-xs-2">
+           <input type="checkbox" [(ngModel)]="settings.autoscroll" (change)="onAutoScrollChange($event)">
+        </div>
+      </div>
+  </div>
+</div>

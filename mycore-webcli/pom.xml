@@ -11,13 +11,97 @@
   <name>MyCoRe Web CLI</name>
   <properties>
     <manifest.priority>67</manifest.priority>
+    <node.version>v6.2.0</node.version>
+    <npm.version>3.9.3</npm.version>
+    <frontend.maven.plugin.version>1.0</frontend.maven.plugin.version>
   </properties>
+	<profiles>
+		<profile>
+			<id>buildTS</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>create-resources</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}/target/webcli/</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${basedir}/src/main/resources/META-INF/resources/modules/webcli</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+							<execution>
+								<id>create-resources2</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<overwrite>true</overwrite>
+									<outputDirectory>${basedir}/src/main/resources/META-INF/resources/modules/webcli/build/</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${basedir}/target/webcli/build</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.github.eirslett</groupId>
+						<artifactId>frontend-maven-plugin</artifactId>
+						<version>${frontend.maven.plugin.version}</version>
+						<executions>
+							<execution>
+								<id>install-node-and-npm</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>install-node-and-npm</goal>
+								</goals>
+								<configuration>
+									<nodeVersion>${node.version}</nodeVersion>
+									<npmVersion>${npm.version}</npmVersion>
+								</configuration>
+							</execution>
+							<execution>
+								<id>npm-install</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<arguments>install</arguments>
+									<workingDirectory>target/webcli</workingDirectory>
+								</configuration>
+							</execution>
+							<execution>
+								<id>gulp-build</id>
+								<goals>
+									<goal>gulp</goal>
+								</goals>
+								<phase>generate-sources</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<installDirectory>target/node-installation-dir</installDirectory>
+							<workingDirectory>target/webcli</workingDirectory>
+							<skip>${frontend.skip}</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
   <dependencies>
-    <dependency>
-      <!-- because of MCRCommandManager-->
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>annotations</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
@@ -47,5 +131,18 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
     </dependency>
+	<dependency>
+	  <groupId>javax.ws.rs</groupId>
+	  <artifactId>jsr311-api</artifactId>
+	  </dependency>
+	<dependency>
+		<groupId>javax.websocket</groupId>
+		<artifactId>javax.websocket-api</artifactId>
+		<version>1.1</version>
+	</dependency>
+	<dependency>
+	  <groupId>com.sun.jersey</groupId>
+	  <artifactId>jersey-server</artifactId>
+	  </dependency>
   </dependencies>
 </project>
