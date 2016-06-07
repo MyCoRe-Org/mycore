@@ -1,7 +1,5 @@
 package org.mycore.mods.classification;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -86,20 +84,12 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
 
     @Override
     protected MCRCategoryID lookupCategoryID() {
-        MCRCategory category = getCategoryByAuthority(authority);
-        return category == null ? null : new MCRCategoryID(category.getId().getRootID(), code);
-    }
-
-    /**
-     * Returns the classification associated with the given authority.
-     * 
-     * @param authority
-     *            a valid MODS authority like "lcc"
-     * @return a MCRCategory that should be a root category, or null if no such category exists.
-     */
-    private MCRCategory getCategoryByAuthority(final String authority) {
-        List<MCRCategory> categoriesByLabel = DAO.getCategoriesByLabel(LABEL_LANG_AUTHORITY, authority);
-        return categoriesByLabel.isEmpty() ? null : categoriesByLabel.get(0);
+        return DAO
+            .getCategoriesByLabel(LABEL_LANG_AUTHORITY, authority)
+            .stream()
+            .findFirst()
+            .map(c -> new MCRCategoryID(c.getId().getRootID(), code))
+            .orElse(null);
     }
 
     @Override
