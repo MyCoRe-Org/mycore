@@ -47,9 +47,10 @@ mycore.session.listing = {
 		  sc.criteria = criteria;
 		  sc.asc = true;
 	  }
-	  return mycore.session.listing.filteredSessions.sort(function(a, b){
+	  mycore.session.listing.filteredSessions.sort(function(a, b){
 		  return sortFunction(sc.asc?a:b,sc.asc?b:a);
 	  });
+	  mycore.session.listing.render();
   },
 
   render: function() {
@@ -125,35 +126,30 @@ mycore.session.listing = {
     mycore.session.listing.sortSessions("login",function(a1,a2){
       return a1.login.localeCompare(a2.login);
     });
-    mycore.session.listing.render();
   },
 
   sortByIP: function() {
     mycore.session.listing.sortSessions("ip",function(a1,a2){
       return a1.ip.localeCompare(a2.ip);
     });
-    mycore.session.listing.render();
   },
 
   sortByFirstAccess: function() {
     mycore.session.listing.sortSessions("createTime",function(a1,a2){
       return a1.createTime - a2.createTime;
     });
-    mycore.session.listing.render();
   },
   
   sortByLastAccess: function() {
     mycore.session.listing.sortSessions("lastAccess",function(a1,a2){
       return a1.lastAccessTime - a2.lastAccessTime;
     });
-    mycore.session.listing.render();
   },
 
   sortByStacktrace: function() {
     mycore.session.listing.sortSessions("stackTrace",function(a1,a2){
       return a1.constructingStacktrace.color.localeCompare(a2.constructingStacktrace.color);
     });
-    mycore.session.listing.render();
   },
 
   onFilterChange: function() {
