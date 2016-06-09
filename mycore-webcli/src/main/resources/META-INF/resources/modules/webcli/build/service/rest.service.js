@@ -27,7 +27,7 @@ System.register(['@angular/core', '@angular/http', 'rxjs/Subject'], function(exp
             let RESTService = class RESTService {
                 constructor(http) {
                     this.http = http;
-                    this.socketURL = "/WebCLISocket";
+                    this.socketURL = "/ws/mycore-webcli/socket";
                     this.socket = null;
                     this.retryCounter = 0;
                     this._currentCommandList = new Subject_1.Subject();

@@ -24,7 +24,7 @@ import com.google.gson.JsonParser;
  * @author Michel Buechner (mcrmibue)
  * 
  */
-@ServerEndpoint(value = "/WebCLISocket", configurator = GetMCRSessionIdConfigurator.class)
+@ServerEndpoint(value = "/ws/mycore-webcli/socket", configurator = GetMCRSessionIdConfigurator.class)
 public class MCRWebCLIResourceSockets {
     
     private static final String SESSION_KEY = "MCRWebCLI";

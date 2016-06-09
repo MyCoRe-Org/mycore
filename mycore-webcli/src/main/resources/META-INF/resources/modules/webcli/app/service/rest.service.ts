@@ -7,7 +7,7 @@ import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class RESTService {
-  socketURL: string = "/WebCLISocket";
+  socketURL: string = "/ws/mycore-webcli/socket";
   socket = null;
   retryCounter: number = 0;
   private _currentCommandList = new Subject<Commands[]>();
