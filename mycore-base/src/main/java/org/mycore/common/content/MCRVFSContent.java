@@ -37,7 +37,6 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 
 /**
@@ -84,10 +83,10 @@ public class MCRVFSContent extends MCRContent {
             }
         };
     }
-    private Message getDebugMessage(String paramMsg){
+    private String getDebugMessage(String paramMsg){
         final String uri = fo.getName().getURI();
         final String id = toString().substring(toString().indexOf('@'));
-        return new ParameterizedMessage(paramMsg+"\n{}", new String[] { id, uri, getDebugStacktrace() });
+        return new ParameterizedMessage(paramMsg+"\n{}", id, uri, getDebugStacktrace()).getFormattedMessage();
     }
 
     private String getDebugStacktrace() {

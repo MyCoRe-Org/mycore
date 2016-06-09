@@ -1,7 +1,10 @@
 package org.mycore.mets.model.converter;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -18,15 +21,13 @@ import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
 
-import static java.util.stream.Collectors.toList;
-
 public class MCRMetsTestUtil {
 
     private static Properties PROPERTIES = new Properties();
 
     public static String readJsonFile(String path) throws IOException {
         InputStream resourceAsStream = MCRMetsTestUtil.class.getClassLoader().getResourceAsStream("json/" + path);
-        List<String> stringList = IOUtils.readLines(resourceAsStream);
+        List<String> stringList = IOUtils.readLines(resourceAsStream, StandardCharsets.UTF_8);
         StringBuilder sb = new StringBuilder();
         stringList.forEach(sb::append);
         return sb.toString();
