@@ -14,6 +14,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * 
  * <p>
  * Current behavior:
+ * </p>
  * <ol>
  *   <li>An user delete's a parent object with 500 children.</li>
  *   <li>MyCoRe tries to delete the parent, but first, it has to delete all children.</li>
@@ -21,10 +22,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *   <li><b>BUT</b> after the deletion of <b>ONE</b> child, the parent object will be updated.</li>
  *   <li>This results in updating the parent 500 times, before its actually deleted.</li>
  * </ol>
- * </p>
  * 
  * <p>
- * What this class tries to solve:<br />
+ * What this class tries to solve:<br>
  * We mark the parent as "will be deleted". When a child is deleted, and the EventHandler tries
  * to removed the child from its parent, the parent will not be updated because its "marked as
  * deleted".
