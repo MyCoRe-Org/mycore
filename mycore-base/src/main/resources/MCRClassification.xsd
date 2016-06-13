@@ -34,14 +34,15 @@
 
   <xsd:complexType name="MCRClass">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="1" type="MCRClassLabel" name="label" />
-      <xsd:element maxOccurs="1" minOccurs="1" type="MCRClassCatgories" name="categories">
+      <xsd:element maxOccurs="unbounded" type="MCRClassLabel" name="label" />
+      <xsd:element minOccurs="0" type="MCRClassURL" name="url" />
+      <xsd:element type="MCRClassCatgories" name="categories">
         <xsd:unique name="uniqueCategoryID">
-          <xsd:selector xpath="category|category/category|category/category/category|category/category/category/category|category/category/category/category|category/category/category/category/category" />
+          <xsd:selector xpath=".//category" />
           <xsd:field xpath="@ID" />
         </xsd:unique>
       </xsd:element>
-      <xsd:element maxOccurs="1" minOccurs="0" type="MCRObjectService" name="service" />
+      <xsd:element minOccurs="0" type="MCRObjectService" name="service" />
     </xsd:sequence>
     <xsd:attribute use="required" type="rootId" name="ID" />
   </xsd:complexType>
@@ -65,14 +66,14 @@
 
   <xsd:complexType name="MCRClassCatgories">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="1" type="MCRClassCategory" name="category" />
+      <xsd:element maxOccurs="unbounded" type="MCRClassCategory" name="category" />
     </xsd:sequence>
   </xsd:complexType>
 
   <xsd:complexType name="MCRClassCategory">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="1" type="MCRClassLabel" name="label" />
-      <xsd:element maxOccurs="1" minOccurs="0" type="MCRClassURL" name="url" />
+      <xsd:element maxOccurs="unbounded" type="MCRClassLabel" name="label" />
+      <xsd:element minOccurs="0" type="MCRClassURL" name="url" />
       <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRClassCategory" name="category" />
     </xsd:sequence>
     <xsd:attribute use="required" type="categId" name="ID" />
@@ -81,10 +82,10 @@
 
   <xsd:complexType name="MCRObjectService">
     <xsd:all>
-      <xsd:element maxOccurs="1" minOccurs="0" name="servdates">
+      <xsd:element minOccurs="0" name="servdates">
         <xsd:complexType>
           <xsd:sequence>
-            <xsd:element maxOccurs="unbounded" minOccurs="1" name="servdate">
+            <xsd:element maxOccurs="unbounded" name="servdate">
               <xsd:complexType>
                 <xsd:simpleContent>
                   <xsd:extension base="xsd:string">
@@ -101,10 +102,10 @@
           <xsd:attribute use="optional" type="xsd:boolean" name="notinherit" />
         </xsd:complexType>
       </xsd:element>
-      <xsd:element maxOccurs="1" minOccurs="0" name="servflags">
+      <xsd:element minOccurs="0" name="servflags">
         <xsd:complexType>
           <xsd:sequence>
-            <xsd:element maxOccurs="unbounded" minOccurs="1" name="servflag">
+            <xsd:element maxOccurs="unbounded" name="servflag">
               <xsd:complexType>
                 <xsd:simpleContent>
                   <xsd:extension base="xsd:string">
@@ -122,10 +123,10 @@
           <xsd:attribute use="optional" type="xsd:boolean" name="notinherit" />
         </xsd:complexType>
       </xsd:element>
-      <xsd:element maxOccurs="1" minOccurs="0" name="servacls">
+      <xsd:element minOccurs="0" name="servacls">
         <xsd:complexType>
           <xsd:sequence>
-            <xsd:element maxOccurs="unbounded" minOccurs="1" name="servacl">
+            <xsd:element maxOccurs="unbounded" name="servacl">
               <xsd:complexType>
                 <xsd:sequence>
                   <xsd:any processContents="skip" />
