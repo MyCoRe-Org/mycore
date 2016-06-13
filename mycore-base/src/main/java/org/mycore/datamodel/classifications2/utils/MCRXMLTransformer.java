@@ -49,6 +49,7 @@ public class MCRXMLTransformer {
         final String classID = xml.getRootElement().getAttributeValue("ID");
         category.setLevel(0);
         category.setId(MCRCategoryID.rootID(classID));
+        setURL(xml.getRootElement(), category);
         //setChildren has to be called before setParent (below) can be called without
         //database access see: org.mycore.datamodel.classifications2.impl.MCRAbstractCategoryImpl.getChildren()
         category.setChildren(new ArrayList<MCRCategory>());
@@ -74,12 +75,7 @@ public class MCRXMLTransformer {
             throw new MCRException("Error while adding labels to category: " + category.getId(), ex);
         }
         category.setLevel(parent.getLevel() + 1);
-        if (e.getChild("url") != null) {
-            final String uri = e.getChild("url").getAttributeValue("href", XLINK_NAMESPACE);
-            if (uri != null) {
-                category.setURI(new URI(uri));
-            }
-        }
+        setURL(e, category);
         buildChildCategories(classID, e.getChildren("category"), category);
         return category;
     }
@@ -108,5 +104,14 @@ public class MCRXMLTransformer {
             labelElement.getAttributeValue("description"));
         return label;
     }
-
+        
+    private static void setURL(Element e, MCRCategory category) throws URISyntaxException {
+        if (e.getChild("url") != null) {
+            final String uri = e.getChild("url").getAttributeValue("href", XLINK_NAMESPACE);
+            if (uri != null) {
+                category.setURI(new URI(uri));
+            }
+        }
+    }
+    
 }
