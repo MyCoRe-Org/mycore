@@ -27,16 +27,35 @@
     <xsl:variable name="toolTip">
       <xsl:apply-templates select="." mode="toolTip" />
     </xsl:variable>
+    
+    <xsl:choose>
+	    <xsl:when test="label[lang('x-group')]">
+		   	<optgroup title="{$toolTip}">
+		   	  <xsl:attribute name="label">
+		   	  	<xsl:value-of select="$indent" disable-output-escaping="yes" />
+		      	<xsl:apply-templates select="." mode="label" />
+		   	  </xsl:attribute>
+		      <xsl:copy-of select="@*" />
+		      <xsl:apply-templates select="item">
+			  	<xsl:with-param name="indent" select="concat($editor.list.indent,$indent)" />
+			  </xsl:apply-templates>
+		    </optgroup>
+	    </xsl:when>
+	    <xsl:otherwise>
+	        <option title="{$toolTip}">
+	          <xsl:if test="label[lang('x-disable')]">
+		   	  	<xsl:attribute name="disabled"/>
+		   	  </xsl:if>
+		      <xsl:copy-of select="@*" />
+		      <xsl:value-of select="$indent" disable-output-escaping="yes" />
+		      <xsl:apply-templates select="." mode="label" />
+		    </option>
+		    <xsl:apply-templates select="item">
+		      <xsl:with-param name="indent" select="concat($editor.list.indent,$indent)" />
+		    </xsl:apply-templates>
+	    </xsl:otherwise>
+	</xsl:choose>
 
-    <option title="{$toolTip}">
-      <xsl:copy-of select="@*" />
-      <xsl:value-of select="$indent" disable-output-escaping="yes" />
-      <xsl:apply-templates select="." mode="label" />
-    </option>
-
-    <xsl:apply-templates select="item">
-      <xsl:with-param name="indent" select="concat($editor.list.indent,$indent)" />
-    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template match="item" mode="label">
