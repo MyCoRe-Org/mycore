@@ -561,32 +561,39 @@ public abstract class MCRServletContentHelper {
      * @param range     Range the client wanted to retrieve
      */
     private static void copy(final MCRContent content, final ServletOutputStream out, final Range range,
+        // TODO: beautify this
         final int inputBufferSize, final int outputBufferSize) throws IOException {
-        if (content.getReadableByteChannel() instanceof SeekableByteChannel) {
-            SeekableByteChannel seekableByteChannel = (SeekableByteChannel) content.getReadableByteChannel();
-            seekableByteChannel.position(range.start);
-            long bytesToCopy = range.end - range.start+1;
-            while (bytesToCopy > 0) {
-                ByteBuffer byteBuffer;
-                if (bytesToCopy > (long) MCRServletContentHelper.DEFAULT_BUFFER_SIZE) {
-                    byteBuffer = ByteBuffer.allocate(MCRServletContentHelper.DEFAULT_BUFFER_SIZE);
-                } else {
-                    byteBuffer = ByteBuffer.allocate((int) bytesToCopy);
-                }
+        if (content.isReusable()) {
+            try (ReadableByteChannel readableByteChannel = content.getReadableByteChannel()) {
+                if (readableByteChannel instanceof SeekableByteChannel) {
+                    SeekableByteChannel seekableByteChannel = (SeekableByteChannel) readableByteChannel;
+                    seekableByteChannel.position(range.start);
+                    long bytesToCopy = range.end - range.start + 1;
+                    while (bytesToCopy > 0) {
+                        ByteBuffer byteBuffer;
+                        if (bytesToCopy > (long) MCRServletContentHelper.DEFAULT_BUFFER_SIZE) {
+                            byteBuffer = ByteBuffer.allocate(MCRServletContentHelper.DEFAULT_BUFFER_SIZE);
+                        } else {
+                            byteBuffer = ByteBuffer.allocate((int) bytesToCopy);
+                        }
 
-                int bytesRead = seekableByteChannel.read(byteBuffer);
-                bytesToCopy -= bytesRead;
-                out.write(byteBuffer.array());
-            }
-        } else {
-            try (final InputStream resourceInputStream = content.getInputStream();
-                 final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
-                         : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
-                endCurrentTransaction();
-                final IOException exception = copyRange(in, out, 0, range.start, range.end, outputBufferSize);
-                if (exception != null) {
-                    throw exception;
+                        int bytesRead = seekableByteChannel.read(byteBuffer);
+                        bytesToCopy -= bytesRead;
+                        out.write(byteBuffer.array());
+                    }
+                    return;
                 }
+            }
+        }
+
+
+        try (final InputStream resourceInputStream = content.getInputStream();
+             final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
+                     : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
+            endCurrentTransaction();
+            final IOException exception = copyRange(in, out, 0, range.start, range.end, outputBufferSize);
+            if (exception != null) {
+                throw exception;
             }
         }
     }
