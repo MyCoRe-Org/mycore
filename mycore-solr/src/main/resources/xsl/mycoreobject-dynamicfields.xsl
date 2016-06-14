@@ -130,7 +130,7 @@
         <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
         <xsl:if test="string-length($uri) &gt; 0">
           <xsl:variable name="class" select="document($uri)" />
-          <xsl:variable name="classid" select="document($uri)/mycoreclass/@ID" />
+          <xsl:variable name="classid" select="$class/mycoreclass/@ID" />
           <xsl:variable name="classTree" select="$class/mycoreclass/categories//category" />
           <xsl:variable name="withTopField" select="not(ancestor::mods:relatedItem)" />
           <xsl:for-each select="$classTree">
