@@ -64,7 +64,7 @@ import com.google.gson.JsonPrimitive;
 /**
  * Is a wrapper class around command execution. Commands will be {@link #addCommand(String) queued} and executed in a
  * seperate thread.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @author Michel Buechner (mcrmibue)
  * @since 2.0
@@ -82,7 +82,7 @@ public class MCRWebCLIContainer {
 
     /**
      * Will instantiate this container with a list of supported commands.
-     * 
+     *
      * @param session
      *            the current Session(Websocket) of the user using the gui.
      */
@@ -94,10 +94,10 @@ public class MCRWebCLIContainer {
      * Adds this <code>cmd</code> to the current command queue. The thread
      * executing the commands will be started automatically if the queue was
      * previously empty.
-     * 
+     *
      * @param cmd
      *            a valid String representation of a
-     *            {@link #MCRWebCLIContainer(HttpSession) known}
+     *            {@link #MCRWebCLIContainer(Session) known}
      *            <code>MCRCommand</code>
      */
     public void addCommand(String cmd) {
@@ -110,7 +110,7 @@ public class MCRWebCLIContainer {
 
     /**
      * Returns the status of the command execution thread.
-     * 
+     *
      * @return true if the thread is running
      */
     public boolean isRunning() {
@@ -158,18 +158,18 @@ public class MCRWebCLIContainer {
         if (knownCommands == null)
             initializeCommands();
     }
-    
+
     public void changeWebSocketSession(Session webSocketSession) {
         this.processCallable.changeWebSocketSession(webSocketSession);
     }
-    
+
 
     public void stopLogging() {
-        this.processCallable.stopLogging();        
+        this.processCallable.stopLogging();
     }
-    
+
     public void startLogging() {
-        this.processCallable.startLogging();        
+        this.processCallable.startLogging();
     }
 
     private static class ProcessCallable implements Callable<Boolean> {
@@ -183,13 +183,13 @@ public class MCRWebCLIContainer {
         MCRSession session;
 
         Log4JGrabber logGrabber;
-        
+
         CommandListObserver commandListObserver;
-        
+
         LogEventDequeObserver logEventQueueObserver;
-        
+
         String currentCommand;
-        
+
         public ProcessCallable(MCRSession session, Session webSocketSession) {
             this.commands = new ObservableCommandList();
             this.session = session;
@@ -198,7 +198,7 @@ public class MCRWebCLIContainer {
             this.logGrabber = new Log4JGrabber(MCRWebCLIContainer.class.getSimpleName() + session.getID(), null,
                 PatternLayout.createDefaultLayout());
             this.logGrabber.start();
-            
+
             this.commandListObserver = new CommandListObserver(commands, webSocketSession);
             commands.addObserver(commandListObserver);
             this.logEventQueueObserver = new LogEventDequeObserver(logs, webSocketSession);
@@ -207,11 +207,11 @@ public class MCRWebCLIContainer {
         }
 
         public void stopLogging() {
-            this.logEventQueueObserver.stopSendMessages();            
+            this.logEventQueueObserver.stopSendMessages();
         }
-        
+
         public void startLogging() {
-            this.logEventQueueObserver.startSendMessages();        
+            this.logEventQueueObserver.startSendMessages();
         }
 
         public Boolean call() throws Exception {
@@ -220,7 +220,7 @@ public class MCRWebCLIContainer {
 
         /**
          * method mainly copied from CLI class
-         * 
+         *
          * @param command
          * @return true if command processed successfully
          * @throws IOException
@@ -344,19 +344,19 @@ public class MCRWebCLIContainer {
                 MCRSessionMgr.releaseCurrentSession();
             }
         }
-        
+
         public void changeWebSocketSession(Session webSocketSession) {
             this.webSocketSession = webSocketSession;
             this.logEventQueueObserver.changeSession(webSocketSession);
             this.commandListObserver.changeSession(webSocketSession);
             sendCurrentCommand();
         }
-        
+
         private void setCurrentCommand(String command) {
             this.currentCommand = command;
             sendCurrentCommand();
         }
-        
+
         private void sendCurrentCommand() {
             JsonObject jObject = new JsonObject();
             jObject.addProperty("type", "currentCommand");
