@@ -1,17 +1,16 @@
 package org.mycore.media;
 
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.jdom2.Element;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.jdom2.Element;
 
 public class MCRPDFObject extends MCRMediaObject {
     protected int numPages;
@@ -98,11 +97,10 @@ public class MCRPDFObject extends MCRMediaObject {
         PDDocument pdf = PDDocument.load(new File(media.folderName + media.fileName));
 
         try {
-            List<PDPage> pages = pdf.getDocumentCatalog().getAllPages();
+            PDPageTree pages = pdf.getDocumentCatalog().getPages();
+            PDFRenderer pdfRenderer = new PDFRenderer(pdf);
 
-            PDPage page = (PDPage) pages.get((int) seek);
-
-            BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_RGB, 96);
+            BufferedImage image = pdfRenderer.renderImageWithDPI((int) seek, 96, ImageType.RGB);
 
             int[] scaledSize = ((MCRPDFObject) media).getScaledSize(maxWidth, maxHeight, keepAspect);
 

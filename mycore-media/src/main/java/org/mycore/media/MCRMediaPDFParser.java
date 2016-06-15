@@ -23,17 +23,17 @@
 
 package org.mycore.media;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.datamodel.ifs.MCROldFile;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Get informations about an PostScript file and implements thumbnail support. 
@@ -147,7 +147,7 @@ public class MCRMediaPDFParser extends MCRMediaParser {
             media.fileSize = file.length();
             media.folderName = (file.getAbsolutePath()).replace(file.getName(), "");
 
-            List<PDPage> pages = pdf.getDocumentCatalog().getAllPages();
+            PDPageTree pages = pdf.getDocumentCatalog().getPages();
 
             media.numPages = pdf.getNumberOfPages();
 
