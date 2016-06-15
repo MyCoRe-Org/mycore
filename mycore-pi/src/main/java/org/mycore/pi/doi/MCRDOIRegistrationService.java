@@ -97,6 +97,9 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         }
 
         MCRDigitalObjectIdentifier newDOI = getNewIdentifier(obj.getId(), additional);
+        if(useTestPrefix){
+            newDOI = newDOI.toTestPrefix();
+        }
 
         MCRObject mcrBase = MCRMetadataManager.retrieveMCRObject(obj.getId());
         Document dataciteDocument = transformToDatacite(newDOI, mcrBase);
