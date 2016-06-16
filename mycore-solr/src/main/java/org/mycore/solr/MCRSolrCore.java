@@ -33,8 +33,7 @@ public class MCRSolrCore {
     protected ConcurrentUpdateSolrClient concurrentClient;
 
     static {
-        USE_CONCURRENT_SERVER = MCRConfiguration.instance().getBoolean(
-            CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled");
+        USE_CONCURRENT_SERVER = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled");
     }
 
     /**
@@ -81,8 +80,7 @@ public class MCRSolrCore {
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
             int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
-            int threadCount = MCRConfiguration.instance()
-                .getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
+            int threadCount = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
             concurrentClient = new ConcurrentUpdateSolrClient(coreURL, queueSize, threadCount);
             concurrentClient.setRequestWriter(new BinaryRequestWriter());
             concurrentClient.setConnectionTimeout(connectionTimeout);
@@ -115,13 +113,13 @@ public class MCRSolrCore {
             shutdownGracefully(solrClient);
             solrClient = null;
         } catch (SolrServerException | IOException e) {
-            LOGGER.error("Error while shutdding down SOLR client.", e);
+            LOGGER.error("Error while shutting down SOLR client.", e);
         }
         try {
             shutdownGracefully(concurrentClient);
             concurrentClient = null;
         } catch (SolrServerException | IOException e) {
-            LOGGER.error("Error while shutdding down SOLR client.", e);
+            LOGGER.error("Error while shutting down SOLR client.", e);
         }
         LOGGER.info("Solr shutdown process completed.");
     }
