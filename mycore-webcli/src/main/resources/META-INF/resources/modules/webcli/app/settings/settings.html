@@ -12,5 +12,11 @@
            <input type="checkbox" [(ngModel)]="settings.autoscroll" (change)="onAutoScrollChange($event)">
         </div>
       </div>
+      <div class="form-group row">
+        <label class="form-control-label col-xs-2">Continue if one fails:</label>
+        <div class="col-xs-2">
+           <input type="checkbox" [(ngModel)]="settings.continueIfOneFails" (change)="onContinueIfOneFailsChange($event)">
+        </div>
+      </div>
   </div>
 </div>

@@ -55,4 +55,10 @@ public class ObservableCommandList extends Observable {
         }
         return "";
     }
+    
+    public void clear() {
+        arrayList.clear();
+        setChanged();
+        notifyObservers();
+    }
 }

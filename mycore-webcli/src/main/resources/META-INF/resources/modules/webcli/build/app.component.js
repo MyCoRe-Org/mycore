@@ -45,8 +45,15 @@ System.register(['@angular/core', './commands/commands.component', './command-in
                     this.title = 'MyCoRe Web CLI2';
                     this.refreshRunning = true;
                     this.currentCommand = "";
+                    this.currentQueueLength = 0;
                     this._restService.currentCommand.subscribe(command => {
                         this.currentCommand = command;
+                    });
+                    this._restService.currentQueue.subscribe(queue => {
+                        this.currentQueueLength = queue.length;
+                        if (queue.length < 1) {
+                            document.getElementsByClassName('logTab')[0].click();
+                        }
                     });
                 }
                 onClickCommandDropDown(event) {
@@ -137,10 +144,10 @@ System.register(['@angular/core', './commands/commands.component', './command-in
     </div>
     <ul class="nav nav-tabs" role="tablist">
       <li class="nav-item active">
-        <a class="nav-link" href="#log" data-toggle="tab" role="tab" onclick='return false;'>Log</a>
+        <a class="nav-link logTab" href="#log" data-toggle="tab" role="tab" onclick='return false;'>Log</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#queue" data-toggle="tab" role="tab" onclick='return false;'>Command Queue</a>
+      <li class="nav-item" [hidden]="currentQueueLength == 0">
+        <a class="nav-link queueTab" href="#queue" data-toggle="tab" role="tab" onclick='return false;'>Command Queue ({{currentQueueLength}})</a>
       </li>
     </ul>
     <div class="tab-content">

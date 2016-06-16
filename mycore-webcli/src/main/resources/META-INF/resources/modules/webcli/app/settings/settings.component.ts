@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {CommunicationService} from '../service/communication.service';
+import {RESTService} from '../service/rest.service';
 import {Settings} from './settings';
 
 @Component({
@@ -9,11 +10,13 @@ import {Settings} from './settings';
 export class WebCliSettingsComponent {
   settings: Settings;
 
-  constructor(private _communicationService: CommunicationService){}
+  constructor(private _communicationService: CommunicationService,
+              private _restService: RESTService){}
 
   ngOnInit() {
-    this.settings = this.getSettingsFromCookie(50, true);
+    this.settings = this.getSettingsFromCookie(50, true, false);
     this._communicationService.setSettings(this.settings);
+    this._restService.setContinueIfOneFails(this.settings.continueIfOneFails);
   }
 
   onHistoryChange() {
@@ -28,7 +31,14 @@ export class WebCliSettingsComponent {
     }
   }
 
-  private getSettingsFromCookie(defaultHSize: number, defautlAutoScroll: boolean) {
+  onContinueIfOneFailsChange(event) {
+    if (localStorage.getItem("continueIfOneFails") != event.srcElement.checked + "") {
+      localStorage.setItem("continueIfOneFails", event.srcElement.checked);
+    }
+    this._restService.setContinueIfOneFails(event.srcElement.checked);
+  }
+
+  private getSettingsFromCookie(defaultHSize: number, defaultAutoScroll: boolean, defaultContinueIfOneFails: boolean) {
     var storageHSize = localStorage.getItem("historySize");
     if (storageHSize != undefined && storageHSize != ""){
       defaultHSize = parseInt(storageHSize);
@@ -38,11 +48,19 @@ export class WebCliSettingsComponent {
     }
     var storageAutoScroll = localStorage.getItem("autoScroll");
     if (storageAutoScroll != undefined && storageAutoScroll != ""){
-      defautlAutoScroll = (storageAutoScroll == "true");
+      defaultAutoScroll = (storageAutoScroll == "true");
     }
     else {
-      localStorage.setItem("autoScroll", defautlAutoScroll +  "");
+      localStorage.setItem("autoScroll", defaultAutoScroll +  "");
     }
-    return new Settings(defaultHSize, defautlAutoScroll);
+
+    var storageContinueIfOneFails = localStorage.getItem("continueIfOneFails");
+    if (storageContinueIfOneFails != undefined && storageContinueIfOneFails != ""){
+      defaultContinueIfOneFails = (storageContinueIfOneFails == "true");
+    }
+    else {
+      localStorage.setItem("defaultContinueIfOneFails", defaultContinueIfOneFails + "")
+    }
+    return new Settings(defaultHSize, defaultAutoScroll, defaultContinueIfOneFails);
   }
 }

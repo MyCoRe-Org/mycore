@@ -1,4 +1,4 @@
-System.register(['@angular/core', '../service/communication.service', './settings'], function(exports_1, context_1) {
+System.register(['@angular/core', '../service/communication.service', '../service/rest.service', './settings'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['@angular/core', '../service/communication.service', './setting
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, communication_service_1, settings_1;
+    var core_1, communication_service_1, rest_service_1, settings_1;
     var WebCliSettingsComponent;
     return {
         setters:[
@@ -20,17 +20,22 @@ System.register(['@angular/core', '../service/communication.service', './setting
             function (communication_service_1_1) {
                 communication_service_1 = communication_service_1_1;
             },
+            function (rest_service_1_1) {
+                rest_service_1 = rest_service_1_1;
+            },
             function (settings_1_1) {
                 settings_1 = settings_1_1;
             }],
         execute: function() {
             let WebCliSettingsComponent = class WebCliSettingsComponent {
-                constructor(_communicationService) {
+                constructor(_communicationService, _restService) {
                     this._communicationService = _communicationService;
+                    this._restService = _restService;
                 }
                 ngOnInit() {
-                    this.settings = this.getSettingsFromCookie(50, true);
+                    this.settings = this.getSettingsFromCookie(50, true, false);
                     this._communicationService.setSettings(this.settings);
+                    this._restService.setContinueIfOneFails(this.settings.continueIfOneFails);
                 }
                 onHistoryChange() {
                     if (localStorage.getItem("historySize") != this.settings.historySize + "") {
@@ -42,7 +47,13 @@ System.register(['@angular/core', '../service/communication.service', './setting
                         localStorage.setItem("autoScroll", event.srcElement.checked);
                     }
                 }
-                getSettingsFromCookie(defaultHSize, defautlAutoScroll) {
+                onContinueIfOneFailsChange(event) {
+                    if (localStorage.getItem("continueIfOneFails") != event.srcElement.checked + "") {
+                        localStorage.setItem("continueIfOneFails", event.srcElement.checked);
+                    }
+                    this._restService.setContinueIfOneFails(event.srcElement.checked);
+                }
+                getSettingsFromCookie(defaultHSize, defaultAutoScroll, defaultContinueIfOneFails) {
                     var storageHSize = localStorage.getItem("historySize");
                     if (storageHSize != undefined && storageHSize != "") {
                         defaultHSize = parseInt(storageHSize);
@@ -52,12 +63,19 @@ System.register(['@angular/core', '../service/communication.service', './setting
                     }
                     var storageAutoScroll = localStorage.getItem("autoScroll");
                     if (storageAutoScroll != undefined && storageAutoScroll != "") {
-                        defautlAutoScroll = (storageAutoScroll == "true");
+                        defaultAutoScroll = (storageAutoScroll == "true");
                     }
                     else {
-                        localStorage.setItem("autoScroll", defautlAutoScroll + "");
+                        localStorage.setItem("autoScroll", defaultAutoScroll + "");
                     }
-                    return new settings_1.Settings(defaultHSize, defautlAutoScroll);
+                    var storageContinueIfOneFails = localStorage.getItem("continueIfOneFails");
+                    if (storageContinueIfOneFails != undefined && storageContinueIfOneFails != "") {
+                        defaultContinueIfOneFails = (storageContinueIfOneFails == "true");
+                    }
+                    else {
+                        localStorage.setItem("defaultContinueIfOneFails", defaultContinueIfOneFails + "");
+                    }
+                    return new settings_1.Settings(defaultHSize, defaultAutoScroll, defaultContinueIfOneFails);
                 }
             };
             WebCliSettingsComponent = __decorate([
@@ -78,11 +96,17 @@ System.register(['@angular/core', '../service/communication.service', './setting
                <input type="checkbox" [(ngModel)]="settings.autoscroll" (change)="onAutoScrollChange($event)">
             </div>
           </div>
+          <div class="form-group row">
+            <label class="form-control-label col-xs-2">Continue if one fails:</label>
+            <div class="col-xs-2">
+               <input type="checkbox" [(ngModel)]="settings.continueIfOneFails" (change)="onContinueIfOneFailsChange($event)">
+            </div>
+          </div>
       </div>
     </div>
   `
                 }), 
-                __metadata('design:paramtypes', [communication_service_1.CommunicationService])
+                __metadata('design:paramtypes', [communication_service_1.CommunicationService, rest_service_1.RESTService])
             ], WebCliSettingsComponent);
             exports_1("WebCliSettingsComponent", WebCliSettingsComponent);
         }

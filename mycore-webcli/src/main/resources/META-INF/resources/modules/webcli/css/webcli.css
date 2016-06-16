@@ -50,22 +50,30 @@ div.web-cli-log{
   height: calc(100% - 232px);
   overflow: auto;
   padding-right: 0;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+div.web-cli-log > pre{
+  overflow: visible;
+  margin-bottom: 0;
 }
 
 div.web-cli-queue{
   height: calc(100% - 232px);
   overflow: auto;
   padding-right: 0;
+  padding-top: 10px;
 }
 
-pre.web-cli-pre{
+/*pre.web-cli-pre{
   text-indent: -69px;
   margin-bottom: -40px;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-right: 15px;
   height: 100%;
-}
+}*/
 
 .row {
   width: 100%;

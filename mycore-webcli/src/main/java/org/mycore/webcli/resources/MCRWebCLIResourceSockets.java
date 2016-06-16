@@ -65,11 +65,18 @@ public class MCRWebCLIResourceSockets {
                     LOGGER.error("Cannot send message to client.", ex);
                 }
             }
+
             if(type.equals("stopLog")) {
                 cliCont.stopLogging();
             }
+
             if(type.equals("startLog")) {
                 cliCont.startLogging();
+            }
+
+            if(type.equals("continueIfOneFails")) {
+                boolean value = jsonObject.get("value").getAsBoolean();
+                cliCont.setContinueIfOneFails(value);
             }
         }
         else {

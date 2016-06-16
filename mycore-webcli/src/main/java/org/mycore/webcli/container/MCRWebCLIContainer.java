@@ -172,6 +172,10 @@ public class MCRWebCLIContainer {
         this.processCallable.startLogging();
     }
 
+    public void setContinueIfOneFails(boolean con) {
+        this.processCallable.setContinueIfOneFails(con);
+    }
+
     private static class ProcessCallable implements Callable<Boolean> {
 
         ObservableLogEventDeque logs;
@@ -190,6 +194,8 @@ public class MCRWebCLIContainer {
 
         String currentCommand;
 
+        boolean continueIfOneFails;
+
         public ProcessCallable(MCRSession session, Session webSocketSession) {
             this.commands = new ObservableCommandList();
             this.session = session;
@@ -204,6 +210,7 @@ public class MCRWebCLIContainer {
             this.logEventQueueObserver = new LogEventDequeObserver(logs, webSocketSession);
             logs.addObserver(logEventQueueObserver);
             this.currentCommand = "";
+            this.continueIfOneFails = false;
         }
 
         public void stopLogging() {
@@ -214,8 +221,12 @@ public class MCRWebCLIContainer {
             this.logEventQueueObserver.startSendMessages();
         }
 
+        public void setContinueIfOneFails(boolean con) {
+            this.continueIfOneFails = con;
+        }
+
         public Boolean call() throws Exception {
-            return processCommands(true);
+            return processCommands();
         }
 
         /**
@@ -225,7 +236,7 @@ public class MCRWebCLIContainer {
          * @return true if command processed successfully
          * @throws IOException
          */
-        private boolean processCommand(String command, boolean continueIfOneFails) throws IOException {
+        private boolean processCommand(String command) throws IOException {
             LOGGER.info("Processing command:'" + command + "' (" + commands.size() + " left)");
             setCurrentCommand(command);
             long start = System.currentTimeMillis();
@@ -253,7 +264,7 @@ public class MCRWebCLIContainer {
                     LOGGER.error("Error while perfoming rollback for command '" + command + "'!", ex2);
                 }
                 if (!continueIfOneFails) {
-                    saveQueue(command);
+                    saveQueue(command, null);
                 }
                 return false;
             } finally {
@@ -283,7 +294,7 @@ public class MCRWebCLIContainer {
             return commandsReturned;
         }
 
-        protected void saveQueue(String lastCommand) throws IOException {
+        protected void saveQueue(String lastCommand, LinkedList<String> failedQueue) throws IOException {
             // lastCommand is null if work is not stopped at first error
             if (lastCommand == null) {
                 LOGGER.error("Some commands failed.");
@@ -304,13 +315,20 @@ public class MCRWebCLIContainer {
                 }
                 for (String command : commands.getCopyAsArrayList())
                     pw.println(command);
+                if(failedQueue != null && !failedQueue.isEmpty()){
+                    for (String failedCommand : failedQueue){
+                        pw.println(failedCommand);
+                    }
+                }
                 pw.close();
             } catch (IOException ex) {
                 LOGGER.error("Cannot write to " + file.getAbsolutePath(), ex);
             }
+            setCurrentCommand("");
+            commands.clear();
         }
 
-        protected boolean processCommands(boolean continueIfOneFailes) throws IOException {
+        protected boolean processCommands() throws IOException {
             final LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
             final AbstractConfiguration logConf = (AbstractConfiguration) logCtx.getConfiguration();
             LinkedList<String> failedQueue = new LinkedList<String>();
@@ -323,18 +341,18 @@ public class MCRWebCLIContainer {
             try {
                 while (!commands.isEmpty()) {
                     String command = commands.remove(0);
-                    if (!processCommand(command, continueIfOneFailes)) {
-                        if (!continueIfOneFailes) {
+                    if (!processCommand(command)) {
+                        if (!continueIfOneFails) {
                             return false;
                         }
                         failedQueue.add(command);
                     }
                 }
-                setCurrentCommand("");
                 if (failedQueue.isEmpty()) {
+                    setCurrentCommand("");
                     return true;
                 } else {
-                    saveQueue(null);
+                    saveQueue(null, failedQueue);
                     return false;
                 }
             } finally {

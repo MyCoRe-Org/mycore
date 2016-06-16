@@ -6,9 +6,10 @@ System.register([], function(exports_1, context_1) {
         setters:[],
         execute: function() {
             class Settings {
-                constructor(hS, aS) {
+                constructor(hS, aS, c) {
                     this.historySize = hS;
                     this.autoscroll = aS;
+                    this.continueIfOneFails = c;
                 }
             }
             exports_1("Settings", Settings);

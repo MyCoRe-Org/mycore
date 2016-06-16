@@ -61,6 +61,14 @@ export class RESTService {
     this.sendMessage(JSON.stringify(message));
   }
 
+  setContinueIfOneFails(con: boolean) {
+    var message = {
+      type: "continueIfOneFails",
+      value: con
+    }
+    this.sendMessage(JSON.stringify(message));
+  }
+
   private sendMessage(message: String) {
     if (message == "") {
       return;

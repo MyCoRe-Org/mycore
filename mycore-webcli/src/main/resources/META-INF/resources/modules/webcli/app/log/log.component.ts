@@ -9,14 +9,12 @@ import {CommunicationService} from '../service/communication.service';
   templateUrl: 'app/log/log.html'
 })
 export class WebCliLogComponent {
-  log: Log[];
   timeout: number;
   settings: Settings;
 
   constructor(private _restService: RESTService,
               private _comunicationService: CommunicationService){
-                this.log = new Array<Log>();
-                this.settings = new Settings(50,true);
+                this.settings = new Settings(50, true, false);
                 this._comunicationService.settings.subscribe(
                   settings =>{
                     this.settings = settings;
@@ -25,14 +23,25 @@ export class WebCliLogComponent {
                 this._restService.currentLog.subscribe(
                   log => {
                     if (log != undefined) {
-                      this.log.push(log);
-                      this.log = this.log.splice(this.settings.historySize * -1, this.settings.historySize);
+                      if (document.getElementsByClassName('web-cli-log')[0].childNodes.length + 1 > this.settings.historySize) {
+                        document.getElementsByClassName('web-cli-log')[0].removeChild(document.getElementsByClassName('web-cli-log')[0].childNodes[0]);
+                      }
+                      var node = document.createElement("pre");
+                      var text = document.createTextNode(log.logLevel + ": " + log.message);
+                      node.appendChild(text);
+                      document.getElementsByClassName('web-cli-log')[0].appendChild(node);
+                      if(log.exception != undefined) {
+                        var nodeEx = document.createElement("pre");
+                        var textEx = document.createTextNode(log.exception);
+                        nodeEx.appendChild(textEx);
+                        document.getElementsByClassName('web-cli-log')[0].appendChild(nodeEx);
+                      }
                     }
                   });
               }
 
   public clearLog() {
-    this.log.splice(0, this.log.length);
+    document.getElementsByClassName('web-cli-log')[0].innerHTML = "";
   }
 
   ngAfterViewChecked() {
@@ -41,7 +50,7 @@ export class WebCliLogComponent {
 
   scrollLog() {
     if (this.settings.autoscroll) {
-        var elem = document.getElementsByClassName('web-cli-log-pre');
+        var elem = document.getElementsByClassName('web-cli-log');
         elem[0].scrollTop = elem[0].scrollHeight;
     }
   }

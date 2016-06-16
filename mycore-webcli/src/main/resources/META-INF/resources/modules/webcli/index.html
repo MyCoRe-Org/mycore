@@ -21,6 +21,13 @@
     <script>
       System.import('app').catch(function(err){ console.error(err); });
     </script>
+    <script>
+    $(document).ready(function() {
+      setInterval(function(){
+         $.get('../ping');
+      }, 1740000);
+    });
+    </script>
   </head>
 
   <!-- 3. Display the application -->

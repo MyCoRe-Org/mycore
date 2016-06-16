@@ -1,4 +1,4 @@
-System.register(['@angular/core', '../service/rest.service'], function(exports_1, context_1) {
+System.register(['@angular/core', '../settings/settings', '../service/rest.service', '../service/communication.service'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,25 +10,39 @@ System.register(['@angular/core', '../service/rest.service'], function(exports_1
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, rest_service_1;
+    var core_1, settings_1, rest_service_1, communication_service_1;
     var WebCliQueueComponent;
     return {
         setters:[
             function (core_1_1) {
                 core_1 = core_1_1;
             },
+            function (settings_1_1) {
+                settings_1 = settings_1_1;
+            },
             function (rest_service_1_1) {
                 rest_service_1 = rest_service_1_1;
+            },
+            function (communication_service_1_1) {
+                communication_service_1 = communication_service_1_1;
             }],
         execute: function() {
             let WebCliQueueComponent = class WebCliQueueComponent {
-                constructor(_restService) {
+                constructor(_restService, _comunicationService) {
                     this._restService = _restService;
-                    this.currentQueue = new Array();
+                    this._comunicationService = _comunicationService;
+                    this.settings = new settings_1.Settings(50, true, false);
+                    this._comunicationService.settings.subscribe(settings => {
+                        this.settings = settings;
+                    });
                     this._restService.currentQueue.subscribe(queue => {
-                        if (queue != undefined) {
-                            this.currentQueue = queue;
+                        let ellipsis = "";
+                        if (queue.length > this.settings.historySize) {
+                            queue = queue.slice(0, this.settings.historySize);
+                            ellipsis = "</br>...";
                         }
+                        let queueString = queue.join("</br>") + ellipsis;
+                        document.getElementsByClassName('web-cli-pre')[0].innerHTML = queueString;
                     });
                 }
             };
@@ -38,14 +52,11 @@ System.register(['@angular/core', '../service/rest.service'], function(exports_1
                     template: `
     <div class="col-lg-12 web-cli-queue">
       <pre class="web-cli-pre">
-        <template ngFor let-command [ngForOf]="currentQueue" let-i="index"><!--
-        --><br *ngIf="i != 0">{{command}}<!--
-        --></template><!--
-      --></pre>
+      </pre>
     </div>
   `
                 }), 
-                __metadata('design:paramtypes', [rest_service_1.RESTService])
+                __metadata('design:paramtypes', [rest_service_1.RESTService, communication_service_1.CommunicationService])
             ], WebCliQueueComponent);
             exports_1("WebCliQueueComponent", WebCliQueueComponent);
         }

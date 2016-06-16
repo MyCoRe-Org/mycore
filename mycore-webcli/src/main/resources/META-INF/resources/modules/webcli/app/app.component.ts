@@ -17,6 +17,7 @@ export class AppComponent {
   title = 'MyCoRe Web CLI2';
   refreshRunning = true;
   currentCommand: String = "";
+  currentQueueLength: number = 0;
   @ViewChild(WebCliLogComponent)
   webCliLogComponent: WebCliLogComponent;
 
@@ -24,6 +25,14 @@ export class AppComponent {
     this._restService.currentCommand.subscribe(
       command => {
           this.currentCommand = command;
+      });
+
+    this._restService.currentQueue.subscribe(
+      queue => {
+          this.currentQueueLength = queue.length;
+          if (queue.length < 1) {
+            document.getElementsByClassName('logTab')[0].click();
+          }
       });
   }
 

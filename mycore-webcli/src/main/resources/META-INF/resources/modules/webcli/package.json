@@ -1,6 +1,6 @@
 {
   "name": "mycore-webcli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "mycore-webcli",
   "main": "app.js",
   "scripts": {

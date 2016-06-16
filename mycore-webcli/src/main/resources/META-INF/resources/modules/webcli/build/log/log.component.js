@@ -31,27 +31,37 @@ System.register(['@angular/core', '../settings/settings', '../service/rest.servi
                 constructor(_restService, _comunicationService) {
                     this._restService = _restService;
                     this._comunicationService = _comunicationService;
-                    this.log = new Array();
-                    this.settings = new settings_1.Settings(50, true);
+                    this.settings = new settings_1.Settings(50, true, false);
                     this._comunicationService.settings.subscribe(settings => {
                         this.settings = settings;
                     });
                     this._restService.currentLog.subscribe(log => {
                         if (log != undefined) {
-                            this.log.push(log);
-                            this.log = this.log.splice(this.settings.historySize * -1, this.settings.historySize);
+                            if (document.getElementsByClassName('web-cli-log')[0].childNodes.length + 1 > this.settings.historySize) {
+                                document.getElementsByClassName('web-cli-log')[0].removeChild(document.getElementsByClassName('web-cli-log')[0].childNodes[0]);
+                            }
+                            var node = document.createElement("pre");
+                            var text = document.createTextNode(log.logLevel + ": " + log.message);
+                            node.appendChild(text);
+                            document.getElementsByClassName('web-cli-log')[0].appendChild(node);
+                            if (log.exception != undefined) {
+                                var nodeEx = document.createElement("pre");
+                                var textEx = document.createTextNode(log.exception);
+                                nodeEx.appendChild(textEx);
+                                document.getElementsByClassName('web-cli-log')[0].appendChild(nodeEx);
+                            }
                         }
                     });
                 }
                 clearLog() {
-                    this.log.splice(0, this.log.length);
+                    document.getElementsByClassName('web-cli-log')[0].innerHTML = "";
                 }
                 ngAfterViewChecked() {
                     this.scrollLog();
                 }
                 scrollLog() {
                     if (this.settings.autoscroll) {
-                        var elem = document.getElementsByClassName('web-cli-log-pre');
+                        var elem = document.getElementsByClassName('web-cli-log');
                         elem[0].scrollTop = elem[0].scrollHeight;
                     }
                 }
@@ -61,12 +71,6 @@ System.register(['@angular/core', '../settings/settings', '../service/rest.servi
                     selector: '[web-cli-log]',
                     template: `
     <div class="col-xs-12 web-cli-log">
-      <pre class="web-cli-log-pre web-cli-pre">
-        <template ngFor let-logEntry [ngForOf]="log" let-i="index"><!--
-        --><br *ngIf="i != 0">{{logEntry.logLevel}}: {{logEntry.message}}<!--
-        --><br *ngIf="logEntry.exception">{{logEntry.exception}}<!--
-        --></template><!--
-      --></pre>
     </div>
   `
                 }), 
