@@ -57,34 +57,40 @@ class MCRPDFTools implements AutoCloseable {
     static BufferedImage getThumbnail(Path pdfFile, int thumbnailSize, boolean centered) throws IOException {
         InputStream fileIS = Files.newInputStream(pdfFile);
         PDDocument pdf = PDDocument.load(fileIS);
-        PDFRenderer pdfRenderer = new PDFRenderer(pdf);
-        BufferedImage level1Image = pdfRenderer.renderImage(0);
-        int imageType = BufferedImage.TYPE_INT_ARGB;
+        try {
+            PDFRenderer pdfRenderer = new PDFRenderer(pdf);
+            BufferedImage level1Image = pdfRenderer.renderImage(0);
+            int imageType = BufferedImage.TYPE_INT_ARGB;
 
-        if (!centered) {
-            return level1Image;
+            if (!centered) {
+                return level1Image;
+            }
+            final double width = level1Image.getWidth();
+            final double height = level1Image.getHeight();
+            LOGGER.info("new PDFBox: " + width + "x" + height);
+            LOGGER.info("temporary image dimensions: " + width + "x" + height);
+            final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
+            final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
+            //if centered make thumbnailSize x thumbnailSize image
+            final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth,
+                    centered ? thumbnailSize
+                            : newHeight,
+                    imageType);
+            LOGGER.info("target image dimensions: " + bicubic.getWidth() + "x" + bicubic.getHeight());
+            final Graphics2D bg = bicubic.createGraphics();
+            bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
+            int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
+            if (x != 0 && y != 0) {
+                LOGGER.warn("Writing at position " + x + "," + y);
+            }
+            bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
+                    (int) Math.ceil(height), null);
+            bg.dispose();
+            return bicubic;
+        } finally {
+            pdf.close();
         }
-        final double width = level1Image.getWidth();
-        final double height = level1Image.getHeight();
-        LOGGER.info("new PDFBox: " + width + "x" + height);
-        LOGGER.info("temporary image dimensions: " + width + "x" + height);
-        final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
-        final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
-        //if centered make thumbnailSize x thumbnailSize image
-        final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth, centered ? thumbnailSize
-                : newHeight, imageType);
-        LOGGER.info("target image dimensions: " + bicubic.getWidth() + "x" + bicubic.getHeight());
-        final Graphics2D bg = bicubic.createGraphics();
-        bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
-        int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
-        if (x != 0 && y != 0) {
-            LOGGER.warn("Writing at position " + x + "," + y);
-        }
-        bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
-                     (int) Math.ceil(height), null);
-        bg.dispose();
-        return bicubic;
     }
 
     MCRContent getThumnail(Path pdfFile, BasicFileAttributes attrs, int thumbnailSize, boolean centered)
