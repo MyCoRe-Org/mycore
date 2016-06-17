@@ -66,7 +66,15 @@ public class MCRIView2XSLFunctions {
      *         null if there are no derivates related to the given mcrid
      */
     public static String getSupportedMainFileByOwner(String mcrID) {
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(mcrID));
+        MCRObjectID objectID = null;
+
+        try {
+            objectID = MCRObjectID.getInstance(mcrID);
+        } catch (Exception e) {
+            return null;
+        }
+
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
         List<MCRMetaLinkID> derivates = obj.getStructure().getDerivates();
         if (derivates.size() > 0)
             return derivates.get(0).toString() + "/" + adapter.getSupportedMainFile(derivates.get(0).toString());
