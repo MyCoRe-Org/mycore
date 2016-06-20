@@ -28,10 +28,13 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Document;
@@ -39,7 +42,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
@@ -55,6 +58,8 @@ import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.urn.hibernate.MCRURN;
+import org.mycore.urn.hibernate.MCRURNPK_;
+import org.mycore.urn.hibernate.MCRURN_;
 import org.mycore.urn.services.MCRURNManager;
 
 /**
@@ -108,7 +113,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
                     } else {
                         if (!MCRURNManager.getURNforDocument(obj.getId().toString()).equals(urn)) {
                             LOGGER.warn("URN in metadata " + urn + "isn't equals with registered URN "
-                                + MCRURNManager.getURNforDocument(obj.getId().toString()) + ", please check!" );
+                                + MCRURNManager.getURNforDocument(obj.getId().toString()) + ", please check!");
                         }
                     }
                 } else {
@@ -222,23 +227,26 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        Criteria q = getSession().createCriteria(MCRURN.class);
-        q.add(Restrictions.isNull("path"));
-        q.add(Restrictions.isNull("filename"));
-        q.add(Restrictions.eq("key.mcrid", der.getId().toString()));
-
-        MCRURN entry = (MCRURN) q.uniqueResult();
-        if (entry != null) {
-            entry.setDfg(false);
-            getSession().update(entry);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRURN> query = cb.createQuery(MCRURN.class);
+        Root<MCRURN> root = query.from(MCRURN.class);
+        try {
+            MCRURN entry = em
+                .createQuery(
+                    query.where(
+                        cb.equal(root.get(MCRURN_.key).get(MCRURNPK_.mcrid), der.getId().toString()),
+                        cb.isNull(root.get(MCRURN_.path)),
+                        cb.isNull(root.get(MCRURN_.filename))))
+                .getSingleResult();
+            if (entry != null) {
+                entry.setDfg(false);
+            }
+        } catch (NoResultException e) {
         }
         MCREvent indexEvent = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.INDEX_EVENT);
         indexEvent.put("derivate", der);
         MCREventManager.instance().handleEvent(indexEvent);
-    }
-
-    private Session getSession() {
-        return MCRHIBConnection.instance().getSession();
     }
 
     /* (non-Javadoc)

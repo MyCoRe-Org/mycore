@@ -26,19 +26,22 @@ package org.mycore.backend.jpa.access;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 
@@ -61,10 +64,9 @@ public class MCRJPARuleStore extends MCRRuleStore {
         .build(new CacheLoader<String, MCRAccessRule>() {
             @Override
             public MCRAccessRule load(String ruleid) {
-                Session session = MCRHIBConnection.instance().getSession();
                 MCRAccessRule rule = null;
-                MCRACCESSRULE hibrule = (MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class)
-                    .add(Restrictions.eq("rid", ruleid)).uniqueResult();
+                EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+                MCRACCESSRULE hibrule = entityManager.find(MCRACCESSRULE.class, ruleid);
                 LOGGER.debug("Getting MCRACCESSRULE done");
 
                 if (hibrule != null) {
@@ -107,16 +109,19 @@ public class MCRJPARuleStore extends MCRRuleStore {
      * Method retrieves the ruleIDs of rules, whose string-representation starts with given data
      */
     @Override
-    @SuppressWarnings("unchecked")
     public Collection<String> retrieveRuleIDs(String ruleExpression, String description) {
-        ArrayList<String> ret = new ArrayList<String>();
-        Session session = MCRHIBConnection.instance().getSession();
-        List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class)
-            .add(Restrictions.like("rule", ruleExpression)).add(Restrictions.like("description", description)).list();
-        for (MCRACCESSRULE aL : l) {
-            ret.add(aL.getRid());
-        }
-        return ret;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder sb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = sb.createQuery(String.class);
+        Root<MCRACCESSRULE> ar = query.from(MCRACCESSRULE.class);
+        return em.createQuery(
+            query.select(
+                ar.get(MCRACCESSRULE_.rid))
+                .where(
+                    sb.and(
+                        sb.like(ar.get(MCRACCESSRULE_.rule), ruleExpression),
+                        sb.like(ar.get(MCRACCESSRULE_.description), description))))
+            .getResultList();
     }
 
     /**
@@ -158,10 +163,13 @@ public class MCRJPARuleStore extends MCRRuleStore {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Collection<String> retrieveAllIDs() {
-        Session session = MCRHIBConnection.instance().getSession();
-        return session.createCriteria(MCRACCESSRULE.class).setProjection(Projections.id()).list();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaQuery<String> query = em.getCriteriaBuilder().createQuery(String.class);
+        return em.createQuery(
+            query.select(
+                query.from(MCRACCESSRULE.class).get(MCRACCESSRULE_.rid)))
+            .getResultList();
     }
 
     /**
@@ -172,24 +180,20 @@ public class MCRJPARuleStore extends MCRRuleStore {
      * @return boolean value
      */
     @Override
-    @SuppressWarnings("unchecked")
     public boolean existsRule(String ruleid) throws MCRException {
         if (ruleCache.getIfPresent(ruleid) != null) {
             return true;
         }
-
-        Session session = MCRHIBConnection.instance().getSession();
-        List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
-        return l.size() == 1;
+        return MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESSRULE.class, ruleid) != null;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public int getNextFreeRuleID(String prefix) {
         int ret = 1;
         Session session = MCRHIBConnection.instance().getSession();
-        List<String> l = session.createQuery("select max(rid) from MCRACCESSRULE where rid like '" + prefix + "%'")
-            .list();
+        List<String> l = session
+            .createQuery("select max(rid) from MCRACCESSRULE where rid like '" + prefix + "%'", String.class)
+            .getResultList();
         if (l.size() > 0) {
             String max = l.get(0);
             if (max == null) {

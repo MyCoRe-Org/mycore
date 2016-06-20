@@ -33,20 +33,20 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference_;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -104,11 +104,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (!childrenOnly) {
             parent = parent.getRoot();
         } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
-            parent = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), parent.getId());
+            parent = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(),
+                parent.getId());
         }
         LOGGER.info("parentID:" + parent.getId());
         String classID = parent.getId().getRootID();
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + queryName);
+        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + queryName);
         // query can take long time, please cache result
         q.setCacheable(true);
         q.setParameter("classID", classID);
@@ -120,7 +121,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
         // get object count for every category (not accumulated)
         @SuppressWarnings("unchecked")
-        List<Object[]> result = q.list();
+        List<Object[]> result = (List<Object[]>) q.getResultList();
         for (Object[] sr : result) {
             MCRCategoryID key = new MCRCategoryID(classID, sr[0].toString());
             Number value = (Number) sr[1];
@@ -130,7 +131,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     public void deleteLink(MCRCategLinkReference reference) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectID");
+        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectID");
         q.setParameter("id", reference.getObjectID());
         q.setParameter("type", reference.getType());
         int deleted = q.executeUpdate();
@@ -158,10 +159,11 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             }
             objectIds.add(ref.getObjectID());
         }
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectCollection");
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        javax.persistence.Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectCollection");
         int deleted = 0;
         for (Map.Entry<String, Collection<String>> entry : typeMap.entrySet()) {
-            q.setParameterList("ids", entry.getValue());
+            q.setParameter("ids", entry.getValue());
             q.setParameter("type", entry.getKey());
             deleted += q.executeUpdate();
         }
@@ -170,28 +172,28 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategory(MCRCategoryID id) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategory");
+        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategory");
         q.setCacheable(true);
         q.setParameter("id", id);
-        return q.list();
+        return (Collection<String>) q.getResultList();
     }
 
     @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategoryAndType");
+        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategoryAndType");
         q.setCacheable(true);
         q.setParameter("id", id);
         q.setParameter("type", type);
-        return q.list();
+        return (Collection<String>) q.getResultList();
     }
 
     @SuppressWarnings("unchecked")
     public Collection<MCRCategoryID> getLinksFromReference(MCRCategLinkReference reference) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "categoriesByObjectID");
+        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "categoriesByObjectID");
         q.setCacheable(true);
         q.setParameter("id", reference.getObjectID());
         q.setParameter("type", reference.getType());
-        return q.list();
+        return (Collection<MCRCategoryID>) q.getResultList();
     }
 
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
@@ -260,9 +262,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 return Optional.ofNullable(super.get(key)).orElse(Boolean.FALSE);
             }
         };
-        Query linkedClassifications = MCRHIBConnection.instance()
+        Query<?> linkedClassifications = MCRHIBConnection.instance()
             .getNamedQuery(NAMED_QUERY_NAMESPACE + "linkedClassifications");
-        ((List<String>) linkedClassifications.list()).stream().map(MCRCategoryID::rootID)
+        ((List<String>) linkedClassifications.getResultList()).stream().map(MCRCategoryID::rootID)
             .forEach(id -> boolMap.put(id, true));
         return boolMap;
     }
@@ -296,12 +298,17 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private BitSet getLinkedInternalIds() {
-        Session session = HIB_CONNECTION_INSTANCE.getSession();
-        Criteria criteria = session.createCriteria(LINK_CLASS);
-        criteria.setProjection(Projections.distinct(Projections.property("category.internalID")));
-        criteria.addOrder(Order.desc("category.internalID"));
-        @SuppressWarnings("unchecked")
-        List<Number> result = criteria.list();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> query = cb.createQuery(Number.class);
+        Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
+        Path<Integer> internalId = li.get(MCRCategoryLinkImpl_.category).get(MCRCategoryImpl_.internalID);
+        List<Number> result = em
+            .createQuery(
+                query.select(internalId)
+                    .orderBy(cb.desc(internalId)))
+            .getResultList();
+
         int maxSize = result.size() == 0 ? 1 : result.get(0).intValue() + 1;
         BitSet linkSet = new BitSet(maxSize);
         for (Number internalID : result) {
@@ -334,44 +341,54 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @Override
     public boolean isInCategory(MCRCategLinkReference reference, MCRCategoryID id) {
-        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "CategoryAndObjectID");
+        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "CategoryAndObjectID");
         q.setCacheable(true);
         q.setParameter("rootID", id.getRootID());
         q.setParameter("categID", id.getID());
         q.setParameter("objectID", reference.getObjectID());
         q.setParameter("type", reference.getType());
-        return !q.list().isEmpty();
+        return !q.getResultList().isEmpty();
     }
 
     @Override
     public Collection<MCRCategLinkReference> getReferences(String type) {
-        Session session = HIB_CONNECTION_INSTANCE.getSession();
-        Criteria criteria = session.createCriteria(LINK_CLASS);
-        criteria.add(Restrictions.eq("objectReference.type", type));
-        criteria.setProjection(Projections.property("objectReference"));
-        @SuppressWarnings("unchecked")
-        List<MCRCategLinkReference> result = criteria.list();
-        return result;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRCategLinkReference> query = cb.createQuery(MCRCategLinkReference.class);
+        Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
+        Path<MCRCategLinkReference> objectReferencePath = li.get(MCRCategoryLinkImpl_.objectReference);
+        return em
+            .createQuery(
+                query.select(objectReferencePath)
+                    .where(cb.equal(objectReferencePath.get(MCRCategLinkReference_.type), type)))
+            .getResultList();
     }
 
     @Override
     public Collection<String> getTypes() {
-        Session session = HIB_CONNECTION_INSTANCE.getSession();
-        Criteria criteria = session.createCriteria(LINK_CLASS);
-        criteria.setProjection(Projections.distinct(Projections.property("objectReference.type")));
-        @SuppressWarnings("unchecked")
-        List<String> result = criteria.list();
-        return result;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
+        return em
+            .createQuery(
+                query
+                    .distinct(true)
+                    .select(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type)))
+            .getResultList();
     }
 
     @Override
     public Collection<MCRCategoryLink> getLinks(String type) {
-        Session session = HIB_CONNECTION_INSTANCE.getSession();
-        Criteria criteria = session.createCriteria(LINK_CLASS);
-        criteria.add(Restrictions.eq("objectReference.type", type));
-        @SuppressWarnings("unchecked")
-        List<MCRCategoryLink> result = criteria.list();
-        return result;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRCategoryLink> query = cb.createQuery(MCRCategoryLink.class);
+        Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
+        return em
+            .createQuery(
+                query
+                    .where(cb.equal(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type), type)))
+            .getResultList();
     }
 
 }

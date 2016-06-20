@@ -21,18 +21,16 @@
  */
 package org.mycore.oai;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
-import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Projections;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.jpa.deleteditems.MCRDELETEDITEMS;
 import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.FriendsDescription;
@@ -108,7 +106,6 @@ public class MCROAIIdentify extends SimpleIdentify {
         }
     }
 
-
     public OAIIdentifierDescription getIdentifierDescription() {
         String reposId = this.config.getString(this.configPrefix + "RepositoryIdentifier");
         String sampleId = this.config.getString(this.configPrefix + "RecordSampleID");
@@ -139,10 +136,9 @@ public class MCROAIIdentify extends SimpleIdentify {
             datestamp = MCROAISearchManager.getSearcher(this.configPrefix, null, null, 1).getEarliestTimestamp();
             // deleted items
             if (DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
-                MCRHIBConnection conn = MCRHIBConnection.instance();
-                Criteria criteria = conn.getSession().createCriteria(MCRDELETEDITEMS.class);
-                criteria.setProjection(Projections.min("id.dateDeleted"));
-                Date earliestDeletedDate = (Date) criteria.uniqueResult();
+                Date earliestDeletedDate = MCRDeletedItemManager.getFirstDate()
+                    .map(ZonedDateTime::toInstant)
+                    .map(Date::from).orElse(null);
                 if (earliestDeletedDate != null && earliestDeletedDate.compareTo(datestamp) < 0) {
                     datestamp = earliestDeletedDate;
                 }

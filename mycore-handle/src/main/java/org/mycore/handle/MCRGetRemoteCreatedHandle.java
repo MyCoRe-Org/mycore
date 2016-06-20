@@ -8,14 +8,15 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.TimerTask;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -62,7 +63,6 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
      * requests has already been submitted). For each entry the handle created by the remote system 
      * is requested and finally stored in the database (if status is 'done').
      * */
-    @SuppressWarnings("unchecked")
     @Override
     public void run() {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -70,15 +70,19 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
         MCRGbvHandleChecksumProvider checksumProvider = new MCRGbvHandleChecksumProvider();
 
         LOGGER.debug("Storing pending handles...");
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
         try {
-            Criteria q = session.createCriteria(MCRHandle.class);
-            q.add(Restrictions.eq("checksum", -1));
-            q.add(Restrictions.and(Restrictions.isNotNull("objectSignature"),
-                Restrictions.isNotNull("messageSignature")));
-
-            List<MCRHandle> list = q.list();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<MCRHandle> query = cb.createQuery(MCRHandle.class);
+            Root<MCRHandle> h = query.from(MCRHandle.class);
+            List<MCRHandle> list = em.createQuery(
+                query.where(
+                    cb.equal(h.get(MCRHandle_.checksum), -1),
+                    cb.isNotNull(h.get(MCRHandle_.objectSignature)),
+                    cb.isNotNull(h.get(MCRHandle_.messageSignature))))
+                .getResultList();
             for (MCRHandle handle : list) {
                 JsonObject message = getMessage(handle.getMessageSignature());
 
@@ -121,7 +125,6 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
                         checksum));
                 }
 
-                session.update(handle);
                 MCRDerivate derivateObject = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(handle
                     .getMcrid()));
                 MCRPath file = MCRPath.getPath(MCRObjectID.getInstance(handle.getMcrid()).toString(), handle.getPath());
@@ -133,11 +136,10 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
             MCRHandleManager.LOGGER.error("Could not get handles from database", ex);
             tx.rollback();
         } finally {
-            if (tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
+            if (tx.isActive()) {
                 tx.commit();
             }
-            session.disconnect();
-            session.close();
+            em.close();
         }
     }
 

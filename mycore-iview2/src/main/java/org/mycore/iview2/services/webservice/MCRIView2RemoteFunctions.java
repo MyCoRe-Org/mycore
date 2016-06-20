@@ -25,8 +25,6 @@ package org.mycore.iview2.services.webservice;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -34,19 +32,21 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.Style;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.iview2.services.MCRJobState;
 import org.mycore.iview2.services.MCRTileJob;
+import org.mycore.iview2.services.MCRTileJob_;
 import org.mycore.iview2.services.MCRTilingQueue;
 
 /**
@@ -59,7 +59,7 @@ import org.mycore.iview2.services.MCRTilingQueue;
 public class MCRIView2RemoteFunctions {
     private static MCRTilingQueue TILE_QUEUE = MCRTilingQueue.getInstance();
 
-    private static SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
+    private static EntityManagerFactory emFactory = MCREntityManagerProvider.getEntityManagerFactory();
 
     private static Logger LOGGER = Logger.getLogger(MCRIView2RemoteFunctions.class);
 
@@ -70,8 +70,8 @@ public class MCRIView2RemoteFunctions {
     @WebMethod(operationName = "next-tile-job")
     @WebResult(name = "tile-job")
     public MCRIView2RemoteJob getNextTileParameters() throws Exception {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction transaction = session.beginTransaction();
+        EntityManager em = emFactory.createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
         try {
             MCRTileJob mcrTileJob = TILE_QUEUE.poll();
             if (mcrTileJob == null){
@@ -85,12 +85,12 @@ public class MCRIView2RemoteFunctions {
             return new MCRIView2RemoteJob(derID, derPath, imagePath);
         } catch (HibernateException | IOException e) {
             LOGGER.error("Error while getting next tiling job.", e);
-            if (transaction != null && transaction.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
             throw e;
         } finally {
-            session.close();
+            em.close();
         }
     }
 
@@ -100,31 +100,30 @@ public class MCRIView2RemoteFunctions {
      */
     @WebMethod(operationName = "finish-tile-job")
     public void finishTileJob(@WebParam(name = "job") MCRIView2RemoteJob jobInfo) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction transaction = session.beginTransaction();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRTileJob> jobQuery = cb.createQuery(MCRTileJob.class);
+        Root<MCRTileJob> jobs = jobQuery.from(MCRTileJob.class);
+        jobQuery.where(cb.equal(jobs.get(MCRTileJob_.derivate), jobInfo.getDerivateID()), cb.equal(jobs.get(MCRTileJob_.path), jobInfo.getDerivatePath()));
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
         try {
-            MCRTileJob image = null;
-            Map<String, String> restrictions = new HashMap<String, String>();
-            restrictions.put("derivate", jobInfo.getDerivateID());
-            restrictions.put("path", jobInfo.getDerivatePath());
-            Criteria jobCriteria = session.createCriteria(MCRTileJob.class).add(Restrictions.allEq(restrictions));
-            image = (MCRTileJob) jobCriteria.uniqueResult();
+            MCRTileJob image = em.createQuery(jobQuery).getSingleResult();
             image.setFinished(new Date());
             image.setStatus(MCRJobState.FINISHED);
             image.setHeight(jobInfo.getHeight());
             image.setWidth(jobInfo.getWidth());
             image.setTiles(jobInfo.getTiles());
             image.setZoomLevel(jobInfo.getZoomLevel());
-            session.update(image);
             transaction.commit();
-        } catch (HibernateException e) {
+        } catch (PersistenceException e) {
             LOGGER.error("Error while getting next tiling job.", e);
             if (transaction != null) {
                 transaction.rollback();
             }
             throw e;
         } finally {
-            session.close();
+            em.close();
         }
     }
 

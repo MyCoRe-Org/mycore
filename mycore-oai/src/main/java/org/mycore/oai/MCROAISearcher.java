@@ -1,17 +1,14 @@
 package org.mycore.oai;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.jpa.deleteditems.MCRDELETEDITEMS;
+import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.pmh.Identify.DeletedRecordPolicy;
 import org.mycore.oai.pmh.MetadataFormat;
@@ -44,8 +41,9 @@ public abstract class MCROAISearcher {
         this.id = Long.toString(random.nextLong(), 36) + Long.toString(System.currentTimeMillis(), 36);
     }
 
-    public void init(String configPrefix, MetadataFormat format, Date expirationDate, DeletedRecordPolicy deletedRecordPolicy,
-            int partitionSize) {
+    public void init(String configPrefix, MetadataFormat format, Date expirationDate,
+        DeletedRecordPolicy deletedRecordPolicy,
+        int partitionSize) {
         this.configPrefix = configPrefix;
         this.metadataFormat = format;
         this.expirationDate = expirationDate;
@@ -59,7 +57,7 @@ public abstract class MCROAISearcher {
     public abstract MCROAIResult query(Set set, Date from, Date until);
 
     public abstract Date getEarliestTimestamp();
-    
+
     boolean isExpired() {
         long currentTime = System.currentTimeMillis();
         return (new Date(currentTime).compareTo(expirationDate) > 0) && currentTime > runningExpirationTimer;
@@ -111,23 +109,14 @@ public abstract class MCROAISearcher {
     @SuppressWarnings("unchecked")
     protected List<String> searchDeleted(Date from, Date until) {
         if (from == null || DeletedRecordPolicy.No.equals(getDeletedRecordPolicy())
-                || DeletedRecordPolicy.Transient.equals(getDeletedRecordPolicy())) {
+            || DeletedRecordPolicy.Transient.equals(getDeletedRecordPolicy())) {
             return new ArrayList<>();
         }
         LOGGER.info("Getting identifiers of deleted items");
         try {
             // building the query
-            MCRHIBConnection conn = MCRHIBConnection.instance();
-            Criteria criteria = conn.getSession().createCriteria(MCRDELETEDITEMS.class);
-            criteria.setProjection(Projections.property("id.identifier"));
-            Criterion lowerBound = Restrictions.ge("id.dateDeleted", from);
-            if (until != null) {
-                Criterion upperBound = Restrictions.le("id.dateDeleted", until);
-                criteria.add(Restrictions.and(lowerBound, upperBound));
-            } else {
-                criteria.add(lowerBound);
-            }
-            return criteria.list();
+            return MCRDeletedItemManager.getDeletedItems(ZonedDateTime.from(from.toInstant()),
+                Optional.ofNullable(until).map(Date::toInstant).map(ZonedDateTime::from));
         } catch (Exception ex) {
             LOGGER.warn("Could not retrieve identifiers of deleted objects", ex);
         }

@@ -30,7 +30,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -46,10 +45,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
 import org.jdom2.Document;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -64,6 +64,7 @@ import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -135,6 +136,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategory secondCateg = nameIdentifier.getChildren().get(1);
         DAO.addCategory(null, nameIdentifier);
         startNewTransaction();
+        MCRCategLinkServiceFactory.getInstance().getLinksFromCategory(secondCateg.getId());
         assertTrue(secondCateg.getId() + " should exist.", DAO.exist(secondCateg.getId()));
         //re-set labels
         DAO.setLabels(secondCateg.getId(), secondCateg.getLabels().stream().collect(Collectors.toSet()));
@@ -163,8 +165,16 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategoryImpl rootCategory = getRootCategoryFromSession();
         assertEquals("Child category count does not match.", category.getChildren().size(), rootCategory.getChildren()
             .size());
-        long allNodes = ((Number) MCRHIBConnection.instance().getSession().createCriteria(MCRCategoryImpl.class)
-            .setProjection(Projections.rowCount()).uniqueResult()).longValue();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> countQuery = cb.createQuery(Number.class);
+        long allNodes = em
+            .createQuery(countQuery
+                .select(cb
+                    .count(countQuery
+                        .from(MCRCategoryImpl.class))))
+            .getSingleResult()
+            .longValue();
         // category + india
         assertEquals("Complete category count does not match.", countNodes(category) + 1, allNodes);
         assertTrue("No root category present", rootCategory.getRoot() != null);

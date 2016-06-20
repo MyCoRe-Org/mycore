@@ -32,7 +32,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.links.MCRLINKHREF;
@@ -134,7 +134,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
         LOGGER.debug("Deleting " + from + " from database MCRLINKHREF");
         Session session = getSession();
-        Iterator<?> it = session.createQuery(sb.toString()).iterate();
+        Iterator<MCRLINKHREF> it = session.createQuery(sb.toString(), MCRLINKHREF.class).getResultList().iterator();
         while (it.hasNext()) {
             session.delete(it.next());
         }

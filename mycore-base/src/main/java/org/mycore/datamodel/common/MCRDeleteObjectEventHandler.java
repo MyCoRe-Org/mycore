@@ -3,7 +3,7 @@
  */
 package org.mycore.datamodel.common;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.apache.log4j.Logger;
 import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
@@ -85,7 +85,7 @@ public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         try {
             LOGGER.info("Saving deletion information for object " + obj.getId());
-            MCRDeletedItemManager.addEntry(obj.getId().toString(), new Date());
+            MCRDeletedItemManager.addEntry(obj.getId().toString(), ZonedDateTime.now());
         } catch (Exception ex) {
             LOGGER.error(ex);
         }
@@ -103,7 +103,7 @@ public class MCRDeleteObjectEventHandler extends MCREventHandlerBase {
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
         try {
             LOGGER.info("Saving deletion information for derivate " + derivate.getId());
-            MCRDeletedItemManager.addEntry(derivate.getId().toString(), new Date());
+            MCRDeletedItemManager.addEntry(derivate.getId().toString(), ZonedDateTime.now());
         } catch (Exception ex) {
             LOGGER.error(ex);
         }

@@ -24,19 +24,21 @@
 package org.mycore.urn.hibernate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.urn.services.MCRURNStore;
@@ -97,7 +99,8 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public synchronized final void create(String urn, String id, String path, String filename) throws MCRPersistenceException {
+    public synchronized final void create(String urn, String id, String path, String filename)
+        throws MCRPersistenceException {
         if (urn == null || urn.length() == 0) {
             throw new MCRPersistenceException("The URN is null.");
         }
@@ -153,14 +156,18 @@ public class MCRHIBURNStore implements MCRURNStore {
             logger.warn("Cannot delete for urn " + urn);
             return;
         }
-
-        Criteria q = getSession().createCriteria(MCRURN.class);
-        q.add(Restrictions.eq("key.mcrurn", urn));
-
-        MCRURN entry = (MCRURN) q.uniqueResult();
-        if (entry != null) {
-            getSession().delete(entry);
-        } else {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRURN> query = cb.createQuery(MCRURN.class);
+        Root<MCRURN> root = query.from(MCRURN.class);
+        try {
+            MCRURN entry = em
+                .createQuery(
+                    query.where(
+                        cb.equal(root.get(MCRURN_.key).get(MCRURNPK_.mcrurn), urn)))
+                .getSingleResult();
+            em.remove(entry);
+        } catch (NoResultException e) {
             logger.warn("URN " + urn + " is unknown and cannot be deleted");
         }
     }
@@ -179,7 +186,7 @@ public class MCRHIBURNStore implements MCRURNStore {
             return;
         }
 
-        Query q = getSession().createQuery("delete from " + classname + " where MCRID = :theObjectId");
+        Query<?> q = getSession().createQuery("delete from " + classname + " where MCRID = :theObjectId");
         q.setParameter("theObjectId", objID);
         int rowCount = q.executeUpdate();
         logger.info(rowCount + " entries were deleted for object " + objID + " from " + MCRURN.class.getSimpleName());
@@ -204,7 +211,6 @@ public class MCRHIBURNStore implements MCRURNStore {
      *            the MCRObjectID as String
      * @return the urn, or null if no urn is assigned to this ID
      */
-    @SuppressWarnings("unchecked")
     public final String getURNforDocument(String id) throws MCRPersistenceException {
         if (id == null || id.length() == 0) {
             return null;
@@ -213,7 +219,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         Session session = getSession();
         String querySB = "select key.mcrurn from " + classname + " where key.mcrid='" + id + "'";
         logger.debug("HQL-Statement: " + querySB.toString());
-        List<String> returns = session.createQuery(querySB.toString()).list();
+        List<String> returns = session.createQuery(querySB.toString(), String.class).getResultList();
         if (returns.size() != 1) {
             return null;
         }
@@ -240,7 +246,6 @@ public class MCRHIBURNStore implements MCRURNStore {
      *            the URN as String
      * @return the document ID, or null if no urn is assigned to this ID
      */
-    @SuppressWarnings("unchecked")
     public final String getDocumentIDforURN(String urn) throws MCRPersistenceException {
         if (urn == null || urn.length() == 0) {
             return null;
@@ -249,7 +254,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         Session session = getSession();
         String querySB = "select key.mcrid from " + classname + " where key.mcrurn='" + urn + "'";
         logger.debug("HQL-Statement: " + querySB.toString());
-        List<String> returns = session.createQuery(querySB.toString()).list();
+        List<String> returns = session.createQuery(querySB.toString(), String.class).getResultList();
         if (returns.size() != 1) {
             return null;
         }
@@ -263,7 +268,6 @@ public class MCRHIBURNStore implements MCRURNStore {
      *            the MCRObjectID as String
      * @return true if an urn is assigned to the given object, false otherwise
      */
-    @SuppressWarnings("unchecked")
     public final boolean hasURNAssigned(String id) throws MCRPersistenceException {
         if (id == null || id.length() == 0) {
             return false;
@@ -272,7 +276,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         Session session = getSession();
         String querySB = "select key.mcrurn from " + classname + " where key.mcrid='" + id + "'";
         logger.debug("HQL-Statement: " + querySB.toString());
-        List<String> returns = session.createQuery(querySB.toString()).list();
+        List<String> returns = session.createQuery(querySB.toString(), String.class).getResultList();
         return !(returns == null || returns.isEmpty());
     }
 
@@ -281,7 +285,6 @@ public class MCRHIBURNStore implements MCRURNStore {
      *
      * @return true if the URN exist, else return false
      */
-    @SuppressWarnings("unchecked")
     public final boolean exist(String urn) {
         boolean exists = false;
         if (urn == null || urn.length() == 0) {
@@ -290,7 +293,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String query = "select key.mcrid from " + classname + " where key.mcrurn = '" + urn + "'";
-        List<String> l = session.createQuery(query.toString()).list();
+        List<String> l = session.createQuery(query.toString(), String.class).getResultList();
         if (!l.isEmpty()) {
             exists = true;
         }
@@ -312,25 +315,24 @@ public class MCRHIBURNStore implements MCRURNStore {
         if (derivateId == null || fileName == null) {
             return null;
         }
-
-        Session session = getSession();
-        Criteria criteria = session.createCriteria(MCRURN.class);
-        criteria.setProjection(Projections.property("key.mcrurn"));
-        Map<String, String> propertyNameValues = new HashMap<String, String>();
-        propertyNameValues.put("key.mcrid", derivateId);
-        propertyNameValues.put("path", path);
-        propertyNameValues.put("filename", fileName);
-        criteria.add(Restrictions.allEq(propertyNameValues));
-        if (logger.isDebugEnabled()) {
-            logger.debug("HQL-Statement: " + criteria.toString());
-        }
-        @SuppressWarnings("unchecked")
-        List<String> returns = criteria.list();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Root<MCRURN> root = query.from(MCRURN.class);
+        List<String> returns = em.createQuery(
+            query
+                .select(root.get(MCRURN_.key).get(MCRURNPK_.mcrurn))
+                .where(
+                    cb.equal(root.get(MCRURN_.key).get(MCRURNPK_.mcrid), derivateId),
+                    cb.equal(root.get(MCRURN_.path), path),
+                    cb.equal(root.get(MCRURN_.filename), fileName)))
+            .getResultList();
         if (returns.isEmpty()) {
             return null;
         }
         if (returns.size() != 1) {
-            logger.warn("There are more than just one urn for file \"" + fileName + "\" in derivate \"" + derivateId + "\"");
+            logger.warn(
+                "There are more than just one urn for file \"" + fileName + "\" in derivate \"" + derivateId + "\"");
         }
         String urn = returns.get(0);
 
@@ -341,45 +343,48 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @return the count of urn matching the given 'registered' attribute
      */
     public long getCount(boolean registered) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> query = cb.createQuery(Number.class);
+        Root<MCRURN> root = query.from(MCRURN.class);
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
         try {
-            Criteria q = session.createCriteria(MCRURN.class);
-            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
-            q.setProjection(Projections.rowCount());
-
-            long hits = (long) q.uniqueResult();
-
-            return hits;
-        } catch (Exception ex) {
-            logger.error("Could not execute query", ex);
+            return em.createQuery(
+                query
+                    .select(cb.count(root))
+                    .where(cb.equal(root.get(MCRURN_.registered), registered)))
+                .getSingleResult()
+                .longValue();
+        } catch (PersistenceException e) {
+            logger.error("Could not execute query", e);
             tx.rollback();
-        } finally {
             tx.commit();
-            session.disconnect();
         }
         return 0;
     }
 
-    @SuppressWarnings("unchecked")
     public List<MCRURN> get(boolean registered, int start, int rows) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRURN> query = cb.createQuery(MCRURN.class);
+        Root<MCRURN> root = query.from(MCRURN.class);
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
         try {
-            Criteria q = session.createCriteria(MCRURN.class);
-            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
-            q.addOrder(Order.asc("key"));
-            q.setFirstResult(start);
-            q.setMaxResults(rows);
-            List<MCRURN> list = (List<MCRURN>) q.list();
-
-            return list;
+            return em
+                .createQuery(
+                    query.where(
+                        cb.equal(root.get(MCRURN_.registered), registered))
+                        .orderBy(cb.asc(root.get(MCRURN_.key))))
+                .setFirstResult(start)
+                .setMaxResults(rows)
+                .getResultList();
         } catch (Exception ex) {
             logger.error("Could not execute query", ex);
             tx.rollback();
         } finally {
             tx.commit();
-            session.disconnect();
         }
         // return an empty list
         return new ArrayList<MCRURN>();
@@ -393,37 +398,47 @@ public class MCRHIBURNStore implements MCRURNStore {
     /**
      * Get all URN for the given object id.
      */
-    @SuppressWarnings("unchecked")
     public List<MCRURN> get(MCRObjectID id) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Criteria q = session.createCriteria(MCRURN.class);
-        q.add(Restrictions.eq("key.mcrid", id.toString()));
-
-        return (List<MCRURN>) q.list();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRURN> query = cb.createQuery(MCRURN.class);
+        Root<MCRURN> root = query.from(MCRURN.class);
+        return em
+            .createQuery(
+                query.where(
+                    cb.equal(root.get(MCRURN_.key).get(MCRURNPK_.mcrid), id.toString()))
+                    .orderBy(cb.asc(root.get(MCRURN_.key))))
+            .getResultList();
     }
 
     /**
      * @return a {@link List} of {@link MCRURN} where path and file name are just blanks or null;
      */
-    @SuppressWarnings("unchecked")
     public List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRURN> query = cb.createQuery(MCRURN.class);
+        Root<MCRURN> root = query.from(MCRURN.class);
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
         try {
-            Criteria q = session.createCriteria(MCRURN.class);
-            q.add(Restrictions.and(Restrictions.isNull("path"), Restrictions.isNull("filename")));
-            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
-            q.add(Restrictions.eq("dfg", Boolean.valueOf(dfg)));
-            q.setFirstResult(start);
-            q.setMaxResults(rows);
-
-            return (List<MCRURN>) q.list();
+            return em
+                .createQuery(
+                    query.where(
+                        cb.isNull(root.get(MCRURN_.path)),
+                        cb.isNull(root.get(MCRURN_.filename)),
+                        cb.equal(root.get(MCRURN_.registered), registered),
+                        cb.equal(root.get(MCRURN_.dfg), dfg)
+                        )
+                        .orderBy(cb.asc(root.get(MCRURN_.key))))
+                .setFirstResult(start)
+                .setMaxResults(rows)
+                .getResultList();
         } catch (Exception ex) {
             logger.error("Could not execute query", ex);
             tx.rollback();
         } finally {
             tx.commit();
-            session.disconnect();
         }
         // return an empty list
         return new ArrayList<MCRURN>();

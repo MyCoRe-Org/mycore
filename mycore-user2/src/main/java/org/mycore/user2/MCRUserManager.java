@@ -24,20 +24,23 @@ package org.mycore.user2;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
-import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
-import org.hibernate.InstantiationException;
-import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -56,12 +59,11 @@ import org.mycore.datamodel.common.MCRISO8601Format;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRUserManager {
-    private static final MCRHIBConnection MCRHIB_CONNECTION = MCRHIBConnection.instance();
 
     private static final int HASH_ITERATIONS = MCRConfiguration.instance()
-            .getInt(MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
+        .getInt(MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
 
-    private static final Logger LOGGER = Logger.getLogger(MCRUserManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final SecureRandom SECURE_RANDOM;
 
@@ -69,8 +71,7 @@ public class MCRUserManager {
         try {
             SECURE_RANDOM = SecureRandom.getInstance("SHA1PRNG");
         } catch (NoSuchAlgorithmException e) {
-            throw new InstantiationException("Could not initialize secure SECURE_RANDOM number", MCRUserManager.class,
-                    e);
+            throw new MCRException("Could not initialize secure SECURE_RANDOM number", e);
         }
     }
 
@@ -111,8 +112,8 @@ public class MCRUserManager {
      * @return the user with the given login name, or null
      */
     public static MCRUser getUser(String userName, String realmId) {
-        Session session = MCRHIB_CONNECTION.getSession();
-        MCRUser mcrUser = getByNaturalID(session, userName, realmId);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRUser mcrUser = getByNaturalID(em, userName, realmId);
         if (mcrUser == null) {
             LOGGER.warn("Could not find requested user: " + userName + "@" + realmId);
             return null;
@@ -163,12 +164,15 @@ public class MCRUserManager {
      * @return true, if a user with the given login name exists.
      */
     public static boolean exists(String userName, String realm) {
-        Session session = MCRHIB_CONNECTION.getSession();
-        Criteria criteria = getUserCriteria(session);
-        criteria.add(getUserRealmCriterion(userName, realm));
-        criteria.setProjection(Projections.rowCount());
-        int count = ((Number) criteria.uniqueResult()).intValue();
-        return count != 0;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> query = cb.createQuery(Number.class);
+        Root<MCRUser> users = query.from(MCRUser.class);
+        return em.createQuery(
+            query
+                .select(cb.count(users))
+                .where(getUserRealmCriterion(cb, users, userName, realm)))
+            .getSingleResult().intValue() > 0;
     }
 
     /** 
@@ -187,8 +191,9 @@ public class MCRUserManager {
             return;
         }
 
-        Session session = MCRHIB_CONNECTION.getSession();
-        session.save(user);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.persist(user);
+        LOGGER.info(() -> "user saved: "+user.getUserID());
         MCRRoleManager.storeRoleAssignments(user);
     }
 
@@ -229,15 +234,15 @@ public class MCRUserManager {
         if (isInvalidUser(user)) {
             throw new MCRException("User is invalid: " + user.getUserID());
         }
-        Session session = MCRHIB_CONNECTION.getSession();
-        MCRUser inDb = getByNaturalID(session, user.getUserName(), user.getRealmID());
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRUser inDb = getByNaturalID(em, user.getUserName(), user.getRealmID());
         if (inDb == null) {
             createUser(user);
             return;
         }
         user.internalID = inDb.internalID;
-        session.evict(inDb);
-        session.update(user);
+        em.detach(inDb);
+        em.merge(user);
         MCRRoleManager.unassignRoles(user);
         MCRRoleManager.storeRoleAssignments(user);
     }
@@ -273,10 +278,10 @@ public class MCRUserManager {
      * @param realmId the ID of the realm the user belongs to 
      */
     public static void deleteUser(String userName, String realmId) {
-        Session session = MCRHIB_CONNECTION.getSession();
         MCRUser user = getUser(userName, realmId);
         MCRRoleManager.unassignRoles(user);
-        session.delete(user);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.remove(user);
     }
 
     /**
@@ -294,47 +299,47 @@ public class MCRUserManager {
      * @param owner the user that owns other users
      */
     public static List<MCRUser> listUsers(MCRUser owner) {
-        Session session = MCRHIB_CONNECTION.getSession();
-        Criteria criteria = getUserCriteria(session);
-        criteria.add(Restrictions.eq("owner", owner));
-        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        @SuppressWarnings("unchecked")
-        List<MCRUser> results = criteria.list();
-        return results;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRUser> query = cb.createQuery(MCRUser.class);
+        Root<MCRUser> users = query.from(MCRUser.class);
+        users.fetch(MCRUser_.owner);
+        return em.createQuery(
+            query
+                .distinct(true)
+                .where(cb.equal(users.get(MCRUser_.owner), owner)))
+            .getResultList();
     }
 
-    private static Criteria buildCondition(String userPattern, String realm, String namePattern) {
-        if ("".equals(realm))
-            realm = null;
-        if ("".equals(userPattern))
-            userPattern = null;
-        if ("".equals(namePattern))
-            namePattern = null;
-        Session session = MCRHIB_CONNECTION.getSession();
-        Criteria criteria = getUserCriteria(session);
+    private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, Optional<String> userPattern,
+        Optional<String> realm, Optional<String> namePattern) {
+        ArrayList<Predicate> predicates = new ArrayList<>(3);
+        realm
+            .filter(s -> !s.isEmpty())
+            .map(s -> cb.equal(root.get(MCRUser_.realmID), s))
+            .ifPresent(predicates::add);
 
-        if (realm != null) {
-            criteria.add(Restrictions.eq("realmID", realm));
+        Optional<Predicate> userPredicate = userPattern
+            .filter(s -> !s.isEmpty())
+            .map(s -> s.replace('*', '%'))
+            .map(s -> s.replace('?', '_'))
+            .map(s -> s.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale()))
+            .map(s -> cb.like(cb.lower(root.get(MCRUser_.userName)), s));
+
+        Optional<Predicate> namePredicate = namePattern
+            .filter(s -> !s.isEmpty())
+            .map(s -> s.replace('*', '%'))
+            .map(s -> s.replace('?', '_'))
+            .map(s -> s.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale()))
+            .map(s -> cb.like(cb.lower(root.get(MCRUser_.realName)), s));
+
+        if (userPattern.isPresent() && namePredicate.isPresent()) {
+            predicates.add(cb.or(userPredicate.get(), namePredicate.get()));
+        } else {
+            userPredicate.ifPresent(predicates::add);
+            namePredicate.ifPresent(predicates::add);
         }
-        Criterion userRestriction = null;
-        if (userPattern != null) {
-            userPattern = userPattern.replace('*', '%').replace('?', '.');
-            userRestriction = Restrictions.ilike("userName", userPattern);
-        }
-        Criterion nameRestriction = null;
-        if (namePattern != null) {
-            namePattern = namePattern.replace('*', '%').replace('?', '.');
-            nameRestriction = Restrictions.ilike("realName", namePattern);
-        }
-        if (userRestriction != null && nameRestriction != null) {
-            criteria.add(Restrictions.or(userRestriction, nameRestriction));
-        } else if (userRestriction != null) {
-            criteria.add(userRestriction);
-        } else if (nameRestriction != null) {
-            criteria.add(nameRestriction);
-        }
-        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        return criteria;
+        return predicates.toArray(new Predicate[predicates.size()]);
     }
 
     /**
@@ -351,10 +356,17 @@ public class MCRUserManager {
      * @return a list of matching users
      */
     public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern) {
-        Criteria condition = buildCondition(userPattern, realm, namePattern);
-        @SuppressWarnings("unchecked")
-        List<MCRUser> results = condition.list();
-        return results;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRUser> query = cb.createQuery(MCRUser.class);
+        Root<MCRUser> user = query.from(MCRUser.class);
+        return em
+            .createQuery(
+                query
+                    .where(
+                        buildCondition(cb, user, Optional.ofNullable(userPattern), Optional.ofNullable(realm),
+                            Optional.ofNullable(namePattern))))
+            .getResultList();
     }
 
     /**
@@ -368,9 +380,18 @@ public class MCRUserManager {
      * @return the number of matching users
      */
     public static int countUsers(String userPattern, String realm, String namePattern) {
-        Criteria condition = buildCondition(userPattern, realm, namePattern);
-        condition.setProjection(Projections.rowCount());
-        return ((Number) condition.uniqueResult()).intValue();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> query = cb.createQuery(Number.class);
+        Root<MCRUser> user = query.from(MCRUser.class);
+        return em
+            .createQuery(
+                query
+                    .select(cb.count(user))
+                    .where(
+                        buildCondition(cb, user, Optional.ofNullable(userPattern), Optional.ofNullable(realm),
+                            Optional.ofNullable(namePattern))))
+            .getSingleResult().intValue();
     }
 
     /**
@@ -416,6 +437,7 @@ public class MCRUserManager {
     public static MCRUser checkPassword(String userName, String password) {
         MCRUser user = getUser(userName);
         if (user == null || user.getHashType() == null) {
+            LOGGER.warn(() -> "User not found: " + userName);
             waitLoginPanalty();
             return null;
         }
@@ -424,50 +446,50 @@ public class MCRUserManager {
                 LOGGER.warn("User " + user.getUserID() + " was disabled!");
             } else {
                 LOGGER.warn("Password expired for user " + user.getUserID() + " on "
-                        + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.COMPLETE_HH_MM_SS.toString()));
+                    + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.COMPLETE_HH_MM_SS.toString()));
             }
             return null;
         }
         try {
             switch (user.getHashType()) {
-            case crypt:
-                //Wahh! did we ever thought about what "salt" means for passwd management?
-                String passwdHash = user.getPassword();
-                String salt = passwdHash.substring(0, 3);
-                if (!MCRUtils.asCryptString(salt, password).equals(passwdHash)) {
-                    //login failed
-                    waitLoginPanalty();
-                    return null;
-                }
-                //update to SHA-256
-                updatePasswordHashToSHA256(user, password);
-                break;
-            case md5:
-                if (!MCRUtils.asMD5String(1, null, password).equals(user.getPassword())) {
-                    waitLoginPanalty();
-                    return null;
-                }
-                //update to SHA-256
-                updatePasswordHashToSHA256(user, password);
-                break;
-            case sha1:
-                if (!MCRUtils.asSHA1String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
+                case crypt:
+                    //Wahh! did we ever thought about what "salt" means for passwd management?
+                    String passwdHash = user.getPassword();
+                    String salt = passwdHash.substring(0, 3);
+                    if (!MCRUtils.asCryptString(salt, password).equals(passwdHash)) {
+                        //login failed
+                        waitLoginPanalty();
+                        return null;
+                    }
+                    //update to SHA-256
+                    updatePasswordHashToSHA256(user, password);
+                    break;
+                case md5:
+                    if (!MCRUtils.asMD5String(1, null, password).equals(user.getPassword())) {
+                        waitLoginPanalty();
+                        return null;
+                    }
+                    //update to SHA-256
+                    updatePasswordHashToSHA256(user, password);
+                    break;
+                case sha1:
+                    if (!MCRUtils.asSHA1String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
                         .equals(user.getPassword())) {
-                    waitLoginPanalty();
-                    return null;
-                }
-                //update to SHA-256
-                updatePasswordHashToSHA256(user, password);
-                break;
-            case sha256:
-                if (!MCRUtils.asSHA256String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
+                        waitLoginPanalty();
+                        return null;
+                    }
+                    //update to SHA-256
+                    updatePasswordHashToSHA256(user, password);
+                    break;
+                case sha256:
+                    if (!MCRUtils.asSHA256String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
                         .equals(user.getPassword())) {
-                    waitLoginPanalty();
-                    return null;
-                }
-                break;
-            default:
-                throw new MCRException("Cannot validate hash type " + user.getHashType());
+                        waitLoginPanalty();
+                        return null;
+                    }
+                    break;
+                default:
+                    throw new MCRException("Cannot validate hash type " + user.getHashType());
             }
         } catch (NoSuchAlgorithmException e) {
             throw new MCRException("Error while validating login", e);
@@ -492,8 +514,8 @@ public class MCRUserManager {
         MCRUserInformation currentUser = session.getUserInformation();
         MCRUser myUser = getUser(user.getUserName(), user.getRealmID()); //only update password
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
-                || currentUser.equals(myUser.getOwner())
-                || (currentUser.equals(user) && myUser.hasNoOwner() || !myUser.isLocked());
+            || currentUser.equals(myUser.getOwner())
+            || (currentUser.equals(user) && myUser.hasNoOwner() || !myUser.isLocked());
         if (!allowed) {
             throw new MCRException("You are not allowed to change password of user: " + user);
         }
@@ -519,20 +541,20 @@ public class MCRUserManager {
         return salt;
     }
 
-    private static MCRUser getByNaturalID(Session session, String userName, String realmId) {
-        final Criteria criteria = getUserCriteria(session);
-        criteria.setFetchMode("owner", FetchMode.JOIN);
-        return (MCRUser) criteria.setCacheable(true).add(getUserRealmCriterion(userName, realmId)).uniqueResult();
+    private static MCRUser getByNaturalID(EntityManager em, String userName, String realmId) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRUser> query = cb.createQuery(MCRUser.class);
+        Root<MCRUser> users = query.from(MCRUser.class);
+        users.fetch(MCRUser_.owner.getName(),JoinType.LEFT);
+        return em.createQuery(query.distinct(true).where(getUserRealmCriterion(cb, users, userName, realmId))).getSingleResult();
     }
 
-    private static Criteria getUserCriteria(Session session) {
-        return session.createCriteria(MCRUser.class);
-    }
-
-    private static Criterion getUserRealmCriterion(String user, String realmId) {
+    private static Predicate[] getUserRealmCriterion(CriteriaBuilder cb, Root<MCRUser> root, String user,
+        String realmId) {
         if (realmId == null) {
             realmId = MCRRealmFactory.getLocalRealm().getID();
         }
-        return Restrictions.naturalId().set("userName", user).set("realmID", realmId);
+        return new Predicate[] { cb.equal(root.get(MCRUser_.userName), user),
+            cb.equal(root.get(MCRUser_.realmID), realmId) };
     }
 }

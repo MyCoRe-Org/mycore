@@ -19,6 +19,7 @@ import javax.persistence.UniqueConstraint;
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
 import org.hibernate.dialect.PostgreSQL9Dialect;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.AbstractEntityPersister;
@@ -34,7 +35,8 @@ public class MCRHibernateConfigHelper {
     public static void checkEntityManagerFactoryConfiguration(EntityManagerFactory entityManagerFactory) {
         try {
             SessionFactoryImpl sessionFactoryImpl = entityManagerFactory.unwrap(SessionFactoryImpl.class);
-            if (PostgreSQL9Dialect.class.isInstance(sessionFactoryImpl.getDialect())) {
+            if (PostgreSQL9Dialect.class
+                .isInstance(sessionFactoryImpl.getServiceRegistry().getService(JdbcServices.class).getDialect())) {
                 //fix ClassLeftUnique and ClassRightUnique, as PostgreSQL cannot evaluate them on statement level
                 modifyConstraints(sessionFactoryImpl);
             }

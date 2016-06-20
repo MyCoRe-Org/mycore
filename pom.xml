@@ -21,7 +21,8 @@
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <uniqueVersion>false</uniqueVersion>
-    <hibernate.version>5.1.0.Final</hibernate.version>
+    <hibernate.version>5.2.0.Final</hibernate.version>
+    <hibernate.core.version>5.2.0.MCR1</hibernate.core.version>
     <httpcomponents.version>4.5.2</httpcomponents.version>
     <httpcore.version>4.4.4</httpcore.version>
     <xalan.version>2.7.2</xalan.version>
@@ -292,7 +293,7 @@
                 <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-                <link>http://docs.jboss.org/hibernate/orm/5.1/javadocs/</link>
+                <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
                 <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
                 <link>http://lucene.apache.org/solr/5_5_0/solr-solrj/</link>
               </links>
@@ -540,7 +541,7 @@
               <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-              <link>http://docs.jboss.org/hibernate/orm/5.1/javadocs/</link>
+              <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
               <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
               <link>http://lucene.apache.org/solr/5_5_0/solr-solrj/</link>
             </links>
@@ -939,19 +940,13 @@
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
-        <version>${hibernate.version}</version>
+        <version>${hibernate.core.version}</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-entitymanager</artifactId>
-        <version>${hibernate.version}</version>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>

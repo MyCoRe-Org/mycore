@@ -4,11 +4,14 @@
 package org.mycore.backend.jpa.deleteditems;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embeddable;
+
+import org.mycore.backend.jpa.MCRZonedDateTimeConverter;
 
 /**
  * @author shermann
@@ -22,13 +25,13 @@ public class MCRDELETEDITEMSPK implements Serializable {
 
     private String identifier;
 
-    private Date dateDeleted;
+    private ZonedDateTime dateDeleted;
 
     public MCRDELETEDITEMSPK() {
 
     }
 
-    public MCRDELETEDITEMSPK(String identifier, Date dateDeleted) {
+    public MCRDELETEDITEMSPK(String identifier, ZonedDateTime dateDeleted) {
         setIdentifier(identifier);
         setDateDeleted(dateDeleted);
     }
@@ -38,15 +41,16 @@ public class MCRDELETEDITEMSPK implements Serializable {
      */
     @Basic
     @Column(name = "DATE_DELETED")
-    public Date getDateDeleted() {
-        return new Date(dateDeleted.getTime());
+    @Convert(converter = MCRZonedDateTimeConverter.class)
+    public ZonedDateTime getDateDeleted() {
+        return dateDeleted;
     }
 
     /**
      * @param dateDeleted the dateDeleted to set
      */
-    public void setDateDeleted(Date dateDeleted) {
-        this.dateDeleted = new Date(dateDeleted.getTime());
+    public void setDateDeleted(ZonedDateTime dateDeleted) {
+        this.dateDeleted = dateDeleted;
     }
 
     /**

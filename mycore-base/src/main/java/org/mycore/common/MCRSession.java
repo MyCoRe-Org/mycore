@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -93,6 +94,8 @@ public class MCRSession implements Cloneable {
     /** The language for this session as upper case character */
     private String language = null;
 
+    private Locale locale = null;
+
     /** The unique ID of this session */
     private String sessionID = null;
 
@@ -121,7 +124,7 @@ public class MCRSession implements Cloneable {
     MCRSession() {
         MCRConfiguration config = MCRConfiguration.instance();
         userInformation = guestUserInformation;
-        language = config.getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+        setCurrentLanguage(config.getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG));
         dataBaseAccess = MCRHIBConnection.isEnabled();
 
         accessCount = new AtomicInteger();
@@ -190,7 +193,13 @@ public class MCRSession implements Cloneable {
 
     /** sets the current language */
     public final void setCurrentLanguage(String language) {
+        Locale newLocale = Locale.forLanguageTag(language);
         this.language = language;
+        this.locale = newLocale;
+    }
+
+    public Locale getLocale() {
+        return locale;
     }
 
     /** Write data to the logger for debugging purposes */

@@ -2,23 +2,25 @@ package org.mycore.handle;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.niofs.MCRPath;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 
 /**
  * Class contains convenience functions for handling handles.
@@ -35,10 +37,43 @@ public class MCRHandleManager {
      * @see MCRHandleManager#isHandleRequested(MCRBase)
      */
     public static boolean isHandleRequested(String base) throws Throwable {
-        Session session = MCRHIBConnection.instance().getSession();
-        Criteria q = session.createCriteria(MCRHandle.class);
-        q.add(Restrictions.eq("mcrid", base));
-        return q.list().size() > 0 ? true : false;
+        return !getByMcrId(base).isEmpty();
+    }
+
+    private static List<MCRHandle> getByMcrId(String base) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRHandle> query = cb.createQuery(MCRHandle.class);
+        Root<MCRHandle> handle = query.from(MCRHandle.class);
+        return em.createQuery(
+            query.where(
+                cb.equal(handle.get(MCRHandle_.mcrid), base)))
+            .getResultList();
+    }
+
+    private static List<MCRHandle> getByMcrIdAndPath(String base, String path) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRHandle> query = cb.createQuery(MCRHandle.class);
+        Root<MCRHandle> handle = query.from(MCRHandle.class);
+        return em.createQuery(
+            query.where(
+                cb.equal(handle.get(MCRHandle_.mcrid), base),
+                cb.equal(handle.get(MCRHandle_.path), path)))
+            .getResultList();
+    }
+
+    private static List<MCRHandle> getByMcrIdAndPathWithObjectSignature(String base, String path) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRHandle> query = cb.createQuery(MCRHandle.class);
+        Root<MCRHandle> handle = query.from(MCRHandle.class);
+        return em.createQuery(
+            query.where(
+                cb.equal(handle.get(MCRHandle_.mcrid), base),
+                cb.equal(handle.get(MCRHandle_.path), path),
+                cb.isNotNull(handle.get(MCRHandle_.objectSignature))))
+            .getResultList();
     }
 
     /**
@@ -47,15 +82,7 @@ public class MCRHandleManager {
      * @return true if a handle request has been issued already
      */
     public static boolean isHandleRequested(MCRBase base) throws Throwable {
-        Session session = MCRHIBConnection.instance().getSession();
-        try {
-            Criteria q = session.createCriteria(MCRHandle.class);
-            q.add(Restrictions.eq("mcrid", base.getId().toString()));
-
-            return q.list().size() > 0 ? true : false;
-        } catch (Exception ex) {
-            throw new Exception("Could not execute query", ex);
-        }
+        return isHandleRequested(base.getId().toString());
     }
 
     /**
@@ -64,17 +91,7 @@ public class MCRHandleManager {
      * @return true if a handle request has been issued already
      */
     public static boolean isHandleRequested(MCRBase base, String path) throws Throwable {
-        Session session = MCRHIBConnection.instance().getSession();
-        try {
-            Criteria q = session.createCriteria(MCRHandle.class);
-            q.add(Restrictions.eq("mcrid", base.getId().toString()));
-            q.add(Restrictions.eq("path", path));
-            q.add(Restrictions.isNotNull("objectSignature"));
-
-            return q.list().size() > 0 ? true : false;
-        } catch (Exception ex) {
-            throw new Exception("Could not execute query", ex);
-        }
+        return !getByMcrIdAndPathWithObjectSignature(base.getId().toString(), path).isEmpty();
     }
 
     /**
@@ -83,27 +100,16 @@ public class MCRHandleManager {
      * @param handle the handle to delete
      */
     synchronized public static void delete(MCRHandle handle) throws Throwable {
-        Session session = MCRHIBConnection.instance().getSession();
-        try {
-            session.delete(handle);
-        } catch (Exception ex) {
-            throw new Exception("Could not delete handle", ex);
-        }
+        MCREntityManagerProvider.getCurrentEntityManager().remove(handle);
     }
 
     /**
      * Deletes all handles registered for the given {@link MCRBase}.
      *
      */
-    @SuppressWarnings("unchecked")
     synchronized public static void delete(MCRBase obj) {
-        Session session = MCRHIBConnection.instance().getSession();
-
-        Criteria q = session.createCriteria(MCRHandle.class);
-        q.add(Restrictions.eq("mcrid", obj.getId().toString()));
-        for (MCRHandle handle : (List<MCRHandle>) q.list()) {
-            session.delete(handle);
-        }
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        getHandle(obj).stream().forEach(em::remove);
     }
 
     /**
@@ -136,7 +142,8 @@ public class MCRHandleManager {
         try {
             JsonObject jsonDelete = MCRHandleManager.createJson(objectSignature, messageSignature, file);
             post.setRequestEntity(new StringRequestEntity(jsonDelete.toString(), "application/json", "UTF-8"));
-            LOGGER.info(MessageFormat.format("Sending request to {0} (request handle delete for object signature {1})", post.getURI(), objectSignature));
+            LOGGER.info(MessageFormat.format("Sending request to {0} (request handle delete for object signature {1})",
+                post.getURI(), objectSignature));
             status = MCRHandleCommons.HTTP_CLIENT.executeMethod(post);
         } catch (IOException e) {
             LOGGER.error("Could not request handle:del", e);
@@ -146,20 +153,9 @@ public class MCRHandleManager {
         return status;
     }
 
-    @SuppressWarnings("unchecked")
     public static MCRHandle getHandle(MCRPath file) throws Throwable {
         String owner = file.getOwner();
-
-        List<MCRHandle> list = new ArrayList<MCRHandle>();
-        Session session = MCRHIBConnection.instance().getSession();
-        try {
-            Criteria q = session.createCriteria(MCRHandle.class);
-            q.add(Restrictions.and(Restrictions.eq("mcrid", owner), Restrictions.eq("path", file.getOwnerRelativePath())));
-
-            list = q.list();
-        } catch (Exception ex) {
-            throw new Exception("Could not execute query", ex);
-        }
+        List<MCRHandle> list = getByMcrIdAndPath(owner, file.getOwnerRelativePath());
         return list.size() < 1 ? null : list.get(0);
     }
 
@@ -176,19 +172,8 @@ public class MCRHandleManager {
      * Retrieves all handle for a given object id.
      *
      */
-    @SuppressWarnings("unchecked")
-    public static List<MCRHandle> getHandle(MCRBase base) throws Throwable {
-        List<MCRHandle> list = new ArrayList<MCRHandle>();
-        Session session = MCRHIBConnection.instance().getSession();
-        try {
-            Criteria q = session.createCriteria(MCRHandle.class);
-            q.add(Restrictions.eq("mcrid", base.getId().toString()));
-
-            list = q.list();
-        } catch (Exception ex) {
-            throw new Exception("Could not execute query", ex);
-        }
-        return list;
+    public static List<MCRHandle> getHandle(MCRBase base) {
+        return getByMcrId(base.getId().toString());
     }
 
     /**
@@ -218,7 +203,8 @@ public class MCRHandleManager {
      * TODO handle provider to be set by property
      */
     @SuppressWarnings("unchecked")
-    private static MCRIHandleProvider getHandleProvider() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    private static MCRIHandleProvider getHandleProvider()
+        throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Class<MCRIHandleProvider> c = (Class<MCRIHandleProvider>) Class.forName(MCRGbvHandleProvider.class.getName());
         MCRIHandleProvider provider = c.newInstance();
         return provider;

@@ -9,15 +9,18 @@ import java.util.List;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -58,18 +61,23 @@ public class MCRRequestHandleAdd extends TimerTask {
      * (handles with an object signature but with no message signature). A request for each object
      * given by its signature is then send to {@link MCRHandleCommons#EDA_REPOS_URL}
      * */
-    @SuppressWarnings("unchecked")
     public void run() {
         if (!MCRHIBConnection.isEnabled()){
             return;
         }
         LOGGER.debug("Checking for new handle:add entries...");
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
         try {
-            Criteria q = session.createCriteria(MCRHandle.class);
-            q.add(Restrictions.and(Restrictions.isNotNull("objectSignature"), Restrictions.isNull("messageSignature")));
-            List<MCRHandle> list = q.list();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<MCRHandle> query = cb.createQuery(MCRHandle.class);
+            Root<MCRHandle> h = query.from(MCRHandle.class);
+            List<MCRHandle> list = em.createQuery(
+                query.where(
+                    cb.isNotNull(h.get(MCRHandle_.objectSignature)),
+                    cb.isNotNull(h.get(MCRHandle_.messageSignature))))
+                .getResultList();
 
             for (MCRHandle handle : list) {
                 String messageSignature = UUID.randomUUID().toString().replace("-", "");
@@ -82,14 +90,12 @@ public class MCRRequestHandleAdd extends TimerTask {
                     continue;
                 }
                 handle.setMessageSignature(messageSignature);
-                session.update(handle);
             }
         } catch (Exception ex) {
             MCRHandleManager.LOGGER.error("Could not get handles from database", ex);
             tx.rollback();
         } finally {
             tx.commit();
-            session.disconnect();
         }
     }
 

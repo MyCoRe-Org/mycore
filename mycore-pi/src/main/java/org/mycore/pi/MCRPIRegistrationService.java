@@ -5,11 +5,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -18,6 +24,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.backend.MCRPI_;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
@@ -25,9 +32,13 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier> {
 
     public static final String REGISTRATION_CONFIG_PREFIX = "MCR.PI.Registration.";
+
     public static final String GENERATOR_CONFIG_PREFIX = "MCR.PI.Generator.";
+
     public static final String INSCRIBER_CONFIG_PREFIX = "MCR.PI.Inscriber.";
+
     private final String registrationServiceID;
+
     private final String type;
 
     public MCRPIRegistrationService(String registrationServiceID, String type) {
@@ -52,20 +63,23 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      * @throws MCRAccessException               if the user does not have the rights to assign a pi to the specific object
      */
-    public void validateRegistration(MCRBase obj, String additional) throws MCRPersistentIdentifierException, MCRAccessException {
+    public void validateRegistration(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException, MCRAccessException {
         String type = getType();
         MCRObjectID id = obj.getId();
         if (isRegistered(id, additional)) {
-            throw new MCRPersistentIdentifierException("There is already a registered " + type + " for Object " + id.toString() + " and additional " + additional);
+            throw new MCRPersistentIdentifierException("There is already a registered " + type + " for Object "
+                + id.toString() + " and additional " + additional);
         }
 
         if (getSynchronizer().hasIdentifier(obj, additional)) {
-            throw new MCRPersistentIdentifierException("There is already a " + type + " in the Object " + id.toString());
+            throw new MCRPersistentIdentifierException(
+                "There is already a " + type + " in the Object " + id.toString());
         }
 
         if (!MCRAccessManager.checkPermission(obj.getId(), PERMISSION_WRITE)) {
             throw MCRAccessException.missingPermission("Update object.", obj.getId().toString(),
-                    PERMISSION_WRITE);
+                PERMISSION_WRITE);
         }
     }
 
@@ -78,12 +92,14 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * @throws MCRActiveLinkException           the {@link MCRPersistentIdentifierInscriber} lets {@link MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
-    public final MCRPersistentIdentifier fullRegister(MCRBase obj, String additional) throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+    public final MCRPersistentIdentifier fullRegister(MCRBase obj, String additional)
+        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
         T identifier = this.registerIdentifier(obj, additional);
         this.getSynchronizer().insertIdentifier(identifier, obj, additional);
 
-        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional, this.getRegistrationServiceID(), new Date());
+        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
+            this.getRegistrationServiceID(), new Date());
         MCRHIBConnection.instance().getSession().save(databaseEntry);
 
         if (obj instanceof MCRObject) {
@@ -104,12 +120,14 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     protected abstract T registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException;
 
-    protected final void onDelete(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected final void onDelete(T identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         delete(identifier, obj, additional);
         MCRPersistentIdentifierManager.delete(obj.getId().toString(), getType(), this.getRegistrationServiceID());
     }
 
-    protected final void onUpdate(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected final void onUpdate(T identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         update(identifier, obj, additional);
     }
 
@@ -121,7 +139,8 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * @param additional
      * @throws MCRPersistentIdentifierException to abort deletion of the object  or if something went wrong. (E.G. {@link org.mycore.pi.doi.MCRDOIRegistrationService} throws if not superuser tries to delete the object)
      */
-    protected abstract void delete(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException;
+    protected abstract void delete(T identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException;
 
     /**
      * Should handle updates of a Object with the PI.
@@ -131,24 +150,28 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * @param additional
      * @throws MCRPersistentIdentifierException to abort update of the object or if something went wrong.
      */
-    protected abstract void update(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException;
-
+    protected abstract void update(T identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException;
 
     public boolean isRegistered(MCRObjectID id, String additional) {
-        return ((Number)MCRHIBConnection.instance()
-                .getSession()
-                .createCriteria(MCRPI.class)
-                .add(Restrictions.eq("mycoreID", id.toString()))
-                .add(Restrictions.eq("type", type))
-                .add(Restrictions.eq("additional", additional))
-                .add(Restrictions.eq("service", registrationServiceID))
-                .setProjection(Projections.rowCount())
-                .uniqueResult()).shortValue() != 0;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> query = cb.createQuery(Number.class);
+        Root<MCRPI> pi = query.from(MCRPI.class);
+        return em.createQuery(
+            query
+                .select(cb.count(pi))
+                .where(
+                    cb.equal(pi.get(MCRPI_.mycoreID), id.toString()),
+                    cb.equal(pi.get(MCRPI_.type), type),
+                    cb.equal(pi.get(MCRPI_.additional), additional),
+                    cb.equal(pi.get(MCRPI_.service), registrationServiceID)))
+            .getSingleResult().shortValue() > 0;
     }
 
     protected final Map<String, String> getProperties() {
         Map<String, String> propertiesMap = MCRConfiguration.instance()
-                .getPropertiesMap(REGISTRATION_CONFIG_PREFIX + registrationServiceID + ".");
+            .getPropertiesMap(REGISTRATION_CONFIG_PREFIX + registrationServiceID + ".");
 
         Map<String, String> shortened = new HashMap<>();
 
@@ -161,8 +184,9 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
     }
 
     protected final T getNewIdentifier(MCRObjectID id, String additional) throws MCRPersistentIdentifierException {
-        MCRPersistentIdentifierGenerator<T> persitentIdentifierGenerator =
-                MCRConfiguration.instance().<MCRPersistentIdentifierGenerator<T>>getInstanceOf(GENERATOR_CONFIG_PREFIX + getProperties().get("Generator"));
+        MCRPersistentIdentifierGenerator<T> persitentIdentifierGenerator = MCRConfiguration.instance()
+            .<MCRPersistentIdentifierGenerator<T>> getInstanceOf(
+                GENERATOR_CONFIG_PREFIX + getProperties().get("Generator"));
         return persitentIdentifierGenerator.generate(id, additional);
     }
 

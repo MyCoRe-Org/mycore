@@ -25,15 +25,18 @@ package org.mycore.urn;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.urn.hibernate.MCRURN;
+import org.mycore.urn.hibernate.MCRURNPK_;
+import org.mycore.urn.hibernate.MCRURN_;
 import org.mycore.urn.services.MCRURNManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -108,17 +111,22 @@ public class MCRXMLFunctions {
         DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
         try {
             Document document = documentBuilder.newDocument();
-            Session session = MCRHIBConnection.instance().getSession();
-            Criteria criteria = session.createCriteria(MCRURN.class);
-            criteria.add(Restrictions.eq("key.mcrid", mcrid));
+            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<MCRURN> query = cb.createQuery(MCRURN.class);
+            Root<MCRURN> root = query.from(MCRURN.class);
             Element rootElement = document.createElement("urn");
             document.appendChild(rootElement);
 
             LOGGER.info("Getting all urns for object " + mcrid);
             long start = System.currentTimeMillis();
+            List<MCRURN> results = em
+                .createQuery(
+                    query.where(
+                        cb.equal(root.get(MCRURN_.key).get(MCRURNPK_.mcrid), mcrid)))
+                .getResultList();
             long temp = start;
 
-            List<MCRURN> results = criteria.list();
             LOGGER.debug("This took " + (System.currentTimeMillis() - start) + " ms");
             LOGGER.debug("Processing the result list");
 
@@ -146,7 +154,7 @@ public class MCRXMLFunctions {
                     rootElement.setAttribute("mcrid", result.getKey().getMcrid());
                     rootElement.setAttribute("urn", result.getKey().getMcrurn());
                 }
-                session.evict(result);
+                em.detach(result);
                 long duration = System.currentTimeMillis() - start;
                 LOGGER.debug("URN processed in " + duration + " ms");
             }

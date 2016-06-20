@@ -8,7 +8,10 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.DAO;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.WORLD_CLASS_RESOURCE_NAME;
 
@@ -22,11 +25,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.content.MCRVFSContent;
@@ -90,8 +97,20 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void setLinks() {
         addTestLinks();
         startNewTransaction();
-        assertEquals("Link count does not match.", testLinks.size(),
-            MCRHIBConnection.instance().getSession().createCriteria(MCRCategoryLinkImpl.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size(), getLinkCount());
+    }
+
+    private int getLinkCount() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> countQuery = cb.createQuery(Number.class);
+        return em
+            .createQuery(countQuery
+                .select(cb
+                    .count(countQuery
+                        .from(MCRCategoryLinkImpl.class))))
+            .getSingleResult()
+            .intValue();
     }
 
     /**
@@ -102,8 +121,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLink(LONDON_REFERENCE);
-        assertEquals("Link count does not match.", testLinks.size() - 1, MCRHIBConnection.instance().getSession()
-            .createCriteria(MCRCategoryLinkImpl.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 1, getLinkCount());
     }
 
     /**
@@ -114,8 +132,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLinks(Arrays.asList(LONDON_REFERENCE, ENGLAND_REFERENCE));
-        assertEquals("Link count does not match.", testLinks.size() - 2, MCRHIBConnection.instance().getSession()
-            .createCriteria(MCRCategoryLinkImpl.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 2, getLinkCount());
     }
 
     /**

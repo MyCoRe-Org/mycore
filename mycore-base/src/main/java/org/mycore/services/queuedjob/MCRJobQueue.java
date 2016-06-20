@@ -40,7 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.config.MCRConfiguration;
@@ -216,7 +216,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (action != null)
             sb.append(" WHERE action='" + action.getName() + "'");
 
-        Query query = session.createQuery(sb.toString());
+        Query<?> query = session.createQuery(sb.toString());
         query.executeUpdate();
     }
 
@@ -238,10 +238,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             sb.append("action='" + action.getName() + "' AND ");
         sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
 
-        Query query = session.createQuery(sb.toString());
-        @SuppressWarnings("unchecked")
-        List<MCRJob> result = query.list();
-        return result.iterator();
+        Query<MCRJob> query = session.createQuery(sb.toString(), MCRJob.class);
+        return query.getResultList().iterator();
     }
 
     /**
@@ -258,7 +256,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             sb.append("action='" + action.getName() + "' AND ");
         sb.append("status='" + MCRJobStatus.NEW + "'");
 
-        return ((Number) session.createQuery(sb.toString()).uniqueResult()).intValue();
+        return session.createQuery(sb.toString(), Number.class).getSingleResult().intValue();
     }
 
     /**
@@ -303,9 +301,11 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
 
-        Query query = session.createQuery(qStr.toString());
-        query.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        MCRJob job = (MCRJob) query.uniqueResult();
+        @SuppressWarnings("deprecation")
+        Query<MCRJob> query = session
+            .createQuery(qStr.toString(), MCRJob.class)
+            .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        MCRJob job = query.getSingleResult();
 
         if (job == null) {
             return null;

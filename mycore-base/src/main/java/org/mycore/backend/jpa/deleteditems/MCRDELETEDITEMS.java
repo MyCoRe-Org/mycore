@@ -4,6 +4,7 @@
 package org.mycore.backend.jpa.deleteditems;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.persistence.Basic;
@@ -57,7 +58,7 @@ public class MCRDELETEDITEMS implements Serializable {
         key = null;
     }
 
-    public MCRDELETEDITEMS(String identifier, Date dateDeleted) {
+    public MCRDELETEDITEMS(String identifier, ZonedDateTime dateDeleted) {
         this.key = new MCRDELETEDITEMSPK(identifier, dateDeleted);
     }
 

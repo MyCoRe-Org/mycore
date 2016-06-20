@@ -29,18 +29,23 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 
 /**
  * JPA implementation of acceess store to manage access rights
@@ -55,12 +60,17 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    public String getRuleID(String objID, String ACPool) {
+    public String getRuleID(String objID, String acPool) {
 
-        Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rule.rid"))
-            .add(Restrictions.eq("key.objid", objID)).add(Restrictions.eq("key.acpool", ACPool));
-        return (String) c.uniqueResult();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Root<MCRACCESS> ac = query.from(MCRACCESS.class);
+        return em.createQuery(
+            query.select(ac.get(MCRACCESS_.rule).get(MCRACCESSRULE_.rid))
+                .where(cb.equal(ac.get(MCRACCESS_.key).get(MCRACCESSPK_.objid), objID),
+                    cb.equal(ac.get(MCRACCESS_.key).get(MCRACCESSPK_.acpool), acPool)))
+            .getSingleResult();
     }
 
     /**
@@ -96,31 +106,22 @@ public class MCRJPAAccessStore extends MCRAccessStore {
      * @param objid
      * @return boolean value
      */
-    @SuppressWarnings("unchecked")
     private boolean existAccessDefinition(String pool, String objid) {
-        Session session = MCRHIBConnection.instance().getSession();
         MCRACCESSPK key = new MCRACCESSPK(pool, objid);
-        List<MCRACCESS> l = session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", key)).list();
-        return l.size() == 1;
+        return MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESS.class, key) != null;
     }
 
     @Override
     public boolean existsRule(String objid, String pool) {
-        Session session = MCRHIBConnection.instance().getSession();
-
         if (objid == null || objid.equals("")) {
             LOGGER.warn("empty parameter objid in existsRule");
             return false;
         }
-
-        Criteria criteria = session.createCriteria(MCRACCESS.class);
-        criteria.setProjection(Projections.rowCount());
-        criteria.add(Restrictions.eq("key.objid", objid));
-        if (pool != null && !pool.equals("")) {
-            criteria.add(Restrictions.eq("key.acpool", pool));
+        try {
+            return getRuleID(objid, pool) != null;
+        } catch (NoResultException e) {
+            return false;
         }
-        int count = ((Number) criteria.uniqueResult()).intValue();
-        return count > 0;
     }
 
     /**
@@ -135,7 +136,8 @@ public class MCRJPAAccessStore extends MCRAccessStore {
         Session session = MCRHIBConnection.instance().getSession();
         session.createQuery(
             "delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '"
-                + rulemapping.getObjId() + "'").executeUpdate();
+                + rulemapping.getObjId() + "'")
+            .executeUpdate();
     }
 
     /**
@@ -168,30 +170,35 @@ public class MCRJPAAccessStore extends MCRAccessStore {
      */
     @Override
     public MCRRuleMapping getAccessDefinition(String pool, String objid) {
-
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRACCESS> query = cb.createQuery(MCRACCESS.class);
+        Root<MCRACCESS> root = query.from(MCRACCESS.class);
         MCRRuleMapping rulemapping = new MCRRuleMapping();
-        MCRACCESS data = (MCRACCESS) session.createCriteria(MCRACCESS.class)
-            .add(Restrictions.eq("key", new MCRACCESSPK(pool, objid))).list().get(0);
-        if (data != null) {
+        try {
+            MCRACCESS data = em
+                .createQuery(query.where(cb.equal(root.get(MCRACCESS_.key), new MCRACCESSPK(pool, objid))))
+                .getSingleResult();
             rulemapping.setCreationdate(data.getCreationdate());
             rulemapping.setCreator(data.getCreator());
             rulemapping.setObjId(data.getKey().getObjid());
             rulemapping.setPool(data.getKey().getAcpool());
             rulemapping.setRuleId(data.getRule().getRid());
+            em.detach(data);
+        } catch (NoResultException e) {
+            //returning empty rulemapping is fine
         }
-        session.evict(data);
         return rulemapping;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ArrayList<String> getMappedObjectId(String pool) {
 
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
 
-        List<MCRACCESS> l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'").list();
+        List<MCRACCESS> l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'", MCRACCESS.class)
+            .getResultList();
         for (MCRACCESS aL : l) {
             ret.add(aL.getKey().getObjid());
         }
@@ -200,12 +207,12 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ArrayList<String> getPoolsForObject(String objid) {
 
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
-        List<MCRACCESS> l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'").list();
+        List<MCRACCESS> l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'", MCRACCESS.class)
+            .getResultList();
         for (MCRACCESS access : l) {
             ret.add(access.getKey().getAcpool());
         }
@@ -214,30 +221,25 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ArrayList<String> getDatabasePools() {
-
-        ArrayList<String> ret = new ArrayList<String>();
-        Session session = MCRHIBConnection.instance().getSession();
-        List<MCRACCESS> l = session.createCriteria(MCRACCESS.class).list();
-        for (MCRACCESS aL : l) {
-            if (!ret.contains(aL.getKey().getAcpool())) {
-                ret.add(aL.getKey().getAcpool());
-            }
-        }
-        return ret;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaQuery<MCRACCESS> query = em.getCriteriaBuilder().createQuery(MCRACCESS.class);
+        return em.createQuery(query.select(query.from(MCRACCESS.class)))
+            .getResultList()
+            .stream()
+            .map(MCRACCESS::getKey)
+            .map(MCRACCESSPK::getAcpool)
+            .distinct()
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
     public List<String> getDistinctStringIDs() {
-        Session session = MCRHIBConnection.instance().getSession();
-        Criteria criteria = session.createCriteria(MCRACCESS.class);
-        String propertyName = "key.objid";
-        criteria.setProjection(Projections.distinct(Projections.property(propertyName)));
-        criteria.addOrder(Order.asc(propertyName));
-        @SuppressWarnings("unchecked")
-        List<String> ret = criteria.list();
-        return ret;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Path<String> selection = query.from(MCRACCESS.class).get(MCRACCESS_.key).get(MCRACCESSPK_.objid);
+        return em.createQuery(query.select(selection).distinct(true).orderBy(cb.asc(selection))).getResultList();
     }
 
     /**
@@ -249,8 +251,9 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     @Override
     public boolean isRuleInUse(String ruleid) {
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'");
-        return !query.list().isEmpty();
+        Query<MCRACCESS> query = session
+            .createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'", MCRACCESS.class);
+        return !query.getResultList().isEmpty();
     }
 
     private static MCRACCESSRULE getAccessRule(String rid) {

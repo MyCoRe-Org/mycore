@@ -24,18 +24,23 @@
 package org.mycore.backend.hibernate;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
+import org.mycore.backend.hibernate.tables.MCRFSNODES_;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -121,51 +126,58 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         fs.setNumchdf(NUMCHDF);
         fs.setNumchtd(NUMCHTD);
         fs.setNumchtf(NUMCHTF);
-        if (!session.contains(fs)){
+        if (!session.contains(fs)) {
             session.saveOrUpdate(fs);
         }
     }
 
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException {
-        Session session = getSession();
-        Criteria c = session.createCriteria(MCRFSNODES.class);
-        c.add(Restrictions.isNull("pid"));
-        c.add(Restrictions.eq("owner", ownerID));
-        c.setProjection(Projections.property("id"));
-        String nodeID = (String) c.uniqueResult();
-        if (nodeID == null) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
+        try {
+            return em.createQuery(query
+                .select(nodes.get(MCRFSNODES_.id))
+                .where(
+                    cb.isNull(nodes.get(MCRFSNODES_.pid)),
+                    cb.equal(nodes.get(MCRFSNODES_.owner), ownerID)))
+                .getSingleResult();
+        } catch (NoResultException e) {
             LOGGER.warn("There is no fsnode with OWNER = " + ownerID);
             return null;
         }
-        return nodeID;
     }
 
     public MCRFilesystemNode retrieveChild(String parentID, String name) {
-        Session session = getSession();
-        Criteria c = session.createCriteria(MCRFSNODES.class);
-        c.add(Restrictions.eq("pid", parentID));
-        c.add(Restrictions.eq("name", name));
-        MCRFSNODES node = (MCRFSNODES) c.uniqueResult();
-
-        if (node == null) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
+        Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
+        try {
+            MCRFSNODES node = em.createQuery(query
+                .where(
+                    cb.equal(nodes.get(MCRFSNODES_.pid), parentID),
+                    cb.equal(nodes.get(MCRFSNODES_.name), name)))
+                .getSingleResult();
+            return buildNode(node);
+        } catch (NoResultException e) {
             return null;
         }
-
-        return buildNode(node);
     }
 
-    @SuppressWarnings("unchecked")
     public List<MCRFilesystemNode> retrieveChildren(String parentID) throws MCRPersistenceException {
-        Session session = getSession();
-        Criteria c = session.createCriteria(MCRFSNODES.class);
-        c.add(Restrictions.eq("pid", parentID));
-        List<MCRFSNODES> l = c.list();
-
-        List<MCRFilesystemNode> list = new ArrayList<MCRFilesystemNode>(l.size());
-        for (MCRFSNODES node : l) {
-            list.add(buildNode(node));
-        }
-        return list;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
+        Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
+        return em.createQuery(query
+            .where(
+                cb.equal(nodes.get(MCRFSNODES_.pid), parentID)))
+            .getResultList()
+            .stream()
+            .map(this::buildNode)
+            .collect(Collectors.toList());
     }
 
     public void deleteNode(String ID) throws MCRPersistenceException {
@@ -195,12 +207,15 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         return filesystemNode;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Iterable<String> getOwnerIDs() throws MCRPersistenceException {
-        Session session = getSession();
-        Criteria criteria = session.createCriteria(MCRFSNODES.class);
-        criteria.setProjection(Projections.distinct(Projections.property("owner")));
-        return criteria.list();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
+        return em.createQuery(query
+            .distinct(true)
+            .select(nodes.get(MCRFSNODES_.owner)))
+            .getResultList();
     }
 }

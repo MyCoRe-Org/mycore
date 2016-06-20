@@ -21,20 +21,14 @@
  */
 package org.mycore.oai;
 
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.jpa.deleteditems.MCRDELETEDITEMS;
+import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -115,8 +109,8 @@ public class MCROAIObjectManager {
             record.setMetadata(new SimpleMetadata(metadataChild.detach()));
         }
         Element aboutElement = recordElement.getChild("about", OAIConstants.NS_OAI);
-        if(aboutElement != null) {
-            for(Element aboutChild : aboutElement.getChildren()) {
+        if (aboutElement != null) {
+            for (Element aboutChild : aboutElement.getChildren()) {
                 record.getAboutList().add(aboutChild.detach());
             }
         }
@@ -130,22 +124,14 @@ public class MCROAIObjectManager {
      * @param mcrId id of the deleted record
      * @return deleted record
      */
-    @SuppressWarnings("rawtypes")
     public Record getDeletedRecord(String mcrId) {
         try {
             // building the query
-            MCRHIBConnection conn = MCRHIBConnection.instance();
-            Criteria criteria = conn.getSession().createCriteria(MCRDELETEDITEMS.class);
-            criteria.setProjection(Projections.property("id.dateDeleted"));
-            Criterion idCriterion = Restrictions.eq("id.identifier", mcrId);
-            criteria.add(idCriterion);
-            List resultList = criteria.list();
-            if (resultList.size() > 0) {
-                Timestamp timestamp = (Timestamp) resultList.get(0);
-                Header header = new Header(getOAIId(mcrId), new Date(timestamp.getTime()), Status.deleted);
-                Record record = new Record(header);
-                return record;
-            }
+            return MCRDeletedItemManager.getLastDeletedDate(mcrId)
+                .map(ZonedDateTime::toInstant)
+                .map(Date::from)
+                .map(deletedDate -> new Record(new Header(getOAIId(mcrId), deletedDate, Status.deleted)))
+                .orElse(null);
         } catch (Exception ex) {
             LOGGER.warn("Error while retrieving deleted record " + mcrId, ex);
         }
@@ -200,7 +186,7 @@ public class MCROAIObjectManager {
             objectType = "data_file";
         }
         return uri.replace("{id}", id).replace("{format}", metadataPrefix).replace("{objectType}", objectType)
-                .replace(":{flag}", !exists ? ":deletedMcrObject" : "");
+            .replace(":{flag}", !exists ? ":deletedMcrObject" : "");
     }
 
     Header headerToHeader(Element headerElement) {

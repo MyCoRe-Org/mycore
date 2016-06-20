@@ -31,7 +31,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.metamodel.EntityType;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -152,7 +152,7 @@ public class MCRHIBConnection {
      * 
      * @return Query defined in mapping
      */
-    public Query getNamedQuery(String name) {
+    public Query<?> getNamedQuery(String name) {
         LOGGER.debug("Using query named:" + name);
         return getSession().getNamedQuery(name);
     }

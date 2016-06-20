@@ -25,18 +25,23 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
+import org.mycore.backend.hibernate.tables.MCRFSNODES_;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -187,48 +192,38 @@ public class MCRIFS2Commands {
     private static void fixDirectoryEntry(File node, String derivate_id, String storage_base, boolean check_only) {
         String name = node.getName();
         LOGGER.debug("fixDirectoryEntry : name = " + node.getName());
-        int counter = 0;
-        String id = "";
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.getTransaction();
         if (tx.getStatus().isNotOneOf(TransactionStatus.ACTIVE)) {
             tx.begin();
         }
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
+        Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
         try {
-            Criteria criteria_directory = session.createCriteria(MCRFSNODES.class);
-            criteria_directory.add(Restrictions.eq("name", name));
-            criteria_directory.add(Restrictions.eq("owner", derivate_id));
-            criteria_directory.add(Restrictions.eq("type", "D"));
-            ScrollableResults fsnodes = criteria_directory.scroll(ScrollMode.FORWARD_ONLY);
-            while (fsnodes.next()) {
-                counter++;
-                MCRFSNODES fsNode = (MCRFSNODES) fsnodes.get(0);
-                id = fsNode.getId();
-                session.evict(fsNode);
-            }
-            fsnodes.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (counter == 1) {
+            em.detach(em.createQuery(query
+                .where(
+                    cb.equal(nodes.get(MCRFSNODES_.owner), derivate_id),
+                    cb.equal(nodes.get(MCRFSNODES_.name), name),
+                    cb.equal(nodes.get(MCRFSNODES_.type), "D")))
+                .getSingleResult());
             LOGGER.debug("Found directory entry for " + name);
             return;
-        }
-        if (counter < 1) {
+        } catch (NoResultException e) {
             LOGGER.error("Can't find directory entry for " + name);
             if (check_only)
                 return;
-        }
-        if (counter > 1) {
+        } catch (NonUniqueResultException e) {
             LOGGER.error("Non unique directory entry for " + name);
             return;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         // fix entry
         LOGGER.info("Fix entry for directory " + name);
-        if (id.length() == 0) {
-            MCRFileMetadataManager fmmgr = MCRFileMetadataManager.instance();
-            id = fmmgr.createNodeID();
-        }
+        MCRFileMetadataManager fmmgr = MCRFileMetadataManager.instance();
+        String id = fmmgr.createNodeID();
         String pid = getParentID(node, derivate_id);
         if (pid != null && pid.length() == 0) {
             LOGGER.error("Parent id for directory " + node.getParentFile().getName() + " is not unique");
@@ -247,7 +242,7 @@ public class MCRIFS2Commands {
             mcrfsnodes.setName(node.getName());
             mcrfsnodes.setDate(new Timestamp(new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault())
                 .getTime().getTime()));
-            session.save(mcrfsnodes);
+            em.persist(mcrfsnodes);
             tx.commit();
             LOGGER.debug("Entry " + name + " fixed.");
         } catch (HibernateException he) {
@@ -265,7 +260,6 @@ public class MCRIFS2Commands {
         LOGGER.debug("fixFileEntry : name = " + node.getName());
         String storageid = node.getAbsolutePath().substring(storage_base.length()).replace("\\", "/");
         LOGGER.debug("fixFileEntry : storageid = " + storageid);
-        int counter = 0;
         String id = "";
         String md5_old = "";
         long size_old = 0;
@@ -275,35 +269,33 @@ public class MCRIFS2Commands {
             tx.begin();
         }
         try {
-            Criteria criteria_file = session.createCriteria(MCRFSNODES.class);
-            criteria_file.add(Restrictions.eq("storeid", content_store));
-            criteria_file.add(Restrictions.eq("storageid", storageid));
-            criteria_file.add(Restrictions.eq("owner", derivate_id));
-            criteria_file.add(Restrictions.eq("type", "F"));
-            ScrollableResults fsnodes = criteria_file.scroll(ScrollMode.FORWARD_ONLY);
-            while (fsnodes.next()) {
-                counter++;
-                MCRFSNODES fsNode = (MCRFSNODES) fsnodes.get(0);
+            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
+            Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
+            try {
+                MCRFSNODES fsNode = em.createQuery(query
+                    .where(
+                        cb.equal(nodes.get(MCRFSNODES_.owner), derivate_id),
+                        cb.equal(nodes.get(MCRFSNODES_.storeid), content_store),
+                        cb.equal(nodes.get(MCRFSNODES_.storageid), storageid),
+                        cb.equal(nodes.get(MCRFSNODES_.type), "F")))
+                    .getSingleResult();
+                LOGGER.debug("Found file entry for " + storageid);
                 id = fsNode.getId();
                 md5_old = fsNode.getMd5();
                 size_old = fsNode.getSize();
-                session.evict(fsNode);
+                em.detach(fsNode);
+            } catch (NoResultException e) {
+                LOGGER.error("Can't find file entry for " + storageid);
+                if (check_only)
+                    return;
+            } catch (NonUniqueResultException e) {
+                LOGGER.error("Non unique file entry for " + storageid);
+                return;
             }
-            fsnodes.close();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        if (counter == 1) {
-            LOGGER.debug("Found file entry for " + storageid);
-        }
-        if (counter < 1) {
-            LOGGER.error("Can't find file entry for " + storageid);
-            if (check_only)
-                return;
-        }
-        if (counter > 1) {
-            LOGGER.error("Non unique file entry for " + storageid);
-            return;
         }
         // check fctid, size and MD5 of the file
         String fctid = "";
@@ -375,32 +367,28 @@ public class MCRIFS2Commands {
     }
 
     private static String getParentID(File node, String derivate_id) {
-        Session session = MCRHIBConnection.instance().getSession();
         File parent_node = node.getParentFile();
-        Criteria criteria_file = session.createCriteria(MCRFSNODES.class);
-        criteria_file.add(Restrictions.eq("name", parent_node.getName()));
-        criteria_file.add(Restrictions.eq("owner", derivate_id));
-        criteria_file.add(Restrictions.eq("type", "D"));
-        ScrollableResults fsnodes = criteria_file.scroll(ScrollMode.FORWARD_ONLY);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
+        Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
         try {
-            int counter = 0;
-            String pid = null;
-            while (fsnodes.next()) {
-                counter++;
-                MCRFSNODES fsNode = (MCRFSNODES) fsnodes.get(0);
-                pid = fsNode.getId();
-                session.evict(fsNode);
-            }
-            if (counter > 1) {
-                LOGGER.error("The directory entry for " + derivate_id + " and " + parent_node.getName()
-                    + " is not unique!");
-                return "";
-            }
-            return pid;
-        } catch (Exception e) {
+            MCRFSNODES fsNode = em.createQuery(query
+                .where(
+                    cb.equal(nodes.get(MCRFSNODES_.owner), derivate_id),
+                    cb.equal(nodes.get(MCRFSNODES_.name), parent_node.getName()),
+                    cb.equal(nodes.get(MCRFSNODES_.type), "D")))
+                .getSingleResult();
+            LOGGER.debug("Found directory entry for " + parent_node.getName());
+            em.detach(fsNode);
+            return fsNode.getId();
+        } catch (NoResultException e) {
+            return "";
+        } catch (NonUniqueResultException e) {
+            LOGGER.error("The directory entry for " + derivate_id + " and " + parent_node.getName()
+                + " is not unique!");
             return "";
         }
-
     }
 
     private static ArrayList<String> getDetivatesOfProject(String content_store, String project_id) {

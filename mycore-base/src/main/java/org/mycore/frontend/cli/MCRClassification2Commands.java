@@ -372,11 +372,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static void repairEmptyLabels() {
         Session session = MCRHIBConnection.instance().getSession();
         String deleteEmptyLabels = "delete from {h-schema}MCRCategoryLabels where text is null or trim(text) = ''";
-        int affected = session.createSQLQuery(deleteEmptyLabels).executeUpdate();
+        int affected = session.createNativeQuery(deleteEmptyLabels).executeUpdate();
         LOGGER.info("Deleted " + affected + " labels.");
         String sqlQuery = "select cat.classid,cat.categid from {h-schema}MCRCategory cat left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where label.text is null";
         @SuppressWarnings("unchecked")
-        List<Object[]> list = session.createSQLQuery(sqlQuery).list();
+        List<Object[]> list = session.createNativeQuery(sqlQuery).getResultList();
 
         for (Object resultList : list) {
             Object[] arrayOfResults = (Object[]) resultList;
@@ -404,8 +404,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + "(select max(cat3.positioninparent) from {h-schema}MCRCategory cat3 "
             + "where cat3.parentid=cat1.parentid) group by cat1.parentid";
 
-        for (List<Object[]> parentWithErrorsList = session.createSQLQuery(sqlQuery).list(); !parentWithErrorsList
-            .isEmpty(); parentWithErrorsList = session.createSQLQuery(sqlQuery).list()) {
+        for (List<Object[]> parentWithErrorsList = session.createNativeQuery(sqlQuery).getResultList(); !parentWithErrorsList
+            .isEmpty(); parentWithErrorsList = session.createNativeQuery(sqlQuery).getResultList()) {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number firstErrorPositionInParent = (Number) parentWithErrors[1];
@@ -424,7 +424,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + "where cat3.parentid=cat1.parentid) and cat1.positioninparent > 0 group by cat1.parentid";
 
         while (true) {
-            List<Object[]> parentWithErrorsList = session.createSQLQuery(sqlQuery).list();
+            List<Object[]> parentWithErrorsList = session.createNativeQuery(sqlQuery).getResultList();
 
             if (parentWithErrorsList.isEmpty()) {
                 break;
@@ -448,7 +448,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + wrongStartPositionInParent
             + "-1 where parentid=" + parentID + " and positioninparent > " + wrongStartPositionInParent;
 
-        session.createSQLQuery(sqlQuery).executeUpdate();
+        session.createNativeQuery(sqlQuery).executeUpdate();
     }
 
     private static void repairCategoryWithGapInPos(Number parentID, Number firstErrorPositionInParent) {
@@ -466,7 +466,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + firstErrorPositionInParent
             + ") where parentid=" + parentID + " and positioninparent > " + firstErrorPositionInParent;
 
-        session.createSQLQuery(sqlQuery).executeUpdate();
+        session.createNativeQuery(sqlQuery).executeUpdate();
     }
 
     @MCRCommand(syntax = "repair left right values for classification {0}", help = "fixes all left and right values in the given classification", order = 130)
@@ -543,7 +543,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         String sqlQuery = "select cat.categid from {h-schema}MCRCategory cat left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where cat.classid='"
             + classID + "' and (label.text is null or trim(label.text) = '')";
         @SuppressWarnings("unchecked")
-        List<String> list = session.createSQLQuery(sqlQuery).list();
+        List<String> list = session.createNativeQuery(sqlQuery).getResultList();
 
         for (String categIDString : list) {
             log.add("EMPTY lables for category " + new MCRCategoryID(classID, categIDString));
@@ -555,7 +555,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         String sqlQuery = "select cat.categid from {h-schema}MCRCategory cat WHERE cat.classid='"
             + classID + "' and cat.level > 0 and cat.parentID is NULL";
         @SuppressWarnings("unchecked")
-        List<String> list = session.createSQLQuery(sqlQuery).list();
+        List<String> list = session.createNativeQuery(sqlQuery).getResultList();
 
         for (String categIDString : list) {
             log.add("parentID is null for category " + new MCRCategoryID(classID, categIDString));
@@ -569,7 +569,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + classID
             + "' and parent.leftValue<cat.leftValue and parent.rightValue>cat.rightValue and parent.level=(cat.level-1)) WHERE cat.classid='"
             + classID + "' and cat.level > 0 and cat.parentID is NULL";
-        int updates = session.createSQLQuery(sqlQuery).executeUpdate();
+        int updates = session.createNativeQuery(sqlQuery).executeUpdate();
         LOGGER.info(() -> "Repaired " + updates + " parentID columns for classification " + classID);
     }
 }
