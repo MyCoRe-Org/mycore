@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.JoinType;
@@ -113,12 +114,12 @@ public class MCRUserManager {
      */
     public static MCRUser getUser(String userName, String realmId) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRUser mcrUser = getByNaturalID(em, userName, realmId);
-        if (mcrUser == null) {
-            LOGGER.warn("Could not find requested user: " + userName + "@" + realmId);
-            return null;
-        }
-        return setRoles(mcrUser);
+        return getByNaturalID(em, userName, realmId)
+            .map(MCRUserManager::setRoles)
+            .orElseGet(() -> {
+                LOGGER.warn("Could not find requested user: " + userName + "@" + realmId);
+                return null;
+            });
     }
 
     private static MCRUser setRoles(MCRUser mcrUser) {
@@ -193,7 +194,7 @@ public class MCRUserManager {
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.persist(user);
-        LOGGER.info(() -> "user saved: "+user.getUserID());
+        LOGGER.info(() -> "user saved: " + user.getUserID());
         MCRRoleManager.storeRoleAssignments(user);
     }
 
@@ -235,16 +236,18 @@ public class MCRUserManager {
             throw new MCRException("User is invalid: " + user.getUserID());
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRUser inDb = getByNaturalID(em, user.getUserName(), user.getRealmID());
-        if (inDb == null) {
+        Optional<MCRUser> inDb = getByNaturalID(em, user.getUserName(), user.getRealmID());
+        if (!inDb.isPresent()) {
             createUser(user);
             return;
         }
-        user.internalID = inDb.internalID;
-        em.detach(inDb);
-        em.merge(user);
-        MCRRoleManager.unassignRoles(user);
-        MCRRoleManager.storeRoleAssignments(user);
+        inDb.ifPresent(db -> {
+            user.internalID = db.internalID;
+            em.detach(db);
+            em.merge(user);
+            MCRRoleManager.unassignRoles(user);
+            MCRRoleManager.storeRoleAssignments(user);
+        });
     }
 
     /**
@@ -541,12 +544,21 @@ public class MCRUserManager {
         return salt;
     }
 
-    private static MCRUser getByNaturalID(EntityManager em, String userName, String realmId) {
+    private static Optional<MCRUser> getByNaturalID(EntityManager em, String userName, String realmId) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRUser> query = cb.createQuery(MCRUser.class);
         Root<MCRUser> users = query.from(MCRUser.class);
-        users.fetch(MCRUser_.owner.getName(),JoinType.LEFT);
-        return em.createQuery(query.distinct(true).where(getUserRealmCriterion(cb, users, userName, realmId))).getSingleResult();
+        users.fetch(MCRUser_.owner.getName(), JoinType.LEFT);
+        try {
+            return Optional
+                .of(em
+                    .createQuery(query
+                        .distinct(true)
+                        .where(getUserRealmCriterion(cb, users, userName, realmId)))
+                    .getSingleResult());
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
     private static Predicate[] getUserRealmCriterion(CriteriaBuilder cb, Root<MCRUser> root, String user,

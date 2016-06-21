@@ -22,7 +22,7 @@
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>5.2.0.Final</hibernate.version>
-    <hibernate.core.version>5.2.0.MCR1</hibernate.core.version>
+    <hibernate.core.version>5.2.0.MCR2</hibernate.core.version>
     <httpcomponents.version>4.5.2</httpcomponents.version>
     <httpcore.version>4.4.4</httpcore.version>
     <xalan.version>2.7.2</xalan.version>

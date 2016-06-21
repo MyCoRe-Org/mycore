@@ -66,11 +66,15 @@ public class MCRJPAAccessStore extends MCRAccessStore {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<String> query = cb.createQuery(String.class);
         Root<MCRACCESS> ac = query.from(MCRACCESS.class);
-        return em.createQuery(
-            query.select(ac.get(MCRACCESS_.rule).get(MCRACCESSRULE_.rid))
-                .where(cb.equal(ac.get(MCRACCESS_.key).get(MCRACCESSPK_.objid), objID),
-                    cb.equal(ac.get(MCRACCESS_.key).get(MCRACCESSPK_.acpool), acPool)))
-            .getSingleResult();
+        try {
+            return em.createQuery(
+                query.select(ac.get(MCRACCESS_.rule).get(MCRACCESSRULE_.rid))
+                    .where(cb.equal(ac.get(MCRACCESS_.key).get(MCRACCESSPK_.objid), objID),
+                        cb.equal(ac.get(MCRACCESS_.key).get(MCRACCESSPK_.acpool), acPool)))
+                .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     /**

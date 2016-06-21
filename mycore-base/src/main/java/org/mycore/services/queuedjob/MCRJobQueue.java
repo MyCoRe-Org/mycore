@@ -38,6 +38,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.persistence.NoResultException;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.query.Query;
@@ -305,14 +307,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         Query<MCRJob> query = session
             .createQuery(qStr.toString(), MCRJob.class)
             .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        MCRJob job = query.getSingleResult();
-
-        if (job == null) {
+        try {
+            MCRJob job = query.getSingleResult();
+            clearPreFetch();
+            return job;
+        } catch (NoResultException e) {
             return null;
         }
-
-        clearPreFetch();
-        return job;
     }
 
     private MCRJob getElement() {
