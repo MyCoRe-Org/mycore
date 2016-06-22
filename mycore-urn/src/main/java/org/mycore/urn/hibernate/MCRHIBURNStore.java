@@ -369,8 +369,6 @@ public class MCRHIBURNStore implements MCRURNStore {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRURN> query = cb.createQuery(MCRURN.class);
         Root<MCRURN> root = query.from(MCRURN.class);
-        EntityTransaction tx = em.getTransaction();
-        tx.begin();
         try {
             return em
                 .createQuery(
@@ -382,9 +380,7 @@ public class MCRHIBURNStore implements MCRURNStore {
                 .getResultList();
         } catch (Exception ex) {
             logger.error("Could not execute query", ex);
-            tx.rollback();
         } finally {
-            tx.commit();
         }
         // return an empty list
         return new ArrayList<MCRURN>();
