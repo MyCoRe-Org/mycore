@@ -73,7 +73,7 @@ public class MCRSolrCore {
         int socketTimeout = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "SolrClient.SocketTimeout");
 
         // default server
-        solrClient = new HttpSolrClient(coreURL);
+        solrClient = new HttpSolrClient.Builder(coreURL).build();
         solrClient.setRequestWriter(new BinaryRequestWriter());
         solrClient.setConnectionTimeout(connectionTimeout);
         solrClient.setSoTimeout(socketTimeout);
@@ -81,7 +81,10 @@ public class MCRSolrCore {
         if (USE_CONCURRENT_SERVER) {
             int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
             int threadCount = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
-            concurrentClient = new ConcurrentUpdateSolrClient(coreURL, queueSize, threadCount);
+            concurrentClient = new ConcurrentUpdateSolrClient.Builder(coreURL)
+                .withQueueSize(queueSize)
+                .withThreadCount(threadCount)
+                .build();
             concurrentClient.setRequestWriter(new BinaryRequestWriter());
             concurrentClient.setConnectionTimeout(connectionTimeout);
             concurrentClient.setSoTimeout(socketTimeout);

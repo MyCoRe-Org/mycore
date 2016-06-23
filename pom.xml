@@ -31,7 +31,7 @@
     <hibernate.version>5.2.0.Final</hibernate.version>
     <hibernate.core.version>5.2.0.MCR2</hibernate.core.version>
     <httpcomponents.version>4.5.2</httpcomponents.version>
-    <httpcore.version>4.4.4</httpcore.version>
+    <httpcore.version>4.4.5</httpcore.version>
     <xalan.version>2.7.2</xalan.version>
     <jersey.version>1.19.1</jersey.version>
     <changelog.since>2016-02-24</changelog.since>
@@ -302,7 +302,7 @@
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
                 <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-                <link>http://lucene.apache.org/solr/5_5_0/solr-solrj/</link>
+                <link>http://lucene.apache.org/solr/6_1_0/solr-solrj/</link>
               </links>
             </configuration>
             <reportSets>
@@ -550,7 +550,7 @@
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
               <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-              <link>http://lucene.apache.org/solr/5_5_0/solr-solrj/</link>
+              <link>http://lucene.apache.org/solr/6_1_0/solr-solrj/</link>
             </links>
           </configuration>
         </plugin>
@@ -763,7 +763,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.11</version>
+        <version>1.12</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -773,7 +773,7 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.6.2</version>
+        <version>2.7</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.findbugs</groupId>
@@ -806,7 +806,7 @@
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
-        <version>2.6</version>
+        <version>2.6.1</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -818,7 +818,7 @@
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>5.5.0</version>
+        <version>6.1.0</version>
         <exclusions>
           <exclusion>
           <groupId>org.slf4j</groupId>
@@ -909,7 +909,7 @@
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
