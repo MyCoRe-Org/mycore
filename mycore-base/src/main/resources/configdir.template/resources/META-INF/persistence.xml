@@ -8,7 +8,6 @@
      -->
     <!-- http://stackoverflow.com/questions/15026302/multiple-jars-single-persistence-unit-solution -->
     <mapping-file>META-INF/mycore-base-mappings.xml</mapping-file>
-    <mapping-file>META-INF/mycore-handle-mappings.xml</mapping-file>
     <mapping-file>META-INF/mycore-ifs-mappings.xml</mapping-file>
     <mapping-file>META-INF/mycore-iview2-mappings.xml</mapping-file>
     <mapping-file>META-INF/mycore-pi-mappings.xml</mapping-file>
