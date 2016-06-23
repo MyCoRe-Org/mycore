@@ -27,6 +27,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -59,7 +60,11 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
      *            a MCRServletJob instance
      */
     public void doGetPost(MCRServletJob job) throws Exception {
-        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(MCRFrontendUtil.getBaseURL());
+        File baseDir = MCRFrontendUtil
+            .getWebAppBaseDir(getServletContext())
+            .orElseGet(() -> new File(MCRConfiguration.instance().getString("MCR.WebApplication.basedir")));
+        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(MCRFrontendUtil.getBaseURL(job.getRequest()),
+            baseDir);
         int number = common.checkSitemapFile();
         LOGGER.debug("Build Google number of URL files " + Integer.toString(number) + ".");
         Document jdom = null;

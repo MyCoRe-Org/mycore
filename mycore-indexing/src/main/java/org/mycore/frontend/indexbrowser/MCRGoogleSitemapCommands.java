@@ -27,6 +27,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -59,7 +60,8 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
         LOGGER.debug("Build Google sitemap start.");
         final long start = System.currentTimeMillis();
         // init
-        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon();
+        File webappBaseDir = new File(MCRConfiguration.instance().getString("MCR.WebApplication.basedir"));
+        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(webappBaseDir);
         // remove old files
         common.removeSitemapFiles();
         // compute number of files

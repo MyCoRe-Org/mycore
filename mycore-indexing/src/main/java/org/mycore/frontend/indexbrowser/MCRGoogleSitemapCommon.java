@@ -25,12 +25,14 @@ package org.mycore.frontend.indexbrowser;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.NotDirectoryException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
@@ -93,7 +95,7 @@ public final class MCRGoogleSitemapCommon {
     private String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
 
     /** The webapps directory path from configuration */
-    private static final String webappBaseDir = MCRConfiguration.instance().getString("MCR.WebApplication.basedir");
+    private final File webappBaseDir;
 
     /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
     private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");
@@ -127,13 +129,19 @@ public final class MCRGoogleSitemapCommon {
     /** local data */
     private List<MCRObjectIDDate> objidlist = null;
 
-    /** The constructor */
-    public MCRGoogleSitemapCommon() {
+    /** The constructor 
+     * @throws NotDirectoryException */
+    public MCRGoogleSitemapCommon(File baseDir) throws NotDirectoryException {
+        if (!Objects.requireNonNull(baseDir, "baseDir may not be null.").isDirectory()) {
+            throw new NotDirectoryException(baseDir.getAbsolutePath());
+        }
+        this.webappBaseDir = baseDir;
+        LOGGER.info("Using webappbaseDir: " + baseDir.getAbsolutePath());
         objidlist = new ArrayList<MCRObjectIDDate>();
         if ((numberOfURLs < 1) || (numberOfURLs > 50000))
             numberOfURLs = 50000;
         if (cdir.length() != 0) {
-            File sitemap_directory = new File(webappBaseDir + File.separator + cdir);
+            File sitemap_directory = new File(webappBaseDir, cdir);
             if (!sitemap_directory.exists()) {
                 sitemap_directory.mkdirs();
             }
@@ -146,8 +154,8 @@ public final class MCRGoogleSitemapCommon {
         return nf;
     }
 
-    public MCRGoogleSitemapCommon(String baseURL) {
-        this();
+    public MCRGoogleSitemapCommon(String baseURL, File baseDir) throws NotDirectoryException {
+        this(baseDir);
         this.baseurl = baseURL;
     }
 

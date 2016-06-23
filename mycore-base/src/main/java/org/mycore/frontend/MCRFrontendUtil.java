@@ -1,5 +1,6 @@
 package org.mycore.frontend;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,6 +17,7 @@ import java.util.TreeSet;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,7 +52,7 @@ public class MCRFrontendUtil {
 
     /** returns the base URL of the mycore system */
     public static String getBaseURL() {
-        if(MCRSessionMgr.hasCurrentSession()) {
+        if (MCRSessionMgr.hasCurrentSession()) {
             MCRSession session = MCRSessionMgr.getCurrentSession();
             Object value = session.get(BASE_URL_ATTRIBUTE);
             if (value != null) {
@@ -130,7 +132,7 @@ public class MCRFrontendUtil {
      * @return an Optional that is either empty or contains a trimmed non-empty String that is either
      *  the value of the request attribute or a parameter (in that order) with the given <code>name</code>.
      */
-    public static Optional<String> getProperty(HttpServletRequest request, String name){
+    public static Optional<String> getProperty(HttpServletRequest request, String name) {
         return Stream.<Supplier<Object>> of(
             () -> request.getAttribute(name),
             () -> request.getParameter(name))
@@ -298,6 +300,10 @@ public class MCRFrontendUtil {
             LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
             response.setDateHeader("Expires", expires.getTime());
         }
+    }
+
+    public static Optional<File> getWebAppBaseDir(ServletContext ctx) {
+        return Optional.ofNullable(ctx.getRealPath("/")).map(File::new);
     }
 
 }
