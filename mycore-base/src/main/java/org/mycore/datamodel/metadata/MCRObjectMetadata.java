@@ -26,6 +26,10 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.log4j.Logger;
@@ -67,7 +71,8 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      *                a special exception for configuartion data
      */
     public MCRObjectMetadata() throws MCRConfigurationException {
-        herited_xml = MCRConfiguration.instance().getBoolean("MCR.Metadata.HeritedForXML", true);
+        herited_xml = MCRConfiguration.instance()
+                                      .getBoolean("MCR.Metadata.HeritedForXML", true);
         meta_list = new ArrayList<MCRMetaElement>();
     }
 
@@ -96,7 +101,8 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                 MCRMetaElement nme = (MCRMetaElement) me.clone();
 
                 for (int j = 0; j < nme.size(); j++) {
-                    nme.getElement(j).incrementInherited();
+                    nme.getElement(j)
+                       .incrementInherited();
                 }
 
                 heritMeta.setMetadataElement(nme);
@@ -135,18 +141,23 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
             int pos = -1;
 
             for (int j = 0; j < size(); j++) {
-                if (meta_list.get(j).getTag().equals(newelm.getTag())) {
+                if (meta_list.get(j)
+                             .getTag()
+                             .equals(newelm.getTag())) {
                     pos = j;
                 }
             }
 
             if (pos != -1) {
-                if (!meta_list.get(pos).inheritsNot()) {
-                    meta_list.get(pos).setHeritable(true);
+                if (!meta_list.get(pos)
+                              .inheritsNot()) {
+                    meta_list.get(pos)
+                             .setHeritable(true);
 
                     for (int j = 0; j < newelm.size(); j++) {
                         MCRMetaInterface obj = newelm.getElement(j);
-                        meta_list.get(pos).addMetaObject(obj);
+                        meta_list.get(pos)
+                                 .addMetaObject(obj);
                     }
                 }
             } else {
@@ -169,7 +180,9 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
         for (MCRMetaElement metaElement : input) {
             int pos = -1;
             for (int j = 0; j < size(); j++) {
-                if (meta_list.get(j).getTag().equals(metaElement.getTag())) {
+                if (meta_list.get(j)
+                             .getTag()
+                             .equals(metaElement.getTag())) {
                     pos = j;
                 }
             }
@@ -178,15 +191,18 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                     boolean found = false;
                     for (MCRMetaInterface mcrMetaInterface : meta_list.get(pos)) {
                         Element xml = mcrMetaInterface.createXML();
-                        Element xmlNEW = metaElement.getElement(j).createXML();
+                        Element xmlNEW = metaElement.getElement(j)
+                                                    .createXML();
                         List<Element> childrenXML = xml.getChildren();
-                        if (childrenXML.size() > 0 && xmlNEW.getChildren().size() > 0) {
+                        if (childrenXML.size() > 0 && xmlNEW.getChildren()
+                                                            .size() > 0) {
                             int i = 0;
                             for (Element element : childrenXML) {
                                 Element elementNew = xmlNEW.getChild(element.getName());
 
                                 if (elementNew != null && element != null) {
-                                    if (element.getText().equals(elementNew.getText())) {
+                                    if (element.getText()
+                                               .equals(elementNew.getText())) {
                                         i++;
                                     }
                                 }
@@ -195,7 +211,8 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                                 found = true;
                             }
                         } else {
-                            if (xml.getText().equals(xmlNEW.getText())) {
+                            if (xml.getText()
+                                   .equals(xmlNEW.getText())) {
                                 found = true;
                             } else if (!found) {
                                 int i = 0;
@@ -215,9 +232,11 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                     }
                     MCRMetaInterface obj = metaElement.getElement(j);
                     if (!found) {
-                        meta_list.get(pos).addMetaObject(obj);
+                        meta_list.get(pos)
+                                 .addMetaObject(obj);
                     } else if (LOGGER.isDebugEnabled()) {
-                        LOGGER.info("Found equal tags: \n\r" + new XMLOutputter(Format.getPrettyFormat()).outputString(obj.createXML()));
+                        LOGGER.info("Found equal tags: \n\r"
+                            + new XMLOutputter(Format.getPrettyFormat()).outputString(obj.createXML()));
                     }
                 }
             } else {
@@ -227,7 +246,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     }
 
     /**
-     * This methode return the MCRMetaElement selected by tag. If this was not
+     * This method return the MCRMetaElement selected by tag. If this was not
      * found, null was returned.
      * 
      * @param tag
@@ -244,7 +263,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     }
 
     /**
-     * This methode return the MCRMetaElement selected by an index. If this was
+     * This method return the MCRMetaElement selected by an index. If this was
      * not found, null was returned.
      * 
      * @param index
@@ -264,7 +283,6 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      */
     public final void setMetadataElement(MCRMetaElement obj) {
         MCRMetaElement old = getMetadataElement(obj.getTag());
-
         if (old == null) {
             meta_list.add(obj);
             return;
@@ -275,13 +293,12 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     }
 
     /**
-     * This methode remove the MCRMetaElement selected by tag from the list.
+     * This method remove the MCRMetaElement selected by tag from the list.
      * 
-     * @return true if set was succesful, otherwise false
+     * @return true if set was successful, otherwise false
      */
     public final MCRMetaElement removeMetadataElement(String tag) {
         MCRMetaElement old = getMetadataElement(tag);
-
         if (old != null) {
             meta_list.remove(old);
             return old;
@@ -290,9 +307,9 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     }
 
     /**
-     * This methode remove the MCRMetaElement selected a index from the list.
+     * This method remove the MCRMetaElement selected a index from the list.
      * 
-     * @return true if set was succesful, otherwise false
+     * @return true if set was successful, otherwise false
      */
     public final MCRMetaElement removeMetadataElement(int index) {
         if (index < 0 || index > size()) {
@@ -300,6 +317,131 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
         }
 
         return meta_list.remove(index);
+    }
+
+    /**
+     * Finds the first, not inherited {@link MCRMetaInterface} with the given tag.
+     * 
+     * @param tag the metadata tag e.g. 'maintitles'
+     * @return an optional of the first meta interface
+     */
+    public final <T extends MCRMetaInterface> Optional<T> findFirst(String tag) {
+        return findFirst(tag, null, 0);
+    }
+
+    /**
+     * Finds the first, not inherited {@link MCRMetaInterface} with the given tag
+     * where the @type attribute is equal to the given type. If the type is null,
+     * this method doesn't care if the @type attribute is set or not.
+     * 
+     * @param tag the metadata tag e.g. 'subtitles'
+     * @param type the @type attribute which have to match
+     * @return an optional of the first meta interface
+     */
+    public final <T extends MCRMetaInterface> Optional<T> findFirst(String tag, String type) {
+        return findFirst(tag, type, 0);
+    }
+
+    /**
+     * Finds the first {@link MCRMetaInterface} with the given tag where the
+     * inheritance level is equal the inherited value.
+     * 
+     * @param tag the metadata tag e.g. 'maintitles'
+     * @param inherited level of inheritance. Zero is the current level,
+     *        parent is one and so on.
+     * @return an optional of the first meta interface
+     */
+    public final <T extends MCRMetaInterface> Optional<T> findFirst(String tag, Integer inherited) {
+        return findFirst(tag, null, inherited);
+    }
+
+    /**
+     * Finds the first {@link MCRMetaInterface} with the given tag where the
+     * inheritance level is equal the inherited value and the @type attribute
+     * is equal to the given type. If the type is null, this method doesn't
+     * care if the @type attribute is set or not.
+     * 
+     * @param tag the metadata tag e.g. 'subtitles'
+     * @param type the @type attribute which have to match
+     * @param inherited level of inheritance. Zero is the current level,
+     *        parent is one and so on.
+     * @return an optional of the first meta interface
+     */
+    public final <T extends MCRMetaInterface> Optional<T> findFirst(String tag, String type, Integer inherited) {
+        Stream<T> stream = stream(tag);
+        return stream.filter(filterByType(type))
+                     .filter(filterByInherited(inherited))
+                     .findFirst();
+    }
+
+    /**
+     * Streams the {@link MCRMetaInterface}s of the given tag.
+     * <pre>
+     * {@code
+     *   Stream<MCRMetaLangText> stream = mcrObjectMetadata.stream("maintitles");
+     * }
+     * </pre>
+     * 
+     * @param tag tag the metadata tag e.g. 'maintitles'
+     * @return a stream of the requested meta interfaces
+     */
+    public final <T extends MCRMetaInterface> Stream<T> stream(String tag) {
+        Optional<MCRMetaElement> metadata = Optional.ofNullable(getMetadataElement(tag));
+        // waiting for https://bugs.openjdk.java.net/browse/JDK-8050820
+        if (!metadata.isPresent()) {
+            return Stream.empty();
+        }
+        return StreamSupport.stream(metadata.get().spliterator(), false).map(metaInterface -> {
+            @SuppressWarnings("unchecked")
+            T t = (T) metaInterface;
+            return t;
+        });
+    }
+
+    /**
+    * Lists the {@link MCRMetaInterface}s of the given tag. This is not a
+    * live list. Removals or adds are not reflected on the
+    * {@link MCRMetaElement}. Use {@link #getMetadataElement(String)}
+    * for those operations.
+    * 
+    * <pre>
+    * {@code
+    *   List<MCRMetaLangText> list = mcrObjectMetadata.list("maintitles");
+    * }
+    * </pre>
+    * 
+    * @param tag tag the metadata tag e.g. 'maintitles'
+    * @return a list of the requested meta interfaces
+    */
+    public final <T extends MCRMetaInterface> List<T> list(String tag) {
+        Stream<T> stream = stream(tag);
+        return stream.collect(Collectors.toList());
+    }
+
+    /**
+     * Checks if the type of an {@link MCRMetaInterface} is equal
+     * the given type. If the given type is null, true is returned.
+     * 
+     * @param type the type to compare
+     * @return true if the types are equal
+     */
+    private Predicate<MCRMetaInterface> filterByType(String type) {
+        return (metaInterface) -> {
+            return type == null || type.equals(metaInterface.getType());
+        };
+    }
+
+    /**
+     * Checks if the inheritance level of an {@link MCRMetaInterface}
+     * is equal the given inherited value.
+     * 
+     * @param inherited the inherited value
+     * @return true if the inherited values are equal
+     */
+    private Predicate<MCRMetaInterface> filterByInherited(Integer inherited) {
+        return (metaInterface) -> {
+            return metaInterface.getInherited() == inherited;
+        };
     }
 
     /**
@@ -360,9 +502,10 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      */
     public JsonObject createJSON() {
         JsonObject metadata = new JsonObject();
-        StreamSupport.stream(spliterator(), true).forEach(metaElement -> {
-            metadata.add(metaElement.getTag(), metaElement.createJSON(herited_xml));
-        });
+        StreamSupport.stream(spliterator(), true)
+                     .forEach(metaElement -> {
+                         metadata.add(metaElement.getTag(), metaElement.createJSON(herited_xml));
+                     });
         return metadata;
     }
 
