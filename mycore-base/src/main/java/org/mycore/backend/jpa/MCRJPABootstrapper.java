@@ -52,6 +52,7 @@ public class MCRJPABootstrapper implements AutoExecutable {
                     .error(() -> "Could not initialize JPA. Database access is disabled in this session.", e);
                 MCRConfiguration.instance().set("MCR.Persistence.Database.Enable", false);
             }
+            MCREntityManagerProvider.init(e);
             return;
         }
         Metamodel metamodel = MCREntityManagerProvider.getEntityManagerFactory().getMetamodel();
