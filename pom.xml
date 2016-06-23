@@ -16,6 +16,13 @@
     Applications based on MyCoRe use a common core, which provides the functionality typically required for such
     applications, for example metadata management, querying, OAI harvesting interface, or an image viewer module.
   </description>
+  <licenses>
+    <license>
+      <name>GNU General Public License, version 3</name>
+      <distribution>repo</distribution>
+      <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+    </license>
+  </licenses>
   <properties>
     <java.target.version>1.8</java.target.version>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
@@ -611,6 +618,24 @@
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <verbose>false</verbose>
+          <addSvnKeyWords>true</addSvnKeyWords>
+          <licenseName>gpl_v3</licenseName>
+        </configuration>
+        <executions>
+          <execution>
+            <id>download-licenses</id>
+            <goals>
+              <goal>update-project-license</goal>
+            </goals>
+            <phase>process-sources</phase>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
         <executions>
