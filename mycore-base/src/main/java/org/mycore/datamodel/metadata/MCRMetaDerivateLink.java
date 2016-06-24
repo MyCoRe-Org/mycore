@@ -33,7 +33,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         String owner = file.getOwner();
         String path = file.subpath(0, file.getNameCount() - 1).toString();
         try {
-            path = MCRXMLFunctions.encodeURIPath(path);
+            path = MCRXMLFunctions.encodeURIPath(path, true);
         } catch (URISyntaxException uriExc) {
             LOGGER.warn("Unable to encode URI path " + path, uriExc);
         }

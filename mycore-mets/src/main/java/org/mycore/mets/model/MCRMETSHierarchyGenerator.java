@@ -199,7 +199,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             File metsFile = new File(fileID, mimeType);
             // set fLocat
             try {
-                final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1));
+                final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1), true);
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
                 metsFile.setFLocat(fLocat);
             } catch (URISyntaxException uriSyntaxException) {
