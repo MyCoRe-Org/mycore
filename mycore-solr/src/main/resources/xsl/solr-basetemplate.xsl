@@ -60,6 +60,9 @@
   </xsl:template>
 
   <xsl:template match="mycoreobject|mycorederivate" mode="baseFields">
+    <field name="objectKind">
+      <xsl:value-of select="local-name(.)" />
+    </field>
     <field name="id">
       <xsl:value-of select="@ID" />
     </field>
