@@ -19,7 +19,6 @@ import org.mycore.urn.hibernate.MCRURN;
  * @author shermann
  *
  */
-@Deprecated
 public class DFGViewerEpicurLiteProvider extends BaseEpicurLiteProvider {
 
     /* (non-Javadoc)

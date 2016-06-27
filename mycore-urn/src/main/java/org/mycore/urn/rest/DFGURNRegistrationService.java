@@ -15,7 +15,6 @@ import org.mycore.urn.services.MCRURNManager;
  * @author shermann
  *
  */
-@Deprecated
 public class DFGURNRegistrationService extends URNRegistrationService {
 
     @SuppressWarnings("unchecked")

@@ -69,7 +69,7 @@ public class MCRURNManager {
     /** The MCRURNStore implementation to use */
     private static MCRURNStore store;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRURNManager.class);
+   private static final Logger LOGGER = Logger.getLogger(MCRURNManager.class);
 
     static {
         try {
@@ -93,7 +93,6 @@ public class MCRURNManager {
      *            the custom NISS
      * @return the complete URN including prefix, NISS and calculated checksum
      */
-    @Deprecated
     public static String buildURN(String configID, String niss) {
         String base = "MCR.URN.SubNamespace." + configID + ".";
         String prefix = MCRConfiguration.instance().getString(base + "Prefix");
@@ -110,7 +109,6 @@ public class MCRURNManager {
      *            the ID of a subnamespace configuration in mycore.properties
      * @return the complete URN including prefix, niss and calculated checksum
      */
-    @Deprecated
     public static synchronized String buildURN(String configID) throws MCRException {
         String base = "MCR.URN.SubNamespace." + configID + ".";
 
@@ -128,11 +126,10 @@ public class MCRURNManager {
         do {
             niss = builder.buildNISS();
             if (niss.equals(niss2)) { // The niss doest'n change (missing counter?)
-                throw new MCRException(
-                    "Could not get unique NISS for URN. Possible reason: Missing counter in NISS Pattern.");
+            	throw new MCRException("Could not get unique NISS for URN. Possible reason: Missing counter in NISS Pattern.");
             }
             urn = buildURN(configID, niss);
-            niss2 = niss;
+            niss2=niss;
         } while (isAssigned(urn));
         return urn;
     }
@@ -141,19 +138,16 @@ public class MCRURNManager {
      * Returns true if the given URN has a valid structure and the checksum is
      * correct.
      */
-    @Deprecated
     public static boolean isValid(String urn) {
         return org.mycore.urn.services.MCRURN.isValid(urn);
     }
 
     /** Returns true if the given urn is assigned to a document ID */
-    @Deprecated
     public static boolean isAssigned(String urn) {
         return store.isAssigned(urn);
     }
 
     /** Assigns the given urn to the given document ID */
-    @Deprecated
     public static void assignURN(String urn, String documentID) {
         store.assignURN(urn, documentID);
     }
@@ -161,7 +155,6 @@ public class MCRURNManager {
     /**
      * @return true if the given object has an urn assigned
      * */
-    @Deprecated
     public static boolean hasURNAssigned(String objId) {
         return store.hasURNAssigned(objId);
     }
@@ -177,12 +170,10 @@ public class MCRURNManager {
      * @param filename
      *      the filename
      */
-    @Deprecated
     public static void assignURN(String urn, String derivateID, String path, String filename) {
         store.assignURN(urn, derivateID, path, filename);
     }
 
-    @Deprecated
     public static void assignURN(String urn, MCRPath path) {
         assignURN(urn, path.getOwner(), path.getOwnerRelativePath());
     }
@@ -196,7 +187,6 @@ public class MCRURNManager {
      * @param path
      *      the path of the derivate in the internal filesystem including file name
      */
-    @Deprecated
     public static void assignURN(String urn, String derivateID, String path) {
         String[] pathParts = splitFilePath(path);
         store.assignURN(urn, derivateID, pathParts[0], pathParts[1]);
@@ -207,7 +197,6 @@ public class MCRURNManager {
      *
      * @return the urn, or null if no urn is assigned to this ID
      */
-    @Deprecated
     public static String getURNforDocument(String documentID) {
         return store.getURNforDocument(documentID);
     }
@@ -216,7 +205,6 @@ public class MCRURNManager {
      * @param filePath complete path to file
      * @return the URN for the given file if any
      */
-    @Deprecated
     public static String getURNForFile(String derivateId, String filePath) {
         String[] pathParts = splitFilePath(filePath);
         return store.getURNForFile(derivateId, pathParts[0], pathParts[1]);
@@ -235,7 +223,6 @@ public class MCRURNManager {
         return store.getURNForFile(derivateId, path, fileName);
     }
 
-    @Deprecated
     public static String getURNForPath(MCRPath path) {
         return getURNForFile(path.getOwner(), path.getOwnerRelativePath());
     }
@@ -245,7 +232,6 @@ public class MCRURNManager {
      *
      * @return the ID, or null if no ID is assigned to this urn
      */
-    @Deprecated
     public static String getDocumentIDforURN(String urn) {
         return store.getDocumentIDforURN(urn);
     }
@@ -253,7 +239,6 @@ public class MCRURNManager {
     /**
      * Removes the urn (and assigned document ID) from the persistent store
      */
-    @Deprecated
     public static void removeURN(String urn) {
         store.removeURN(urn);
     }
@@ -261,7 +246,6 @@ public class MCRURNManager {
     /**
      * Removes the urn (and assigned document ID) from the persistent store
      */
-    @Deprecated
     public static void removeURNByObjectID(String objID) {
         store.removeURNByObjectID(objID);
     }
@@ -273,11 +257,10 @@ public class MCRURNManager {
      * @param configID - the configurationID of the URN Builder
      * @return the URN
      */
-    @Deprecated
     public static synchronized String buildAndAssignURN(String documentID, String configID) {
-        if (hasURNAssigned(documentID)) {
+        if(hasURNAssigned(documentID)){
             String urn = getURNforDocument(documentID);
-            LOGGER.warn("Returning the already assign URN: " + urn + " for document " + documentID + ".");
+            LOGGER.warn("Returning the already assign URN: "+ urn + " for document "+documentID+".");
             return urn;
         }
         String urn = buildURN(configID);
@@ -288,17 +271,14 @@ public class MCRURNManager {
     /**
      * @return the count of urn matching the given 'registered' attribute
      */
-    @Deprecated
     public static long getCount(boolean registered) {
         return store.getCount(registered);
     }
 
-    @Deprecated
     public static List<MCRURN> get(boolean registered, int start, int rows) {
         return store.get(registered, start, rows);
     }
 
-    @Deprecated
     public static void update(MCRURN urn) {
         store.update(urn);
     }
@@ -306,7 +286,6 @@ public class MCRURNManager {
     /**
      * Get all URN for the given object id.
      */
-    @Deprecated
     public static List<MCRURN> get(MCRObjectID id) {
         return store.get(id);
     }
@@ -314,7 +293,6 @@ public class MCRURNManager {
     /**
      * @return a {@link List} of {@link MCRURN} where path and file name are just blanks or null;
      */
-    @Deprecated
     public static List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows) {
         return store.getBaseURN(registered, dfg, start, rows);
     }

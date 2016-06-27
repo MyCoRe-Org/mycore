@@ -17,7 +17,6 @@ import org.mycore.urn.services.MCRURNManager;
  * @author shermann
  *
  */
-@Deprecated
 public class URNRegistrationService extends TimerTask implements Closeable {
 
     protected static final Logger LOGGER = Logger.getLogger(URNRegistrationService.class);

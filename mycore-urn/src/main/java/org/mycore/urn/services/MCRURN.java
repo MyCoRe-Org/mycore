@@ -21,7 +21,6 @@ import java.net.URI;
  * @author shermann
  * @author Robert Stephan
  */
-@Deprecated
 public class MCRURN {
 
     final private static String URN_PREFIX = "urn:nbn:de:";

@@ -37,7 +37,6 @@ import java.util.UUID;
  *
  * @author Kathleen Neumann (kkrebs)
  */
-@Deprecated
 public class MCRNISSBuilderUUID implements MCRNISSBuilder {
 
     public void init(String configID) {

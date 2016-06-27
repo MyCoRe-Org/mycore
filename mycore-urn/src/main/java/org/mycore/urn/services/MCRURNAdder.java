@@ -36,7 +36,6 @@ import org.xml.sax.SAXException;
  * @author Kathleen Neumann (kkrebs)
  * @author Frank L\u00FCtzenkirchen (fluet)
  */
-@Deprecated
 public class MCRURNAdder {
 
     private static final Logger LOGGER = Logger.getLogger(MCRURNAdder.class);
