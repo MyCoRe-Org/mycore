@@ -1,6 +1,5 @@
 package org.mycore.pi.doi;
 
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,6 +32,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIRegistrationService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -43,15 +43,25 @@ import org.xml.sax.SAXException;
  */
 public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigitalObjectIdentifier> {
 
-    public static final Namespace DATACITE_NAMESPACE = Namespace.getNamespace("datacite", "http://datacite.org/schema/kernel-3");
+    public static final Namespace DATACITE_NAMESPACE = Namespace.getNamespace("datacite",
+        "http://datacite.org/schema/kernel-3");
+
     public static final String TEST_PREFIX = "UseTestPrefix";
+
     private static final Logger LOGGER = LogManager.getLogger();
+
     private static final String TYPE = "doi";
+
     private String username;
+
     private String password;
+
     private String transformer;
+
     private String host;
+
     private String registerURL;
+
     private boolean useTestPrefix = false;
 
     public String getRegisterURL() {
@@ -70,16 +80,19 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         host = "mds.datacite.org";
     }
 
-    private static void insertDOI(Document datacite, MCRDigitalObjectIdentifier doi) throws MCRPersistentIdentifierException {
-        XPathExpression<Element> compile = XPathFactory.instance().compile("//datacite:identifier[@identifierType='DOI']",
-                Filters.element(), null, DATACITE_NAMESPACE);
+    private static void insertDOI(Document datacite, MCRDigitalObjectIdentifier doi)
+        throws MCRPersistentIdentifierException {
+        XPathExpression<Element> compile = XPathFactory.instance().compile(
+            "//datacite:identifier[@identifierType='DOI']",
+            Filters.element(), null, DATACITE_NAMESPACE);
         List<Element> doiList = compile.evaluate(datacite);
 
         if (doiList.size() > 1) {
             throw new MCRPersistentIdentifierException("There is more then one identifier with type DOI!");
         } else if (doiList.size() == 1) {
             Element doiElement = doiList.stream().findAny().get();
-            LOGGER.warn("Found existing DOI(" + doiElement.getTextTrim() + ") in Document will be replaced with" + doi.asString());
+            LOGGER.warn("Found existing DOI(" + doiElement.getTextTrim() + ") in Document will be replaced with"
+                + doi.asString());
             doiElement.setText(doi.asString());
         } else {
             // must be 0
@@ -91,13 +104,15 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     }
 
     @Override
-    public MCRDigitalObjectIdentifier registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    public MCRDigitalObjectIdentifier registerIdentifier(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
-            throw new MCRPersistentIdentifierException(getClass().getName() + " doesn't support additional information! (" + additional + ")");
+            throw new MCRPersistentIdentifierException(
+                getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
 
         MCRDigitalObjectIdentifier newDOI = getNewIdentifier(obj.getId(), additional);
-        if(useTestPrefix){
+        if (useTestPrefix) {
             newDOI = newDOI.toTestPrefix();
         }
 
@@ -128,16 +143,17 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
      */
     public List<Map.Entry<String, URI>> getMediaList(MCRObject obj) {
         List<Map.Entry<String, URI>> entryList = new ArrayList<>();
-        Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(obj.getId(), 1, TimeUnit.MINUTES).stream().findFirst();
+        Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(obj.getId(), 1, TimeUnit.MINUTES)
+            .stream().findFirst();
         derivateIdOptional.ifPresent(derivateId -> {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
             String mainDoc = derivate.getDerivate().getInternals().getMainDoc();
             MCRPath mainDocumentPath = MCRPath.getPath(derivateId.toString(), mainDoc);
             try {
-                String contentType = Files.probeContentType(mainDocumentPath);
-                contentType = contentType == null ? "application/octet-stream" : contentType;
-                // TODO: maybe add link to viewer if PDF or other supported format
-                entryList.add(new AbstractMap.SimpleEntry<>(contentType, new URI(this.registerURL + MCRXMLFunctions.encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDoc))));
+                String contentType = Optional.ofNullable(MCRContentTypes.probeContentType(mainDocumentPath))
+                    .orElse("application/octet-stream");
+                entryList.add(new AbstractMap.SimpleEntry<>(contentType, new URI(this.registerURL + MCRXMLFunctions
+                    .encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDoc))));
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Error while detecting the file to register!", e);
             }
@@ -149,7 +165,8 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         return new MCRDataciteClient(host, username, password, false, this.useTestPrefix);
     }
 
-    private Document transformToDatacite(MCRDigitalObjectIdentifier doi, MCRBase mcrBase) throws MCRPersistentIdentifierException {
+    private Document transformToDatacite(MCRDigitalObjectIdentifier doi, MCRBase mcrBase)
+        throws MCRPersistentIdentifierException {
         MCRObjectID id = mcrBase.getId();
         MCRBaseContent content = new MCRBaseContent(mcrBase);
 
@@ -159,14 +176,18 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             insertDOI(dataciteDocument, doi);
             return dataciteDocument;
         } catch (IOException | JDOMException | SAXException e) {
-            throw new MCRPersistentIdentifierException("Could not transform the content of " + id.toString() + " with the transformer " + transformer, e);
+            throw new MCRPersistentIdentifierException(
+                "Could not transform the content of " + id.toString() + " with the transformer " + transformer, e);
         }
     }
 
     @Override
-    public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
-        if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
-            LOGGER.warn("SuperUser deletes object " + obj.getId().toString() + " with registered doi " + doi.asString() + ". Try to set DOI inactive.");
+    public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
+        if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+            .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
+            LOGGER.warn("SuperUser deletes object " + obj.getId().toString() + " with registered doi " + doi.asString()
+                + ". Try to set DOI inactive.");
             try {
                 getDataciteClient().deleteMetadata(doi);
             } catch (MCRPersistentIdentifierException e) {
@@ -178,7 +199,8 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     }
 
     @Override
-    public void update(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    public void update(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         Document datacite = transformToDatacite(doi, obj);
         MCRDataciteClient dataciteClient = getDataciteClient();
         dataciteClient.deleteMetadata(doi);
