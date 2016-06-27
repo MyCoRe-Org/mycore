@@ -45,6 +45,7 @@ import javax.xml.transform.sax.SAXResult;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
+import org.apache.fop.apps.EnvironmentalProfileFactory;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -105,7 +106,9 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
         FopFactoryBuilder fopFactoryBuilder;
         try {
-            fopFactoryBuilder = new FopFactoryBuilder(new URI(BASE_URI), resolver);
+            // use restricted io to prevent issues with font caching on some systems 
+            fopFactoryBuilder = new FopFactoryBuilder(
+                    EnvironmentalProfileFactory.createRestrictedIO(new URI(BASE_URI), resolver));
             final String fo_cfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
             if (!fo_cfg.isEmpty()) {
                 try {
@@ -163,7 +166,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             final FOUserAgent userAgent = fopFactory.newFOUserAgent();
             userAgent.setProducer(MessageFormat.format("MyCoRe {0} ({1})", MCRCoreVersion.getCompleteVersion(),
                     userAgent.getProducer()));
-            
+
             final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, out);
             final Source src = input.getSource();
             final Result res = new SAXResult(fop.getDefaultHandler());
