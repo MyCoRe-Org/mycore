@@ -14,6 +14,7 @@
     <manifest.priority>85</manifest.priority>
     <!-- TODO: remove -->
     <forbiddenapis.skip>true</forbiddenapis.skip>
+    <maven.compiler.arg />
   </properties>
   <dependencies>
     <dependency>

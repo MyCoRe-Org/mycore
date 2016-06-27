@@ -2,6 +2,7 @@ package org.mycore.urn.rest;
 
 import org.apache.log4j.Logger;
 
+@Deprecated
 public class DefaultURNServerConfiguration implements URNServerConfiguration {
 
     static final Logger LOGGER = Logger.getLogger(DefaultURNServerConfiguration.class);

@@ -13,6 +13,7 @@ import org.mycore.urn.hibernate.MCRURN;
 import org.mycore.urn.services.MCRIURNProvider;
 import org.mycore.urn.services.MCRURNManager;
 
+@Deprecated
 public class URNProcessor {
 
     private static final Logger LOGGER = Logger.getLogger(URNProcessor.class);

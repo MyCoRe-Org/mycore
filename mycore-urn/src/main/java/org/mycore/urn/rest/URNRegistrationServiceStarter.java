@@ -18,6 +18,7 @@ import org.mycore.common.events.MCRStartupHandler;
  * @author shermann
  *
  */
+@Deprecated
 public class URNRegistrationServiceStarter implements MCRStartupHandler.AutoExecutable, MCRShutdownHandler.Closeable {
 
     private static final Logger LOGGER = Logger.getLogger(URNRegistrationServiceStarter.class);

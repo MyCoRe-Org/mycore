@@ -13,6 +13,7 @@ import org.mycore.common.MCRException;
  * @author shermann
  * 
  */
+@Deprecated
 public class MCRURNProvider extends MCRAbstractURNProvider  {
 
     /* (non-Javadoc)

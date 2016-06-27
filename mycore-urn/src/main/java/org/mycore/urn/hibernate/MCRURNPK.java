@@ -39,6 +39,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @version $Revision$ $Date$
  */
 @Embeddable
+@Deprecated
 public class MCRURNPK implements Serializable {
 
     private static final long serialVersionUID = 8252257587972286981L;

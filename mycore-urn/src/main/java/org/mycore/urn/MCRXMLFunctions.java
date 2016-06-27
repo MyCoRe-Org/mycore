@@ -46,6 +46,7 @@ import org.w3c.dom.NodeList;
  * @author Thomas Scheffler (yagee)
  *
  */
+@Deprecated
 public class MCRXMLFunctions {
 
     private static Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);

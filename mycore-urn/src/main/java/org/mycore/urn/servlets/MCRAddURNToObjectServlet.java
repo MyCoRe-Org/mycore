@@ -31,6 +31,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
  *
  * @author shermann
  */
+@Deprecated
 public class MCRAddURNToObjectServlet extends MCRServlet {
     private static final Logger LOGGER = Logger.getLogger(MCRAddURNToObjectServlet.class);
 

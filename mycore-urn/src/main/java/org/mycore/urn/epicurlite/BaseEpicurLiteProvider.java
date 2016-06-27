@@ -30,6 +30,7 @@ import org.mycore.urn.hibernate.MCRURN;
  * @author shermann
  *
  */
+@Deprecated
 public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
     
     private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration.instance().getString("MCR.URN.URNGranular.SupportedContentTypes", "");

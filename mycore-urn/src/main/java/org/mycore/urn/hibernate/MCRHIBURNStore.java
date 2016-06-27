@@ -45,6 +45,7 @@ import org.mycore.urn.services.MCRURNStore;
 /**
  * This class implements the MCRXMLInterface.
  */
+@Deprecated
 public class MCRHIBURNStore implements MCRURNStore {
     // logger
     static Logger logger = Logger.getLogger(MCRHIBURNStore.class.getName());

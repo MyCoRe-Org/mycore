@@ -23,6 +23,7 @@ import org.mycore.urn.hibernate.MCRURN;
  * @author shermann
  *
  */
+@Deprecated
 public class URNServer {
 
     private static final Logger LOGGER = Logger.getLogger(URNServer.class);
