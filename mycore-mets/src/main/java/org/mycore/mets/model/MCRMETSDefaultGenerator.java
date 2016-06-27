@@ -177,7 +177,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         String fileName = "";
 
         try {
-            final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1), false);
+            final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1), true);
             int beginIndex = href.lastIndexOf("/") == -1 ? 0 : href.lastIndexOf("/") + 1;
             int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length() : href
                 .lastIndexOf(".");
