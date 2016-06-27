@@ -14,6 +14,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -36,6 +38,7 @@ import com.google.gson.Gson;
 public class MCRPersistentIdentifierRegistrationResource {
 
     public static final int COUNT_LIMIT = 100;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @GET
     @Path("type/{type}")
@@ -84,6 +87,7 @@ public class MCRPersistentIdentifierRegistrationResource {
         try {
             mycoreIDObject = MCRObjectID.getInstance(mycoreId);
         } catch (MCRException e) {
+            LOGGER.error(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorJSON("The provided id " + mycoreId + " seems to be invalid!", e)).build();
         }
 
@@ -92,8 +96,10 @@ public class MCRPersistentIdentifierRegistrationResource {
         try {
             identifier = registrationService.fullRegister(object, additional);
         } catch (MCRPersistentIdentifierException|MCRActiveLinkException e) {
+            LOGGER.error(e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(buildErrorJSON("Error while register new identifier!", e)).build();
         } catch (MCRAccessException e) {
+            LOGGER.error(e);
             return Response.status(Response.Status.FORBIDDEN).entity(buildErrorJSON("Error while register new identifier!", e)).build();
         }
 
@@ -126,7 +132,7 @@ public class MCRPersistentIdentifierRegistrationResource {
     }
 
     private String buildErrorJSON(String message, Exception e) {
-        return new Gson().toJson(new MCRPIErrorJSON(message + e.toString()));
+        return new Gson().toJson(new MCRPIErrorJSON(message, e));
     }
 
     private String buildIdentifierObject(MCRPersistentIdentifier pi) {

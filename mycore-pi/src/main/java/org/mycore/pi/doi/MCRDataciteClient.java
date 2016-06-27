@@ -3,6 +3,7 @@ package org.mycore.pi.doi;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.AbstractMap;
@@ -34,7 +35,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -343,6 +343,17 @@ public class MCRDataciteClient {
             CloseableHttpResponse response = httpClient.execute(post);
             StatusLine statusLine = response.getStatusLine();
 
+            StringBuilder sb = new StringBuilder();
+            try (InputStream is = response.getEntity().getContent()) {
+                Scanner scanner = new Scanner(is, "UTF-8");
+                while (scanner.hasNextLine()) {
+                    sb.append(scanner.nextLine()).append(System.lineSeparator());
+                }
+            } catch (IOException | UnsupportedOperationException e) {
+                LOGGER.warn("Could not read content!", e);
+            }
+            String responseString = sb.toString();
+
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_CREATED:
                     Header[] responseHeaders = response.getAllHeaders();
@@ -352,13 +363,13 @@ public class MCRDataciteClient {
                         }
                     }
                     // should not happen
-                    throw new MCRDatacenterException("Location header not found in response!");
+                    throw new MCRDatacenterException("Location header not found in response! - " + responseString);
                 case HttpStatus.SC_BAD_REQUEST: // invalid xml or wrong prefix
-                    throw new MCRDatacenterException("Invalid xml or wrong prefix: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase());
+                    throw new MCRDatacenterException("Invalid xml or wrong prefix: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase() + " - " + responseString);
                 case HttpStatus.SC_UNAUTHORIZED: // no login
                     throw new MCRDatacenterAuthenticationException();
                 default:
-                    throw new MCRDatacenterException("Unknown return status: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase());
+                    throw new MCRDatacenterException("Unknown return status: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase() + " - " + responseString);
             }
         } catch (IOException | URISyntaxException e) {
             throw new MCRDatacenterException("Error while storing metadata!", e);
