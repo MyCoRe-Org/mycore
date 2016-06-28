@@ -34,10 +34,10 @@
     <httpcore.version>4.4.5</httpcore.version>
     <xalan.version>2.7.2</xalan.version>
     <jersey.version>1.19.1</jersey.version>
-    <changelog.since>2016-02-24</changelog.since>
+    <changelog.since>2016-06-27</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2016.06.0.1</changes.version>
-    <site.suffix />
+    <site.suffix>2016.06.0.x</site.suffix>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
   </properties>
