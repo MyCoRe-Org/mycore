@@ -111,6 +111,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
         linkID.setXLinkTitle(der.getLabel());
         try {
             MCRMetadataManager.update(obj);
+            MCRMetadataManager.update(der);
         } catch (MCRPersistenceException | MCRActiveLinkException e) {
             throw new MCRPersistenceException("Can't store label of derivate " + derivateID
                 + " in derivate list of object " + objectID + ".", e);
