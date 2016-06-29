@@ -118,13 +118,12 @@ abstract class MCRPersistenceServlet extends MCRServlet {
         String fuhid = fuh.getID();
         String base = MCRFrontendUtil.getBaseURL() + uploadPage;
         Properties params = new Properties();
-        params.put("XSL.UploadID", fuhid);
+        params.put("uploadId", fuhid);
+        params.put("parentObjectID", objectId);
+        if (derivateId != null) {
+            params.put("derivateID", derivateId);
+        }
         params.put("cancelUrl", MCRPersistenceHelper.getCancelUrl(request));
-        params.put("XSL.target.param.1", "method=formBasedUpload");
-        params.put("XSL.target.param.2", "uploadId=" + fuhid);
-        params.put("XSL.ObjectID", objectId);
-        params.put("mcrid", objectId);
-        params.put("XSL.parentObjectID", objectId);
         response.sendRedirect(response.encodeRedirectURL(buildRedirectURL(base, params)));
     }
 
