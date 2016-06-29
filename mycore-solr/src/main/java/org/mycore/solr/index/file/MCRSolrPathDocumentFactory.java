@@ -29,22 +29,17 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.ProviderMismatchException;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.jdom2.Document;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.content.MCRPathContent;
-import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -57,9 +52,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.mets.model.Mets;
-import org.mycore.mets.model.struct.LogicalDiv;
-import org.mycore.mets.model.struct.LogicalStructMap;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
@@ -69,7 +61,6 @@ import com.google.common.io.Files;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
  */
 public class MCRSolrPathDocumentFactory {
 
@@ -146,52 +137,11 @@ public class MCRSolrPathDocumentFactory {
         iDate.setDate(new Date(attr.lastModifiedTime().toMillis()));
         doc.setField("modified", iDate.getISOString());
 
-        //        if (input.hasAudioVideoExtender()) {
-        //            MCRAudioVideoExtender ext = input.getAudioVideoExtender();
-        //            doc.setField("bitRate", ext.getBitRate());
-        //            doc.setField("frameRate", ext.getFrameRate());
-        //            doc.setField("duration", ext.getDurationTimecode());
-        //            doc.setField("mediaType", (ext.hasVideoStream() ? "video" : "audio"));
-        //        }
-
-        String metsFileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
-        if (input.getFileName().toString().equalsIgnoreCase(metsFileName)) {
-            try {
-                Document d = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRPathContent(input));
-                Mets p = new Mets(d);
-                LogicalStructMap structMap = (LogicalStructMap) p.getStructMap(LogicalStructMap.TYPE);
-                LogicalDiv rootDiv = structMap.getDivContainer();
-                List<LogicalDiv> children = getAllChilds(rootDiv);
-
-                for (LogicalDiv childDiv : children) {
-                    doc.addField("content", childDiv.getLabel());
-
-                    // some types contain - or other illegal character and they should be removed
-                    String cleanType = childDiv.getType().replaceAll("[\\-\\s]","");
-
-                    doc.addField("mets." + cleanType, childDiv.getLabel());
-                }
-            } catch (Exception e) {
-                throw new MCRPersistenceException("could not parse mets.xml", e);
-            }
-        }
-
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("MCRFile " + input.toString() + " transformed to:\n" + doc.toString());
         }
 
         return doc;
-    }
-
-    private List<LogicalDiv> getAllChilds(LogicalDiv rootDiv) {
-        ArrayList<LogicalDiv> allChildren = new ArrayList<LogicalDiv>();
-        List<LogicalDiv> children = rootDiv.getChildren();
-
-        allChildren.add(rootDiv);
-        for (LogicalDiv logicalSubDiv : children) {
-            allChildren.addAll(getAllChilds(logicalSubDiv));
-        }
-        return allChildren;
     }
 
     /**
