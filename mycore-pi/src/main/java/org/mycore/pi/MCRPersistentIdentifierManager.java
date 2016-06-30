@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -60,6 +61,27 @@ public class MCRPersistentIdentifierManager {
         return getCount(null);
     }
 
+    public static boolean exist(MCRPIRegistrationInfo mcrpiRegistrationInfo) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Number> rowCountQuery = cb.createQuery(Number.class);
+        Root<MCRPI> pi = rowCountQuery.from(MCRPI.class);
+        return em.createQuery(
+                rowCountQuery
+                        .select(cb.count(pi))
+                        .where(cb.equal(pi.get(MCRPI_.type), mcrpiRegistrationInfo.getType()))
+                        .where(cb.equal(pi.get(MCRPI_.additional), mcrpiRegistrationInfo.getAdditional()))
+                        .where(cb.equal(pi.get(MCRPI_.created), mcrpiRegistrationInfo.getCreated()))
+                        .where(cb.equal(pi.get(MCRPI_.identifier), mcrpiRegistrationInfo.getIdentifier()))
+                        .where(cb.equal(pi.get(MCRPI_.mcrRevision), mcrpiRegistrationInfo.getMcrRevision()))
+                        .where(cb.equal(pi.get(MCRPI_.service), mcrpiRegistrationInfo.getService()))
+                        .where(cb.equal(pi.get(MCRPI_.mcrVersion), mcrpiRegistrationInfo.getMcrVersion()))
+                        .where(cb.equal(pi.get(MCRPI_.registered), mcrpiRegistrationInfo.getRegistered()))
+                        .where(cb.equal(pi.get(MCRPI_.mycoreID), mcrpiRegistrationInfo.getMycoreID()))
+        ).getSingleResult().intValue() > 0;
+
+    }
+
     public static int getCount(String type) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -72,9 +94,10 @@ public class MCRPersistentIdentifierManager {
             .getSingleResult().intValue();
     }
 
-    public static void delete(String objectID, String type, String service) {
+    public static void delete(String objectID, String additional, String type, String service) {
         Objects.requireNonNull(objectID, "objectId may not be null");
         Objects.requireNonNull(type, "type may not be null");
+        Objects.requireNonNull(additional, "additional may not be null");
         Objects.requireNonNull(service, "service may not be null");
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -86,8 +109,13 @@ public class MCRPersistentIdentifierManager {
                     .where(
                         cb.equal(pi.get(MCRPI_.mycoreID), objectID),
                         cb.equal(pi.get(MCRPI_.type), type),
+                        cb.equal(pi.get(MCRPI_.additional), additional),
                         cb.equal(pi.get(MCRPI_.service), service)))
                 .getSingleResult());
+    }
+
+    public static List<MCRPIRegistrationInfo> getList() {
+        return getList(null, -1, -1);
     }
 
     public static List<MCRPIRegistrationInfo> getList(int from, int count) {
@@ -99,13 +127,24 @@ public class MCRPersistentIdentifierManager {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRPIRegistrationInfo> getQuery = cb.createQuery(MCRPIRegistrationInfo.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
-        return em.createQuery(
-            getQuery
-                .select(pi)
-                .where(
-                    cb.equal(pi.get(MCRPI_.type), type)))
-            .setMaxResults(count)
-            .setFirstResult(from)
+        CriteriaQuery<MCRPIRegistrationInfo> all = getQuery
+                .select(pi);
+
+        if (type != null) {
+            all = all.where(cb.equal(pi.get(MCRPI_.type), type));
+        }
+
+        TypedQuery<MCRPIRegistrationInfo> typedQuery = em.createQuery(all);
+
+        if (from != -1) {
+            typedQuery = typedQuery.setFirstResult(from);
+        }
+
+        if (count != -1) {
+            typedQuery = typedQuery.setMaxResults(count);
+        }
+
+        return typedQuery
             .getResultList();
     }
 

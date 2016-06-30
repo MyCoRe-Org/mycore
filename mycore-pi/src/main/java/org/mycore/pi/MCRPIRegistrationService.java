@@ -10,8 +10,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -27,6 +25,10 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.GsonBuilder;
+
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier> {
@@ -36,6 +38,8 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
     public static final String GENERATOR_CONFIG_PREFIX = "MCR.PI.Generator.";
 
     public static final String INSCRIBER_CONFIG_PREFIX = "MCR.PI.Inscriber.";
+    public static final String PI_FLAG = "MyCoRe-PI";
+    public static final String FLAG_SEPERATOR = "\\";
 
     private final String registrationServiceID;
 
@@ -83,6 +87,22 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         }
     }
 
+    public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
+        String json = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(FieldAttributes fieldAttributes) {
+                String name = fieldAttributes.getName();
+                return name.equals("mcrRevision") || name.equals("mycoreID") || name.equals("id") || name.equals("mcrVersion");
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> aClass) {
+                return false;
+            }
+        }).create().toJson(databaseEntry);
+        obj.getService().addFlag(PI_FLAG, json);
+    }
+
     /**
      * Validates everything, registers a new Identifier, inserts the identifier to object metadata and writes a information to the Database.
      *
@@ -101,6 +121,8 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
             this.getRegistrationServiceID(), new Date());
         MCRHIBConnection.instance().getSession().save(databaseEntry);
+
+        addFlagToObject(obj, databaseEntry);
 
         if (obj instanceof MCRObject) {
             MCRMetadataManager.update((MCRObject) obj);
@@ -123,7 +145,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
     protected final void onDelete(T identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         delete(identifier, obj, additional);
-        MCRPersistentIdentifierManager.delete(obj.getId().toString(), getType(), this.getRegistrationServiceID());
+        MCRPersistentIdentifierManager.delete(obj.getId().toString(), additional, getType(), this.getRegistrationServiceID());
     }
 
     protected final void onUpdate(T identifier, MCRBase obj, String additional)
