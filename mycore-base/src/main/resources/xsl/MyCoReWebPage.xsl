@@ -13,6 +13,8 @@
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:include href="xslInclude:MyCoReWebPage" />
 
+  <xsl:variable name="PageID" select="/MyCoReWebPage/@id" />
+
   <xsl:variable name="PageTitle">
     <xsl:choose>
       <xsl:when test="/MyCoReWebPage/section/@i18n">
@@ -112,7 +114,7 @@
 
   <!-- =============================================================================== -->
 
-  <xsl:template match="section">
+  <xsl:template match="/MyCoReWebPage/section">
     <xsl:for-each select="node()">
       <xsl:apply-templates select="." />
     </xsl:for-each>
