@@ -32,22 +32,19 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
-import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
-import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 /**
  * This servlet handles form based file upload.
@@ -72,7 +69,12 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
 
         MCREditorSubmission sub = (MCREditorSubmission) job.getRequest().getAttribute("MCREditorSubmission");
         MCRRequestParameters rp = sub == null ? new MCRRequestParameters(job.getRequest()) : sub.getParameters();
-        MCRUploadHandler handler = getUploadHandler(rp);
+        Optional<MCRUploadHandler> uh = getUploadHandler(rp);
+        if (!uh.isPresent()) {
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter 'uploadId' is missing!");
+            return;
+        }
+        MCRUploadHandler handler = uh.get();
         LOGGER.info("UploadHandler form based file upload for ID " + handler.getID());
 
         List<FileItem> files = getUploadedFiles(rp);
@@ -96,43 +98,10 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
             throw new RuntimeException("System is currently in read-only mode");
     }
 
-    private MCRUploadHandler getUploadHandler(MCRRequestParameters rp) {
-        String uploadId = rp.getParameter("uploadId");
-
-        if ((uploadId != null) && !uploadId.isEmpty())
-            return MCRUploadHandlerManager.getHandler(uploadId);
-        else
-            return createUploadHandler(rp);
-    }
-
-    /* I actually don't like this, because the type of handler and parameters are hard-coded */
-    private MCRUploadHandler createUploadHandler(MCRRequestParameters rp) {
-        String parentObjectID = rp.getParameter("parentObjectID");
-        String derivateID = getSubmittedDerivateID(rp);
-
-        LOGGER.info("Create missing upload handler for " + parentObjectID + " derivateID " + derivateID);
-        guardAgainstMissingPermissions(parentObjectID, derivateID);
-
-        String cancelUrl = Optional.ofNullable(rp.getParameter("cancelUrl"))
-            .orElseGet(() -> MCRFrontendUtil.getBaseURL() + "receive/" + parentObjectID);
-        return new MCRUploadHandlerIFS(parentObjectID, derivateID, cancelUrl);
-    }
-
-    private String getSubmittedDerivateID(MCRRequestParameters rp) {
-        String derivateID = rp.getParameter("derivateID");
-        if ((derivateID != null) && derivateID.trim().isEmpty())
-            derivateID = null;
-        return derivateID;
-    }
-
-    private void guardAgainstMissingPermissions(String parentObjectID, String derivateID) {
-        if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE))
-            throw new MCRPersistenceException(
-                "You do not have \"" + PERMISSION_WRITE + "\" permission on " + parentObjectID + ".");
-
-        if ((derivateID != null) && !MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE))
-            throw new MCRPersistenceException(
-                "You do not have \"" + PERMISSION_WRITE + "\" permission on " + derivateID + ".");
+    private Optional<MCRUploadHandler> getUploadHandler(MCRRequestParameters rp) {
+        return Optional
+            .ofNullable(rp.getParameter("uploadId"))
+            .map(MCRUploadHandlerManager::getHandler);
     }
 
     private void handleUploadedFiles(MCRUploadHandler handler, List<FileItem> files) throws Exception, IOException {
