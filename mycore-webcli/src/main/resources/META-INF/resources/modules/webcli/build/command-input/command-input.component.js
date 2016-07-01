@@ -32,19 +32,37 @@ System.register(['@angular/core', '../service/rest.service', '../service/communi
                     this.recentCommands = new Array();
                     this.commandIndex = 0;
                     this.commmandChangend = false;
+                    this.recentCommandsMaxLength = 10;
                     this._comunicationService.currentCommand.subscribe(command => {
                         this.command = command;
                         this.commmandChangend = true;
                     });
+                    this._comunicationService.settings.subscribe(settings => {
+                        this.recentCommandsMaxLength = settings.comHistorySize;
+                    });
+                    var commandHistory = localStorage.getItem("commandHistory");
+                    if (commandHistory != undefined && commandHistory != "") {
+                        this.recentCommands = JSON.parse(commandHistory);
+                    }
                 }
                 execute(command) {
                     if (this.commandIndex != 0) {
                         this.recentCommands.pop();
                     }
                     this._restService.executeCommand(command);
-                    this.recentCommands.push(command);
+                    this.addCommandToRecentCommands(command);
                     this.commandIndex = 0;
                     this.command = "";
+                }
+                addCommandToRecentCommands(command) {
+                    if (this.recentCommands.length + 1 > this.recentCommandsMaxLength) {
+                        this.recentCommands.shift();
+                    }
+                    this.recentCommands.push(command);
+                    if (this.recentCommands.length > this.recentCommandsMaxLength) {
+                        this.recentCommands = this.recentCommands.splice(this.recentCommandsMaxLength * -1, this.recentCommandsMaxLength);
+                    }
+                    this.updateCommandListInLocalStorage();
                 }
                 onKeyPress(event, keyCode) {
                     if (keyCode == "13") {
@@ -88,6 +106,9 @@ System.register(['@angular/core', '../service/rest.service', '../service/communi
                         input.focus();
                         input.setSelectionRange(match.index, match.index + match[0].length);
                     }
+                }
+                updateCommandListInLocalStorage() {
+                    localStorage.setItem("commandHistory", JSON.stringify(this.recentCommands));
                 }
             };
             WebCliCommandInputComponent = __decorate([

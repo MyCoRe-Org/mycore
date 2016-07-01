@@ -14,7 +14,7 @@ export class WebCliLogComponent {
 
   constructor(private _restService: RESTService,
               private _comunicationService: CommunicationService){
-                this.settings = new Settings(50, true, false);
+                this.settings = new Settings(500, 10, true, false);
                 this._comunicationService.settings.subscribe(
                   settings =>{
                     this.settings = settings;

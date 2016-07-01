@@ -31,7 +31,7 @@ System.register(['@angular/core', '../settings/settings', '../service/rest.servi
                 constructor(_restService, _comunicationService) {
                     this._restService = _restService;
                     this._comunicationService = _comunicationService;
-                    this.settings = new settings_1.Settings(50, true, false);
+                    this.settings = new settings_1.Settings(500, 10, true, false);
                     this._comunicationService.settings.subscribe(settings => {
                         this.settings = settings;
                     });

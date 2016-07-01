@@ -11,6 +11,7 @@ export class WebCliCommandInputComponent {
   recentCommands: string[] = new Array<string>();
   commandIndex: number = 0;
   commmandChangend: boolean = false;
+  recentCommandsMaxLength: number = 10;
 
   constructor(private _restService: RESTService,
               private _comunicationService: CommunicationService,
@@ -21,6 +22,15 @@ export class WebCliCommandInputComponent {
         this.commmandChangend = true;
       }
     );
+    this._comunicationService.settings.subscribe(
+      settings => {
+        this.recentCommandsMaxLength = settings.comHistorySize;
+      }
+    )
+    var commandHistory = localStorage.getItem("commandHistory");
+    if (commandHistory != undefined && commandHistory != "") {
+      this.recentCommands = JSON.parse(commandHistory);
+    }
   }
 
   execute(command: string) {
@@ -28,9 +38,20 @@ export class WebCliCommandInputComponent {
       this.recentCommands.pop();
     }
     this._restService.executeCommand(command);
-    this.recentCommands.push(command);
+    this.addCommandToRecentCommands(command);
     this.commandIndex = 0;
     this.command = "";
+  }
+
+  addCommandToRecentCommands(command: string) {
+    if (this.recentCommands.length + 1  > this.recentCommandsMaxLength){
+      this.recentCommands.shift();
+    }
+    this.recentCommands.push(command);
+    if (this.recentCommands.length > this.recentCommandsMaxLength) {
+      this.recentCommands = this.recentCommands.splice(this.recentCommandsMaxLength * -1, this.recentCommandsMaxLength);
+    }
+    this.updateCommandListInLocalStorage();
   }
 
   onKeyPress(event, keyCode) {
@@ -78,5 +99,9 @@ export class WebCliCommandInputComponent {
       input.focus();
       input.setSelectionRange(match.index, match.index + match[0].length);
     }
+  }
+
+  updateCommandListInLocalStorage() {
+    localStorage.setItem("commandHistory", JSON.stringify(this.recentCommands));
   }
 }
