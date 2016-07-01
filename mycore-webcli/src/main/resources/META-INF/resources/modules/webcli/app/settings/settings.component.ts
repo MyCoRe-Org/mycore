@@ -14,7 +14,7 @@ export class WebCliSettingsComponent {
               private _restService: RESTService){}
 
   ngOnInit() {
-    this.settings = this.getSettingsFromCookie(50, true, false);
+    this.settings = this.getSettingsFromCookie(500, 10, true, false);
     this._communicationService.setSettings(this.settings);
     this._restService.setContinueIfOneFails(this.settings.continueIfOneFails);
   }
@@ -22,6 +22,12 @@ export class WebCliSettingsComponent {
   onHistoryChange() {
     if (localStorage.getItem("historySize") != this.settings.historySize + "") {
       localStorage.setItem("historySize", this.settings.historySize + "");
+    }
+  }
+
+  onComHistoryChange() {
+    if (localStorage.getItem("comHistorySize") != this.settings.comHistorySize + "") {
+      localStorage.setItem("comHistorySize", this.settings.comHistorySize + "");
     }
   }
 
@@ -38,13 +44,20 @@ export class WebCliSettingsComponent {
     this._restService.setContinueIfOneFails(event.srcElement.checked);
   }
 
-  private getSettingsFromCookie(defaultHSize: number, defaultAutoScroll: boolean, defaultContinueIfOneFails: boolean) {
+  private getSettingsFromCookie(defaultHSize: number, defaultComHSize: number, defaultAutoScroll: boolean, defaultContinueIfOneFails: boolean) {
     var storageHSize = localStorage.getItem("historySize");
     if (storageHSize != undefined && storageHSize != ""){
       defaultHSize = parseInt(storageHSize);
     }
     else {
       localStorage.setItem("historySize", defaultHSize + "");
+    }
+    var storageComHSize = localStorage.getItem("comHistorySize");
+    if (storageComHSize != undefined && storageComHSize != ""){
+      defaultComHSize = parseInt(storageComHSize);
+    }
+    else {
+      localStorage.setItem("comHistorySize", defaultComHSize + "");
     }
     var storageAutoScroll = localStorage.getItem("autoScroll");
     if (storageAutoScroll != undefined && storageAutoScroll != ""){
@@ -61,6 +74,6 @@ export class WebCliSettingsComponent {
     else {
       localStorage.setItem("defaultContinueIfOneFails", defaultContinueIfOneFails + "")
     }
-    return new Settings(defaultHSize, defaultAutoScroll, defaultContinueIfOneFails);
+    return new Settings(defaultHSize, defaultComHSize, defaultAutoScroll, defaultContinueIfOneFails);
   }
 }
