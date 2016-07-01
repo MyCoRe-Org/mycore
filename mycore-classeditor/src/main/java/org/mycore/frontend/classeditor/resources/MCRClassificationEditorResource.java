@@ -46,7 +46,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRStreamContent;
@@ -231,6 +230,14 @@ public class MCRClassificationEditorResource {
             }
             try {
                 op.run();
+            } catch (WebApplicationException webExc) {
+                LOGGER.warn("Classification error.", webExc);
+                MCRSessionMgr.getCurrentSession().rollbackTransaction();
+                throw webExc;
+            } catch (Exception e) {
+                LOGGER.error("Classification error.", e);
+                MCRSessionMgr.getCurrentSession().rollbackTransaction();
+                throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
             } finally {
                 MCRSessionMgr.getCurrentSession().commitTransaction();
             }
@@ -255,21 +262,16 @@ public class MCRClassificationEditorResource {
 
         @Override
         public void run() {
-            try {
-                MCRCategoryID categoryID = category.getId();
-                if (CATEGORY_DAO.exist(categoryID)) {
-                    if (categoryID.isRootID()
-                        && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
-                        throw new WebApplicationException(Status.UNAUTHORIZED);
-                    }
-                    CATEGORY_DAO.deleteCategory(categoryID);
-                    setResponse(Response.status(Status.GONE).build());
-                } else {
-                    setResponse(Response.notModified().build());
+            MCRCategoryID categoryID = category.getId();
+            if (CATEGORY_DAO.exist(categoryID)) {
+                if (categoryID.isRootID()
+                    && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
+                    throw new WebApplicationException(Status.UNAUTHORIZED);
                 }
-            } catch (MCRPersistenceException e) {
-                e.printStackTrace();
-                setResponse(Response.status(Status.NOT_FOUND).build());
+                CATEGORY_DAO.deleteCategory(categoryID);
+                setResponse(Response.status(Status.GONE).build());
+            } else {
+                setResponse(Response.notModified().build());
             }
         }
 
