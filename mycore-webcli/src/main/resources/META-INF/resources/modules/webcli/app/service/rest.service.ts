@@ -14,11 +14,13 @@ export class RESTService {
   private _currentLog = new Subject<Log>();
   private _currentQueue = new Subject<String[]>();
   private _currentCommand = new Subject<String>();
+  private _currentQueueLength = new Subject<number>();
 
   currentCommandList = this._currentCommandList.asObservable();
   currentLog = this._currentLog.asObservable();
   currentQueue = this._currentQueue.asObservable();
   currentCommand = this._currentCommand.asObservable();
+  currentQueueLength = this._currentQueueLength.asObservable();
 
   constructor(private http: Http) {
     var loc = window.location;
@@ -119,6 +121,7 @@ export class RESTService {
         else {
           this._currentQueue.next(new Array<String>());
         }
+        this._currentQueueLength.next(message.size);
       }
       if (message.type == "currentCommand"){
           this._currentCommand.next(message.return);

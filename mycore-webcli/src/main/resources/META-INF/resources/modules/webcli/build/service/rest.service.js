@@ -34,10 +34,12 @@ System.register(['@angular/core', '@angular/http', 'rxjs/Subject'], function(exp
                     this._currentLog = new Subject_1.Subject();
                     this._currentQueue = new Subject_1.Subject();
                     this._currentCommand = new Subject_1.Subject();
+                    this._currentQueueLength = new Subject_1.Subject();
                     this.currentCommandList = this._currentCommandList.asObservable();
                     this.currentLog = this._currentLog.asObservable();
                     this.currentQueue = this._currentQueue.asObservable();
                     this.currentCommand = this._currentCommand.asObservable();
+                    this.currentQueueLength = this._currentQueueLength.asObservable();
                     var loc = window.location;
                     var protocol = "ws://";
                     if (location.protocol == "https:") {
@@ -129,6 +131,7 @@ System.register(['@angular/core', '@angular/http', 'rxjs/Subject'], function(exp
                             else {
                                 this._currentQueue.next(new Array());
                             }
+                            this._currentQueueLength.next(message.size);
                         }
                         if (message.type == "currentCommand") {
                             this._currentCommand.next(message.return);

@@ -34,6 +34,7 @@
 									<resources>
 										<resource>
 											<directory>${basedir}/src/main/resources/META-INF/resources/modules/webcli</directory>
+											<exclude>node_modules/**</exclude>
 										</resource>
 									</resources>
 								</configuration>

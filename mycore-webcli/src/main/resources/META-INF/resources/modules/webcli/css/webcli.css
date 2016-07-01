@@ -44,6 +44,7 @@ html, body {
 
 #log {
   padding-bottom: 0;
+  height: 100%;
 }
 
 div.web-cli-log{
@@ -59,7 +60,12 @@ div.web-cli-log > pre{
   margin-bottom: 0;
 }
 
-div.web-cli-queue{
+div.web-cli-queue {
+  height: 100%;
+  padding-right: 0;
+}
+
+div.web-cli-queue > pre{
   height: calc(100% - 232px);
   overflow: auto;
   padding-right: 0;

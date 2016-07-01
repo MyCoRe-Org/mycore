@@ -37,6 +37,7 @@ public class CommandListObserver implements Observer{
             else {
                 jObject.addProperty("return", obCommandList.getAsJSONArrayString()); 
             }
+            jObject.addProperty("size", obCommandList.size()); 
             try {
                 this.session.getBasicRemote().sendText(jObject.toString());
             } catch (IOException ex) {
