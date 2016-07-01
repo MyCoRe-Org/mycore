@@ -27,11 +27,12 @@ export class AppComponent {
           this.currentCommand = command;
       });
 
-    this._restService.currentQueue.subscribe(
-      queue => {
-          this.currentQueueLength = queue.length;
-          if (queue.length < 1) {
-            document.getElementsByClassName('logTab')[0].click();
+    this._restService.currentQueueLength.subscribe(
+      queueLength => {
+          this.currentQueueLength = queueLength;
+          if (queueLength < 1) {
+            (<HTMLElement>document.getElementsByClassName('logTab')[0]).click();
+            this.webCliLogComponent.scrollLog();
           }
       });
   }

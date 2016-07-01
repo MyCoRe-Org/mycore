@@ -49,10 +49,11 @@ System.register(['@angular/core', './commands/commands.component', './command-in
                     this._restService.currentCommand.subscribe(command => {
                         this.currentCommand = command;
                     });
-                    this._restService.currentQueue.subscribe(queue => {
-                        this.currentQueueLength = queue.length;
-                        if (queue.length < 1) {
+                    this._restService.currentQueueLength.subscribe(queueLength => {
+                        this.currentQueueLength = queueLength;
+                        if (queueLength < 1) {
                             document.getElementsByClassName('logTab')[0].click();
+                            this.webCliLogComponent.scrollLog();
                         }
                     });
                 }

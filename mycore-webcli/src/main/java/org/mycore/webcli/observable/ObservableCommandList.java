@@ -51,7 +51,8 @@ public class ObservableCommandList extends Observable {
     
     public String getAsJSONArrayString() {
         if (!arrayList.isEmpty()) {
-            return MCRJSONUtils.getJsonArray(arrayList).toString();
+            //limited to 100 Elements, for performance reasons
+            return MCRJSONUtils.getJsonArray(arrayList.subList(0, 100 > arrayList.size() ? arrayList.size() : 100)).toString();
         }
         return "";
     }
