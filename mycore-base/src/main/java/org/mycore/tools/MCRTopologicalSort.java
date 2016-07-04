@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -131,6 +133,40 @@ public class MCRTopologicalSort {
         }
         dirty = false;
     }
+    
+    /**
+     * reads MCRObjectIDs, retrieves parent links from MCRLinkTableManager
+     * and creates the graph
+     * 
+     * uses StAX cursor API (higher performance)
+     */
+    public void prepareMCRObjects(String[] mcrids) {
+        nodes = HashBiMap.create(mcrids.length);
+        edgeSources.clear();
+
+        String mcrid = null;
+        Map<Integer, String> parentNames = new HashMap<Integer, String>();
+
+        for (int i = 0; i < mcrids.length; i++) {
+            mcrid = mcrids[i];
+            
+            Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(mcrid, "parent");
+            nodes.forcePut(i, mcrid);
+            if(!parents.isEmpty()){
+                parentNames.put(i, parents.iterator().next());
+            }
+           
+            //build edges
+            for (int source : parentNames.keySet()) {
+                Integer target = nodes.inverse().get(parentNames.get(source));
+                if (target != null) {
+                    addEdge(source, target);
+                }
+            }
+        }
+        dirty = false;
+    }
+
 
     /**
      * add a node to the graph
