@@ -33,7 +33,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -68,7 +69,7 @@ public final class MCRObjectID {
 
     private static final MCRObjectIDFormat idFormat = new MCRObjectIDDefaultFormat();
 
-    private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
 
     private static HashSet<String> VALID_TYPE_LIST;
     static {
@@ -350,42 +351,14 @@ public final class MCRObjectID {
      *         otherwise return false
      */
     private boolean setID(String id) {
-        if (id == null) {
+        if(!isValid(id)) {
             return false;
         }
-
-        String mcr_id = id.trim();
-        if (mcr_id.length() > MAX_LENGTH) {
-            return false;
-        }
-
-        String[] idParts = getIDParts(mcr_id);
-
-        if (idParts.length != 3) {
-            return false;
-        }
-
+        String[] idParts = getIDParts(id.trim());
         projectId = idParts[0].intern();
-
         objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
-
-        if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
-            LOGGER.warn("Property MCR.Metadata.Type." + objectType + " is not set. Thus " + id
-                + " cannot be a valid id");
-            return false;
-        }
-
-        try {
-            numberPart = Integer.parseInt(idParts[2]);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        if (numberPart < 0) {
-            return false;
-        }
+        numberPart = Integer.parseInt(idParts[2]);
         this.combinedId = formatID(projectId, objectType, numberPart);
-
         return true;
     }
 
@@ -457,4 +430,40 @@ public final class MCRObjectID {
     public static boolean isValidType(String type) {
         return VALID_TYPE_LIST.contains(type);
     }
+
+    /**
+     * Checks if the given id is a valid mycore id in the form of {project}_{object_type}_{number}.
+     * 
+     * @param id the id to check
+     * @return true if the id is valid, false otherwise
+     */
+    public static boolean isValid(String id) {
+        if (id == null) {
+            return false;
+        }
+        String mcr_id = id.trim();
+        if (mcr_id.length() > MAX_LENGTH) {
+            return false;
+        }
+        String[] idParts = getIDParts(mcr_id);
+        if (idParts.length != 3) {
+            return false;
+        }
+        String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
+        if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
+            LOGGER.warn("Property MCR.Metadata.Type." + objectType + " is not set. Thus " + id
+                + " cannot be a valid id");
+            return false;
+        }
+        try {
+            Integer numberPart = Integer.parseInt(idParts[2]);
+            if (numberPart < 0) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
 }
