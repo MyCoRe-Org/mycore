@@ -135,7 +135,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "delete all objects in topological order", help = "Removes all MCRObjects in topological order.", order = 25)
     public static List<String> deleteTopologicalAllObjects() throws MCRActiveLinkException {
         final List<String> objectIds = MCRXMLMetadataManager.instance().listIDs();
-        String[] objects = objectIds.toArray(new String[objectIds.size()]);
+        List<String> validObjectIds = new ArrayList<>();
+        for(String id: objectIds){
+            if(!id.contains("_derivate_")){
+                validObjectIds.add(id);
+            }
+        }
+        String[] objects = validObjectIds.toArray(new String[validObjectIds.size()]);
         MCRTopologicalSort ts = new MCRTopologicalSort();
         ts.prepareMCRObjects(objects);
         int[] order = ts.doTopoSort();
@@ -143,8 +149,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         List<String> cmds = new ArrayList<String>(objectIds.size());
         if (order != null) {
             //delete in reverse order
-            for (int o = objects.length-1; o>=0; o--) {
-                cmds.add("delete object " + objects[o]);
+            for (int o = order.length-1; o>=0; o--) {
+                cmds.add("delete object " + ts.getNodeName(order[o]));
             }
         }
         return cmds;

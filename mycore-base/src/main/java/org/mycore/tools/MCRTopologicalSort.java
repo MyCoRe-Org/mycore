@@ -146,20 +146,18 @@ public class MCRTopologicalSort {
         nodes = HashBiMap.create(mcrids.length);
         edgeSources.clear();
 
-        String mcrid = null;
-
         for (int i = 0; i < mcrids.length; i++) {
             nodes.forcePut(i, mcrids[i]);
         }
         for (int i = 0; i < mcrids.length; i++) {
-            Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(mcrid, "parent");
+            Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(mcrids[i], "parent");
             for (String p : parents) {
                 Integer target = nodes.inverse().get(p);
                 if (target != null) {
                     addEdge(i, target);
                 }
             }
-            Collection<String> refs = MCRLinkTableManager.instance().getDestinationOf(mcrid, "reference");
+            Collection<String> refs = MCRLinkTableManager.instance().getDestinationOf(mcrids[i], "reference");
             for (String r : refs) {
                 Integer target = nodes.inverse().get(r);
                 if (target != null) {
@@ -248,8 +246,8 @@ public class MCRTopologicalSort {
      */
     public int[] doTopoSort() {
         if (dirty) {
-            LOGGER
-                .error("The data of this instance is inconsistent. Please call prepareData() again or start with a new instance!");
+            LOGGER.error(
+                "The data of this instance is inconsistent. Please call prepareData() again or start with a new instance!");
             return null;
         }
         dirty = true;
