@@ -71,9 +71,12 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
                 }
                 String relationshipTypeRaw = linkingNode.getAttributeValue("type");
                 MCRMODSRelationshipType relType = MCRMODSRelationshipType.valueOf(relationshipTypeRaw);
-                linkTableManager.addReferenceLink(obj.getId(),
-                    MCRObjectID.getInstance(targetID),
-                    MCRLinkTableManager.ENTRY_TYPE_REFERENCE, relType.toString());
+                //MCR-1328 (no reference links for 'host')
+                if (relType != MCRMODSRelationshipType.host) {
+                    linkTableManager.addReferenceLink(obj.getId(),
+                        MCRObjectID.getInstance(targetID),
+                        MCRLinkTableManager.ENTRY_TYPE_REFERENCE, relType.toString());
+                }
             }
         }
     }
