@@ -95,6 +95,7 @@ public class MCRTopologicalSort {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         for (int i = 0; i < files.length; i++) {
             file = files[i];
+
             try (FileInputStream fis = new FileInputStream(new File(dir, file))) {
                 XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(fis);
                 while (xmlStreamReader.hasNext()) {
@@ -122,18 +123,19 @@ public class MCRTopologicalSort {
             } catch (XMLStreamException | IOException e) {
                 e.printStackTrace();
             }
+        }
 
-            //build edges
-            for (int source : parentNames.keySet()) {
-                Integer target = nodes.inverse().get(parentNames.get(source));
-                if (target != null) {
-                    addEdge(source, target);
-                }
+        //build edges
+        for (int source : parentNames.keySet()) {
+            Integer target = nodes.inverse().get(parentNames.get(source));
+            if (target != null) {
+                addEdge(source, target);
             }
         }
+
         dirty = false;
     }
-    
+
     /**
      * reads MCRObjectIDs, retrieves parent links from MCRLinkTableManager
      * and creates the graph
@@ -145,28 +147,28 @@ public class MCRTopologicalSort {
         edgeSources.clear();
 
         String mcrid = null;
-        Map<Integer, String> parentNames = new HashMap<Integer, String>();
 
         for (int i = 0; i < mcrids.length; i++) {
-            mcrid = mcrids[i];
-            
+            nodes.forcePut(i, mcrids[i]);
+        }
+        for (int i = 0; i < mcrids.length; i++) {
             Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(mcrid, "parent");
-            nodes.forcePut(i, mcrid);
-            if(!parents.isEmpty()){
-                parentNames.put(i, parents.iterator().next());
-            }
-           
-            //build edges
-            for (int source : parentNames.keySet()) {
-                Integer target = nodes.inverse().get(parentNames.get(source));
+            for (String p : parents) {
+                Integer target = nodes.inverse().get(p);
                 if (target != null) {
-                    addEdge(source, target);
+                    addEdge(i, target);
+                }
+            }
+            Collection<String> refs = MCRLinkTableManager.instance().getDestinationOf(mcrid, "reference");
+            for (String r : refs) {
+                Integer target = nodes.inverse().get(r);
+                if (target != null) {
+                    addEdge(i, target);
                 }
             }
         }
         dirty = false;
     }
-
 
     /**
      * add a node to the graph
