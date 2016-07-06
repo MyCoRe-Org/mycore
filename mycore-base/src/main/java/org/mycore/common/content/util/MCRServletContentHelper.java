@@ -566,6 +566,7 @@ public abstract class MCRServletContentHelper {
         if (content.isReusable()) {
             try (ReadableByteChannel readableByteChannel = content.getReadableByteChannel()) {
                 if (readableByteChannel instanceof SeekableByteChannel) {
+                    endCurrentTransaction();
                     SeekableByteChannel seekableByteChannel = (SeekableByteChannel) readableByteChannel;
                     seekableByteChannel.position(range.start);
                     long bytesToCopy = range.end - range.start + 1;

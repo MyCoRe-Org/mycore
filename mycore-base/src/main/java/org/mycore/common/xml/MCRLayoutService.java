@@ -37,6 +37,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
@@ -194,6 +195,7 @@ public class MCRLayoutService {
                 } else {
                     transformer.transform(source, bout);
                 }
+                endCurrentTransaction();
                 response.setContentLength(bout.size());
                 bout.writeTo(servletOutputStream);
             } finally {
@@ -242,5 +244,12 @@ public class MCRLayoutService {
         } catch (Exception e) {
             return "application/octet-stream";
         }
+    }
+
+    /**
+     * Called before sending data to end hibernate transaction.
+     */
+    private static void endCurrentTransaction() {
+        MCRSessionMgr.getCurrentSession().commitTransaction();
     }
 }
