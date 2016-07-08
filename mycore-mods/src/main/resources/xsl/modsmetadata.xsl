@@ -877,26 +877,34 @@
             </xsl:otherwise>
           </xsl:choose>
           <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
-          <!-- Issue -->
-          <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number">
-            <xsl:value-of
-              select="concat(mods:part/mods:detail[@type='issue']/mods:caption,' ',mods:part/mods:detail[@type='issue']/mods:number)" />
-          </xsl:if>
-          <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number and (mods:part/mods:date or mods:originInfo[@eventType='publication']/mods:dateIssued)">
-            <xsl:text>/</xsl:text>
-          </xsl:if>
-          <xsl:if test="mods:part/mods:date or mods:originInfo[@eventType='publication']/mods:dateIssued">
-            <xsl:choose>
-              <xsl:when test="mods:part/mods:date"><xsl:value-of select="concat(mods:part/mods:date,' ')" /></xsl:when>
-              <xsl:otherwise>
-                <xsl:apply-templates select="mods:originInfo[@eventType='publication']/mods:dateIssued" mode="formatDate" /><xsl:text> </xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
           <!-- Volume -->
           <xsl:if test="mods:part/mods:detail[@type='volume']/mods:number">
             <xsl:value-of
-              select="concat('(',i18n:translate('component.mods.metaData.dictionary.volume.article'),': ',mods:part/mods:detail[@type='volume']/mods:number,') ')" />
+              select="concat('Vol. ',mods:part/mods:detail[@type='volume']/mods:number)" />
+            <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number">
+              <xsl:text>, </xsl:text>
+            </xsl:if>
+          </xsl:if>
+          <!-- Issue -->
+          <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number">
+            <xsl:value-of
+              select="concat('H. ',mods:part/mods:detail[@type='issue']/mods:number)" />
+          </xsl:if>
+          <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number and (mods:part/mods:date or mods:originInfo[@eventType='publication']/mods:dateIssued)">
+            <xsl:text> </xsl:text>
+          </xsl:if>
+          <xsl:if test="mods:part/mods:date or mods:originInfo[@eventType='publication']/mods:dateIssued">
+            <xsl:choose>
+              <xsl:when test="mods:part/mods:date"><xsl:value-of select="concat('(',mods:part/mods:date,')')" /></xsl:when>
+              <xsl:otherwise>
+                <xsl:text>(</xsl:text>
+                <xsl:apply-templates select="mods:originInfo[@eventType='publication']/mods:dateIssued" mode="formatDate" />
+                <xsl:text>)</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+            <xsl:if test="mods:part/mods:extent[@unit='pages']">
+              <xsl:text>, </xsl:text>
+            </xsl:if>
           </xsl:if>
           <!-- Pages -->
           <xsl:if test="mods:part/mods:extent[@unit='pages']">
