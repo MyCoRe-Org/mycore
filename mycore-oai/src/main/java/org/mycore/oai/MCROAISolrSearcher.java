@@ -68,10 +68,11 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             if (setFilter == null) {
                 String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(), set.getSpec()
                     .split("\\:")[0]);
+                String field = getConfig().getString(getConfigPrefix() + "SetSolrField", "category.top");
                 if (origSet.contains(":")) {
-                    setFilter = "category.top:" + classid + "\\:" + origSet.substring(origSet.indexOf(":") + 1);
+                    setFilter = field + ":" + classid + "\\:" + origSet.substring(origSet.indexOf(":") + 1);
                 } else {
-                    setFilter = "category.top:" + classid + "*";
+                    setFilter = field + ":" + classid + "*";
                 }
             }
             query.add("fq", setFilter);
