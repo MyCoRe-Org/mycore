@@ -19,12 +19,18 @@ public class MCRZonedDateTimeConverter implements AttributeConverter<ZonedDateTi
 
     @Override
     public Date convertToDatabaseColumn(ZonedDateTime date) {
+        if(date == null) {
+            return null;
+        }
         Instant instant = Instant.from(date);
         return Date.from(instant);
     }
 
     @Override
     public ZonedDateTime convertToEntityAttribute(Date dbData) {
+        if(dbData == null) {
+            return null;
+        }
         Instant instant = dbData.toInstant();
         return ZonedDateTime.from(instant);
     }

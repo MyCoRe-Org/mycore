@@ -58,7 +58,7 @@ public class MCRDeletedItemManager {
         CriteriaQuery<ZonedDateTime> query = cb.createQuery(ZonedDateTime.class);
         Root<MCRDELETEDITEMS> deletedItems = query.from(MCRDELETEDITEMS.class);
         try {
-            return Optional.of(
+            return Optional.ofNullable(
                 em.createQuery(
                     query.select(
                         cb.least(deletedItems.get(MCRDELETEDITEMS_.key).get(MCRDELETEDITEMSPK_.dateDeleted))))
