@@ -18,14 +18,13 @@
 package org.mycore.frontend.cli;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -258,12 +257,11 @@ public class MCRCommandLineInterface {
 
     private static void saveCommandQueueToFile(final Vector<String> queue, String fname) {
         output("Writing unprocessed commands to file " + fname);
-        try (BufferedWriter bw = Files.newBufferedWriter(new File(fname).toPath(), Charset.defaultCharset(),
-            StandardOpenOption.CREATE)) {
+        try (PrintWriter pw = new PrintWriter(new File(fname), Charset.defaultCharset().name())) {
             for (String command : queue) {
-                bw.append(command);
-                bw.newLine();
+                pw.println(command);
             }
+            pw.close();
         } catch (IOException ex) {
             MCRCLIExceptionHandler.handleException(ex);
         }
