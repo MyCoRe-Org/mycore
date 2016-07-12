@@ -37,7 +37,7 @@
     <changelog.since>2016-06-27</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2016.06.0.1</changes.version>
-    <site.suffix>2016.06.0.x</site.suffix>
+    <site.suffix>-2016.06.0.x</site.suffix>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
   </properties>
