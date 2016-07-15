@@ -279,6 +279,12 @@
     </a>
   </xsl:template>
 
+  <xsl:template match="mods:accessCondition" mode="oa-logo">
+    <a rel="license" href="https://open-access.net/">
+      <img src="http://open-access.net/fileadmin/logos/OpenAccess_Logo.JPG" style="width: 25%;" />
+    </a>
+  </xsl:template>
+
   <xsl:template match="mods:accessCondition" mode="cc-text">
     <!-- like cc_by-nc-sa: remove the 'cc_' -->
     <xsl:variable name="licenseString" select="substring-before(substring-after(@xlink:href, '#cc_'), '_')" />
@@ -328,7 +334,7 @@
     <a itemprop="creator" href="{$query}">
       <span itemscope="itemscope" itemtype="http://schema.org/Person">
         <span itemprop="name">
-			<xsl:apply-templates select="." mode="nameString" />
+      <xsl:apply-templates select="." mode="nameString" />
         </span>
         <xsl:if test="count($nameIdentifier) &gt; 0">
           <xsl:text>&#160;</xsl:text><!-- add whitespace here -->
@@ -376,16 +382,16 @@
           <xsl:value-of select="mods:displayForm" />
         </xsl:when>
         <xsl:when test="mods:namePart[not(@type)]">
-	        <xsl:for-each select="mods:namePart[not(@type)]">
-	        	 <xsl:choose>
-	              <xsl:when test="position() = 1">
-	                <xsl:value-of select="text()"/>
-	              </xsl:when>
-	              <xsl:otherwise>
-	                <xsl:value-of select="concat(' ', text())"/>
-	              </xsl:otherwise>
-	            </xsl:choose>
-	        </xsl:for-each>
+          <xsl:for-each select="mods:namePart[not(@type)]">
+             <xsl:choose>
+                <xsl:when test="position() = 1">
+                  <xsl:value-of select="text()"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="concat(' ', text())"/>
+                </xsl:otherwise>
+              </xsl:choose>
+          </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="mods:namePart[@type='family']" />

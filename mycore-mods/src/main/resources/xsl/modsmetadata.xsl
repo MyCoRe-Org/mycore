@@ -842,6 +842,9 @@
               <xsl:when test="contains($trimmed, 'oa_nlz')">
                 <xsl:apply-templates select="." mode="oa_nlz" />
               </xsl:when>
+              <xsl:when test="contains($trimmed, 'oa')">
+                <xsl:apply-templates select="." mode="oa-logo" />
+              </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="." />
               </xsl:otherwise>
