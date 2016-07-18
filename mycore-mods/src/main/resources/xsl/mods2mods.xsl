@@ -59,7 +59,7 @@
   <xsl:template match="mods:location" mode="mods2mods">
     <xsl:copy>
       <xsl:copy-of select="@*" />
-      <xsl:apply-templates select="*[not(local-name()='url' and @access='object in context')]" />
+      <xsl:apply-templates select="*[not(local-name()='url' and @access='object in context')]" mode="mods2mods" />
     </xsl:copy>
   </xsl:template>
 
