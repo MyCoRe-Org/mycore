@@ -13,13 +13,14 @@ import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.MCRPersistentIdentifierGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRCreateDateDOIGenerator implements MCRPersistentIdentifierGenerator<MCRDigitalObjectIdentifier> {
+public class MCRCreateDateDOIGenerator extends MCRPersistentIdentifierGenerator<MCRDigitalObjectIdentifier> {
 
     private static final String DATE_PATTERN = "yyyyMMdd-HHmmss";
     private final MCRDOIParser mcrdoiParser;
     private String prefix = MCRConfiguration.instance().getString("MCR.DOI.Prefix");
 
-    public MCRCreateDateDOIGenerator() {
+    public MCRCreateDateDOIGenerator(String generatorID) {
+        super(generatorID);
         mcrdoiParser = new MCRDOIParser();
     }
 
@@ -30,7 +31,7 @@ public class MCRCreateDateDOIGenerator implements MCRPersistentIdentifierGenerat
             MCRISO8601Date mcrdate = new MCRISO8601Date();
             mcrdate.setDate(createdate);
             String format = mcrdate.format(DATE_PATTERN, Locale.ENGLISH);
-            Optional<MCRPersistentIdentifier> parse = mcrdoiParser.parse(prefix + "/" + format);
+            Optional<MCRDigitalObjectIdentifier> parse = mcrdoiParser.parse(prefix + "/" + format);
             MCRPersistentIdentifier doi = parse.get();
             return (MCRDigitalObjectIdentifier) doi;
         } else {

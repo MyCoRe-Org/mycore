@@ -96,6 +96,8 @@ public final class MCRConstants {
 
     public static final Namespace INFO_SRW_NAMESPACE = Namespace.getNamespace("info", "info:srw/schema/5/picaXML-v1.0");
 
+    public static final Namespace PIDEF_NAMESPACE = Namespace.getNamespace("pidef", "http://nbn-resolving.org/pidef");
+
     public static final Namespace DIAG_NAMESPACE = Namespace.getNamespace("diag",
         "http://www.loc.gov/zing/srw/diagnostic");
 

@@ -48,7 +48,6 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
-import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.exceptions.MCRDatacenterAuthenticationException;
 import org.mycore.pi.exceptions.MCRDatacenterException;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
@@ -79,7 +78,7 @@ public class MCRDataciteClient {
      * @param userName   the login username will be used in every method or null if no login should be used
      * @param password   the password
      * @param testMode   changes are not written to the Database (just tests requests)
-     * @param testPrefix automaticaly sets the test prefix (can be used to test)
+     * @param testPrefix automaticaly sets the test PREFIX (can be used to test)
      */
     public MCRDataciteClient(String host, String userName, String password, Boolean testMode, Boolean testPrefix) {
         this.host = host;
@@ -211,7 +210,7 @@ public class MCRDataciteClient {
                 case HttpStatus.SC_CREATED:
                     return;
                 case HttpStatus.SC_BAD_REQUEST:
-                    throw new MCRDatacenterException(getStatusString(response)); // invalid prefix or wrong format, but format is hard defined!
+                    throw new MCRDatacenterException(getStatusString(response)); // invalid PREFIX or wrong format, but format is hard defined!
                 case HttpStatus.SC_UNAUTHORIZED:
                     throw new MCRDatacenterAuthenticationException();
                 case HttpStatus.SC_PRECONDITION_FAILED:
@@ -239,7 +238,7 @@ public class MCRDataciteClient {
 
                     while (scanner.hasNextLine()) {
                         String line = scanner.nextLine();
-                        Optional<MCRPersistentIdentifier> parse = new MCRDOIParser().parse(line);
+                        Optional<MCRDigitalObjectIdentifier> parse = new MCRDOIParser().parse(line);
                         MCRDigitalObjectIdentifier doi = (MCRDigitalObjectIdentifier) parse.orElseThrow(() -> new MCRException("Could not parse DOI from Datacite!"));
                         doiList.add(doi);
                     }
@@ -364,8 +363,8 @@ public class MCRDataciteClient {
                     }
                     // should not happen
                     throw new MCRDatacenterException("Location header not found in response! - " + responseString);
-                case HttpStatus.SC_BAD_REQUEST: // invalid xml or wrong prefix
-                    throw new MCRDatacenterException("Invalid xml or wrong prefix: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase() + " - " + responseString);
+                case HttpStatus.SC_BAD_REQUEST: // invalid xml or wrong PREFIX
+                    throw new MCRDatacenterException("Invalid xml or wrong PREFIX: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase() + " - " + responseString);
                 case HttpStatus.SC_UNAUTHORIZED: // no login
                     throw new MCRDatacenterAuthenticationException();
                 default:

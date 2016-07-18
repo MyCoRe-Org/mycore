@@ -10,7 +10,12 @@ import org.mycore.pi.MCRPersistentIdentifierInscriber;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRMODSDOIPersistentIdentifierInscriber implements MCRPersistentIdentifierInscriber<MCRDigitalObjectIdentifier> {
+public class MCRMODSDOIPersistentIdentifierInscriber extends MCRPersistentIdentifierInscriber<MCRDigitalObjectIdentifier> {
+
+
+    public MCRMODSDOIPersistentIdentifierInscriber(String inscriberID) {
+        super(inscriberID);
+    }
 
     @Override
     public void insertIdentifier(MCRDigitalObjectIdentifier identifier, MCRBase base,String additional) throws MCRPersistentIdentifierException {
@@ -23,7 +28,7 @@ public class MCRMODSDOIPersistentIdentifierInscriber implements MCRPersistentIde
     public boolean hasIdentifier(MCRBase base, String additional) throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(base);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        Element element = wrapper.getElement(".//mods:identifier[@type='doi']");
+        Element element = wrapper.getElement("mods:identifier[@type='doi']");
         return element != null;
     }
 

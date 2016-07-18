@@ -49,8 +49,6 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String TYPE = "doi";
-
     private String username;
 
     private String password;
@@ -68,7 +66,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     }
 
     public MCRDOIRegistrationService(String serviceID) {
-        super(serviceID, TYPE);
+        super(serviceID, MCRDigitalObjectIdentifier.TYPE);
 
         Map<String, String> properties = getProperties();
         username = properties.get("Username");

@@ -3,16 +3,15 @@ package org.mycore.pi.doi;
 
 import java.util.Optional;
 
-import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.MCRPersistentIdentifierParser;
 
-public class MCRDOIParser implements MCRPersistentIdentifierParser {
+public class MCRDOIParser implements MCRPersistentIdentifierParser<MCRDigitalObjectIdentifier> {
 
     // The Prefix of every doi Prefix
     public static final String PREFIX_PREFIX = "10.";
 
     @Override
-    public Optional<MCRPersistentIdentifier> parse(String doi) {
+    public Optional<MCRDigitalObjectIdentifier> parse(String doi) {
         if (!doi.startsWith(PREFIX_PREFIX)) {
             return Optional.empty();
         }

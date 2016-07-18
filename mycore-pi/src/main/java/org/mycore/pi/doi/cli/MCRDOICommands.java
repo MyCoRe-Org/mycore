@@ -52,7 +52,7 @@ public class MCRDOICommands {
 
                         MCRObjectID objectID = MCRObjectID.getInstance(idString);
                         if(MCRMetadataManager.exists(objectID)){
-                            if (!registrationService.isRegistered(objectID, "")) {
+                            if (!registrationService.isCreated(objectID, "")) {
                                 LOGGER.info("DOI is not registered in MyCoRe. Add to Database: " + doi.asString() + " / " + s);
 
                                 MCRPI databaseEntry = new MCRPI(doi.asString(), registrationService.getType(), idString, "", serviceID, new Date());
@@ -105,7 +105,10 @@ public class MCRDOICommands {
 
         MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
 
-        MCRDigitalObjectIdentifier doi = (MCRDigitalObjectIdentifier) new MCRDOIParser().parse(doiString).orElseThrow(() -> new IllegalArgumentException("The String " + doiString + " is no valid DOI!"));
+        MCRDigitalObjectIdentifier doi = new MCRDOIParser()
+                .parse(doiString)
+                .orElseThrow(() -> new IllegalArgumentException("The String " + doiString + " is no valid DOI!"));
+
         try {
             URI uri = dataciteClient.resolveDOI(doi);
 
@@ -125,7 +128,10 @@ public class MCRDOICommands {
                     newMediaList.forEach(e -> newHashMap.put(e.getKey(), e.getValue()));
                     oldMediaList.forEach(e -> {
                         if (!newHashMap.containsKey(e.getKey())) {
-                            newHashMap.put(e.getKey(), newMediaList.stream().findFirst().orElseThrow(() -> new MCRException("new media list is empty (this should not happen)")).getValue());
+                            newHashMap.put(e.getKey(), newMediaList.stream()
+                                    .findFirst()
+                                    .orElseThrow(() -> new MCRException("new media list is empty (this should not happen)"))
+                                    .getValue());
                         }
                     });
 

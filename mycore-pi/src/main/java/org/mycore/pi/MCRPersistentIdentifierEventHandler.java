@@ -24,13 +24,13 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         /* Add PIs to DB if they are not there */
-        MCRPersistentIdentifierManager.getRegistered(obj).forEach(pi -> {
-            MCRPersistentIdentifierManager.delete(pi.getMycoreID(), pi.getAdditional(), pi.getType(), pi.getService());
+        MCRPersistentIdentifierManager.getInstance().getRegistered(obj).forEach(pi -> {
+            MCRPersistentIdentifierManager.getInstance().delete(pi.getMycoreID(), pi.getAdditional(), pi.getType(), pi.getService());
         });
 
         Gson gson = new Gson();
         obj.getService().getFlags(MCRPIRegistrationService.PI_FLAG).stream().map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
-                .filter(entry -> !MCRPersistentIdentifierManager.exist(entry))
+                .filter(entry -> !MCRPersistentIdentifierManager.getInstance().exist(entry))
                 .forEach(entry -> {
                     entry.setMcrRevision(MCRCoreVersion.getRevision());
                     entry.setMcrVersion(MCRCoreVersion.getVersion());
@@ -38,7 +38,11 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
                     LOGGER.info("Add PI : " + entry.getIdentifier() + " with service " + entry.getService() + " to database!");
                     MCRHIBConnection.instance().getSession().save(entry);
                 });
+
     }
+
+
+
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
@@ -65,7 +69,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
     private void detectServices(MCRObject obj, BiConsumer<MCRPIRegistrationService, MCRPIRegistrationInfo> r) {
         MCRPIRegistrationServiceManager serviceManager = MCRPIRegistrationServiceManager.getInstance();
 
-        List<MCRPIRegistrationInfo> registered = MCRPersistentIdentifierManager.getRegistered(obj);
+        List<MCRPIRegistrationInfo> registered = MCRPersistentIdentifierManager.getInstance().getRegistered(obj);
         List<String> serviceList = serviceManager.getServiceList();
 
         for (MCRPIRegistrationInfo pi : registered) {
@@ -82,7 +86,8 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
 
     private MCRPersistentIdentifier getIdentifier(MCRPIRegistrationInfo pi) {
         MCRPersistentIdentifierManager identifierManager = MCRPersistentIdentifierManager.getInstance();
-        MCRPersistentIdentifierParser parser = identifierManager.getParserForType(pi.getType());
+        MCRPersistentIdentifierParser<?> parser = identifierManager.getParserForType(pi.getType());
+
         return parser.parse(pi.getIdentifier()).orElseThrow(() -> new MCRException("Cannot parse a previous inserted identifier"));
     }
 

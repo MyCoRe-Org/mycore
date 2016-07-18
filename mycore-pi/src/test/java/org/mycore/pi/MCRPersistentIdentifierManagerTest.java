@@ -26,7 +26,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     @Test
     public void testGet() {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
-        Optional<MCRPersistentIdentifier> mockIdentifierOptional = managerInstance.get(mockString).findAny();
+        Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = managerInstance.get(mockString).findAny();
 
         Assert.assertTrue(mockIdentifierOptional.isPresent());
         Assert.assertEquals(mockIdentifierOptional.get().asString(), mockString);
@@ -35,7 +35,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     @Test
     public void testParseIdentifier() {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
-        Optional<MCRPersistentIdentifier> mcrMockIdentifier = managerInstance.get(mockString).findFirst();
+        Optional<? extends MCRPersistentIdentifier> mcrMockIdentifier = managerInstance.get(mockString).findFirst();
         Assert.assertEquals(mcrMockIdentifier.get().asString(), mockString);
     }
 
@@ -59,15 +59,19 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         MCRMockIdentifier identifier = (MCRMockIdentifier) registrationService.fullRegister(mcrObject, "");
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
-        Assert.assertTrue("The identifier " + identifier.asString() + " should be registered now!", registrationService.isRegistered(id, ""));
+        Assert.assertTrue("The identifier " + identifier.asString() + " should be registered now!", registrationService.isCreated(id, ""));
 
         registrationService.onUpdate(identifier, mcrObject, "");
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertTrue("The identifier " + identifier.asString() + " should have been updated!", casted.isUpdatedCalled());
 
         registrationService.onDelete(identifier, mcrObject, "");
-        Assert.assertFalse("The identifier " + identifier.asString() + " should not be registered now!", registrationService.isRegistered(id, ""));
+        Assert.assertFalse("The identifier " + identifier.asString() + " should not be registered now!", registrationService.isCreated(id, ""));
 
+        Assert.assertEquals("There should be one resolver", MCRPersistentIdentifierManager.getInstance()
+                .getResolvers().stream().filter(r-> {
+                    return r.getName().equals(MCRMockResolver.NAME);
+                }).count()>0);
 
     }
 
@@ -85,11 +89,19 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
         configuration.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         configuration.put("MCR.Metadata.Type.mock", "true");
+
+        configuration.put("MCR.PI.Resolvers", MCRMockIdentifierRegistrationService.class.getName());
+
         configuration.put("MCR.PI.Registration." + MOCK_SERVICE, MCRMockIdentifierRegistrationService.class.getName());
         configuration.put("MCR.PI.Registration." + MOCK_SERVICE + ".Generator", MOCK_PID_GENERATOR);
         configuration.put("MCR.PI.Registration." + MOCK_SERVICE + ".Inscriber", MOCK_INSCRIBER);
+
         configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER, MCRMockInscriber.class.getName());
+        configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER + "." + MCRMockInscriber.TEST_PROPERTY, MCRMockInscriber.TEST_PROPERTY_VALUE);
+
         configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR, MCRMockIdentifierGenerator.class.getName());
+        configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR + "." + MCRMockIdentifierGenerator.TEST_PROPERTY, MCRMockIdentifierGenerator.TEST_PROPERTY_VALUE);
+
         configuration.put("MCR.PI.Parsers." + MCRMockIdentifierRegistrationService.TYPE, MCRMockIdentifierParser.class.getName());
 
         return configuration;

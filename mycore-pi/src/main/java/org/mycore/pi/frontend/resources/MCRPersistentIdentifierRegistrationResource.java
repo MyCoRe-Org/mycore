@@ -19,8 +19,8 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIRegistrationService;
@@ -46,9 +46,9 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response listByType(@PathParam("type") String type, @DefaultValue("0") @QueryParam("from") int from, @DefaultValue("50") @QueryParam("size") int size) {
         Response errorResponse = validateParameters(from, size);
         if (errorResponse != null) return errorResponse;
-        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPersistentIdentifierManager.getList(type, from, size);
+        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPersistentIdentifierManager.getInstance().getList(type, from, size);
         return Response.status(Response.Status.OK)
-                .entity(new Gson().toJson(new MCRPIListJSON(type, from, size, MCRPersistentIdentifierManager.getCount(type), mcrpiRegistrationInfos)))
+                .entity(new Gson().toJson(new MCRPIListJSON(type, from, size, MCRPersistentIdentifierManager.getInstance().getCount(type), mcrpiRegistrationInfos)))
                 .build();
     }
 
@@ -57,9 +57,9 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response list(@DefaultValue("0") @QueryParam("from") int from, @DefaultValue("50") @QueryParam("size") int size) {
         Response errorResponse = validateParameters(from, size);
         if (errorResponse != null) return errorResponse;
-        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPersistentIdentifierManager.getList(from, size);
+        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPersistentIdentifierManager.getInstance().getList(from, size);
         return Response.status(Response.Status.OK)
-                .entity(new Gson().toJson(new MCRPIListJSON(null, from, size, MCRPersistentIdentifierManager.getCount(), mcrpiRegistrationInfos)))
+                .entity(new Gson().toJson(new MCRPIListJSON(null, from, size, MCRPersistentIdentifierManager.getInstance().getCount(), mcrpiRegistrationInfos)))
                 .build();
     }
 
@@ -92,7 +92,7 @@ public class MCRPersistentIdentifierRegistrationResource {
         }
 
         MCRPersistentIdentifier identifier;
-        MCRObject object = MCRMetadataManager.retrieveMCRObject(mycoreIDObject);
+        MCRBase object = MCRMetadataManager.retrieve(mycoreIDObject);
         try {
             identifier = registrationService.fullRegister(object, additional);
         } catch (MCRPersistentIdentifierException|MCRActiveLinkException e) {
