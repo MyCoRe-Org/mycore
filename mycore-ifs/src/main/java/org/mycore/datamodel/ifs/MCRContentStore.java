@@ -121,11 +121,8 @@ public abstract class MCRContentStore {
         if (!exists(file)) {
             return false;
         }
-        try {
-            return MCRUtils.getMD5Sum(doRetrieveMCRContent(file).getInputStream()).equals(file.getMD5());
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException(e);
-        }
+        return MCRUtils.getMD5Sum(doRetrieveMCRContent(file).getInputStream()).equals(file.getMD5());
+
     }
 
     /**

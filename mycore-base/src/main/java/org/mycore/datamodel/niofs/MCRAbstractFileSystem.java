@@ -15,7 +15,6 @@ import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
@@ -131,7 +130,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
         String md5Sum;
         try {
             md5Sum = MCRUtils.getMD5Sum(Files.newInputStream(path));
-        } catch (NoSuchAlgorithmException | IOException e) {
+        } catch (IOException e) {
             Logger.getLogger(getClass()).error("Could not verify path: " + path, e);
             return false;
         }

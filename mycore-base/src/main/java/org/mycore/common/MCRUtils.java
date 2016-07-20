@@ -739,7 +739,7 @@ public class MCRUtils {
     /**
      * Calculates md5 sum of InputStream. InputStream is consumed after calling this method and automatically closed.
      */
-    public static String getMD5Sum(InputStream inputStream) throws IOException, NoSuchAlgorithmException {
+    public static String getMD5Sum(InputStream inputStream) throws IOException {
         MCRMD5InputStream md5InputStream = null;
         try {
             md5InputStream = new MCRMD5InputStream(inputStream);

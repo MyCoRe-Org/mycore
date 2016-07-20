@@ -161,9 +161,6 @@ public class MCRIFSCommands {
             String md5Sum;
             try {
                 md5Sum = MCRUtils.getMD5Sum(fileInputStream);
-            } catch (NoSuchAlgorithmException e) {
-                LOGGER.error(e);
-                return false;
             } catch (IOException e) {
                 LOGGER.error(e);
                 return false;
