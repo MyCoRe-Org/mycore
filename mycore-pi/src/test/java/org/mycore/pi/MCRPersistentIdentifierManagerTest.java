@@ -68,7 +68,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         registrationService.onDelete(identifier, mcrObject, "");
         Assert.assertFalse("The identifier " + identifier.asString() + " should not be registered now!", registrationService.isCreated(id, ""));
 
-        Assert.assertEquals("There should be one resolver", MCRPersistentIdentifierManager.getInstance()
+        Assert.assertTrue("There should be one resolver", MCRPersistentIdentifierManager.getInstance()
                 .getResolvers().stream().filter(r-> {
                     return r.getName().equals(MCRMockResolver.NAME);
                 }).count()>0);
@@ -90,7 +90,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         configuration.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         configuration.put("MCR.Metadata.Type.mock", "true");
 
-        configuration.put("MCR.PI.Resolvers", MCRMockIdentifierRegistrationService.class.getName());
+        configuration.put("MCR.PI.Resolvers", MCRMockResolver.class.getName());
 
         configuration.put("MCR.PI.Registration." + MOCK_SERVICE, MCRMockIdentifierRegistrationService.class.getName());
         configuration.put("MCR.PI.Registration." + MOCK_SERVICE + ".Generator", MOCK_PID_GENERATOR);
