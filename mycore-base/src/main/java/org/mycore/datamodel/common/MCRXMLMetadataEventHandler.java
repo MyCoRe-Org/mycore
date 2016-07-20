@@ -24,16 +24,19 @@
 package org.mycore.datamodel.common;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRBaseContent;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 
 /**
  * This class manages all operations of the XMLTables for operations of an
@@ -86,6 +89,11 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
         handleStoreEvent(evt, obj);
     }
 
+    @Override
+    protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        handleStoreEvent(evt, obj);
+    }
+
     /**
      * This method add the data to SQL table of XML data via MCRXMLMetadataManager.
      * 
@@ -132,11 +140,17 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
         MCRObjectID id = obj.getId();
         try {
             switch (eventType) {
+                case MCREvent.REPAIR_EVENT:
                 case MCREvent.UPDATE_EVENT:
                 case MCREvent.CREATE_EVENT:
                     MCRBaseContent content = new MCRBaseContent(obj);
-                    Date modified = obj.getService().getDate("modifydate");
+                    Date modified = obj.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
                     switch (eventType) {
+                        case MCREvent.REPAIR_EVENT:
+                            MCRContent retrieveContent = metaDataManager.retrieveContent(id);
+                            if (isUptodate(retrieveContent, content)) {
+                                return;
+                            }
                         case MCREvent.UPDATE_EVENT:
                             metaDataManager.update(id, content, modified);
                             break;
@@ -155,6 +169,11 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
         } catch (IOException e) {
             throw new MCRPersistenceException("Error while handling '" + eventType + "' event of '" + id + "'", e);
         }
+    }
+
+    private boolean isUptodate(MCRContent retrieveContent, MCRBaseContent content) throws IOException {
+        return retrieveContent.lastModified() > content.lastModified()
+            || Arrays.equals(retrieveContent.asByteArray(), content.asByteArray());
     }
 
 }
