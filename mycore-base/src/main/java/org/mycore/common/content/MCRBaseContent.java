@@ -24,6 +24,7 @@
 package org.mycore.common.content;
 
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRObjectService;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -34,6 +35,7 @@ public class MCRBaseContent extends MCRJDOMContent {
     public MCRBaseContent(MCRBase base) {
         super(base.createXML());
         setName(base.getId() + ".xml");
+        setLastModified(base.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE).getTime());
     }
 
 }
