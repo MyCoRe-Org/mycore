@@ -1,6 +1,6 @@
 <project name="MyCoRe Components integration" xmlns:mcr="antlib:org.mycore.buildtools">
   <property name="components.order"
-            value="acl-editor2,broadcasting,buildtools,classbrowser,classeditor,coma,indexing,migration-2014,session-listing,swf,mets,solr,iview2,mods,urn,user2,webcli,webservices,z3950,oai,pi,handle,wcms2,xeditor,ifs,restapi" />
+            value="acl-editor2,broadcasting,buildtools,classbrowser,classeditor,coma,ifs,indexing,iview2,media,mets,migration-2015,mods,oai,pi,restapi,session-listing,solr,swf,sword,urn,user2,wcms2,webcli,wfc,xeditor" />
 
   <import file="${integration.dir}/helper.xml" />
   <taskdef resource="org/mycore/buildtools/antlib.xml"
@@ -179,22 +179,6 @@
   <target name="create.users" description="--> adds user to the application">
     <componentPreHook target="create.users" />
     <componentHook target="create.users" />
-  </target>
-
-  <!-- =================================
-  target: deploy
-  ================================= -->
-  <target name="webservice.deploy" description="--> deploys components to the web application">
-    <componentPreHook target="webservice.deploy" />
-    <componentHook target="webservice.deploy" />
-  </target>
-
-  <!-- =================================
-  target: undeply
-  ================================= -->
-  <target name="webservice.undeploy" description="--> undeploys components from the web application">
-    <componentPreHook target="webservice.undeploy" />
-    <componentHook target="webservice.undeploy" />
   </target>
 
 </project>
