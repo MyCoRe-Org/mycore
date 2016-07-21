@@ -51,6 +51,8 @@ class MCRPersistenceHelper {
     }
 
     static String getCancelUrl(HttpServletRequest request) {
+    	String cancelURL = request.getParameter("cancelURL");
+    	if ( !(cancelURL==null) || !(cancelURL.equals("")) ) return cancelURL;
         String referer = request.getHeader("Referer");
         if (referer == null || referer.equals("")) {
             referer = MCRFrontendUtil.getBaseURL();
