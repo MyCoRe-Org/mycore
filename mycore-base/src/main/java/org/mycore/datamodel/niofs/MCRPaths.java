@@ -73,7 +73,7 @@ final class MCRPaths {
         URI uri;
         try {
             uri = getURI(scheme, owner, path);
-            Logger.getLogger(MCRPaths.class).info("Generated path URI:" + uri);
+            Logger.getLogger(MCRPaths.class).debug("Generated path URI:" + uri);
         } catch (URISyntaxException e) {
             throw new InvalidPathException(path, "URI syntax error (" + e.getMessage() + ") for path");
         }
