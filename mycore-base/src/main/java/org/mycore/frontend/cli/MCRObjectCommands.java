@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -61,6 +63,9 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.tools.MCRTopologicalSort;
@@ -1015,4 +1020,41 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         LOGGER.info("Repaired " + mid.toString());
     }
 
+    @MCRCommand(syntax = "merge derivates of object {0}",
+            help = "Retrieves the MCRObject with the MCRObjectID {0} and if it has more then one MCRDerivate, then all" +
+                    " Files will be copied to the first Derivate and all other will be deleted.", order = 190)
+    public static void mergeDerivatesOfObject(String id) {
+        MCRObjectID objectID = MCRObjectID.getInstance(id);
+        if (!MCRMetadataManager.exists(objectID)) {
+            LOGGER.error("The object with the id " + id + " does not exist!");
+            return;
+        }
+
+        MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
+
+        List<MCRMetaLinkID> derivateLinkIDs = object.getStructure().getDerivates();
+        List<MCRObjectID> derivateIDs = derivateLinkIDs.stream().map(MCRMetaLinkID::getXLinkHrefID).collect(Collectors.toList());
+
+        if (derivateIDs.size() <= 1) {
+            LOGGER.error("The object with the id " + id + " has no Derivates to merge!");
+            return;
+        }
+
+        String mainID = derivateIDs.get(0).toString();
+        MCRPath mainDerivateRootPath = MCRPath.getPath(mainID, "/");
+
+        derivateIDs.stream().skip(1).forEach(derivateID -> {
+            LOGGER.info("Merge " + derivateID.toString() + " into " + mainID + "...");
+            MCRPath copyRootPath = MCRPath.getPath(derivateID.toString(), "/");
+            try {
+                MCRTreeCopier treeCopier = new MCRTreeCopier(copyRootPath, mainDerivateRootPath);
+                Files.walkFileTree(copyRootPath, treeCopier);
+                Files.walkFileTree(copyRootPath, MCRRecursiveDeleter.instance());
+                MCRMetadataManager.deleteMCRDerivate(derivateID);
+            } catch (IOException | MCRAccessException e) {
+                throw new MCRException(e);
+            }
+        });
+
+    }
 }

@@ -26,7 +26,14 @@ public class MCRTreeCopier implements FileVisitor<Path> {
 
     private final Path target;
 
+    private final boolean renameExisting;
+
     public MCRTreeCopier(Path source, Path target) throws NoSuchFileException {
+        this(source, target, false);
+    }
+
+    public MCRTreeCopier(Path source, Path target, boolean renameOnExisting) throws NoSuchFileException {
+        this.renameExisting = renameOnExisting;
         if (Files.notExists(target)) {
             throw new NoSuchFileException(target.toString(), null, "Target directory does not exist.");
         }
@@ -49,19 +56,26 @@ public class MCRTreeCopier implements FileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
-    @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-        copyFile(file, target.resolve(toTargetFS(source.relativize(file))));
-        return FileVisitResult.CONTINUE;
-    }
-
     private void copyFile(Path source, Path target) {
         try {
+            if (renameExisting && Files.exists(target)) {
+                int nameTry = 1;
+                String fileName = target.getFileName().toString();
+                int numberPosition = fileName.lastIndexOf(".") == -1 ? fileName.length() : fileName.lastIndexOf(".");
+                String prefixString = fileName.substring(0, numberPosition);
+                String suffixString = fileName.substring(numberPosition, fileName.length());
+                String newName = null;
+                Path parent = target.getParent();
+                do {
+                    newName = prefixString + nameTry++ + suffixString;
+                } while (Files.exists(target = parent.resolve(newName)));
+            }
             Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {
             LOGGER.error("Unable to copy: " + source, x);
         }
     }
+
 
     private Path toTargetFS(Path source) {
         if (target.getFileSystem().equals(source.getFileSystem())) {
@@ -86,6 +100,12 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 LOGGER.error("Unable to copy all attributes to: " + newdir, x);
             }
         }
+        return FileVisitResult.CONTINUE;
+    }
+
+    @Override
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+        copyFile(file, target.resolve(toTargetFS(source.relativize(file))));
         return FileVisitResult.CONTINUE;
     }
 
