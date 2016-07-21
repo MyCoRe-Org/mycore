@@ -34,11 +34,11 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 /**
  * Service for assigning granular URNs to Derivate.
  * You can call it with a Derivate-ID and it will assign a Base-URN for the Derivate and granular URNs for every file in the Derivate (except IgnoreFileNames).
- * If you then add a file to Derivate you can call with Derivate-ID and additional path of the file. E.g. mir_derivate_00000060 and /image1.jpg<br/>
+ * If you then add a file to Derivate you can call with Derivate-ID and additional path of the file. E.g. mir_derivate_00000060 and /image1.jpg
  * <p>
- * <b>Inscriber is ignored with this {@link MCRPIRegistrationService}</b><br/>
- * <p>
- * Configuration Parameter(s):<br/>
+ * <b>Inscriber is ignored with this {@link MCRPIRegistrationService}</b>
+ * </p>
+ * Configuration Parameter(s):
  * <dl>
  * <dt>IgnoreFileNames</dt>
  * <dd>Comma seperated list of regex file which should not have a urn assigned. Default: mets\\.xml</dd>
