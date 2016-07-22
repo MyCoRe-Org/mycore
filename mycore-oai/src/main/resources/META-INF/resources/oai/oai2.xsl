@@ -39,7 +39,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     The 'about' section of 'record'
     The 'compession' part of 'identify'
     The optional attributes of 'resumptionToken'
-    The optional 'setDescription' container of 'set'
 
   All the links just link to oai_dc versions of records.
 
@@ -447,6 +446,7 @@ p.intro {
     <tr><td class="key">setName</td>
     <td class="value"><xsl:value-of select="oai:setName"/></td></tr>
     <xsl:apply-templates select="oai:setSpec" />
+    <xsl:apply-templates select="oai:setDescription" />
   </table>
 </xsl:template>
 
@@ -538,6 +538,25 @@ p.intro {
   <td class="value"><xsl:value-of select="."/>
     <xsl:text> </xsl:text><a class="link" href="?verb=ListIdentifiers&amp;metadataPrefix=oai_dc&amp;set={.}">Identifiers</a>
     <xsl:text> </xsl:text><a class="link" href="?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;set={.}">Records</a>
+  </td></tr>
+</xsl:template>
+
+<!-- oai setSpec object -->
+
+<xsl:template match="oai:setDescription">
+  <tr><td class="key">setDescription</td>
+  <td class="value">
+    <xsl:choose>
+      <xsl:when test="oai_dc:dc" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+        <xsl:apply-templates select="oai_dc:dc" />
+      </xsl:when>
+      <xsl:otherwise>
+        <h3>Unknown Metadata Format</h3>
+        <div class="xmlSource">
+          <xsl:apply-templates select="." mode='xmlMarkup' />
+        </div>
+      </xsl:otherwise>
+    </xsl:choose>
   </td></tr>
 </xsl:template>
 
