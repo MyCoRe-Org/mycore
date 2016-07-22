@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -49,6 +50,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
+import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.OAIDataList;
 import org.mycore.oai.pmh.Set;
@@ -194,18 +196,44 @@ public class MCROAISetManager {
                 String setSpec = setElement.getChildText("setSpec", NS_OAI);
                 String setName = setElement.getChildText("setName", NS_OAI);
                 if (!contains(setSpec, setList)) {
-                    if (setSpec.contains(":")) {
-                        String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
-                        classID = MCRClassificationAndSetMapper.mapClassificationToSet(this.configPrefix, classID);
-                        String newSetSpec = classID + setSpec.substring(setSpec.indexOf(':'));
-                        setList.add(new Set(newSetSpec, setName));
-                    } else {
-                        setList.add(new Set(setSpec, setName));
-                    }
+                    Set set = new Set(getSetSpec(setSpec), setName);
+                    set.getDescription().addAll(
+                        setElement
+                            .getChildren("setDescription", NS_OAI)
+                            .stream() //all setDescription
+                            .flatMap(e -> e
+                                .getChildren()
+                                .stream()
+                                .limit(1)) //first childElement of setDescription
+                            .peek(Element::detach)
+                            .map(d -> (Description) new Description() {
+
+                                @Override
+                                public Element toXML() {
+                                    return d;
+                                }
+
+                                @Override
+                                public void fromXML(Element descriptionElement) {
+                                    throw new UnsupportedOperationException();
+                                }
+                            })
+                            .collect(Collectors.toList()));
+                    setList.add(set);
                 }
             }
         }
         return this.filterEmptySets ? filterEmptySets(setList) : setList;
+    }
+
+    private String getSetSpec(String setSpec) {
+        if (setSpec.contains(":")) {
+            String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
+            classID = MCRClassificationAndSetMapper.mapClassificationToSet(this.configPrefix, classID);
+            return classID + setSpec.substring(setSpec.indexOf(':'));
+        } else {
+            return setSpec;
+        }
     }
 
     /**
