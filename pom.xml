@@ -213,8 +213,8 @@
                   <packages>org.mycore.iview2*</packages>
                 </group>
                 <group>
-                  <title>MyCoRe Component: Importer</title>
-                  <packages>org.mycore.importer*</packages>
+                  <title>MyCoRe Component: Import/Export</title>
+                  <packages>org.mycore.impex*</packages>
                 </group>
                 <group>
                   <title>MyCoRe Component: Migration 2.1 -&gt; 2013.06</title>
@@ -1580,6 +1580,7 @@
     <module>mycore-classeditor</module>
     <module>mycore-indexing</module>
     <module>mycore-ifs</module>
+    <module>mycore-impex</module>
     <module>mycore-iview2</module>
     <module>mycore-media</module>
     <module>mycore-meta</module>
