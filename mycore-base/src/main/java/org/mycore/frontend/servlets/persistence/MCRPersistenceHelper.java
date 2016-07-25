@@ -51,8 +51,10 @@ class MCRPersistenceHelper {
     }
 
     static String getCancelUrl(HttpServletRequest request) {
-    	String cancelURL = request.getParameter("cancelURL");
-    	if ( !(cancelURL==null) || !(cancelURL.equals("")) ) return cancelURL;
+        String cancelURL = request.getParameter("cancelURL");
+        if (cancelURL != null && !cancelURL.isEmpty()) {
+            return cancelURL;
+        }
         String referer = request.getHeader("Referer");
         if (referer == null || referer.equals("")) {
             referer = MCRFrontendUtil.getBaseURL();
@@ -123,12 +125,14 @@ class MCRPersistenceHelper {
         return mcrObject;
     }
 
-    protected static String getWebPage(ServletContext context, String modernPage, String deprecatedPage) throws ServletException {
+    protected static String getWebPage(ServletContext context, String modernPage, String deprecatedPage)
+        throws ServletException {
         try {
             if (context.getResource("/" + modernPage) == null
                 && context.getResource("/" + deprecatedPage) != null) {
-                LogManager.getLogger().warn("Could not find " + modernPage + " in webapp root, using deprecated " + deprecatedPage
-                    + " instead.");
+                LogManager.getLogger()
+                    .warn("Could not find " + modernPage + " in webapp root, using deprecated " + deprecatedPage
+                        + " instead.");
                 return deprecatedPage;
             }
         } catch (MalformedURLException e) {
