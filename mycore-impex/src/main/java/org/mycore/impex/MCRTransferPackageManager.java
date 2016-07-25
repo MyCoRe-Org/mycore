@@ -67,7 +67,7 @@ public class MCRTransferPackageManager {
             return INSTANCE;
         }
         synchronized (MCRTransferPackageManager.class) {
-            if (INSTANCE != null) {
+            if (INSTANCE == null) {
                 INSTANCE = new MCRTransferPackageManager();
             }
             return INSTANCE;
