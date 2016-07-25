@@ -18,18 +18,18 @@
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE" />
       <!--  PostgreSQL -->
       <!--
-      <property name="javax.persistence.jdbc.driver">org.postgresql.Driver</property>
-      <property name="javax.persistence.jdbc.url">jdbc:postgresql://127.0.0.1/mycore</property>
+      <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
+      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1/mycore" />
       -->
       <!-- MySQL -->
       <!--
-      <property name="javax.persistence.jdbc.driver">com.mysql.jdbc.Driver</property>
-      <property name="javax.persistence.jdbc.url">jdbc:mysql://127.0.0.1/mycore?useUnicode=true&amp;characterEncoding=UTF-8</property>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1/mycore?useUnicode=true&amp;characterEncoding=UTF-8" />
       -->
       <!-- DB2 -->
       <!--
-      <property name="javax.persistence.jdbc.driver">com.ibm.db2.jcc.DB2Driver</property>
-      <property name="javax.persistence.jdbc.url">jdbc:db2://localhost:50000/mycore</property>
+      <property name="javax.persistence.jdbc.driver" value="com.ibm.db2.jcc.DB2Driver" />
+      <property name="javax.persistence.jdbc.url" value="jdbc:db2://localhost:50000/mycore" />
       -->
       <property name="javax.persistence.jdbc.user" value="sa" />
       <property name="javax.persistence.jdbc.password" value="" />
