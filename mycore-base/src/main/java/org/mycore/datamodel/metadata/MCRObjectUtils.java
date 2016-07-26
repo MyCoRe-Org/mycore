@@ -1,18 +1,19 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jdom2.Attribute;
+import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * This class contains several helper methods for {@link MCRObject}.
@@ -23,12 +24,18 @@ public abstract class MCRObjectUtils {
 
     private static XPathExpression<Attribute> META_LINK_HREF;
 
+    private static XPathExpression<Element> META_CLASS;
+
     static {
-        Map<String, Object> vars = new HashMap<String, Object>();
-        vars.put("id", null);
-        String exp = "./mycoreobject/metadata/*[@class=$id]/*/@xlink:href";
         List<Namespace> ns = MCRConstants.getStandardNamespaces();
-        META_LINK_HREF = XPathFactory.instance().compile(exp, Filters.attribute(), vars, ns);
+
+        // META_LINK_HREF
+        String linkExp = "./mycoreobject/metadata/*[@class='MCRMetaLinkID']/*/@xlink:href";
+        META_LINK_HREF = XPathFactory.instance().compile(linkExp, Filters.attribute(), null, ns);
+
+        // META_CLASS
+        String classExp = "./mycoreobject/metadata/*[@class='MCRMetaClassification']/*";
+        META_CLASS = XPathFactory.instance().compile(classExp, Filters.element(), null, ns);
     }
 
     /**
@@ -110,23 +117,32 @@ public abstract class MCRObjectUtils {
      * links or any {@link MCRMetaDerivateLink}s.
      * 
      * @param object the object where to get the entitylinks from
-     * @throws MCRException one of the linked objects does not exists
+     * @return a list of linked objects
+     * @throws MCRPersistenceException one of the linked objects does not exists
      */
-    public static List<MCRObject> getLinkedObjects(MCRObject object) {
-        String metaLink = MCRMetaLinkID.class.getSimpleName();
-        List<MCRObject> linkedObjects = new ArrayList<MCRObject>();
-        getLinkedObjects(object, metaLink).map(MCRObjectID::getInstance).peek(id -> {
+    public static List<MCRObject> getLinkedObjects(MCRObject object) throws MCRPersistenceException {
+        Stream<String> stream = META_LINK_HREF.evaluate(object.createXML()).stream().map(Attribute::getValue);
+        return stream.map(MCRObjectID::getInstance).peek(id -> {
             if (!MCRMetadataManager.exists(id)) {
-                throw new MCRException("MCRObject " + id + " is linked with (part of the metadata) " + object.getId()
-                    + " but does not exist.");
+                throw new MCRPersistenceException("MCRObject " + id + " is linked with (part of the metadata) "
+                    + object.getId() + " but does not exist.");
             }
-        }).map(MCRMetadataManager::retrieveMCRObject).forEach(linkedObjects::add);
-        return linkedObjects;
+        }).map(MCRMetadataManager::retrieveMCRObject).collect(Collectors.toList());
     }
 
-    private static synchronized Stream<String> getLinkedObjects(MCRObject object, String metaLink) {
-        META_LINK_HREF.setVariable("id", metaLink);
-        return META_LINK_HREF.evaluate(object.createXML()).stream().map(Attribute::getValue);
+    /**
+     * Returns a list of {@link MCRCategoryID}s which are used in the given object.
+     * 
+     * @param object the object where to get the categories from
+     * @return a list of linked categories
+     */
+    public static List<MCRCategoryID> getCategories(MCRObject object) {
+        Stream<Element> stream = META_CLASS.evaluate(object.createXML()).stream();
+        return stream.map((e) -> {
+            String classId = e.getAttributeValue("classid");
+            String categId = e.getAttributeValue("categid");
+            return new MCRCategoryID(classId, categId);
+        }).distinct().collect(Collectors.toList());
     }
 
 }

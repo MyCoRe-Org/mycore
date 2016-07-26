@@ -4,16 +4,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.MCRException;
+import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -25,21 +31,29 @@ import org.mycore.datamodel.metadata.MCRObjectUtils;
 
 /**
  * Basic transfer package containing a {@link MCRObject}, all its descendants,
- * links and derivates (including their files).
+ * links, derivates (including their files) and referenced classifications.
+ * <p>
+ * To build a transfer package call {@link #build()}, this initializes
+ * all required objects and checks if they are valid. Call {@link #getContent()}
+ * to retrieve the content afterwards.
+ * </p>
  * 
  * @author Silvio Hermann
  * @author Matthias Eichner
  */
 public class MCRTransferPackage {
 
-    public static final String INSERT_ORDER_XML_FILENAME = "InsertOrder.xml";
+    public static final String IMPORT_CONFIG_FILENAME = "import.xml";
 
     public static final String CONTENT_PATH = "content/";
+    
+    public static final String CLASS_PATH = CONTENT_PATH + "classifications/";
 
     protected MCRObject source;
 
     /**
-     * List of objects including the source, its descendants and all resolved links.
+     * Set of objects including the source, its descendants and all resolved links.
+     * Its linked because the import order matters.
      */
     protected LinkedHashSet<MCRObject> objects;
 
@@ -49,44 +63,28 @@ public class MCRTransferPackage {
     protected List<MCRTransferPackageFileContainer> fileContainers;
 
     /**
-     * Creates a new transfer package for the given sourceId.
-     * 
-     * @param sourceId a mycore object identifier
+     * Set of classifications.
      */
-    public MCRTransferPackage(MCRObjectID sourceId) {
-        if (sourceId == null) {
-            throw new IllegalArgumentException("One does not simply provide 'null' as parameter.");
-        }
-        if (!MCRMetadataManager.exists(sourceId)) {
-            throw new IllegalArgumentException(
-                "Requested object '" + sourceId + "' does not exist. Thus a transfer package cannot be created.");
-        }
-        this.source = MCRMetadataManager.retrieveMCRObject(sourceId);
+    protected Set<String> classifications;
+
+    public MCRTransferPackage(MCRObject source) {
+        this.source = source;
     }
 
     /**
      * Builds the transfer package.
      * 
-     * @throws MCRException is thrown if some of the referenced objects or derivates couldn't be retrieved
+     * @throws MCRUsageException is thrown if some of the referenced objects or derivates couldn't be retrieved
+     * @throws MCRAccessException if the Users doesn't have the rights to create this transfer package
      */
-    public void build() throws MCRException {
-        this.objects = buildObjects(this.source);
-        this.fileContainers = buildFileContainers(this.source);
-    }
-
-    /**
-     * Creates and returns a set of {@link MCRObject}s referenced by the object given by {@link MCRTransferPackage#getObjectID()} 
-     * explicitly and implicitly (by its children). Derivate's are handled different (they are treated in 
-     * {@link MCRTransferPackage#createFileContainers()}).
-     *
-     * In fact all links of type {@link MCRMetaLinkID} will be resolved and the corresponding objects will be added to the list.  
-     * 
-     * @return a list of objects referenced by the object given by {@link MCRTransferPackage#getObjectID()}
-     */
-    protected LinkedHashSet<MCRObject> buildObjects(MCRObject object) {
+    public void build() throws MCRUsageException, MCRAccessException {
         LinkedHashMap<MCRObjectID, MCRObject> objectMap = new LinkedHashMap<MCRObjectID, MCRObject>();
-        resolveChildrenAndLinks(object, objectMap);
-        return new LinkedHashSet<>(objectMap.values());
+        Set<MCRCategoryID> categories = new HashSet<>();
+        resolveChildrenAndLinks(source, objectMap, categories);
+
+        this.objects = new LinkedHashSet<>(objectMap.values());
+        this.classifications = categories.stream().map(MCRCategoryID::getRootID).distinct().collect(Collectors.toSet());
+        this.fileContainers = buildFileContainers(source);
     }
 
     /**
@@ -96,13 +94,17 @@ public class MCRTransferPackage {
      * @param object the source object
      * @param objectMap the map which will be created
      */
-    protected void resolveChildrenAndLinks(MCRObject object, LinkedHashMap<MCRObjectID, MCRObject> objectMap) {
+    protected void resolveChildrenAndLinks(MCRObject object, LinkedHashMap<MCRObjectID, MCRObject> objectMap,
+        Set<MCRCategoryID> categories) {
         // add links
         for (MCRObject entityLink : MCRObjectUtils.getLinkedObjects(this.source)) {
             if (!objectMap.containsKey(entityLink.getId())) {
                 objectMap.put(entityLink.getId(), entityLink);
             }
         }
+        // add classifications
+        MCRObjectUtils.getCategories(object).forEach(categories::add);
+
         // add the object to the objectMap
         objectMap.put(object.getId(), object);
 
@@ -110,11 +112,11 @@ public class MCRTransferPackage {
         for (MCRMetaLinkID metaLinkId : object.getStructure().getChildren()) {
             MCRObjectID childId = MCRObjectID.getInstance(metaLinkId.toString());
             if (!MCRMetadataManager.exists(childId)) {
-                throw new MCRException(
+                throw new MCRUsageException(
                     "Requested object '" + childId + "' does not exist. Thus a transfer package cannot be created.");
             }
             MCRObject child = MCRMetadataManager.retrieveMCRObject(childId);
-            resolveChildrenAndLinks(child, objectMap);
+            resolveChildrenAndLinks(child, objectMap, categories);
         }
     }
 
@@ -137,7 +139,7 @@ public class MCRTransferPackage {
                       .map(MCRMetaLinkID::getXLinkHrefID)
                       .peek(derivateId -> {
                           if (!MCRMetadataManager.exists(derivateId)) {
-                              throw new MCRException("Requested derivate '" + derivateId
+                              throw new MCRUsageException("Requested derivate '" + derivateId
                                   + "' does not exist. Thus a transfer package cannot be created.");
                           }
                       })
@@ -147,24 +149,20 @@ public class MCRTransferPackage {
     }
 
     /**
-     * Generates an xml file, which contains the insert order for the MCRObject you will get by
-     * invoking {@link TransferPackage#getObjectHierarchy()}.
+     * Generates an xml file, which contains import configuration.
      * 
-     * @return the objectInsertOrder or null
+     * @return import configuration document    
      */
-    public Document getObjectInsertOrderDocument() {
-        if (this.objects == null) {
-            return null;
-        }
-        Element importOrder = new Element("ImportOrder");
-        int order = 0;
+    public Document buildImportConfiguration() {
+        Element configElement = new Element("config");
+        Element orderElement = new Element("order");
         for (MCRObject object : objects) {
-            Element e = new Element("Order");
+            Element e = new Element("object");
             e.setText(object.toString());
-            e.setAttribute("value", String.valueOf(order++));
-            importOrder.addContent(e);
+            orderElement.addContent(e);
         }
-        return new Document(importOrder);
+        configElement.addContent(orderElement);
+        return new Document(configElement);
     }
 
     /**
@@ -175,14 +173,15 @@ public class MCRTransferPackage {
      */
     public Map<String, MCRContent> getContent() throws IOException {
         Map<String, MCRContent> content = new HashMap<>();
+        // config
+        content.put(IMPORT_CONFIG_FILENAME, new MCRJDOMContent(buildImportConfiguration()));
+
         // objects
         for (MCRObject object : this.objects) {
             String fileName = CONTENT_PATH + object.getId().toString() + ".xml";
             Document xml = object.createXML();
             content.put(fileName, new MCRJDOMContent(xml));
         }
-        String insertOrderFileName = CONTENT_PATH + INSERT_ORDER_XML_FILENAME;
-        content.put(insertOrderFileName, new MCRJDOMContent(getObjectInsertOrderDocument()));
 
         // file containers
         for (MCRTransferPackageFileContainer fc : this.fileContainers) {
@@ -198,6 +197,13 @@ public class MCRTransferPackage {
             for (MCRFile file : fc.getFiles()) {
                 content.put(folder + file.getAbsolutePath(), file.getContent());
             }
+        }
+
+        // classifications
+        for (String classId : this.classifications) {
+            Document classification = MCRClassificationUtils.asDocument(classId);
+            String path = CLASS_PATH + classId + ".xml";
+            content.put(path, new MCRJDOMContent(classification));
         }
         return content;
     }

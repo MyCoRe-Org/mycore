@@ -5,8 +5,10 @@ package org.mycore.common;
 
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -109,6 +111,25 @@ public class MCRStreamUtils {
     @SafeVarargs
     public static <T> Stream<T> concat(Stream<T>... streams) {
         return Stream.of(streams).reduce(Stream::concat).orElse(Stream.empty());
+    }
+
+    /**
+     * Stream distinct by filter function.
+     * <p>
+     * <code>
+     * persons.stream().filter(MCRStreamUtils.distinctByKey(p -> p.getName());
+     * </code>
+     * </p>
+     * It should be noted that for ordered parallel stream this solution does not guarantee
+     * which object will be extracted (unlike normal distinct()).
+     * 
+     * @see http://stackoverflow.com/questions/23699371/java-8-distinct-by-property
+     * @param keyExtractor a compare function
+     * @return a predicate
+     */
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
 }

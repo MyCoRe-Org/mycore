@@ -27,6 +27,7 @@ import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
 
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -36,7 +37,6 @@ import com.sun.jersey.spi.container.ContainerRequest;
  *
  */
 public class MCRNewClassificationPermission implements MCRResourceAccessChecker {
-    public static final String PERMISSION = "create-class";
 
     private static final Logger LOGGER = Logger.getLogger(MCRNewClassificationPermission.class);
 
@@ -45,8 +45,9 @@ public class MCRNewClassificationPermission implements MCRResourceAccessChecker 
      */
     @Override
     public boolean isPermitted(ContainerRequest request) {
-        LOGGER.info(MessageFormat.format("{0} has permission {1}?", request.getPath(), PERMISSION));
-        return MCRAccessManager.checkPermission(PERMISSION);
+        LOGGER.info(MessageFormat.format("{0} has permission {1}?", request.getPath(),
+            MCRClassificationUtils.CREATE_CLASS_PERMISSION));
+        return MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION);
     }
 
 }

@@ -5,9 +5,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,23 +39,18 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.jdom2.Document;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.content.MCRStreamContent;
-import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
-import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.frontend.classeditor.access.MCRClassificationWritePermission;
 import org.mycore.frontend.classeditor.access.MCRNewClassificationPermission;
 import org.mycore.frontend.classeditor.json.MCRJSONCategory;
@@ -67,7 +60,6 @@ import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.search.MCRSolrSearchUtils;
-import org.xml.sax.SAXParseException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -167,21 +159,11 @@ public class MCRClassificationEditorResource {
         if (rootidStr == null || "".equals(rootidStr)) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
-        MCRCategoryID classId = MCRCategoryID.rootID(rootidStr);
-        MCRCategory classification = MCRCategoryDAOFactory.getInstance().getRootCategory(classId, -1);
-        if (classification == null) {
+        String classAsString = MCRClassificationUtils.asString(rootidStr);
+        if (classAsString == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
-        try {
-            Document jdom = MCRCategoryTransformer.getMetaDataDocument(classification, true);
-            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-            StringWriter wr = new StringWriter();
-            out.output(jdom, wr);
-            return wr.toString();
-        } catch (Exception exc) {
-            LOGGER.error("while export classification " + rootidStr, exc);
-            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-        }
+        return classAsString;
     }
 
     @GET
@@ -195,7 +177,7 @@ public class MCRClassificationEditorResource {
                 it.remove();
             }
         }
-        if (rootCategories.isEmpty() && !MCRAccessManager.checkPermission(MCRNewClassificationPermission.PERMISSION)) {
+        if (rootCategories.isEmpty() && !MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         Map<MCRCategoryID, Boolean> linkMap = CATEG_LINK_SERVICE.hasLinks(null);
@@ -361,23 +343,12 @@ public class MCRClassificationEditorResource {
     @Produces(MediaType.TEXT_HTML)
     public Response importClassification(@FormDataParam("classificationFile") InputStream uploadedInputStream,
         @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
-        MCRCategory classification;
         try {
-            Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(uploadedInputStream));
-            classification = MCRXMLTransformer.getCategory(jdom);
-        } catch (SAXParseException | URISyntaxException e) {
-            throw new WebApplicationException(e);
-        }
-        if (CATEGORY_DAO.exist(classification.getId())) {
-            if (!MCRAccessManager.checkPermission(classification.getId().getRootID(), PERMISSION_WRITE)) {
-                return Response.status(Status.UNAUTHORIZED).build();
-            }
-            CATEGORY_DAO.replaceCategory(classification);
-        } else {
-            if (!MCRAccessManager.checkPermission(MCRNewClassificationPermission.PERMISSION)) {
-                return Response.status(Status.UNAUTHORIZED).build();
-            }
-            CATEGORY_DAO.addCategory(null, classification);
+            MCRClassificationUtils.fromStream(uploadedInputStream);
+        } catch(MCRAccessException accessExc) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        } catch(Exception exc) {
+            throw new WebApplicationException(exc);
         }
         // This is a hack to support iframe loading via ajax.
         // The benefit is to load file input form data without reloading the page.
