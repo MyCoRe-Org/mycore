@@ -3,10 +3,12 @@ package org.mycore.impex;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -37,6 +39,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+import org.xml.sax.SAXParseException;
 
 /**
  * Contains utility methods for handling transfer packages.
@@ -67,14 +70,16 @@ public abstract class MCRTransferPackageUtil {
      *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
      * @throws JDOMException
      *                some jdom parsing went wrong
+     * @throws URISyntaxException 
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static void importTar(Path pathToTar)
-        throws IOException, MCRActiveLinkException, MCRAccessException, JDOMException {
+    public static void importTar(Path pathToTar) throws IOException, MCRActiveLinkException, MCRAccessException,
+        JDOMException, MCRException, SAXParseException, URISyntaxException {
         if (!Files.exists(pathToTar)) {
             throw new FileNotFoundException(pathToTar.toAbsolutePath().toString() + " does not exist.");
         }
-        String fileName = pathToTar.getFileName().toString();
-        Path targetDirectory = pathToTar.getParent().resolve(fileName.substring(0, fileName.lastIndexOf(".")));
+        Path targetDirectory = getTargetDirectory(pathToTar);
         MCRUtils.untar(pathToTar, targetDirectory);
 
         // import the data from the extracted tar
@@ -83,6 +88,17 @@ public abstract class MCRTransferPackageUtil {
         // delete the extracted files, but keep the tar
         LOGGER.info("Deleting expanded tar in " + targetDirectory);
         Files.walkFileTree(targetDirectory, MCRRecursiveDeleter.instance());
+    }
+
+    /**
+     * Returns the path where the *.tar will be unzipped.
+     * 
+     * @param pathToTar the path to the tar.
+     * @return path to the directory
+     */
+    public static Path getTargetDirectory(Path pathToTar) {
+        String fileName = pathToTar.getFileName().toString();
+        return pathToTar.getParent().resolve(fileName.substring(0, fileName.lastIndexOf(".")));
     }
 
     /**
@@ -98,19 +114,15 @@ public abstract class MCRTransferPackageUtil {
      *                if object is created (no real update), see {@link MCRMetadataManager#create(MCRObject)}
      * @throws MCRAccessException 
      *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
+     * @throws URISyntaxException 
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static void importFromDirectory(Path targetDirectory)
-        throws JDOMException, IOException, MCRActiveLinkException, MCRAccessException {
+    public static void importFromDirectory(Path targetDirectory) throws JDOMException, IOException,
+        MCRActiveLinkException, MCRAccessException, MCRException, SAXParseException, URISyntaxException {
         // import classifications
-        Path classPath = targetDirectory.resolve(MCRTransferPackage.CLASS_PATH);
-        try (Stream<Path> stream = Files.find(classPath, 2, filterClassifications())) {
-            stream.forEach((pathToClassification) -> {
-                try {
-                    MCRClassificationUtils.fromPath(pathToClassification);
-                } catch (Exception exc) {
-                    LOGGER.error("Unable to import classification " + pathToClassification.toString());
-                }
-            });
+        for (Path pathToClassification : getClassifications(targetDirectory)) {
+            MCRClassificationUtils.fromPath(pathToClassification);
         }
 
         // import objects & derivates
@@ -121,8 +133,25 @@ public abstract class MCRTransferPackageUtil {
     }
 
     /**
-     * Imports a object from the targetDirectory path. Be aware that the object is imported
-     * with importMode = true. This means that the {@link MCREventManager#
+     * Returns a list containing all paths to the classifications which should be imported.
+     * 
+     * @param targetDirectory
+     *                the directory where the *.tar was unpacked
+     * @return list of paths
+     * @throws IOException
+     *                if an I/O error is thrown when accessing one of the files
+     */
+    public static List<Path> getClassifications(Path targetDirectory) throws IOException {
+        List<Path> classificationPaths = new ArrayList<>();
+        Path classPath = targetDirectory.resolve(MCRTransferPackage.CLASS_PATH);
+        try (Stream<Path> stream = Files.find(classPath, 2, filterClassifications())) {
+            stream.forEach(classificationPaths::add);
+        }
+        return classificationPaths;
+    }
+
+    /**
+     * Imports a object from the targetDirectory path.
      * 
      * @param targetDirectory
      *                the directory where the *.tar was unpacked
@@ -138,6 +167,33 @@ public abstract class MCRTransferPackageUtil {
      *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
      */
     public static void importObject(Path targetDirectory, String objectId)
+        throws JDOMException, IOException, MCRActiveLinkException, MCRAccessException {
+        // import object
+        List<String> derivates = importObjectCLI(targetDirectory, objectId);
+        // process the saved derivates
+        for (String derivateId : derivates) {
+            importDerivate(targetDirectory, derivateId);
+        }
+    }
+
+    /**
+     * Same as {@link #importObject(Path, String)} but returns a list of derivates which
+     * should be imported afterwards.
+     * 
+     * @param targetDirectory
+     *                the directory where the *.tar was unpacked
+     * @param objectId
+     *                object id to import
+     * @throws JDOMException
+     *                coulnd't parse the import order xml
+     * @throws IOException
+     *                when an I/O error prevents a document from being fully parsed
+     * @throws MCRActiveLinkException
+     *                if object is created (no real update), see {@link MCRMetadataManager#create(MCRObject)}
+     * @throws MCRAccessException 
+     *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
+     */
+    public static List<String> importObjectCLI(Path targetDirectory, String objectId)
         throws JDOMException, IOException, MCRActiveLinkException, MCRAccessException {
         SAXBuilder sax = new SAXBuilder();
         Path targetXML = targetDirectory.resolve(CONTENT_DIRECTORY).resolve(objectId + ".xml");
@@ -157,14 +213,20 @@ public abstract class MCRTransferPackageUtil {
         mcr.getStructure().clearDerivates();
         // update
         MCRMetadataManager.update(mcr);
-
-        // process the saved derivates
-        for (String derivateId : derivates) {
-            importDerivate(targetDirectory, derivateId);
-        }
+        // return list of derivates
+        return derivates;
     }
 
-    private static void importDerivate(Path targetDirectory, String derivateId)
+    /**
+     * Imports a derivate from the given target directory path.
+     * 
+     * @param targetDirectory path to the extracted *.tar archive
+     * @param derivateId the derivate to import
+     * @throws JDOMException derivate xml couldn't be read
+     * @throws IOException some file system stuff went wrong
+     * @throws MCRAccessException you do not have the permissions to do the import
+     */
+    public static void importDerivate(Path targetDirectory, String derivateId)
         throws JDOMException, IOException, MCRAccessException {
         SAXBuilder sax = new SAXBuilder();
 
@@ -235,7 +297,7 @@ public abstract class MCRTransferPackageUtil {
      * @param targetDirectory directory where the *.tar was unpacked
      * @return list of object which lies within the directory
      */
-    private static List<String> getMCRObjects(Path targetDirectory) throws JDOMException, IOException {
+    public static List<String> getMCRObjects(Path targetDirectory) throws JDOMException, IOException {
         Path order = targetDirectory.resolve(MCRTransferPackage.IMPORT_CONFIG_FILENAME);
         Document xml = new SAXBuilder().build(order.toFile());
         Element config = xml.getRootElement();

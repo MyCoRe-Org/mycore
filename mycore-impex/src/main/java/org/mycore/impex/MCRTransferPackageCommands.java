@@ -5,12 +5,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.services.packaging.MCRPackerManager;
@@ -19,6 +25,8 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
 
 @MCRCommandGroup(name = "Transfer Package Commands")
 public class MCRTransferPackageCommands {
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRTransferPackageCommands.class);
 
     @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.", syntax = "create transfer package for objects matching {0}")
     public static void create(String query) throws Exception {
@@ -50,9 +58,67 @@ public class MCRTransferPackageCommands {
     }
 
     @MCRCommand(help = "Imports a transfer package located at {0}. Where {0} is the absolute path to the tar file.", syntax = "import transfer package from tar {0}")
-    public static void importTransferPackageFromTar(String pathToTar) throws Exception {
+    public static List<String> importTransferPackageFromTar(String pathToTar) throws Exception {
         Path tar = Paths.get(pathToTar);
-        MCRTransferPackageUtil.importTar(tar);
+        if (!Files.exists(tar)) {
+            throw new FileNotFoundException(tar.toAbsolutePath().toString() + " does not exist.");
+        }
+        Path targetDirectory = MCRTransferPackageUtil.getTargetDirectory(tar);
+
+        List<String> commands = new ArrayList<>();
+        commands.add("_import transfer package untar " + pathToTar);
+        commands.add("_import transfer package from directory " + targetDirectory);
+        commands.add("_import transfer package clean up " + targetDirectory);
+        return commands;
+    }
+
+    @MCRCommand(syntax = "_import transfer package untar {0}")
+    public static void _untar(String pathToTar) throws Exception {
+        Path tar = Paths.get(pathToTar);
+        Path targetDirectory = MCRTransferPackageUtil.getTargetDirectory(tar);
+        LOGGER.info("Untar " + pathToTar + " to " + targetDirectory + "...");
+        MCRUtils.untar(tar, targetDirectory);
+    }
+
+    @MCRCommand(syntax = "_import transfer package from directory {0}")
+    public static List<String> _fromDirectory(String targetDirectoryPath) throws Exception {
+        LOGGER.info("Import transfer package from " + targetDirectoryPath + "...");
+        Path targetDirectory = Paths.get(targetDirectoryPath);
+        List<String> commands = new ArrayList<>();
+
+        // load classifications
+        List<Path> classificationPaths = MCRTransferPackageUtil.getClassifications(targetDirectory);
+        for (Path pathToClassification : classificationPaths) {
+            commands.add("load classification from file " + pathToClassification.toAbsolutePath().toString());
+        }
+
+        // import objects
+        List<String> mcrObjects = MCRTransferPackageUtil.getMCRObjects(targetDirectory);
+        for (String id : mcrObjects) {
+            commands.add("_import transfer package object " + id + " from " + targetDirectoryPath);
+        }
+        return commands;
+    }
+
+    @MCRCommand(syntax = "_import transfer package object {0} from {1}")
+    public static List<String> _importObject(String objectId, String targetDirectoryPath) throws Exception {
+        Path targetDirectory = Paths.get(targetDirectoryPath);
+        List<String> derivates = MCRTransferPackageUtil.importObjectCLI(targetDirectory, objectId);
+        return derivates.stream().map(derId -> {
+            return "_import transfer package derivate " + derId + " from " + targetDirectoryPath;
+        }).collect(Collectors.toList());
+    }
+
+    @MCRCommand(syntax = "_import transfer package derivate {0} from {1}")
+    public static void _importDerivate(String derivateId, String targetDirectoryPath) throws Exception {
+        Path targetDirectory = Paths.get(targetDirectoryPath);
+        MCRTransferPackageUtil.importDerivate(targetDirectory, derivateId);
+    }
+
+    @MCRCommand(syntax = "_import transfer package clean up {0}")
+    public static void _cleanUp(String targetDirectoryPath) throws Exception {
+        LOGGER.info("Deleting expanded tar in " + targetDirectoryPath + "...");
+        Files.walkFileTree(Paths.get(targetDirectoryPath), MCRRecursiveDeleter.instance());
     }
 
 }
