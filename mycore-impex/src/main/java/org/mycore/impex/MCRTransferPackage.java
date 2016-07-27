@@ -97,7 +97,7 @@ public class MCRTransferPackage {
     protected void resolveChildrenAndLinks(MCRObject object, LinkedHashMap<MCRObjectID, MCRObject> objectMap,
         Set<MCRCategoryID> categories) {
         // add links
-        for (MCRObject entityLink : MCRObjectUtils.getLinkedObjects(this.source)) {
+        for (MCRObject entityLink : MCRObjectUtils.getLinkedObjects(object)) {
             if (!objectMap.containsKey(entityLink.getId())) {
                 objectMap.put(entityLink.getId(), entityLink);
             }
