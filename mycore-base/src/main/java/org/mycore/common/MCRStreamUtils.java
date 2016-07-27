@@ -46,11 +46,8 @@ public class MCRStreamUtils {
      */
     public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodeSupplier,
         Function<Collection<T>, Stream<T>> streamProvider) {
-        return Stream
-            .concat(Stream.of(node), subNodeSupplier
-                .andThen(streamProvider)
-                .apply(node)
-                .flatMap(subNode -> flatten(subNode, subNodeSupplier, streamProvider)));
+        return Stream.concat(Stream.of(node), subNodeSupplier.andThen(streamProvider).apply(node).flatMap(
+            subNode -> flatten(subNode, subNodeSupplier, streamProvider)));
     }
 
     /**
@@ -84,14 +81,10 @@ public class MCRStreamUtils {
      * @since 2016.04
      */
     public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodeSupplier,
-        Function<Collection<T>, Stream<T>> streamProvider,
-        Predicate<T> filter) {
-        return Stream
-            .concat(Stream.of(node), subNodeSupplier
-                .andThen(streamProvider)
-                .apply(node)
-                .filter(filter)
-                .flatMap(subNode -> flatten(subNode, subNodeSupplier, streamProvider, filter)));
+        Function<Collection<T>, Stream<T>> streamProvider, Predicate<T> filter) {
+        return Stream.concat(Stream.of(node),
+            subNodeSupplier.andThen(streamProvider).apply(node).filter(filter).flatMap(
+                subNode -> flatten(subNode, subNodeSupplier, streamProvider, filter)));
     }
 
     /**
@@ -100,8 +93,8 @@ public class MCRStreamUtils {
      * @return a sequential, ordered Stream of unknown size
      */
     public static <T> Stream<T> asStream(Enumeration<T> e) {
-        return StreamSupport
-            .stream(Spliterators.spliteratorUnknownSize(Iterators.forEnumeration(e), Spliterator.ORDERED), false);
+        return StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(Iterators.forEnumeration(e), Spliterator.ORDERED), false);
     }
 
     /**
@@ -117,13 +110,13 @@ public class MCRStreamUtils {
      * Stream distinct by filter function.
      * <p>
      * <code>
-     * persons.stream().filter(MCRStreamUtils.distinctByKey(p -> p.getName());
+     * persons.stream().filter(MCRStreamUtils.distinctByKey(p -&gt; p.getName());
      * </code>
      * </p>
      * It should be noted that for ordered parallel stream this solution does not guarantee
      * which object will be extracted (unlike normal distinct()).
      * 
-     * @see http://stackoverflow.com/questions/23699371/java-8-distinct-by-property
+     * @see <a href="http://stackoverflow.com/questions/23699371/java-8-distinct-by-property">stackoverflow</a>
      * @param keyExtractor a compare function
      * @return a predicate
      */
