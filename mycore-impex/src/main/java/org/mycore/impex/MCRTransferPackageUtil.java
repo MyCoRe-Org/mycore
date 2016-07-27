@@ -103,7 +103,7 @@ public abstract class MCRTransferPackageUtil {
         throws JDOMException, IOException, MCRActiveLinkException, MCRAccessException {
         // import classifications
         Path classPath = targetDirectory.resolve(MCRTransferPackage.CLASS_PATH);
-        try (Stream<Path> stream = Files.find(classPath, 1, filterClassifications())) {
+        try (Stream<Path> stream = Files.find(classPath, 2, filterClassifications())) {
             stream.forEach((pathToClassification) -> {
                 try {
                     MCRClassificationUtils.fromPath(pathToClassification);
@@ -210,7 +210,7 @@ public abstract class MCRTransferPackageUtil {
             if (Files.isDirectory(path)) {
                 return true;
             }
-            if (path.endsWith(".md5")) {
+            if (path.toString().endsWith(".md5")) {
                 return false;
             }
             if (path.getFileName().toString().equals(derivateId + ".xml")) {
@@ -225,7 +225,7 @@ public abstract class MCRTransferPackageUtil {
             if (Files.isDirectory(path)) {
                 return false;
             }
-            return path.endsWith(".xml");
+            return path.toString().endsWith(".xml");
         };
     }
 
