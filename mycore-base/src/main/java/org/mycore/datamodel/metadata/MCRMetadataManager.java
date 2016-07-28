@@ -182,8 +182,10 @@ public final class MCRMetadataManager {
             throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " allready exists, nothing done.");
         }
 
-        if (!mcrDerivate.isValid()) {
-            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " is not valid.");
+        try {
+            mcrDerivate.validate();
+        } catch(MCRException exc) {
+            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " is not valid.", exc);
         }
         final MCRObjectID objid = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
         if (!MCRAccessManager.checkPermission(objid, PERMISSION_WRITE)) {

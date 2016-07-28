@@ -135,7 +135,7 @@ final public class MCRObject extends MCRBase {
     }
 
     /**
-     * This methode create a XML stream for all object data.
+     * This method creates a XML stream for all object data.
      * 
      * @exception MCRException
      *                if the content of this class is not valid
@@ -143,12 +143,16 @@ final public class MCRObject extends MCRBase {
      */
     @Override
     public final Document createXML() throws MCRException {
-        Document doc = super.createXML();
-        Element elm = doc.getRootElement();
-        elm.addContent(mcr_struct.createXML());
-        elm.addContent(mcr_metadata.createXML());
-        elm.addContent(mcr_service.createXML());
-        return doc;
+        try {
+            Document doc = super.createXML();
+            Element elm = doc.getRootElement();
+            elm.addContent(mcr_struct.createXML());
+            elm.addContent(mcr_metadata.createXML());
+            elm.addContent(mcr_service.createXML());
+            return doc;
+        } catch(MCRException exc) {
+            throw new MCRException("The content of '" + mcr_id + "' is invalid.");
+        }
     }
 
     /**
@@ -194,24 +198,38 @@ final public class MCRObject extends MCRBase {
         mcr_metadata.debug();
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.MCRBase#isValid()
+    /**
+     * Validates this MCRObject. This method throws an exception if:
+     *  <ul>
+     *  <li>the mcr_id is null</li>
+     *  <li>the XML schema is null or empty</li>
+     *  <li>the service part is null or invalid</li>
+     *  <li>the structure part is null or invalid</li>
+     *  <li>the metadata part is null or invalid</li>
+     *  </ul>
+     * 
+     * @throws MCRException the MCRObject is invalid
      */
-    @Override
-    public boolean isValid() {
-        if (!super.isValid()) {
-            LOGGER.warn("MCRBase is invalid");
-            return false;
+    public void validate() {
+        super.validate();
+        MCRObjectStructure structure = getStructure();
+        MCRObjectMetadata metadata = getMetadata();
+        if(structure == null) {
+            throw new MCRException("The <structure> part of '" + getId() + "' is undefined.");
         }
-        if (!getStructure().isValid()) {
-            LOGGER.warn("Structure is invalid");
-            return false;
+        if(metadata == null) {
+            throw new MCRException("The <metadata> part of '" + getId() + "' is undefined.");
         }
-        if (!getMetadata().isValid()) {
-            LOGGER.warn("Metadata is invalid");
-            return false;
+        try {
+            structure.validate();
+        } catch(MCRException exc) {
+            throw new MCRException("The <structure> part of '" + getId() + "' is invalid.", exc);
         }
-        return true;
+        try {
+            metadata.validate();
+        } catch(MCRException exc) {
+            throw new MCRException("The <metadata> part of '" + getId() + "' is invalid.", exc);
+        }
     }
 
     /**

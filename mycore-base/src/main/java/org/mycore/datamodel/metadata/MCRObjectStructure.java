@@ -252,7 +252,7 @@ public class MCRObjectStructure {
         }
         MCRObjectID derivateId = derivateLink.getXLinkHrefID();
         MCRMetaLinkID oldLink = getDerivateLink(derivateId);
-        if(derivateLink.equals(oldLink)) {
+        if (derivateLink.equals(oldLink)) {
             return false;
         }
         if (oldLink != null) {
@@ -343,12 +343,14 @@ public class MCRObjectStructure {
      * @return org.jdom2.Element the structure XML string
      */
     public final Element createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content is not valid.");
+        try {
+            validate();
+        } catch(MCRException exc) {
+            throw new MCRException("The content is not valid.", exc);
         }
 
         Element elm = new Element("structure");
-        
+
         if (parent != null) {
             Element elmm = new Element("parents");
             elmm.setAttribute("class", "MCRMetaLinkID");
@@ -431,7 +433,7 @@ public class MCRObjectStructure {
             linkID.debug();
         }
     }
-    
+
     /**
      * <em>isValid</em> checks whether all of the MCRMetaLink's in the link
      * vectors are valid or not.
@@ -439,33 +441,59 @@ public class MCRObjectStructure {
      * @return boolean true, if structure is valid
      */
     public final boolean isValid() {
+        try {
+            validate();
+            return true;
+        } catch (MCRException exc) {
+            LOGGER.warn("The <structure> part of a <mycoreobject> is invalid.", exc);
+        }
+        return false;
+    }
+
+    /**
+     * Validates this MCRObjectStructure. This method throws an exception if:
+     *  <ul>
+     *  <li>the parent is not null but invalid</li>
+     *  <li>one of the children is invalid</li>
+     *  <li>one of the derivates is invalid</li>
+     *  </ul>
+     * 
+     * @throws MCRException the MCRObjectStructure is invalid
+     */
+    public void validate() throws MCRException {
         for (MCRMetaLinkID child : getChildren()) {
-            if (!child.isValid()) {
-                return false;
+            try {
+                child.validate();
+            } catch (Exception exc) {
+                throw new MCRException("The link to the children '" + child.getXLinkHref() + "' is invalid.", exc);
             }
         }
 
         if (parent != null) {
-            if (!parent.isValid()) {
-                return false;
+            try {
+                parent.validate();
+            } catch (Exception exc) {
+                throw new MCRException("The link to the parent '" + parent.getXLinkHref() + "' is invalid.", exc);
             }
         }
 
         for (MCRMetaLinkID derivate : getDerivates()) {
-            if (!derivate.isValid()) {
-                return false;
+            try {
+                derivate.validate();
+            } catch (Exception exc) {
+                throw new MCRException("The link to the derivate '" + derivate.getXLinkHref() + "' is invalid.", exc);
             }
-
             if (!derivate.getXLinkType().equals("locator")) {
-                return false;
+                throw new MCRException("The xlink:type of the derivate link '" + derivate.getXLinkHref()
+                    + "' has to be 'locator' and not '" + derivate.getXLinkType() + "'.");
             }
 
-            if (!derivate.getXLinkHrefID().getTypeId().equals("derivate")) {
-                return false;
+            String typeId = derivate.getXLinkHrefID().getTypeId();
+            if (!typeId.equals("derivate")) {
+                throw new MCRException("The derivate link '" + derivate.getXLinkHref()
+                    + "' is invalid. The _type_ has to be 'derivate' and not '" + typeId + "'.");
             }
         }
-
-        return true;
     }
 
 }

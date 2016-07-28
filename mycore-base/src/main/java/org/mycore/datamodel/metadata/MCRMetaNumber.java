@@ -187,17 +187,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
         setNumber(number);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.MCRMetaDefault#isValid()
-     */
-    @Override
-    public boolean isValid() {
-        if (!super.isValid()) {
-            return false;
-        }
-        return true;
-    }
-
     /**
      * This method set the dimension, if it is null, an empty string was set to
      * the dimension element.

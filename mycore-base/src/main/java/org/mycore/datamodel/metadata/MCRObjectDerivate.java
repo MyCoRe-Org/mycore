@@ -349,10 +349,11 @@ public class MCRObjectDerivate {
      * @return a JDOM Element with the XML data of the structure data part
      */
     public final org.jdom2.Element createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content is not valid.");
+        try {
+            validate();
+        } catch(MCRException exc) {
+            throw new MCRException("The content is not valid.", exc);
         }
-
         org.jdom2.Element elm = new org.jdom2.Element("derivate");
         elm.setAttribute("display", String.valueOf(display));
 
@@ -417,21 +418,35 @@ public class MCRObjectDerivate {
      * @return a boolean value
      */
     public final boolean isValid() {
+        try {
+            validate();
+            return true;
+        } catch (MCRException exc) {
+            LOGGER.warn("The <derivate> part of the mycorederivate '" + derivateID.toString() + "' is invalid.", exc);
+        }
+        return false;
+    }
+
+    /**
+     * Validates this MCRObjectDerivate. This method throws an exception if:
+     *  <ul>
+     *  <li>the linkmeta is null</li>
+     *  <li>the linkmeta xlink:type is not 'locator'</li>
+     *  <li>the internals and the externals are empty</li>
+     *  </ul>
+     * 
+     * @throws MCRException the MCRObjectDerivate is invalid
+     */
+    public void validate() throws MCRException {
         if (linkmeta == null) {
-            LOGGER.warn("linkmeta == null");
-            return false;
+            throw new MCRException("linkmeta == null");
         }
         if (!linkmeta.getXLinkType().equals("locator")) {
-            LOGGER.warn("linkmeta type != locator");
-            return false;
+            throw new MCRException("linkmeta type != locator");
         }
-
         if ((internals == null) && (externals.size() == 0)) {
-            LOGGER.warn("(internals == null) && (externals.size() == 0)");
-            return false;
+            throw new MCRException("(internals == null) && (externals.size() == 0)");
         }
-
-        return true;
     }
 
     /**
@@ -460,4 +475,5 @@ public class MCRObjectDerivate {
     void setDerivateID(MCRObjectID id) {
         this.derivateID = id;
     }
+
 }

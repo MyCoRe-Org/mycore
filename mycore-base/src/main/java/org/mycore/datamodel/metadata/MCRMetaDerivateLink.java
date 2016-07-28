@@ -120,22 +120,27 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         return MCRPath.getPath(getOwner(), getPath());
     }
 
-    @Override
-    public boolean isValid() {
-        if (!super.isValid()) {
-            return false;
-        }
+    /**
+     * Validates this MCRMetaDerivateLink. This method throws an exception if:
+     * <ul>
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>the linked files is null or does not exist</li>
+     * </ul>
+     * 
+     * @throws MCRException the MCRMetaDerivateLink is invalid
+     */
+    public void validate() throws MCRException {
+        super.validate();
         try {
             MCRPath linkedFile = getLinkedFile();
             if (linkedFile == null || !Files.exists(linkedFile)) {
-                LOGGER.warn("File not found: " + super.href);
-                return false;
+                throw new MCRException(getSubTag() + ": File not found: " + super.href);
             }
         } catch (Exception exc) {
-            LOGGER.warn("Unable to validate derivate link " + getXLinkHref(), exc);
-            return false;
+            throw new MCRException(getSubTag() + ": Error while getting linked file " + super.href, exc);
         }
-        return true;
     }
 
 }

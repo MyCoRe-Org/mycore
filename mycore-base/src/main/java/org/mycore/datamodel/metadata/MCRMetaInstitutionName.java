@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -44,8 +43,6 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
     private String nickname;
 
     private String property;
-
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaInstitutionName.class);
 
     /**
      * This is the constructor. <br>
@@ -214,26 +211,21 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
     }
 
     /**
-     * This method checks the validation of the content of this class. The
-     * method returns <em>false</em> if
+     * Validates this MCRMetaInstitutionName. This method throws an exception if:
      * <ul>
-     * <li>the name is empty
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>the trimmed fullname is null or empty</li>
      * </ul>
-     * otherwise the method returns <em>true</em>.
      * 
-     * @return a boolean value
+     * @throws MCRException the MCRMetaInstitutionName is invalid
      */
-    @Override
-    public final boolean isValid() {
-        if (!super.isValid()) {
-            return false;
+    public void validate() throws MCRException {
+        super.validate();
+        if (fullname == null || (fullname = fullname.trim()).length() == 0) {
+            throw new MCRException(getSubTag() + ": fullname is null or empty");
         }
-        if ((fullname = fullname.trim()).length() == 0) {
-            LOGGER.warn(getSubTag() + ": fullname is null or empty");
-            return false;
-        }
-
-        return true;
     }
 
     /**

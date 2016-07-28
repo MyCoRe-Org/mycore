@@ -274,9 +274,11 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * @return a JDOM Element with the XML MCRMeta... part
      */
     public Element createXML() throws MCRException {
-        if (!isValid()) {
+        try {
+            validate();
+        } catch(MCRException exc) {
             debug();
-            throw new MCRException("The content of MCRMetaDefault is not valid.");
+            throw exc;
         }
         Element elm = new Element(subtag);
         if (getLang() != null && getLang().length() > 0)
@@ -323,19 +325,35 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * @return a boolean value
      */
     public boolean isValid() {
+        try {
+            validate();
+            return true;
+        } catch (MCRException exc) {
+            LOGGER.warn("The the metadata element '" + subtag + "' is invalid.", exc);
+        }
+        return false;
+    }
+
+    /**
+     * Validates this MCRMetaDefault. This method throws an exception if:
+     * <ul>
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * </ul>
+     * 
+     * @throws MCRException the MCRMetaDefault is invalid
+     */
+    public void validate() throws MCRException {
         if (subtag == null || (subtag = subtag.trim()).length() == 0) {
-            LOGGER.warn("No tag name defined!");
-            return false;
+            throw new MCRException("No tag name defined!");
         }
         if (lang != null && !MCRLanguageFactory.instance().isSupportedLanguage(lang)) {
-            LOGGER.warn(getSubTag() + ": language is not supported: " + lang);
-            return false;
+            throw new MCRException(getSubTag() + ": language is not supported: " + lang);
         }
         if (getInherited() < 0) {
-            LOGGER.warn(getSubTag() + ": inherited can not be smaller than '0': " + getInherited());
-            return false;
+            throw new MCRException(getSubTag() + ": inherited can not be smaller than '0': " + getInherited());
         }
-        return true;
     }
 
     @Override

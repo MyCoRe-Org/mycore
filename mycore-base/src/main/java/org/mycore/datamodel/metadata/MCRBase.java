@@ -264,24 +264,14 @@ public abstract class MCRBase {
     }
 
     /**
-     * This methode create a XML stream for all object data.
+     * This method create a XML stream for all object data.
      * 
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Document with the XML data of the object as byte array
      */
     public Document createXML() throws MCRException {
-        if (!isValid()) {
-            String msg;
-            MCRObjectID id = getId();
-            if (id == null) {
-                msg = "The content is not valid.";
-            } else {
-                msg = "The content of " + id.toString() + " is not valid.";
-            }
-            throw new MCRException(msg);
-        }
-
+        validate();
         Element elm = new Element(getRootTagName());
         Document doc = new Document(elm);
         elm.addNamespaceDeclaration(XSI_NAMESPACE);
@@ -331,19 +321,41 @@ public abstract class MCRBase {
      * @return a boolean value
      */
     public boolean isValid() {
+        try {
+            validate();
+            return true;
+        } catch(MCRException exc) {
+            LOGGER.warn("The content of this object '" +  mcr_id + "' is invalid.", exc);
+        }
+        return false;
+    }
+
+    /**
+     * Validates the content of this class. This method throws an exception if:
+     *  <ul>
+     *  <li>the mcr_id is null</li>
+     *  <li>the XML schema is null or empty</li>
+     *  <li>the service part is null or invalid</li>
+     *  </ul>
+     * 
+     * @throws MCRException the content is invalid
+     */
+    public void validate() throws MCRException {
         if (mcr_id == null) {
-            LOGGER.warn("MCRObjectID is undefined");
-            return false;
+            throw new MCRException("MCRObjectID is undefined.");
         }
         if (getSchema() == null || getSchema().length() == 0) {
-            LOGGER.warn("XML Schema is undefined");
-            return false;
+            throw new MCRException("XML Schema of '" + mcr_id + "' is undefined.");
         }
-        if (!getService().isValid()) {
-            LOGGER.warn("Service is invalid");
-            return false;
+        MCRObjectService service = getService();
+        if(service == null) {
+            throw new MCRException("The <service> part of '" + mcr_id + "' is undefined.");
         }
-        return true;
+        try {
+            service.validate();
+        } catch(MCRException exc) {
+            throw new MCRException("The <service> part of '" + mcr_id + "' is invalid.", exc);
+        }
     }
 
     public boolean isImportMode() {

@@ -471,15 +471,15 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * @return a JDOM Element with the XML data of the metadata part
      */
     public final org.jdom2.Element createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("MCRObjectMetadata : The content is not valid.");
+        try {
+            validate();
+        } catch(MCRException exc) {
+            throw new MCRException("MCRObjectMetadata : The content is not valid.", exc);
         }
-
         Element elm = new Element("metadata");
         for (MCRMetaElement e : this) {
             elm.addContent(e.createXML(herited_xml));
         }
-
         return elm;
     }
 
@@ -521,13 +521,32 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * @return a boolean value
      */
     public final boolean isValid() {
+        try {
+            validate();
+            return true;
+        } catch (MCRException exc) {
+            LOGGER.warn("The <metadata> element is invalid.", exc);
+        }
+        return false;
+    }
+
+    /**
+     * Validates this MCRObjectMetadata. This method throws an exception if:
+     * <ul>
+     * <li>one of the MCRMetaElement children is invalid</li>
+     * </ul>
+     * 
+     * @throws MCRException the MCRObjectMetadata is invalid
+     */
+    public void validate() throws MCRException {
         for (MCRMetaElement e : this) {
-            if (!e.isValid()) {
-                Logger.getLogger(MCRObjectMetadata.class).warn(e.getTag() + " is not valid.");
-                return false;
+            try {
+                e.validate();
+            } catch(Exception exc) {
+                throw new MCRException("The <metadata> element is invalid because '" + e.getTag() + "' is invalid.",
+                    exc);
             }
         }
-        return true;
     }
 
     /**

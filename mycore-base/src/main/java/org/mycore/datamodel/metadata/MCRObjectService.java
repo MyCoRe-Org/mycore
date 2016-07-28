@@ -667,10 +667,11 @@ public class MCRObjectService {
      * @return a JDOM Element with the XML data of the structure data part
      */
     public final org.jdom2.Element createXML() throws MCRException {
-        if (!isValid()) {
-            throw new MCRException("The content is not valid.");
+        try {
+            validate();
+        } catch(MCRException exc) {
+            throw new MCRException("The content is not valid.", exc);            
         }
-
         org.jdom2.Element elm = new org.jdom2.Element("service");
 
         if (dates.size() != 0) {
@@ -796,17 +797,34 @@ public class MCRObjectService {
      * @return a boolean value
      */
     public final boolean isValid() {
+        try {
+            validate();
+            return true;
+        } catch(MCRException exc) {
+            LOGGER.warn("The <service> part is invalid.");
+        }
+        return false;
+    }
+
+    /**
+     * Validates the content of this class. This method throws an exception if:
+     *  <ul>
+     *  <li>the date value of "createdate" is not null or empty</li>
+     *  <li>the date value of "modifydate" is not null or empty</li>
+     *  </ul>
+     * 
+     * @throws MCRException the content is invalid
+     */
+    public void validate() {
+        // TODO: this makes no sense - there is nothing to validate
         if (getISO8601Date(DATE_TYPE_CREATEDATE) == null) {
             setDate(DATE_TYPE_CREATEDATE);
         }
-
         if (getISO8601Date(DATE_TYPE_MODIFYDATE) == null) {
             setDate(DATE_TYPE_MODIFYDATE);
         }
-
-        return true;
     }
-
+    
     /**
      * This method returns the index for the given flag value.
      * 

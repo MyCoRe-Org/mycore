@@ -384,40 +384,38 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     }
 
     /**
-     * This method checks the validation of the content of this class. The
-     * method returns <em>false</em> if
+     * Validates this MCRMetaPersonName. This method throws an exception if:
      * <ul>
-     * <li>the full name is empty or
-     * <li>the catenation of academic, peerage, first name, prefix and surname is an empty String
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>the firstname, the callname or the fullname is null</li>
      * </ul>
-     * otherwise the method returns <em>true</em>.
      * 
-     * @return a boolean value
+     * @throws MCRException the MCRMetaPersonName is invalid
      */
-    @Override
-    public final boolean isValid() {
+    public void validate() throws MCRException {
+        super.validate();
+        if(firstname == null || callname == null || fullname == null) {
+            throw new MCRException(getSubTag() + ": one of fullname, callname or firstname is null.");
+        }
         if ((firstname = firstname.trim()).length() == 0) {
             firstname = callname;
         }
-
         if ((callname = callname.trim()).length() == 0) {
             callname = firstname;
         }
-
         if ((fullname = fullname.trim()).length() == 0) {
             StringBuilder sb = new StringBuilder(128);
             sb.append(academic).append(' ').append(peerage).append(' ').append(firstname).append(' ').append(prefix)
                     .append(' ').append(surname);
             fullname = sb.toString().trim();
             if (fullname.length() == 0) {
-                LOGGER.warn(getSubTag() + ": full name / first name or surname is empty");
-                return false;
+                throw new MCRException(getSubTag() + ": full name / first name or surname is empty");
             }
         }
-
-        return true;
     }
-
+    
     /**
      * This method make a clone of this class.
      */

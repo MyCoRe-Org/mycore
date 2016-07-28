@@ -354,9 +354,11 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * @return a JDOM Element with the XML Element part
      */
     public final Element createXML(boolean flag) throws MCRException {
-        if (!isValid()) {
+        try {
+            validate();
+        } catch(MCRException exc) {
             debug();
-            throw new MCRException("MCRMetaElement : The content is not valid: Tag=" + this.tag);
+            throw new MCRException("MCRMetaElement : The content is not valid: Tag=" + this.tag, exc);
         }
         Element elm = new Element(tag);
         elm.setAttribute("class", getClassName());
@@ -416,27 +418,39 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * @return a boolean value
      */
     public final boolean isValid() {
+        try {
+            validate();
+            return true;
+        } catch (MCRException exc) {
+            LOGGER.warn("The '" + getTag() + "' is invalid.", exc);
+        }
+        return false;
+    }
+
+    /**
+     * Validates this MCRMetaElement. This method throws an exception if:
+     * <ul>
+     * <li>the classname is not null or empty</li>
+     * <li>the tag is not null or empty</li>
+     * <li>if the list is empty</li>
+     * <li>the lang value was supported</li>
+     * </ul>
+     * 
+     * @throws MCRException the MCRMetaElement is invalid
+     */
+    public void validate() throws MCRException {
         if (tag == null || (tag = tag.trim()).length() == 0) {
-            LOGGER.warn("No tag name defined!");
-            return false;
+            throw new MCRException("No tag name defined!");
         }
-
         if (clazz == null) {
-            LOGGER.warn(getTag() + ": @class is not defined");
-            return false;
+            throw new MCRException(getTag() + ": @class is not defined");
         }
-
         if (!clazz.getPackage().getName().equals(META_PACKAGE_NAME.substring(0, META_PACKAGE_NAME.length() - 1))) {
-            LOGGER.warn(getTag() + ": package " + clazz.getPackage().getName() + " does not equal " + META_PACKAGE_NAME);
-            return false;
+            throw new MCRException(getTag() + ": package " + clazz.getPackage().getName() + " does not equal " + META_PACKAGE_NAME);
         }
-
         if (list.size() == 0) {
-            LOGGER.warn(getTag() + ": does not contain any sub elements");
-            return false;
+            throw new MCRException(getTag() + ": does not contain any sub elements");
         }
-
-        return true;
     }
 
     /**
@@ -477,4 +491,5 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     public Iterator<MCRMetaInterface> iterator() {
         return list.iterator();
     }
+
 }

@@ -456,18 +456,19 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * This method checks the validation of the content of this class. The
-     * method returns <em>false</em> if
+     * Validates this MCRMetaHistoryDate. This method throws an exception if:
      * <ul>
-     * <li>the number of texts is 0 (empty texts are delete)
-     * <li>von is null or bis is null or calendar is null
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>the number of texts is 0 (empty texts are delete)</li>
+     * <li>von is null or bis is null or calendar is null</li>
      * </ul>
-     * otherwise the method returns <em>true</em>.
      * 
-     * @return a boolean value
+     * @throws MCRException the MCRMetaHistoryDate is invalid
      */
-    @Override
-    public boolean isValid() {
+    public void validate() throws MCRException {
+        super.validate();
         for (int i = 0; i < texts.size(); i++) {
             MCRMetaHistoryDateText textitem = texts.get(i);
             if (!textitem.isValid()) {
@@ -476,20 +477,16 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             }
         }
         if (texts.size() == 0) {
-            LOGGER.warn(getSubTag() + ": no texts defined");
-            return false;
+            throw new MCRException(getSubTag() + ": no texts defined");
         }
         if (von == null || bis == null || calendar == null) {
-            LOGGER.warn(getSubTag() + ": von,bis or calenda are null");
-            return false;
+            throw new MCRException(getSubTag() + ": von,bis or calendar are null");
         }
         if (ibis < ivon) {
             Calendar swp = (Calendar) von.clone();
             setVonDate((Calendar) bis.clone());
             setBisDate(swp);
         }
-
-        return true;
     }
 
     /**

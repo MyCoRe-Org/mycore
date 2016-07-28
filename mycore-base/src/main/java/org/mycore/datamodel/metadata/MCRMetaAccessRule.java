@@ -168,30 +168,26 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     }
 
     /**
-     * This method check the validation of the content of this class. The method
-     * returns <em>true</em> if
+     * Validates this MCRMetaAccessRule. This method throws an exception if:
      * <ul>
-     * <li>the subtag is not null or empty
-     * <li>the text is not null or empty
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>the condition is null</li>
+     * <li>the permission is null or empty</li>
      * </ul>
-     * otherwise the method return <em>false</em>
      * 
-     * @return a boolean value
+     * @throws MCRException the MCRMetaAccessRule is invalid
      */
     @Override
-    public boolean isValid() {
-        if (!super.isValid()) {
-            return false;
-        }
+    public void validate() throws MCRException {
+        super.validate();
         if (condition == null) {
-            LOGGER.warn(getSubTag() + ": condition is null");
-            return false;
+            throw new MCRException(getSubTag() + ": condition is null");
         }
         if (permission == null || permission.length() == 0) {
-            LOGGER.warn(getSubTag() + ": permission is null or empty");
-            return false;
+            throw new MCRException(getSubTag() + ": permission is null or empty");
         }
-        return true;
     }
 
     /**

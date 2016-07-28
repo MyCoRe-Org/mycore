@@ -68,7 +68,7 @@ final public class MCRDerivate extends MCRBase {
         mcr_derivate = new MCRObjectDerivate(getId());
     }
 
-    public MCRDerivate(byte[] bytes, boolean valid) throws SAXParseException, IOException {
+    public MCRDerivate(byte[] bytes, boolean valid) throws SAXParseException {
         this();
         setFromXML(bytes, valid);
     }
@@ -171,17 +171,28 @@ final public class MCRDerivate extends MCRBase {
         LOGGER.debug("");
     }
 
-    @Override
-    public boolean isValid() {
-        if (!super.isValid()) {
-            LOGGER.warn("MCRBase is invalid");
-            return false;
+    /**
+     * Validates this MCRDerivate. This method throws an exception if:
+     *  <ul>
+     *  <li>the mcr_id is null</li>
+     *  <li>the XML schema is null or empty</li>
+     *  <li>the service part is null or invalid</li>
+     *  <li>the MCRObjectDerivate is null or invalid</li>
+     *  </ul>
+     * 
+     * @throws MCRException the MCRDerivate is invalid
+     */
+    public void validate() throws MCRException {
+        super.validate();
+        MCRObjectDerivate derivate = getDerivate();
+        if(derivate == null) {
+            throw new MCRException("The <derivate> part of '" + getId().toString() + "' is undefined.");
         }
-        if (!getDerivate().isValid()) {
-            LOGGER.warn("MCRObjectDerivate is invalid");
-            return false;
+        try {
+            derivate.validate();
+        } catch(Exception exc) {
+            throw new MCRException("The <derivate> part of '" + getId().toString() + "' is invalid.", exc);
         }
-        return true;
     }
 
     /**

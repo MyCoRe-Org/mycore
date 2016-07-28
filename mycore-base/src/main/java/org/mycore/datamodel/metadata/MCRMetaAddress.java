@@ -235,28 +235,21 @@ final public class MCRMetaAddress extends MCRMetaDefault {
     }
 
     /**
-     * This method checks the validation of the content of this class. The
-     * method returns <em>false</em> if
+     * Validates this MCRMetaAddress. This method throws an exception if:
      * <ul>
-     * <li>the country is empty and
-     * <li>the state is empty and
-     * <li>the zipCode is empty and
-     * <li>the city is empty and
-     * <li>the street is empty and
-     * <li>the number is empty
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>all of country, state, zip, city, street and number is empty</li>
      * </ul>
-     * otherwise the method returns <em>true</em>.
      * 
-     * @return a boolean value
+     * @throws MCRException the MCRMetaAddress is invalid
      */
-    @Override
-    public final boolean isValid() {
+    public void validate() throws MCRException {
+        super.validate();
         if (getCountry() == null && getState() == null && getZipCode() == null && getCity() == null && getStreet() == null && getNumber() == null) {
-            LOGGER.warn(getSubTag() + ": address is empty");
-            return false;
+            throw new MCRException(getSubTag() + ": address is empty");
         }
-
-        return true;
     }
 
     /**

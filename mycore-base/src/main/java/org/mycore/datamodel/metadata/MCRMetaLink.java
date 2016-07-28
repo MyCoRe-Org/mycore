@@ -401,67 +401,48 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * This method check the validation of the content of this class. The method returns <em>true</em> if
+     * Validates this MCRMetaLink. This method throws an exception if:
      * <ul>
-     * <li>the subtag is not null or empty
-     * <li>the xlink:type not "locator" or "arc"
-     * <li>the from or to are not valid
+     * <li>the subtag is not null or empty</li>
+     * <li>the xlink:type not "locator" or "arc"</li>
+     * <li>the from or to are not valid</li>
      * </ul>
-     * otherwise the method return <em>false</em>
      * 
-     * @return a boolean value
+     * @throws MCRException the MCRMetaLink is invalid
      */
-    @Override
-    public boolean isValid() {
-        if (!super.isValid()) {
-            return false;
-        }
-
+    public void validate() throws MCRException {
+        super.validate();
         if (label != null && label.length() > 0) {
             if (!XMLChar.isValidNCName(label)) {
-                LOGGER.warn(getSubTag() + ": label is no valid NCName:" + label);
-                return false;
+                throw new MCRException(getSubTag() + ": label is no valid NCName:" + label);
             }
         }
-
         if (linktype == null) {
-            LOGGER.warn(getSubTag() + ": linktype is null");
-            return false;
+            throw new MCRException(getSubTag() + ": linktype is null");
         }
-
         if (!linktype.equals("locator") && !linktype.equals("arc")) {
-            LOGGER.warn(getSubTag() + ": linktype is unsupported: " + linktype);
-            return false;
+            throw new MCRException(getSubTag() + ": linktype is unsupported: " + linktype);
         }
-
         if (linktype.equals("arc")) {
             if (from == null || from.length() == 0) {
-                LOGGER.warn(getSubTag() + ": from is null or empty");
-                return false;
+                throw new MCRException(getSubTag() + ": from is null or empty");
             } else if (!XMLChar.isValidNCName(from)) {
-                LOGGER.warn(getSubTag() + ": from is no valid NCName:" + from);
-                return false;
+                throw new MCRException(getSubTag() + ": from is no valid NCName:" + from);
             }
 
             if (to == null || to.length() == 0) {
-                LOGGER.warn(getSubTag() + ": to is null or empty");
-                return false;
+                throw new MCRException(getSubTag() + ": to is null or empty");
             } else if (!XMLChar.isValidNCName(to)) {
-                LOGGER.warn(getSubTag() + ": to is no valid NCName:" + to);
-                return false;
+                throw new MCRException(getSubTag() + ": to is no valid NCName:" + to);
             }
         }
-
         if (linktype.equals("locator")) {
             if (href == null || href.length() == 0) {
-                LOGGER.warn(getSubTag() + ": href is null or empty");
-                return false;
+                throw new MCRException(getSubTag() + ": href is null or empty");
             }
         }
-
-        return true;
     }
-
+    
     /**
      * This method make a clone of this class.
      */

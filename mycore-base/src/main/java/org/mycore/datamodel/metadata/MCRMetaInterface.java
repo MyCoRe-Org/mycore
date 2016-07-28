@@ -143,6 +143,13 @@ public interface MCRMetaInterface extends Cloneable {
     public boolean isValid();
 
     /**
+     * Validates the content of this class.
+     * 
+     * @throws MCRException the content is invalid
+     */
+    public void validate() throws MCRException;
+
+    /**
      * This method make a clone of this class.
      */
     public MCRMetaInterface clone();

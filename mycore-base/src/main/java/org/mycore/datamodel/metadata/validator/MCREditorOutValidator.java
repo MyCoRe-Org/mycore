@@ -211,10 +211,7 @@ public class MCREditorOutValidator {
             throw new MCRException("Could not instantiate " + metaClass.getCanonicalName());
         }
         test.setFromDOM(datasubtag);
-
-        if (!test.isValid()) {
-            throw new MCRException("Element " + datasubtag.getName() + " is not valid.");
-        }
+        test.validate();
         return null;
     }
 

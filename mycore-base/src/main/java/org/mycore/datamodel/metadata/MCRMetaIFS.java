@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -46,8 +45,6 @@ final public class MCRMetaIFS extends MCRMetaDefault {
     private String maindoc;
 
     private String ifsid;
-
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaIFS.class);
 
     /**
      * This is the constructor. <br>
@@ -183,27 +180,21 @@ final public class MCRMetaIFS extends MCRMetaDefault {
     }
 
     /**
-     * This method check the validation of the content of this class. The method
-     * returns <em>true</em> if
+     * Validates this MCRMetaIFS. This method throws an exception if:
      * <ul>
-     * <li>the subtag is not null or empty
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>the trimmed sourcepath is null empty</li>
      * </ul>
-     * otherwise the method return <em>false</em>
      * 
-     * @return a boolean value
+     * @throws MCRException the MCRMetaIFS is invalid
      */
-    @Override
-    public final boolean isValid() {
-        if (!super.isValid()) {
-            return false;
-        }
-
+    public void validate() throws MCRException {
+        super.validate();
         if (sourcepath != null && (sourcepath = sourcepath.trim()).length() == 0) {
-            LOGGER.warn(getSubTag() + ": sourcepath is null or empty");
-            return false;
+            throw new MCRException(getSubTag() + ": sourcepath is null or empty");
         }
-
-        return true;
     }
 
     @Override

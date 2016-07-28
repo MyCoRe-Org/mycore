@@ -44,7 +44,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
     protected String text;
 
     protected String form;
-    
+
     private static final Logger LOGGER = Logger.getLogger(MCRMetaLangText.class);
 
     /**
@@ -77,7 +77,8 @@ public class MCRMetaLangText extends MCRMetaDefault {
      *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaLangText(String set_subtag, String default_lang, String set_type, int set_inherted, String set_form, String set_text) throws MCRException {
+    public MCRMetaLangText(String set_subtag, String default_lang, String set_type, int set_inherted, String set_form,
+        String set_text) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         text = "";
 
@@ -222,7 +223,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
     @Override
     public JsonObject createJSON() {
         JsonObject obj = super.createJSON();
-        if(getForm() != null) {
+        if (getForm() != null) {
             obj.addProperty("form", getForm());
         }
         obj.addProperty("text", getText());
@@ -230,32 +231,24 @@ public class MCRMetaLangText extends MCRMetaDefault {
     }
 
     /**
-     * This method check the validation of the content of this class. The method
-     * returns <em>true</em> if
+     * Validates this MCRMetaLangText. This method throws an exception if:
      * <ul>
-     * <li>the subtag is not null or empty
-     * <li>the text is not null or empty
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>the trimmed text is null or empty</li>
      * </ul>
-     * otherwise the method return <em>false</em>
      * 
-     * @return a boolean value
+     * @throws MCRException the MCRMetaLangText is invalid
      */
-    @Override
-    public boolean isValid() {
-        if (!super.isValid()) {
-            return false;
-        }
-
+    public void validate() throws MCRException {
+        super.validate();
         if (text == null || (text = text.trim()).length() == 0) {
-            LOGGER.warn(getSubTag()+": text is null or empty");
-            return false;
+            throw new MCRException(getSubTag() + ": text is null or empty");
         }
-
         if (form == null || (form = form.trim()).length() == 0) {
             form = "plain";
         }
-
-        return true;
     }
 
     /**

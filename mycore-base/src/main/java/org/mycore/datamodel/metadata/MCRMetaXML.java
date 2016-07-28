@@ -144,28 +144,21 @@ public class MCRMetaXML extends MCRMetaDefault {
     }
 
     /**
-     * This method check the validation of the content of this class. The method
-     * returns <em>true</em> if
+     * Validates this MCRMetaXML. This method throws an exception if:
      * <ul>
-     * <li>the subtag is not null or empty
-     * <li>the text is not null or empty
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>the content is null</li>
      * </ul>
-     * otherwise the method return <em>false</em>
      * 
-     * @return a boolean value
+     * @throws MCRException the MCRMetaXML is invalid
      */
-    @Override
-    public boolean isValid() {
-        if (!super.isValid()) {
-            return false;
+    public void validate() throws MCRException {
+        super.validate();
+        if(content == null) {
+            throw new MCRException(getSubTag() + ": content is null or empty");
         }
-
-        if (content == null) {
-            LOGGER.warn(getSubTag() + ": content is null or empty");
-            return false;
-        }
-
-        return true;
     }
 
     /**

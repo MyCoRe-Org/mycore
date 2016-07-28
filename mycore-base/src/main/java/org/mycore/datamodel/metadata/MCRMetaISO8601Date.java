@@ -249,30 +249,23 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     }
 
     /**
-     * checks the formal correctness of this element.
+     * Validates this MCRMetaISO8601Date. This method throws an exception if:
+     * <ul>
+     * <li>the subtag is not null or empty</li>
+     * <li>the lang value was supported</li>
+     * <li>the inherited value is lower than zero</li>
+     * <li>the isoDate or the temporal accessor is null</li>
+     * </ul>
      * 
-     * This check includes:
-     * <ol>
-     * <li>the included date is set</li>
-     * <li>the super implementation returns true</li>
-     * </ol>
-     * 
-     * @see MCRMetaDefault#isValid()
-     * @return false, if any test fails and the instance should not be used for
-     *         persistence purposes
+     * @throws MCRException the MCRMetaISO8601Date is invalid
      */
-    @Override
-    public boolean isValid() {
-        if (!super.isValid()) {
-            return false;
+    public void validate() throws MCRException {
+        super.validate();
+        if(isoDate == null || isoDate.getDt() == null) {
+            throw new MCRException(getSubTag() + ": date is invalid");
         }
-        if (isoDate.getDt() == null) {
-            LOGGER.warn(getSubTag() + ": date is invalid");
-            return false;
-        }
-        return true;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null)
