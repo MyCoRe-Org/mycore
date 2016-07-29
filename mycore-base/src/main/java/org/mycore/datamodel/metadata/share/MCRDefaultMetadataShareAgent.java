@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata.share;
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -50,9 +51,18 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
     public boolean shareableMetadataChanged(MCRObject oldVersion, MCRObject newVersion) {
         final MCRObjectMetadata md = newVersion.getMetadata();
         final MCRObjectMetadata mdold = oldVersion.getMetadata();
+        final Element newXML = md.createXML();
+        Element oldXML = null;
+        try {
+            oldXML = mdold.createXML();
+        } catch (MCRException exc) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("The old metadata of the object " + oldVersion.getId().toString() + " was invalid.", exc);
+            }
+        }
         //simple save without changes, this is also a short-path for mycore-mods
         //TODO: handle inheritance of mycore-mods in that component
-        if (MCRXMLHelper.deepEqual(md.createXML(), mdold.createXML())) {
+        if (oldXML != null && MCRXMLHelper.deepEqual(newXML, oldXML)) {
             return false;
         }
         int numheritablemd = 0;
@@ -64,8 +74,15 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
                 try {
                     final MCRMetaElement melmold = mdold.getMetadataElement(melm.getTag());
                     final Element jelm = melm.createXML(true);
-                    final Element jelmold = melmold.createXML(true);
-                    if (!MCRXMLHelper.deepEqual(jelmold, jelm)) {
+                    Element jelmold = null;
+                    try {
+                        jelmold = melmold.createXML(true);
+                    } catch(MCRException exc) {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("One of the old metadata elements is invalid.", exc);
+                        }
+                    }
+                    if (jelmold == null || !MCRXMLHelper.deepEqual(jelmold, jelm)) {
                         return true;
                     }
                 } catch (final RuntimeException e) {
