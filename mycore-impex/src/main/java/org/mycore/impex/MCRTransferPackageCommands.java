@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -89,7 +90,7 @@ public class MCRTransferPackageCommands {
         // load classifications
         List<Path> classificationPaths = MCRTransferPackageUtil.getClassifications(targetDirectory);
         for (Path pathToClassification : classificationPaths) {
-            commands.add("load classification from file " + pathToClassification.toAbsolutePath().toString());
+            commands.add("_import transfer package classification from " + pathToClassification.toAbsolutePath().toString());
         }
 
         // import objects
@@ -98,6 +99,11 @@ public class MCRTransferPackageCommands {
             commands.add("_import transfer package object " + id + " from " + targetDirectoryPath);
         }
         return commands;
+    }
+
+    @MCRCommand(syntax = "_import transfer package classification from {0}")
+    public static void _importObject(String pathToClassification) throws Exception {
+        MCRClassificationUtils.fromPath(Paths.get(pathToClassification));
     }
 
     @MCRCommand(syntax = "_import transfer package object {0} from {1}")
