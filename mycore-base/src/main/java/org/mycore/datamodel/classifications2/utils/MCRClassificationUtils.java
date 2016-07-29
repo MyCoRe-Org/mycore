@@ -60,7 +60,8 @@ public class MCRClassificationUtils {
     }
 
     /**
-     * Imports a classification from the given path.
+     * Imports a classification from the given path. If the classification
+     * already exists, it will be replaced.
      * 
      * @param pathToClassification path to the classification
      * @throws IOException could not read from file
@@ -76,7 +77,8 @@ public class MCRClassificationUtils {
     }
 
     /**
-     * Imports a classification from the given input stream.
+     * Imports a classification from the given input stream. If the classification
+     * already exists, it will be replaced.
      * 
      * @param inputStream the classification stream
      * @throws MCRException xml parsing went wrong
