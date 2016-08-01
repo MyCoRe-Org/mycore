@@ -3,9 +3,11 @@ package org.mycore.impex;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -31,7 +33,6 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -247,14 +248,9 @@ public abstract class MCRTransferPackageUtil {
         try (Stream<Path> stream = Files.find(derivateDirectory, 5,
             filterDerivateDirectory(derivateId, derivateDirectory))) {
             stream.forEach(path -> {
-                try {
-                    if (Files.isDirectory(path)) {
-                        MCRPath mcrDirectory = MCRPath.getPath(derivateId,
-                            derivateDirectory.relativize(path).toString());
-                        Files.createDirectory(mcrDirectory);
-                    } else {
-                        MCRFileImportExport.addFiles(path.toFile(), derivateId.toString());
-                    }
+                String targetPath = derivateDirectory.relativize(path).toString();
+                try (InputStream in = Files.newInputStream(path)) {
+                    Files.copy(in, MCRPath.getPath(derivateId, targetPath), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ioExc) {
                     throw new MCRException(
                         "Unable to add file " + path.toAbsolutePath().toString() + " to derivate " + derivateId, ioExc);
@@ -266,16 +262,10 @@ public abstract class MCRTransferPackageUtil {
     private static BiPredicate<Path, BasicFileAttributes> filterDerivateDirectory(String derivateId,
         Path derivateDirectory) {
         return (path, attr) -> {
-            if (derivateDirectory.equals(path)) {
-                return false;
-            }
             if (Files.isDirectory(path)) {
-                return true;
+                return false;
             }
             if (path.toString().endsWith(".md5")) {
-                return false;
-            }
-            if (path.getFileName().toString().equals(derivateId + ".xml")) {
                 return false;
             }
             return true;
