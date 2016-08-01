@@ -83,6 +83,22 @@ public abstract class MCRObjectUtils {
     }
 
     /**
+     * Returns all children of the given object. If the object has no
+     * children, an empty list is returned.
+     * 
+     * @param mcrObject the mycore object
+     * @return list of all children
+     */
+    public static List<MCRObject> getChildren(MCRObject mcrObject) {
+        return mcrObject.getStructure()
+                        .getChildren()
+                        .stream()
+                        .map(link -> link.getXLinkHrefID())
+                        .map(MCRMetadataManager::retrieveMCRObject)
+                        .collect(Collectors.toList());
+    }
+
+    /**
      * Returns a list of all descendants and the object itself. For more information
      * see {@link MCRObjectUtils#getDescendants}.
      * 
@@ -103,11 +119,9 @@ public abstract class MCRObjectUtils {
      */
     public static List<MCRObject> getDescendants(MCRObject mcrObject) {
         List<MCRObject> objectList = new ArrayList<>();
-        for (MCRMetaLinkID link : mcrObject.getStructure().getChildren()) {
-            MCRObjectID mcrChildID = link.getXLinkHrefID();
-            MCRObject mcrChild = MCRMetadataManager.retrieveMCRObject(mcrChildID);
-            objectList.addAll(getDescendantsAndSelf(mcrChild));
-        }
+        getChildren(mcrObject).forEach(child -> {
+            objectList.addAll(getDescendantsAndSelf(child));
+        });
         return objectList;
     }
 

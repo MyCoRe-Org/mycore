@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.log4j.Logger;
@@ -27,6 +26,7 @@ import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectUtils;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.files.FLocat;
@@ -268,12 +268,11 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      */
     private void createLogicalStruct(MCRObject parentObject, LogicalDiv parentLogicalDiv) {
         // run through all children
-        List<MCRObjectID> childrenIds = getChildren(parentObject);
-        for (int i = 0; i < childrenIds.size(); i++) {
-            MCRObjectID childId = childrenIds.get(i);
-            MCRObject childObject = MCRMetadataManager.retrieveMCRObject(childId);
+        List<MCRObject> children = MCRObjectUtils.getChildren(parentObject);
+        for (int i = 0; i < children.size(); i++) {
+            MCRObject childObject = children.get(i);
             // create new logical sub div
-            String id = "log_" + childId.toString();
+            String id = "log_" + childObject.getId().toString();
             LogicalDiv logicalChildDiv = new LogicalDiv(id, getType(childObject), getLabel(childObject), i + 1);
             // add to parent
             parentLogicalDiv.add(logicalChildDiv);
@@ -294,19 +293,6 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             // do recursive call for children
             createLogicalStruct(childObject, logicalChildDiv);
         }
-    }
-
-    /**
-     * Returns all children id's of this MCRObject.
-     * 
-     * @param parentObject the mycore object
-     */
-    protected List<MCRObjectID> getChildren(MCRObject parentObject) {
-        return parentObject.getStructure()
-            .getChildren()
-            .stream()
-            .map(link -> MCRObjectID.getInstance(link.getXLinkHref()))
-            .collect(Collectors.toList());
     }
 
     /**
