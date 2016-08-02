@@ -243,10 +243,9 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         LogicalStructMap lstr = new LogicalStructMap();
         MCRObjectID objId = this.rootObj.getId();
         // create main div
-        String id = "log_" + objId.toString();
         String amdId = this.amdSection.getId();
         String dmdId = this.dmdSection.getId();
-        LogicalDiv logicalDiv = new LogicalDiv(id, getType(this.rootObj), getLabel(this.rootObj), 1, amdId, dmdId);
+        LogicalDiv logicalDiv = new LogicalDiv(objId.toString(), getType(this.rootObj), getLabel(this.rootObj), 1, amdId, dmdId);
         lstr.setDivContainer(logicalDiv);
         // run through all children
         createLogicalStruct(this.rootObj, logicalDiv);
@@ -272,7 +271,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         for (int i = 0; i < children.size(); i++) {
             MCRObject childObject = children.get(i);
             // create new logical sub div
-            String id = "log_" + childObject.getId().toString();
+            String id = childObject.getId().toString();
             LogicalDiv logicalChildDiv = new LogicalDiv(id, getType(childObject), getLabel(childObject), i + 1);
             // add to parent
             parentLogicalDiv.add(logicalChildDiv);
