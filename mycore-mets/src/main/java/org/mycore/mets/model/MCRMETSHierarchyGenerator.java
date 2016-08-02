@@ -268,7 +268,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      */
     private void createLogicalStruct(MCRObject parentObject, LogicalDiv parentLogicalDiv) {
         // run through all children
-        List<MCRObject> children = MCRObjectUtils.getChildren(parentObject);
+        List<MCRObject> children = getChildren(parentObject);
         for (int i = 0; i < children.size(); i++) {
             MCRObject childObject = children.get(i);
             // create new logical sub div
@@ -293,6 +293,15 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             // do recursive call for children
             createLogicalStruct(childObject, logicalChildDiv);
         }
+    }
+
+    /**
+     * Returns all children id's of this MCRObject.
+     * 
+     * @param parentObject the mycore object
+     */
+    protected List<MCRObject> getChildren(MCRObject parentObject) {
+        return MCRObjectUtils.getChildren(parentObject);
     }
 
     /**
