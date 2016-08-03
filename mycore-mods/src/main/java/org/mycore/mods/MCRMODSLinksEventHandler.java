@@ -73,15 +73,14 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
                 MCRMODSRelationshipType relType = MCRMODSRelationshipType.valueOf(relationshipTypeRaw);
                 //MCR-1328 (no reference links for 'host')
                 if (relType != MCRMODSRelationshipType.host) {
-                    linkTableManager.addReferenceLink(obj.getId(),
-                        MCRObjectID.getInstance(targetID),
+                    linkTableManager.addReferenceLink(obj.getId(), MCRObjectID.getInstance(targetID),
                         MCRLinkTableManager.ENTRY_TYPE_REFERENCE, relType.toString());
                 }
             }
         }
     }
 
-   /* (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase#handleObjectUpdated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
@@ -93,9 +92,11 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         //may have to reindex children, if they inherit any information
         for (MCRMetaLinkID childLinkID : obj.getStructure().getChildren()) {
             MCRObjectID childID = childLinkID.getXLinkHrefID();
-            MCREvent childEvent = new MCREvent(childID.getTypeId(), MCREvent.INDEX_EVENT);
-            childEvent.put("object", MCRMetadataManager.retrieve(childID));
-            MCREventManager.instance().handleEvent(childEvent);
+            if (MCRMetadataManager.exists(childID)) {
+                MCREvent childEvent = new MCREvent(childID.getTypeId(), MCREvent.INDEX_EVENT);
+                childEvent.put("object", MCRMetadataManager.retrieve(childID));
+                MCREventManager.instance().handleEvent(childEvent);
+            }
         }
     }
 
