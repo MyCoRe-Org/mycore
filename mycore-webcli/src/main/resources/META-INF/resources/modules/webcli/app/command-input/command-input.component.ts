@@ -44,14 +44,16 @@ export class WebCliCommandInputComponent {
   }
 
   addCommandToRecentCommands(command: string) {
-    if (this.recentCommands.length + 1  > this.recentCommandsMaxLength){
-      this.recentCommands.shift();
+    if (this.recentCommands.length == 0 || command != this.recentCommands[this.recentCommands.length - 1]) {
+      if (this.recentCommands.length + 1  > this.recentCommandsMaxLength){
+        this.recentCommands.shift();
+      }
+      this.recentCommands.push(command);
+      if (this.recentCommands.length > this.recentCommandsMaxLength) {
+        this.recentCommands = this.recentCommands.splice(this.recentCommandsMaxLength * -1, this.recentCommandsMaxLength);
+      }
+      this.updateCommandListInLocalStorage();
     }
-    this.recentCommands.push(command);
-    if (this.recentCommands.length > this.recentCommandsMaxLength) {
-      this.recentCommands = this.recentCommands.splice(this.recentCommandsMaxLength * -1, this.recentCommandsMaxLength);
-    }
-    this.updateCommandListInLocalStorage();
   }
 
   onKeyPress(event, keyCode) {

@@ -55,14 +55,16 @@ System.register(['@angular/core', '../service/rest.service', '../service/communi
                     this.command = "";
                 }
                 addCommandToRecentCommands(command) {
-                    if (this.recentCommands.length + 1 > this.recentCommandsMaxLength) {
-                        this.recentCommands.shift();
+                    if (this.recentCommands.length == 0 || command != this.recentCommands[this.recentCommands.length - 1]) {
+                        if (this.recentCommands.length + 1 > this.recentCommandsMaxLength) {
+                            this.recentCommands.shift();
+                        }
+                        this.recentCommands.push(command);
+                        if (this.recentCommands.length > this.recentCommandsMaxLength) {
+                            this.recentCommands = this.recentCommands.splice(this.recentCommandsMaxLength * -1, this.recentCommandsMaxLength);
+                        }
+                        this.updateCommandListInLocalStorage();
                     }
-                    this.recentCommands.push(command);
-                    if (this.recentCommands.length > this.recentCommandsMaxLength) {
-                        this.recentCommands = this.recentCommands.splice(this.recentCommandsMaxLength * -1, this.recentCommandsMaxLength);
-                    }
-                    this.updateCommandListInLocalStorage();
                 }
                 onKeyPress(event, keyCode) {
                     if (keyCode == "13") {
