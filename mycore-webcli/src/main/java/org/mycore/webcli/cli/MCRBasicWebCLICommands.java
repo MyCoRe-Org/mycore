@@ -4,10 +4,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.cli.MCRCommandLineInterface;
 import org.mycore.frontend.cli.MCRCommandStatistics;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.webcli.container.MCRWebCLIContainer;
 
 @MCRCommandGroup(name = "Basic commands")
 public class MCRBasicWebCLICommands {
@@ -23,11 +25,21 @@ public class MCRBasicWebCLICommands {
 
     @MCRCommand(syntax = "cancel on error", help = "Cancel execution of further commands in case of error")
     public static void cancelonError() {
+        setContinueIfOneFails(false);
         MCRCommandLineInterface.cancelOnError();
     }
 
     @MCRCommand(syntax = "skip on error", help = "Skip execution of failed command in case of error")
     public static void skipOnError() {
+        setContinueIfOneFails(true);
         MCRCommandLineInterface.skipOnError();
+    }
+    
+    private static void setContinueIfOneFails(boolean value) {
+        Object sessionValue;
+        synchronized (MCRSessionMgr.getCurrentSession()) {
+            sessionValue = MCRSessionMgr.getCurrentSession().get("MCRWebCLI");
+            ((MCRWebCLIContainer) sessionValue).setContinueIfOneFails(value, true);
+        }
     }
 }

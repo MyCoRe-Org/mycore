@@ -15,12 +15,14 @@ export class RESTService {
   private _currentQueue = new Subject<String[]>();
   private _currentCommand = new Subject<String>();
   private _currentQueueLength = new Subject<number>();
+  private _continueIfOneFails = new Subject<boolean>();
 
   currentCommandList = this._currentCommandList.asObservable();
   currentLog = this._currentLog.asObservable();
   currentQueue = this._currentQueue.asObservable();
   currentCommand = this._currentCommand.asObservable();
   currentQueueLength = this._currentQueueLength.asObservable();
+  continueIfOneFails = this._continueIfOneFails.asObservable();
 
   constructor(private http: Http) {
     var loc = window.location;
@@ -125,6 +127,11 @@ export class RESTService {
       }
       if (message.type == "currentCommand"){
           this._currentCommand.next(message.return);
+      }
+      if (message.type == "continueIfOneFails"){
+          if(message.value != undefined) {
+            this._continueIfOneFails.next(message.value);
+          }
       }
     }
   }

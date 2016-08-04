@@ -11,7 +11,11 @@ export class WebCliSettingsComponent {
   settings: Settings;
 
   constructor(private _communicationService: CommunicationService,
-              private _restService: RESTService){}
+              private _restService: RESTService){
+                this._restService.continueIfOneFails.subscribe(
+                  value => this.settings.continueIfOneFails = value
+                );
+              }
 
   ngOnInit() {
     this.settings = this.getSettingsFromCookie(500, 10, true, false);

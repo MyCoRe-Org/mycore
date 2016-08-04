@@ -31,6 +31,7 @@ System.register(['@angular/core', '../service/communication.service', '../servic
                 constructor(_communicationService, _restService) {
                     this._communicationService = _communicationService;
                     this._restService = _restService;
+                    this._restService.continueIfOneFails.subscribe(value => this.settings.continueIfOneFails = value);
                 }
                 ngOnInit() {
                     this.settings = this.getSettingsFromCookie(500, 10, true, false);

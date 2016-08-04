@@ -35,11 +35,13 @@ System.register(['@angular/core', '@angular/http', 'rxjs/Subject'], function(exp
                     this._currentQueue = new Subject_1.Subject();
                     this._currentCommand = new Subject_1.Subject();
                     this._currentQueueLength = new Subject_1.Subject();
+                    this._continueIfOneFails = new Subject_1.Subject();
                     this.currentCommandList = this._currentCommandList.asObservable();
                     this.currentLog = this._currentLog.asObservable();
                     this.currentQueue = this._currentQueue.asObservable();
                     this.currentCommand = this._currentCommand.asObservable();
                     this.currentQueueLength = this._currentQueueLength.asObservable();
+                    this.continueIfOneFails = this._continueIfOneFails.asObservable();
                     var loc = window.location;
                     var protocol = "ws://";
                     if (location.protocol == "https:") {
@@ -135,6 +137,11 @@ System.register(['@angular/core', '@angular/http', 'rxjs/Subject'], function(exp
                         }
                         if (message.type == "currentCommand") {
                             this._currentCommand.next(message.return);
+                        }
+                        if (message.type == "continueIfOneFails") {
+                            if (message.value != undefined) {
+                                this._continueIfOneFails.next(message.value);
+                            }
                         }
                     };
                 }

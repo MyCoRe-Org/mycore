@@ -175,6 +175,10 @@ public class MCRWebCLIContainer {
     public void setContinueIfOneFails(boolean con) {
         this.processCallable.setContinueIfOneFails(con);
     }
+    
+    public void setContinueIfOneFails(boolean con, boolean sendMessage) {
+        this.processCallable.setContinueIfOneFails(con, sendMessage);
+    }
 
     private static class ProcessCallable implements Callable<Boolean> {
 
@@ -220,9 +224,23 @@ public class MCRWebCLIContainer {
         public void startLogging() {
             this.logEventQueueObserver.startSendMessages();
         }
-
+        
         public void setContinueIfOneFails(boolean con) {
+            setContinueIfOneFails(con, false);
+        }
+
+        public void setContinueIfOneFails(boolean con, boolean sendMessage) {
             this.continueIfOneFails = con;
+            if (sendMessage) {
+                JsonObject jObject = new JsonObject();
+                jObject.addProperty("type", "continueIfOneFails");
+                jObject.addProperty("value", con);
+                try {
+                    webSocketSession.getBasicRemote().sendText(jObject.toString());
+                } catch (IOException e) {
+                    LOGGER.error("Cannot send message to client.", e);
+                }
+            }
         }
 
         public Boolean call() throws Exception {
