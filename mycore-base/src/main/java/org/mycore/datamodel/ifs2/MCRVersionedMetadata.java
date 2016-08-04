@@ -121,12 +121,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         super(store, fo, id, docType);
         try {
             // 1. current revision, 2. deleted revision, empty()
-            revision = Optional.ofNullable(Optional
-                .ofNullable(getStore()
-                    .getRepository()
-                    .info(getFilePath(), -1))
-                .map(SVNDirEntry::getRevision)
-                .orElseGet(this::getLastRevision));
+            revision = Optional.ofNullable(Optional.ofNullable(getStore().getRepository().info(getFilePath(), -1))
+                    .map(SVNDirEntry::getRevision).orElseGet(this::getLastRevision));
         } catch (SVNException e) {
             LOGGER.error("Could not get last revision of " + getStore().getID() + "_" + id, e);
             revision = Optional.empty();
@@ -293,15 +289,21 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * 
      * @return all stored versions of this metadata object
      */
+    @SuppressWarnings("unchecked")
     public List<MCRMetadataVersion> listVersions() throws IOException {
         try {
             List<MCRMetadataVersion> versions = new ArrayList<MCRMetadataVersion>();
             SVNRepository repository = getStore().getRepository();
             String path = getFilePath();
             String dir = getDirectory();
-            @SuppressWarnings("unchecked")
-            Collection<SVNLogEntry> entries = repository.log(new String[] { dir }, null, 0,
-                repository.getLatestRevision(), true, true);
+
+            Collection<SVNLogEntry> entries = null;
+            try {
+                entries = repository.log(new String[] { dir }, null, 0, repository.getLatestRevision(), true, true);
+            } catch (Exception ioex) {
+                LOGGER.error("Could not get versions", ioex);
+                return versions;
+            }
 
             for (SVNLogEntry entry : entries) {
                 SVNLogEntryPath svnLogEntryPath = entry.getChangedPaths().get(path);
@@ -330,8 +332,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             if (revision < 0) {
                 revision = getLastPresentRevision();
                 if (revision < 0) {
-                    LOGGER.warn(MessageFormat.format("Metadata object {0} in store {1} has no last revision!", getID(),
-                        getStore().getID()));
+                    LOGGER.warn(
+                            MessageFormat.format("Metadata object {0} in store {1} has no last revision!", getID(), getStore().getID()));
                     return null;
                 }
             }
@@ -347,9 +349,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                     return new MCRMetadataVersion(this, logEntry, type);
                 }
             }
-            LOGGER.warn(MessageFormat.format("Metadata object {0} in store {1} has no revision ''{2}''!", getID(),
-                getStore().getID(),
-                getRevision()));
+            LOGGER.warn(MessageFormat.format("Metadata object {0} in store {1} has no revision ''{2}''!", getID(), getStore().getID(),
+                    getRevision()));
             return null;
         } catch (SVNException svnExc) {
             throw new IOException(svnExc);
@@ -371,8 +372,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         LastRevisionLogHandler lastRevisionLogHandler = new LastRevisionLogHandler(path, deleted);
         int limit = 0; //we stop through LastRevisionFoundException
         try {
-            repository.log(new String[] { dir }, repository.getLatestRevision(), 0, true, true, limit, false, null,
-                lastRevisionLogHandler);
+            repository.log(new String[] { dir }, repository.getLatestRevision(), 0, true, true, limit, false, null, lastRevisionLogHandler);
         } catch (LastRevisionFoundException e) {
         }
         return lastRevisionLogHandler.getLastRevision();
