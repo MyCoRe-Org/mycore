@@ -103,6 +103,9 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     }
 
     synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
+        if(MCRMarkManager.instance().isMarkedForImport(objectOrDerivate.getId())) {
+            return;
+        }
         long tStart = System.currentTimeMillis();
         try {
             if (LOGGER.isDebugEnabled()) {

@@ -7,14 +7,14 @@ import org.mycore.common.events.MCREventHandler;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * Experimental class to improve performance on delete and update operations.
- * You can mark object's as "will be deleted" or "will be updated". You can
+ * Experimental class to improve performance on delete and import operations.
+ * You can mark object's as "will be deleted" or "will be imported". You can
  * use this information on {@link MCREventHandler}'s to exclude those
  * marked objects from operations which makes no sense.
  * 
- * <p>
- * Current behavior:
- * </p>
+ * <h1>
+ * Current delete behavior:
+ * </h1>
  * <ol>
  *   <li>An user delete's a parent object with 500 children.</li>
  *   <li>MyCoRe tries to delete the parent, but first, it has to delete all children.</li>
@@ -30,6 +30,24 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * deleted".
  * </p>
  * 
+ * <h1>
+ * Current import behavior:
+ * </h1>
+ * 
+ * <ol>
+ *   <li>An import is started with a bunch of hierarchic objects.</li>
+ *   <li>MyCoRe imports all the objects and does a "create" update.</li>
+ *   <li><b>BUT</b> for each object created the parent is updated again (because a child was added)!</li>
+ *   <li>This results in unnecessary updates.</li>
+ * </ol>
+ * 
+ * <p>
+ * What this class tries to solve:<br>
+ * We mark all objects as "will be imported". On import, we ignore all solr index call for
+ * those objects. After the import, we delete all marks and do an solr import for all
+ * objects at once.
+ * </p>
+ * 
  * TODO: check side effects
  * 
  * @author Matthias Eichner
@@ -39,7 +57,7 @@ public class MCRMarkManager {
     private static MCRMarkManager INSTANCE = null;
 
     public static enum Operation {
-        UPDATE, DELETE
+        DELETE, IMPORT
     }
 
     private Map<MCRObjectID, Operation> marks;
@@ -106,13 +124,13 @@ public class MCRMarkManager {
     }
 
     /**
-     * Checks if the object is marked for deletion.
+     * Checks if the object is marked for import.
      * 
      * @param mcrId the mcr identifier
-     * @return true if its marked for deletion
+     * @return true if its marked for import
      */
-    public boolean isMarkedForUpdate(MCRObjectID mcrId) {
-        return Operation.UPDATE.equals(this.marks.get(mcrId));
+    public boolean isMarkedForImport(MCRObjectID mcrId) {
+        return Operation.IMPORT.equals(this.marks.get(mcrId));
     }
 
 }
