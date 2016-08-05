@@ -203,6 +203,7 @@ public abstract class MCRTransferPackageUtil {
         }
         Document objXML = sax.build(targetXML.toFile());
         MCRObject mcr = new MCRObject(objXML);
+        mcr.setImportMode(true);
 
         List<String> derivates = new LinkedList<String>();
         // one must copy the ids before updating the mcr objects

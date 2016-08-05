@@ -17,11 +17,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
+import org.mycore.datamodel.common.MCRMarkManager;
+import org.mycore.datamodel.common.MCRMarkManager.Operation;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.services.packaging.MCRPackerManager;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
 @MCRCommandGroup(name = "Transfer Package Commands")
@@ -95,7 +99,9 @@ public class MCRTransferPackageCommands {
 
         // import objects
         List<String> mcrObjects = MCRTransferPackageUtil.getMCRObjects(targetDirectory);
+        MCRMarkManager markManager = MCRMarkManager.instance();
         for (String id : mcrObjects) {
+            markManager.mark(MCRObjectID.getInstance(id), Operation.IMPORT);
             commands.add("_import transfer package object " + id + " from " + targetDirectoryPath);
         }
         return commands;
@@ -123,6 +129,17 @@ public class MCRTransferPackageCommands {
 
     @MCRCommand(syntax = "_import transfer package clean up {0}")
     public static void _cleanUp(String targetDirectoryPath) throws Exception {
+        Path targetDirectory = Paths.get(targetDirectoryPath);
+        // delete mark of imported object
+        List<String> mcrObjects = MCRTransferPackageUtil.getMCRObjects(targetDirectory);
+        MCRMarkManager markManager = MCRMarkManager.instance();
+        for (String id : mcrObjects) {
+            markManager.remove(MCRObjectID.getInstance(id));
+        }
+        // index all objects
+        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects, true);
+
+        // deleting expanded directory
         LOGGER.info("Deleting expanded tar in " + targetDirectoryPath + "...");
         Files.walkFileTree(Paths.get(targetDirectoryPath), MCRRecursiveDeleter.instance());
     }
