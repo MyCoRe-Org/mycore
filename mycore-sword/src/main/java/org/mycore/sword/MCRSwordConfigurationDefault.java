@@ -53,8 +53,8 @@ public class MCRSwordConfigurationDefault implements SwordConfiguration {
     }
 
     @Override
-    public int getMaxUploadSize() {
-        return MCRConfiguration.instance().getInt("MCR.SWORD.Max.Uploaded.File.Size");
+    public long getMaxUploadSize() {
+        return MCRConfiguration.instance().getLong("MCR.SWORD.Max.Uploaded.File.Size");
     }
 
     @Override
