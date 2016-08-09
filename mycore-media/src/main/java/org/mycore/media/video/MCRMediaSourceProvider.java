@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRAbstractFileStore;
 import org.mycore.datamodel.niofs.MCRPath;
