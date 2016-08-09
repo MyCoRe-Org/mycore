@@ -110,7 +110,7 @@ public class MCRMediaSourceProvider {
     }
 
     private Optional<String> getDashStream() {
-        return wowzaToken.flatMap(w -> toURL(w, wowzaBaseURL, "/Manifest", wowzaHashParameter));
+        return wowzaToken.flatMap(w -> toURL(w, wowzaBaseURL, "/manifest.mpd", wowzaHashParameter));
     }
 
     private Optional<String> getHLSStream() {
