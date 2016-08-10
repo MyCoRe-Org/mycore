@@ -10,17 +10,21 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.mets.validator.validators.ValidationException;
 import org.mycore.sword.MCRSwordConstants;
 import org.mycore.sword.MCRSwordUtil;
 import org.swordapp.server.Deposit;
@@ -28,6 +32,7 @@ import org.swordapp.server.MediaResource;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
+import org.mycore.mets.validator.METSValidator;
 
 /**
  * @author Sebastian Hofmann (mcrshofm)
@@ -118,7 +123,26 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle {
             if (pathIsDirectory && deposit.getMimeType().equals(MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP)) {
                 path = MCRPath.getPath(derivateId, requestFilePath);
                 try {
-                    MCRSwordUtil.extractZipToPath(deposit.getInputStream(), path);
+                    MCRSwordUtil.extractZipToPath(deposit.getInputStream(), path, (file) -> {
+                        if(file.getFileName().toString().equals("mets.xml")){
+                            try(InputStream is = Files.newInputStream(file)){
+                                METSValidator validator = new METSValidator(is);
+                                List<ValidationException> validateResult = validator.validate();
+
+                                if(validateResult.size()>0){
+                                    String result = validateResult.stream().map(e -> e.getMessage()).collect(Collectors.joining(System.lineSeparator()));
+                                    return new MCRSwordUtil.MCRValidationResult(false, result);
+                                } else {
+                                    return new MCRSwordUtil.MCRValidationResult(true, null);
+                                }
+
+                            } catch (IOException|JDOMException e) {
+                                return new MCRSwordUtil.MCRValidationResult(false, "Could not read mets.xml: " + e.getMessage());
+                            }
+                        } else {
+                            return new MCRSwordUtil.MCRValidationResult(true, null);
+                        }
+                    });
                 } catch (IOException | NoSuchAlgorithmException | URISyntaxException e) {
                     throw new SwordServerException("Error while extracting ZIP.", e);
                 }

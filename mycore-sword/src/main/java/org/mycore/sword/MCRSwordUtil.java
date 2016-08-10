@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.regex.Matcher;
@@ -184,7 +185,7 @@ public class MCRSwordUtil {
         return '/' + path.getRoot().relativize(path).toString();
     }
 
-    public static String extractZipToPath(InputStream inputStream, MCRPath target) throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
+    public static String extractZipToPath(InputStream inputStream, MCRPath target, MCRFileValidator validator) throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
         final Path zipTempFile = Files.createTempFile("swordv2_", new Double(Math.random()).toString() + ".temp.zip");
         final MessageDigest md5 = MessageDigest.getInstance("MD5");
         final DigestInputStream digestInputStream = new DigestInputStream(inputStream, md5);
@@ -193,6 +194,19 @@ public class MCRSwordUtil {
 
         try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipTempFile.toUri().toString()), new HashMap<String, Object>())) {
             final Path sourcePath = zipfs.getPath("/");
+            Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    MCRValidationResult validationResult = validator.validate(file);
+                    if (!validationResult.isValid()) {
+                        throw new MCRException("Validation failed for " + file.toString() +
+                                (validationResult.getMessage().isPresent() ? " with message : " + validationResult.getMessage().get() : "") + ".");
+                    }
+
+                    return FileVisitResult.TERMINATE;
+                }
+            });
+
             Files.walkFileTree(sourcePath,
                     new SimpleFileVisitor<Path>() {
                         @Override
@@ -438,4 +452,35 @@ public class MCRSwordUtil {
             getEditMediaFileIRIStream(collection, derivateId.toString()).forEach(depositReceipt::addEditMediaIRI);
         }
     }
+
+    public interface MCRFileValidator {
+        MCRValidationResult validate(Path pathToFile);
+    }
+
+    public static class MCRValidationResult {
+        private boolean valid;
+        private Optional<String> message;
+
+        public MCRValidationResult(boolean valid, String message) {
+            this.valid = valid;
+            this.message = Optional.ofNullable(message);
+        }
+
+        public boolean isValid() {
+            return valid;
+        }
+
+        public void setValid(boolean valid) {
+            this.valid = valid;
+        }
+
+        public Optional<String> getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = Optional.ofNullable(message);
+        }
+    }
+
 }

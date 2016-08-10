@@ -64,5 +64,13 @@
       <groupId>org.apache.abdera</groupId>
       <artifactId>abdera-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.mycore.mets</groupId>
+      <artifactId>mets-validator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom2</artifactId>
+    </dependency>
   </dependencies>
 </project>

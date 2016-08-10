@@ -708,7 +708,7 @@
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-validator</artifactId>
-        <version>1.1</version>
+        <version>1.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
