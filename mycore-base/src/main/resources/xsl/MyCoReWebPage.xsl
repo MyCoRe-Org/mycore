@@ -57,7 +57,15 @@
   <!-- =============================================================================== -->
   <xsl:template match="selectBox">
     <xsl:if test="@classification">
-      <xsl:variable name="classDocument" select="document(concat('xslStyle:items2options:classification:editor:-1:children:', @classification))" />
+      <xsl:variable name="maxLengthVisible">
+        <xsl:if test="@maxLengthVisible">
+          <xsl:value-of select="concat('?MaxLengthVisible=' ,@maxLengthVisible)" />
+        </xsl:if>
+      </xsl:variable>
+
+      <xsl:variable name="classDocument"
+        select="document(concat('xslStyle:items2options', $maxLengthVisible, ':classification:editor:-1:children:', @classification))" />
+
       <xsl:variable name="style">
         <xsl:choose>
           <xsl:when test="@style">
