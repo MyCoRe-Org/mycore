@@ -32,20 +32,18 @@ import java.lang.annotation.Target;
 import org.mycore.frontend.cli.MCRCommandLineInterface;
 
 /**
- * @author Thomas Scheffler (yagee)
- *
- */
-/**
- * Annotates a public static method as a command that could be executed via {@link MCRCommandLineInterface}.
+ * Annotates a class that holds public static methods as commands they could be executed via 
+ * {@link MCRCommandLineInterface}.
+ * 
  * @author Thomas Scheffler (yagee)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Target(ElementType.TYPE)
 public @interface MCRCommandGroup {
-    /**
-     * A name for this command group
-     */
-    String name();
+	/**
+	 * A name for this command group
+	 */
+	String name();
 
 }
