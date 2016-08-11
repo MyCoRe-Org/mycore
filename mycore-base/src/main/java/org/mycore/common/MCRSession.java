@@ -38,6 +38,11 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.EntityTransaction;
@@ -49,7 +54,11 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRSessionEvent;
+import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.frontend.servlets.MCRServletJob;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * Instances of this class collect information kept during a session like the currently active user, the preferred
@@ -115,7 +124,46 @@ public class MCRSession implements Cloneable {
 
     private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<Throwable>();
 
+    private ThreadLocal<List<Runnable>> onCommitTasks = new ThreadLocal<List<Runnable>>() {
+        @Override
+        protected List<Runnable> initialValue() {
+            return Collections.synchronizedList(new CopyOnWriteArrayList<>());
+        }
+    };
+
+    private static ExecutorService COMMIT_SERVICE;
+
     private static MCRUserInformation guestUserInformation = MCRSystemUserInformation.getGuestInstance();
+
+    static {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRSession-OnCommitService-#%d")
+                                                                .build();
+        COMMIT_SERVICE = Executors.newFixedThreadPool(4, threadFactory);
+        MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
+
+            @Override
+            public void prepareClose() {
+                COMMIT_SERVICE.shutdown();
+            }
+
+            @Override
+            public int getPriority() {
+                return Integer.MIN_VALUE + 8;
+            }
+
+            @Override
+            public void close() {
+                if (!COMMIT_SERVICE.isTerminated()) {
+                    try {
+                        COMMIT_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
+                    } catch (InterruptedException e) {
+                        LOGGER.warn("Error while waiting for shutdown.", e);
+                    }
+                }
+            }
+
+        });
+    }
 
     /**
      * The constructor of a MCRSession. As default the user ID is set to the value of the property variable named
@@ -335,8 +383,8 @@ public class MCRSession implements Cloneable {
             lastActivatedStackTrace.set(new RuntimeException("This is for debugging purposes only"));
             fireSessionEvent(activated, concurrentAccess.incrementAndGet());
         } else {
-            MCRException e = new MCRException("Cannot activate a Session more than once per thread: "
-                + currentThreadCount.get().get());
+            MCRException e = new MCRException(
+                "Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
             LOGGER.warn("Too many activate() calls stacktrace:", e);
             LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace.get());
         }
@@ -372,10 +420,7 @@ public class MCRSession implements Cloneable {
     void fireSessionEvent(MCRSessionEvent.Type type, int concurrentAccessors) {
         MCRSessionEvent event = new MCRSessionEvent(this, type, concurrentAccessors);
         LOGGER.debug(event);
-        MCRSessionMgr
-            .getListeners()
-            .stream()
-            .forEach(l -> l.sessionEvent(event));
+        MCRSessionMgr.getListeners().stream().forEach(l -> l.sessionEvent(event));
     }
 
     public long getThisAccessTime() {
@@ -408,6 +453,7 @@ public class MCRSession implements Cloneable {
             transaction.get().commit();
             transaction.remove();
         }
+        submitOnCommitTasks();
     }
 
     /**
@@ -459,6 +505,22 @@ public class MCRSession implements Cloneable {
     public void setUserInformation(MCRUserInformation userSystemAdapter) {
         this.userInformation = userSystemAdapter;
         setLoginTime();
+    }
+
+    /**
+     * Add a task which will be executed after {@link #commitTransaction()} was called.
+     * 
+     * @param task thread witch will be executed after an commit
+     */
+    public void onCommit(Runnable task) {
+        this.onCommitTasks.get().add(task);
+    }
+
+    protected synchronized void submitOnCommitTasks() {
+        this.onCommitTasks.get().forEach(task -> {
+            COMMIT_SERVICE.submit(task);
+        });
+        this.onCommitTasks.get().clear();
     }
 
 }
