@@ -12,6 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +25,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.mets.validator.METSValidator;
 import org.mycore.mets.validator.validators.ValidationException;
 import org.mycore.sword.MCRSwordConstants;
 import org.mycore.sword.MCRSwordUtil;
@@ -32,12 +34,11 @@ import org.swordapp.server.MediaResource;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
-import org.mycore.mets.validator.METSValidator;
 
 /**
  * @author Sebastian Hofmann (mcrshofm)
  */
-public class MCRSwordMediaHandler implements MCRSwordLifecycle {
+public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCRFileValidator {
 
     protected final static Logger LOGGER = Logger.getLogger(MCRSwordMediaHandler.class);
 
@@ -109,9 +110,10 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle {
 
     }
 
+
     public void addResource(String derivateId, String requestFilePath, Deposit deposit) throws SwordError, SwordServerException {
-        MCRPath path = MCRPath.getPath(derivateId, requestFilePath);
-        final boolean pathIsDirectory = Files.isDirectory(path);
+        MCRPath ifsRootPath = MCRPath.getPath(derivateId, requestFilePath);
+        final boolean pathIsDirectory = Files.isDirectory(ifsRootPath);
         final String depositFilename = deposit.getFilename();
         final String packaging = deposit.getPackaging();
 
@@ -119,49 +121,56 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle {
             throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "You dont have the right to write to the derivate!");
         }
 
+        Path tempFile = null;
+        try {
+            tempFile = MCRSwordUtil.createTempFileFromStream(deposit.getFilename(), deposit.getInputStream(), deposit.getMd5());
+        } catch (IOException e) {
+            throw new SwordServerException("Could not store deposit to temp files", e);
+        }
+
         if (packaging != null && packaging.equals(UriRegistry.PACKAGE_SIMPLE_ZIP)) {
             if (pathIsDirectory && deposit.getMimeType().equals(MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP)) {
-                path = MCRPath.getPath(derivateId, requestFilePath);
+                ifsRootPath = MCRPath.getPath(derivateId, requestFilePath);
                 try {
-                    MCRSwordUtil.extractZipToPath(deposit.getInputStream(), path, (file) -> {
-                        if(file.getFileName().toString().equals("mets.xml")){
-                            try(InputStream is = Files.newInputStream(file)){
-                                METSValidator validator = new METSValidator(is);
-                                List<ValidationException> validateResult = validator.validate();
+                    List<MCRSwordUtil.MCRValidationResult> invalidResults = MCRSwordUtil.validateZipFile(this, tempFile)
+                            .stream()
+                            .filter(validationResult -> !validationResult.isValid())
+                            .collect(Collectors.toList());
 
-                                if(validateResult.size()>0){
-                                    String result = validateResult.stream().map(e -> e.getMessage()).collect(Collectors.joining(System.lineSeparator()));
-                                    return new MCRSwordUtil.MCRValidationResult(false, result);
-                                } else {
-                                    return new MCRSwordUtil.MCRValidationResult(true, null);
-                                }
+                    if (invalidResults.size() > 0) {
+                        throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, invalidResults.stream()
+                                .map(MCRSwordUtil.MCRValidationResult::getMessage)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .collect(Collectors.joining(System.lineSeparator())));
+                    }
 
-                            } catch (IOException|JDOMException e) {
-                                return new MCRSwordUtil.MCRValidationResult(false, "Could not read mets.xml: " + e.getMessage());
-                            }
-                        } else {
-                            return new MCRSwordUtil.MCRValidationResult(true, null);
-                        }
-                    });
+                    MCRSwordUtil.extractZipToPath(tempFile, ifsRootPath);
                 } catch (IOException | NoSuchAlgorithmException | URISyntaxException e) {
                     throw new SwordServerException("Error while extracting ZIP.", e);
                 }
             } else {
                 throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, "The Request makes no sense. (mime type must be " + MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP + " and path must be a directory)");
             }
-        } else if (packaging.equals(UriRegistry.PACKAGE_BINARY)) {
-            path = MCRPath.getPath(derivateId, requestFilePath + depositFilename);
+        } else if (packaging != null && packaging.equals(UriRegistry.PACKAGE_BINARY)) {
             try {
-                Files.copy(deposit.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                MCRSwordUtil.MCRValidationResult validationResult = validate(tempFile);
+                if (!validationResult.isValid()) {
+                    throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, validationResult.getMessage().get());
+                }
+                ifsRootPath = MCRPath.getPath(derivateId, requestFilePath + depositFilename);
+                try (InputStream is = Files.newInputStream(tempFile)) {
+                    Files.copy(is, ifsRootPath, StandardCopyOption.REPLACE_EXISTING);
+                }
             } catch (IOException e) {
-                LOGGER.error("Could not add " + path);
+                throw new SwordServerException("Error while adding file " + ifsRootPath.toString(), e);
             }
         }
-
     }
 
     public void deleteMediaResource(String derivateId, String requestFilePath) throws SwordError, SwordServerException {
         if(!MCRAccessManager.checkPermission(derivateId, MCRAccessManager.PERMISSION_DELETE)){
+            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "You dont have the right to delete (from) the derivate!");
         }
 
         if (requestFilePath == null || requestFilePath.equals("/")) {
@@ -211,6 +220,29 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle {
     @Override
     public void destroy() {
 
+    }
+
+    @Override
+    public MCRSwordUtil.MCRValidationResult validate(Path pathToFile) {
+        // single added file name are remapped to mets.xml -> swordv2_*mets.xml
+        if (pathToFile.getFileName().toString().endsWith("mets.xml")) {
+            try (InputStream is = Files.newInputStream(pathToFile)) {
+                METSValidator validator = new METSValidator(is);
+                List<ValidationException> validateResult = validator.validate();
+
+                if (validateResult.size() > 0) {
+                    String result = validateResult.stream().map(Throwable::getMessage).collect(Collectors.joining(System.lineSeparator()));
+                    return new MCRSwordUtil.MCRValidationResult(false, result);
+                } else {
+                    return new MCRSwordUtil.MCRValidationResult(true, null);
+                }
+
+            } catch (IOException | JDOMException e) {
+                return new MCRSwordUtil.MCRValidationResult(false, "Could not read mets.xml: " + e.getMessage());
+            }
+        } else {
+            return new MCRSwordUtil.MCRValidationResult(true, null);
+        }
     }
 }
 

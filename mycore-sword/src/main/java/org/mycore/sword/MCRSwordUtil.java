@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
@@ -52,6 +53,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
@@ -185,28 +187,41 @@ public class MCRSwordUtil {
         return '/' + path.getRoot().relativize(path).toString();
     }
 
-    public static String extractZipToPath(InputStream inputStream, MCRPath target, MCRFileValidator validator) throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
-        final Path zipTempFile = Files.createTempFile("swordv2_", new Double(Math.random()).toString() + ".temp.zip");
-        final MessageDigest md5 = MessageDigest.getInstance("MD5");
-        final DigestInputStream digestInputStream = new DigestInputStream(inputStream, md5);
-        Files.copy(digestInputStream, zipTempFile, StandardCopyOption.REPLACE_EXISTING);
-        final String md5String = MCRUtils.toHexString(md5.digest());
+    /**
+     * Stores stream to temp file and checks md5
+     *
+     * @param inputStream the stream which holds the File
+     * @param checkMd5    the md5 to compare with (or null if no md5 check is needed)
+     * @return the path to the temp file
+     * @throws IOException if md5 does mismatch or if stream could not be read
+     */
+    public static Path createTempFileFromStream(String fileName, InputStream inputStream, String checkMd5) throws IOException {
+        final Path zipTempFile = Files.createTempFile("swordv2_", fileName);
+        MessageDigest md5Digest = null;
 
-        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipTempFile.toUri().toString()), new HashMap<String, Object>())) {
+        if (checkMd5 != null) {
+            try {
+                md5Digest = MessageDigest.getInstance("MD5");
+                inputStream = new DigestInputStream(inputStream, md5Digest);
+            } catch (NoSuchAlgorithmException e) {
+                throw new MCRConfigurationException("No MD5 available!", e);
+            }
+        }
+
+        Files.copy(inputStream, zipTempFile, StandardCopyOption.REPLACE_EXISTING);
+
+        if (checkMd5 != null) {
+            final String md5String = MCRUtils.toHexString(md5Digest.digest());
+            if (!md5String.equals(checkMd5)) {
+                throw new IOException("MD5 mismatch, expected " + checkMd5 + " got " + md5String);
+            }
+        }
+        return zipTempFile;
+    }
+
+    public static void extractZipToPath(Path zipFilePath, MCRPath target) throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri().toString()), new HashMap<String, Object>())) {
             final Path sourcePath = zipfs.getPath("/");
-            Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    MCRValidationResult validationResult = validator.validate(file);
-                    if (!validationResult.isValid()) {
-                        throw new MCRException("Validation failed for " + file.toString() +
-                                (validationResult.getMessage().isPresent() ? " with message : " + validationResult.getMessage().get() : "") + ".");
-                    }
-
-                    return FileVisitResult.TERMINATE;
-                }
-            });
-
             Files.walkFileTree(sourcePath,
                     new SimpleFileVisitor<Path>() {
                         @Override
@@ -233,7 +248,25 @@ public class MCRSwordUtil {
                     });
         }
 
-        return md5String;
+    }
+
+    public static List<MCRValidationResult> validateZipFile(final MCRFileValidator validator, Path zipFile) throws IOException, URISyntaxException {
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri().toString()), new HashMap<String, Object>())) {
+            final Path sourcePath = zipfs.getPath("/");
+            ArrayList<MCRValidationResult> validationResults = new ArrayList<>();
+            Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    MCRValidationResult validationResult = validator.validate(file);
+                    if (!validationResult.isValid()) {
+                        validationResults.add(validationResult);
+                    }
+
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+            return validationResults;
+        }
     }
 
     public static String encodeURLPart(String uri) {
