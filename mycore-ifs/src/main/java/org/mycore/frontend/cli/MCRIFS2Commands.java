@@ -28,6 +28,7 @@ import java.util.TimeZone;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
+import javax.persistence.PersistenceException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -43,6 +44,8 @@ import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRFSNODES_;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
@@ -237,7 +240,6 @@ public class MCRIFS2Commands {
             + " is not unique!");
             return;
 		}
-        System.out.println("6666666666666666666666666666666 " + pid + " " + node.getName() + " " + derivate_id);
         try {
             MCRFSNODES mcrfsnodes = new MCRFSNODES();
             mcrfsnodes.setId(id);
@@ -268,13 +270,14 @@ public class MCRIFS2Commands {
         String id = "";
         String md5_old = "";
         long size_old = 0;
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.getTransaction();
-        if (tx.getStatus().isNotOneOf(TransactionStatus.ACTIVE)) {
-            tx.begin();
+        boolean foundEntry=false;
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        boolean transactionActive = mcrSession.isTransactionActive();
+        if (!transactionActive) {
+            mcrSession.beginTransaction();
         }
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         try {
-            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
             Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
@@ -287,6 +290,7 @@ public class MCRIFS2Commands {
                         cb.equal(nodes.get(MCRFSNODES_.type), "F")))
                     .getSingleResult();
                 LOGGER.debug("Found file entry for " + storageid);
+                foundEntry=true;
                 id = fsNode.getId();
                 md5_old = fsNode.getMd5();
                 size_old = fsNode.getSize();
@@ -321,17 +325,17 @@ public class MCRIFS2Commands {
         if (size_old == size && md5_old.equals(md5)) {
             return;
         }
-        if (size_old != size && size_old != 0) {
+        if (foundEntry && size_old != size) {
             LOGGER.warn("Wrong file size for " + storageid + " : " + size_old + " <-> " + size);
         }
-        if (!md5_old.equals(md5) && md5_old.length() != 0) {
+        if (foundEntry && !md5.equals(md5_old)) {
             LOGGER.warn("Wrong file md5 for " + storageid + " : " + md5_old + " <-> " + md5);
         }
         if (check_only)
             return;
         // fix entry
         LOGGER.info("Fix entry for file " + storageid);
-        if (id.length() == 0) {
+        if (!foundEntry) {
             MCRFileMetadataManager fmmgr = MCRFileMetadataManager.instance();
             id = fmmgr.createNodeID();
         }
@@ -359,14 +363,12 @@ public class MCRIFS2Commands {
             mcrfsnodes.setStorageid(storageid);
             mcrfsnodes.setFctid(fctid);
             mcrfsnodes.setMd5(md5);
-            session.persist(mcrfsnodes);
-            tx.commit();
+            em.merge(mcrfsnodes);
+            mcrSession.commitTransaction();
             LOGGER.debug("Entry " + node.getName() + " fixed.");
-        } catch (HibernateException he) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            he.printStackTrace();
+        } catch (PersistenceException pe) {
+            mcrSession.rollbackTransaction();
+            pe.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
