@@ -191,7 +191,7 @@ public class MCRIFS2Commands {
 
     private static void fixDirectoryEntry(File node, String derivate_id, String storage_base, boolean check_only) {
         String name = node.getName();
-        LOGGER.debug("fixDirectoryEntry : name = " + node.getName());
+        LOGGER.debug("fixDirectoryEntry : name = " + name);
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.getTransaction();
         if (tx.getStatus().isNotOneOf(TransactionStatus.ACTIVE)) {
@@ -224,15 +224,20 @@ public class MCRIFS2Commands {
         LOGGER.info("Fix entry for directory " + name);
         MCRFileMetadataManager fmmgr = MCRFileMetadataManager.instance();
         String id = fmmgr.createNodeID();
-        String pid = getParentID(node, derivate_id);
-        if (pid != null && pid.length() == 0) {
-            LOGGER.error("Parent id for directory " + node.getParentFile().getName() + " is not unique");
+        String pid = null;
+		try {
+			pid = getParentID(node, derivate_id);
+		} catch (NoResultException e1) {
+			if (!derivate_id.equals(name)) {
+				LOGGER.error("Can't find parent id for directory " + name);
+	            return;
+			}
+		} catch (NonUniqueResultException e1) {
+            LOGGER.error("The directory entry for " + derivate_id + " and " + node.getParentFile().getName()
+            + " is not unique!");
             return;
-        }
-        if (pid == null && !derivate_id.equals(name)) {
-            LOGGER.error("Can't find parent id for directory " + name);
-            return;
-        }
+		}
+        System.out.println("6666666666666666666666666666666 " + pid + " " + node.getName() + " " + derivate_id);
         try {
             MCRFSNODES mcrfsnodes = new MCRFSNODES();
             mcrfsnodes.setId(id);
@@ -330,15 +335,16 @@ public class MCRIFS2Commands {
             MCRFileMetadataManager fmmgr = MCRFileMetadataManager.instance();
             id = fmmgr.createNodeID();
         }
-        String pid = getParentID(node, derivate_id);
-        if (pid != null && pid.length() == 0) {
-            LOGGER.error("Parent id for directory " + node.getParentFile().getName() + " is not unique");
-            return;
-        }
-        if (pid == null) {
+        String pid = null;
+		try {
+			pid = getParentID(node, derivate_id);
+		} catch (NoResultException e1) {
             LOGGER.error("Can't find parent id of directory for file " + storageid);
+		} catch (NonUniqueResultException e1) {
+            LOGGER.error("The directory entry for " + derivate_id + " and " + node.getParentFile().getName()
+            + " is not unique!");
             return;
-        }
+		}
         try {
             MCRFSNODES mcrfsnodes = new MCRFSNODES();
             mcrfsnodes.setId(id);
@@ -353,7 +359,7 @@ public class MCRIFS2Commands {
             mcrfsnodes.setStorageid(storageid);
             mcrfsnodes.setFctid(fctid);
             mcrfsnodes.setMd5(md5);
-            session.saveOrUpdate(mcrfsnodes);
+            session.persist(mcrfsnodes);
             tx.commit();
             LOGGER.debug("Entry " + node.getName() + " fixed.");
         } catch (HibernateException he) {
@@ -366,29 +372,21 @@ public class MCRIFS2Commands {
         }
     }
 
-    private static String getParentID(File node, String derivate_id) {
+    private static String getParentID(File node, String derivate_id) throws NoResultException, NonUniqueResultException {
         File parent_node = node.getParentFile();
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
         Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
-        try {
-            MCRFSNODES fsNode = em.createQuery(query
-                .where(
-                    cb.equal(nodes.get(MCRFSNODES_.owner), derivate_id),
-                    cb.equal(nodes.get(MCRFSNODES_.name), parent_node.getName()),
-                    cb.equal(nodes.get(MCRFSNODES_.type), "D")))
-                .getSingleResult();
-            LOGGER.debug("Found directory entry for " + parent_node.getName());
-            em.detach(fsNode);
-            return fsNode.getId();
-        } catch (NoResultException e) {
-            return "";
-        } catch (NonUniqueResultException e) {
-            LOGGER.error("The directory entry for " + derivate_id + " and " + parent_node.getName()
-                + " is not unique!");
-            return "";
-        }
+        MCRFSNODES fsNode = em.createQuery(query
+             .where(
+                cb.equal(nodes.get(MCRFSNODES_.owner), derivate_id),
+                cb.equal(nodes.get(MCRFSNODES_.name), parent_node.getName()),
+                cb.equal(nodes.get(MCRFSNODES_.type), "D")))
+            .getSingleResult();
+        LOGGER.debug("Found directory entry for " + parent_node.getName());
+        em.detach(fsNode);
+        return fsNode.getId();
     }
 
     private static ArrayList<String> getDetivatesOfProject(String content_store, String project_id) {
