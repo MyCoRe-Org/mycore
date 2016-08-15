@@ -1,5 +1,4 @@
 /*
- * 
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -135,11 +134,11 @@ public class MCRFSNODES {
 
     @Column(name = "DATE")
     public Date getDate() {
-        return new Date(date.getTime());
+        return date;
     }
 
     public void setDate(Date date) {
-        this.date = new Date(date.getTime());
+        this.date = date;
     }
 
     @Column(name = "STOREID", length = 32)
