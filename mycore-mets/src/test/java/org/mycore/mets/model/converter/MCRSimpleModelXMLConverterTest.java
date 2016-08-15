@@ -18,8 +18,8 @@ public class MCRSimpleModelXMLConverterTest {
 
     private static final String PATHS_TO_CHECK = "count(//mets:structLink/mets:smLink)=3;" +
             "count(//mets:structMap[@TYPE='LOGICAL']/mets:div[@LABEL='testRootLabel'])=1;" +
-            "count(//mets:structMap[@TYPE='LOGICAL']/mets:div[@LABEL='testRootLabel']/mets:div[@LABEL='subSection1Label' and @ORDER='1'])=1;" +
-            "count(//mets:structMap[@TYPE='LOGICAL']/mets:div[@LABEL='testRootLabel']/mets:div[@LABEL='subSection2Label' and @ORDER='2'])=1;" +
+            "count(//mets:structMap[@TYPE='LOGICAL']/mets:div[@LABEL='testRootLabel']/mets:div[@LABEL='subSection1Label'])=1;" +
+            "count(//mets:structMap[@TYPE='LOGICAL']/mets:div[@LABEL='testRootLabel']/mets:div[@LABEL='subSection2Label'])=1;" +
             "count(//mets:fileGrp[@USE='MASTER']/mets:file)=3;" +
             "count(//mets:fileGrp[@USE='ALTO']/mets:file)=3;" +
             "count(//mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[@TYPE='page'])=3;" +
