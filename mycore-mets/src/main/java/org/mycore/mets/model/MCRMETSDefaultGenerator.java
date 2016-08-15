@@ -25,7 +25,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -125,7 +124,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         LogicalStructMap logicalStructMap = new LogicalStructMap();
 
         LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), typeProvider.getType(MCRObjectID
-            .getInstance(dir.getOwner())), dir.getOwner(), 1, amdSec.getId(), dmdSec.getId());
+            .getInstance(dir.getOwner())), dir.getOwner(), amdSec.getId(), dmdSec.getId());
         logicalDiv.setDmdId(dmdSec.getId());
         logicalStructMap.setDivContainer(logicalDiv);
         // struct Link
@@ -134,7 +133,6 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         // create internal structure
         structureMets(dir, ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, 0);
         hrefIdMap.clear();
-        sortByOrder(physicalStructMap.getDivContainer());
 
         // add to mets
         mets.addDmdSec(dmdSec);
@@ -160,8 +158,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
             if (isInExcludedRootFolder(directory.getKey())) {
                 structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, logOrder);
             } else {
-                LogicalDiv section = new LogicalDiv("log_" + Integer.toString(++logOrder), "section", dirName,
-                    logOrder);
+                LogicalDiv section = new LogicalDiv("log_" + Integer.toString(++logOrder), "section", dirName);
                 logicalDiv.add(section);
                 structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, section, structLink, logOrder);
             }
@@ -252,7 +249,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
                 }
             }
         } else {
-            PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page", physicalDiv.getChildren().size() + 1);
+            PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page");
             Fptr fptr = new Fptr(fileID);
             pyhsicalPage.add(fptr);
             physicalDiv.add(pyhsicalPage);
@@ -282,16 +279,6 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         return FileUse.MASTER;
     }
 
-    private void sortByOrder(PhysicalDiv physicalDiv) {
-        List<PhysicalSubDiv> sortedSubDivs = new ArrayList<PhysicalSubDiv>(physicalDiv.getChildren());
-        for (PhysicalSubDiv physSubDiv : physicalDiv.getChildren()) {
-            sortedSubDivs.set(physSubDiv.getOrder() - 1, physSubDiv);
-            physicalDiv.remove(physSubDiv);
-        }
-        for (PhysicalSubDiv physicalSubDiv : sortedSubDivs) {
-            physicalDiv.add(physicalSubDiv);
-        }
-    }
 
     /**
      * Checks if a root directory should be included in mets.xml

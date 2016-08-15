@@ -229,8 +229,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         for (File file : fList) {
             String fileId = file.getId();
             // add page
-            PhysicalSubDiv page = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE,
-                order++);
+            PhysicalSubDiv page = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE);
             physicalDiv.add(page);
             // add file pointer
             Fptr fptr = new Fptr(fileId);
@@ -245,7 +244,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         // create main div
         String amdId = this.amdSection.getId();
         String dmdId = this.dmdSection.getId();
-        LogicalDiv logicalDiv = new LogicalDiv(objId.toString(), getType(this.rootObj), getLabel(this.rootObj), 1, amdId, dmdId);
+        LogicalDiv logicalDiv = new LogicalDiv(objId.toString(), getType(this.rootObj), getLabel(this.rootObj), amdId, dmdId);
         lstr.setDivContainer(logicalDiv);
         // run through all children
         createLogicalStruct(this.rootObj, logicalDiv);
@@ -272,7 +271,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             MCRObject childObject = children.get(i);
             // create new logical sub div
             String id = childObject.getId().toString();
-            LogicalDiv logicalChildDiv = new LogicalDiv(id, getType(childObject), getLabel(childObject), i + 1);
+            LogicalDiv logicalChildDiv = new LogicalDiv(id, getType(childObject), getLabel(childObject));
             // add to parent
             parentLogicalDiv.add(logicalChildDiv);
             // check if a derivate link exists and get the linked file

@@ -154,11 +154,14 @@ public class MCRDFGLinkServlet extends MCRServlet {
                 PhysicalStructMap structMap = (PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE);
                 PhysicalDiv rootDiv = structMap.getDivContainer();
                 List<PhysicalSubDiv> children = rootDiv.getChildren();
-                for (PhysicalSubDiv physicalSubDiv : children) {
+
+                for (int index = 0; index < children.size(); index++) {
+                    PhysicalSubDiv physicalSubDiv = children.get(index);
+
                     List<Fptr> fptrList = physicalSubDiv.getChildren();
                     for (Fptr fptr : fptrList) {
                         if (fptr.getFileId().equals(fileID))
-                            orderNumber = physicalSubDiv.getOrder();
+                            orderNumber = index+1;
                     }
                 }
             }

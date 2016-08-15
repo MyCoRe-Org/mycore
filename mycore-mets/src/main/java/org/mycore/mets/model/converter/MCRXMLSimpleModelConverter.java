@@ -96,7 +96,6 @@ public class MCRXMLSimpleModelConverter {
         List<MCRMetsSection> childSectionList = metsSection.getMetsSectionList();
         current.getChildren()
                 .stream()
-                .sorted((child1, child2) -> child1.getOrder() - child2.getOrder())
                 .map(section -> MCRXMLSimpleModelConverter.buildSection(section, idSectionMap, metsSection, idFileMap))
                 .forEachOrdered(metsSection::addSection);
 
@@ -110,7 +109,6 @@ public class MCRXMLSimpleModelConverter {
         List<MCRMetsPage> result = new ArrayList<>();
 
         physicalSubDivs.stream()
-                .sorted((subDiv1, subDiv2) -> subDiv1.getOrder() - subDiv2.getOrder()) // sort sub divs by order
                 .map((physicalSubDiv) -> {
                     // Convert PhysicalSubDiv to MetsPage
                     MCRMetsPage metsPage = new MCRMetsPage();
@@ -137,7 +135,9 @@ public class MCRXMLSimpleModelConverter {
     }
 
     private static void linkPages(Mets mets, Map<String, MCRMetsSection> idSectionMap, Map<String, MCRMetsPage> idPageMap, MCRMetsSimpleModel metsSimpleModel) {
-        mets.getStructLink().getSmLinks().stream().map((smLink) -> {
+        mets.getStructLink().getSmLinks().stream()
+                .filter(smLink -> idSectionMap.containsKey(smLink.getFrom()) && idPageMap.containsKey(smLink.getTo()))
+                .map((smLink) -> {
             MCRMetsSection metsSection = idSectionMap.get(smLink.getFrom());
             MCRMetsPage metsPage = idPageMap.get(smLink.getTo());
             return new MCRMetsLink(metsSection, metsPage);

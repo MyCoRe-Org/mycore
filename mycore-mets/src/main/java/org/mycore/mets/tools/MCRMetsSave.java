@@ -11,7 +11,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -235,7 +234,7 @@ public class MCRMetsSave {
 
         // add to structMap physical
         int newOrder = getNewOrder(mets);
-        PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE, newOrder);
+        PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE);
         div.add(new Fptr(fileId));
 
         for (String match : matches) {
@@ -611,7 +610,6 @@ public class MCRMetsSave {
                         }
                         divContainer.remove(physicalSubDivToRemove);
                     }
-                    correctSubDivOrder(divContainer);
                 }
             }
         } catch (Exception ex) {
@@ -622,19 +620,6 @@ public class MCRMetsSave {
         return modifiedMets.asDocument();
     }
 
-    /**
-     * corrects the order of all PhysicalSubDiv of a PhysicalDiv
-     * @param physicalDiv
-     */
-    private static void correctSubDivOrder(PhysicalDiv physicalDiv) {
-        List<PhysicalSubDiv> children = physicalDiv.getChildren();
-
-        Collections.sort(children, (o1, o2) -> o1.getOrder() - o2.getOrder());
-
-        for (int i = 1; i <= children.size(); i++) {
-            children.get(i - 1).setOrder(i);
-        }
-    }
 
     /**
      * @param mets

@@ -77,7 +77,7 @@ public class MCRSimpleModelXMLConverter {
 
             String id = PHYSICAL_ID_PREFIX + UUID.randomUUID().toString();
 
-            PhysicalSubDiv physicalSubDiv = new PhysicalSubDiv(id, DEFAULT_PHYSICAL_TYPE, order+1);
+            PhysicalSubDiv physicalSubDiv = new PhysicalSubDiv(id, DEFAULT_PHYSICAL_TYPE);
             String orderLabel = page.getOrderLabel();
             if(orderLabel != null){
                 physicalSubDiv.setOrderLabel(orderLabel);
@@ -109,21 +109,19 @@ public class MCRSimpleModelXMLConverter {
         String type = rootSection.getType();
         String label = rootSection.getLabel();
         String id = LOGICAL_ID_PREFIX + UUID.randomUUID().toString();
-        LogicalDiv logicalDiv = new LogicalDiv(id, type, label, 1);
+        LogicalDiv logicalDiv = new LogicalDiv(id, type, label);
         sectionIdMap.put(rootSection, id);
 
-        Integer count = 1;
         for (MCRMetsSection metsSection : rootSection.getMetsSectionList()) {
-            buildLogicalSubDiv(metsSection, logicalDiv, count, sectionIdMap, idToNewIDMap);
-            count++;
+            buildLogicalSubDiv(metsSection, logicalDiv, sectionIdMap, idToNewIDMap);
         }
         logicalStructMap.setDivContainer(logicalDiv);
     }
 
 
-    private static void buildLogicalSubDiv(MCRMetsSection metsSection, LogicalDiv parent, int nthChild, Map<MCRMetsSection, String> sectionIdMap, Map<String, String> idToNewIDMap) {
+    private static void buildLogicalSubDiv(MCRMetsSection metsSection, LogicalDiv parent, Map<MCRMetsSection, String> sectionIdMap, Map<String, String> idToNewIDMap) {
         String id = LOGICAL_ID_PREFIX + UUID.randomUUID().toString();
-        LogicalDiv logicalSubDiv = new LogicalDiv(id, metsSection.getType(), metsSection.getLabel(), nthChild);
+        LogicalDiv logicalSubDiv = new LogicalDiv(id, metsSection.getType(), metsSection.getLabel());
 
         if(metsSection.getAltoLinks().size()>0){
             Fptr fptr = new Fptr();
@@ -149,9 +147,9 @@ public class MCRSimpleModelXMLConverter {
 
         sectionIdMap.put(metsSection, id);
         parent.add(logicalSubDiv);
-        int count = 0;
+        int count = 1;
         for (MCRMetsSection section : metsSection.getMetsSectionList()) {
-            buildLogicalSubDiv(section, logicalSubDiv, count, sectionIdMap, idToNewIDMap);
+            buildLogicalSubDiv(section, logicalSubDiv, sectionIdMap, idToNewIDMap);
         }
     }
 
