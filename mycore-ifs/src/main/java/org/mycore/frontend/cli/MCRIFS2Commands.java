@@ -19,11 +19,8 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -247,8 +244,7 @@ public class MCRIFS2Commands {
             mcrfsnodes.setType("D");
             mcrfsnodes.setOwner(derivate_id);
             mcrfsnodes.setName(node.getName());
-            mcrfsnodes.setDate(new Timestamp(new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault())
-                .getTime().getTime()));
+            mcrfsnodes.setDate(new Date(node.lastModified()));
             em.persist(mcrfsnodes);
             tx.commit();
             LOGGER.debug("Entry " + name + " fixed.");
@@ -357,8 +353,7 @@ public class MCRIFS2Commands {
             mcrfsnodes.setOwner(derivate_id);
             mcrfsnodes.setName(node.getName());
             mcrfsnodes.setSize(size);
-            mcrfsnodes.setDate(new Timestamp(new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault())
-                .getTime().getTime()));
+            mcrfsnodes.setDate(new Date(node.lastModified()));
             mcrfsnodes.setStoreid(content_store);
             mcrfsnodes.setStorageid(storageid);
             mcrfsnodes.setFctid(fctid);

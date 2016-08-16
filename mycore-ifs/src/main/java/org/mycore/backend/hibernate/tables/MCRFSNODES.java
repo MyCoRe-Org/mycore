@@ -1,4 +1,5 @@
 /*
+ * 
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -23,6 +24,7 @@
 package org.mycore.backend.hibernate.tables;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -134,11 +136,15 @@ public class MCRFSNODES {
 
     @Column(name = "DATE")
     public Date getDate() {
-        return date;
+        return Optional
+            .ofNullable(date)
+            .map(Date::getTime)
+            .map(Date::new)
+            .orElse(null);
     }
 
     public void setDate(Date date) {
-        this.date = date;
+        this.date = new Date(date.getTime());
     }
 
     @Column(name = "STOREID", length = 32)
