@@ -1,0 +1,23 @@
+{
+  "name": "mycore-viewer",
+  "version": "0.5.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-less": "^0.10.0",
+    "grunt-contrib-uglify": "^0.7.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-maven": "~1.1.0",
+    "grunt-newer": "^0.7.0",
+    "grunt-svninfo": "^0.1.4",
+    "grunt-ts": "^6.0.0-beta.3"
+  },
+  "author": "Sebastian Hofmann <hofmann.s@uni-jena.de>",
+  "license": "GPL"
+}

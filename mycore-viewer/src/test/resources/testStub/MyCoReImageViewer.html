@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MyCoRe-ImageViewer</title>
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+<script
+	src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+<link
+	href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"
+	rel="stylesheet">
+<script src="/classes/META-INF/resources/modules/iview2/js/iview-client-base.js"></script>
+<script src="/classes/META-INF/resources/modules/iview2/js/iview-client-desktop.js"></script>
+<script src="/classes/META-INF/resources/modules/iview2/js/iview-client-mets.js"></script>
+<link href="/classes/META-INF/resources/modules/iview2/css/default.css" type="text/css"
+	rel="stylesheet">
+
+<script>
+    window.onload = function() {
+	/**
+	 *  location: string;
+	 *  imageXmlPath: string;
+	 *  tileProviderPath: string;
+	 *  startImage: string;
+	 * @type {mycore.iview.imageviewer.MyCoReViewer}
+	 */
+	window["viewer"] = new mycore.viewer.MyCoReViewer(jQuery("body"), {
+	    mobile : false,
+	    doctype : "mets",
+	    metsURL : "{$name}/mets.xml",
+	    imageXmlPath : "{$baseUrl}",
+	    tileProviderPath : "{$baseUrl}",
+	    filePath : "{$startFile}",
+	    derivate : "{$name}",
+	    i18nURL : "/classes/META-INF/resources/modules/iview2/i18n/{lang}.json",
+	    lang : "de",
+		webApplicationBaseURL:"../classes/META-INF/resources",
+	    metadataUrl : "",
+        objId: "",
+		adminMail: "mcradmin@mycore.de",
+        permalink: {
+            enabled: true,
+            updateHistory: false
+        },
+		chapter: {
+			showOnStart: true
+		}
+	});
+    }
+</script>
+</head>
+<body>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+.gradient(@color: #F5F5F5, @start: #EEE, @stop: #FFF) {
+  background: @color;
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(0, @start), color-stop(1, @stop));
+  background: -ms-linear-gradient(bottom,
+  @start,
+  @stop);
+  background: -moz-linear-gradient(center bottom,
+  @start 0%,
+  @stop 100%);
+  background: -o-linear-gradient(@stop,
+  @start);
+  filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",@stop,@start));
+}
+
+.bw-gradient(@color: #F5F5F5, @start: 0, @stop: 255) {
+  background: @color;
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(0, rgb(@start,@start,@start)), color-stop(1, rgb(@stop,@stop,@stop)));
+  background: -ms-linear-gradient(bottom, rgb(@start,@start,@start) 0%, rgb(@stop,@stop,@stop) 100%);
+  background: -moz-linear-gradient(center bottom, rgb(@start,@start,@start) 0%, rgb(@stop,@stop,@stop) 100%);
+  background: -o-linear-gradient(rgb(@stop,@stop,@stop), rgb(@start,@start,@start));
+  filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",rgb(@stop,@stop,@stop), rgb(@start,@start,@start)));
+}
+
+.box-shadow(@x: 0px, @y:0px, @blur:40px, @spread: 12px, @color: rgba(0,0,0,0.2)) {
+  -webkit-box-shadow: @x @y @blur @spread @color; /* WebKit */
+  -moz-box-shadow: @x @y @blur @spread @color; /* Firefox */
+  box-shadow: @x @y @blur @spread @color; /* Standard */
+}
+
+.border-radius(@bottomLeft, @bottomRight, @topLeft, @topRight) {
+  -webkit-border-bottom-right-radius: @bottomRight;
+  -webkit-border-bottom-left-radius: @bottomLeft;
+  -moz-border-radius-bottomright: @bottomRight;
+  -moz-border-radius-bottomleft: @bottomLeft;
+  border-bottom-right-radius: @bottomRight;
+  border-bottom-left-radius: @bottomLeft;
+  -webkit-border-top-left-radius: @topLeft;
+  -webkit-border-top-right-radius: @topRight;
+  -moz-border-radius-topleft: @topLeft;
+  -moz-border-radius-topright: @topRight;
+  border-top-left-radius: @topLeft;
+  border-top-right-radius: @topRight;
+}

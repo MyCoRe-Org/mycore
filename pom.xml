@@ -683,12 +683,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.mycore</groupId>
-        <artifactId>mycore-viewer</artifactId>
-        <version>0.9-SNAPSHOT</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-model</artifactId>
         <version>0.10-SNAPSHOT</version>
@@ -1596,6 +1590,7 @@
     <module>mycore-sword</module>
     <module>mycore-urn</module>
     <module>mycore-user2</module>
+    <module>mycore-viewer</module>
     <module>mycore-wcms2</module>
     <module>mycore-webcli</module>
     <module>mycore-wfc</module>

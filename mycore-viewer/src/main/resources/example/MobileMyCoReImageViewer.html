@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MyCoRe-ImageViewer</title>
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="../META-INF/resources/modules/iview2/js/iview-client-base.js"></script>
+    <script src="../META-INF/resources/modules/iview2/js/iview-client-mobile.js"></script>
+    <script src="../META-INF/resources/modules/iview2/js/iview-client-mets.js"></script>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+    <link href="../META-INF/resources/modules/iview2/css/mobile.css" type="text/css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <script>
+        window.onload = function () {
+            /**
+             *         location: string;
+             imageXmlPath: string;
+             tileProviderPath: string;
+             startImage: string;
+             */
+            window["viewer"] = new mycore.viewer.MyCoReViewer(jQuery("body"),
+                    {
+                        "mobile": true,
+                        doctype: "mets",
+                        metsURL: "mets/HisBest_derivate_00000376/mets.xml",
+                        "imageXmlPath": "http://archive.thulb.uni-jena.de/tiles/hisbest/",
+                        "tileProviderPath": "http://atile1.thulb.uni-jena.de/tiles/hisbest/, http://atile2.thulb.uni-jena.de/tiles/hisbest/, http://atile3.thulb.uni-jena.de/tiles/hisbest/, http://atile4.thulb.uni-jena.de/tiles/hisbest/",
+                        "filePath": "/RN_0004_0002r.tif",
+                        derivate: "HisBest_derivate_00000376",
+                        i18nURL: "../META-INF/resources/modules/iview2/i18n/{lang}.json",
+                        lang: "de",
+                        pdfCreatorStyle: "pdf",
+                        pdfCreatorURI: "http://wrackdm17.thulb.uni-jena.de/mets-printer/pdf",
+                        metadataURL: "",
+                        objId: "",
+                        webApplicationBaseURL: "/classes/META-INF/resources",
+                        adminMail: "mcradmin@mycore.de"
+                    });
+        }
+    </script>
+</head>
+<body>
+
+</body>
+</html>
