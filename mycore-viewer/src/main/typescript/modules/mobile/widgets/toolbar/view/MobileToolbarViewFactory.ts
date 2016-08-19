@@ -11,12 +11,10 @@ module mycore.viewer.widgets.toolbar {
 
         createTextView(id:string):TextView {
             throw new ViewerError("text view not supported by Mobile!");
-            return null;
         }
 
         createImageView(id:string):ImageView {
             throw new ViewerError("image view not supported by Mobile!");
-            return null;
         }
 
         createGroupView(id:string, align:string):GroupView {

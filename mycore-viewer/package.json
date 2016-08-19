@@ -16,7 +16,7 @@
     "grunt-maven": "~1.1.0",
     "grunt-newer": "^0.7.0",
     "grunt-svninfo": "^0.1.4",
-    "grunt-ts": "^6.0.0-beta.3"
+    "grunt-ts": "5.5.1"
   },
   "author": "Sebastian Hofmann <hofmann.s@uni-jena.de>",
   "license": "GPL"

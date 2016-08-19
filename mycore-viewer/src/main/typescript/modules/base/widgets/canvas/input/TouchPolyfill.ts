@@ -69,7 +69,7 @@ module mycore.viewer.widgets.canvas {
         }
 
         private _createTouchesArray() {
-            var arr = new Array<{ clientX: number; clientY: number }>();
+            var arr = new Array<{ clientX: number; clientY: number,  pageX:number, pageY:number }>();
             this._idPointerMap.values.forEach((pos: Position2D) => arr.push({ clientX: pos.x, clientY: pos.y, pageX: pos.x, pageY: pos.y }));
             return arr;
         }

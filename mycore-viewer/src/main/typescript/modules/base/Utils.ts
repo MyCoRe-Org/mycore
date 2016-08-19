@@ -410,7 +410,7 @@ class MyCoReMap<K, V> {
         return typeof elem != "undefined" && elem != null;
     }
 
-    public forEach(call:(key:K, value:V) => void) {
+    public forEach(call:(key:string, value:V) => void) {
         for (var key in this.arr) {
             call(key.substring(MyCoReMap.keyPrefix.length), this.arr[key]);
         }
@@ -444,7 +444,7 @@ class MyCoReMap<K, V> {
             var currentMap = maps[mapIndex];
 
             currentMap.forEach((k, v) => {
-                that.set(k, v);
+                that.set(<any>k, v);
             });
         }
     }

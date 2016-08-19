@@ -253,7 +253,6 @@ module mycore.viewer.widgets.canvas {
                     } else {
                         return new Rect(new Position2D(0, yPos), pageDimension);
                     }
-                    break;
                 case 90:
                 case 270:
                     if (this._rotation == 90 ? firstPage : !firstPage) {
@@ -261,8 +260,6 @@ module mycore.viewer.widgets.canvas {
                     } else {
                         return new Rect(new Position2D(-pageDimension.width / 2, yPos + (this._pageDimension.height) - (pageDimension.height / 2)), pageDimension);
                     }
-
-                    break;
             }
         }
 

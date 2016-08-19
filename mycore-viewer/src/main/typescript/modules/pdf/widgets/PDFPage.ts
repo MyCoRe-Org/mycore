@@ -102,7 +102,7 @@ module mycore.viewer.widgets.canvas {
 
         private _updateBackBuffer(newScale) {
             var vp = this._pdfPage.getViewport(newScale, this._rotation);
-            var task = <any> this._pdfPage.render({
+            var task = <any> this._pdfPage.render(<PDFRenderParams>{
                 canvasContext : <CanvasRenderingContext2D>this._backBuffer.getContext('2d'),
                 viewport : vp
             });
