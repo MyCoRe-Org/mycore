@@ -24,6 +24,7 @@
 package org.mycore.backend.hibernate.tables;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -135,7 +136,11 @@ public class MCRFSNODES {
 
     @Column(name = "DATE")
     public Date getDate() {
-        return new Date(date.getTime());
+        return Optional
+            .ofNullable(date)
+            .map(Date::getTime)
+            .map(Date::new)
+            .orElse(null);
     }
 
     public void setDate(Date date) {
