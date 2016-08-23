@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Locale;
@@ -170,20 +171,25 @@ public class MCRIVIEWIIIFImageImpl implements MCRIIIFImageImpl {
     }
 
     public MCRIIIFImageInformation getInformation(String identifier) throws ImageNotFoundException, ProvidingException, MCRAccessException {
-        Path tiledFile = TILE_FILE_PROVIDER.getTiledFile(identifier);
-        MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
+        try {
+            Path tiledFile = TILE_FILE_PROVIDER.getTiledFile(identifier);
+            MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
 
-        MCRIIIFImageInformation imageInformation = new MCRIIIFImageInformation(DEFAULT_CONTEXT, buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight());
+            MCRIIIFImageInformation imageInformation = new MCRIIIFImageInformation(DEFAULT_CONTEXT, buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight());
 
 
-        MCRIIIFImageTileInformation tileInformation = new MCRIIIFImageTileInformation(256, 256);
-        for (int i = 0; i < tiledPictureProps.getZoomlevel(); i++) {
-            tileInformation.scaleFactors.add((int) Math.pow(2, i));
+            MCRIIIFImageTileInformation tileInformation = new MCRIIIFImageTileInformation(256, 256);
+            for (int i = 0; i < tiledPictureProps.getZoomlevel(); i++) {
+                tileInformation.scaleFactors.add((int) Math.pow(2, i));
+            }
+
+            imageInformation.tiles.add(tileInformation);
+
+            return imageInformation;
+        } catch (FileSystemNotFoundException e) {
+            LOGGER.error("Could not find Iview ZIP for " + identifier, e);
+            throw new ImageNotFoundException(identifier);
         }
-
-        imageInformation.tiles.add(tileInformation);
-
-        return imageInformation;
     }
 
     @Override
