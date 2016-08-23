@@ -146,7 +146,7 @@ public class MCRIFS2Commands {
         LOGGER.info("Stop repair of MCRFSNODES for project " + project_id);
     }
 
-    @MCRCommand(syntax = "repair mcrfsnodes for project id {0} of content store {1}", help = "repair the entries of MCRFNODES with data from content store {1} for MCRObject {0}")
+    @MCRCommand(syntax = "repair mcrfsnodes for object {0} of content store {1}", help = "repair the entries of MCRFNODES with data from content store {1} for MCRObject {0}")
     public static void repairMCRFSNODESForObject(String object_id, String content_store) {
         LOGGER.info("Start repair of MCRFSNODES for object " + object_id);
         ArrayList<String> derivates = getDerivatesOfObject(content_store, object_id);
