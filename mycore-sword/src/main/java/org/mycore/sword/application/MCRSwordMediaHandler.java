@@ -125,47 +125,58 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
 
         Path tempFile = null;
         try {
-            tempFile = MCRSwordUtil.createTempFileFromStream(deposit.getFilename(), deposit.getInputStream(), deposit.getMd5());
-        } catch (IOException e) {
-            throw new SwordServerException("Could not store deposit to temp files", e);
-        }
-
-        if (packaging != null && packaging.equals(UriRegistry.PACKAGE_SIMPLE_ZIP)) {
-            if (pathIsDirectory && deposit.getMimeType().equals(MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP)) {
-                ifsRootPath = MCRPath.getPath(derivateId, requestFilePath);
-                try {
-                    List<MCRSwordUtil.MCRValidationResult> invalidResults = MCRSwordUtil.validateZipFile(this, tempFile)
-                            .stream()
-                            .filter(validationResult -> !validationResult.isValid())
-                            .collect(Collectors.toList());
-
-                    if (invalidResults.size() > 0) {
-                        throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, invalidResults.stream()
-                                .map(MCRSwordUtil.MCRValidationResult::getMessage)
-                                .filter(Optional::isPresent)
-                                .map(Optional::get)
-                                .collect(Collectors.joining(System.lineSeparator())));
-                    }
-
-                    MCRSwordUtil.extractZipToPath(tempFile, ifsRootPath);
-                } catch (IOException | NoSuchAlgorithmException | URISyntaxException e) {
-                    throw new SwordServerException("Error while extracting ZIP.", e);
-                }
-            } else {
-                throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, "The Request makes no sense. (mime type must be " + MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP + " and path must be a directory)");
-            }
-        } else if (packaging != null && packaging.equals(UriRegistry.PACKAGE_BINARY)) {
             try {
-                MCRSwordUtil.MCRValidationResult validationResult = validate(tempFile);
-                if (!validationResult.isValid()) {
-                    throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, validationResult.getMessage().get());
-                }
-                ifsRootPath = MCRPath.getPath(derivateId, requestFilePath + depositFilename);
-                try (InputStream is = Files.newInputStream(tempFile)) {
-                    Files.copy(is, ifsRootPath, StandardCopyOption.REPLACE_EXISTING);
-                }
+                tempFile = MCRSwordUtil.createTempFileFromStream(deposit.getFilename(), deposit.getInputStream(), deposit.getMd5());
             } catch (IOException e) {
-                throw new SwordServerException("Error while adding file " + ifsRootPath.toString(), e);
+                throw new SwordServerException("Could not store deposit to temp files", e);
+            }
+
+            if (packaging != null && packaging.equals(UriRegistry.PACKAGE_SIMPLE_ZIP)) {
+                if (pathIsDirectory && deposit.getMimeType().equals(MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP)) {
+                    ifsRootPath = MCRPath.getPath(derivateId, requestFilePath);
+                    try {
+                        List<MCRSwordUtil.MCRValidationResult> invalidResults = MCRSwordUtil.validateZipFile(this, tempFile)
+                                .stream()
+                                .filter(validationResult -> !validationResult.isValid())
+                                .collect(Collectors.toList());
+
+                        if (invalidResults.size() > 0) {
+                            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, invalidResults.stream()
+                                    .map(MCRSwordUtil.MCRValidationResult::getMessage)
+                                    .filter(Optional::isPresent)
+                                    .map(Optional::get)
+                                    .collect(Collectors.joining(System.lineSeparator())));
+                        }
+
+                        MCRSwordUtil.extractZipToPath(tempFile, ifsRootPath);
+                    } catch (IOException | NoSuchAlgorithmException | URISyntaxException e) {
+                        throw new SwordServerException("Error while extracting ZIP.", e);
+                    }
+                } else {
+                    throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, "The Request makes no sense. (mime type must be " + MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP + " and path must be a directory)");
+                }
+            } else if (packaging != null && packaging.equals(UriRegistry.PACKAGE_BINARY)) {
+                try {
+                    MCRSwordUtil.MCRValidationResult validationResult = validate(tempFile);
+                    if (!validationResult.isValid()) {
+                        throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, validationResult.getMessage().get());
+                    }
+                    ifsRootPath = MCRPath.getPath(derivateId, requestFilePath + depositFilename);
+                    try (InputStream is = Files.newInputStream(tempFile)) {
+                        Files.copy(is, ifsRootPath, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    throw new SwordServerException("Error while adding file " + ifsRootPath.toString(), e);
+                }
+            }
+        } finally {
+            if (tempFile != null) {
+                try {
+                    LOGGER.info("Delete temp file: " + tempFile.toString());
+                    Files.delete(tempFile);
+                } catch (IOException e) {
+                    LOGGER.error("Could not delete temp file: " + tempFile.toString(), e);
+                }
             }
         }
     }

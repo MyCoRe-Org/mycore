@@ -148,7 +148,7 @@ public class MCRSwordUtil {
         MediaResource resultRessource;
         InputStream is;
         try {
-            is = Files.newInputStream(tempFile);
+            is = new MCRDeleteFileOnCloseFilterInputStream(Files.newInputStream(tempFile), tempFile);
             resultRessource = new MediaResource(is, MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP, UriRegistry.PACKAGE_SIMPLE_ZIP);
         } catch (IOException e) {
             throw new MCRException("could not read from temp file!", e);
