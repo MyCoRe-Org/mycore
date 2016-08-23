@@ -51,6 +51,8 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -155,6 +157,7 @@ public class MCRSwordUtil {
     }
 
     private static void addDirectoryToZip(ZipArchiveOutputStream zipOutputStream, Path directory) {
+        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
         final DirectoryStream<Path> paths;
         try {
             paths = Files.newDirectoryStream(directory);
@@ -174,7 +177,11 @@ public class MCRSwordUtil {
                     zipArchiveEntry = new ZipArchiveEntry(fileName);
                     zipArchiveEntry.setSize(Files.size(p));
                     zipOutputStream.putArchiveEntry(zipArchiveEntry);
+                    if(currentSession.isTransactionActive()){
+                        currentSession.commitTransaction();
+                    }
                     Files.copy(p, zipOutputStream);
+                    currentSession.beginTransaction();
                     zipOutputStream.closeArchiveEntry();
                 }
             } catch (IOException e) {
@@ -196,6 +203,11 @@ public class MCRSwordUtil {
      * @throws IOException if md5 does mismatch or if stream could not be read
      */
     public static Path createTempFileFromStream(String fileName, InputStream inputStream, String checkMd5) throws IOException {
+        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+        if(currentSession.isTransactionActive()){
+            currentSession.commitTransaction();
+        }
+
         final Path zipTempFile = Files.createTempFile("swordv2_", fileName);
         MessageDigest md5Digest = null;
 
@@ -204,6 +216,7 @@ public class MCRSwordUtil {
                 md5Digest = MessageDigest.getInstance("MD5");
                 inputStream = new DigestInputStream(inputStream, md5Digest);
             } catch (NoSuchAlgorithmException e) {
+                currentSession.beginTransaction();
                 throw new MCRConfigurationException("No MD5 available!", e);
             }
         }
@@ -213,9 +226,12 @@ public class MCRSwordUtil {
         if (checkMd5 != null) {
             final String md5String = MCRUtils.toHexString(md5Digest.digest());
             if (!md5String.equals(checkMd5)) {
+                currentSession.beginTransaction();
                 throw new IOException("MD5 mismatch, expected " + checkMd5 + " got " + md5String);
             }
         }
+
+        currentSession.beginTransaction();
         return zipTempFile;
     }
 
@@ -242,6 +258,11 @@ public class MCRSwordUtil {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                                 throws IOException {
+                            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+                            if(currentSession.isTransactionActive()){
+                                currentSession.commitTransaction();
+                            }
+                            currentSession.beginTransaction();
                             Files.copy(file, target.resolve(sourcePath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
                             return FileVisitResult.CONTINUE;
                         }
