@@ -40,12 +40,14 @@ public class MCRRolesConverter implements MCRUserAttributeConverter<String, Coll
             throws Exception {
         Collection<String> roles = new HashSet<String>();
 
-        for (final String v : value.split(separator)) {
-            final String role = v.contains("@") ? v.substring(0, v.indexOf("@")) : v;
-            if (valueMapping != null) {
-                final String[] mapping = valueMapping.containsKey(role) ? valueMapping.get(role).split(",") : null;
-                if (mapping != null)
-                    roles.addAll(Arrays.asList(mapping));
+        if (value != null) {
+            for (final String v : value.split(separator)) {
+                final String role = v.contains("@") ? v.substring(0, v.indexOf("@")) : v;
+                if (valueMapping != null) {
+                    final String[] mapping = valueMapping.containsKey(role) ? valueMapping.get(role).split(",") : null;
+                    if (mapping != null)
+                        roles.addAll(Arrays.asList(mapping));
+                }
             }
         }
 
