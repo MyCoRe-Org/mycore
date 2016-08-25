@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import com.google.common.cache.CacheBuilder;
@@ -50,25 +51,41 @@ public class MCRCreatorCache {
             .maximumSize(CACHE_SIZE).build(new CacheLoader<MCRObjectID, String>() {
                 @Override
                 public String load(final MCRObjectID objectId) throws Exception {
-                    return Optional.ofNullable(MCRXMLMetadataManager.instance().listRevisions(objectId))
-                            .map(versions -> {
-                                return versions.stream()
-                                        .sorted(Comparator.comparingLong(MCRMetadataVersion::getRevision).reversed())
-                                        .filter(v -> v.getType() == MCRMetadataVersion.CREATED).findFirst()
-                                        .map(version -> {
-                                            LOGGER.info(
-                                                    "Found creator " + version.getUser() + " in revision "
-                                                            + version.getRevision()
-                                                            + " of " + objectId);
-                                            return version.getUser();
-                                        }).orElseGet(() -> {
-                                            LOGGER.info("Could not get creator information of " + objectId + ".");
-                                            return null;
-                                        });
-                            }).orElseGet(() -> {
-                                LOGGER.info("Could not get creator information.");
-                                return null;
-                            });
+                    return Optional.ofNullable(MCRMetadataManager.retrieveMCRObject(objectId).getService()).map(os -> {
+                        if (os.isFlagTypeSet("createdby")) {
+                            final String creator = os.getFlags("createdby").get(0);
+                            LOGGER.info("Found creator " + creator + " of " + objectId);
+                            return creator;
+                        }
+                        LOGGER.info("Try to get creator information of " + objectId + " from svn history.");
+                        return null;
+                    }).orElseGet(() -> {
+                        try {
+                            return Optional.ofNullable(MCRXMLMetadataManager.instance().listRevisions(objectId))
+                                    .map(versions -> {
+                                        return versions.stream()
+                                                .sorted(Comparator.comparingLong(MCRMetadataVersion::getRevision)
+                                                        .reversed())
+                                                .filter(v -> v.getType() == MCRMetadataVersion.CREATED).findFirst()
+                                                .map(version -> {
+                                                    LOGGER.info(
+                                                            "Found creator " + version.getUser() + " in revision "
+                                                                    + version.getRevision()
+                                                                    + " of " + objectId);
+                                                    return version.getUser();
+                                                }).orElseGet(() -> {
+                                                    LOGGER.info(
+                                                            "Could not get creator information of " + objectId + ".");
+                                                    return null;
+                                                });
+                                    }).orElseGet(() -> {
+                                        LOGGER.info("Could not get creator information.");
+                                        return null;
+                                    });
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
                 }
             });
 
