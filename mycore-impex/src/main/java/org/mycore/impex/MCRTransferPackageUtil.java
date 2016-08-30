@@ -145,8 +145,10 @@ public abstract class MCRTransferPackageUtil {
     public static List<Path> getClassifications(Path targetDirectory) throws IOException {
         List<Path> classificationPaths = new ArrayList<>();
         Path classPath = targetDirectory.resolve(MCRTransferPackage.CLASS_PATH);
-        try (Stream<Path> stream = Files.find(classPath, 2, filterClassifications())) {
-            stream.forEach(classificationPaths::add);
+        if(Files.exists(classPath)) {
+            try (Stream<Path> stream = Files.find(classPath, 2, filterClassifications())) {
+                stream.forEach(classificationPaths::add);
+            }
         }
         return classificationPaths;
     }
