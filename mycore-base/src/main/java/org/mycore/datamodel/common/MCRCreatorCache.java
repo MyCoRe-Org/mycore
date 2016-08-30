@@ -111,4 +111,21 @@ public class MCRCreatorCache {
         return CACHE.get(MCRObjectID.getInstance(objectId));
     }
 
+    /**
+     * Discard the cached creator for given {@link MCRObjectID}.
+     *  
+     * @param objectId the {@link MCRObjectID}
+     */
+    public static void invalidate(final MCRObjectID objectId) {
+        CACHE.invalidate(objectId);
+    }
+
+    /**
+     * Discard the cached creator for given {@link MCRObjectID}.
+     * 
+     * @param objectId the {@link MCRObjectID}
+     */
+    public static void invalidate(final String objectId) {
+        CACHE.invalidate(MCRObjectID.getInstance(objectId));
+    }
 }
