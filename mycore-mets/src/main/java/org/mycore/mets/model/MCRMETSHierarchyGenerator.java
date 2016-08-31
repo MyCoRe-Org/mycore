@@ -225,7 +225,6 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         // run through files
         FileGrp masterGroup = this.fileSection.getFileGroup(FileGrp.USE_MASTER);
         List<File> fList = masterGroup.getFileList();
-        int order = 1;
         for (File file : fList) {
             String fileId = file.getId();
             // add page
@@ -374,12 +373,15 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * @return
      */
     private PhysicalSubDiv getPhysicalDiv(String fileId) {
-        if (fileId == null)
+        if (fileId == null) {
             return null;
+        }
         PhysicalDiv mainDiv = this.physicalStructMap.getDivContainer();
-        for (PhysicalSubDiv subDiv : mainDiv.getChildren())
-            if (subDiv.getId().contains(fileId))
+        for (PhysicalSubDiv subDiv : mainDiv.getChildren()) {
+            if(subDiv.getFptr(fileId) != null) {
                 return subDiv;
+            }
+        }
         return null;
     }
 
