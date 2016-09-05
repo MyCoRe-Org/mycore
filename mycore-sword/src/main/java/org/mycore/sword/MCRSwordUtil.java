@@ -236,6 +236,7 @@ public class MCRSwordUtil {
     }
 
     public static void extractZipToPath(Path zipFilePath, MCRPath target) throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
+        LOGGER.info("Extracting zip: " + zipFilePath.toString());
         try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri().toString()), new HashMap<String, Object>())) {
             final Path sourcePath = zipfs.getPath("/");
             Files.walkFileTree(sourcePath,
@@ -262,6 +263,7 @@ public class MCRSwordUtil {
                             if(currentSession.isTransactionActive()){
                                 currentSession.commitTransaction();
                             }
+                            LOGGER.info("Extracting: " + file.toString());
                             currentSession.beginTransaction();
                             Files.copy(file, target.resolve(sourcePath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
                             return FileVisitResult.CONTINUE;

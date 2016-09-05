@@ -44,7 +44,7 @@ public class MCRSwordConfigurationDefault implements SwordConfiguration {
 
     @Override
     public boolean storeAndCheckBinary() {
-        return true;
+        return false; // MCR code stores files and checks files..
     }
 
     @Override
