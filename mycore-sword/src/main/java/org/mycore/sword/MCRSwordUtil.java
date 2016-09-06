@@ -8,6 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
@@ -17,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -77,6 +80,7 @@ import org.swordapp.server.UriRegistry;
 public class MCRSwordUtil {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
+    private static final int COPY_BUFFER_SIZE = 32 * 1024;
     private static Logger LOGGER = Logger.getLogger(MCRSwordUtil.class);
 
     public static MCRDerivate createDerivate(String documentID) throws MCRPersistenceException, IOException, MCRAccessException {
@@ -260,12 +264,30 @@ public class MCRSwordUtil {
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                                 throws IOException {
                             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-                            if(currentSession.isTransactionActive()){
-                                currentSession.commitTransaction();
-                            }
+
                             LOGGER.info("Extracting: " + file.toString());
-                            currentSession.beginTransaction();
-                            Files.copy(file, target.resolve(sourcePath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
+                            Path targetFilePath = target.resolve(sourcePath.relativize(file));
+                            // WORKAROUND: copy is bad with IFS because fsnodes is locked until copy is completed
+                            // so we end the transaction after we got a byte channel, then we write the data
+                            // and before completion we start the transaction to let niofs write the md5 to the table
+                            try (SeekableByteChannel destinationChannel = Files.newByteChannel(targetFilePath, StandardOpenOption.WRITE, StandardOpenOption.SYNC, StandardOpenOption.CREATE);
+                                 SeekableByteChannel sourceChannel = Files.newByteChannel(file, StandardOpenOption.READ)) {
+                                if (currentSession.isTransactionActive()) {
+                                    currentSession.commitTransaction();
+                                }
+                                ByteBuffer buffer = ByteBuffer.allocateDirect(COPY_BUFFER_SIZE);
+                                while (sourceChannel.read(buffer) != -1 || buffer.position() > 0) {
+                                    buffer.flip();
+                                    destinationChannel.write(buffer);
+                                    buffer.compact();
+                                }
+                            } finally {
+                                if (!currentSession.isTransactionActive()) {
+                                    currentSession.beginTransaction();
+                                }
+                            }
+
+
                             return FileVisitResult.CONTINUE;
                         }
                     });
