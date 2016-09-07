@@ -1,5 +1,6 @@
 package org.mycore.datamodel.metadata;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,8 +13,11 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 /**
  * This class contains several helper methods for {@link MCRObject}.
@@ -157,6 +161,42 @@ public abstract class MCRObjectUtils {
             String categId = e.getAttributeValue("categid");
             return new MCRCategoryID(classId, categId);
         }).distinct().collect(Collectors.toList());
+    }
+
+    /**
+     * Restores a MyCoRe Object to the selected revision. Please note that children and derivates
+     * are not deleted or reverted!
+     * 
+     * @param mcrId the mycore object identifier
+     * @param revision The revision to restore to. If this is lower than zero, the last revision is used.
+     * @return the new {@link MCRObject}
+     * 
+     * @throws IOException An error occurred while retrieving the revision information. This is most
+     *          likely due an svn error.
+     * @throws MCRPersistenceException There is no such object with the given id and revision.
+     */
+    public static MCRObject restore(MCRObjectID mcrId, Long revision) throws IOException, MCRPersistenceException {
+        // get content
+        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
+        MCRContent content = xmlMetadataManager.retrieveContent(mcrId, revision);
+        if (content == null) {
+            throw new MCRPersistenceException("No such object " + mcrId + " with revision " + revision + ".");
+        }
+        // store it
+        try {
+            MCRObject mcrObj = new MCRObject(content.asXML());
+            if (MCRMetadataManager.exists(mcrId)) {
+                MCRMetadataManager.update(mcrObj);
+            } else {
+                if (xmlMetadataManager.exists(mcrId)) {
+                    xmlMetadataManager.delete(mcrId);
+                }
+                MCRMetadataManager.create(mcrObj);
+            }
+            return mcrObj;
+        } catch (Exception exc) {
+            throw new MCRException("Unable to get object " + mcrId + " with revision " + revision + ".", exc);
+        }
     }
 
 }

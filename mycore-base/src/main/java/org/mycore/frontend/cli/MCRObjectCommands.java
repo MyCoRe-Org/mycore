@@ -63,6 +63,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectUtils;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
@@ -123,7 +124,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "delete all objects of type {0}", help = "Removes MCRObjects of type {0}.", order = 20)
-    public static List<String> deleteAllObjects(String type) throws MCRActiveLinkException {
+    public static List<String> deleteAllObjects(String type) {
         final List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
         List<String> cmds = new ArrayList<String>(objectIds.size());
         for (String id : objectIds) {
@@ -160,7 +161,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "delete object from {0} to {1}",
         help = "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.", order = 30)
-    public static List<String> deleteFromTo(String IDfrom, String IDto) throws MCRActiveLinkException {
+    public static List<String> deleteFromTo(String IDfrom, String IDto) {
         int from_i = 0;
         int to_i = 0;
 
@@ -737,36 +738,18 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            id of MyCoRe Object
      * @param revision
      *            revision to restore
-     * @throws MCRActiveLinkException
-     *             if object is created (no real update)
      */
     @MCRCommand(
         syntax = "restore {0} to revision {1}", help = "Restores the selected MCRObject to the selected revision.",
         order = 270)
-    public static void restoreToRevision(String id, long revision) throws MCRActiveLinkException {
+    public static void restoreToRevision(String id, long revision) {
         LOGGER.info("Try to restore object " + id + " with revision " + revision);
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
-        // get xml of revision
         try {
-            MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
-            MCRContent content = xmlMetadataManager.retrieveContent(mcrId, revision);
-            if (content == null) {
-                LOGGER.warn("No such object " + id + " with revision " + revision);
-                return;
-            }
-            // store it
-            MCRObject mcrObj = new MCRObject(content.asXML());
-            if (MCRMetadataManager.exists(mcrId)) {
-                MCRMetadataManager.update(mcrObj);
-            } else {
-                if (xmlMetadataManager.exists(mcrId)) {
-                    xmlMetadataManager.delete(mcrId);
-                }
-                MCRMetadataManager.create(mcrObj);
-            }
+            MCRObjectUtils.restore(mcrId, revision);
             LOGGER.info("Object " + id + " successfully restored!");
-        } catch (Exception e) {
-            LOGGER.error("While retrieving object " + id + " with revision " + revision, e);
+        } catch (Exception exc) {
+            LOGGER.error("While retrieving object " + id + " with revision " + revision, exc);
         }
     }
 
