@@ -5,6 +5,7 @@
   <xsl:import href="xslImport:solr-document:mods-solr.xsl" />
   <xsl:include href="mods-utils.xsl" />
   <xsl:include href="mods2mods.xsl" />
+  <xsl:include href="coreFunctions.xsl" />
   <xsl:include href="xslInclude:mods" />
 
   <xsl:strip-space elements="mods:*" />
@@ -120,6 +121,12 @@
       <xsl:if test="position()=1">
         <field name="mods.dateIssued">
           <xsl:value-of select="." />
+        </field>
+        <field name="mods.yearIssued">
+          <xsl:call-template name="formatISODate">
+            <xsl:with-param name="date" select="." />
+            <xsl:with-param name="format" select="'YYYY'" />
+          </xsl:call-template>
         </field>
       </xsl:if>
     </xsl:for-each>
