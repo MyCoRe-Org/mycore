@@ -47,7 +47,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRMODSEmbargoUtils {
 
-    private static final String POOLPRIVILEGE_EMBARGO = "embargo";
+    public static final String POOLPRIVILEGE_EMBARGO = "embargo";
 
     private static final int CAPACITY = 10000;
 
@@ -68,8 +68,7 @@ public class MCRMODSEmbargoUtils {
             return true;
         }
 
-        return MCRAccessManager.checkPermission(objectId, MCRAccessManager.PERMISSION_READ)
-                && (MCRAccessManager.checkPermission(POOLPRIVILEGE_EMBARGO) || isCurrentUserCreator(objectId));
+        return MCRAccessManager.checkPermission(objectId, MCRAccessManager.PERMISSION_READ);
     }
 
     /**
@@ -100,7 +99,7 @@ public class MCRMODSEmbargoUtils {
         return null;
     }
 
-    private static String getCachedEmbargo(final MCRObjectID objectId) {
+    public static String getCachedEmbargo(final MCRObjectID objectId) {
         ModifiedHandle modifiedHandle = MCRXMLMetadataManager.instance().getLastModifiedHandle(objectId, 10,
                 TimeUnit.MINUTES);
         String embargo = null;
@@ -130,7 +129,7 @@ public class MCRMODSEmbargoUtils {
         }
     }
 
-    private static boolean isCurrentUserCreator(final MCRObjectID objectId) {
+    public static boolean isCurrentUserCreator(final MCRObjectID objectId) {
         try {
             final String creator = MCRCreatorCache.getCreator(objectId);
             return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(creator);
