@@ -38,13 +38,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
@@ -212,13 +212,14 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     public void clear() {
         if (!running)
             return;
-        Session session = MCRHIBConnection.instance().getSession();
+
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         StringBuilder sb = new StringBuilder("DELETE FROM MCRJob");
         if (action != null)
             sb.append(" WHERE action='" + action.getName() + "'");
 
-        Query<?> query = session.createQuery(sb.toString());
+        Query query = em.createQuery(sb.toString());
         query.executeUpdate();
     }
 
@@ -233,14 +234,14 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             List<MCRJob> empty = Collections.emptyList();
             return empty.iterator();
         }
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         StringBuilder sb = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
         if (action != null)
             sb.append("action='" + action.getName() + "' AND ");
         sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
 
-        Query<MCRJob> query = session.createQuery(sb.toString(), MCRJob.class);
+        TypedQuery<MCRJob> query = em.createQuery(sb.toString(), MCRJob.class);
         return query.getResultList().iterator();
     }
 
@@ -251,14 +252,14 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     public int size() {
         if (!running)
             return 0;
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         StringBuilder sb = new StringBuilder("SELECT count(*) FROM MCRJob WHERE ");
         if (action != null)
             sb.append("action='" + action.getName() + "' AND ");
         sb.append("status='" + MCRJobStatus.NEW + "'");
 
-        return session.createQuery(sb.toString(), Number.class).getSingleResult().intValue();
+        return em.createQuery(sb.toString(), Number.class).getSingleResult().intValue();
     }
 
     /**
@@ -295,7 +296,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (!running)
             return null;
 
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '"
                 + action.getName() + "' ");
@@ -303,10 +304,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
 
-        @SuppressWarnings("deprecation")
-        Query<MCRJob> query = session
-            .createQuery(qStr.toString(), MCRJob.class)
-            .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        TypedQuery<MCRJob> query = em.createQuery(qStr.toString(), MCRJob.class);
         try {
             MCRJob job = query.getSingleResult();
             clearPreFetch();
@@ -337,17 +335,16 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     private int preFetch(int amount) {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         StringBuilder sb = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
         if (action != null)
             sb.append("action='" + action.getName() + "' AND ");
         sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
 
-        Query query = session.createQuery(sb.toString()).setMaxResults(amount);
+        TypedQuery<MCRJob> query = em.createQuery(sb.toString(), MCRJob.class).setMaxResults(amount);
 
-        @SuppressWarnings("unchecked")
-        List<MCRJob> jobs = query.list();
+        List<MCRJob> jobs = query.getResultList();
 
         int i = 0;
         for (MCRJob job : jobs) {
@@ -357,7 +354,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
             i++;
             preFetch.add(job.clone());
-            session.evict(job);
+            em.detach(job);
         }
         LOGGER.debug("prefetched " + i + " jobs");
         return i;
@@ -370,16 +367,16 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private boolean updateJob(MCRJob job) {
         if (!running)
             return false;
-        Session session = MCRHIBConnection.instance().getSession();
-        session.update(job);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.merge(job);
         return true;
     }
 
     private boolean addJob(MCRJob job) {
         if (!running)
             return false;
-        Session session = MCRHIBConnection.instance().getSession();
-        session.save(job);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.persist(job);
         return true;
     }
 
@@ -408,25 +405,25 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (!running)
             return 0;
 
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         StringBuilder qStr = new StringBuilder("FROM MCRJob job WHERE action = '" + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
 
-        Query query = session.createQuery(qStr.toString());
+        Query query = em.createQuery(qStr.toString());
 
         @SuppressWarnings("unchecked")
-        Iterator<MCRJob> results = query.iterate();
+        Iterator<MCRJob> results = query.getResultList().iterator();
         if (!results.hasNext())
             return 0;
 
         MCRJob job = results.next();
 
         try {
-            session.delete(job);
-            session.evict(job);
+            em.remove(job);
+            em.detach(job);
             return 1;
         } finally {
             clearPreFetch();
@@ -443,12 +440,12 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (!running)
             return 0;
 
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
-        Query query = session.createQuery("FROM MCRJob job WHERE action = '" + action.getName() + "'");
+        Query query = em.createQuery("FROM MCRJob job WHERE action = '" + action.getName() + "'");
 
         @SuppressWarnings("unchecked")
-        Iterator<MCRJob> results = query.iterate();
+        Iterator<MCRJob> results = query.getResultList().iterator();
         if (!results.hasNext())
             return 0;
         try {
@@ -456,8 +453,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             while (results.hasNext()) {
                 MCRJob job = results.next();
 
-                session.delete(job);
-                session.evict(job);
+                em.remove(job);
+                em.detach(job);
                 delC++;
             }
             return delC;

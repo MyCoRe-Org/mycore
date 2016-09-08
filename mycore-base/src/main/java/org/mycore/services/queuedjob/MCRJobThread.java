@@ -27,10 +27,11 @@ import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -56,12 +57,14 @@ public class MCRJobThread implements Runnable {
     public void run() {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction transaction = session.beginTransaction();
+        EntityManager em = MCREntityManagerProvider.getEntityManagerFactory().createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
         try {
             Class<? extends MCRJobAction> actionClass = job.getAction();
             Constructor<? extends MCRJobAction> actionConstructor = actionClass.getConstructor(MCRJob.class);
             MCRJobAction action = actionConstructor.newInstance(job);
+
+            transaction.begin();
 
             try {
                 job.setStart(new Date());
@@ -76,7 +79,7 @@ public class MCRJobThread implements Runnable {
             } catch (Exception e) {
                 LOGGER.error("Exception occured while try to start job.", e);
             }
-            session.update(job);
+            em.merge(job);
             transaction.commit();
         } catch (Exception e) {
             LOGGER.error("Error while getting next job.", e);
@@ -84,7 +87,7 @@ public class MCRJobThread implements Runnable {
                 transaction.rollback();
             }
         } finally {
-            session.close();
+            em.close();
             MCRSessionMgr.releaseCurrentSession();
             mcrSession.close();
         }
