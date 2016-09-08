@@ -26,13 +26,13 @@ package org.mycore.services.queuedjob;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
+import javax.persistence.TypedQuery;
+
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
@@ -42,7 +42,6 @@ import org.mycore.common.config.MCRConfiguration;
  * @author Ren\u00E9 Adler
  */
 public class MCRStalledJobResetter implements Runnable {
-    private static SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
     private static HashMap<String, MCRStalledJobResetter> INSTANCES = new HashMap<String, MCRStalledJobResetter>();
 
@@ -56,7 +55,7 @@ public class MCRStalledJobResetter implements Runnable {
         if (action != null) {
             this.action = action;
             maxTimeDiff = MCRConfiguration.instance()
-                .getInt(MCRJobQueue.CONFIG_PREFIX + action.getSimpleName() + ".TimeTillReset", maxTimeDiff);
+                    .getInt(MCRJobQueue.CONFIG_PREFIX + action.getSimpleName() + ".TimeTillReset", maxTimeDiff);
         }
     }
 
@@ -76,45 +75,46 @@ public class MCRStalledJobResetter implements Runnable {
      * Resets jobs to {@link MCRJobStatus#NEW} that where in status {@link MCRJobStatus#PROCESSING} for to long time.
      */
     public void run() {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction executorTransaction = session.beginTransaction();
+        EntityManager em = MCREntityManagerProvider.getEntityManagerFactory().createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
         LOGGER.info("MCRJob is Checked for dead Entries");
+        transaction.begin();
 
         StringBuilder sb = new StringBuilder("FROM MCRJob WHERE ");
         if (action != null)
             sb.append("action='" + action.getName() + "' AND ");
         sb.append(" status='" + MCRJobStatus.PROCESSING + "' ORDER BY id ASC");
 
-        Query<MCRJob> query = session.createQuery(sb.toString(), MCRJob.class);
+        TypedQuery<MCRJob> query = em.createQuery(sb.toString(), MCRJob.class);
 
         long current = new Date(System.currentTimeMillis()).getTime() / 60000;
 
         boolean reset = query
-            .getResultList()
-            .stream()
-            .map(job -> {
-                boolean ret = false;
-                long start = job.getStart().getTime() / 60000;
-                if (current - start >= maxTimeDiff) {
-                    LOGGER.debug("->Resetting too long in queue");
+                .getResultList()
+                .stream()
+                .map(job -> {
+                    boolean ret = false;
+                    long start = job.getStart().getTime() / 60000;
+                    if (current - start >= maxTimeDiff) {
+                        LOGGER.debug("->Resetting too long in queue");
 
-                    job.setStatus(MCRJobStatus.NEW);
-                    job.setStart(null);
-                    session.update(job);
-                    ret = true;
-                } else {
-                    LOGGER.debug("->ok");
-                }
-                return ret;
-            })
-            .reduce(Boolean::logicalOr)
-            .orElse(false);
+                        job.setStatus(MCRJobStatus.NEW);
+                        job.setStart(null);
+                        ret = true;
+                    } else {
+                        LOGGER.debug("->ok");
+                    }
+                    return ret;
+                })
+                .reduce(Boolean::logicalOr)
+                .orElse(false);
         try {
-            executorTransaction.commit();
-        } catch (HibernateException e) {
+            transaction.commit();
+        } catch (RollbackException e) {
             e.printStackTrace();
-            if (executorTransaction != null) {
-                executorTransaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
                 reset = false;//No changes are applied, so no notification is needed as well
             }
         }
@@ -124,7 +124,7 @@ public class MCRStalledJobResetter implements Runnable {
                 MCRJobQueue.getInstance(action).notifyListener();
             }
         }
-        session.close();
+        em.close();
         LOGGER.info("MCRJob checking is done");
     }
 }

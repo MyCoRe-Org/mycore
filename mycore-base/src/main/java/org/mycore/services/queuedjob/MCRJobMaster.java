@@ -33,11 +33,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
+
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -158,7 +159,8 @@ public class MCRJobMaster implements Runnable, Closeable {
             };
             final AtomicInteger activeThreads = new AtomicInteger();
             final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
-            jobServe = new ThreadPoolExecutor(jobThreadCount, jobThreadCount, 1, TimeUnit.DAYS, workQueue, slaveFactory) {
+            jobServe = new ThreadPoolExecutor(jobThreadCount, jobThreadCount, 1, TimeUnit.DAYS, workQueue,
+                    slaveFactory) {
 
                 @Override
                 protected void afterExecute(Runnable r, Throwable t) {
@@ -181,11 +183,14 @@ public class MCRJobMaster implements Runnable, Closeable {
                         if (!running)
                             break;
 
-                        Session session = MCRHIBConnection.instance().getSession();
-                        Transaction transaction = session.beginTransaction();
+                        EntityManager em = MCREntityManagerProvider.getEntityManagerFactory().createEntityManager();
+                        EntityTransaction transaction = em.getTransaction();
+
                         MCRJob job = null;
                         MCRJobAction action = null;
                         try {
+                            transaction.begin();
+
                             job = JOB_QUEUE.poll();
 
                             if (job != null) {
@@ -198,7 +203,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                             }
 
                             transaction.commit();
-                        } catch (HibernateException e) {
+                        } catch (RollbackException e) {
                             LOGGER.error("Error while getting next job.", e);
                             if (transaction != null) {
                                 try {
@@ -208,7 +213,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                                 }
                             }
                         } finally {
-                            session.close();
+                            em.close();
                         }
                         if (job != null && action != null && action.isActivated() && !jobServe.isShutdown()) {
                             LOGGER.info("Creating:" + job);
