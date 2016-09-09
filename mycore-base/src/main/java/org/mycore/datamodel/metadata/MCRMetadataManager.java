@@ -35,11 +35,13 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import javax.persistence.PersistenceException;
 
@@ -793,11 +795,19 @@ public final class MCRMetadataManager {
         MCRObject old = MCRMetadataManager.retrieveMCRObject(id);
 
         // save the order of derivates and clean the structure
+        final List<String> childOrder = mcrObject.getStructure()
+                                           .getChildren()
+                                           .stream()
+                                           .map(MCRMetaLinkID::getXLinkHref)
+                                           .collect(Collectors.toList());
         mcrObject.getStructure().clearChildren();
-        List<String> derOrder = new ArrayList<String>();
-        for (MCRMetaLinkID derID : mcrObject.getStructure().getDerivates()) {
-            derOrder.add(derID.getXLinkHref());
-        }
+
+        final List<String> derOrder = mcrObject.getStructure()
+                                         .getDerivates()
+                                         .stream()
+                                         .map(MCRMetaLinkID::getXLinkHref)
+                                         .collect(Collectors.toList());
+
         HashMap<String, String> newlinkTitles = new HashMap<String, String>();
         HashMap<String, String> newlinkLabels = new HashMap<String, String>();
         for (MCRMetaLinkID newlinkID : mcrObject.getStructure().getDerivates()) {
@@ -845,8 +855,17 @@ public final class MCRMetadataManager {
             MCRMetadataManager.fireUpdateEvent(parent);
         }
 
-        // set the children from the original
-        mcrObject.getStructure().getChildren().addAll(old.getStructure().getChildren());
+        // set the children from the original -> but with new order
+        List<MCRMetaLinkID> children = old.getStructure().getChildren();
+        children.sort(new Comparator<MCRMetaLinkID>() {
+            @Override
+            public int compare(MCRMetaLinkID o1, MCRMetaLinkID o2) {
+                int i1 = childOrder.indexOf(o1.getXLinkHref());
+                int i2 = childOrder.indexOf(o2.getXLinkHref());
+                return Integer.compare(i1, i2);
+            }
+        });
+        mcrObject.getStructure().getChildren().addAll(children);
 
         // import all herited matadata from the parent
         receiveMetadata(mcrObject);
