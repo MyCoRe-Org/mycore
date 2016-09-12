@@ -38,6 +38,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.ifs.MCRFileNodeServlet;
@@ -46,9 +48,12 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.i18n.MCRTranslation;
 
+import static org.mycore.mods.MCRMODSEmbargoUtils.POOLPRIVILEGE_EMBARGO;
+
 /**
  * Enforces embargo of mods documents to {@link MCRFileNodeServlet}.
  * @author Thomas Scheffler (yagee)
+ * @deprecated You should implement your own {@link MCRAccessCheckStrategy}. For a example you can look at MIRStrategy.
  */
 public class MCRMODSEmbargoFilter implements Filter {
 
@@ -58,11 +63,13 @@ public class MCRMODSEmbargoFilter implements Filter {
 
     private static final TimeUnit EXPIRE_UNIT = TimeUnit.HOURS;
 
-    /* (non-Javadoc)
-     * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
-     */
-    @Override
-    public void init(FilterConfig config) throws ServletException {
+    public static boolean isReadAllowed(final MCRObjectID objectId) {
+        if (objectId == null || !"mods".equals(objectId.getTypeId())) {
+            return true;
+        }
+
+        return MCRAccessManager.checkPermission(objectId, MCRAccessManager.PERMISSION_READ)
+                && (MCRAccessManager.checkPermission(POOLPRIVILEGE_EMBARGO) || MCRMODSEmbargoUtils.isCurrentUserCreator(objectId));
     }
 
     /* (non-Javadoc)
@@ -70,6 +77,14 @@ public class MCRMODSEmbargoFilter implements Filter {
      */
     @Override
     public void destroy() {
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+     */
+    @Override
+    public void init(FilterConfig config) throws ServletException {
+        LOGGER.warn(MCRMODSEmbargoFilter.class.getName() + " is deprecated!");
     }
 
     /* (non-Javadoc)
@@ -90,7 +105,7 @@ public class MCRMODSEmbargoFilter implements Filter {
             session.beginTransaction();
             try {
                 MCRObjectID objectId = MCRMetadataManager.getObjectId(derivateID, EXPIRE, EXPIRE_UNIT);
-                if (!newSession && MCRMODSEmbargoUtils.isReadAllowed(objectId)) {
+                if (!newSession && isReadAllowed(objectId)) {
                     return; //user is allowed to read
                 }
                 final String embargo = MCRMODSEmbargoUtils.getEmbargo(objectId);
