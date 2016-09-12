@@ -31,7 +31,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRSessionMgr;
@@ -57,19 +56,6 @@ public class MCRMODSEmbargoUtils {
 
     private static MCRCache<MCRObjectID, String> embargoCache = new MCRCache<>(CAPACITY, "MODS embargo filter cache");
 
-    /**
-     * Checks if current user is allowed to read the given {@link MCRObjectID}.
-     * 
-     * @param objectId the {@link MCRObjectID}
-     * @return <code>true</code> is allowed to read
-     */
-    public static boolean isReadAllowed(final MCRObjectID objectId) {
-        if (objectId == null || !"mods".equals(objectId.getTypeId())) {
-            return true;
-        }
-
-        return MCRAccessManager.checkPermission(objectId, MCRAccessManager.PERMISSION_READ);
-    }
 
     /**
      * Returns the embargo or <code>null</code> if none is set or is allowed to read.
@@ -88,14 +74,12 @@ public class MCRMODSEmbargoUtils {
      * @return the embargo or <code>null</code>
      */
     public static String getEmbargo(final MCRObjectID objectId) {
-        if (!isReadAllowed(objectId)) {
-            String embargo = getCachedEmbargo(objectId);
 
-            if (embargo != null && !embargo.isEmpty() && isAfterToday(embargo)) {
-                return embargo;
-            }
+        String embargo = getCachedEmbargo(objectId);
+
+        if (embargo != null && !embargo.isEmpty() && isAfterToday(embargo)) {
+            return embargo;
         }
-
         return null;
     }
 
