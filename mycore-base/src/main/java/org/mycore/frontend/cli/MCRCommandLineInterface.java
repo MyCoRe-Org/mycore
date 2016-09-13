@@ -197,6 +197,7 @@ public class MCRCommandLineInterface {
                 if (!interactiveMode) {
                     System.exit(1);
                 }
+                commandQueue.clear();
             }
         } finally {
             MCRSessionMgr.releaseCurrentSession();
