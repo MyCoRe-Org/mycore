@@ -20,6 +20,10 @@ module mycore.viewer {
                 settings.filePath = settings.filePath.substring(1);
             }
 
+            if (settings.derivateURL.charAt(settings.derivateURL.length - 1) != '/') {
+                settings.derivateURL += "/";
+            }
+
             settings.filePath = encodeURI(settings.filePath);
 
             if(settings.webApplicationBaseURL.lastIndexOf("/")==settings.webApplicationBaseURL.length-1){

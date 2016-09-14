@@ -1,12 +1,12 @@
 module mycore.viewer.model {
     import DropdownButtonController = mycore.viewer.widgets.toolbar.DropdownButtonController;
     export class MyCoReDesktopToolbarModel extends model.MyCoReBasicToolbarModel {
-        private _viewSelectGroup:widgets.toolbar.ToolbarGroup;
 
-        constructor() {
-            super("MyCoReDesktopToolbar");
+        constructor(name = "MyCoReDesktopToolbar") {
+            super(name);
         }
 
+        public _viewSelectGroup:widgets.toolbar.ToolbarGroup;
         public viewSelectChilds:Array<widgets.toolbar.ToolbarDropdownButtonChild>;
         public viewSelect:widgets.toolbar.ToolbarDropdownButton;
 
