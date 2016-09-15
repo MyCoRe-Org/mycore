@@ -23,7 +23,10 @@
 
 package org.mycore.frontend.jersey.filter.access;
 
-import com.sun.jersey.spi.container.ContainerRequest;
+import java.io.InputStream;
+import java.util.Scanner;
+
+import javax.ws.rs.container.ContainerRequestContext;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -31,5 +34,19 @@ import com.sun.jersey.spi.container.ContainerRequest;
  */
 public interface MCRResourceAccessChecker {
 
-    public boolean isPermitted(ContainerRequest request);
+    public boolean isPermitted(ContainerRequestContext request);
+
+    /**
+     * http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string?answertab=votes#tab-top
+     * 
+     * @param is the inputstream to read
+     * @return the string
+     */
+    public default String convertStreamToString(InputStream is) {
+        try (Scanner s = new Scanner(is, "UTF-8")) {
+            s.useDelimiter("\\A");
+            return s.hasNext() ? s.next() : "";
+        }
+    }
+
 }

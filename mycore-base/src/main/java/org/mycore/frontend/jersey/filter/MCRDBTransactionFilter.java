@@ -1,35 +1,22 @@
 package org.mycore.frontend.jersey.filter;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+
 import org.mycore.common.MCRSessionMgr;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
-
-class MCRDBTransactionFilter implements ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
+public class MCRDBTransactionFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     @Override
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
+    public void filter(ContainerRequestContext request, ContainerResponseContext response) {
         MCRSessionMgr.getCurrentSession().commitTransaction();
-        return response;
     }
 
     @Override
-    public ContainerRequest filter(ContainerRequest request) {
+    public void filter(ContainerRequestContext request) {
         MCRSessionMgr.getCurrentSession().beginTransaction();
-        return request;
-    }
-
-    @Override
-    public ContainerRequestFilter getRequestFilter() {
-        return this;
-    }
-
-    @Override
-    public ContainerResponseFilter getResponseFilter() {
-        return this;
     }
 
 }

@@ -12,46 +12,6 @@
   <properties>
     <manifest.priority>18</manifest.priority>
   </properties>
-  <!-- TODO: build minified version of classeditor -->
-  <!--<build>
-    <plugins>
-      <plugin>
-        <groupId>com.samaxes.maven</groupId>
-        <artifactId>maven-minify-plugin</artifactId>
-        <version>1.3.5</version>
-        <executions>
-          <execution>
-            <id>default-minify</id>
-            <phase>process-resources</phase>
-            <configuration>
-              <verbose>true</verbose>
-              <webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
-              <webappTargetDir>${project.build.outputDirectory}/components/classeditor/web/modules/classeditor</webappTargetDir>
-              <jsSourceDir>components/classeditor/web/modules/classeditor/js</jsSourceDir>
-              <jsSourceFiles>
-                <jsSourceFile>mycore/dojoClasses.js</jsSourceFile>
-                <jsSourceFile>CategoryEditorPane.js</jsSourceFile>
-                <jsSourceFile>ClassificationUtils.js</jsSourceFile>
-                <jsSourceFile>Editor.js</jsSourceFile>
-                <jsSourceFile>EventHandler.js</jsSourceFile>
-                <jsSourceFile>ExportDialog.js</jsSourceFile>
-                <jsSourceFile>LabelEditor.js</jsSourceFile>
-                <jsSourceFile>LanguageEditor.js</jsSourceFile>
-                <jsSourceFile>LazyLoadingTree.js</jsSourceFile>
-                <jsSourceFile>SettingsDialog.js</jsSourceFile>
-                <jsSourceFile>SimpleI18nManager.js</jsSourceFile>
-                <jsSourceFile>TreePane.js</jsSourceFile>
-              </jsSourceFiles>
-              <jsFinalFile>classificationEditor.js</jsFinalFile>
-            </configuration>
-            <goals>
-              <goal>minify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>-->
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
@@ -76,41 +36,37 @@
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-multipart</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.test-framework</groupId>
+      <artifactId>jersey-test-framework-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+      <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-server</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-multipart</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey.jersey-test-framework</groupId>
-      <artifactId>jersey-test-framework-grizzly</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-apache-client</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jdom</groupId>
@@ -119,10 +75,6 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-core</artifactId>
     </dependency>
   </dependencies>
 </project>

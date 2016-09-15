@@ -25,11 +25,7 @@
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-client</artifactId>
+      <artifactId>javax.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>

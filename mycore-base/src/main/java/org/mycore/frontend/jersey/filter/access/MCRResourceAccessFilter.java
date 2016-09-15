@@ -29,20 +29,17 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
-
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRResourceAccessFilter implements ContainerRequestFilter, ResourceFilter {
+public class MCRResourceAccessFilter implements ContainerRequestFilter {
 
     private MCRResourceAccessChecker accessChecker;
 
@@ -50,38 +47,24 @@ public class MCRResourceAccessFilter implements ContainerRequestFilter, Resource
         this.accessChecker = accessChecker;
     }
 
-    /* (non-Javadoc)
-     * @see com.sun.jersey.spi.container.ContainerRequestFilter#filter(com.sun.jersey.spi.container.ContainerRequest)
-     */
     @Override
-    public ContainerRequest filter(ContainerRequest request) {
-        //due to ContainerRequest.getEntity() resumes InputStream, we need to keep a copy of it in memory
-        try (InputStream in = request.getEntityInputStream()) {
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        // TODO due to ContainerRequest.getEntity() consumes InputStream, we need to keep a copy of it in memory
+        try (InputStream in = requestContext.getEntityStream()) {
             ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
             IOUtils.copy(in, out);
             byte[] entity = out.toByteArray();
             //restore input
-            request.setEntityInputStream(new ByteArrayInputStream(entity));
-            boolean hasPermission = accessChecker.isPermitted(request);
+            requestContext.setEntityStream(new ByteArrayInputStream(entity));
+            boolean hasPermission = accessChecker.isPermitted(requestContext);
             if (!hasPermission) {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
             //restore input
-            request.setEntityInputStream(new ByteArrayInputStream(entity));
-            return request;
+            requestContext.setEntityStream(new ByteArrayInputStream(entity));
         } catch (IOException e) {
             throw new WebApplicationException(e);
         }
-    }
-
-    @Override
-    public ContainerRequestFilter getRequestFilter() {
-        return this;
-    }
-
-    @Override
-    public ContainerResponseFilter getResponseFilter() {
-        return null;
     }
 
 }

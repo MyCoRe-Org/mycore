@@ -1,30 +1,21 @@
 package org.mycore.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
-import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationLoader;
-import org.mycore.common.config.MCRConfigurationLoaderFactory;
-import org.mycore.common.config.MCRRuntimeComponentDetector;
 
 public class MCRTestCase {
-
-    File properties = null;
 
     String oldProperties;
 
@@ -35,19 +26,7 @@ public class MCRTestCase {
 
     @BeforeClass
     public static void initBaseDir() throws IOException {
-        if (System.getProperties().getProperty("MCR.Home") == null) {
-            File baseDir = junitFolder.newFolder("mcrhome");
-            System.out.println("Setting MCR.Home=" + baseDir.getAbsolutePath());
-            System.getProperties().setProperty("MCR.Home", baseDir.getAbsolutePath());
-        }
-        if (System.getProperties().getProperty("MCR.AppName") == null) {
-            String  currentComponentName = getCurrentComponentName();
-            System.out.println("Setting MCR.AppName="+ currentComponentName);
-            System.getProperties().setProperty("MCR.AppName", getCurrentComponentName());
-        }
-        File configDir=new File(System.getProperties().getProperty("MCR.Home"), System.getProperties().getProperty("MCR.AppName"));
-        System.out.println("Creating config directory: "+ configDir);
-        configDir.mkdirs();
+        MCRTestCaseHelper.beforeClass(junitFolder);
     }
 
     /**
@@ -60,31 +39,13 @@ public class MCRTestCase {
     @Before
     public void setUp() throws Exception {
         initProperties();
-        String mcrComp = MCRRuntimeComponentDetector.getMyCoReComponents()
-            .stream()
-            .map(MCRComponent::toString)
-            .collect(Collectors.joining(", "));
-        String appMod = MCRRuntimeComponentDetector.getApplicationModules()
-            .stream()
-            .map(MCRComponent::toString)
-            .collect(Collectors.joining(", "));
-        System.out.printf("MyCoRe components detected: %s\nApplications modules detected: %s\n",
-            mcrComp.isEmpty() ? "'none'" : mcrComp,
-            appMod.isEmpty() ? "'none'" : appMod);
+        MCRTestCaseHelper.before(getTestProperties());
         config = MCRConfiguration.instance();
-        MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
-        HashMap<String, String> testProperties = new HashMap<>(configurationLoader.load());
-        testProperties.putAll(getTestProperties());
-        config.initialize(testProperties, true);
     }
 
     @After
     public void tearDown() throws Exception {
-        if (properties != null) {
-            properties.delete();
-            properties = null;
-        }
-        MCRConfiguration.instance().initialize(Collections.<String, String> emptyMap(), true);
+        MCRTestCaseHelper.after();
     }
 
     protected Map<String, String> getTestProperties() {

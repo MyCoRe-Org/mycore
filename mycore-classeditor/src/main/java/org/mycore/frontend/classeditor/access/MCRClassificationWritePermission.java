@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -37,8 +38,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.frontend.classeditor.utils.MCRCategUtils;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
-
-import com.sun.jersey.spi.container.ContainerRequest;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -53,8 +52,8 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
      * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker#isPermitted(com.sun.jersey.spi.container.ContainerRequest)
      */
     @Override
-    public boolean isPermitted(ContainerRequest request) {
-        String value = request.getEntity(String.class);
+    public boolean isPermitted(ContainerRequestContext request) {
+        String value = convertStreamToString(request.getEntityStream());
         try {
             //        Set<MCRCategoryID> categories = MCRCategUtils.getRootCategoryIDs(value);
             HashMap<MCRCategoryID, String> categories = MCRCategUtils.getCategoryIDMap(value);
@@ -75,7 +74,7 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
         } catch (Exception exc) {
             throw new WebApplicationException(exc,
                 Response.status(Status.INTERNAL_SERVER_ERROR)
-                    .entity("Unable to check permission for request " + request.getRequestUri() + " containing entity value " + value)
+                    .entity("Unable to check permission for request " + request.getUriInfo().getRequestUri() + " containing entity value " + value)
                     .build());
         }
     }
@@ -84,7 +83,7 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
         if (state.equals("new")) {
             return MCRAccessManager.checkPermission(PERMISSION_CREATE);
         }
-
         return MCRAccessManager.checkPermission(category.getRootID(), PERMISSION_WRITE);
     }
+
 }

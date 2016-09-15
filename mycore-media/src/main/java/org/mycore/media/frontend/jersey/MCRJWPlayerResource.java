@@ -21,13 +21,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.logging.log4j.LogManager;
+import org.glassfish.jersey.server.JSONP;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.media.video.MCRMediaSource;
 import org.mycore.media.video.MCRMediaSourceProvider;
 
 import com.google.gson.Gson;
-import com.sun.jersey.api.json.JSONWithPadding;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -40,10 +40,11 @@ public class MCRJWPlayerResource {
     @GET
     @Path("{derivateId}/{path: .+}/sources.js")
     @Produces({ "application/javascript" })
-    public JSONWithPadding getSources(@PathParam("derivateId") String derivateId, @PathParam("path") String path,
-        @QueryParam("callback") String callback)
-            throws URISyntaxException, IOException {
-        return new JSONWithPadding(getSources(derivateId, path), callback);
+    @JSONP(callback = "callback", queryParam = "callback")
+    public String getSourcesAsJSONP(@PathParam("derivateId") String derivateId, @PathParam("path") String path)
+        throws URISyntaxException, IOException {
+        // TODO: FIX THIS: https://jersey.java.net/documentation/latest/user-guide.html#d0e8837
+        return getSources(derivateId, path);
     }
 
     @GET
@@ -54,16 +55,11 @@ public class MCRJWPlayerResource {
         MCRObjectID derivate = MCRJerseyUtil.getID(derivateId);
         MCRJerseyUtil.checkDerivateReadPermission(derivate);
         try {
-            MCRMediaSourceProvider formatter = new MCRMediaSourceProvider(
-                derivateId,
-                path,
+            MCRMediaSourceProvider formatter = new MCRMediaSourceProvider(derivateId, path,
                 Optional.ofNullable(request.getHeader("User-Agent")),
-                () -> Arrays
-                    .stream(Optional.ofNullable(request.getQueryString())
-                        .orElse("")
-                        .split("&"))
-                    .filter(p -> !p.startsWith("callback="))
-                    .toArray(size -> new String[size]));
+                () -> Arrays.stream(Optional.ofNullable(request.getQueryString()).orElse("").split("&"))
+                            .filter(p -> !p.startsWith("callback="))
+                            .toArray(size -> new String[size]));
             return toJson(formatter.getSources());
         } catch (NoSuchFileException e) {
             LogManager.getLogger().warn("Could not find video file.", e);
@@ -72,12 +68,9 @@ public class MCRJWPlayerResource {
     }
 
     private String toJson(List<MCRMediaSource> sources) {
-        return new Gson().toJson(sources
-            .stream()
-            .map(s -> new Source(s.getUri(), s.getType().getSimpleType()))
-            .toArray(size -> new Source[size]));
+        return new Gson().toJson(sources.stream().map(s -> new Source(s.getUri(), s.getType().getSimpleType())).toArray(
+            size -> new Source[size]));
     }
-
 
     /* simple pojo for json output */
     private static class Source {

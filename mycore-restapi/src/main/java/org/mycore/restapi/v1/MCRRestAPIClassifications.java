@@ -135,7 +135,7 @@ public class MCRRestAPIClassifications {
                 //toDo
             }
         }
-        return Response.status(com.sun.jersey.api.client.ClientResponse.Status.BAD_REQUEST).build();
+        return Response.status(Status.BAD_REQUEST).build();
     }
 
     /**

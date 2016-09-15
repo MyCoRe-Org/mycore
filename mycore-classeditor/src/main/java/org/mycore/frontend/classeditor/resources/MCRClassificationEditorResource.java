@@ -39,6 +39,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
@@ -67,8 +69,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonStreamParser;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
 
 /**
  * This class is responsible for CRUD-operations of MCRCategories. It accepts
@@ -99,6 +99,13 @@ public class MCRClassificationEditorResource {
 
     @Context
     UriInfo uriInfo;
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("test")
+    public String test() {
+        return "Hallo";
+    }
 
     /**
      * @param rootidStr
@@ -177,7 +184,8 @@ public class MCRClassificationEditorResource {
                 it.remove();
             }
         }
-        if (rootCategories.isEmpty() && !MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION)) {
+        if (rootCategories.isEmpty()
+            && !MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         Map<MCRCategoryID, Boolean> linkMap = CATEG_LINK_SERVICE.hasLinks(null);
@@ -341,13 +349,12 @@ public class MCRClassificationEditorResource {
     @Path("import")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
-    public Response importClassification(@FormDataParam("classificationFile") InputStream uploadedInputStream,
-        @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
+    public Response importClassification(@FormDataParam("classificationFile") InputStream uploadedInputStream) {
         try {
             MCRClassificationUtils.fromStream(uploadedInputStream);
-        } catch(MCRAccessException accessExc) {
+        } catch (MCRAccessException accessExc) {
             return Response.status(Status.UNAUTHORIZED).build();
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new WebApplicationException(exc);
         }
         // This is a hack to support iframe loading via ajax.

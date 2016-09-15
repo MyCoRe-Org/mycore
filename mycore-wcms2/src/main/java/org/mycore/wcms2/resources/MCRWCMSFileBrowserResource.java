@@ -19,6 +19,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.wcms2.MCRWebPagesSynchronizer;
@@ -38,8 +40,6 @@ import java.util.ArrayList;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
 
 @Path("wcms2/filebrowser")
 @MCRRestrictedAccess(MCRWCMSPermission.class)

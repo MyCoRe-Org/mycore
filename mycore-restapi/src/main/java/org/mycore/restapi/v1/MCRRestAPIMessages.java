@@ -37,6 +37,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.jdom2.Document;
@@ -47,7 +48,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.stream.JsonWriter;
-import com.sun.jersey.api.client.ClientResponse;
 
 /**
  * REST API for messages.
@@ -172,6 +172,6 @@ public class MCRRestAPIMessages {
         } catch (IOException e) {
             //toDo
         }
-        return Response.status(ClientResponse.Status.BAD_REQUEST).build();
+        return Response.status(Status.BAD_REQUEST).build();
     }
 }

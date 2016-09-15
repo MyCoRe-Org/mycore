@@ -25,12 +25,12 @@ package org.mycore.frontend.classeditor.access;
 
 import java.text.MessageFormat;
 
+import javax.ws.rs.container.ContainerRequestContext;
+
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
-
-import com.sun.jersey.spi.container.ContainerRequest;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -44,8 +44,8 @@ public class MCRNewClassificationPermission implements MCRResourceAccessChecker 
      * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker#isPermitted(com.sun.jersey.spi.container.ContainerRequest)
      */
     @Override
-    public boolean isPermitted(ContainerRequest request) {
-        LOGGER.info(MessageFormat.format("{0} has permission {1}?", request.getPath(),
+    public boolean isPermitted(ContainerRequestContext request) {
+        LOGGER.info(MessageFormat.format("{0} has permission {1}?", request.getUriInfo().getPath(),
             MCRClassificationUtils.CREATE_CLASS_PERMISSION));
         return MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION);
     }
