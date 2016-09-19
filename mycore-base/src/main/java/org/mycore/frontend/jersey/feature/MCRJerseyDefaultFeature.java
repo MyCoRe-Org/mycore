@@ -20,6 +20,12 @@ import org.mycore.frontend.jersey.filter.access.MCRResourceAccessCheckerFactory;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessFilter;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 
+/**
+ * Default feature for mycore. Does register a transaction, session and
+ * access filter.
+ * 
+ * @author Matthias Eichner
+ */
 @Provider
 public class MCRJerseyDefaultFeature implements DynamicFeature {
 
@@ -27,30 +33,41 @@ public class MCRJerseyDefaultFeature implements DynamicFeature {
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
-        String propertyString = MCRConfiguration.instance().getString("MCR.Jersey.resource.packages",
-            "org.mycore.frontend.jersey.resources");
-        List<String> packages = Arrays.asList(propertyString.split(","));
-
         Class<?> resourceClass = resourceInfo.getResourceClass();
         Method resourceMethod = resourceInfo.getResourceMethod();
-
         String packageName = resourceClass.getPackage().getName();
-        if (packages.contains(packageName)) {
-            context.register(MCRDBTransactionFilter.class);
-            context.register(MCRSessionHookFilter.class);
+        if (getPackages().contains(packageName)) {
+            registerTransactionFilter(context);
+            registerSessionHookFilter(context);
+            registerAccessFilter(context, resourceClass, resourceMethod);
+        }
+    }
 
-            MCRRestrictedAccess restrictedAccessMETHOD = resourceMethod.getAnnotation(MCRRestrictedAccess.class);
-            MCRRestrictedAccess restrictedAccessTYPE = resourceClass.getAnnotation(MCRRestrictedAccess.class);
+    protected List<String> getPackages() {
+        String propertyString = MCRConfiguration.instance().getString("MCR.Jersey.resource.packages",
+            "org.mycore.frontend.jersey.resources");
+        return Arrays.asList(propertyString.split(","));
+    }
 
-            if (restrictedAccessMETHOD != null) {
-                LOGGER.info("Access to " + resourceMethod.toString() + " is restricted by "
-                    + restrictedAccessMETHOD.value().getCanonicalName());
-                addFilter(context, restrictedAccessMETHOD);
-            } else if (restrictedAccessTYPE != null) {
-                LOGGER.info("Access to " + resourceClass.getName() + " is restricted by "
-                    + restrictedAccessTYPE.value().getCanonicalName());
-                addFilter(context, restrictedAccessTYPE);
-            }
+    protected void registerTransactionFilter(FeatureContext context) {
+        context.register(MCRDBTransactionFilter.class);
+    }
+
+    protected void registerSessionHookFilter(FeatureContext context) {
+        context.register(MCRSessionHookFilter.class);
+    }
+
+    protected void registerAccessFilter(FeatureContext context, Class<?> resourceClass, Method resourceMethod) {
+        MCRRestrictedAccess restrictedAccessMETHOD = resourceMethod.getAnnotation(MCRRestrictedAccess.class);
+        MCRRestrictedAccess restrictedAccessTYPE = resourceClass.getAnnotation(MCRRestrictedAccess.class);
+        if (restrictedAccessMETHOD != null) {
+            LOGGER.info("Access to " + resourceMethod.toString() + " is restricted by "
+                + restrictedAccessMETHOD.value().getCanonicalName());
+            addFilter(context, restrictedAccessMETHOD);
+        } else if (restrictedAccessTYPE != null) {
+            LOGGER.info("Access to " + resourceClass.getName() + " is restricted by "
+                + restrictedAccessTYPE.value().getCanonicalName());
+            addFilter(context, restrictedAccessTYPE);
         }
     }
 
