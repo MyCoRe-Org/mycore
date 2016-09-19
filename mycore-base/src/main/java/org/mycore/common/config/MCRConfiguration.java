@@ -55,8 +55,9 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
 
 /**
- * Provides methods to manage and read all configuration properties from the MyCoRe configuration files. The class is
- * implemented using the singleton pattern. Using this class is very easy, here is an example:
+ * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
+ * The Properties used by this class are initialized via {@link MCRConfigurationLoaderFactory}.
+ * The class is implemented using the singleton pattern. Using this class is very easy, here is an example:
  * 
  * <PRE>
  * // Get a configuration property as a String: 
@@ -67,40 +68,11 @@ import com.google.common.collect.Maps;
  * </PRE>
  * 
  * As you see, the class provides methods to get configuration properties as different data types and allows you to
- * specify defaults. All MyCoRe configuration properties should start with "<CODE>MCR.</CODE>" When
- * <CODE>instance()</CODE> is called the first time, the file <B><CODE>
- * mycore.properties</CODE> </B> is read. It can be located somewhere in the <CODE>CLASSPATH</CODE>, even in a jar or
- * zip file. The properties file may have a property called <B><CODE>MCR.Configuration.Include</CODE> </B> that contains
- * a comma-separated list of other configuration files to read subsequently. The class also reads any Java <B>system
- * properties</B> that start with "<CODE>MCR.</CODE>" and that are set when the application starts. System properties
- * will override properties read from the configuration files. Furthermore, the name of the main configuration file can
- * be altered by specifying the system property <B><CODE>
- * MCR.Configuration.File</CODE> </B>. Here is an example:
- * 
- * <PRE>
- * java -DMCR.Configuration.File=some_other.properties -DMCR.foo=bar MyCoReSample
- * </PRE>
- * 
- * Property values may include the values of other properties, recursively, by referencing the other property. Example:
- * 
- * <PRE>
- * MCR.Foo1=FooValue
- * MCR.Foo2=Some %MCR.Foo1% more information
- * </PRE>
- * 
- * The class also provides methods for <B>listing or saving </B> all properties to an <CODE>OutputStream</CODE> and for
- * <B>reloading </B> all configuration properties at runtime. This allows servlets that run a long time to re-read the
- * configuration files when client code tells them to do so, for example. Using the <CODE>set</CODE> methods allows
- * client code to set new configuration properties or overwrite existing ones with new values. Finally, applications
- * could also <B>subclass <CODE>MCRConfiguration</CODE> </B> to change or add behavior and use an instance of the
- * subclass instead of this class. This is transparent for client code, they would still use <CODE>
- * MCRConfiguration.instance()</CODE> to get the subclass instance. To use a subclass instead of
- * <CODE>MCRConfiguration</CODE> itself, specify the system property <CODE>MCR.Configuration.Class</CODE>, e. g.
- * 
- * <PRE>
- * java -DMCR.Configuration.Class=MCRConfigurationSubclass MyCoReSample
- * </PRE>
- * 
+ * specify defaults. All MyCoRe configuration properties should start with "<CODE>MCR.</CODE>"
+ *
+ * The class also provides methods for <B>listing and saving</B> all properties to an <CODE>OutputStream</CODE>.
+ * Using the <CODE>set</CODE> methods allows
+ * client code to set new configuration properties or overwrite existing ones with new values. 
  * @see #list(PrintStream)
  * @see #store
  * @author Frank Lützenkirchen
