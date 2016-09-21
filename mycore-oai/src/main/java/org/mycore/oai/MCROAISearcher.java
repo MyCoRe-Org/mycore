@@ -36,19 +36,21 @@ public abstract class MCROAISearcher {
 
     protected int partitionSize;
 
+    protected MCROAISetManager setManager;
+
     public MCROAISearcher() {
         Random random = new Random(System.currentTimeMillis());
         this.id = Long.toString(random.nextLong(), 36) + Long.toString(System.currentTimeMillis(), 36);
     }
 
     public void init(String configPrefix, MetadataFormat format, Date expirationDate,
-        DeletedRecordPolicy deletedRecordPolicy,
-        int partitionSize) {
+        DeletedRecordPolicy deletedRecordPolicy, int partitionSize, MCROAISetManager setManager) {
         this.configPrefix = configPrefix;
         this.metadataFormat = format;
         this.expirationDate = expirationDate;
         this.deletedRecordPolicy = deletedRecordPolicy;
         this.partitionSize = partitionSize;
+        this.setManager = setManager;
         updateRunningExpirationTimer();
     }
 
@@ -73,6 +75,10 @@ public abstract class MCROAISearcher {
 
     public Date getExpirationDate() {
         return expirationDate;
+    }
+
+    public MCROAISetManager getSetManager() {
+        return setManager;
     }
 
     /**
@@ -106,7 +112,6 @@ public abstract class MCROAISearcher {
      * 
      * @return a list with identifiers of the deleted objects
      */
-    @SuppressWarnings("unchecked")
     protected List<String> searchDeleted(Date from, Date until) {
         if (from == null || DeletedRecordPolicy.No.equals(getDeletedRecordPolicy())
             || DeletedRecordPolicy.Transient.equals(getDeletedRecordPolicy())) {

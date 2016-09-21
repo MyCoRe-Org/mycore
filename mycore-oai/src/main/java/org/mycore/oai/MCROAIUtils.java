@@ -21,36 +21,15 @@
  */
 package org.mycore.oai;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRQueryCondition;
-import org.mycore.services.fieldquery.MCRQueryParser;
-import org.mycore.services.fieldquery.MCRSortBy;
+import org.mycore.oai.pmh.Set;
 
 public abstract class MCROAIUtils {
 
     public static String getDefaultRestriction(String configPrefix) {
         MCRConfiguration config = MCRConfiguration.instance();
         return config.getString(configPrefix + "Search.Restriction", null);
-    }
-
-    public static MCRCondition getDefaultRestrictionCondition(String configPrefix) {
-        String r = getDefaultRestriction(configPrefix);
-        if (r != null) {
-            try {
-                return new MCRQueryParser().parse(r);
-            } catch (Exception ex) {
-                String msg = "Unable to parse " + configPrefix + "Search.Restriction=" + r;
-                throw new MCRConfigurationException(msg, ex);
-            }
-        }
-        return null;
     }
 
     public static String getDefaultSetQuery(String setSpec, String configPrefix) {
@@ -61,8 +40,8 @@ public abstract class MCROAIUtils {
             return "category:" + classID + "\\:" + categID;
         } else {
             String id = setSpec;
-            String query = MCRConfiguration.instance().getString(
-                configPrefix + "MapSetToQuery." + id.replace(":", "_"), "");
+            String query = MCRConfiguration.instance().getString(configPrefix + "MapSetToQuery." + id.replace(":", "_"),
+                "");
             if (!query.equals("")) {
                 return query;
             } else {
@@ -72,37 +51,28 @@ public abstract class MCROAIUtils {
         }
     }
 
-    public static MCRCondition getDefaultSetCondition(String setSpec, String configPrefix) {
-        if (setSpec.contains(":")) {
-            String categID = setSpec.substring(setSpec.lastIndexOf(':') + 1).trim();
-            String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
-            classID = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, classID);
-            String id = classID + ":" + categID;
-            return new MCRQueryCondition("category", "=", id);
-        } else {
-            String id = setSpec;
-            String query = MCRConfiguration.instance().getString(
-                configPrefix + "MapSetToQuery." + id.replace(":", "_"), "");
-            if (!query.equals("")) {
-                return new MCRQueryParser().parse(query);
-            } else {
-                id = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, id);
-                return new MCRQueryCondition("category", "like", id + "*");
-            }
-        }
+    /**
+     * The default setSpec format is: <b>SET_ID<b>:<b>SET_VALUE</b>.
+     * This returns the SET_ID of the setSpec.
+     * 
+     * @param set the set to get the id from
+     * @return the id
+     */
+    public static String getSetId(Set set) {
+        String spec = set.getSpec();
+        return spec.substring(0, spec.indexOf(":"));
     }
 
-    public static List<MCRSortBy> getSortByList(String configField, String defaultValue) {
-        MCRConfiguration config = MCRConfiguration.instance();
-        List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
-        String searchSortBy = config.getString(configField, defaultValue);
-        for (StringTokenizer st = new StringTokenizer(searchSortBy, ",;:"); st.hasMoreTokens();) {
-            String token = st.nextToken().trim();
-            String field = token.split(" ")[0];
-            boolean order = "ascending".equalsIgnoreCase(token.split(" ")[1]);
-            sortBy.add(new MCRSortBy(field, order));
-        }
-        return sortBy;
+    /**
+     * The default setSpec format is: <b>SET_ID<b>:<b>SET_VALUE</b>.
+     * This returns the SET_VALUE of the setSpec.
+     * 
+     * @param set the set to get the value from
+     * @return the value
+     */
+    public static String getSetSpecValue(Set set) {
+        String spec = set.getSpec();
+        return spec.substring(spec.indexOf(":") + 1);
     }
 
 }

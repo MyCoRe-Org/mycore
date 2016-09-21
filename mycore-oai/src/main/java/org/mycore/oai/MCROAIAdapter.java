@@ -115,10 +115,10 @@ public class MCROAIAdapter implements OAIAdapter {
     public MCROAISearchManager getSearchManager() {
         if (this.searchManager == null) {
             this.searchManager = new MCROAISearchManager();
-            int partitionSize = MCRConfiguration.instance().getInt(
-                getConfigPrefix() + "ResumptionTokens.PartitionSize", DEFAULT_PARTITION_SIZE);
+            int partitionSize = MCRConfiguration.instance().getInt(getConfigPrefix() + "ResumptionTokens.PartitionSize",
+                DEFAULT_PARTITION_SIZE);
             this.searchManager.init(getConfigPrefix(), getIdentify().getDeletedRecordPolicy(), getObjectManager(),
-                partitionSize);
+                getSetManager(), partitionSize);
         }
         return this.searchManager;
     }
@@ -158,7 +158,8 @@ public class MCROAIAdapter implements OAIAdapter {
      * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getSets(java.lang.String)
      */
     @Override
-    public OAIDataList<Set> getSets(String resumptionToken) throws NoSetHierarchyException, BadResumptionTokenException {
+    public OAIDataList<Set> getSets(String resumptionToken)
+        throws NoSetHierarchyException, BadResumptionTokenException {
         MCROAISetManager setManager = getSetManager();
         OAIDataList<Set> setList = setManager.get();
         if (setList.isEmpty()) {
@@ -226,8 +227,8 @@ public class MCROAIAdapter implements OAIAdapter {
      * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getMetadataFormats(java.lang.String)
      */
     @Override
-    public List<MetadataFormat> getMetadataFormats(String identifier) throws IdDoesNotExistException,
-        NoMetadataFormatsException {
+    public List<MetadataFormat> getMetadataFormats(String identifier)
+        throws IdDoesNotExistException, NoMetadataFormatsException {
         if (!getObjectManager().exists(identifier)) {
             throw new IdDoesNotExistException(identifier);
         }
@@ -239,8 +240,8 @@ public class MCROAIAdapter implements OAIAdapter {
      * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getRecord(java.lang.String, org.mycore.oai.pmh.MetadataFormat)
      */
     @Override
-    public Record getRecord(String identifier, MetadataFormat format) throws CannotDisseminateFormatException,
-        IdDoesNotExistException {
+    public Record getRecord(String identifier, MetadataFormat format)
+        throws CannotDisseminateFormatException, IdDoesNotExistException {
         MCROAIObjectManager objectManager = getObjectManager();
         if (!objectManager.exists(identifier)) {
             DeletedRecordPolicy rP = getIdentify().getDeletedRecordPolicy();

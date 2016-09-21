@@ -23,12 +23,9 @@ package org.mycore.oai;
 
 import static org.mycore.oai.pmh.OAIConstants.NS_OAI;
 
-import java.io.IOException;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -36,13 +33,9 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hibernate.Transaction;
 import org.jdom2.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -54,12 +47,9 @@ import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.OAIDataList;
 import org.mycore.oai.pmh.Set;
-import org.mycore.parsers.bool.MCRAndCondition;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.services.fieldquery.MCRSortBy;
-import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.search.MCRConditionTransformer;
+import org.mycore.oai.set.MCROAISolrSetConfiguration;
+import org.mycore.oai.set.MCROAISetConfiguration;
+import org.mycore.oai.set.MCROAISetHandler;
 
 /**
  * Manager class to handle OAI-PMH set specific behavior. For a data provider instance, set support is optional and must be configured as described below.
@@ -87,7 +77,7 @@ public class MCROAISetManager {
 
     protected String configPrefix;
 
-    protected List<String> setURIs;
+    protected Map<String, MCROAISetConfiguration<?>> setConfigurationMap;
 
     /**
      * Time in milliseconds when the classification changed.
@@ -104,7 +94,7 @@ public class MCROAISetManager {
     protected final OAIDataList<Set> cachedSetList;
 
     public MCROAISetManager() {
-        this.setURIs = new ArrayList<String>();
+        this.setConfigurationMap = Collections.synchronizedMap(new HashMap<>());
         this.cachedSetList = new OAIDataList<Set>();
         this.classLastModified = Long.MIN_VALUE;
     }
@@ -150,13 +140,13 @@ public class MCROAISetManager {
     }
 
     protected void updateURIs() {
-        this.setURIs = new ArrayList<String>();
+        this.setConfigurationMap = Collections.synchronizedMap(new HashMap<>());
         MCRConfiguration config = MCRConfiguration.instance();
-        Map<String, String> setProperties = config.getPropertiesMap(this.configPrefix + "Sets.");
-        for (String value : setProperties.values()) {
-            if (value.trim().length() > 0) {
-                this.setURIs.add(value);
-            }
+        String setIds = config.getString(this.configPrefix + "Sets");
+        for (String setId : setIds.split(",")) {
+            setId = setId.trim();
+            MCROAISetConfiguration<?> setConf = new MCROAISolrSetConfiguration(this.configPrefix, setId);
+            this.setConfigurationMap.put(setId, setConf);
         }
     }
 
@@ -188,99 +178,70 @@ public class MCROAISetManager {
         return clonedList;
     }
 
+    /**
+     * Returns the {@link MCROAISetConfiguration} for the given set id.
+     * 
+     * @param setId the set identifier
+     * @return the configuration for this set
+     */
+    @SuppressWarnings("unchecked")
+    public <T> MCROAISetConfiguration<T> getConfig(String setId) {
+        return (MCROAISetConfiguration<T>) this.setConfigurationMap.get(setId);
+    }
+
     protected OAIDataList<Set> createSetList() {
         OAIDataList<Set> setList = new OAIDataList<Set>();
-        for (String uri : this.setURIs) {
-            Element resolved = MCRURIResolver.instance().resolve(uri);
-            for (Element setElement : (List<Element>) (resolved.getChildren("set", OAIConstants.NS_OAI))) {
-                String setSpec = setElement.getChildText("setSpec", NS_OAI);
-                String setName = setElement.getChildText("setName", NS_OAI);
-                if (!contains(setSpec, setList)) {
-                    Set set = new Set(getSetSpec(setSpec), setName);
-                    set.getDescription().addAll(
-                        setElement
-                            .getChildren("setDescription", NS_OAI)
-                            .stream() //all setDescription
-                            .flatMap(e -> e
-                                .getChildren()
-                                .stream()
-                                .limit(1)) //first childElement of setDescription
-                            .peek(Element::detach)
-                            .map(d -> (Description) new Description() {
-
-                                @Override
-                                public Element toXML() {
-                                    return d;
-                                }
-
-                                @Override
-                                public void fromXML(Element descriptionElement) {
-                                    throw new UnsupportedOperationException();
-                                }
-                            })
-                            .collect(Collectors.toList()));
-                    setList.add(set);
+        synchronized (this.setConfigurationMap) {
+            for (MCROAISetConfiguration<?> conf : this.setConfigurationMap.values()) {
+                MCROAISetHandler<?> handler = conf.getHandler();
+                Element resolved = MCRURIResolver.instance().resolve(conf.getURI());
+                for (Element setElement : (List<Element>) (resolved.getChildren("set", OAIConstants.NS_OAI))) {
+                    Set set = createSet(conf.getId(), setElement);
+                    if (!contains(set.getSpec(), setList)) {
+                        if (!handler.filter(set)) {
+                            setList.add(set);
+                        }
+                    }
                 }
-            }
-        }
-        return this.filterEmptySets ? filterEmptySets(setList) : setList;
-    }
-
-    private String getSetSpec(String setSpec) {
-        if (setSpec.contains(":")) {
-            String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
-            classID = MCRClassificationAndSetMapper.mapClassificationToSet(this.configPrefix, classID);
-            return classID + setSpec.substring(setSpec.indexOf(':'));
-        } else {
-            return setSpec;
-        }
-    }
-
-    /**
-     * Removes all sets which are empty.
-     * <ul>
-     *   <li>The parent is empty -&gt; all child sets must be empty too</li>
-     *   <li>There are no results for this set</li>
-     * </ul>
-     * @param setList the list to filter
-     * @return the same list filtered
-     */
-    protected OAIDataList<Set> filterEmptySets(OAIDataList<Set> setList) {
-        for (Iterator<Set> it = setList.iterator(); it.hasNext();) {
-            Set set = it.next();
-            String setSpec = set.getSpec();
-            // Check parent set, if existing
-            if (setSpec.contains(":") && (setSpec.lastIndexOf(":") > setSpec.indexOf(":"))) {
-                String parentSetSpec = setSpec.substring(0, setSpec.lastIndexOf(":"));
-                // If parent set is empty, all child sets must be empty, too
-                if (!contains(parentSetSpec, setList)) {
-                    it.remove();
-                    continue;
-                }
-            }
-            if (isEmptySet(setSpec)) {
-                it.remove();
             }
         }
         return setList;
     }
 
-    /**
-     * Checks if the given set has results. Returns true if there are no
-     * results for this set, otherwise false.
-     *
-     * @param setSpec spec to check
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected boolean isEmptySet(String setSpec) {
-        // Build a query to count results
-        MCRAndCondition query = new MCRAndCondition();
-        query.addChild(buildSetCondition(setSpec));
-        MCRCondition restriction = MCROAIUtils.getDefaultRestrictionCondition(this.configPrefix);
-        if (restriction != null) {
-            query.addChild(restriction);
+    private Set createSet(String setId, Element setElement) {
+        String setSpec = setElement.getChildText("setSpec", NS_OAI);
+        String setName = setElement.getChildText("setName", NS_OAI);
+        Set set = new Set(getSetSpec(setId, setSpec), setName);
+        set.getDescription()
+           .addAll(setElement.getChildren("setDescription", NS_OAI)
+                             .stream() //all setDescription
+                             .flatMap(e -> e.getChildren().stream().limit(1)) //first childElement of setDescription
+                             .peek(Element::detach)
+                             .map(d -> (Description) new Description() {
+                                 @Override
+                                 public Element toXML() {
+                                     return d;
+                                 }
+
+                                 @Override
+                                 public void fromXML(Element descriptionElement) {
+                                     throw new UnsupportedOperationException();
+                                 }
+                             })
+                             .collect(Collectors.toList()));
+        return set;
+    }
+
+    private String getSetSpec(String setId, String elementText) {
+        StringBuffer setSpec = new StringBuffer(setId).append(":");
+        if (elementText.contains(":")) {
+            String classID = elementText.substring(0, elementText.indexOf(':')).trim();
+            classID = MCRClassificationAndSetMapper.mapClassificationToSet(this.configPrefix, classID);
+            setSpec.append(classID).append(elementText.substring(elementText.indexOf(':')));
+        } else {
+            setSpec.append(elementText);
         }
-        return hasNoResults(new MCRQuery(query));
+        return setSpec.toString();
     }
 
     /**
@@ -312,21 +273,6 @@ public class MCROAISetManager {
      */
     public static boolean contains(String setSpec, OAIDataList<Set> setList) {
         return get(setSpec, setList) != null;
-    }
-
-    protected MCRCondition buildSetCondition(String setSpec) {
-        return MCROAIUtils.getDefaultSetCondition(setSpec, this.configPrefix);
-    }
-
-    public boolean hasNoResults(MCRQuery query) {
-        SolrQuery solrQuery = MCRConditionTransformer.getSolrQuery(query.getCondition(),
-            Collections.<MCRSortBy> emptyList(), 1);
-        try {
-            QueryResponse queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
-            return queryResponse.getResults().isEmpty();
-        } catch (SolrServerException | IOException e) {
-            throw new MCRException(e);
-        }
     }
 
 }

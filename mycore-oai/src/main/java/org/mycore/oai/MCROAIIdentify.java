@@ -65,8 +65,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         this.setDeletedRecordPolicy(DeletedRecordPolicy.get(deletedRecordPolicy));
         String granularity = this.config.getString(configPrefix + "Granularity", Granularity.YYYY_MM_DD.name());
         this.setGranularity(Granularity.valueOf(granularity));
-        String adminMail = this.config.getString(configPrefix + "AdminEmail",
-            config.getString("MCR.Mail.Sender"));
+        String adminMail = this.config.getString(configPrefix + "AdminEmail", config.getString("MCR.Mail.Sender"));
 
         this.setEarliestDatestamp(calculateEarliestTimestamp());
         this.getAdminEmailList().add(adminMail);
@@ -133,12 +132,13 @@ public class MCROAIIdentify extends SimpleIdentify {
         Date datestamp = DateUtils.parseUTC(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
         try {
             // existing items
-            datestamp = MCROAISearchManager.getSearcher(this.configPrefix, null, null, 1).getEarliestTimestamp();
+            datestamp = MCROAISearchManager.getSearcher(this.configPrefix, null, null, 1, null).getEarliestTimestamp();
             // deleted items
             if (DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
                 Date earliestDeletedDate = MCRDeletedItemManager.getFirstDate()
-                    .map(ZonedDateTime::toInstant)
-                    .map(Date::from).orElse(null);
+                                                                .map(ZonedDateTime::toInstant)
+                                                                .map(Date::from)
+                                                                .orElse(null);
                 if (earliestDeletedDate != null && earliestDeletedDate.compareTo(datestamp) < 0) {
                     datestamp = earliestDeletedDate;
                 }

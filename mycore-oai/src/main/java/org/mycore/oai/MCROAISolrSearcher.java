@@ -11,8 +11,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.datamodel.common.MCRISO8601Date;
-import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.oai.pmh.Set;
+import org.mycore.oai.set.MCROAISetConfiguration;
 import org.mycore.solr.MCRSolrClientFactory;
 
 public class MCROAISolrSearcher extends MCROAISearcher {
@@ -63,19 +63,9 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
         // set support
         if (this.set != null) {
-            String origSet = set.getSpec();
-            String setFilter = getConfig().getString(getConfigPrefix() + "MapSetToQuery." + origSet, null);
-            if (setFilter == null) {
-                String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(), set.getSpec()
-                    .split("\\:")[0]);
-                String field = getConfig().getString(getConfigPrefix() + "SetSolrField", "category.top");
-                if (origSet.contains(":")) {
-                    setFilter = field + ":" + classid + "\\:" + origSet.substring(origSet.indexOf(":") + 1);
-                } else {
-                    setFilter = field + ":" + classid + "*";
-                }
-            }
-            query.add("fq", setFilter);
+            String setId = MCROAIUtils.getSetId(this.set);
+            MCROAISetConfiguration<SolrQuery> setConfig = getSetManager().getConfig(setId);
+            setConfig.getHandler().apply(this.set, query);
         }
 
         // date range

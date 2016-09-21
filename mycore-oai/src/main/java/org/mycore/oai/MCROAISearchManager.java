@@ -31,6 +31,8 @@ public class MCROAISearchManager {
 
     protected MCROAIObjectManager objManager;
 
+    protected MCROAISetManager setManager;
+
     protected DeletedRecordPolicy deletedRecordPolicy;
 
     protected int partitionSize;
@@ -58,9 +60,10 @@ public class MCROAISearchManager {
     }
 
     public void init(String configPrefix, DeletedRecordPolicy deletedRecordPolicy, MCROAIObjectManager objManager,
-        int partitionSize) {
+        MCROAISetManager setManager, int partitionSize) {
         this.configPrefix = configPrefix;
         this.objManager = objManager;
+        this.setManager = setManager;
         this.deletedRecordPolicy = deletedRecordPolicy;
         this.partitionSize = partitionSize;
     }
@@ -88,14 +91,14 @@ public class MCROAISearchManager {
     }
 
     public OAIDataList<Header> searchHeader(MetadataFormat format, Set set, Date from, Date until) {
-        MCROAISearcher searcher = getSearcher(getConfigPrefix(), format, getDeletedRecordPolicy(), getPartitionSize());
+        MCROAISearcher searcher = getSearcher(getConfigPrefix(), format, getDeletedRecordPolicy(), getPartitionSize(), setManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);
         return getHeaderList(searcher, result, 0);
     }
 
     public OAIDataList<Record> searchRecord(MetadataFormat format, Set set, Date from, Date until) {
-        MCROAISearcher searcher = getSearcher(getConfigPrefix(), format, getDeletedRecordPolicy(), getPartitionSize());
+        MCROAISearcher searcher = getSearcher(getConfigPrefix(), format, getDeletedRecordPolicy(), getPartitionSize(), setManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);
         return getRecordList(searcher, result, 0);
@@ -149,12 +152,12 @@ public class MCROAISearchManager {
 
     protected void setResumptionToken(OAIDataList<?> dataList, String id, Date expirationDate, int cursor, int hits) {
         boolean setToken = cursor < hits;
-        if(hits>getPartitionSize()){
+        if (hits > getPartitionSize()) {
             DefaultResumptionToken rsToken = new DefaultResumptionToken();
             rsToken.setCompleteListSize(hits);
             // this has to be the position (starting at 0) of the FIRST record of the OAI response !!! 
             // see http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
-            rsToken.setCursor(((cursor-1) / partitionSize)*partitionSize); 
+            rsToken.setCursor(((cursor - 1) / partitionSize) * partitionSize);
             rsToken.setExpirationDate(expirationDate);
             if (setToken) {
                 rsToken.setToken(id + TOKEN_DELIMITER + String.valueOf(cursor));
@@ -181,11 +184,11 @@ public class MCROAISearchManager {
     }
 
     public static MCROAISearcher getSearcher(String configPrefix, MetadataFormat format,
-        DeletedRecordPolicy deletedRecordPolicy, int partitionSize) {
+        DeletedRecordPolicy deletedRecordPolicy, int partitionSize, MCROAISetManager setManager) {
         MCROAISearcher searcher = getConfig().<MCROAISearcher> getInstanceOf(configPrefix + "Searcher",
             "org.mycore.oai.MCROAISolrSearcher");
         searcher.init(configPrefix, format, new Date(System.currentTimeMillis() + MAX_AGE), deletedRecordPolicy,
-            partitionSize);
+            partitionSize, setManager);
         return searcher;
     }
 
