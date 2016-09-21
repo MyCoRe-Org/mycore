@@ -38,6 +38,9 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
 
     @Override
     public boolean filter(Set set) {
+        if (!filterEmptySets()) {
+            return false;
+        }
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         ModifiableSolrParams p = new ModifiableSolrParams();
         String value = MCROAIUtils.getSetSpecValue(set);
@@ -55,6 +58,10 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
             LOGGER.error("Unable to get results of solr server", exc);
             return true;
         }
+    }
+
+    private boolean filterEmptySets() {
+        return MCRConfiguration.instance().getBoolean(getConfigPrefix() + "FilterEmptySets", true);
     }
 
 }

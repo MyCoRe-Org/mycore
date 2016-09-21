@@ -89,8 +89,6 @@ public class MCROAISetManager {
      */
     protected int cacheMaxAge;
 
-    protected boolean filterEmptySets;
-
     protected final OAIDataList<Set> cachedSetList;
 
     public MCROAISetManager() {
@@ -99,10 +97,9 @@ public class MCROAISetManager {
         this.classLastModified = Long.MIN_VALUE;
     }
 
-    public void init(String configPrefix, int cacheMaxAge, boolean filterEmptySets) {
+    public void init(String configPrefix, int cacheMaxAge) {
         this.configPrefix = configPrefix;
         this.cacheMaxAge = cacheMaxAge;
-        this.filterEmptySets = filterEmptySets;
         updateURIs();
         if (this.cacheMaxAge != 0) {
             startTimerTask();
