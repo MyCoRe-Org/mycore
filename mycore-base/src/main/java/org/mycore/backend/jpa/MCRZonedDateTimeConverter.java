@@ -3,7 +3,10 @@
  */
 package org.mycore.backend.jpa;
 
+import java.time.DateTimeException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -19,7 +22,7 @@ public class MCRZonedDateTimeConverter implements AttributeConverter<ZonedDateTi
 
     @Override
     public Date convertToDatabaseColumn(ZonedDateTime date) {
-        if(date == null) {
+        if (date == null) {
             return null;
         }
         Instant instant = Instant.from(date);
@@ -28,11 +31,16 @@ public class MCRZonedDateTimeConverter implements AttributeConverter<ZonedDateTi
 
     @Override
     public ZonedDateTime convertToEntityAttribute(Date dbData) {
-        if(dbData == null) {
+        if (dbData == null) {
             return null;
         }
         Instant instant = dbData.toInstant();
-        return ZonedDateTime.from(instant);
+        try {
+            return ZonedDateTime.from(instant);
+        } catch (DateTimeException exc) {
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
+            return ZonedDateTime.of(localDateTime, ZoneId.of("UTC"));
+        }
     }
 
 }
