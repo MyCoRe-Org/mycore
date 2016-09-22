@@ -43,6 +43,8 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.services.http.MCRHttpUtils;
+import org.mycore.services.http.MCRIdleConnectionMonitorThread;
 import org.xml.sax.SAXException;
 
 public class MCRSolrProxyServlet extends MCRServlet {
@@ -271,12 +273,12 @@ public class MCRSolrProxyServlet extends MCRServlet {
             queryHandlerMap.put(standardHandler.getPath(), standardHandler);
         }
 
-        solrHost = MCRSolrProxyUtils.getHttpHost(SERVER_URL);
+        solrHost = MCRHttpUtils.getHttpHost(SERVER_URL);
         if (solrHost == null) {
             throw new ServletException("URI does not specify a valid host name: " + SERVER_URL);
         }
-        httpClientConnectionManager = MCRSolrProxyUtils.getConnectionManager(MAX_CONNECTIONS);
-        httpClient = MCRSolrProxyUtils.getHttpClient(httpClientConnectionManager, MAX_CONNECTIONS);
+        httpClientConnectionManager = MCRHttpUtils.getConnectionManager(MAX_CONNECTIONS);
+        httpClient = MCRHttpUtils.getHttpClient(httpClientConnectionManager, MAX_CONNECTIONS);
 
         // start thread to monitor stalled connections
         idleConnectionMonitorThread = new MCRIdleConnectionMonitorThread(httpClientConnectionManager);

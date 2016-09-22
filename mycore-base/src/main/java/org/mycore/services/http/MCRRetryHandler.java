@@ -1,4 +1,4 @@
-package org.mycore.solr.proxy;
+package org.mycore.services.http;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -14,10 +14,10 @@ import org.apache.http.protocol.HttpContext;
  * Handles request retries. 
  * @author Thomas Scheffler (yagee)
  */
-class MCRSolrRetryHandler implements HttpRequestRetryHandler {
+class MCRRetryHandler implements HttpRequestRetryHandler {
     int maxExecutionCount;
 
-    public MCRSolrRetryHandler(int maxExecutionCount) {
+    public MCRRetryHandler(int maxExecutionCount) {
         super();
         this.maxExecutionCount = maxExecutionCount;
     }
