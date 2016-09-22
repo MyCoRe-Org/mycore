@@ -26,13 +26,20 @@ package org.mycore.services.i18n;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 public class MCRTranslationTest extends MCRTestCase {
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.Languages", "de,en,fr,pl");
+        return testProperties;
+    }
 
     @Test
     public void translate() {
@@ -59,8 +66,7 @@ public class MCRTranslationTest extends MCRTestCase {
     @Test
     public void getAvailableLanguages() {
         Set<String> availableLanguages = MCRTranslation.getAvailableLanguages();
-        System.out.println(availableLanguages);
-        assertEquals(7, availableLanguages.size());
+        assertEquals(4, availableLanguages.size());
     }
 
     @Test
