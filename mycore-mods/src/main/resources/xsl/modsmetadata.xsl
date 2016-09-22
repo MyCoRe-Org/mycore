@@ -442,7 +442,7 @@
           <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.characteristics'),':')" />
         </td>
         <td class="metavalue">
-          <table>
+          <table class="table table-condensed">
             <tr>
               <th>
                 <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.year')" />
