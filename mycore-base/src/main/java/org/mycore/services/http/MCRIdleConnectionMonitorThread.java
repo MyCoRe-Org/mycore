@@ -1,4 +1,4 @@
-package org.mycore.solr.proxy;
+package org.mycore.services.http;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,7 +10,7 @@ import org.apache.http.conn.HttpClientConnectionManager;
  * These connections will be closed every 5 seconds.
  * @author Thomas Scheffler (yagee)
  */
-class MCRIdleConnectionMonitorThread extends Thread {
+public class MCRIdleConnectionMonitorThread extends Thread {
     private final HttpClientConnectionManager connMgr;
 
     private volatile boolean shutdown;
