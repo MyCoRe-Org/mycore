@@ -35,7 +35,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Comment;
 import org.jdom2.Content;
@@ -72,7 +73,7 @@ import com.google.gson.JsonPrimitive;
  */
 public class MCRXMLHelper {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRXMLHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXMLHelper.class);
 
     /**
      * Removes characters that are illegal in XML text nodes or attribute
