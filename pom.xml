@@ -34,6 +34,8 @@
     <httpcore.version>4.4.5</httpcore.version>
     <xalan.version>2.7.2</xalan.version>
     <jersey.version>2.23.2</jersey.version>
+    <guice.version>4.1.0</guice.version>
+    <hk2.version>2.5.0-b16</hk2.version>
     <changelog.since>2016-06-27</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2016.07</changes.version>
@@ -1120,6 +1122,21 @@
         <artifactId>grizzly-http-servlet</artifactId>
         <version>2.3.23</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>hk2-api</artifactId>
+        <version>${hk2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>guice-bridge</artifactId>
+        <version>${hk2.version}</version>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
