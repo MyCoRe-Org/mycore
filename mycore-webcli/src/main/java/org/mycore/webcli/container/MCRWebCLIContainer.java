@@ -179,6 +179,10 @@ public class MCRWebCLIContainer {
     public void setContinueIfOneFails(boolean con, boolean sendMessage) {
         this.processCallable.setContinueIfOneFails(con, sendMessage);
     }
+    
+    public void clearCommandList() {
+        this.processCallable.clearCommandList();
+    }
 
     private static class ProcessCallable implements Callable<Boolean> {
 
@@ -241,6 +245,11 @@ public class MCRWebCLIContainer {
                     LOGGER.error("Cannot send message to client.", e);
                 }
             }
+        }
+        
+        public void clearCommandList() {
+            this.commands.clear();
+            setCurrentCommand("");
         }
 
         public Boolean call() throws Exception {

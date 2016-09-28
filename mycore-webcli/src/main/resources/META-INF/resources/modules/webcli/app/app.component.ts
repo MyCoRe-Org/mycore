@@ -50,6 +50,10 @@ export class AppComponent {
     this.webCliLogComponent.clearLog();
   }
 
+  clearCommandList(){
+    this._restService.clearCommandList();
+  }
+
   setRefresh(refresh: boolean){
     this.refreshRunning = refresh;
     if (refresh){

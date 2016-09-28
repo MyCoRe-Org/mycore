@@ -65,6 +65,13 @@ export class RESTService {
     this.sendMessage(JSON.stringify(message));
   }
 
+  clearCommandList() {
+    var message = {
+      type: "clearCommandList"
+    }
+    this.sendMessage(JSON.stringify(message));
+  }
+
   setContinueIfOneFails(con: boolean) {
     var message = {
       type: "continueIfOneFails",
