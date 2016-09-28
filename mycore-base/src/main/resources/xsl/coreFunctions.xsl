@@ -21,7 +21,7 @@
         Template: UrlSetParam
         synopsis: Inserts a $HttpSession to an URL
         param:
-        
+
         url: URL to include the session
     -->
   <xsl:template name="UrlAddSession">
@@ -58,7 +58,7 @@
         Template: UrlDeleteParam
         synopsis: removes a jsessionID parameter from a URL
         param:
-        
+
         url: URL to remove the session
     -->
   <xsl:template name="UrlDeleteSession">
@@ -69,7 +69,7 @@
         Template: UrlSetParam
         synopsis: Replaces a parameter value or adds a parameter to an URL
         param:
-        
+
         url: URL to contain the parameter and value
         par: name of the parameter
         value: new value
@@ -138,7 +138,7 @@
         Template: UrlGetParam
         synopsis: Gets the value of a given parameter from a specific URL
         param:
-        
+
         url: URL containing the parameter and value
         par: name of the parameter
     -->
@@ -179,7 +179,7 @@
     <!--
         Template: UrlDelParam
         synopsis: Removes the parameter and value of a given parameter from a specific URL
-        
+
         url: URL containing the parameter and value
         par: name of the parameter
     -->
@@ -247,7 +247,7 @@
         Template: ShortenText
         synopsis: Cuts text after a maximum of given chars but at end of the word that would be affected. If the text is shortened "..." is appended.
         param:
-        
+
         text: the text to be shorten
         length: the number of chars
     -->
@@ -261,19 +261,19 @@
         Template: shortenPersonLabel
         synopsis: removes all Chrakters behind a '(' in label of persons (also works with al otrher Strings)
         param:
-        
+
         text: the text to be shorten
     -->
   <xsl:template name="shortenPersonLabel">
     <xsl:param name="text" />
     <xsl:value-of select="mcrxml:shortenPersonLabel($text)" />
   </xsl:template>
-  
+
     <!--
         Template: ClassCategLink
         synopsis: Generates a link to get a classification
         param:
-        
+
         classid: classification id
         categid: category id
         host: host to query
@@ -297,7 +297,7 @@
         Template: ClassLink
         synopsis: Generates a link to get a classification
         param:
-        
+
         classid: classification id
         host: host to query
     -->
@@ -317,7 +317,7 @@
     <!--
         Template: PageGen
         synopsis: returns a list of links to access other pages of a result list
-        
+
         parameters:
         i: running indicator - leave untouched
         id: editorID
@@ -370,7 +370,7 @@
         <xsl:when test="$i &gt; $currentpage">
           <xsl:choose>
                         <!-- jump only one if your near currentpage,
-                            or at last page 
+                            or at last page
                             or to support bigger window at beginning
                             or to skip a jump of 2
 -->
@@ -427,7 +427,7 @@
   </xsl:template>
     <!-- Template typeOfObjectID
         synopsis: returns the type of the ObjectID submitted usally the second part of the ID
-        
+
         parameters:
         id: MCRObjectID
     -->
@@ -439,7 +439,7 @@
 
     <!-- Template selectLang
         synopsis: returns $CurrentLang if $nodes[lang($CurrentLang)] is not empty, else $DefaultLang
-        
+
         parameters:
         nodes: the nodeset to check
     -->
@@ -457,7 +457,7 @@
 
     <!-- Template selectPresentLang
         synopsis: returns the result of selectLang if nodes for that language are present, else returns a language for which nodes a present
-        
+
         parameters:
         nodes: the nodeset to check
     -->
@@ -594,7 +594,7 @@
         Template: formatISODate
         synopsis: formates the given date (ISO 8601) to the defined local format
         param:
-        
+
         date: date in ISO 8601 format
         format: target format (must suit to SimpleDateFormat)
         locale: use local, e.g. "de" "en"
@@ -603,6 +603,14 @@
     <xsl:param name="date" />
     <xsl:param name="format" />
     <xsl:param name="locale" select="$CurrentLang" />
+
+    <xsl:comment>
+      Start - formatISODate (coreFunctions.xsl)
+      <xsl:value-of select="concat('date:', $date)"/>
+      <xsl:value-of select="concat('format:', $format)"/>
+      <xsl:value-of select="concat('locale:', $CurrentLang)"/>
+    </xsl:comment>
+
     <xsl:variable name="formatArg">
       <xsl:choose>
         <xsl:when test="string-length($format)&gt;0">
@@ -623,13 +631,16 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:value-of select="mcrxml:formatISODate( string( $date ),string( $formatArg ),string( $locale ) )" />
+    <xsl:comment>
+      End - formatISODate (coreFunctions.xsl)
+    </xsl:comment>
   </xsl:template>
 
     <!--
         Template: formatFileSize
         synopsis: formates the size in a more human readable form
         param:
-        
+
         size: size in bytes
     -->
   <xsl:template name="formatFileSize">
@@ -638,16 +649,16 @@
   </xsl:template>
 
     <!-- ====================================================================================={
-        
+
         section: template name="ersetzen"
-        
+
         Search for a part in a string and replace it
-        
+
         parameters:
         vorlage - the original string
         raus - the searched string to replace
         rein - the new string
-        
+
         }===================================================================================== -->
 
   <xsl:template name="ersetzen">
@@ -675,7 +686,7 @@
         Template: Tokenizer
         synopsis: splits a string to tokens elements when ever a delimiter occurs
         param:
-        
+
         string: the string to split into token
         delimiter: a string that acts a token delimiter in "string"
     -->
@@ -703,13 +714,13 @@
     <!-- ======================================================================================================== -->
     <!--
         Template: get.readAccess
-        synopsis: 
-        Verifies read access for a given webpage. 
+        synopsis:
+        Verifies read access for a given webpage.
         The webpage must be contained in navigation.xml as //item/@href
-        params: 
+        params:
         webpage:            *//item/@href from navigation.xml
-        blockerWebpage:     *//item/@href from navigation.xml that has already been verified for (write access =true). 
-        So, only the values of "items/@href" of the ancestor axis till and exclusiv $blockerWebpage 
+        blockerWebpage:     *//item/@href from navigation.xml that has already been verified for (write access =true).
+        So, only the values of "items/@href" of the ancestor axis till and exclusiv $blockerWebpage
         will be verified.
     -->
   <xsl:template name="get.readAccess">
