@@ -603,14 +603,6 @@
     <xsl:param name="date" />
     <xsl:param name="format" />
     <xsl:param name="locale" select="$CurrentLang" />
-
-    <xsl:comment>
-      Start - formatISODate (coreFunctions.xsl)
-      <xsl:value-of select="concat('date:', $date)"/>
-      <xsl:value-of select="concat('format:', $format)"/>
-      <xsl:value-of select="concat('locale:', $CurrentLang)"/>
-    </xsl:comment>
-
     <xsl:variable name="formatArg">
       <xsl:choose>
         <xsl:when test="string-length($format)&gt;0">
@@ -631,9 +623,6 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:value-of select="mcrxml:formatISODate( string( $date ),string( $formatArg ),string( $locale ) )" />
-    <xsl:comment>
-      End - formatISODate (coreFunctions.xsl)
-    </xsl:comment>
   </xsl:template>
 
     <!--
