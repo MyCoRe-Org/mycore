@@ -26,15 +26,9 @@ public final class MCRISO8601FormatChooser {
 
     public final static DateTimeFormatter YEAR_FORMAT = ISODateTimeFormat.year();
 
-    public final static DateTimeFormatter YEAR_FORMAT_BC = ISODateTimeFormat.yearBC();
-
     public final static DateTimeFormatter YEAR_MONTH_FORMAT = ISODateTimeFormat.yearMonth();
 
-    public final static DateTimeFormatter YEAR_MONTH_FORMAT_BC = ISODateTimeFormat.yearMonthBC();
-
     public final static DateTimeFormatter COMPLETE_FORMAT = ISODateTimeFormat.date();
-
-    public final static DateTimeFormatter COMPLETE_FORMAT_BC = ISODateTimeFormat.dateBC();
 
     public final static DateTimeFormatter COMPLETE_HH_MM_FORMAT = ISODateTimeFormat.dateHourMinute();
 
@@ -44,26 +38,19 @@ public final class MCRISO8601FormatChooser {
 
     public final static DateTimeFormatter UTC_YEAR_FORMAT = ISODateTimeFormat.year().withZone(ZoneOffset.UTC);
 
-    public final static DateTimeFormatter UTC_YEAR_FORMAT_BC = ISODateTimeFormat.yearBC().withZone(ZoneOffset.UTC);
-
     public final static DateTimeFormatter UTC_YEAR_MONTH_FORMAT = ISODateTimeFormat.yearMonth()
-            .withZone(ZoneOffset.UTC);
-
-    public final static DateTimeFormatter UTC_YEAR_MONTH_FORMAT_BC = ISODateTimeFormat.yearMonthBC()
-            .withZone(ZoneOffset.UTC);
+        .withZone(ZoneOffset.UTC);
 
     public final static DateTimeFormatter UTC_COMPLETE_FORMAT = ISODateTimeFormat.date().withZone(ZoneOffset.UTC);
 
-    public final static DateTimeFormatter UTC_COMPLETE_FORMAT_BC = ISODateTimeFormat.dateBC().withZone(ZoneOffset.UTC);
-
     public final static DateTimeFormatter UTC_COMPLETE_HH_MM_FORMAT = ISODateTimeFormat.dateHourMinute().withZone(
-            ZoneOffset.UTC);
+        ZoneOffset.UTC);
 
     public final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis().withZone(
-            ZoneOffset.UTC);
+        ZoneOffset.UTC);
 
     public final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_SSS_FORMAT = ISODateTimeFormat.dateTime().withZone(
-            ZoneOffset.UTC);
+        ZoneOffset.UTC);
 
     private static final Pattern MILLI_CHECK_PATTERN = Pattern.compile("\\.\\d{4,}\\+");
 
@@ -86,7 +73,8 @@ public final class MCRISO8601FormatChooser {
         if (isoFormat != null) {
             df = getFormatterForFormat(isoFormat);
         } else if (isoString != null && isoString.length() != 0) {
-            df = getFormatterForDuration(isoString);
+            String normalized = isoString.charAt(0) == '-' ? isoString.substring(1) : isoString;
+            df = getFormatterForDuration(normalized);
         } else {
             df = COMPLETE_HH_MM_SS_SSS_FORMAT;
         }
@@ -98,80 +86,60 @@ public final class MCRISO8601FormatChooser {
 
     private static DateTimeFormatter getFormatterForFormat(MCRISO8601Format isoFormat) {
         switch (isoFormat) {
-        case YEAR:
-            return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
-        case YEAR_MONTH:
-            return USE_UTC ? UTC_YEAR_MONTH_FORMAT : YEAR_MONTH_FORMAT;
-        case COMPLETE:
-            return USE_UTC ? UTC_COMPLETE_FORMAT : COMPLETE_FORMAT;
-        case COMPLETE_HH_MM:
-            return USE_UTC ? UTC_COMPLETE_HH_MM_FORMAT : COMPLETE_HH_MM_FORMAT;
-        case COMPLETE_HH_MM_SS:
-            return USE_UTC ? UTC_COMPLETE_HH_MM_SS_FORMAT : COMPLETE_HH_MM_SS_FORMAT;
-        case COMPLETE_HH_MM_SS_SSS:
-            return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
-
-        /* BC date support */
-        case YEAR_BC:
-            return USE_UTC ? UTC_YEAR_FORMAT_BC : YEAR_FORMAT_BC;
-        case YEAR_MONTH_BC:
-            return USE_UTC ? UTC_YEAR_MONTH_FORMAT_BC : YEAR_MONTH_FORMAT_BC;
-        case COMPLETE_BC:
-            return USE_UTC ? UTC_COMPLETE_FORMAT_BC : COMPLETE_FORMAT_BC;
-
-        default:
-            return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            case YEAR:
+                return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
+            case YEAR_MONTH:
+                return USE_UTC ? UTC_YEAR_MONTH_FORMAT : YEAR_MONTH_FORMAT;
+            case COMPLETE:
+                return USE_UTC ? UTC_COMPLETE_FORMAT : COMPLETE_FORMAT;
+            case COMPLETE_HH_MM:
+                return USE_UTC ? UTC_COMPLETE_HH_MM_FORMAT : COMPLETE_HH_MM_FORMAT;
+            case COMPLETE_HH_MM_SS:
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_FORMAT : COMPLETE_HH_MM_SS_FORMAT;
+            case COMPLETE_HH_MM_SS_SSS:
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            default:
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
         }
     }
 
     private static DateTimeFormatter getFormatterForDuration(String isoString) {
         boolean test = false;
         switch (isoString.length()) {
-        case 1:
-        case 2:
-        case 3:
-            return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
-        case 4:
-            if (isoString.indexOf('-') == -1) {
+            case 1:
+            case 2:
+            case 3:
                 return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
-            }
-        case 5:
-            if (isoString.indexOf('-') != -1) {
-                return USE_UTC ? UTC_YEAR_FORMAT_BC : YEAR_FORMAT_BC;
-            }
-        case 6:
-        case 7:
-            return USE_UTC ? UTC_YEAR_MONTH_FORMAT : YEAR_MONTH_FORMAT;
-        case 8:
-            if (isoString.indexOf('-') != -1) {
-                return USE_UTC ? UTC_YEAR_MONTH_FORMAT_BC : YEAR_MONTH_FORMAT_BC;
-            }
-        case 10:
-            return USE_UTC ? UTC_COMPLETE_FORMAT : COMPLETE_FORMAT;
-        case 11:
-            if (isoString.indexOf('-') != -1) {
-                return USE_UTC ? UTC_COMPLETE_FORMAT_BC : COMPLETE_FORMAT_BC;
-            }
-        case 17: // YYYY-MM-DDThh:mm'Z'
-            test = true;
-        case 22:
-            if (test || !isoString.endsWith("Z")) {
-                // YYYY-MM-DDThh:mm[+-]hh:mm
-                return USE_UTC ? UTC_COMPLETE_HH_MM_FORMAT : COMPLETE_HH_MM_FORMAT;
-            }
-            // YYYY-MM-DDThh:mm:ss.s'Z'
-            return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
-        case 20: // YYYY-MM-DDThh:mm:ss'Z'
-        case 25: // YYYY-MM-DDThh:mm:ss[+-]hh:mm
-            return USE_UTC ? UTC_COMPLETE_HH_MM_SS_FORMAT : COMPLETE_HH_MM_SS_FORMAT;
-        case 23: // YYYY-MM-DDThh:mm:ss.ss'Z'
-        case 24: // YYYY-MM-DDThh:mm:ss.sss'Z'
-        case 27: // YYYY-MM-DDThh:mm:ss.s[+-]hh:mm
-        case 28: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
-        case 29: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
-            return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
-        default:
-            return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            case 4:
+                if (isoString.indexOf('-') == -1) {
+                    return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
+                }
+            case 5:
+            case 6:
+            case 7:
+                return USE_UTC ? UTC_YEAR_MONTH_FORMAT : YEAR_MONTH_FORMAT;
+            case 10:
+                return USE_UTC ? UTC_COMPLETE_FORMAT : COMPLETE_FORMAT;
+            case 17: // YYYY-MM-DDThh:mm'Z'
+                test = true;
+            case 22:
+                if (test || !isoString.endsWith("Z")) {
+                    // YYYY-MM-DDThh:mm[+-]hh:mm
+                    return USE_UTC ? UTC_COMPLETE_HH_MM_FORMAT : COMPLETE_HH_MM_FORMAT;
+                }
+                // YYYY-MM-DDThh:mm:ss.s'Z'
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            case 20: // YYYY-MM-DDThh:mm:ss'Z'
+            case 25: // YYYY-MM-DDThh:mm:ss[+-]hh:mm
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_FORMAT : COMPLETE_HH_MM_SS_FORMAT;
+            case 23: // YYYY-MM-DDThh:mm:ss.ss'Z'
+            case 24: // YYYY-MM-DDThh:mm:ss.sss'Z'
+            case 27: // YYYY-MM-DDThh:mm:ss.s[+-]hh:mm
+            case 28: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
+            case 29: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
+            default:
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
         }
     }
 
@@ -198,51 +166,39 @@ public final class MCRISO8601FormatChooser {
             return DateTimeFormatter.ofPattern("yyyy", Locale.ROOT);
         }
 
-        public static DateTimeFormatter yearBC() {
-            return DateTimeFormatter.ofPattern("-yyyy", Locale.ROOT);
-        }
-
         public static DateTimeFormatter yearMonth() {
             return DateTimeFormatter.ofPattern("yyyy-MM", Locale.ROOT);
-        }
-
-        public static DateTimeFormatter yearMonthBC() {
-            return DateTimeFormatter.ofPattern("-yyyy-MM", Locale.ROOT);
         }
 
         public static DateTimeFormatter date() {
             return DateTimeFormatter.ISO_LOCAL_DATE;
         }
 
-        public static DateTimeFormatter dateBC() {
-            return DateTimeFormatter.ofPattern("-yyyy-MM-dd", Locale.ROOT);
-        }
-
         public static DateTimeFormatter dateHourMinute() {
             return new DateTimeFormatterBuilder().parseCaseInsensitive().appendValue(YEAR, 4).appendLiteral('-')
-                    .appendValue(MONTH_OF_YEAR, 2).appendLiteral('-').appendValue(DAY_OF_MONTH, 2).appendLiteral('T')
-                    .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':').appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                    .appendOffset("+HH:MM", "Z").toFormatter(Locale.ROOT).withChronology(IsoChronology.INSTANCE)
-                    .withResolverStyle(ResolverStyle.STRICT);
+                .appendValue(MONTH_OF_YEAR, 2).appendLiteral('-').appendValue(DAY_OF_MONTH, 2).appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':').appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendOffset("+HH:MM", "Z").toFormatter(Locale.ROOT).withChronology(IsoChronology.INSTANCE)
+                .withResolverStyle(ResolverStyle.STRICT);
         }
 
         public static DateTimeFormatter dateTimeNoMillis() {
             return new DateTimeFormatterBuilder().parseCaseInsensitive().appendValue(YEAR, 4).appendLiteral('-')
-                    .appendValue(MONTH_OF_YEAR, 2).appendLiteral('-').appendValue(DAY_OF_MONTH, 2).appendLiteral('T')
-                    .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':').appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                    .appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2).appendOffset("+HH:MM", "Z")
-                    .toFormatter(Locale.ROOT).withChronology(IsoChronology.INSTANCE)
-                    .withResolverStyle(ResolverStyle.STRICT);
+                .appendValue(MONTH_OF_YEAR, 2).appendLiteral('-').appendValue(DAY_OF_MONTH, 2).appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':').appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2).appendOffset("+HH:MM", "Z")
+                .toFormatter(Locale.ROOT).withChronology(IsoChronology.INSTANCE)
+                .withResolverStyle(ResolverStyle.STRICT);
         }
 
         public static DateTimeFormatter dateTime() {
             return new DateTimeFormatterBuilder().parseCaseInsensitive().appendValue(YEAR, 4).appendLiteral('-')
-                    .appendValue(MONTH_OF_YEAR, 2).appendLiteral('-').appendValue(DAY_OF_MONTH, 2).appendLiteral('T')
-                    .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':').appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                    .appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                    .appendFraction(ChronoField.NANO_OF_SECOND, 3, 3, true).appendOffset("+HH:MM", "Z")
-                    .toFormatter(Locale.ROOT).withChronology(IsoChronology.INSTANCE)
-                    .withResolverStyle(ResolverStyle.STRICT);
+                .appendValue(MONTH_OF_YEAR, 2).appendLiteral('-').appendValue(DAY_OF_MONTH, 2).appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':').appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+                .appendFraction(ChronoField.NANO_OF_SECOND, 3, 3, true).appendOffset("+HH:MM", "Z")
+                .toFormatter(Locale.ROOT).withChronology(IsoChronology.INSTANCE)
+                .withResolverStyle(ResolverStyle.STRICT);
         }
     }
 
