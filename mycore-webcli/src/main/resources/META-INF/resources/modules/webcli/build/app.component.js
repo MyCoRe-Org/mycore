@@ -68,6 +68,9 @@ System.register(['@angular/core', './commands/commands.component', './command-in
                 clearLog() {
                     this.webCliLogComponent.clearLog();
                 }
+                clearCommandList() {
+                    this._restService.clearCommandList();
+                }
                 setRefresh(refresh) {
                     this.refreshRunning = refresh;
                     if (refresh) {
@@ -110,6 +113,12 @@ System.register(['@angular/core', './commands/commands.component', './command-in
             <span class="nav-link with-spinner" (click)="setRefresh(false)">
               <i class="fa fa-pause"></i>
               Stop Refresh
+            </span>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link" (click)="clearCommandList()">
+              <i class="fa fa-stop"></i>
+              Clear Command Queue
             </span>
           </li>
           <li class="nav-item" data-toggle="collapse" data-target="#exCollapsingNavbar">

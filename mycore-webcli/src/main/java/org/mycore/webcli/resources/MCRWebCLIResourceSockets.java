@@ -78,6 +78,10 @@ public class MCRWebCLIResourceSockets {
                 boolean value = jsonObject.get("value").getAsBoolean();
                 cliCont.setContinueIfOneFails(value);
             }
+            
+            if(type.equals("clearCommandList")) {
+                cliCont.clearCommandList();
+            }
         }
         else {
             try {

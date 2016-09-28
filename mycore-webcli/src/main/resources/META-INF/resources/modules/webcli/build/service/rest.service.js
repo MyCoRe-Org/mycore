@@ -77,6 +77,12 @@ System.register(['@angular/core', '@angular/http', 'rxjs/Subject'], function(exp
                     };
                     this.sendMessage(JSON.stringify(message));
                 }
+                clearCommandList() {
+                    var message = {
+                        type: "clearCommandList"
+                    };
+                    this.sendMessage(JSON.stringify(message));
+                }
                 setContinueIfOneFails(con) {
                     var message = {
                         type: "continueIfOneFails",
