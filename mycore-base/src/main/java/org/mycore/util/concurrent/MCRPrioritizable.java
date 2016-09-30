@@ -5,11 +5,16 @@ package org.mycore.util.concurrent;
  * 
  * @author Matthias Eichner
  */
-public interface MCRPrioritizable<T> {
+public interface MCRPrioritizable extends Comparable<MCRPrioritizable> {
 
     /**
      * Returns the priority.
      */
-    public T getPriority();
+    public Integer getPriority();
+
+    @Override
+    default int compareTo(MCRPrioritizable o) {
+        return o.getPriority().compareTo(o.getPriority());
+    }
 
 }
