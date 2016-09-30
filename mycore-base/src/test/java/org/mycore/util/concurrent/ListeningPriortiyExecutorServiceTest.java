@@ -1,13 +1,16 @@
 package org.mycore.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -15,10 +18,15 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 public class ListeningPriortiyExecutorServiceTest {
 
+    private static Logger LOGGER = LogManager.getLogger(ListeningPriortiyExecutorServiceTest.class);
+
+    static int EXCPECTED[] = { 1, 4, 2, 3 };
+
     @Test
     public void priortiy() throws Exception {
-        MCRListeningPriorityExecutorService es = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-                new PriorityBlockingQueue<Runnable>()));
+        MCRListeningPriorityExecutorService es = new MCRListeningPriorityExecutorService(
+            new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
+
         UnimportantTask unimportantTask1 = new UnimportantTask(1);
         UnimportantTask unimportantTask2 = new UnimportantTask(2);
         UnimportantTask unimportantTask3 = new UnimportantTask(3);
@@ -34,12 +42,19 @@ public class ListeningPriortiyExecutorServiceTest {
         submit = es.submit(importantTask);
         Futures.addCallback(submit, callback);
         es.awaitTermination(1, TimeUnit.SECONDS);
+
+        assertEquals("all threads should be executed after termination", 4, TestCallback.COUNTER);
+        for (int i = 0; i < 4; i++) {
+            assertEquals(
+                "threads should be executed in order -> unimportantTask1, importantTask, unimportantTask2, unimportantTask3",
+                EXCPECTED[i], TestCallback.ORDER[i]);
+        }
     }
 
     private static class TestCallback implements FutureCallback<Integer> {
-        static int counter = 0;
+        static int COUNTER = 0;
 
-        static int excpected[] = { 1, 4, 2, 3 };
+        static int ORDER[] = { 0, 0, 0, 0 };
 
         @Override
         public void onFailure(Throwable t) {
@@ -48,8 +63,7 @@ public class ListeningPriortiyExecutorServiceTest {
 
         @Override
         public void onSuccess(Integer result) {
-            assertEquals("Threads should be executed in order -> unimportantTask1, importantTask, unimportantTask2, unimportantTask3",
-                    excpected[counter++], result.intValue());
+            ORDER[COUNTER++] = result.intValue();
         }
     }
 
@@ -62,7 +76,8 @@ public class ListeningPriortiyExecutorServiceTest {
 
         @Override
         public Integer call() throws Exception {
-            Thread.sleep(100);
+            LOGGER.info("Executing task " + id);
+            Thread.sleep(200);
             return id;
         }
 
@@ -81,7 +96,8 @@ public class ListeningPriortiyExecutorServiceTest {
 
         @Override
         public Integer call() throws Exception {
-            Thread.sleep(100);
+            LOGGER.info("Executing task " + id);
+            Thread.sleep(200);
             return id;
         }
 
