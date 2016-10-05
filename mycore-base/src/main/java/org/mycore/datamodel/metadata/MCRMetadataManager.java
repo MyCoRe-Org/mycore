@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +62,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.common.MCRMarkManager.Operation;
+import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
@@ -220,7 +222,7 @@ public final class MCRMetadataManager {
             LOGGER.debug("adding Derivate in data store");
             MCRMetadataManager.addOrUpdateDerivateToObject(objid, der);
         } catch (final Exception e) {
-            MCRMetadataManager.restore(mcrDerivate, objectBackup);
+            MCRMetadataManager.restore(mcrDerivate, objid, objectBackup);
             // throw final exception
             throw new MCRPersistenceException("Error while creatlink to MCRObject " + objid + ".", e);
         }
@@ -253,7 +255,7 @@ public final class MCRMetadataManager {
                         if (Files.exists(rootPath)) {
                             deleteDerivate(derId.toString());
                         }
-                        MCRMetadataManager.restore(mcrDerivate, objectBackup);
+                        MCRMetadataManager.restore(mcrDerivate, objid, objectBackup);
                         throw new MCRPersistenceException("Can't add derivate to the IFS", e);
                     }
                 } else {
@@ -956,17 +958,21 @@ public final class MCRMetadataManager {
         return false;
     }
 
-    private static void restore(final MCRDerivate mcrDerivate, final byte[] backup) {
-        // restore original instance of MCRObject
-        final MCRObject obj = new MCRObject();
+    private static void restore(final MCRDerivate mcrDerivate, final MCRObjectID mcrObjectId, final byte[] backup) {
         try {
-            obj.setFromXML(backup, false);
+            final MCRObject obj = new MCRObject(backup, false);
+            // If an event handler exception occurred, its crucial to restore the object first
+            // before updating it again. Otherwise the exception could be thrown again and
+            // the object will be in an invalid state (the not existing derivate will be
+            // linked with the object).
+            MCRXMLMetadataManager.instance().update(mcrObjectId, obj.createXML(), new Date());
+
+            // update and call event handlers
             MCRMetadataManager.update(obj);
         } catch (final Exception e1) {
-            LOGGER.warn("Error while restoring " + obj.getId(), e1);
+            LOGGER.warn("Error while restoring " + mcrObjectId, e1);
         } finally {
-            // delete from the XML table
-            // handle events
+            // remove derivate
             fireEvent(mcrDerivate, null, MCREvent.DELETE_EVENT);
         }
     }
