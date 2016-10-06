@@ -1,8 +1,9 @@
 package org.mycore.datamodel.common;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -32,58 +33,6 @@ public class MCRISO8601DateTest {
     }
 
     @Test
-    public void formatChooser() {
-        // test year
-        String duration = "-16";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.YEAR_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        duration = "2006";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.YEAR_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        // test year-month
-        duration = "2006-01";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.YEAR_MONTH_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        // test complete
-        duration = "2006-01-18";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        // test complete with hour and minutes
-        duration = "2006-01-18T11:08Z";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        duration = "2006-01-18T11:08+02:00";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        // test complete with hour, minutes and seconds
-        duration = "2006-01-18T11:08:20Z";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        duration = "2006-01-18T11:08:20+02:00";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        // test complete with hour, minutes, seconds and fractions of a second
-        duration = "2006-01-18T11:08:20.1Z";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        duration = "2006-01-18T11:08:20.12Z";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        duration = "2006-01-18T11:08:20.123Z";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        duration = "2006-01-18T11:08:20.1+02:00";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        duration = "2006-01-18T11:08:20.12+02:00";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-        duration = "2006-01-18T11:08:20.123+02:00";
-        assertEquals(duration + " test failed", getFormat(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT),
-            getFormat(MCRISO8601FormatChooser.getFormatter(duration, null)));
-    }
-
-    @Test
     public void getDate() {
         MCRISO8601Date ts = new MCRISO8601Date();
         assertNull("Date is not Null", ts.getDate());
@@ -101,28 +50,6 @@ public class MCRISO8601DateTest {
         assertEquals("Set format differs from get format", MCRISO8601Format.COMPLETE, ts.getIsoFormat());
     }
 
-    private String getFormat(DateTimeFormatter df) {
-        if (df == null || df == MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT
-            || df == MCRISO8601FormatChooser.UTC_COMPLETE_HH_MM_SS_SSS_FORMAT) {
-            return MCRISO8601Format.COMPLETE_HH_MM_SS_SSS.toString();
-        } else if (df == MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT
-            || df == MCRISO8601FormatChooser.UTC_COMPLETE_HH_MM_SS_FORMAT) {
-            return MCRISO8601Format.COMPLETE_HH_MM_SS.toString();
-        } else if (df == MCRISO8601FormatChooser.COMPLETE_HH_MM_FORMAT
-            || df == MCRISO8601FormatChooser.UTC_COMPLETE_HH_MM_FORMAT) {
-            return MCRISO8601Format.COMPLETE_HH_MM.toString();
-        } else if (df == MCRISO8601FormatChooser.COMPLETE_FORMAT || df == MCRISO8601FormatChooser.UTC_COMPLETE_FORMAT) {
-            return MCRISO8601Format.COMPLETE.toString();
-        } else if (df == MCRISO8601FormatChooser.YEAR_MONTH_FORMAT
-            || df == MCRISO8601FormatChooser.UTC_YEAR_MONTH_FORMAT) {
-            return MCRISO8601Format.YEAR_MONTH.toString();
-        } else if (df == MCRISO8601FormatChooser.YEAR_FORMAT || df == MCRISO8601FormatChooser.UTC_YEAR_FORMAT) {
-            return MCRISO8601Format.YEAR.toString();
-        } else {
-            return MCRISO8601Format.COMPLETE_HH_MM_SS_SSS.toString();
-        }
-    }
-
     @Test
     public void getISOString() {
         MCRISO8601Date ts = new MCRISO8601Date();
@@ -131,12 +58,12 @@ public class MCRISO8601DateTest {
         ts.setDate(dt);
         assertNotNull("Date is Null", ts.getISOString());
     }
-    
+
     @Test
-    public void testFormat(){
-        String year="2015";
-        String simpleFormat="yyyy";
-        String language="de";
+    public void testFormat() {
+        String year = "2015";
+        String simpleFormat = "yyyy";
+        String language = "de";
         //simulate MCRXMLFunctions.format();
         Locale locale = new Locale(language);
         MCRISO8601Date mcrdate = new MCRISO8601Date();
