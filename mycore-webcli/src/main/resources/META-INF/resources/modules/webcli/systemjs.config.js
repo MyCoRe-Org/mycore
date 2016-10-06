@@ -1,18 +1,21 @@
 (function(global) {
+  var paths = {
+    'npm:': 'node_modules/'
+  };
   // map tells the System loader where to look for things
   var map = {
     'app':                                'build',
-    '@angular/core':                      '//unpkg.com/@angular/core@2.0.0-rc.1/',
-    '@angular/common':                    '//unpkg.com/@angular/common@2.0.0-rc.1/',
-    '@angular/compiler':                  '//unpkg.com/@angular/compiler@2.0.0-rc.1/',
-    '@angular/http':                      '//unpkg.com/@angular/http@2.0.0-rc.1/',
-    '@angular/platform-browser':          '//unpkg.com/@angular/platform-browser@2.0.0-rc.1/',
-    '@angular/platform-browser-dynamic':  '//unpkg.com/@angular/platform-browser-dynamic@2.0.0-rc.1/',
-    '@angular/router':                    '//unpkg.com/@angular/router@2.0.0-rc.1/',
-    '@angular/router-deprecated':         '//unpkg.com/@angular/router-deprecated@2.0.0-rc.1/',
-    '@angular/upgrade':                   '//unpkg.com/@angular/upgrade@2.0.0-rc.1/',
-    'angular2-in-memory-web-api':         '//unpkg.com/angular2-in-memory-web-api@0.0.10/',
-    'rxjs':                               '//unpkg.com/rxjs@5.0.0-beta.6/'
+    '@angular/core':                      'npm:@angular/core',
+    '@angular/common':                    'npm:@angular/common',
+    '@angular/compiler':                  'npm:@angular/compiler',
+    '@angular/http':                      'npm:@angular/http',
+    '@angular/platform-browser':          'npm:@angular/platform-browser',
+    '@angular/platform-browser-dynamic':  'npm:@angular/platform-browser-dynamic',
+    '@angular/router':                    'npm:@angular/router',
+    '@angular/router-deprecated':         'npm:@angular/router-deprecated',
+    '@angular/upgrade':                   'npm:@angular/upgrade',
+    'angular2-in-memory-web-api':         'npm:angular2-in-memory-web-api',
+    'rxjs':                               'npm:rxjs'
   };
   // packages tells the System loader how to load when no filename and/or no extension
   var packages = {
@@ -36,6 +39,7 @@
     packages['@angular/'+pkgName] = { main: pkgName + '.umd.js', defaultExtension: 'js' };
   });
   var config = {
+    paths: paths,
     map: map,
     packages: packages
   }
