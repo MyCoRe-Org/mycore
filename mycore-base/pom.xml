@@ -98,7 +98,6 @@
         </executions>
         <configuration>
           <doCheck>false</doCheck>
-          <doUpdate>true</doUpdate>
           <revisionOnScmFailure>0</revisionOnScmFailure>
         </configuration>
       </plugin>
