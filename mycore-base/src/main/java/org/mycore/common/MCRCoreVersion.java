@@ -41,9 +41,9 @@ public class MCRCoreVersion {
 
     public static final String VERSION = prop.getProperty("mycore.version");
 
-    public static final int REVISION = getRevisionFromProperty();
+    public static final String REVISION = getRevisionFromProperty();
 
-    public static final String COMPLETE = VERSION + " r" + REVISION;
+    public static final String COMPLETE = VERSION + " commit " + REVISION;
 
     public static String getVersion() {
         return VERSION;
@@ -65,7 +65,7 @@ public class MCRCoreVersion {
         return props;
     }
 
-    public static int getRevision() {
+    public static String getRevision() {
         return REVISION;
     }
 
@@ -78,13 +78,7 @@ public class MCRCoreVersion {
         System.out.printf(Locale.ROOT, "Config directory: %s%n", MCRConfigurationDir.getConfigurationDirectory());
     }
 
-    private static int getRevisionFromProperty() {
-        try {
-            return Integer.parseInt(prop.getProperty("revision.number"));
-        } catch (NumberFormatException e) {
-            Logger.getLogger(MCRCoreVersion.class).error(
-                "Error parsing revisionnumber: " + prop.getProperty("revision.number"));
-            return -1;
-        }
+    private static String getRevisionFromProperty() {
+        return prop.getProperty("revision.number");
     }
 }

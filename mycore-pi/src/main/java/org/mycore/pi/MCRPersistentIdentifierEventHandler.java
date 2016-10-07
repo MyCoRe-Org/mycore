@@ -32,7 +32,8 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
         obj.getService().getFlags(MCRPIRegistrationService.PI_FLAG).stream().map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
                 .filter(entry -> !MCRPersistentIdentifierManager.getInstance().exist(entry))
                 .forEach(entry -> {
-                    entry.setMcrRevision(MCRCoreVersion.getRevision());
+                    //TODO: disabled for MCR-1393
+//                    entry.setMcrRevision(MCRCoreVersion.getRevision());
                     entry.setMcrVersion(MCRCoreVersion.getVersion());
                     entry.setMycoreID(obj.getId().toString());
                     LOGGER.info("Add PI : " + entry.getIdentifier() + " with service " + entry.getService() + " to database!");
