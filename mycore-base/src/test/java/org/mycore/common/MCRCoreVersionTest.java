@@ -46,8 +46,8 @@ public class MCRCoreVersionTest extends MCRTestCase {
      */
     @Test
     public void getRevision() {
-        assertTrue("Revision is not a natural number: " + MCRCoreVersion.getRevision(),
-            MCRCoreVersion.getRevision() > 0);
+        assertTrue("Revision is not a SHA1 hash: " + MCRCoreVersion.getRevision(),
+           MCRCoreVersion.getRevision().matches("[a-fA-F0-9]{40}"));
     }
 
 }
