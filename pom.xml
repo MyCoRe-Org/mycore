@@ -70,9 +70,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/branches/mycore-2016.06.0.x</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/branches/mycore-2016.06.0.x</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/branches/mycore-2016.06.0.x</url>
+    <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
+    <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycorei.git</developerConnection>
+    <url>https://github.com/MyCoRe-Org/mycore/tree/mycore-2016.06.0.x</url>
   </scm>
   <profiles>
     <profile>
