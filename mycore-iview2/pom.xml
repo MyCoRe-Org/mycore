@@ -37,10 +37,6 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
       <version>${project.version}</version>
@@ -54,6 +50,12 @@
           <artifactId>commons-fileupload</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-iiif</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.mycore.iview2</groupId>

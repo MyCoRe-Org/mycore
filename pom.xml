@@ -775,7 +775,7 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.10</version>
+        <version>1.11-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>log4j</groupId>
@@ -1705,6 +1705,7 @@
     <module>mycore-classeditor</module>
     <module>mycore-indexing</module>
     <module>mycore-ifs</module>
+    <module>mycore-iiif</module>
     <module>mycore-impex</module>
     <module>mycore-iview2</module>
     <module>mycore-media</module>
