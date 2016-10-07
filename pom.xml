@@ -72,9 +72,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
+    <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
+    <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycorei.git</developerConnection>
+    <url>https://github.com/MyCoRe-Org/mycore</url>
   </scm>
   <profiles>
     <profile>
