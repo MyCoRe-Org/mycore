@@ -47,7 +47,8 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     @Column(nullable = false)
     private String mcrVersion;
 
-    @Column(nullable = false)
+    //TODO: nullable since MCR-1393
+    @Column
     private int mcrRevision;
 
     private MCRPI() {
@@ -65,7 +66,8 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
         this.additional = additional;
         this.service = service;
         this.registered = registered;
-        this.mcrRevision = MCRCoreVersion.getRevision();
+        //TODO: disabled by MCR-1393
+//        this.mcrRevision = MCRCoreVersion.getRevision();
         this.mcrVersion = MCRCoreVersion.getVersion();
         this.created = new Date();
     }
