@@ -17,7 +17,6 @@ hs_err_pid*
 # IntelliJ
 /out/
 # mycore addition
-*/*.iml
 *.iml
 
 # mpeltonen/sbt-idea plugin
