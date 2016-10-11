@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
-import org.jdom2.DataConversionException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -219,7 +218,7 @@ public class MCRMetsSave {
         return mets;
     }
 
-    private static void updateOnImageFile(Document mets, String fileId, String path) throws DataConversionException {
+    private static void updateOnImageFile(Document mets, String fileId, String path) {
         LOGGER.debug("FILE is a image!");
         //check if custom files are present and save the ids
         List<String> matches = new ArrayList<>();
@@ -231,9 +230,7 @@ public class MCRMetsSave {
             }
         }
 
-
         // add to structMap physical
-        int newOrder = getNewOrder(mets);
         PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE);
         div.add(new Fptr(fileId));
 
@@ -270,21 +267,6 @@ public class MCRMetsSave {
         } else {
             LOGGER.warn("no physical page found for file " + matchId);
         }
-    }
-
-    /**
-     * gets a new order for a page in a mets file
-     *
-     * @param mets
-     * @return
-     * @throws DataConversionException
-     */
-    private static int getNewOrder(Document mets) throws DataConversionException {
-        XPathExpression<Attribute> attributeXpath = XPathFactory.instance().compile(
-                "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER",
-                Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
-        Attribute orderAttribute = attributeXpath.evaluateFirst(mets);
-        return orderAttribute.getIntValue() + 1;
     }
 
     private static Element getPhysicalFile(Document mets, String matchId) {
