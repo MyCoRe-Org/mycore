@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 
 import org.apache.log4j.Logger;
@@ -232,6 +233,8 @@ public class MCRJobMaster implements Runnable, Closeable {
                                 LOGGER.error("Job thread was interrupted.", e);
                             }
                         }
+                    } catch (PersistenceException pe) {
+                        LOGGER.warn("Catch PersistenceException and ignore.", pe);
                     } finally {
                         runLock.unlock();
                     }
