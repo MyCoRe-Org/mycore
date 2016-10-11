@@ -57,6 +57,7 @@ import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -513,7 +514,7 @@ public class MCRSession implements Cloneable {
      * @param task thread witch will be executed after an commit
      */
     public void onCommit(Runnable task) {
-        this.onCommitTasks.get().add(task);
+        this.onCommitTasks.get().add(new MCRTransactionableRunnable(task));
     }
 
     protected synchronized void submitOnCommitTasks() {
