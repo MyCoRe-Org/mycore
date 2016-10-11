@@ -8,7 +8,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 /**
- * Decorates a {@link Runnable} with the mycore session and database transaction handling.
+ * Decorates a {@link Runnable} with a mycore session and a database transaction.
  * 
  * @author Matthias Eichner
  */
@@ -18,14 +18,29 @@ public class MCRTransactionableRunnable implements Runnable {
 
     private Runnable decorator;
 
+    private MCRSession session;
+
     public MCRTransactionableRunnable(Runnable decorator) {
+        this(decorator, null);
+    }
+
+    /**
+     * Creates a new {@link MCRTransactionableRunnable} using the given {@link MCRSession}.
+     * 
+     * @param decorator the runnable to run
+     * @param session the session to use
+     */
+    public MCRTransactionableRunnable(Runnable decorator, MCRSession session) {
         this.decorator = decorator;
+        this.session = session;
     }
 
     @Override
     public void run() {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        MCRSessionMgr.setCurrentSession(session);
+        if(this.session == null) {
+            this.session = MCRSessionMgr.getCurrentSession();
+        }
+        MCRSessionMgr.setCurrentSession(this.session);
         Transaction transaction = MCRHIBConnection.instance().getSession().beginTransaction();
         try {
             this.decorator.run();

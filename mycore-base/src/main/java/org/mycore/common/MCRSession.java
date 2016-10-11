@@ -514,7 +514,7 @@ public class MCRSession implements Cloneable {
      * @param task thread witch will be executed after an commit
      */
     public void onCommit(Runnable task) {
-        this.onCommitTasks.get().add(new MCRTransactionableRunnable(task));
+        this.onCommitTasks.get().add(new MCRTransactionableRunnable(task, MCRSessionMgr.getCurrentSession()));
     }
 
     protected synchronized void submitOnCommitTasks() {
