@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -93,6 +95,7 @@ public class MCRTopologicalSort {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         for (int i = 0; i < files.length; i++) {
             file = files[i];
+
             try (FileInputStream fis = new FileInputStream(new File(dir, file))) {
                 XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(fis);
                 while (xmlStreamReader.hasNext()) {
@@ -120,12 +123,45 @@ public class MCRTopologicalSort {
             } catch (XMLStreamException | IOException e) {
                 e.printStackTrace();
             }
+        }
 
-            //build edges
-            for (int source : parentNames.keySet()) {
-                Integer target = nodes.inverse().get(parentNames.get(source));
+        //build edges
+        for (int source : parentNames.keySet()) {
+            Integer target = nodes.inverse().get(parentNames.get(source));
+            if (target != null) {
+                addEdge(source, target);
+            }
+        }
+
+        dirty = false;
+    }
+
+    /**
+     * reads MCRObjectIDs, retrieves parent links from MCRLinkTableManager
+     * and creates the graph
+     * 
+     * uses StAX cursor API (higher performance)
+     */
+    public void prepareMCRObjects(String[] mcrids) {
+        nodes = HashBiMap.create(mcrids.length);
+        edgeSources.clear();
+
+        for (int i = 0; i < mcrids.length; i++) {
+            nodes.forcePut(i, mcrids[i]);
+        }
+        for (int i = 0; i < mcrids.length; i++) {
+            Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(mcrids[i], "parent");
+            for (String p : parents) {
+                Integer target = nodes.inverse().get(p);
                 if (target != null) {
-                    addEdge(source, target);
+                    addEdge(i, target);
+                }
+            }
+            Collection<String> refs = MCRLinkTableManager.instance().getDestinationOf(mcrids[i], "reference");
+            for (String r : refs) {
+                Integer target = nodes.inverse().get(r);
+                if (target != null) {
+                    addEdge(i, target);
                 }
             }
         }
@@ -210,8 +246,8 @@ public class MCRTopologicalSort {
      */
     public int[] doTopoSort() {
         if (dirty) {
-            LOGGER
-                .error("The data of this instance is inconsistent. Please call prepareData() again or start with a new instance!");
+            LOGGER.error(
+                "The data of this instance is inconsistent. Please call prepareData() again or start with a new instance!");
             return null;
         }
         dirty = true;

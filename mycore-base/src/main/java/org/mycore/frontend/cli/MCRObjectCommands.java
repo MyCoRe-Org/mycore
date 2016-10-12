@@ -132,6 +132,35 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         return cmds;
     }
+    
+    /**
+     * Delete all MCRObjects from the datastore in topological order
+     *
+     */
+    @MCRCommand(
+        syntax = "delete all objects in topological order", help = "Removes all MCRObjects in topological order.", order = 25)
+    public static List<String> deleteTopologicalAllObjects() throws MCRActiveLinkException {
+        final List<String> objectIds = MCRXMLMetadataManager.instance().listIDs();
+        List<String> validObjectIds = new ArrayList<>();
+        for(String id: objectIds){
+            if(!id.contains("_derivate_")){
+                validObjectIds.add(id);
+            }
+        }
+        String[] objects = validObjectIds.toArray(new String[validObjectIds.size()]);
+        MCRTopologicalSort ts = new MCRTopologicalSort();
+        ts.prepareMCRObjects(objects);
+        int[] order = ts.doTopoSort();
+        
+        List<String> cmds = new ArrayList<String>(objectIds.size());
+        if (order != null) {
+            //delete in reverse order
+            for (int o = order.length-1; o>=0; o--) {
+                cmds.add("delete object " + ts.getNodeName(order[o]));
+            }
+        }
+        return cmds;
+    }
 
     /**
      * Delete a MCRObject from the datastore.

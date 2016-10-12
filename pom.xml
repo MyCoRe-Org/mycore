@@ -669,6 +669,12 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalparam>${javadoc.doclint.none}</additionalparam>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencyManagement>
