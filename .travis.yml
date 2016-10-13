@@ -1,6 +1,9 @@
 language: java
 sudo: true
 dist: trusty
+cache:
+  directories:
+    - $HOME/.m2
 env:
   global:
     - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
