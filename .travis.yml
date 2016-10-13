@@ -4,7 +4,8 @@ dist: trusty
 env:
   global:
     - TMPDIR=~/tmp
-    - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -Djava.io.tmpdir=$TMPDIR"
+    - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
+    - _JAVA_OPTIONS=-Djava.io.tmpdir=$TMPDIR
 install:
   - sudo apt-get update -qq
 before_script:
