@@ -33,6 +33,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.mycore.frontend.jersey.access.MCRRequireLogin;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
@@ -100,5 +101,11 @@ public class MCREchoResource {
             }
         }
         return jRequest.toString();
+    }
+
+    @GET
+    @Path("ping")
+    public Response ping() {
+        return Response.ok("pong").build();
     }
 }
