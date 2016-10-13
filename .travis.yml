@@ -6,6 +6,8 @@ env:
     - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
 install:
   - sudo apt-get update -qq
+script:
+  - mvn -B clean install
 after_success:
   - mvn -B javadoc:javadoc
 
