@@ -60,10 +60,4 @@ public class MCRWebCLIResource {
             .getResourceAsStream("/META-INF/resources/modules/webcli/" + filename))
             .build();
     }
-    
-    @GET
-    @Path("ping")
-    public Response ping() {
-        return Response.ok().build();
-    }
 }
