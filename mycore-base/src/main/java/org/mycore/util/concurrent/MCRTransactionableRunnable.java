@@ -1,9 +1,9 @@
 package org.mycore.util.concurrent;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Transaction;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -14,52 +14,42 @@ import org.mycore.common.MCRSessionMgr;
  */
 public class MCRTransactionableRunnable implements Runnable {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCRTransactionableRunnable.class);
+    protected final static Logger LOGGER = LogManager.getLogger();
 
     private Runnable decorator;
 
     private MCRSession session;
 
-    public MCRTransactionableRunnable(Runnable decorator) {
-        this(decorator, null);
-    }
-
     /**
      * Creates a new {@link MCRTransactionableRunnable} using the given {@link MCRSession}.
+     * Decorator and session must not be null.
      * 
      * @param decorator the runnable to run
      * @param session the session to use
      */
     public MCRTransactionableRunnable(Runnable decorator, MCRSession session) {
-        this.decorator = decorator;
-        this.session = session;
+        this.decorator = Objects.requireNonNull(decorator, "decorator must not be null");
+        this.session = Objects.requireNonNull(session, "session must not be null");
     }
 
     @Override
     public void run() {
-        if(this.session == null) {
-            this.session = MCRSessionMgr.getCurrentSession();
-        }
         MCRSessionMgr.setCurrentSession(this.session);
-        Transaction transaction = MCRHIBConnection.instance().getSession().beginTransaction();
+        session.beginTransaction();
         try {
             this.decorator.run();
         } finally {
             try {
-                transaction.commit();
+                session.commitTransaction();
             } catch (Exception commitExc) {
                 LOGGER.error("Error while commiting transaction.", commitExc);
                 try {
-                    transaction.rollback();
+                    session.rollbackTransaction();
                 } catch (Exception rollbackExc) {
                     LOGGER.error("Error while rollbacking transaction.", commitExc);
                 }
-            }
-            try {
+            } finally {
                 MCRSessionMgr.releaseCurrentSession();
-                session.close();
-            } catch (Exception exc) {
-                LOGGER.error("Unable to release session: " + session.getID());
             }
         }
     }
