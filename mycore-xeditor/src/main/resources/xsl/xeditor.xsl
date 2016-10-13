@@ -239,7 +239,7 @@
     <xsl:variable name="xed_repeat" select="." />
 
     <xsl:for-each select="xalan:tokenize(transformer:repeat($transformer,@xpath,@min,@max,@method))">
-      <a name="rep-{transformer:nextAnchorID($transformer)}" />
+      <a id="rep-{transformer:nextAnchorID($transformer)}" />
       <xsl:value-of select="transformer:bindRepeatPosition($transformer)" />
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
       <xsl:value-of select="transformer:unbind($transformer)" />
