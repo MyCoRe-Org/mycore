@@ -4,10 +4,11 @@ dist: trusty
 env:
   global:
     - TMPDIR=~/tmp
-    - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
+    - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -Djava.io.tmpdir=$TMPDIR"
 install:
   - sudo apt-get update -qq
-script:
+before_script:
   - mkdir -p $TMPDIR
-  - mvn -B -Djava.io.tmpdir=$TMPDIR clean install && mvn -B -Djava.io.tmpdir=$TMPDIR javadoc:javadoc
+after_success:
+  - mvn -B javadoc:javadoc
 
