@@ -87,6 +87,8 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     protected Map<String, String> getTestProperties() {
         HashMap<String, String> configuration = new HashMap<>();
 
+        configuration.put("MCR.Metadata.Store.BaseDir", "/tmp");
+        configuration.put("MCR.Metadata.Store.SVNBase", "/tmp/versions");
         configuration.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         configuration.put("MCR.Metadata.Type.mock", "true");
 

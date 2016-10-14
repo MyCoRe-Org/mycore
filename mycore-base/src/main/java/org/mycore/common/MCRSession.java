@@ -502,8 +502,16 @@ public class MCRSession implements Cloneable {
     /**
      * @param userSystemAdapter
      *            the userInformation to set
+     * @throws IllegalArgumentException if transition to new user information is forbidden (privilege escalation)
      */
     public void setUserInformation(MCRUserInformation userSystemAdapter) {
+        //check for MCR-1400
+        if (!isTransitionAllowed(userSystemAdapter)) {
+            throw new IllegalArgumentException("User transition from "
+                + getUserInformation().getUserID()
+                + " to " + userSystemAdapter.getUserID()
+                + " is not permitted within the same session.");
+        }
         this.userInformation = userSystemAdapter;
         setLoginTime();
     }
@@ -522,6 +530,17 @@ public class MCRSession implements Cloneable {
             COMMIT_SERVICE.submit(task);
         });
         this.onCommitTasks.get().clear();
+    }
+
+    private boolean isTransitionAllowed(MCRUserInformation userSystemAdapter) {
+        //allow if current user super user or not logged in
+        if (MCRSystemUserInformation.getSuperUserInstance().equals(userInformation)
+            || MCRSystemUserInformation.getGuestInstance().equals(userInformation))
+            return true;
+        //allow if new user information has default rights of guest user
+        //or userID equals old userID
+        return MCRSystemUserInformation.getGuestInstance().equals(userSystemAdapter)
+            || userInformation.getUserID().equals(userSystemAdapter.getUserID());
     }
 
 }
