@@ -396,6 +396,14 @@ public class MCRSession implements Cloneable {
             transaction.set(entityTransaction);
         }
     }
+    
+    /**
+     * Determine whether the current resource transaction has been marked for rollback.
+     * @return boolean indicating whether the transaction has been marked for rollback
+     */
+    public boolean transactionRequiresRollback() {
+        return isTransactionActive() && transaction.get().getRollbackOnly();
+    }
 
     /**
      * commits the database transaction. Commit is only done if {@link #isTransactionActive()} returns true.

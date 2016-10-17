@@ -1,5 +1,6 @@
 package org.mycore.frontend.jersey.filter;
 
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -12,7 +13,12 @@ class MCRDBTransactionFilter implements ResourceFilter, ContainerRequestFilter, 
 
     @Override
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        MCRSessionMgr.getCurrentSession().commitTransaction();
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        if(session.transactionRequiresRollback()) {
+            session.rollbackTransaction();
+        } else {
+            session.commitTransaction();
+        }
         return response;
     }
 
