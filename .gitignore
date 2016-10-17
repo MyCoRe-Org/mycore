@@ -1,3 +1,7 @@
+#ignore when switching from trunk
+/mycore-impex/
+/mycore-viewer/
+
 .class
 
 # Mobile Tools for Java (J2ME)
