@@ -80,7 +80,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 @NamedQueries({
     @NamedQuery(name = "MCRCategory.updateLeft", query = "UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.id.rootID= :classID AND cat.left >= :left"),
     @NamedQuery(name = "MCRCategory.updateRight", query = "UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.id.rootID= :classID AND cat.right >= :left"),
-    @NamedQuery(name = "MCRCateogry.commonAncestor", query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:rootID AND cat.left < :left AND cat.right > :right ORDER BY cat.left DESC"),
+    @NamedQuery(name = "MCRCategory.commonAncestor", query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:rootID AND cat.left < :left AND cat.right > :right ORDER BY cat.left DESC"),
     @NamedQuery(name = "MCRCategory.byNaturalId", query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL)"),
     @NamedQuery(name = "MCRCategory.byLabelInClass", query = "FROM MCRCategoryImpl as cat "
         + "INNER JOIN cat.labels as label "

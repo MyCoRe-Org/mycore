@@ -465,6 +465,35 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertLeftRightVal(child2ID, 3, 4);
     }
 
+    @Test
+    public void moveCategoryDeep() {
+        String rootIDStr = "rootID";
+        MCRCategoryID rootID = MCRCategoryID.rootID(rootIDStr);
+        MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
+        MCRCategoryID child2ID = new MCRCategoryID(rootIDStr, "child2");
+        MCRCategoryID child3ID = new MCRCategoryID(rootIDStr, "child3");
+        MCRCategoryID child4ID = new MCRCategoryID(rootIDStr, "child4");
+
+        MCRCategoryImpl root = newCategory(rootID, "root node");
+        MCRCategoryImpl a = newCategory(child1ID, "child node 1");
+        MCRCategoryImpl aa = newCategory(child2ID, "child node 2");
+        MCRCategoryImpl aaa = newCategory(child3ID, "child node 3");
+        MCRCategoryImpl aab = newCategory(child4ID, "child node 4");
+        
+        addChild(root, a);
+        addChild(a, aa);
+        addChild(aa, aaa);
+        addChild(aa, aab);
+
+        startNewTransaction();
+        DAO.addCategory(null, root);
+        endTransaction();
+
+        startNewTransaction();
+        DAO.moveCategory(child4ID, child3ID);
+        endTransaction();
+    }
+
     private void assertLeftRightVal(MCRCategoryID categID, int expectedLeftVal, int expectedRightVal) {
         startNewTransaction();
         MCRCategoryImpl retrievedRoot = (MCRCategoryImpl) DAO.getCategory(categID, 0);

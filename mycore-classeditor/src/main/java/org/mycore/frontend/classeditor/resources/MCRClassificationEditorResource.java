@@ -46,7 +46,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -207,43 +206,7 @@ public class MCRClassificationEditorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteCateg(String json) {
         MCRJSONCategory category = parseJson(json);
-        return sessionized(new DeleteOp(category)).getResponse();
-    }
-
-    private <T extends OperationInSession> T sessionized(T op) {
-        // we don't use getSingleInstanceOf(name, default) to keep DefaultSessionWrapper private
-        //        MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().<MCRSessionWrapper>getSingleInstanceOf("MCR.Session.Wrapper.Class");
-        MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().getInstanceOf("MCR.Session.Wrapper.Class",
-            new DefaultSessionWrapper());
-        return sessionWrapper.wrap(op);
-    }
-
-    interface MCRSessionWrapper {
-        public <T extends OperationInSession> T wrap(T op);
-    }
-
-    private class DefaultSessionWrapper implements MCRSessionWrapper {
-        @Override
-        public <T extends OperationInSession> T wrap(T op) {
-            if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
-                MCRSessionMgr.getCurrentSession().beginTransaction();
-            }
-            try {
-                op.run();
-            } catch (WebApplicationException webExc) {
-                LOGGER.warn("Classification error.", webExc);
-                MCRSessionMgr.getCurrentSession().rollbackTransaction();
-                throw webExc;
-            } catch (Exception e) {
-                LOGGER.error("Classification error.", e);
-                MCRSessionMgr.getCurrentSession().rollbackTransaction();
-                throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
-            } finally {
-                MCRSessionMgr.getCurrentSession().commitTransaction();
-            }
-            return op;
-        }
-
+        return new DeleteOp(category).getResponse();
     }
 
     interface OperationInSession {
@@ -341,7 +304,7 @@ public class MCRClassificationEditorResource {
                 SaveElement categ = getCateg(jsonObject);
                 MCRJSONCategory parsedCateg = parseJson(categ.getJson());
                 if ("update".equals(status)) {
-                    sessionized(new UpdateOp(parsedCateg, jsonObject));
+                    new UpdateOp(parsedCateg, jsonObject);
                 } else if ("delete".equals(status)) {
                     deleteCateg(categ.getJson());
                 } else {
