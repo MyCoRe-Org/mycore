@@ -12,6 +12,7 @@
 hs_err_pid*
 
 ##IntelliJ https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
+*.iml
 .idea/
 *.iws
 # IntelliJ
