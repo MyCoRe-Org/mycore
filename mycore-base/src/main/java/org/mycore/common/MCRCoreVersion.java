@@ -29,7 +29,6 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfigurationDir;
 
 /**
@@ -41,9 +40,11 @@ public class MCRCoreVersion {
 
     public static final String VERSION = prop.getProperty("mycore.version");
 
+    public static final String BRANCH = prop.getProperty("git.branch");
+
     public static final String REVISION = getRevisionFromProperty();
 
-    public static final String COMPLETE = VERSION + " commit " + REVISION;
+    public static final String COMPLETE = VERSION + " " + BRANCH + ":" + REVISION;
 
     public static String getVersion() {
         return VERSION;
@@ -64,6 +65,10 @@ public class MCRCoreVersion {
         }
         return props;
     }
+    
+    public static String getBranch() {
+        return BRANCH;
+    }
 
     public static String getRevision() {
         return REVISION;
@@ -74,7 +79,7 @@ public class MCRCoreVersion {
     }
 
     public static void main(String arg[]) {
-        System.out.printf(Locale.ROOT, "MyCoRe\tver: %s\tcommit: %s%n", VERSION, REVISION);
+        System.out.printf(Locale.ROOT, "MyCoRe\tver: %s\tbranch: %s\tcommit: %s%n", VERSION, BRANCH, REVISION);
         System.out.printf(Locale.ROOT, "Config directory: %s%n", MCRConfigurationDir.getConfigurationDirectory());
     }
 
