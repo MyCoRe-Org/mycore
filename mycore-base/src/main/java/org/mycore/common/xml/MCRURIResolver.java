@@ -26,6 +26,8 @@ package org.mycore.common.xml;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -197,6 +199,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("localclass", new MCRLocalClassResolver());
         supportedSchemes.put("classification", new MCRClassificationResolver());
         supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
+        supportedSchemes.put("catchEx", new MCRExceptionAsXMLResolver());
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
         supportedSchemes.put("xslTransform", new MCRLayoutTransformerResolver());
@@ -397,7 +400,7 @@ public final class MCRURIResolver implements URIResolver {
          */
         public Map<String, URIResolver> getURIResolverMapping();
     }
-    
+
     public static interface MCRCacheableURIResolver extends URIResolver{
         public MCRCacheableURIResponse getResponse(String href, String base) throws TransformerException;
 
@@ -405,9 +408,9 @@ public final class MCRURIResolver implements URIResolver {
         default Source resolve(String href, String base) throws TransformerException {
             return getResponse(href, base).getSource();
         }
-         
+
     }
-    
+
     public static class MCRCacheableURIResponse{
         private Source source;
         private Supplier<Integer> hash;
@@ -452,7 +455,7 @@ public final class MCRURIResolver implements URIResolver {
         }
 
     }
-    
+
     private static class MCRFileResolver implements URIResolver {
 
         @Override
@@ -471,7 +474,7 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
     }
-    
+
     private static class MCRRESTResolver implements MCRCacheableURIResolver {
 
         private static final long MAX_OBJECT_SIZE = MCRConfiguration.instance()
@@ -552,7 +555,7 @@ public final class MCRURIResolver implements URIResolver {
                 lastModified = Optional.ofNullable(response.getLastHeader("last-modified"))
                     .map(Header::getValue)
                     .orElse(null);
-              
+
                 try {
                     InputStream content = response.getEntity().getContent();
                     responseStream =  new FilterInputStream(content) {
@@ -1064,6 +1067,37 @@ public final class MCRURIResolver implements URIResolver {
 
     }
 
+    private static class MCRExceptionAsXMLResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String target = href.substring(href.indexOf(":") + 1);
+
+            try {
+                return MCRURIResolver.instance().resolve(target, base);
+            } catch (Exception ex) {
+                LOGGER.debug("Caught " + ex.getClass().getName() + ". Put it into XML to process in XSL!");
+                Element exception = new Element("exception");
+                Element message = new Element("message");
+                Element stacktraceElement = new Element("stacktrace");
+
+                exception.addContent(message);
+                exception.addContent(stacktraceElement);
+
+                message.setText(ex.getMessage());
+
+                try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+                    ex.printStackTrace(pw);
+                    stacktraceElement.setText(pw.toString());
+                } catch (IOException e) {
+                    throw new MCRException("Error while writing Exception to String!", e);
+                }
+
+                return new JDOMSource(exception);
+            }
+        }
+    }
+
     /**
      * Ensures that the return of the given uri is never null. When the return is null, or the uri throws an exception,
      * this resolver will return an empty XML element instead. Usage: notnull:<anyMyCoReURI>
@@ -1525,7 +1559,7 @@ public final class MCRURIResolver implements URIResolver {
 
     /**
      * Resolves an data url and returns the content.
-     * 
+     *
      * @see MCRDataURL
      */
     private static class MCRDataURLResolver implements URIResolver {
