@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 
 import org.apache.log4j.Logger;
@@ -244,6 +245,13 @@ public class MCRJobMaster implements Runnable, Closeable {
                         } catch (InterruptedException e) {
                             LOGGER.error("Job thread was interrupted.", e);
                         }
+                } catch (PersistenceException e) {
+                    LOGGER.warn("We have an database error, sleep and run later.", e);
+                    try {
+                        Thread.sleep(60000);
+                    } catch (InterruptedException ie) {
+                        LOGGER.error("Waiting for database was interrupted.", ie);
+                    }
                 } catch (Throwable e) {
                     LOGGER.error("Keep running while catching exceptions.", e);
                 }
