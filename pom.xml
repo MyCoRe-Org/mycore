@@ -300,7 +300,7 @@
       </reporting>
     </profile>
     <profile>
-      <id>hudson</id>
+      <id>bamboo</id>
       <build>
         <plugins>
           <plugin>
@@ -315,9 +315,10 @@
                 <manifestEntries>
                   <Specification-Title>${project.name}</Specification-Title>
                   <Specification-Version>${project.version}</Specification-Version>
-                  <Implementation-Version>${BUILD_TAG}</Implementation-Version>
-                  <Implementation-Build>${BUILD_NUMBER}</Implementation-Build>
-                  <Implementation-Revision>${SVN_REVISION}</Implementation-Revision>
+                  <Implementation-Version>${bambooPlanRepositoryBranchName}</Implementation-Version>
+                  <Implementation-Build>${bambooBuildNumber}</Implementation-Build>
+                  <Implementation-Revision>${bambooPlanRepositoryRevision}</Implementation-Revision>
+                  <Git-Repository>${bambooPlanRepositoryRepositoryUrl}</Git-Repository>
                   <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
                   <Priority>${manifest.priority}</Priority>
                 </manifestEntries>
