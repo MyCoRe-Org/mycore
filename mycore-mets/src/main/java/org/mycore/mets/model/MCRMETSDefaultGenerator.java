@@ -58,6 +58,7 @@ import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
 import org.mycore.mets.tools.MCRMetsSave;
+import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -91,6 +92,9 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         createMets(dir, ignoreNodes, mets);
 
         MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(dir.getOwner()));
+        mets.getLogicalStructMap().getDivContainer().setLabel(
+                MCRTranslation.translate(" MCR.Mets.LogicalStructMap.Default.Label", owner.getId().toString()));
+
         Map<String, String> urnFileMap = owner.getUrnMap();
         if (urnFileMap.size() > 0) {
             try {
