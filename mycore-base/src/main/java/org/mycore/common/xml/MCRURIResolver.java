@@ -23,39 +23,6 @@
 
 package org.mycore.common.xml;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.function.Supplier;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.ServletContext;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.URIResolver;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
-
 import org.apache.http.Header;
 import org.apache.http.client.cache.HttpCacheContext;
 import org.apache.http.client.config.RequestConfig;
@@ -74,12 +41,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRCoreVersion;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUsageException;
+import org.mycore.common.*;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRByteContent;
@@ -102,11 +64,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRFileMetadata;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectDerivate;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.*;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.tools.MCRObjectFactory;
@@ -114,6 +72,27 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import javax.servlet.ServletContext;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Reads XML documents from various URI types. This resolver is used to read DTDs, XML Schema files, XSL document()
@@ -197,6 +176,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("localclass", new MCRLocalClassResolver());
         supportedSchemes.put("classification", new MCRClassificationResolver());
         supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
+        supportedSchemes.put("catchEx", new MCRExceptionAsXMLResolver());
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
         supportedSchemes.put("xslTransform", new MCRLayoutTransformerResolver());
@@ -1062,6 +1042,38 @@ public final class MCRURIResolver implements URIResolver {
             return Math.max(xmlLastModified, classLastModified);
         }
 
+    }
+
+
+    private static class MCRExceptionAsXMLResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String target = href.substring(href.indexOf(":") + 1);
+
+            try {
+                return MCRURIResolver.instance().resolve(target, base);
+            } catch (Exception ex) {
+                LOGGER.debug("Caught " + ex.getClass().getName() + ". Put it into XML to process in XSL!");
+                Element exception = new Element("exception");
+                Element message = new Element("message");
+                Element stacktraceElement = new Element("stacktrace");
+
+                exception.addContent(message);
+                exception.addContent(stacktraceElement);
+
+                message.setText(ex.getMessage());
+
+                try( StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+                    ex.printStackTrace(pw);
+                    stacktraceElement.setText(pw.toString());
+                } catch (IOException e) {
+                    throw new MCRException("Error while writing Exception to String!",e);
+                }
+
+                return new JDOMSource(exception);
+            }
+        }
     }
 
     /**
