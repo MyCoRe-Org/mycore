@@ -703,12 +703,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         FlushModeType fm = entityManager.getFlushMode();
         entityManager.setFlushMode(FlushModeType.COMMIT);
         try {
-            return task.apply(entityManager);
-        } finally {
+            T result = task.apply(entityManager);
             entityManager.setFlushMode(fm);
             if (flushAtEnd) {
                 entityManager.flush();
             }
+            return result;
+        } catch (RuntimeException e) {
+            entityManager.setFlushMode(fm);
+            throw e;
         }
     }
 

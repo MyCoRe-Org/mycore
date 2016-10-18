@@ -23,8 +23,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRJSONManager;
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -38,8 +36,6 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 import org.mycore.frontend.classeditor.mocks.CategoryLinkServiceMock;
 import org.mycore.frontend.classeditor.mocks.LinkTableStoreMock;
-import org.mycore.frontend.classeditor.resources.MCRClassificationEditorResource.MCRSessionWrapper;
-import org.mycore.frontend.classeditor.resources.MCRClassificationEditorResource.OperationInSession;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.resources.MCRJerseyTest;
 
@@ -47,16 +43,6 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     private CategoryDAOMock categDAO;
 
     static Logger LOGGER = Logger.getLogger(MCRClassificationEditorResourceTest.class);
-
-//    public static class SessionWrapperMock implements MCRSessionWrapper {
-//
-//        @Override
-//        public <T extends OperationInSession> T wrap(T op) {
-//            op.run();
-//            return op;
-//        }
-//
-//    }
 
     @Override
     protected Map<String, String> getTestProperties() {
@@ -75,7 +61,6 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
         map.put("ClassificationResouce.useSession", "false");
         map.put("MCR.Category.LinkService", CategoryLinkServiceMock.class.getName());
         map.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-//        mcrProperties.set("MCR.Session.Wrapper.Class", SessionWrapperMock.class.getName());
         return map;
     }
     

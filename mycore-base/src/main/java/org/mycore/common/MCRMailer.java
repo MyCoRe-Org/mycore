@@ -131,7 +131,7 @@ public class MCRMailer extends MCRServlet {
             }
             mailProperties.setProperty("mail.smtp.host", config.getString("MCR.Mail.Server"));
             mailProperties.setProperty("mail.transport.protocol", config.getString("MCR.Mail.Protocol"));
-
+            mailProperties.setProperty("mail.smtp.port", config.getString("MCR.Mail.Port", "25"));
             mailSession = Session.getDefaultInstance(mailProperties, auth);
             mailSession.setDebug(config.getBoolean("MCR.Mail.Debug"));
         } catch (MCRConfigurationException mcrx) {
