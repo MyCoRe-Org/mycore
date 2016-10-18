@@ -24,6 +24,7 @@
 package org.mycore.services.queuedjob;
 
 import java.util.AbstractQueue;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +43,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -122,6 +127,10 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             pollLock.lock();
             MCRJob job = getElement();
             if (job != null) {
+                if (job.getStatus() == MCRJobStatus.PROCESSING) {
+                    return null;
+                }
+
                 job.setStart(new Date(System.currentTimeMillis()));
                 job.setStatus(MCRJobStatus.PROCESSING);
                 if (!updateJob(job)) {
@@ -236,12 +245,20 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
-        StringBuilder sb = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
-        if (action != null)
-            sb.append("action='" + action.getName() + "' AND ");
-        sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRJob> cq = cb.createQuery(MCRJob.class);
+        Root<MCRJob> root = cq.from(MCRJob.class);
 
-        TypedQuery<MCRJob> query = em.createQuery(sb.toString(), MCRJob.class);
+        List<Predicate> predicates = new ArrayList<Predicate>();
+        predicates.add(cb.equal(root.get("status"), MCRJobStatus.NEW));
+        if (action != null)
+            predicates.add(cb.equal(root.get("action"), action));
+        cq.where(cb.and(predicates.toArray(new Predicate[] {})));
+        cq.orderBy(cb.asc(root.get("added")));
+        cq.distinct(true);
+
+        TypedQuery<MCRJob> query = em.createQuery(cq);
+
         return query.getResultList().iterator();
     }
 
@@ -305,6 +322,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         }
 
         TypedQuery<MCRJob> query = em.createQuery(qStr.toString(), MCRJob.class);
+
         try {
             MCRJob job = query.getSingleResult();
             clearPreFetch();
@@ -337,18 +355,25 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private int preFetch(int amount) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
-        StringBuilder sb = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
-        if (action != null)
-            sb.append("action='" + action.getName() + "' AND ");
-        sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRJob> cq = cb.createQuery(MCRJob.class);
+        Root<MCRJob> root = cq.from(MCRJob.class);
 
-        TypedQuery<MCRJob> query = em.createQuery(sb.toString(), MCRJob.class).setMaxResults(amount);
+        List<Predicate> predicates = new ArrayList<Predicate>();
+        predicates.add(cb.equal(root.get("status"), MCRJobStatus.NEW));
+        if (action != null)
+            predicates.add(cb.equal(root.get("action"), action));
+        cq.where(cb.and(predicates.toArray(new Predicate[] {})));
+        cq.orderBy(cb.asc(root.get("added")));
+        cq.distinct(true);
+
+        TypedQuery<MCRJob> query = em.createQuery(cq);
+        query.setMaxResults(amount);
 
         List<MCRJob> jobs = query.getResultList();
 
         int i = 0;
         for (MCRJob job : jobs) {
-            //mySQL workaround for pending hibernate transactions, almost perfect
             if (job.getParameters().isEmpty())
                 continue;
 
