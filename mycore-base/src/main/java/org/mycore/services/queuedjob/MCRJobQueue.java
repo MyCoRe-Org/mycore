@@ -127,10 +127,6 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             pollLock.lock();
             MCRJob job = getElement();
             if (job != null) {
-                if (job.getStatus() == MCRJobStatus.PROCESSING) {
-                    return null;
-                }
-
                 job.setStart(new Date(System.currentTimeMillis()));
                 job.setStatus(MCRJobStatus.PROCESSING);
                 if (!updateJob(job)) {
