@@ -185,7 +185,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                             if (!running)
                                 break;
 
-                            EntityManager em = MCREntityManagerProvider.getEntityManagerFactory().createEntityManager();
+                            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
                             EntityTransaction transaction = em.getTransaction();
 
                             MCRJob job = null;
