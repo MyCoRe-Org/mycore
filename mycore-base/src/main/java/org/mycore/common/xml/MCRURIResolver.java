@@ -1081,6 +1081,8 @@ public final class MCRURIResolver implements URIResolver {
                 Element message = new Element("message");
                 Element stacktraceElement = new Element("stacktrace");
 
+                stacktraceElement.setAttribute("space","preserve", Namespace.XML_NAMESPACE);
+
                 exception.addContent(message);
                 exception.addContent(stacktraceElement);
 
