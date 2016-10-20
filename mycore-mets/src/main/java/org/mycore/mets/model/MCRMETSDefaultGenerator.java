@@ -92,8 +92,10 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         createMets(dir, ignoreNodes, mets);
 
         MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(dir.getOwner()));
-        mets.getLogicalStructMap().getDivContainer().setLabel(
-                MCRTranslation.translate("MCR.Mets.LogicalStructMap.Default.Label", owner.getId().toString()));
+
+        mets.getLogicalStructMap().getDivContainer().setLabel(MCRTranslation.exists("MCR.Mets.LogicalStructMap.Default.Label") ?
+                MCRTranslation.translate("MCR.Mets.LogicalStructMap.Default.Label") :
+                owner.getId().toString());
 
         Map<String, String> urnFileMap = owner.getUrnMap();
         if (urnFileMap.size() > 0) {
