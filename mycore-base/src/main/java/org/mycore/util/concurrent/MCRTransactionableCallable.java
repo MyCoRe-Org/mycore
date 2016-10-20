@@ -27,7 +27,7 @@ public class MCRTransactionableCallable<V> implements Callable<V> {
      * be committed and the session will be released and closed.
      * 
      * <p>If you want to execute your callable in the context of an already existing
-     * session use the {@link MCRTransactionableCallableTest#MCRTransactionableCallable(Callable, MCRSession)}
+     * session use the {@link MCRTransactionableCallable#MCRTransactionableCallable(Callable, MCRSession)}
      * constructor instead.
      * 
      * @param decorator the callable to decorate
