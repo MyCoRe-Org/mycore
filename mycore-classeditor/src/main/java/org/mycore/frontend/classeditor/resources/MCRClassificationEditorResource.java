@@ -32,14 +32,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
@@ -90,7 +88,6 @@ import com.google.gson.JsonStreamParser;
  */
 @Path("classifications")
 public class MCRClassificationEditorResource {
-    private static final Logger LOGGER = Logger.getLogger(MCRClassificationEditorResource.class);
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -196,7 +193,9 @@ public class MCRClassificationEditorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteCateg(String json) {
         MCRJSONCategory category = parseJson(json);
-        return new DeleteOp(category).getResponse();
+        DeleteOp deleteOp = new DeleteOp(category);
+        deleteOp.run();
+        return deleteOp.getResponse();
     }
 
     interface OperationInSession {
@@ -294,7 +293,7 @@ public class MCRClassificationEditorResource {
                 SaveElement categ = getCateg(jsonObject);
                 MCRJSONCategory parsedCateg = parseJson(categ.getJson());
                 if ("update".equals(status)) {
-                    new UpdateOp(parsedCateg, jsonObject);
+                    new UpdateOp(parsedCateg, jsonObject).run();
                 } else if ("delete".equals(status)) {
                     deleteCateg(categ.getJson());
                 } else {
