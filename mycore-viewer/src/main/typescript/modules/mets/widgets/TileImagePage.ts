@@ -293,7 +293,7 @@ module mycore.viewer.widgets.canvas {
         }
 
         private maxZoomLevel(): number {
-            return Math.ceil(Math.log(Math.max(this._width, this._height) / TileImagePage.TILE_SIZE) / Math.LN2);
+            return Math.max(Math.ceil(Math.log(Math.max(this._width, this._height) / TileImagePage.TILE_SIZE) / Math.LN2), 0);
         }
 
         private getZoomLevel(scale: number): number {
