@@ -178,74 +178,83 @@ public class MCRJobMaster implements Runnable, Closeable {
             LOGGER.info("JobMaster" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " with "
                     + jobThreadCount + " thread(s) is started");
             while (running) {
-                while (activeThreads.get() < jobThreadCount) {
-                    runLock.lock();
-                    try {
-                        if (!running)
-                            break;
-
-                        EntityManager em = MCREntityManagerProvider.getEntityManagerFactory().createEntityManager();
-                        EntityTransaction transaction = em.getTransaction();
-
-                        MCRJob job = null;
-                        MCRJobAction action = null;
+                try {
+                    while (activeThreads.get() < jobThreadCount) {
+                        runLock.lock();
                         try {
-                            transaction.begin();
+                            if (!running)
+                                break;
 
-                            job = JOB_QUEUE.poll();
+                            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+                            EntityTransaction transaction = em.getTransaction();
 
-                            if (job != null) {
-                                action = toMCRJobAction(job.getAction());
+                            MCRJob job = null;
+                            MCRJobAction action = null;
+                            try {
+                                transaction.begin();
 
-                                if (action != null && !action.isActivated()) {
-                                    job.setStatus(MCRJobStatus.NEW);
-                                    job.setStart(null);
+                                job = JOB_QUEUE.poll();
+
+                                if (job != null) {
+                                    action = toMCRJobAction(job.getAction());
+
+                                    if (action != null && !action.isActivated()) {
+                                        job.setStatus(MCRJobStatus.NEW);
+                                        job.setStart(null);
+                                    }
                                 }
-                            }
 
-                            transaction.commit();
-                        } catch (RollbackException e) {
-                            LOGGER.error("Error while getting next job.", e);
-                            if (transaction != null) {
+                                transaction.commit();
+                            } catch (RollbackException e) {
+                                LOGGER.error("Error while getting next job.", e);
+                                if (transaction != null) {
+                                    try {
+                                        transaction.rollback();
+                                    } catch (RuntimeException re) {
+                                        LOGGER.warn("Could not rollback transaction.", re);
+                                    }
+                                }
+                            } finally {
+                                em.close();
+                            }
+                            if (job != null && action != null && action.isActivated() && !jobServe.isShutdown()) {
+                                LOGGER.info("Creating:" + job);
+                                jobServe.execute(new MCRJobThread(job));
+                            } else {
                                 try {
-                                    transaction.rollback();
-                                } catch (RuntimeException re) {
-                                    LOGGER.warn("Could not rollback transaction.", re);
+                                    synchronized (JOB_QUEUE) {
+                                        if (running) {
+                                            LOGGER.debug("No job in queue going to sleep");
+                                            //fixes a race conditioned deadlock situation
+                                            //do not wait longer than 60 sec. for a new MCRJob
+                                            JOB_QUEUE.wait(60000);
+                                        }
+                                    }
+                                } catch (InterruptedException e) {
+                                    LOGGER.error("Job thread was interrupted.", e);
                                 }
                             }
                         } finally {
-                            em.close();
+                            runLock.unlock();
                         }
-                        if (job != null && action != null && action.isActivated() && !jobServe.isShutdown()) {
-                            LOGGER.info("Creating:" + job);
-                            jobServe.execute(new MCRJobThread(job));
-                        } else {
-                            try {
-                                synchronized (JOB_QUEUE) {
-                                    if (running) {
-                                        LOGGER.debug("No job in queue going to sleep");
-                                        //fixes a race conditioned deadlock situation
-                                        //do not wait longer than 60 sec. for a new MCRJob
-                                        JOB_QUEUE.wait(60000);
-                                    }
-                                }
-                            } catch (InterruptedException e) {
-                                LOGGER.error("Job thread was interrupted.", e);
-                            }
+                    } // while(activeThreads.get() < jobThreadCount)
+                    if (activeThreads.get() < jobThreadCount)
+                        try {
+                            LOGGER.info("Waiting for a job to finish");
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            LOGGER.error("Job thread was interrupted.", e);
                         }
-                    } catch (PersistenceException pe) {
-                        LOGGER.warn("Catch PersistenceException and ignore.", pe);
-                    } finally {
-                        runLock.unlock();
-                    }
-                } // while(activeThreads.get() < jobThreadCount)
-                if (activeThreads.get() < jobThreadCount)
+                } catch (PersistenceException e) {
+                    LOGGER.warn("We have an database error, sleep and run later.", e);
                     try {
-                        LOGGER.info("Waiting for a job to finish");
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        LOGGER.error("Job thread was interrupted.", e);
+                        Thread.sleep(60000);
+                    } catch (InterruptedException ie) {
+                        LOGGER.error("Waiting for database was interrupted.", ie);
                     }
+                } catch (Throwable e) {
+                    LOGGER.error("Keep running while catching exceptions.", e);
+                }
             } // while(running)
         }
         LOGGER.info(preLabel + "Master thread finished");

@@ -196,7 +196,9 @@ public class MCRClassificationEditorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteCateg(String json) {
         MCRJSONCategory category = parseJson(json);
-        return new DeleteOp(category).getResponse();
+        DeleteOp deleteOp = new DeleteOp(category);
+        deleteOp.run();
+        return deleteOp.getResponse();
     }
 
     interface OperationInSession {
@@ -294,7 +296,7 @@ public class MCRClassificationEditorResource {
                 SaveElement categ = getCateg(jsonObject);
                 MCRJSONCategory parsedCateg = parseJson(categ.getJson());
                 if ("update".equals(status)) {
-                    new UpdateOp(parsedCateg, jsonObject);
+                    new UpdateOp(parsedCateg, jsonObject).run();
                 } else if ("delete".equals(status)) {
                     deleteCateg(categ.getJson());
                 } else {

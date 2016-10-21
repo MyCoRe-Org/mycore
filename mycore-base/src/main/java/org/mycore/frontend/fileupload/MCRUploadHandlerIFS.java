@@ -75,6 +75,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     protected MCRPath rootDir;
 
+    private int numFiles;
+
     public MCRUploadHandlerIFS(String documentID, String derivateID) {
         super();
         this.documentID = Objects.requireNonNull(documentID, "Document ID may not be 'null'.");
@@ -90,6 +92,13 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     @Override
     public void startUpload(int numFiles) throws Exception {
+        this.numFiles=numFiles;
+    }
+    
+    private synchronized void prepareUpload() throws MCRPersistenceException, MCRAccessException, IOException {
+        if (this.derivate != null) {
+            return;
+        }
         LOGGER.debug("upload starting, expecting " + numFiles + " files");
 
         MCRObjectID derivateID = getOrCreateDerivateID();
@@ -163,12 +172,14 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     public boolean acceptFile(String path, String checksum, long length) throws Exception {
         LOGGER.debug("incoming acceptFile request: " + path + " " + checksum + " " + length + " bytes");
         boolean shouldAcceptFile = true;
-        MCRPath child = MCRPath.toMCRPath(rootDir.resolve(path));
-        if (Files.isRegularFile(child)) {
-            @SuppressWarnings("rawtypes")
-            MCRFileAttributes attrs = Files.readAttributes(child, MCRFileAttributes.class);
-            shouldAcceptFile = attrs.size() != length
-                || !(checksum.equals(attrs.md5sum()) && child.getFileSystem().verifies(child, attrs));
+        if (rootDir != null) {
+            MCRPath child = MCRPath.toMCRPath(rootDir.resolve(path));
+            if (Files.isRegularFile(child)) {
+                @SuppressWarnings("rawtypes")
+                MCRFileAttributes attrs = Files.readAttributes(child, MCRFileAttributes.class);
+                shouldAcceptFile = attrs.size() != length
+                    || !(checksum.equals(attrs.md5sum()) && child.getFileSystem().verifies(child, attrs));
+            }
         }
         LOGGER.debug("Should the client send this file? " + shouldAcceptFile);
         return shouldAcceptFile;
@@ -186,6 +197,10 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             if (length != 0 && length != myLength) {
                 throw new IOException("Length of transmitted data does not match promised length: " + myLength + "!="
                     + length);
+            }
+            if (rootDir == null) {
+                //MCR-1376: Create derivate only if at least one file was successfully uploaded
+                prepareUpload();
             }
             MCRPath file = getFile(path);
             LOGGER.info("Moving " + tempFile + " to " + file + ".");
@@ -216,15 +231,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             if (dirStream.iterator().hasNext()) {
                 updateMainFile();
             } else {
-                deleteEmptyDerivate();
+                throw new IllegalStateException("No files were uploaded, delete entry in database for " + derivate.getId().toString()+"!");
             }
         }
-    }
-
-    private void deleteEmptyDerivate() throws MCRPersistenceException, MCRAccessException {
-        LOGGER.warn("No files were uploaded, delete entry in database for " + derivate.getId().toString()
-            + " and return:");
-        MCRMetadataManager.deleteMCRDerivate(derivate.getId());
     }
 
     private void updateMainFile() throws IOException {

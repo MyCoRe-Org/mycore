@@ -216,6 +216,7 @@ public class MCRServlet extends HttpServlet {
                     LOGGER.warn("Session steal attempt from IP " + newip + ", previous IP was " + lastIP
                         + ". Session: " + session.toString());
                     MCRSessionMgr.releaseCurrentSession();
+                    session.close(); //MCR-1409 do not leak old session
                     session = MCRSessionMgr.getCurrentSession();
                     session.setCurrentIP(newip);
                 }

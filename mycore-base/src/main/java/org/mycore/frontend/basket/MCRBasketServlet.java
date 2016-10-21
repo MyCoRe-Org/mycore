@@ -137,6 +137,8 @@ public class MCRBasketServlet extends MCRServlet {
         }
         if (referer != null && "referer".equals(redirect)) {
             res.sendRedirect(res.encodeRedirectURL(referer.toExternalForm()));
+        } else if (redirect != null) {
+            res.sendRedirect(res.encodeRedirectURL(redirect));
         } else {
             res.sendRedirect(res.encodeRedirectURL(getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type));
         }
