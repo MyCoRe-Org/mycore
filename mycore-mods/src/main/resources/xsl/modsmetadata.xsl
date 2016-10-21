@@ -56,11 +56,18 @@
               <xsl:call-template name="lf2br">
                 <xsl:with-param name="string" select="normalize-space(.)" />
               </xsl:call-template>
+              <xsl:if test="@authority='gnd' and @valueURI">
+                <xsl:apply-templates select="." mode="gnd"/>
+              </xsl:if>
             </xsl:if>
           </xsl:for-each>
         </td>
       </tr>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="mods:topic[@authority='gnd']" mode="gnd">
+    <a href="{@valueURI}" title="Link zu GND"><sup>GND</sup></a>
   </xsl:template>
 
   <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued|mods:dateCaptured|mods:dateModified" mode="present">
