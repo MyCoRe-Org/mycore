@@ -9,6 +9,7 @@
     <script src="../META-INF/resources/modules/iview2/js/iview-client-base.js"></script>
     <script src="../META-INF/resources/modules/iview2/js/iview-client-desktop.js"></script>
     <script src="../META-INF/resources/modules/iview2/js/iview-client-pdf.js"></script>
+    <script src="../META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.js"></script>
     <script src="../META-INF/resources/modules/iview2/js/lib/pdf.js"></script>
     <link href="../META-INF/resources/modules/iview2/css/default.css" type="text/css" rel="stylesheet">
 
@@ -36,7 +37,14 @@
                 permalink: {
                     enabled: true,
                     updateHistory: false
-                }
+                },
+                toolbar: [ {
+                    id: "test_button1",
+                    label: "test_button",
+                    type:"button",
+                    href:"http://google.de/",
+                    inGroup: "ActionControllGroup"
+                }]
             });
         }
     </script>

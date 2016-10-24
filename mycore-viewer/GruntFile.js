@@ -33,7 +33,9 @@ module.exports = function (grunt) {
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.js",
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.js",
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.js",
-                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.js"
+                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.js",
+                        "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.js"
+
                     }
                 }
             },
@@ -123,6 +125,14 @@ module.exports = function (grunt) {
                 viewer_piwik: {
                     out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.js",
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/piwik/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+                    options: {
+                        declaration: true,
+                        sourceMap: false
+                    }
+                },
+                viewer_toolbar_extender: {
+                    out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-toolbar-extender.js",
+                    src:["<%= globalConfig.projectBase %>src/main/typescript/modules/toolbar-extender/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
                         sourceMap: false
