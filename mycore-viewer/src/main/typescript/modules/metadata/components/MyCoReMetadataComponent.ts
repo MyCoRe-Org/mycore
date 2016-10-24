@@ -23,38 +23,44 @@ module mycore.viewer.components {
                     objId : this._settings.objId
                 });
                 this._container.load(metadataUrl, {}, ()=> {
-                    /*
-                     if the container is scrolled we want to restore the scroll position before this._container was inserted
-                     */
-                    if (this._container.parent().scrollTop() > 0) {
-                        var containerHeightDiff = this._container.height();
-                        var parent = this._container.parent();
-                        parent.scrollTop(parent.scrollTop() + containerHeightDiff);
-                    }
+                    this.correctScrollPosition();
                 });
+            } else if ("metsURL" in this._settings) {
+                var resolver = (name) => XMLUtil.NS_MAP.get(name);
+                var xpath = "/mets:mets/*[@ID='AMD_MYCOREVIEWER']/mets:techMD[@ID='MYCOREVIEWER_DISPLAY']/mets:mdWrap[@MDTYPE='OTHER' and @OTHERMDTYPE='MCRVIEWER_HTML']/mets:xmlData/*";
+                var metsURL = (<any>this._settings).metsURL;
+                var settings = {
+                    url : metsURL,
+                    success : (response) => {
+                        console.log(response);
+                        var htmlElement = (<any>response).evaluate(xpath, response.documentElement, resolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                        this._container.append(htmlElement);
+                    },
+                    error : (request, status, exception) => {
+                        console.log(status);
+                        console.error(exception);
+                    }
+                };
+
+                jQuery.ajax(settings);
             }
 
             this.trigger(new events.ComponentInitializedEvent(this));
             this.trigger(new events.WaitForEvent(this, events.ShowContentEvent.TYPE));
         }
 
+        private correctScrollPosition() {
+            /*
+             if the container is scrolled we want to restore the scroll position before this._container was inserted
+             */
+            if (this._container.parent().scrollTop() > 0) {
+                var containerHeightDiff = this._container.height();
+                var parent = this._container.parent();
+                parent.scrollTop(parent.scrollTop() + containerHeightDiff);
+            }
+        }
+
         public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
-            /* for extra sidebar
-             if (e.type == events.ProvideToolbarModelEvent.TYPE) {
-             var ptme = <events.ProvideToolbarModelEvent>e;
-             ptme.model._dropdownChildren.unshift({id: "metadata", label: "Metadaten"
-             });
-             ptme.model._sidebarControllDropdownButton.children = ptme.model._dropdownChildren;
-             } *
-
-             if (e.type == widgets.toolbar.events.DropdownButtonPressedEvent.TYPE) {
-             var tbpe = <widgets.toolbar.events.DropdownButtonPressedEvent>e;
-             if (tbpe.childId == "metadata") {
-             this.trigger(new events.ShowContentEvent(this, this._container, events.ShowContentEvent.DIRECTION_WEST));
-             }
-             }           */
-
-
             if (e.type == events.ShowContentEvent.TYPE) {
                 var sce = <events.ShowContentEvent>e;
 
