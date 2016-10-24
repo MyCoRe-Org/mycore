@@ -2,6 +2,26 @@
 <mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd">
 	<mets:dmdSec ID="dmd_HisBest_derivate_00000376" />
 	<mets:amdSec ID="amd_HisBest_derivate_00000376" />
+	<mets:amdSec ID="AMD_MYCOREVIEWER">
+		<mets:techMD ID="MYCOREVIEWER_DISPLAY">
+			<mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="MCRVIEWER_HTML"
+									 MIMETYPE="text/xml">
+				<mets:xmlData>
+					<!-- start with <div> or complete <html> document
+                    with <head> and<body> -->
+					<div xmlns="http://www.w3.org/1999/xhtml"
+							 xsi:schemaLocation="http://www.w3.org/1999/xhtml
+               https://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd" class="well">
+						<p>Max Mustermann</p>
+						<p><strong>Führer durch Neubrandenburg und Umgegend:
+							mit einem Plane der Stadt und einer Karte
+							der Umgegend</strong></p>
+						<p>Brünslow, Neubrandenburg, 1888</p>
+					</div>
+				</mets:xmlData>
+			</mets:mdWrap>
+		</mets:techMD>
+	</mets:amdSec>
 	<mets:fileSec>
 		<mets:fileGrp USE="MASTER">
 			<mets:file ID="master_7f8523a6-f7bb-4ba5-afea-e02f0a6495eb"
