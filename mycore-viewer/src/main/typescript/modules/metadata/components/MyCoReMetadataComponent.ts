@@ -27,7 +27,7 @@ module mycore.viewer.components {
                 });
             } else if ("metsURL" in this._settings) {
                 var resolver = (name) => XMLUtil.NS_MAP.get(name);
-                var xpath = "/mets:mets/*[@ID='AMD_MYCOREVIEWER']/mets:techMD[@ID='MYCOREVIEWER_DISPLAY']/mets:mdWrap[@MDTYPE='OTHER' and @OTHERMDTYPE='MCRVIEWER_HTML']/mets:xmlData/*";
+                var xpath = "/mets:mets/*/mets:techMD/mets:mdWrap[@OTHERMDTYPE='MCRVIEWER_HTML']/mets:xmlData/*";
                 var metsURL = (<any>this._settings).metsURL;
                 var settings = {
                     url : metsURL,
