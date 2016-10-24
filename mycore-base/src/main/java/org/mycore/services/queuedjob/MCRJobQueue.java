@@ -24,6 +24,7 @@
 package org.mycore.services.queuedjob;
 
 import java.util.AbstractQueue;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +43,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -52,7 +57,7 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private static Logger LOGGER = Logger.getLogger(MCRJobQueue.class);
 
-    private static Map<String, MCRJobQueue> INSTANCES = new HashMap<String, MCRJobQueue>();
+    protected static Map<String, MCRJobQueue> INSTANCES = new HashMap<String, MCRJobQueue>();
 
     protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
 
@@ -224,24 +229,40 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     /**
-     * iterates of jobs of status {@link MCRJobStatus#NEW}
+     * iterates over jobs of status {@link MCRJobStatus#NEW}
      * 
      * does not change the status.
      */
     @Override
     public Iterator<MCRJob> iterator() {
+        return iterator(MCRJobStatus.NEW);
+    }
+
+    /**
+     * Builds iterator for jobs with given {@link MCRJobStatus} or <code>null</code> for all jobs.
+     */
+    public Iterator<MCRJob> iterator(MCRJobStatus status) {
         if (!running) {
             List<MCRJob> empty = Collections.emptyList();
             return empty.iterator();
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
-        StringBuilder sb = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
-        if (action != null)
-            sb.append("action='" + action.getName() + "' AND ");
-        sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRJob> cq = cb.createQuery(MCRJob.class);
+        Root<MCRJob> root = cq.from(MCRJob.class);
 
-        TypedQuery<MCRJob> query = em.createQuery(sb.toString(), MCRJob.class);
+        List<Predicate> predicates = new ArrayList<Predicate>();
+        if (status != null)
+            predicates.add(cb.equal(root.get("status"), status));
+        if (action != null)
+            predicates.add(cb.equal(root.get("action"), action));
+        cq.where(cb.and(predicates.toArray(new Predicate[] {})));
+        cq.orderBy(cb.asc(root.get("added")));
+        cq.distinct(true);
+
+        TypedQuery<MCRJob> query = em.createQuery(cq);
+
         return query.getResultList().iterator();
     }
 
