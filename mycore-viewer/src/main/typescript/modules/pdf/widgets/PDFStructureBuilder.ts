@@ -179,7 +179,7 @@ module mycore.viewer.widgets.pdf {
             }
 
             var chapterDestination = (typeof node.dest == "object") ? node.dest : this._destinations[node.dest];
-            if (chapterDestination[ 0 ] == null) {
+            if (chapterDestination == null || chapterDestination[ 0 ] == null) {
                 return null;
             }
 
