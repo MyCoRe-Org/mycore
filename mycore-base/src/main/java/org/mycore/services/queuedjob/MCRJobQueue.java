@@ -57,7 +57,7 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private static Logger LOGGER = Logger.getLogger(MCRJobQueue.class);
 
-    private static Map<String, MCRJobQueue> INSTANCES = new HashMap<String, MCRJobQueue>();
+    protected static Map<String, MCRJobQueue> INSTANCES = new HashMap<String, MCRJobQueue>();
 
     protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
 
@@ -229,12 +229,19 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     /**
-     * iterates of jobs of status {@link MCRJobStatus#NEW}
+     * iterates over jobs of status {@link MCRJobStatus#NEW}
      * 
      * does not change the status.
      */
     @Override
     public Iterator<MCRJob> iterator() {
+        return iterator(MCRJobStatus.NEW);
+    }
+
+    /**
+     * Builds iterator for jobs with given {@link MCRJobStatus} or <code>null</code> for all jobs.
+     */
+    public Iterator<MCRJob> iterator(MCRJobStatus status) {
         if (!running) {
             List<MCRJob> empty = Collections.emptyList();
             return empty.iterator();
@@ -246,7 +253,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         Root<MCRJob> root = cq.from(MCRJob.class);
 
         List<Predicate> predicates = new ArrayList<Predicate>();
-        predicates.add(cb.equal(root.get("status"), MCRJobStatus.NEW));
+        if (status != null)
+            predicates.add(cb.equal(root.get("status"), status));
         if (action != null)
             predicates.add(cb.equal(root.get("action"), action));
         cq.where(cb.and(predicates.toArray(new Predicate[] {})));

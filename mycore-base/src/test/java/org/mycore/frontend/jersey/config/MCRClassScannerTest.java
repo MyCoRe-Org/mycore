@@ -12,7 +12,7 @@ public class MCRClassScannerTest extends MCRTestCase {
     @Test
     public void scan() throws Exception {
         MCRResourceConfig config = new MCRResourceConfig();
-        assertEquals(1, config.getPackages().length);
+        assertEquals(2, config.getPackages().length);
     }
 
 }
