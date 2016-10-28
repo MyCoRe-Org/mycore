@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:encoder="xalan://java.net.URLEncoder"
   xmlns:xalan="http://xml.apache.org/xalan" exclude-result-prefixes="xalan encoder">
-
+  
+  <xsl:key name="maxScore" match="@maxScore" use="../preceding-sibling::str[@name='groupValue']" />
+  <xsl:variable name="maxScore" select="/response/lst[@name='grouped']/lst/arr[@name='groups']/lst/result/@maxScore[not(. &lt; ../../../lst/result/@maxScore)][1]" />
+  <xsl:variable name="response" select="/response" />
 	<!-- 
 		This Stylesheet checks for a join filterquery and creates a new request to the solr server and adds the result.
 		It adds additional information of the joined objects.
@@ -55,7 +58,9 @@
           <xsl:variable name="groupBase" select="lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']" />
           <xsl:if test="$groupBase/lst">
             <xsl:variable name="orChain">
-              <xsl:apply-templates mode="query" select="$groupBase/lst/str[@name='groupValue']" />
+              <xsl:apply-templates mode="query" select="$groupBase/lst/str[@name='groupValue']">
+                <xsl:with-param name="ranked" select="true()" />
+              </xsl:apply-templates>
             </xsl:variable>
             <xsl:variable name="query">
               <xsl:value-of select="'+id:('" />
@@ -68,6 +73,7 @@
             </xsl:variable>
             <xsl:apply-templates select="document(concat('solr:', $queryStr))/response" mode="join">
               <xsl:with-param name="resultName" select="'groupOwner'" />
+              <xsl:with-param name="copyScore" select="true()" />
             </xsl:apply-templates>
           </xsl:if>
         </xsl:when>
@@ -91,16 +97,54 @@
 
   <xsl:template match="response" mode="join">
     <xsl:param name="resultName" />
+    <!-- MCR-1422: copy score from original query -->
+    <xsl:param name="copyScore" select="false()" />
     <xsl:copy>
       <xsl:attribute name="subresult">
         <xsl:value-of select="$resultName" />
       </xsl:attribute>
-      <xsl:copy-of select="@*|node()" />
+      <xsl:choose>
+        <xsl:when test="$copyScore">
+          <xsl:apply-templates select="@*|node()" mode="copyScore" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:copy-of select="@*|node()" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="@*|node()" mode="copyScore">
+    <xsl:copy>
+      <xsl:apply-templates select='@*|node()' mode="copyScore" />
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="result[@name='response']/@maxScore" mode="copyScore">
+    <xsl:attribute name="maxScore">
+      <xsl:value-of select="$maxScore" />
+    </xsl:attribute>
+  </xsl:template>
+  
+  <xsl:template match="float[@name='score']" mode="copyScore" >
+    <xsl:copy>
+      <xsl:copy-of select="@*" />
+      <!-- save for context change later -->
+      <xsl:variable name="groupValue" select="../str[@name='returnId']" />
+      <!-- change context for key() -->
+      <xsl:for-each select="$response">
+        <xsl:value-of select="key('maxScore', $groupValue)" />
+      </xsl:for-each>
     </xsl:copy>
   </xsl:template>
 
   <xsl:template mode="query" match="str">
+    <!-- ranked=true for grouped results, to keep order -->
+    <xsl:param name="ranked" select="false()" />
     <xsl:value-of select="concat(' OR ',.)" />
+    <xsl:if test="$ranked">
+      <xsl:value-of select="concat('^',key('maxScore',.))"/>
+    </xsl:if>
   </xsl:template>
   
   <xsl:template match="str" mode="queryParms">
