@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -165,6 +166,7 @@ public abstract class MCRFilesystemNode {
      * 
      */
     protected void checkName(String name, boolean doExistCheck) {
+        name = Normalizer.normalize(name, Normalizer.Form.NFC);
 
         if (name == null) {
             throw new MCRUsageException(name + " is null.");
