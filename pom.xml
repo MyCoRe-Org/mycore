@@ -328,6 +328,39 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>keepNode</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-clean</id>
+                <configuration>
+                  <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                  <filesets>
+                    <fileset>
+                      <directory>target</directory>
+                      <excludes>
+                        <exclude>node_build/node_modules/</exclude>
+                        <exclude>node_build/node/</exclude>
+                      </excludes>
+                      <followSymlinks>false</followSymlinks>
+                    </fileset>
+                  </filesets>
+                </configuration>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>clean</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
   <repositories>
     <repository>
