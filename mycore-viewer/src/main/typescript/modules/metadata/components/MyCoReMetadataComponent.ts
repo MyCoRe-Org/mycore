@@ -26,14 +26,16 @@ module mycore.viewer.components {
                     this.correctScrollPosition();
                 });
             } else if ("metsURL" in this._settings) {
-                var resolver = (name) => XMLUtil.NS_MAP.get(name);
                 var xpath = "/mets:mets/*/mets:techMD/mets:mdWrap[@OTHERMDTYPE='MCRVIEWER_HTML']/mets:xmlData/*";
                 var metsURL = (<any>this._settings).metsURL;
                 var settings = {
                     url : metsURL,
                     success : (response) => {
-                        console.log(response);
-                        var htmlElement = (<any>response).evaluate(xpath, response.documentElement, resolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                        var htmlElement = <any>singleSelectShim(<any>response, xpath, XMLUtil.NS_MAP);
+                        if ("xml" in htmlElement) {
+                            // htmlElement is IXMLDOMElement
+                            htmlElement = jQuery((<any>htmlElement).xml);
+                        }
                         this._container.append(htmlElement);
                     },
                     error : (request, status, exception) => {
