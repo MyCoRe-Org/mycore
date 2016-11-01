@@ -27,7 +27,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/webcli/</outputDirectory>
+              <outputDirectory>${basedir}/target/node_build/</outputDirectory>
               <resources>
                 <resource>
                   <directory>${basedir}/src/main/resources/META-INF/resources/modules/webcli</directory>
@@ -48,7 +48,7 @@
               <outputDirectory>${project.build.directory}/classes/META-INF/resources/modules/webcli/node_modules/@angular</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${basedir}/target/webcli/node_modules/@angular</directory>
+                  <directory>${basedir}/target/node_build/node_modules/@angular</directory>
                 </resource>
               </resources>
             </configuration>
@@ -64,7 +64,7 @@
               <outputDirectory>${project.build.directory}/classes/META-INF/resources/modules/webcli/node_modules/rxjs</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${basedir}/target/webcli/node_modules/rxjs</directory>
+                  <directory>${basedir}/target/node_build/node_modules/rxjs</directory>
                 </resource>
               </resources>
             </configuration>
@@ -80,7 +80,7 @@
               <outputDirectory>${project.build.directory}/classes/META-INF/resources/modules/webcli/node_modules/angular2-in-memory-web-api</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${basedir}/target/webcli/node_modules/angular2-in-memory-web-api</directory>
+                  <directory>${basedir}/target/node_build/node_modules/angular2-in-memory-web-api</directory>
                 </resource>
               </resources>
             </configuration>
@@ -96,7 +96,7 @@
               <outputDirectory>${project.build.directory}/classes/META-INF/resources/modules/webcli/node_modules/core-js</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${basedir}/target/webcli/node_modules/core-js</directory>
+                  <directory>${basedir}/target/node_build/node_modules/core-js</directory>
                 </resource>
               </resources>
             </configuration>
@@ -112,7 +112,7 @@
               <outputDirectory>${project.build.directory}/classes/META-INF/resources/modules/webcli/node_modules/zone.js</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${basedir}/target/webcli/node_modules/zone.js</directory>
+                  <directory>${basedir}/target/node_build/node_modules/zone.js</directory>
                 </resource>
               </resources>
             </configuration>
@@ -128,7 +128,7 @@
               <outputDirectory>${project.build.directory}/classes/META-INF/resources/modules/webcli/node_modules/reflect-metadata</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${basedir}/target/webcli/node_modules/reflect-metadata</directory>
+                  <directory>${basedir}/target/node_build/node_modules/reflect-metadata</directory>
                 </resource>
               </resources>
             </configuration>
@@ -144,7 +144,7 @@
               <outputDirectory>${project.build.directory}/classes/META-INF/resources/modules/webcli/node_modules/systemjs</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${basedir}/target/webcli/node_modules/systemjs</directory>
+                  <directory>${basedir}/target/node_build/node_modules/systemjs</directory>
                 </resource>
               </resources>
             </configuration>
@@ -160,7 +160,7 @@
               <outputDirectory>${project.build.directory}/classes/META-INF/resources/modules/webcli/build</outputDirectory>
               <resources>
                 <resource>
-                  <directory>${basedir}/target/webcli/build</directory>
+                  <directory>${basedir}/target/node_build/build</directory>
                 </resource>
               </resources>
             </configuration>
@@ -191,7 +191,7 @@
             </goals>
             <configuration>
               <arguments>install</arguments>
-              <workingDirectory>target/webcli</workingDirectory>
+              <workingDirectory>target/node_build</workingDirectory>
             </configuration>
           </execution>
           <execution>
@@ -203,8 +203,8 @@
           </execution>
         </executions>
         <configuration>
-          <installDirectory>target/node-installation-dir</installDirectory>
-          <workingDirectory>target/webcli</workingDirectory>
+          <installDirectory>target/node_build/node</installDirectory>
+          <workingDirectory>target/node_build</workingDirectory>
           <skip>${frontend.skip}</skip>
         </configuration>
       </plugin>

@@ -599,10 +599,21 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             String id = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading MCRObject with ID " + id);
+            Map<String, String> params;
+            StringTokenizer tok = new StringTokenizer(id, "?");
+            id = tok.nextToken();
+
+            if (tok.hasMoreTokens()) {
+                params = getParameterMap(tok.nextToken());
+            } else {
+                params = Collections.emptyMap();
+            }
 
             MCRObjectID mcrid = MCRObjectID.getInstance(id);
             try {
-                MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(mcrid);
+                MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.instance();
+                MCRContent content = params.containsKey("r") ?
+                    xmlmm.retrieveContent(mcrid, Long.valueOf(params.get("r"))) : xmlmm.retrieveContent(mcrid);
                 if (content == null) {
                     return null;
                 }
