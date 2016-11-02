@@ -97,17 +97,16 @@ module mycore.viewer.widgets.pdf {
             thumbnailDrawCanvas.height = (originalSize.height) * vpScale;
 
             var task = <any> page.render({canvasContext: thumbnailCanvasCtx, viewport: vp})
-            var that = this;
-            task.internalRenderTask.callback = function okay(err) {
-                that._loadedPageCount++;
-                var imgUrl = thumbnailDrawCanvas.toDataURL();
+            task.promise.then((onErr)=>{
+                this._loadedPageCount++;
+                let imgUrl = thumbnailDrawCanvas.toDataURL();
                 thumbnailDrawCanvas = null;
                 thumbnailCanvasCtx = null;
                 for (var callbackIndex in callbacks) {
-                    var callback = callbacks[callbackIndex];
+                    let callback = callbacks[callbackIndex];
                     callback(imgUrl);
                 }
-            };
+            });
 
         }
 
