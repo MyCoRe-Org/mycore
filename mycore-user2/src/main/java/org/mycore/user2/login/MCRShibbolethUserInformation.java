@@ -3,6 +3,7 @@
  */
 package org.mycore.user2.login;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -29,8 +30,6 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
     @MCRUserAttribute
     private String realName;
 
-    @MCRUserAttribute(separator = ";")
-    @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
     private Set<String> roles = new HashSet<String>();
 
     public MCRShibbolethUserInformation(String userId, String realmId, Map<String, Object> attributes)
@@ -82,4 +81,15 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
         return value != null ? value.toString() : null;
     }
 
+    // This is used for MCRUserAttributeMapper
+
+    Collection<String> getRoles() {
+        return roles;
+    }
+
+    @MCRUserAttribute(name = "roles", separator = ";")
+    @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
+    void setRoles(Collection<String> roles) {
+        this.roles.addAll(roles);
+    }
 }
