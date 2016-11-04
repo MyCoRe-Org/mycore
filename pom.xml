@@ -71,7 +71,7 @@
   </ciManagement>
   <scm>
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
-    <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycorei.git</developerConnection>
+    <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore/tree/mycore-2016.06.0.x</url>
   </scm>
   <profiles>
