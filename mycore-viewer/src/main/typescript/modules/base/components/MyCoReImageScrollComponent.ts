@@ -666,6 +666,7 @@ module mycore.viewer.components {
             this._pageLayout.jumpToPage(order);
             this._pageController.viewport.scale = scale;
             this._pageLayout.setCurrentPositionInPage(position);
+            this._pageController._updateSizeIfChanged();
 
             if (Utils.getVar(this._settings, "canvas.startup.fitWidth", false)) {
                 this._pageLayout.fitToWidth(true);

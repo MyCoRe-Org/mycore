@@ -39,7 +39,7 @@ module mycore.viewer.widgets.canvas {
         
         public _overview:Overview = null;
 
-        private _updateSizeIfChanged() {
+        public _updateSizeIfChanged() {
             this._views.forEach(view => {
                 var retinaWidth = view.container.width() * (window.devicePixelRatio || 1);
                 var retinaHeight = view.container.height() * (window.devicePixelRatio || 1);
