@@ -3,8 +3,8 @@ module mycore.viewer.widgets.canvas {
     export class PDFPage implements model.AbstractPage {
 
         constructor(public id, private _pdfPage:PDFPageProxy) {
-            var width = this._pdfPage.view[ 2 ] - this._pdfPage.view[ 0 ];
-            var height = this._pdfPage.view[ 3 ] - this._pdfPage.view[ 1 ];
+            var width = (this._pdfPage.view[ 2 ] - this._pdfPage.view[ 0 ]) * PDFPage.CSS_UNITS;
+            var height = (this._pdfPage.view[ 3 ] - this._pdfPage.view[ 1 ]) * PDFPage.CSS_UNITS;
 
             var pageRotation = (<any>_pdfPage).pageInfo.rotate;
             if (pageRotation == 90 || pageRotation == 270) {
@@ -17,12 +17,14 @@ module mycore.viewer.widgets.canvas {
             this.size = new Size2D(width, height);
         }
 
+        static CSS_UNITS = 96.0 / 72.0;
         public refreshCallback:() => void;
         public size:Size2D;
 
         private _rotation:number;
         private _frontBuffer:HTMLCanvasElement = document.createElement("canvas");
         private _backBuffer:HTMLCanvasElement = document.createElement("canvas");
+        private _timeOutIDHolder: number = null;
 
         private _bbScale:number = -1;
         private _fbScale:number = -1;
@@ -54,11 +56,11 @@ module mycore.viewer.widgets.canvas {
                         var x;
                         var y;
 
-                            x = transform[ 4 ];
-                            y = transform[ 5 ];
+                            x = transform[ 4 ]  * PDFPage.CSS_UNITS;
+                            y = transform[ 5 ]  * PDFPage.CSS_UNITS;
 
 
-                        var textElement = new PDFTextElement(angle, new Size2D(e.width, e.height), fontHeight, e.str, new Position2D(x, y), style.fontFamily, this.id);
+                        var textElement = new PDFTextElement(angle, new Size2D(e.width, e.height).scale(PDFPage.CSS_UNITS).roundDown(), fontHeight, e.str, new Position2D(x, y), style.fontFamily, this.id);
                         textContent.content.push(textElement);
                     });
                     this._textData = textContent;
@@ -74,21 +76,22 @@ module mycore.viewer.widgets.canvas {
 
         }
 
-        public draw(ctx:CanvasRenderingContext2D, rect:Rect, sourceScale):void {
-            if (!this._promiseRunning && sourceScale > this._fbScale) {
-                this._updateBackBuffer(sourceScale);
+        public draw(ctx: CanvasRenderingContext2D, rect: Rect, sourceScale, overview: boolean, infoScale:number): void {
+            if (!overview && sourceScale != this._fbScale) {
+                if(!this._promiseRunning ){
+                    this._updateBackBuffer(sourceScale);
+                }
             }
 
             if (this._fbScale == -1) {
                 return;
             }
 
-
             var scaledRect = rect.scale(this._fbScale);
             var sourceScaleRect = rect.scale(sourceScale);
 
-            var sw = Math.floor(scaledRect.size.width);
-            var sh = Math.floor(scaledRect.size.height);
+            var sw =scaledRect.size.width;
+            var sh = scaledRect.size.height;
 
             if (sw > 0 && sh > 0) {
                 ctx.save();
@@ -101,7 +104,7 @@ module mycore.viewer.widgets.canvas {
         }
 
         private _updateBackBuffer(newScale) {
-            var vp = this._pdfPage.getViewport(newScale, this._rotation);
+            var vp = this._pdfPage.getViewport(newScale * PDFPage.CSS_UNITS, this._rotation);
             var task = <any> this._pdfPage.render(<PDFRenderParams>{
                 canvasContext : <CanvasRenderingContext2D>this._backBuffer.getContext('2d'),
                 viewport : vp

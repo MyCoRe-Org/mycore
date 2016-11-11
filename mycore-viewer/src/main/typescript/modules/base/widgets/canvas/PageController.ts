@@ -194,24 +194,18 @@ module mycore.viewer.widgets.canvas {
             ctx1.save();
             ctx2.save();
             {
-                ctx1.scale(scale, scale);
-                ctx2.scale(scale, scale);
                 {
-                    ctx1.translate(-areaInViewport.pos.x, -areaInViewport.pos.y);
-                    ctx1.translate(info.position.x, info.position.y);
+                    ctx1.translate(Math.floor((-areaInViewport.pos.x + info.position.x) * scale), Math.floor((-areaInViewport.pos.y + info.position.y) * scale));
                     ctx1.rotate(info.rotation * Math.PI / 180);
-                    ctx1.translate(-notRotated.width / 2, -notRotated.height / 2);
-                    ctx1.translate(pagePartInPage.pos.x, pagePartInPage.pos.y);
+                    ctx1.translate(Math.floor(((-notRotated.width / 2) + pagePartInPage.pos.x) * scale), Math.floor(((-notRotated.height / 2) + pagePartInPage.pos.y) * scale));
 
-                    ctx2.translate(-areaInViewport.pos.x, -areaInViewport.pos.y);
-                    ctx2.translate(info.position.x, info.position.y);
+                    ctx2.translate(Math.floor((-areaInViewport.pos.x + info.position.x) * scale), (-areaInViewport.pos.y + info.position.y) * scale);
                     ctx2.rotate(info.rotation * Math.PI / 180);
-                    ctx2.translate(-notRotated.width / 2, -notRotated.height / 2);
-                    ctx2.translate(pagePartInPage.pos.x, pagePartInPage.pos.y);
+                    ctx2.translate(((-notRotated.width / 2) + pagePartInPage.pos.x) * pagePartInPage.pos.x.scale, ((-notRotated.height / 2) * pagePartInPage.pos.y) * scale);
                 }
-                ctx1.scale(1 / scale, 1 / scale);
-                ctx2.scale(1 / scale, 1 / scale);
+
                 var realAreaToDraw = pagePartInPage.scale(1 / info.scale);
+                realAreaToDraw = new Rect(realAreaToDraw.pos.roundDown(), realAreaToDraw.size.roundDown());
 
                 if (!markerOnly) {
                     page.draw(ctx1, realAreaToDraw, scale * info.scale, preview);
@@ -246,7 +240,8 @@ module mycore.viewer.widgets.canvas {
         }
 
         public removePage(page:model.AbstractPage):void {
-            page.refreshCallback = null;
+            page.refreshCallback = ()=> {
+            };
             page.clear();
             this._pageArea.removePage(page);
         }

@@ -198,6 +198,10 @@ class Size2D {
     public getSurface() {
         return this.width * this.height;
     }
+
+    roundDown() {
+        return new Size2D(Math.floor(this.width), Math.floor(this.height));
+    }
 }
 
 class Rect {
