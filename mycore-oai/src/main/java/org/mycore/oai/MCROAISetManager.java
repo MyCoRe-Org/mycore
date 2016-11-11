@@ -139,11 +139,13 @@ public class MCROAISetManager {
     protected void updateURIs() {
         this.setConfigurationMap = Collections.synchronizedMap(new HashMap<>());
         MCRConfiguration config = MCRConfiguration.instance();
-        String setIds = config.getString(this.configPrefix + "Sets", "");
-        for (String setId : setIds.split(",")) {
-            setId = setId.trim();
-            MCROAISetConfiguration<?> setConf = new MCROAISolrSetConfiguration(this.configPrefix, setId);
-            this.setConfigurationMap.put(setId, setConf);
+        String setIds = config.getString(this.configPrefix + "Sets", null);
+        if(setIds != null) {
+            for (String setId : setIds.split(",")) {
+                setId = setId.trim();
+                MCROAISetConfiguration<?> setConf = new MCROAISolrSetConfiguration(this.configPrefix, setId);
+                this.setConfigurationMap.put(setId, setConf);
+            }
         }
     }
 
