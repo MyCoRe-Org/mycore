@@ -12,6 +12,15 @@ module mycore.viewer.widgets.canvas {
                 "right": "0px",
                 "overflow":"hidden"
             });
+
+            var ctx1 = <CanvasRenderingContext2D>this.drawCanvas.getContext("2d");
+            var ctx2 = <CanvasRenderingContext2D>this.markCanvas.getContext("2d");
+
+            if ("imageSmoothingEnabled" in ctx1) {
+                (<any>ctx1).imageSmoothingEnabled = false;
+                (<any>ctx2).imageSmoothingEnabled = false;
+            }
+
         }
 
         private _container:JQuery = jQuery("<div></div>");
