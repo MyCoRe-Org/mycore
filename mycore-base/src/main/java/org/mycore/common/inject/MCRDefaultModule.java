@@ -1,5 +1,8 @@
 package org.mycore.common.inject;
 
+import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
+
 import com.google.inject.AbstractModule;
 
 /**
@@ -11,7 +14,10 @@ public class MCRDefaultModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        // nothing to bind yet
+
+        // PROCESSING API
+        bind(MCRProcessableRegistry.class).to(MCRCentralProcessableRegistry.class);
+
     }
 
 }

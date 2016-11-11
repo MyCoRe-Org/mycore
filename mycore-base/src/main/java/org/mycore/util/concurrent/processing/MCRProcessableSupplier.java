@@ -14,7 +14,7 @@ import org.mycore.common.processing.MCRProgressable;
 import org.mycore.util.concurrent.MCRPrioritySupplier;
 
 /**
- * A processable supplier combines a {@link Supplier<R>} and a {@link MCRProcessable}.
+ * A processable supplier combines a {@link Supplier} and a {@link MCRProcessable}.
  * The supplier will be executed with the help of an {@link CompletableFuture}.
  * To get the future call {@link #getFuture()}.
  * 
@@ -31,8 +31,8 @@ public class MCRProcessableSupplier<R> extends MCRAbstractProcessable<Callable<R
     /**
      * Creates a new {@link MCRProcessableSupplier} by the already committed task and its future.
      * 
-     * @param task the task to submit
-     * @param executorService the executor service
+     * @param task the task which should be executed
+     * @param future the future
      * @return a new processable supplier
      */
     public static <T> MCRProcessableSupplier<T> of(Callable<T> task, CompletableFuture<T> future) {

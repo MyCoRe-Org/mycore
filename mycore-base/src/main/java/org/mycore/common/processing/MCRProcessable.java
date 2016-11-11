@@ -91,8 +91,7 @@ public interface MCRProcessable extends MCRProgressable {
     public Throwable getError();
 
     /**
-     * Time (instant) the process was started (the {@link #call()} was
-     * executed). Returns null if the process was not started yet.
+     * Time (instant) the process was started. Returns null if the process was not started yet.
      * 
      * @return the time the process was started
      */
