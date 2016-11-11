@@ -43,7 +43,7 @@ public class MCRAbstractProgressable implements MCRListenableProgressable {
     /**
      * Sets the progress text for this process.
      * 
-     * @param progress the new progress text
+     * @param progressText the new progress text
      */
     public void setProgressText(String progressText) {
         String oldProgressText = this.progressText;

@@ -11,18 +11,20 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.common.processing.MCRProcessableStatus;
+import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
 
-public class MCRProcessableFactoryTest {
+public class MCRProcessableFactoryTest extends MCRTestCase {
 
     private static Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void newPool() throws Exception {
-        MCRProcessableRegistry registry = new MCRProcessableRegistry();
+        MCRProcessableRegistry registry = new MCRCentralProcessableRegistry();
         MCRProcessableCollection collection = new MCRProcessableDefaultCollection("test");
         registry.register(collection);
 

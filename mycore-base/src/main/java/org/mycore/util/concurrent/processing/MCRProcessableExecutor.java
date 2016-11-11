@@ -55,7 +55,7 @@ public interface MCRProcessableExecutor {
      * <p><b>
      * You should not submit task to this thread pool directly. Use the submit
      * methods of this class instead.
-     * <b></p>
+     * </b></p>
      * 
      * @return the thread pool.
      */
