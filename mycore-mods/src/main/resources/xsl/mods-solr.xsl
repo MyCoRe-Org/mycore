@@ -175,9 +175,6 @@
         <field name="mods.relatedItem.{$type}">
           <xsl:value-of select="$relatedID" />
         </field>
-        <field name="mods.relatedItem.{$relatedID}">
-          <xsl:value-of select="$type" />
-        </field>
       </xsl:if>
       <!-- END MCR-888 -->
     </xsl:for-each>
