@@ -12,7 +12,7 @@
   <xsl:template match="mycoreobject[./metadata/def.modsContainer/modsContainer/mods:mods]">
     <xsl:apply-imports />
     <!-- classification fields from mycore-mods -->
-    <xsl:apply-templates select="metadata//mods:*[@authority or @authorityURI]" />
+    <xsl:apply-templates select="metadata//mods:*[@authority or @authorityURI]|metadata//mods:mods/mods:typeOfResource|metadata//mods:mods/mods:accessCondition" />
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
     <field name="mods.type">
       <xsl:apply-templates select="." mode="mods-type" />
@@ -28,7 +28,7 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template match="mods:*[@authority or @authorityURI]">
+  <xsl:template match="mods:*[@authority or @authorityURI]|mods:typeOfResource|mods:accessCondition">
     <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
     <xsl:if test="string-length($uri) &gt; 0">
       <xsl:variable name="topField" select="not(ancestor::mods:relatedItem)" />
