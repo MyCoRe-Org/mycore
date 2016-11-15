@@ -1615,5 +1615,6 @@
     <module>mycore-complete</module>
     <module>iview2-addons</module>
     <module>mycore-coma</module>
+    <module>mycore-autodeploy</module>
   </modules>
 </project>

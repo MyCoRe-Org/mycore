@@ -30,7 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.Manifest;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.MCRException;
@@ -98,7 +97,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             type = Type.module;
             setName(artifactId.replaceAll("[_-]?module", ""));
         }
-        this.jarFile = jarFile;
+        setJarFile(jarFile);
         this.artifactId = artifactId;
         this.manifest = manifest;
         buildSortCriteria();
@@ -118,19 +117,19 @@ public class MCRComponent implements Comparable<MCRComponent> {
             throw new MCRException(artifactId + " has unsupported priority: " + priority);
         }
         switch (type) {
-            case complete:
-                break;
-            case base:
-                priority += 100;
-                break;
-            case component:
-                priority += 200;
-                break;
-            case module:
-                priority += 300;
-                break;
-            default:
-                throw new MCRException("Do not support MCRComponenty of type: " + type);
+        case complete:
+            break;
+        case base:
+            priority += 100;
+            break;
+        case component:
+            priority += 200;
+            break;
+        case module:
+            priority += 300;
+            break;
+        default:
+            throw new MCRException("Do not support MCRComponenty of type: " + type);
         }
         this.sortCriteria = PRIORITY_FORMAT.format(priority) + getName();
     }
@@ -153,15 +152,15 @@ public class MCRComponent implements Comparable<MCRComponent> {
      */
     public String getResourceBase() {
         switch (type) {
-            case base:
-                return "config/";
-            case component:
-                return "components/" + getName() + "/config/";
-            case module:
-                return "config/" + getName() + "/";
-            default:
-                LOGGER.debug(getName() + ": there is no resource base for type " + type);
-                break;
+        case base:
+            return "config/";
+        case component:
+            return "components/" + getName() + "/config/";
+        case module:
+            return "config/" + getName() + "/";
+        default:
+            LOGGER.debug(getName() + ": there is no resource base for type " + type);
+            break;
         }
         return null;
     }
@@ -197,6 +196,29 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     private void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Returns the jar file or <code>null</code> if nothing was set.
+     * 
+     * @return the jar file
+     */
+    public File getJarFile() {
+        return jarFile;
+    }
+
+    private void setJarFile(File jarFile) {
+        this.jarFile = jarFile;
+    }
+
+    /**
+     * Returns the mainfest main attribute value for given attribute name.
+     * 
+     * @param name the attribute name
+     * @return the attribute value
+     */
+    public String getManifestMainAttribute(String name) {
+        return manifest.getMainAttributes().getValue(name);
     }
 
     /**
@@ -253,16 +275,16 @@ public class MCRComponent implements Comparable<MCRComponent> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         switch (type) {
-            case base:
-            case component:
-                sb.append("mcr:");
-                break;
-            case module:
-                sb.append("app:");
-                break;
-            default:
-                //complete
-                break;
+        case base:
+        case component:
+            sb.append("mcr:");
+            break;
+        case module:
+            sb.append("app:");
+            break;
+        default:
+            //complete
+            break;
         }
         sb.append(artifactId);
         return sb.toString();

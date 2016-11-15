@@ -23,8 +23,11 @@
 
 package org.mycore.common.config;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -59,23 +62,23 @@ public class MCRRuntimeComponentDetector {
     private static final Name ATT_MCR_ARTIFACT_ID = new Name("MCR-Artifact-Id");
 
     private static SortedSet<MCRComponent> ALL_COMPONENTS = Collections
-        .unmodifiableSortedSet(getConfiguredComponents());
+            .unmodifiableSortedSet(getConfiguredComponents());
 
     private static SortedSet<MCRComponent> MYCORE_COMPONENTS = Collections.unmodifiableSortedSet(
-        ALL_COMPONENTS.stream()
-            .filter(MCRComponent::isMyCoReComponent)
-            .collect(Collectors.toCollection(TreeSet::new)));
+            ALL_COMPONENTS.stream()
+                    .filter(MCRComponent::isMyCoReComponent)
+                    .collect(Collectors.toCollection(TreeSet::new)));
 
     private static SortedSet<MCRComponent> APP_MODULES = Collections.unmodifiableSortedSet(
-        ALL_COMPONENTS.stream()
-            .filter(MCRComponent::isAppModule)
-            .collect(Collectors.toCollection(TreeSet::new)));
+            ALL_COMPONENTS.stream()
+                    .filter(MCRComponent::isAppModule)
+                    .collect(Collectors.toCollection(TreeSet::new)));
 
     private static SortedSet<MCRComponent> getConfiguredComponents() {
         try {
             String underTesting = System.getProperty("MCRRuntimeComponentDetector.underTesting");
             Enumeration<URL> resources = MCRRuntimeComponentDetector.class.getClassLoader().getResources(
-                "META-INF/MANIFEST.MF");
+                    "META-INF/MANIFEST.MF");
             if (!resources.hasMoreElements() && underTesting == null) {
                 LOGGER.warn("Did not find any Manifests.");
                 return Collections.emptySortedSet();
@@ -85,7 +88,7 @@ public class MCRRuntimeComponentDetector {
                 URL manifestURL = resources.nextElement();
                 try (InputStream manifestStream = manifestURL.openStream()) {
                     Manifest manifest = new Manifest(manifestStream);
-                    MCRComponent component = buildComponent(manifest);
+                    MCRComponent component = buildComponent(manifest, manifestURL);
 
                     if (component != null) {
                         components.add(component);
@@ -104,7 +107,7 @@ public class MCRRuntimeComponentDetector {
         }
     }
 
-    private static MCRComponent buildComponent(Manifest manifest) throws IOException {
+    private static MCRComponent buildComponent(Manifest manifest, URL manifestURL) throws IOException {
         Attributes mainAttributes = manifest.getMainAttributes();
         String artifactId = mainAttributes.getValue(ATT_MCR_ARTIFACT_ID);
         String pomPropertiesPath = mainAttributes.getValue(ATT_POM);
@@ -120,10 +123,10 @@ public class MCRRuntimeComponentDetector {
             }
 
             try (InputStream pi = MCRRuntimeComponentDetector.class.getClassLoader().getResourceAsStream(
-                pomPropertiesPath)) {
+                    pomPropertiesPath)) {
                 if (pi == null) {
                     LOGGER.warn("Manifest entry " + ATT_POM + " set to \"" + pomPropertiesPath
-                        + "\", but resource could not be loaded.");
+                            + "\", but resource could not be loaded.");
                     return null;
                 }
                 Properties pomProperties = new Properties();
@@ -134,16 +137,28 @@ public class MCRRuntimeComponentDetector {
         }
 
         if (artifactId != null && artifactId.startsWith("mycore-")
-            || mainAttributes.containsKey(ATT_MCR_APPLICATION_MODULE)) {
+                || mainAttributes.containsKey(ATT_MCR_APPLICATION_MODULE)) {
             if (usePomProperties) {
                 LOGGER.warn("No Attribute \"" + ATT_MCR_ARTIFACT_ID + "\" in Manifest of "
-                    + mainAttributes.getValue(ATT_MCR_APPLICATION_MODULE) + ".");
+                        + mainAttributes.getValue(ATT_MCR_APPLICATION_MODULE) + ".");
                 LOGGER.warn("Change this in the future, pom.properties path definition is deprecated.");
                 LOGGER.info("Using artifactId in " + pomPropertiesPath + ".");
             }
 
-            return new MCRComponent(artifactId, manifest);
+            return new MCRComponent(artifactId, manifest, extractJarFile(manifestURL));
         }
+        return null;
+    }
+
+    private static File extractJarFile(URL manifestURL) {
+        try {
+            if (manifestURL.toExternalForm().startsWith("jar:")) {
+                return new File(new URI(manifestURL.getPath().replaceAll("!.*$", "")));
+            }
+        } catch (URISyntaxException e) {
+            LOGGER.error("Couldn't extract jar file path from MANIFEST.MF url.", e);
+        }
+
         return null;
     }
 
