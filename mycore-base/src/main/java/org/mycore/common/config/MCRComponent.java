@@ -30,7 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.Manifest;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.MCRException;
@@ -98,7 +97,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             type = Type.module;
             setName(artifactId.replaceAll("[_-]?module", ""));
         }
-        this.jarFile = jarFile;
+        setJarFile(jarFile);
         this.artifactId = artifactId;
         this.manifest = manifest;
         buildSortCriteria();
@@ -197,6 +196,29 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     private void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Returns the jar file or <code>null</code> if nothing was set.
+     * 
+     * @return the jar file
+     */
+    public File getJarFile() {
+        return jarFile;
+    }
+
+    private void setJarFile(File jarFile) {
+        this.jarFile = jarFile;
+    }
+
+    /**
+     * Returns the mainfest main attribute value for given attribute name.
+     * 
+     * @param name the attribute name
+     * @return the attribute value
+     */
+    public String getManifestMainAttribute(String name) {
+        return manifest.getMainAttributes().getValue(name);
     }
 
     /**
