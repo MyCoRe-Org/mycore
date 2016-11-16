@@ -12,13 +12,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
@@ -30,6 +27,10 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
+import org.mycore.common.inject.MCRInjectorConfig;
+import org.mycore.common.processing.MCRProcessableCollection;
+import org.mycore.common.processing.MCRProcessableDefaultCollection;
+import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrClientFactory;
@@ -40,6 +41,9 @@ import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 import org.mycore.solr.search.MCRSolrSearchUtils;
+import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
+import org.mycore.util.concurrent.processing.MCRProcessableFactory;
+import org.mycore.util.concurrent.processing.MCRProcessableSupplier;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -57,22 +61,33 @@ public class MCRSolrIndexer {
      */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.BulkSize", 100);
 
-    final static ExecutorService PARALLEL_SERVICE;
+    final static MCRProcessableExecutor PARALLEL_SERVICE;
 
-    final static ExecutorService SERIAL_SERVICE = MoreExecutors.newDirectExecutorService();
+    final static MCRProcessableExecutor SERIAL_SERVICE;
 
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
     static {
+        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+
         int poolSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.ThreadCount", 4);
-        PARALLEL_SERVICE = Executors.newFixedThreadPool(poolSize,
+        final ExecutorService parellelPool = Executors.newFixedThreadPool(poolSize,
             new ThreadFactoryBuilder().setNameFormat("SOLR-Indexer-#%d").build());
+        MCRProcessableCollection parallelCollection = new MCRProcessableDefaultCollection("SOLR parallel");
+        registry.register(parallelCollection);
+        PARALLEL_SERVICE = MCRProcessableFactory.newPool(parellelPool, parallelCollection);
+
+        final ExecutorService serialPool = MoreExecutors.newDirectExecutorService();
+        MCRProcessableCollection serialCollection = new MCRProcessableDefaultCollection("SOLR serial");
+        registry.register(serialCollection);
+        SERIAL_SERVICE = MCRProcessableFactory.newPool(serialPool, serialCollection);
+
         MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
 
             @Override
             public void prepareClose() {
-                PARALLEL_SERVICE.shutdown();
-                SERIAL_SERVICE.shutdown();
+                PARALLEL_SERVICE.getExecutor().shutdown();
+                SERIAL_SERVICE.getExecutor().shutdown();
             }
 
             @Override
@@ -82,8 +97,8 @@ public class MCRSolrIndexer {
 
             @Override
             public void close() {
-                waitForShutdown(SERIAL_SERVICE);
-                waitForShutdown(PARALLEL_SERVICE);
+                waitForShutdown(serialPool);
+                waitForShutdown(parellelPool);
             }
 
             private void waitForShutdown(ExecutorService service) {
@@ -149,7 +164,7 @@ public class MCRSolrIndexer {
             LOGGER.debug("Deleting \"" + Arrays.asList(solrIDs) + "\" from solr");
             UpdateRequest req = new UpdateRequest();
             //delete all documents rooted at this id
-            if(useNestedDocuments()) {
+            if (useNestedDocuments()) {
                 StringBuilder deleteQuery = new StringBuilder("_root_:(");
                 for (String solrID : solrIDs) {
                     deleteQuery.append('"');
@@ -285,8 +300,8 @@ public class MCRSolrIndexer {
                 MCRContent content = metadataMgr.retrieveContent(objId);
                 contentMap.put(objId, content);
                 if (i % BULK_SIZE == 0 || totalCount == i) {
-                    MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(
-                        contentMap);
+                    MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance()
+                                                                                 .getIndexHandler(contentMap);
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     indexHandler.setSolrServer(solrClient);
                     statistic = indexHandler.getStatistic();
@@ -360,36 +375,29 @@ public class MCRSolrIndexer {
      *            if current transaction is read-only, save to say 'true' here
      */
     public static void submitIndexHandler(MCRSolrIndexHandler indexHandler, boolean parallel) {
-        MCRSolrIndexTask indexTask = new MCRSolrIndexTask(indexHandler);
-        ExecutorService es = parallel ? PARALLEL_SERVICE : SERIAL_SERVICE;
-        Future<List<MCRSolrIndexHandler>> future = es.submit(indexTask);
-        try {
-            List<MCRSolrIndexHandler> handlerList = future.get();
-            if (handlerList != null) {
-                //TODO: Java 8: fire an wait to finish
-                indexAndWait(handlerList, es);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error while submitting index handler.", e);
-        }
+        MCRProcessableExecutor es = parallel ? PARALLEL_SERVICE : SERIAL_SERVICE;
+        submitIndexHandler(indexHandler, es);
     }
 
-    private static void indexAndWait(List<MCRSolrIndexHandler> handlerList, ExecutorService es)
-        throws InterruptedException,
-        ExecutionException {
-        if (handlerList == null || handlerList.isEmpty()) {
-            return;
-        }
-        CompletionService<List<MCRSolrIndexHandler>> cs = new ExecutorCompletionService<>(es);
-        for (MCRSolrIndexHandler handler : handlerList) {
-            cs.submit(new MCRSolrIndexTask(handler));
-        }
-        int count = handlerList.size();
-        LOGGER.info("Waiting for " + count + " index handler to complete");
-        for (int i = 0; i < count; i++) {
-            List<MCRSolrIndexHandler> handlers = cs.take().get();
-            indexAndWait(handlers, es);
-        }
+    private static void submitIndexHandler(MCRSolrIndexHandler indexHandler, MCRProcessableExecutor es) {
+        MCRSolrIndexTask indexTask = new MCRSolrIndexTask(indexHandler);
+        MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = es.submit(indexTask);
+        supplier.getFuture().whenComplete(afterIndex(es));
+    }
+
+    private static BiConsumer<? super List<MCRSolrIndexHandler>, ? super Throwable> afterIndex(MCRProcessableExecutor es) {
+        return (handlerList, exc) -> {
+            if (exc != null) {
+                LOGGER.error("Error while submitting index handler.", exc);
+                return;
+            }
+            if (handlerList == null || handlerList.isEmpty()) {
+                return;
+            }
+            for (MCRSolrIndexHandler handler : handlerList) {
+                submitIndexHandler(handler, es);
+            }
+        };
     }
 
     /**
@@ -452,8 +460,8 @@ public class MCRSolrIndexer {
      * the same documents as the store. All solr zombie documents will be removed, and all not indexed mycore objects
      * will be indexed.
      */
-    public static void synchronizeMetadataIndex(String objectType, boolean parallel) throws IOException,
-        SolrServerException {
+    public static void synchronizeMetadataIndex(String objectType, boolean parallel)
+        throws IOException, SolrServerException {
         LOGGER.info("synchronize " + objectType);
         // get ids from store
         LOGGER.info("fetching mycore store...");
