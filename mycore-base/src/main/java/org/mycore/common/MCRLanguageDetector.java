@@ -24,9 +24,12 @@
 package org.mycore.common;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ibm.icu.lang.UCharacter;
 import com.ibm.icu.lang.UScript;
@@ -35,8 +38,8 @@ import org.apache.log4j.Logger;
 
 /**
  * Detects the language of a given text string by 
- * looking for typical words and word endings for each language.
- * German, englisch and french are currently supported.
+ * looking for typical words and word endings and used characters for each language.
+ * German, english, french, arabic, chinese, japanese, greek and hebrew are currently supported.
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
@@ -48,19 +51,26 @@ public class MCRLanguageDetector {
 
     private static Properties endings = new Properties();
 
+    private static Map<Integer, String> code2languageCodes = new HashMap<Integer, String>();
+
     static {
-        words.put(
-                "de",
-                "als am auch auf aus bei bis das dem den der deren derer des dessen die dies diese dieser dieses ein eine einer eines einem für hat im ist mit sich sie über und vom von vor wie zu zum zur");
+        code2languageCodes.put(UScript.ARABIC, "ar");
+        code2languageCodes.put(UScript.GREEK, "el");
+        code2languageCodes.put(UScript.HAN, "zh");
+        code2languageCodes.put(UScript.HEBREW, "he");
+        code2languageCodes.put(UScript.JAPANESE, "ja");
+        code2languageCodes.put(UScript.KATAKANA, "ja");
+
+        words.put("de",
+            "als am auch auf aus bei bis das dem den der deren derer des dessen die dies diese dieser dieses ein eine einer eines einem für hat im ist mit sich sie über und vom von vor wie zu zum zur");
         words.put("en",
-                "a and are as at do for from has have how its like new of on or the their through to with you your");
-        words.put(
-                "fr",
-                "la le les un une des, à aux de pour par sur comme aussi jusqu'à jusqu'aux quel quels quelles laquelle lequel lesquelles lesquelles auxquels auxquelles avec sans ont sont duquel desquels desquelles quand");
+            "a and are as at do for from has have how its like new of on or the their through to with you your");
+        words.put("fr",
+            "la le les un une des, à aux de pour par sur comme aussi jusqu'à jusqu'aux quel quels quelles laquelle lequel lesquelles lesquelles auxquels auxquelles avec sans ont sont duquel desquels desquelles quand");
 
         endings.put("en", "ar ble cal ce ced ed ent ic ies ing ive ness our ous ons ral th ure y");
         endings.put("de",
-                "ag chen gen ger iche icht ig ige isch ische ischen kar ker keit ler mus nen ner rie rer ter ten trie tz ung yse");
+            "ag chen gen ger iche icht ig ige isch ische ischen kar ker keit ler mus nen ner rie rer ter ten trie tz ung yse");
         endings.put("fr", "é, és, ée, ées, euse, euses, ème, euil, asme, isme, aux");
     }
 
@@ -100,47 +110,56 @@ public class MCRLanguageDetector {
     }
 
     public static String detectLanguageByCharacter(String text) {
-        if (text == null || text.length() == 0) {
+        if (text == null || text.isEmpty()) {
             LOGGER.warn("The text for language detection is null or empty");
             return null;
         }
         LOGGER.debug("Detecting language of [" + text + "]");
-        int code;
+
+        Map<Integer, AtomicInteger> scores = new HashMap<Integer, AtomicInteger>();
+        buildScores(text, scores);
+        int code = getCodeWithMaxScore(scores);
+
+        return code2languageCodes.containsKey(code) ? code2languageCodes.get(code) : null;
+    }
+
+    private static void buildScores(String text, Map<Integer, AtomicInteger> scores) {
         try {
             char[] chararray = text.toCharArray();
             for (int i = 0; i < text.length(); i++) {
-                code = UScript.getScript(UCharacter.codePointAt(chararray, i));
-                switch (code) {
-                case UScript.ARABIC:
-                    LOGGER.debug("The language looks like ARABIC");
-                    return "ar";
-                case UScript.GREEK:
-                    LOGGER.debug("The language looks like GREEK");
-                    return "el";
-                case UScript.HAN:
-                    LOGGER.debug("The language looks like HAN");
-                    return "zh";
-                case UScript.HEBREW:
-                    LOGGER.debug("The language looks like HEBREW");
-                    return "he";
-                case UScript.JAPANESE:
-                    LOGGER.debug("The language looks like JAPANESE");
-                    return "ja";
-                case UScript.KATAKANA:
-                    LOGGER.debug("The language looks like KATAKANA");
-                    return "ja";
-                }
+                int code = UScript.getScript(UCharacter.codePointAt(chararray, i));
+                increaseScoreFor(scores, code);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
-        return null;
+    }
+
+    private static void increaseScoreFor(Map<Integer, AtomicInteger> scores, int code) {
+        AtomicInteger score = scores.get(code);
+        if (score == null) {
+            score = new AtomicInteger();
+            scores.put(code, score);
+        }
+        score.incrementAndGet();
+    }
+
+    private static int getCodeWithMaxScore(Map<Integer, AtomicInteger> scores) {
+        int maxCode = 0, maxScore = 0;
+        for (Integer code : scores.keySet()) {
+            int score = scores.get(code).get();
+            if (score > maxScore) {
+                maxScore = score;
+                maxCode = code;
+            }
+        }
+        return maxCode;
     }
 
     /**
      * Detects the language of a given text string.
      * 
      * @param text the text string
-     * @return the language code: de, en, fr or null
+     * @return the language code: de, en, fr, ar ,el, zh, he, jp or null
      */
     public static String detectLanguage(String text) {
         LOGGER.debug("Detecting language of [" + text + "]");
