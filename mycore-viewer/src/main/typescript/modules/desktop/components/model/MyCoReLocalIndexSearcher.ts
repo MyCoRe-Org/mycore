@@ -49,7 +49,7 @@ module mycore.viewer.model {
 
         public search(query:string, resultReporter:(objects:Array<ResultObject>)=>void, searchCompleteCallback:(maxResults?:number)=>void, count?:number, start?:number) {
             var results = this._searchIndex.search(query).results;
-            this.clearDoubleResults(results);
+            results = this.clearDoubleResults(results);
             resultReporter(results);
             searchCompleteCallback(results.length);
         }
