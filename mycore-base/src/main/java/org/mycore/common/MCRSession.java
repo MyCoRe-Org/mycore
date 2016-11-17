@@ -31,14 +31,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -125,12 +127,7 @@ public class MCRSession implements Cloneable {
 
     private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<Throwable>();
 
-    private ThreadLocal<List<Runnable>> onCommitTasks = new ThreadLocal<List<Runnable>>() {
-        @Override
-        protected List<Runnable> initialValue() {
-            return Collections.synchronizedList(new CopyOnWriteArrayList<>());
-        }
-    };
+    private ThreadLocal<Queue<Runnable>> onCommitTasks = ThreadLocal.withInitial(LinkedList::new);
 
     private static ExecutorService COMMIT_SERVICE;
 
@@ -442,7 +439,7 @@ public class MCRSession implements Cloneable {
             transaction.set(entityTransaction);
         }
     }
-    
+
     /**
      * Determine whether the current resource transaction has been marked for rollback.
      * @return boolean indicating whether the transaction has been marked for rollback
@@ -530,14 +527,28 @@ public class MCRSession implements Cloneable {
      * @param task thread witch will be executed after an commit
      */
     public void onCommit(Runnable task) {
-        this.onCommitTasks.get().add(new MCRTransactionableRunnable(task, this));
+        this.onCommitTasks.get().offer(Objects.requireNonNull(task));
     }
 
-    protected synchronized void submitOnCommitTasks() {
-        this.onCommitTasks.get().forEach(task -> {
+    private synchronized void submitOnCommitTasks() {
+        Queue<Runnable> runnables = onCommitTasks.get();
+        onCommitTasks.remove();
+        runnables.stream()
+            .map(r -> new MCRTransactionableRunnable(r, this))
+            .forEach(this::submitOrRunOnCommitTask);
+    }
+    
+    private void submitOrRunOnCommitTask(MCRTransactionableRunnable task){
+        try {
             COMMIT_SERVICE.submit(task);
-        });
-        this.onCommitTasks.get().clear();
+        } catch (RuntimeException e) {
+            LOGGER.error("Could not submit onCommit task. Running it locally.", e);
+            try {
+                task.run();
+            } catch (RuntimeException e2) {
+                LOGGER.fatal("Argh! Could not run task either. This task is lost 😰", e2);
+            }
+        }
     }
 
     private boolean isTransitionAllowed(MCRUserInformation userSystemAdapter) {
