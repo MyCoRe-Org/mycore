@@ -136,13 +136,15 @@ module mycore.viewer.components {
             if(e.type == events.ShowContentEvent.TYPE) {
                 var sce = <events.ShowContentEvent>e;
                 if(sce.size == 0 && sce.containerDirection == events.ShowContentEvent.DIRECTION_EAST) {
-                    this.dropDownButton.children.forEach(child=>{
-                        delete child.icon;
-                    });
-                    this.dropDownButton.children = this.dropDownButton.children;
-                    this.layerDisplay.getLayer().forEach(s=>{
-                       this.layerDisplay.removeLayer(s);
-                    });
+                    if(this.dropDownButton!=null){
+                        this.dropDownButton.children.forEach(child=> {
+                            delete child.icon;
+                        });
+                        this.dropDownButton.children = this.dropDownButton.children;
+                        this.layerDisplay.getLayer().forEach(s=> {
+                            this.layerDisplay.removeLayer(s);
+                        });
+                    }
                 }
             }
 

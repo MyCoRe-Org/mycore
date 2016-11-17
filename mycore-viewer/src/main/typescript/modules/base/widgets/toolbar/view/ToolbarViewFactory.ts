@@ -3,6 +3,7 @@
 /// <reference path="group/GroupView.ts" />
 /// <reference path="dropdown/DropdownView.ts" />
 /// <reference path="button/ButtonView.ts" />
+/// <reference path="input/TextInputView.ts" />
 /// <reference path="ToolbarView.ts" />
 
 module mycore.viewer.widgets.toolbar {
@@ -14,6 +15,7 @@ module mycore.viewer.widgets.toolbar {
         createDropdownView(id:string):DropdownView;
         createLargeDropdownView(id:string):DropdownView;
         createButtonView(id:string):ButtonView;
+        createTextInputView(id: string): TextInputView;
     }
 
     export var ToolbarViewFactoryImpl: ToolbarViewFactory;

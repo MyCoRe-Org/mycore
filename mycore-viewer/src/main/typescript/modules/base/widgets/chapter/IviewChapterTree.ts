@@ -31,8 +31,10 @@ module mycore.viewer.widgets.chaptertree {
         }
 
         public setChapterExpanded(element: ChapterTreeChapter, expanded: boolean) {
-            this._model.chapterVisible.set(element.id, expanded);
-            this._view.setOpened(element.id, expanded);
+            if(element!=null){
+                this._model.chapterVisible.set(element.id, expanded);
+                this._view.setOpened(element.id, expanded);
+            }
         }
 
         public getChapterExpanded(element: ChapterTreeChapter) {

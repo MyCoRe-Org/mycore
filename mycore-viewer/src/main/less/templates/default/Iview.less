@@ -146,9 +146,25 @@
     }
   }
 
-  .textSearch li a {
-    white-space: normal;
-    overflow: visible;
+  .textSearch {
+    li {
+      &.list-group-item {
+        &.active {
+          background: rgb(50, 118, 177);
+          border-color: rgb(40, 94, 142);
+          a {
+            color: white;
+          }
+        }
+      }
+      a {
+        white-space: normal;
+        overflow: visible;
+      }
+      span.childLabel {
+        color: #dddddd !important;
+      }
+    }
   }
 
   .sidebar {

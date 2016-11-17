@@ -59,8 +59,8 @@ module mycore.viewer.widgets.canvas {
                     if (this.scrollHandler != null) {
                         this.scrollHandler();
                     }
+                    e.preventDefault();
                 }
-                e.preventDefault();
             });
 
             jQuery(document.body).mouseup((e)=> {

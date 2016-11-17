@@ -4,10 +4,12 @@
 /// <reference path="dropdown/BootstrapDropdownView.ts" />
 /// <reference path="dropdown/BootstrapLargeDropdownView.ts" />
 /// <reference path="button/BootstrapButtonView.ts" />
+/// <reference path="input/BootstrapTextInputView.ts" />
 /// <reference path="BootstrapToolbarView.ts" />
 
 module mycore.viewer.widgets.toolbar {
     export class BootstrapToolbarViewFactory implements ToolbarViewFactory {
+
         createToolbarView():ToolbarView {
             return new BootstrapToolbarView();
         }
@@ -34,6 +36,10 @@ module mycore.viewer.widgets.toolbar {
 
         createButtonView(id:string):ButtonView {
             return new BootstrapButtonView(id);
+        }
+
+        createTextInputView(id: string): TextInputView {
+            return new BootstrapTextInputView(id);
         }
     }
 
