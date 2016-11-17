@@ -199,9 +199,9 @@ module mycore.viewer.widgets.canvas {
                     ctx1.rotate(info.rotation * Math.PI / 180);
                     ctx1.translate(Math.floor(((-notRotated.width / 2) + pagePartInPage.pos.x) * scale), Math.floor(((-notRotated.height / 2) + pagePartInPage.pos.y) * scale));
 
-                    ctx2.translate(Math.floor((-areaInViewport.pos.x + info.position.x) * scale), (-areaInViewport.pos.y + info.position.y) * scale);
+                    ctx2.translate(Math.floor((-areaInViewport.pos.x + info.position.x) * scale), Math.floor(-areaInViewport.pos.y + info.position.y) * scale);
                     ctx2.rotate(info.rotation * Math.PI / 180);
-                    ctx2.translate(((-notRotated.width / 2) + pagePartInPage.pos.x) * pagePartInPage.pos.x.scale, ((-notRotated.height / 2) * pagePartInPage.pos.y) * scale);
+                    ctx2.translate((Math.floor(-notRotated.width / 2) + pagePartInPage.pos.x) * scale, Math.floor((-notRotated.height / 2) + pagePartInPage.pos.y) * scale);
                 }
 
                 var realAreaToDraw = pagePartInPage.scale(1 / info.scale);
