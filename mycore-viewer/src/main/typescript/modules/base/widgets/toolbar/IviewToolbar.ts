@@ -20,6 +20,7 @@
 /// <reference path="control/TextController.ts" />
 /// <reference path="model/ToolbarText.ts" />
 /// <reference path="view/text/TextView.ts" />
+/// <reference path="control/TextInputController.ts" />
 
 
 module mycore.viewer.widgets.toolbar {
@@ -38,6 +39,7 @@ module mycore.viewer.widgets.toolbar {
             this._dropdownController = new DropdownButtonController(<any>this._idGroupViewMap, this._idViewMap,_mobile);
             this._textController = new TextController(<any>this._idGroupViewMap, this._idViewMap, _mobile);
             this._imageController = new ImageController(<any>this._idGroupViewMap, this._idViewMap);
+            this._textInputController = new TextInputController(<any>this._idGroupViewMap, this._idViewMap);
 
             var that = this;
             this._buttonController.eventManager.bind(function ToolbarCallback(e:mycore.viewer.widgets.events.ViewerEvent){
@@ -61,6 +63,7 @@ module mycore.viewer.widgets.toolbar {
         private _dropdownController:DropdownButtonController;
         private _textController:TextController;
         private _imageController:ImageController;
+        private _textInputController:TextInputController;
 
         public get model() {
             return this._model;
@@ -118,6 +121,11 @@ module mycore.viewer.widgets.toolbar {
                     return;
                 }
 
+                if (component instanceof ToolbarTextInput) {
+                    this._textInputController.childAdded(parent, component);
+                    return;
+                }
+
                 if (component instanceof ToolbarImage) {
                     if(this._mobile) {
                         throw new ViewerError("Mobile Toolbar doesnt support Image!");
@@ -156,6 +164,11 @@ module mycore.viewer.widgets.toolbar {
 
             if (component instanceof ToolbarImage) {
                 this._imageController.childRemoved(parent, component);
+                return;
+            }
+
+            if (component instanceof ToolbarTextInput) {
+                this._textInputController.childRemoved(parent, component);
                 return;
             }
         }

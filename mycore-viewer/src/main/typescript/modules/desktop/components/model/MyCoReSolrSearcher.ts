@@ -30,6 +30,11 @@ module mycore.viewer.model {
                 this._currentRequest.abortRequest();
             }
 
+            if(query==""){
+                resultReporter((new Array()));
+                return;
+            }
+
             this._currentRequest = new widgets.solr.SolrSearchRequest(query, ()=> {
                 console.log(this._currentRequest.solrRequestResult);
                 resultReporter(this.extractSearchResults(query, this._currentRequest.solrRequestResult));

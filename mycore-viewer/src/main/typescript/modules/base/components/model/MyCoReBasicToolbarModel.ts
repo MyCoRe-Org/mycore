@@ -29,6 +29,7 @@ module mycore.viewer.model {
         public _zoomControllGroup:widgets.toolbar.ToolbarGroup;
         public _actionControllGroup:widgets.toolbar.ToolbarGroup;
         public _layoutControllGroup:widgets.toolbar.ToolbarGroup;
+        public _searchGroup:widgets.toolbar.ToolbarGroup;
         public _closeViewerGroup:widgets.toolbar.ToolbarGroup;
 
         public _sidebarControllDropdownButton: widgets.toolbar.ToolbarDropdownButton;
@@ -102,6 +103,8 @@ module mycore.viewer.model {
             this._actionControllGroup = new widgets.toolbar.ToolbarGroup("ActionControllGroup");
             this._shareButton = new widgets.toolbar.ToolbarButton("ShareButton", "", "share", "share");
             this._actionControllGroup.addComponent(this._shareButton);
+
+            this._searchGroup = new widgets.toolbar.ToolbarGroup("SearchGroup", true);
 
 
             this._closeViewerGroup = new widgets.toolbar.ToolbarGroup("CloseViewerGroup", true);

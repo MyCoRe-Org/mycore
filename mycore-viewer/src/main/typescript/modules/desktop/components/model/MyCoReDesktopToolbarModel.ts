@@ -20,6 +20,7 @@ module mycore.viewer.model {
             this.addGroup(this._imageChangeControllGroup);
             this.addGroup(this._actionControllGroup);
             this.addGroup(this._closeViewerGroup);
+            this.addGroup(this._searchGroup);
         }
 
 

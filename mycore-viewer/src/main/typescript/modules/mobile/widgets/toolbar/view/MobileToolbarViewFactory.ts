@@ -5,6 +5,10 @@
 
 module mycore.viewer.widgets.toolbar {
     export class MobileToolbarViewFactory implements ToolbarViewFactory {
+
+        createTextInputView(id: string): mycore.viewer.widgets.toolbar.TextInputView {
+            throw new ViewerError("text input view not supported by Mobile!");
+        }
         createToolbarView():ToolbarView {
             return new MobileToolbarView();
         }

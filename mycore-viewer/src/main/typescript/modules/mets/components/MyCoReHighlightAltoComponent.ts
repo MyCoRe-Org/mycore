@@ -4,6 +4,8 @@ module mycore.viewer.components {
     import RequestAltoModelEvent = mycore.viewer.components.events.RequestAltoModelEvent;
     import AreaInPage = mycore.viewer.widgets.canvas.AreaInPage;
     import WaitForEvent = mycore.viewer.components.events.WaitForEvent;
+    import CanvasMarkerType = mycore.viewer.widgets.canvas.CanvasMarkerType;
+
     export class MyCoReHighlightAltoComponent extends ViewerComponent {
         private marker:widgets.canvas.CanvasMarker = null;
 
@@ -27,7 +29,7 @@ module mycore.viewer.components {
         public handle(e:mycore.viewer.widgets.events.ViewerEvent) {
             if (e.type == events.ChapterChangedEvent.TYPE) {
                 let cce = <events.ChapterChangedEvent>e;
-                this.marker.clearAll();
+                this.marker.clearAll(CanvasMarkerType.AREA);
                 if (cce.chapter.additional.has("blocklist")) {
                     let blocklist:Array<{
                         fileId:string,
@@ -63,7 +65,7 @@ module mycore.viewer.components {
                                             if(blockToHighlight == null) {
                                                 continue;
                                             }
-                                            this.marker.markArea(new AreaInPage(imageHref, blockToHighlight.getBlockHPos(), blockToHighlight.getBlockVPos(), blockToHighlight.getWidth(), blockToHighlight.getHeight()));
+                                            this.marker.markArea(new AreaInPage(imageHref, blockToHighlight.getBlockHPos(), blockToHighlight.getBlockVPos(), blockToHighlight.getWidth(), blockToHighlight.getHeight(), CanvasMarkerType.AREA));
                                         }
                                     }
                                 );
@@ -79,7 +81,7 @@ module mycore.viewer.components {
             if(e.type == events.ShowContentEvent.TYPE){
                 let sce = (<events.ShowContentEvent>e);
                 if(sce.containerDirection==events.ShowContentEvent.DIRECTION_WEST){
-                    this.marker.clearAll();
+                    this.marker.clearAll(CanvasMarkerType.AREA);
                 }
 
             }

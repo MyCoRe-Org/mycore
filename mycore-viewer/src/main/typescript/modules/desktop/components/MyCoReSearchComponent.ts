@@ -4,8 +4,8 @@
 
 module mycore.viewer.components {
     import AreaInPage = mycore.viewer.widgets.canvas.AreaInPage;
+    import CanvasMarkerType = mycore.viewer.widgets.canvas.CanvasMarkerType;
     export class MyCoReSearchComponent extends ViewerComponent {
-        private onchange;
 
         constructor(private _settings:MyCoReViewerSettings) {
             super();
@@ -15,12 +15,12 @@ module mycore.viewer.components {
         private _searchContainer:JQuery;
         private _sidebarLabel = jQuery("<span>Suche</span>");
         private _model:model.StructureModel = null;
-        private _searchForm:JQuery = null;
-        private  _valueToApply:string = null
+        private  _valueToApply:string = null;
         private _containerVisible:boolean = false;
         private _indexPrepared:boolean = false;
         private _indexPreparing:boolean = false;
         private _textPresent:boolean = false;
+        private _toolbarTextInput: widgets.toolbar.ToolbarTextInput = new widgets.toolbar.ToolbarTextInput("search", "", "");
 
         private _searcher:model.MyCoReViewerSearcher = null;
         private _imageHrefImageMap:MyCoReMap<string, model.StructureImage> = new MyCoReMap<string, model.StructureImage>();
@@ -42,9 +42,13 @@ module mycore.viewer.components {
             ],
             (_self:MyCoReSearchComponent)=> {
                 let searchLabel = _self._languageModel.getTranslation("sidebar.search");
+                this._toolbarTextInput.placeHolder = _self._languageModel.getTranslation("search.placeHolder");
                 _self._sidebarLabel.text(searchLabel);
-                _self._tbModel._dropdownChildren.unshift({id : "search", label : searchLabel});
-                _self._tbModel._sidebarControllDropdownButton.children = _self._tbModel._dropdownChildren;
+                _self._tbModel._searchGroup.addComponent(this._toolbarTextInput);
+                if (this._valueToApply != null) {
+                    this._toolbarTextInput.value = this._valueToApply;
+                    this._valueToApply = null;
+                }
         });
 
         private _tbModel:model.MyCoReBasicToolbarModel = null;
@@ -54,42 +58,31 @@ module mycore.viewer.components {
         private _progressbar:JQuery = null;
         private _progressbarInner:JQuery = null;
         private _searchTextTimeout = -1;
+        private _searchAreaReady = false;
 
         public get container() {
             return this._container;
         }
 
-        private addSearchForm() {
+        private initSearchArea() {
+            this._progressbar.parent().remove();
             this._progressbar.remove();
             this._container.css({"text-align": "left"});
-            this._searchForm = jQuery("<input id='search' type='text' class='form-control' />");
 
-            this._panel.append(this._searchForm);
 
             this._searchContainer = jQuery("<ul class='list-group textSearch'></ul>");
             this._searchContainer.appendTo(this.container);
 
-            this.onchange = ()=> {
-                if(this._searchTextTimeout != -1){
-                    window.clearTimeout(this._searchTextTimeout);
-                    this._searchTextTimeout = -1;
-                }
-
-                this._searchTextTimeout = window.setTimeout(()=>{
-                    this._search(this._searchForm.val());
-                },300);
-            };
-
-            this._searchForm.bind("keyup", this.onchange);
-
-            if(this._valueToApply!=null){
-                this._searchForm.val(this._valueToApply);
-                this._valueToApply = null;
-                this.onchange();
-            }
+            this._searchAreaReady = true;
+            this._search(this._toolbarTextInput.value);
         }
 
         private _search(str:string) {
+            if(str==""){
+                var direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_EAST;
+                this.trigger(new events.ShowContentEvent(this, this._container, direction, 0, this._sidebarLabel));
+            }
+
             this._searchContainer.children().remove();
 
             var textContents = new Array<model.TextElement>();
@@ -101,9 +94,10 @@ module mycore.viewer.components {
                     wordMap.set(e.obj, e.matchWords);
                 });
 
+                var lastClicked:JQuery = null;
                 searchResults.forEach((e) => {
                     var result = jQuery("<li class='list-group-item'></li>");
-                    var link = jQuery("<a></a>").append(e.context);
+                    var link = jQuery("<a></a>").append(e.context.clone());
                     result.append(link);
 
 
@@ -111,6 +105,13 @@ module mycore.viewer.components {
                     if (this._imageHrefImageMap.has(e.obj.pageHref)) {
                         var image = this._imageHrefImageMap.get(e.obj.pageHref);
                         link.click(()=> {
+                            if(lastClicked!=null){
+                                lastClicked.removeClass("active");
+                            }
+                            lastClicked = result;
+                            result.addClass("active");
+                            this._marker.clearAll(CanvasMarkerType.WORD_STRONG);
+                            this._marker.markArea(new AreaInPage(e.obj.pageHref, e.obj.pos.x, e.obj.pos.y, e.obj.size.width, e.obj.size.height, CanvasMarkerType.WORD_STRONG));
                             this.trigger(new events.ImageSelectedEvent(this, image));
                         });
                         var page = jQuery("<span class='childLabel'>" + (image.orderLabel || image.order) + "</span>");
@@ -121,9 +122,10 @@ module mycore.viewer.components {
 
                 });
             }, ()=> {
-                this._marker.clearAll();
+                this._marker.clearAll(CanvasMarkerType.WORD);
+                this._marker.clearAll(CanvasMarkerType.WORD_STRONG);
                 textContents.forEach(tc=> {
-                    this._marker.markArea(new AreaInPage(tc.pageHref, tc.pos.x, tc.pos.y, tc.size.width, tc.size.height));
+                    this._marker.markArea(new AreaInPage(tc.pageHref, tc.pos.x, tc.pos.y, tc.size.width, tc.size.height, CanvasMarkerType.WORD));
                 });
             });
         }
@@ -142,10 +144,23 @@ module mycore.viewer.components {
             this._initProgressbar();
             this._panel.append(this._progressbar);
 
-            jQuery(document.body).keypress((e)=> {
-                if (e.keyCode == 102 && this._textPresent && jQuery("input:focus").length == 0) {
-                    e.preventDefault();
+
+            this._toolbarTextInput.getProperty("value").addObserver({
+                propertyChanged : (_old: ViewerProperty<string>, _new: ViewerProperty<string>)=> {
+
                     this.openSearch();
+
+                    if (this._searchAreaReady) {
+                        if (this._searchTextTimeout != -1) {
+                            window.clearTimeout(this._searchTextTimeout);
+                            this._searchTextTimeout = -1;
+                        }
+
+                        this._searchTextTimeout = window.setTimeout(()=> {
+                            this._search(this._toolbarTextInput.value);
+                        }, 300);
+                    }
+
                 }
             });
 
@@ -208,11 +223,12 @@ module mycore.viewer.components {
 
             if (e.type == events.ShowContentEvent.TYPE) {
                 var sce = <events.ShowContentEvent> e;
-                if (sce.containerDirection == events.ShowContentEvent.DIRECTION_WEST && sce.content == this._container) {
+                if (sce.containerDirection == events.ShowContentEvent.DIRECTION_EAST && sce.content == this._container) {
                     if (sce.size == 0) {
-                        this._marker.clearAll();
-                    } else if (this._searchForm != null && this._searchForm.val().length > 0) {
-                        this._search(this._searchForm.val());
+                        this._marker.clearAll(CanvasMarkerType.WORD);
+                        this._marker.clearAll(CanvasMarkerType.WORD_STRONG);
+                    } else if (this._searchAreaReady && this._toolbarTextInput.value.length > 0) {
+                        this._search(this._toolbarTextInput.value);
                     }
 
                 }
@@ -231,8 +247,8 @@ module mycore.viewer.components {
 
             if (e.type == events.RequestStateEvent.TYPE) {
                 let rse = <events.RequestStateEvent>e;
-                if(this._searchForm!=null){
-                    let searchText = this._searchForm.val();
+                if (this._searchAreaReady != null) {
+                    let searchText = this._toolbarTextInput.value;
                     if (searchText != null && searchText != "") {
                         rse.stateMap.set("q", searchText);
                     }
@@ -245,9 +261,8 @@ module mycore.viewer.components {
                 if(rse.restoredState.has("q")){
                     let q = rse.restoredState.get("q");
                     this.openSearch();
-                    if(this._searchForm!=null){
-                        this._searchForm.val("q");
-                        this.onchange();
+                    if (this._searchAreaReady != null) {
+                        this._toolbarTextInput.value = q;
                     } else {
                         this._valueToApply = q;
                     }
@@ -259,20 +274,14 @@ module mycore.viewer.components {
         }
 
         private openSearch() {
-            var direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_WEST;
+            var direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_EAST;
             this.trigger(new events.ShowContentEvent(this, this._container, direction, -1, this._sidebarLabel));
-            this.focusSearch();
             this.updateContainerSize();
 
             this._containerVisible = true;
             this._containerVisibleModelLoadedSync(this);
         }
 
-        private focusSearch() {
-            if (this._searchForm != null) {
-                this._searchForm.focus();
-            }
-        }
 
         private _prepareIndex(model:model.StructureModel) {
             this._model._imageList.forEach((image)=> {
@@ -289,7 +298,7 @@ module mycore.viewer.components {
                 // and to complete indexing
                 if (ofY == (x)) {
                     this._indexPrepared = true;
-                    this.addSearchForm();
+                    this.initSearchArea();
                 }
             });
         }

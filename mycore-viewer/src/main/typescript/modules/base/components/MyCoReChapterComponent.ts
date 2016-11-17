@@ -131,8 +131,10 @@ module mycore.viewer.components {
                     if (this._chapterWidget.getSelectedChapter() == null ||
                         this._structureModel.chapterToImageMap.get(this._chapterWidget.getSelectedChapter().id) != imageChangedEvent.image) {
                         let newChapter = this._structureModel._imageToChapterMap.get(imageChangedEvent.image.id);
-                        this._chapterWidget.setChapterExpanded(<model.StructureChapter>newChapter, true);
-                        this._chapterWidget.jumpToChapter(<model.StructureChapter>newChapter);
+                        if (newChapter != null) {
+                            this._chapterWidget.setChapterExpanded(<model.StructureChapter>newChapter, true);
+                            this._chapterWidget.jumpToChapter(<model.StructureChapter>newChapter);
+                        }
                     }
                 }
             }
