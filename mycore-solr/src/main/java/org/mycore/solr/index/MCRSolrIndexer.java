@@ -45,7 +45,6 @@ import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 import org.mycore.util.concurrent.processing.MCRProcessableSupplier;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
@@ -61,9 +60,7 @@ public class MCRSolrIndexer {
      */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.BulkSize", 100);
 
-    final static MCRProcessableExecutor PARALLEL_SERVICE;
-
-    final static MCRProcessableExecutor SERIAL_SERVICE;
+    final static MCRProcessableExecutor SOLR_EXECUTOR;
 
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
@@ -71,23 +68,17 @@ public class MCRSolrIndexer {
         MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
 
         int poolSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.ThreadCount", 4);
-        final ExecutorService parellelPool = Executors.newFixedThreadPool(poolSize,
+        final ExecutorService threadPool = Executors.newFixedThreadPool(poolSize,
             new ThreadFactoryBuilder().setNameFormat("SOLR-Indexer-#%d").build());
-        MCRProcessableCollection parallelCollection = new MCRProcessableDefaultCollection("SOLR parallel");
-        registry.register(parallelCollection);
-        PARALLEL_SERVICE = MCRProcessableFactory.newPool(parellelPool, parallelCollection);
-
-        final ExecutorService serialPool = MoreExecutors.newDirectExecutorService();
-        MCRProcessableCollection serialCollection = new MCRProcessableDefaultCollection("SOLR serial");
-        registry.register(serialCollection);
-        SERIAL_SERVICE = MCRProcessableFactory.newPool(serialPool, serialCollection);
+        MCRProcessableCollection solrCollection = new MCRProcessableDefaultCollection("Solr Indexer");
+        registry.register(solrCollection);
+        SOLR_EXECUTOR = MCRProcessableFactory.newPool(threadPool, solrCollection);
 
         MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
 
             @Override
             public void prepareClose() {
-                PARALLEL_SERVICE.getExecutor().shutdown();
-                SERIAL_SERVICE.getExecutor().shutdown();
+                SOLR_EXECUTOR.getExecutor().shutdown();
             }
 
             @Override
@@ -97,8 +88,7 @@ public class MCRSolrIndexer {
 
             @Override
             public void close() {
-                waitForShutdown(serialPool);
-                waitForShutdown(parellelPool);
+                waitForShutdown(SOLR_EXECUTOR.getExecutor());
             }
 
             private void waitForShutdown(ExecutorService service) {
@@ -240,15 +230,15 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds solr's metadata index.
      */
-    public static void rebuildMetadataIndex(boolean parallel) {
-        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), parallel);
+    public static void rebuildMetadataIndex() {
+        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs());
     }
 
     /**
      * Rebuilds solr's metadata index.
      */
-    public static void rebuildMetadataIndex(SolrClient cuss, boolean parallel) {
-        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), cuss, parallel);
+    public static void rebuildMetadataIndex(SolrClient cuss) {
+        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), cuss);
     }
 
     /**
@@ -257,13 +247,13 @@ public class MCRSolrIndexer {
      * @param type
      *            of the objects to index
      */
-    public static void rebuildMetadataIndex(String type, boolean parallel) {
+    public static void rebuildMetadataIndex(String type) {
         List<String> identfiersOfType = MCRXMLMetadataManager.instance().listIDsOfType(type);
-        rebuildMetadataIndex(identfiersOfType, parallel);
+        rebuildMetadataIndex(identfiersOfType);
     }
 
-    public static void rebuildMetadataIndex(List<String> list, boolean parallel) {
-        rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrClient(), parallel);
+    public static void rebuildMetadataIndex(List<String> list) {
+        rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrClient());
     }
 
     /**
@@ -273,10 +263,8 @@ public class MCRSolrIndexer {
      *            list of identifiers of the objects to index
      * @param solrClient
      *            solr server to index
-     * @param parallel
-     *            TODO
      */
-    public static void rebuildMetadataIndex(List<String> list, SolrClient solrClient, boolean parallel) {
+    public static void rebuildMetadataIndex(List<String> list, SolrClient solrClient) {
         LOGGER.info("Re-building Metadata Index");
         if (list.isEmpty()) {
             LOGGER.info("Sorry, no documents to index");
@@ -305,7 +293,7 @@ public class MCRSolrIndexer {
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     indexHandler.setSolrServer(solrClient);
                     statistic = indexHandler.getStatistic();
-                    submitIndexHandler(indexHandler, parallel);
+                    submitIndexHandler(indexHandler);
                     contentMap.clear();
                 }
             } catch (Exception ex) {
@@ -321,13 +309,13 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds solr's content index.
      */
-    public static void rebuildContentIndex(boolean parallel) {
+    public static void rebuildContentIndex() {
         rebuildContentIndex(MCRSolrClientFactory.getSolrClient(),
-            MCRXMLMetadataManager.instance().listIDsOfType("derivate"), parallel);
+            MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
     }
 
-    public static void rebuildContentIndex(SolrClient hss, boolean parallel) {
-        rebuildContentIndex(hss, MCRXMLMetadataManager.instance().listIDsOfType("derivate"), parallel);
+    public static void rebuildContentIndex(SolrClient hss) {
+        rebuildContentIndex(hss, MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
     }
 
     /**
@@ -337,14 +325,14 @@ public class MCRSolrIndexer {
      * @param list
      *            containing mycore object id's
      */
-    public static void rebuildContentIndex(List<String> list, boolean parallel) {
-        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(), list, parallel);
+    public static void rebuildContentIndex(List<String> list) {
+        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(), list);
     }
 
     /**
      * Rebuilds solr's content index.
      */
-    public static void rebuildContentIndex(SolrClient solrClient, List<String> list, boolean parallel) {
+    public static void rebuildContentIndex(SolrClient solrClient, List<String> list) {
         LOGGER.info("Re-building Content Index");
 
         if (list.isEmpty()) {
@@ -359,7 +347,7 @@ public class MCRSolrIndexer {
         for (String id : list) {
             MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrClient);
             indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-            submitIndexHandler(indexHandler, parallel);
+            submitIndexHandler(indexHandler);
         }
 
         long tStop = System.currentTimeMillis();
@@ -371,21 +359,14 @@ public class MCRSolrIndexer {
      * 
      * @param indexHandler
      *            index handler to submit
-     * @param parallel
-     *            if current transaction is read-only, save to say 'true' here
      */
-    public static void submitIndexHandler(MCRSolrIndexHandler indexHandler, boolean parallel) {
-        MCRProcessableExecutor es = parallel ? PARALLEL_SERVICE : SERIAL_SERVICE;
-        submitIndexHandler(indexHandler, es);
-    }
-
-    private static void submitIndexHandler(MCRSolrIndexHandler indexHandler, MCRProcessableExecutor es) {
+    public static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
         MCRSolrIndexTask indexTask = new MCRSolrIndexTask(indexHandler);
-        MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = es.submit(indexTask);
-        supplier.getFuture().whenComplete(afterIndex(es));
+        MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = SOLR_EXECUTOR.submit(indexTask);
+        supplier.getFuture().whenComplete(afterIndex());
     }
 
-    private static BiConsumer<? super List<MCRSolrIndexHandler>, ? super Throwable> afterIndex(MCRProcessableExecutor es) {
+    private static BiConsumer<? super List<MCRSolrIndexHandler>, ? super Throwable> afterIndex() {
         return (handlerList, exc) -> {
             if (exc != null) {
                 LOGGER.error("Error while submitting index handler.", exc);
@@ -395,7 +376,7 @@ public class MCRSolrIndexer {
                 return;
             }
             for (MCRSolrIndexHandler handler : handlerList) {
-                submitIndexHandler(handler, es);
+                submitIndexHandler(handler);
             }
         };
     }
@@ -403,9 +384,9 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds and optimizes solr's metadata and content index.
      */
-    public static void rebuildMetadataAndContentIndex(boolean parallel) throws Exception {
-        MCRSolrIndexer.rebuildMetadataIndex(parallel);
-        MCRSolrIndexer.rebuildContentIndex(parallel);
+    public static void rebuildMetadataAndContentIndex() throws Exception {
+        MCRSolrIndexer.rebuildMetadataIndex();
+        MCRSolrIndexer.rebuildContentIndex();
         MCRSolrIndexer.optimize();
     }
 
@@ -438,7 +419,7 @@ public class MCRSolrIndexer {
         try {
             MCRSolrOptimizeIndexHandler indexHandler = new MCRSolrOptimizeIndexHandler();
             indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-            submitIndexHandler(indexHandler, false);
+            submitIndexHandler(indexHandler);
         } catch (Exception ex) {
             LOGGER.error("Could not optimize solr index", ex);
         }
@@ -448,10 +429,10 @@ public class MCRSolrIndexer {
      * Synchronizes the solr server with the database. As a result the solr server contains the same documents as the
      * database. All solr zombie documents will be removed, and all not indexed mycore objects will be indexed.
      */
-    public static void synchronizeMetadataIndex(boolean parallel) throws IOException, SolrServerException {
+    public static void synchronizeMetadataIndex() throws IOException, SolrServerException {
         Collection<String> objectTypes = MCRXMLMetadataManager.instance().getObjectTypes();
         for (String objectType : objectTypes) {
-            synchronizeMetadataIndex(objectType, parallel);
+            synchronizeMetadataIndex(objectType);
         }
     }
 
@@ -460,7 +441,7 @@ public class MCRSolrIndexer {
      * the same documents as the store. All solr zombie documents will be removed, and all not indexed mycore objects
      * will be indexed.
      */
-    public static void synchronizeMetadataIndex(String objectType, boolean parallel)
+    public static void synchronizeMetadataIndex(String objectType)
         throws IOException, SolrServerException {
         LOGGER.info("synchronize " + objectType);
         // get ids from store
@@ -489,7 +470,7 @@ public class MCRSolrIndexer {
         storeList.removeAll(solrList);
         if (!storeList.isEmpty()) {
             LOGGER.info("index " + storeList.size() + " mycore objects");
-            rebuildMetadataIndex(storeList, parallel);
+            rebuildMetadataIndex(storeList);
         }
     }
 

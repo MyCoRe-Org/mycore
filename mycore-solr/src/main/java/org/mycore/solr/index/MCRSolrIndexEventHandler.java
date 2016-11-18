@@ -29,6 +29,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -52,121 +53,149 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        this.handleMCRBaseCreated(evt, obj);
+        addObject(evt, obj);
     }
 
     @Override
     synchronized protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         if (this.useNestedDocuments()) {
-            this.handleObjectDeleted(evt, obj);
+            solrDelete(obj.getId());
         }
-        this.handleMCRBaseCreated(evt, obj);
+        addObject(evt, obj);
     }
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         if (this.useNestedDocuments()) {
-            this.handleObjectDeleted(evt, obj);
+            solrDelete(obj.getId());
         }
-        this.handleMCRBaseCreated(evt, obj);
+        addObject(evt, obj);
     }
 
     @Override
     synchronized protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRSolrIndexer.deleteById(obj.getId().toString());
+        solrDelete(obj.getId());
     }
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate derivate) {
-        this.handleMCRBaseCreated(evt, derivate);
+        addObject(evt, derivate);
     }
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate derivate) {
         if (this.useNestedDocuments()) {
-            MCRSolrIndexer.deleteById(derivate.getId().toString());
+            solrDelete(derivate.getId());
         }
-        this.handleMCRBaseCreated(evt, derivate);
+        addObject(evt, derivate);
     }
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate derivate) {
         if (this.useNestedDocuments()) {
-            MCRSolrIndexer.deleteById(derivate.getId().toString());
+            solrDelete(derivate.getId());
         }
-        this.handleMCRBaseCreated(evt, derivate);
+        addObject(evt, derivate);
     }
 
     @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
-        MCRSolrIndexer.deleteDerivate(derivate.getId().toString());
-    }
-
-    synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
-        if(MCRMarkManager.instance().isMarkedForImport(objectOrDerivate.getId())) {
-            return;
-        }
-        long tStart = System.currentTimeMillis();
-        try {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing");
-            }
-            MCRContent content = (MCRContent) evt.get("content");
-            if (content == null) {
-                content = new MCRBaseContent(objectOrDerivate);
-            }
-            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(content,
-                objectOrDerivate.getId());
-            indexHandler.setCommitWithin(1000);
-            MCRSolrIndexer.submitIndexHandler(indexHandler, false);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString()
-                    + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Error creating transfer thread for object " + objectOrDerivate, ex);
-        }
+        deleteDerivate(derivate);
     }
 
     @Override
     protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
-        try {
-            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
-                MCRSolrClientFactory.getSolrClient()), false);
-        } catch (Exception ex) {
-            LOGGER.error("Error creating transfer thread for file " + path.toString(), ex);
-        }
+        addFile(path, attrs);
     }
 
     @Override
     protected void handlePathUpdated(MCREvent evt, Path path, BasicFileAttributes attrs) {
-        this.handlePathCreated(evt, path, attrs);
-    }
-
-    @Override
-    protected void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {
-        if (isMarkedForDeletion(file)) {
-            return;
-        }
-        UpdateResponse updateResponse = MCRSolrIndexer.deleteById(file.toUri().toString());
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Deleted file " + file + ". Response:" + updateResponse);
-        }
+        addFile(path, attrs);
     }
 
     @Override
     protected void updatePathIndex(MCREvent evt, Path file, BasicFileAttributes attrs) {
-        handlePathCreated(evt, file, attrs);
+        addFile(file, attrs);
+    }
+
+    @Override
+    protected void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {
+        removeFile(file);
     }
 
     @Override
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
-        MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId().toString()), false);
+        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId().toString()));
+        });
     }
 
     @Override
     protected void handleObjectIndex(MCREvent evt, MCRObject obj) {
         handleObjectUpdated(evt, obj);
+    }
+
+    synchronized protected void addObject(MCREvent evt, MCRBase objectOrDerivate) {
+        if (MCRMarkManager.instance().isMarkedForImport(objectOrDerivate.getId())) {
+            return;
+        }
+        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            long tStart = System.currentTimeMillis();
+            try {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing");
+                }
+                MCRContent content = (MCRContent) evt.get("content");
+                if (content == null) {
+                    content = new MCRBaseContent(objectOrDerivate);
+                }
+                MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(content,
+                    objectOrDerivate.getId());
+                indexHandler.setCommitWithin(1000);
+                MCRSolrIndexer.submitIndexHandler(indexHandler);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString()
+                        + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error creating transfer thread for object " + objectOrDerivate, ex);
+            }
+        });
+    }
+
+    synchronized protected void solrDelete(MCRObjectID id) {
+        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            MCRSolrIndexer.deleteById(id.toString());
+        });
+    }
+
+    synchronized protected void deleteDerivate(MCRDerivate derivate) {
+        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            MCRSolrIndexer.deleteDerivate(derivate.getId().toString());
+        });
+    }
+
+    synchronized protected void addFile(Path path, BasicFileAttributes attrs) {
+        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            try {
+                MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
+                    MCRSolrClientFactory.getSolrClient()));
+            } catch (Exception ex) {
+                LOGGER.error("Error creating transfer thread for file " + path.toString(), ex);
+            }
+        });
+    }
+
+    synchronized protected void removeFile(Path file) {
+        if (isMarkedForDeletion(file)) {
+            return;
+        }
+        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            UpdateResponse updateResponse = MCRSolrIndexer.deleteById(file.toUri().toString());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Deleted file " + file + ". Response:" + updateResponse);
+            }
+        });
     }
 
     /**

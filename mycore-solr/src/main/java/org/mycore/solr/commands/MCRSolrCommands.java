@@ -34,19 +34,19 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr metadata and content index", help = "rebuilds solr's metadata and content index",
         order = 10)
     public static void rebuildMetadataAndContentIndex() throws Exception {
-        MCRSolrIndexer.rebuildMetadataAndContentIndex(true);
+        MCRSolrIndexer.rebuildMetadataAndContentIndex();
     }
 
     @MCRCommand(
         syntax = "rebuild solr metadata index", help = "rebuilds solr's metadata index", order = 20)
     public static void rebuildMetadataIndex() {
-        MCRSolrIndexer.rebuildMetadataIndex(true);
+        MCRSolrIndexer.rebuildMetadataIndex();
     }
 
     @MCRCommand(
         syntax = "rebuild solr content index", help = "rebuilds solr's content index", order = 30)
     public static void rebuildContentIndex() {
-        MCRSolrIndexer.rebuildContentIndex(true);
+        MCRSolrIndexer.rebuildContentIndex();
     }
 
     @MCRCommand(
@@ -59,7 +59,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "restricted rebuild solr metadata index for objecttype {0}",
         help = "rebuilds solr's metadata index for the given type in {0}", order = 40)
     public static void rebuildMetadataIndex(String type) {
-        MCRSolrIndexer.rebuildMetadataIndex(type, true);
+        MCRSolrIndexer.rebuildMetadataIndex(type);
     }
 
     @MCRCommand(
@@ -109,7 +109,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "rebuilds solr's metadata index for selected objects", order = 50)
     public static void rebuildMetadataIndexForSelected() {
         List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
-        MCRSolrIndexer.rebuildMetadataIndex(selectedObjects, true);
+        MCRSolrIndexer.rebuildMetadataIndex(selectedObjects);
     }
 
     @MCRCommand(
@@ -117,7 +117,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "rebuilds solr's content index for selected objects and or derivates", order = 60)
     public static void rebuildContentIndexForSelected() {
         List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
-        MCRSolrIndexer.rebuildContentIndex(selectedObjects, true);
+        MCRSolrIndexer.rebuildContentIndex(selectedObjects);
     }
 
     @MCRCommand(
@@ -130,7 +130,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         for (MCRObject obj : objectList) {
             idList.add(obj.getId().toString());
         }
-        MCRSolrIndexer.rebuildMetadataIndex(idList, true);
+        MCRSolrIndexer.rebuildMetadataIndex(idList);
     }
 
     @MCRCommand(
@@ -139,8 +139,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     public static void createIndex(String url) throws Exception {
         SolrClient cuss = MCRSolrClientFactory.getConcurrentSolrClient();
         SolrClient hss = MCRSolrClientFactory.getSolrClient();
-        MCRSolrIndexer.rebuildMetadataIndex(cuss, true);
-        MCRSolrIndexer.rebuildContentIndex(hss, true);
+        MCRSolrIndexer.rebuildMetadataIndex(cuss);
+        MCRSolrIndexer.rebuildContentIndex(hss);
         if (cuss instanceof ConcurrentUpdateSolrClient) {
             ((ConcurrentUpdateSolrClient) cuss).blockUntilFinished();
         }
@@ -150,14 +150,14 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "synchronize metadata index", help = "synchronizes the database and solr server", order = 150)
     public static void synchronizeMetadataIndex() throws Exception {
-        MCRSolrIndexer.synchronizeMetadataIndex(true);
+        MCRSolrIndexer.synchronizeMetadataIndex();
     }
 
     @MCRCommand(
         syntax = "restricted synchronize metadata index for objecttype {0}",
         help = "synchronizes the mycore store and solr server", order = 160)
     public static void synchronizeMetadataIndex(String objectType) throws Exception {
-        MCRSolrIndexer.synchronizeMetadataIndex(objectType, true);
+        MCRSolrIndexer.synchronizeMetadataIndex(objectType);
     }
 
     @MCRCommand(
