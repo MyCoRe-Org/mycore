@@ -137,7 +137,7 @@ public class MCRTransferPackageCommands {
             markManager.remove(MCRObjectID.getInstance(id));
         }
         // index all objects
-        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects, true);
+        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects);
 
         // deleting expanded directory
         LOGGER.info("Deleting expanded tar in " + targetDirectoryPath + "...");
