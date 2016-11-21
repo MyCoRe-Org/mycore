@@ -63,7 +63,8 @@ module.exports = function (grunt) {
                     src:"<%= globalConfig.projectBase %>src/main/typescript/modules/base/module.ts",
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 },
                 viewer_desktop: {
@@ -71,7 +72,8 @@ module.exports = function (grunt) {
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/desktop/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 },
                 viewer_frame: {
@@ -79,7 +81,8 @@ module.exports = function (grunt) {
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/frame/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 },
                 viewer_logo: {
@@ -87,7 +90,8 @@ module.exports = function (grunt) {
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/logo/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 },
                 viewer_metadata: {
@@ -95,7 +99,8 @@ module.exports = function (grunt) {
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/metadata/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 },
                 viewer_mets: {
@@ -103,7 +108,8 @@ module.exports = function (grunt) {
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/mets/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 },
                 viewer_mobile: {
@@ -111,7 +117,8 @@ module.exports = function (grunt) {
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/mobile/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 },
                 viewer_pdf: {
@@ -119,7 +126,8 @@ module.exports = function (grunt) {
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/pdf/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 },
                 viewer_piwik: {
@@ -127,7 +135,8 @@ module.exports = function (grunt) {
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/piwik/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 },
                 viewer_toolbar_extender: {
@@ -135,7 +144,8 @@ module.exports = function (grunt) {
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/toolbar-extender/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
                     options: {
                         declaration: true,
-                        sourceMap: false
+                        sourceMap: false,
+                        fast: 'never'
                     }
                 }
             }
