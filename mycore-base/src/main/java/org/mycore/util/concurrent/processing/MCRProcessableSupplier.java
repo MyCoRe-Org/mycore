@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import org.mycore.common.processing.MCRAbstractProcessable;
+import org.mycore.common.processing.MCRProcessableTask;
 import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableStatus;
 import org.mycore.common.processing.MCRProgressable;
@@ -22,7 +22,7 @@ import org.mycore.util.concurrent.MCRPrioritySupplier;
  *
  * @param <R> the result of the task
  */
-public class MCRProcessableSupplier<R> extends MCRAbstractProcessable<Callable<R>> implements Supplier<R> {
+public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> implements Supplier<R> {
 
     protected CompletableFuture<R> future;
 

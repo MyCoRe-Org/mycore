@@ -15,11 +15,9 @@ import java.util.List;
  * event handlers are not fired.
  * </p>
  * 
- * @param T the task
- * 
  * @author Matthias Eichner
  */
-public abstract class MCRAbstractProcessable<T> extends MCRAbstractProgressable implements MCRProcessable {
+public class MCRAbstractProcessable extends MCRAbstractProgressable implements MCRProcessable {
 
     protected String name;
 
@@ -35,11 +33,8 @@ public abstract class MCRAbstractProcessable<T> extends MCRAbstractProgressable 
 
     protected List<MCRProcessableStatusListener> statusListener;
 
-    protected T task;
-
-    public MCRAbstractProcessable(T task) {
+    public MCRAbstractProcessable() {
         super();
-        this.task = task;
         this.name = null;
         this.status = MCRProcessableStatus.created;
         this.error = null;
@@ -49,8 +44,6 @@ public abstract class MCRAbstractProcessable<T> extends MCRAbstractProgressable 
         this.endTime = null;
 
         this.statusListener = Collections.synchronizedList(new ArrayList<>());
-
-        delegateProgressable();
     }
 
     /**
@@ -72,8 +65,14 @@ public abstract class MCRAbstractProcessable<T> extends MCRAbstractProgressable 
         return this.error;
     }
 
-    public T getTask() {
-        return task;
+    /**
+     * Sets the internal processable error. This will set the status to failed.
+     * 
+     * @param error the error
+     */
+    public void setError(Throwable error) {
+        this.error = error;
+        this.status = MCRProcessableStatus.failed;
     }
 
     /**
@@ -84,6 +83,12 @@ public abstract class MCRAbstractProcessable<T> extends MCRAbstractProgressable 
     public void setStatus(MCRProcessableStatus status) {
         MCRProcessableStatus oldStatus = this.status;
         this.status = status;
+        if (status.equals(MCRProcessableStatus.processing)) {
+            this.startTime = Instant.now();
+        }
+        if (status.equals(MCRProcessableStatus.successful) || status.equals(MCRProcessableStatus.failed)) {
+            this.endTime = Instant.now();
+        }
         fireStatusChanged(oldStatus);
     }
 
@@ -121,22 +126,6 @@ public abstract class MCRAbstractProcessable<T> extends MCRAbstractProgressable 
         synchronized (this.statusListener) {
             this.statusListener.forEach(listener -> {
                 listener.onStatusChange(this, oldStatus, getStatus());
-            });
-        }
-    }
-
-    protected void delegateProgressable() {
-        if (this.task instanceof MCRListenableProgressable) {
-            ((MCRListenableProgressable) this.task).addProgressListener(new MCRProgressableListener() {
-                @Override
-                public void onProgressTextChange(MCRProgressable source, String oldProgressText, String newProgressText) {
-                    setProgressText(newProgressText);
-                }
-
-                @Override
-                public void onProgressChange(MCRProgressable source, Integer oldProgress, Integer newProgress) {
-                    setProgress(newProgress);
-                }
             });
         }
     }

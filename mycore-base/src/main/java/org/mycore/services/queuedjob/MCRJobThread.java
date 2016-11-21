@@ -35,6 +35,8 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.processing.MCRAbstractProcessable;
+import org.mycore.common.processing.MCRProcessableStatus;
 
 /**
  * A slave thread of {@link MCRJobMaster}.
@@ -45,13 +47,15 @@ import org.mycore.common.MCRSystemUserInformation;
  * @author Ren\u00E9 Adler
  *
  */
-public class MCRJobThread implements Runnable {
+public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
     protected MCRJob job = null;
 
     private static Logger LOGGER = Logger.getLogger(MCRJobThread.class);
 
     public MCRJobThread(MCRJob job) {
         this.job = job;
+        setName(this.job.getAction().getSimpleName());
+        setStatus(MCRProcessableStatus.created);
     }
 
     public void run() {
@@ -67,17 +71,21 @@ public class MCRJobThread implements Runnable {
             transaction.begin();
 
             try {
+                setStatus(MCRProcessableStatus.processing);
                 job.setStart(new Date());
 
                 action.execute();
 
                 job.setFinished(new Date());
                 job.setStatus(MCRJobStatus.FINISHED);
+                setStatus(MCRProcessableStatus.successful);
             } catch (ExecutionException ex) {
                 LOGGER.error("Exception occured while try to start job. Perform rollback.", ex);
+                setError(ex);
                 action.rollback();
-            } catch (Exception e) {
-                LOGGER.error("Exception occured while try to start job.", e);
+            } catch (Exception ex) {
+                LOGGER.error("Exception occured while try to start job.", ex);
+                setError(ex);
             }
             em.merge(job);
             transaction.commit();
@@ -92,4 +100,6 @@ public class MCRJobThread implements Runnable {
             mcrSession.close();
         }
     }
+
+    
 }

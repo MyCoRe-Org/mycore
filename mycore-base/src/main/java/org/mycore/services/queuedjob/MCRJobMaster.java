@@ -46,6 +46,12 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
+import org.mycore.common.inject.MCRInjectorConfig;
+import org.mycore.common.processing.MCRProcessableCollection;
+import org.mycore.common.processing.MCRProcessableDefaultCollection;
+import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
+import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
 /**
  * The master of all {@link MCRJobThread}s threads.
@@ -64,8 +70,8 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     private Class<? extends MCRJobAction> action;
 
-    private ThreadPoolExecutor jobServe;
-
+    private MCRProcessableExecutor jobServe;
+    
     private volatile boolean running = true;
 
     private ReentrantLock runLock;
@@ -136,6 +142,9 @@ public class MCRJobMaster implements Runnable, Closeable {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
 
+        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+        MCRProcessableCollection jobCollection = new MCRProcessableDefaultCollection("MCR Job");
+
         boolean activated = CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated", true);
         activated = activated
                 && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "activated", true);
@@ -160,7 +169,7 @@ public class MCRJobMaster implements Runnable, Closeable {
             };
             final AtomicInteger activeThreads = new AtomicInteger();
             final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
-            jobServe = new ThreadPoolExecutor(jobThreadCount, jobThreadCount, 1, TimeUnit.DAYS, workQueue,
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(jobThreadCount, jobThreadCount, 1, TimeUnit.DAYS, workQueue,
                     slaveFactory) {
 
                 @Override
@@ -175,6 +184,10 @@ public class MCRJobMaster implements Runnable, Closeable {
                     activeThreads.incrementAndGet();
                 }
             };
+
+            registry.register(jobCollection);
+            jobServe = MCRProcessableFactory.newPool(executor, jobCollection);
+
             LOGGER.info("JobMaster" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " with "
                     + jobThreadCount + " thread(s) is started");
             while (running) {
@@ -217,9 +230,9 @@ public class MCRJobMaster implements Runnable, Closeable {
                             } finally {
                                 em.close();
                             }
-                            if (job != null && action != null && action.isActivated() && !jobServe.isShutdown()) {
+                            if (job != null && action != null && action.isActivated() && !jobServe.getExecutor().isShutdown()) {
                                 LOGGER.info("Creating:" + job);
-                                jobServe.execute(new MCRJobThread(job));
+                                jobServe.submit(new MCRJobThread(job));
                             } else {
                                 try {
                                     synchronized (JOB_QUEUE) {
@@ -259,6 +272,7 @@ public class MCRJobMaster implements Runnable, Closeable {
         }
         LOGGER.info(preLabel + "Master thread finished");
         MCRSessionMgr.releaseCurrentSession();
+        registry.unregister(jobCollection);
     }
 
     /**
@@ -277,10 +291,10 @@ public class MCRJobMaster implements Runnable, Closeable {
         try {
             if (jobServe != null) {
                 LOGGER.debug("Shutdown executor jobs.");
-                jobServe.shutdown();
+                jobServe.getExecutor().shutdown();
                 try {
                     LOGGER.debug("Await termination of executor jobs.");
-                    jobServe.awaitTermination(60, TimeUnit.SECONDS);
+                    jobServe.getExecutor().awaitTermination(60, TimeUnit.SECONDS);
                     LOGGER.debug("All jobs finished.");
                 } catch (InterruptedException e) {
                     LOGGER.debug("Could not wait 60 seconds...", e);
@@ -295,11 +309,11 @@ public class MCRJobMaster implements Runnable, Closeable {
      * Shuts down this thread and every local threads spawned by {@link #run()}.
      */
     public void close() {
-        if (jobServe != null && !jobServe.isShutdown()) {
+        if (jobServe != null && !jobServe.getExecutor().isShutdown()) {
             LOGGER.info("We are in a hurry, closing service right now");
-            jobServe.shutdownNow();
+            jobServe.getExecutor().shutdownNow();
             try {
-                jobServe.awaitTermination(60, TimeUnit.SECONDS);
+                jobServe.getExecutor().awaitTermination(60, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 LOGGER.debug("Could not wait  60 seconds...", e);
             }
