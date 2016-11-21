@@ -23,11 +23,14 @@
 
 package org.mycore.frontend.jersey.resources;
 
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -75,7 +78,22 @@ public class MCREchoResource {
         jRequest.addProperty("serverName", request.getServerName());
         jRequest.addProperty("servletPath", request.getServletPath());
         jRequest.addProperty("serverPort", request.getServerPort());
-        jRequest.add("session", gson.toJsonTree(request.getSession(false)).getAsJsonObject().get("session"));
+
+        HttpSession session = request.getSession(false);
+        List<String> attributes = Collections.list(session.getAttributeNames());
+        JsonObject sessionJSON = new JsonObject();
+        JsonObject attributesJSON = new JsonObject();
+        attributes.forEach(attr -> {
+            attributesJSON.addProperty(attr, session.getAttribute(attr).toString());
+        });
+        sessionJSON.add("attributes", attributesJSON);
+        sessionJSON.addProperty("id", session.getId());
+        sessionJSON.addProperty("creationTime", session.getCreationTime());
+        sessionJSON.addProperty("lastAccessedTime", session.getLastAccessedTime());
+        sessionJSON.addProperty("maxInactiveInterval", session.getMaxInactiveInterval());
+        sessionJSON.addProperty("isNew", session.isNew());
+        jRequest.add("session", sessionJSON);
+
         jRequest.addProperty("localPort", request.getLocalPort());
         JsonArray jLocales = new JsonArray();
         Enumeration<Locale> locales = request.getLocales();
