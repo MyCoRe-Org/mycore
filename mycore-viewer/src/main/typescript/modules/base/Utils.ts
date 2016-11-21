@@ -666,7 +666,7 @@ var viewerDeviceSupportTouch = ('ontouchstart' in window);
 
 function viewerCrossBrowserWheel(element:HTMLElement, handler:(e:{
     deltaX: number; deltaY: number; orig: any
-    ; pos: Position2D; altKey?: boolean
+    ; pos: Position2D; altKey?: boolean, ctrlKey?:boolean
 }) => void) {
     var internHandler = (e:any) => {
         e.preventDefault();
@@ -677,7 +677,7 @@ function viewerCrossBrowserWheel(element:HTMLElement, handler:(e:{
         var pos = new Position2D(x, y).scale(window.devicePixelRatio);
 
         if ("deltaX" in e) {
-            handler({deltaX: e.deltaX, deltaY: e.deltaY, orig: e, pos: pos, altKey: e.altKey});
+            handler({deltaX: e.deltaX, deltaY: e.deltaY, orig: e, pos: pos, altKey: e.altKey, ctrlKey: e.ctrlKey});
             return;
         }
 
@@ -688,7 +688,7 @@ function viewerCrossBrowserWheel(element:HTMLElement, handler:(e:{
             if ("detail" in e) {
                 var pixel = e.detail;
 
-                var obj = {deltaX: 0, deltaY: 0, orig: e, pos: pos, altKey: e.altKey};
+                var obj = {deltaX: 0, deltaY: 0, orig: e, pos: pos, altKey: e.altKey, ctrlKey: e.ctrlKey};
 
                 if (horizontal) {
                     obj.deltaX = pixel;

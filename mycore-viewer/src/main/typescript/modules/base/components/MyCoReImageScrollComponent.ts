@@ -781,9 +781,9 @@ module mycore.viewer.components {
             }
         }
 
-        public scroll(e:{ deltaX: number; deltaY: number; orig: any; pos: Position2D; altKey?: boolean }) {
+        public scroll(e:{ deltaX: number; deltaY: number; orig: any; pos: Position2D; altKey?: boolean, ctrlKey?:boolean }) {
             var zoomParameter = (ViewerParameterMap.fromCurrentUrl().get("iview2.scroll") == "zoom");
-            var zoom = (zoomParameter) ? !e.altKey : e.altKey;
+            var zoom = (zoomParameter) ? !e.altKey||e.ctrlKey : e.altKey||e.ctrlKey;
             var vp = this._pageController.viewport;
 
             if (zoom) {
