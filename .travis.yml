@@ -11,4 +11,5 @@ install:
   - sudo apt-get update -qq
 script:
   - mvn -B clean install && mvn -B javadoc:javadoc
-
+after_script:
+  - mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
