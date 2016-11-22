@@ -225,6 +225,9 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
     @Override
     public File getLocalFile(String storageId) throws IOException {
+        if(storageId==null || storageId.isEmpty()){
+            throw new IOException("No storage id");
+        }
         MCRFile file = getFile(storageId);
         return file.getLocalFile();
     }

@@ -97,6 +97,7 @@ public class MCRIFSCommands {
             atts.addAttribute(NS_URI, ATT_STORAGEID, ATT_STORAGEID, CDATA, node.getStorageid());
             atts.addAttribute(NS_URI, ATT_OWNER, ATT_OWNER, CDATA, node.getOwner());
             atts.addAttribute(NS_URI, ATT_NAME, ATT_NAME, CDATA, node.getName());
+            atts.addAttribute(NS_URI, ATT_IFS_ID, ATT_IFS_ID, CDATA, node.getId());
         }
 
         final static String ATT_STORAGEID = "storageid";
@@ -109,6 +110,8 @@ public class MCRIFSCommands {
 
         final static String ATT_SIZE = "size";
 
+        final static String ATT_IFS_ID = "ifsid";
+
     }
 
     private static class LocalFileExistChecker extends FSNodeChecker {
@@ -119,7 +122,7 @@ public class MCRIFSCommands {
 
         @Override
         public boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts) {
-            if (localFile.exists()) {
+            if (localFile != null && localFile.exists()) {
                 return true;
             }
             LOGGER.warn("File is missing: " + localFile);
@@ -390,7 +393,13 @@ public class MCRIFSCommands {
                     owner = fsNode.getOwner();
                     LOGGER.info("Checking owner/derivate: " + owner);
                 }
-                File f = currentStore.getLocalFile(storageID);
+
+                File f = null;
+                try {
+                    f = currentStore.getLocalFile(storageID);
+                } catch (IOException e) {
+                    LOGGER.warn("Missing file with storageID: " + storageID);
+                }
                 if (!checker.checkNode(fsNode, f, atts)) {
                     th.startElement(nsURI, elementName, elementName, atts);
                     th.endElement(nsURI, elementName, elementName);
