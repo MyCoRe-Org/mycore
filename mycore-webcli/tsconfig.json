@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "outDir": "build",
+    "rootDir": "src/main/ts",
+    "outDir": "target/classes/META-INF/resources/modules/webcli/build",
     "target": "es6",
-    "module": "system",
+    "module": "commonjs",
     "moduleResolution": "node",
-    "sourceMap": false,
+    "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
