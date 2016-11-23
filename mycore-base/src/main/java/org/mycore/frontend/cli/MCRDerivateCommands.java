@@ -20,16 +20,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.CopyOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -41,14 +49,25 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.XSLTransformer;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRPathContent;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
+import org.mycore.common.function.MCRFunctions;
+import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -60,6 +79,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -787,5 +807,46 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
         LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
     }
+
+    @MCRCommand(syntax = "transform xml matching file name pattern {0} in derivate {1} with stylesheet {2}",
+        help = "Finds all files in Derivate {1} which match the pattern {0} (the complete path with regex: or glob:*.xml syntax) and transforms them with stylesheet {2}")
+    public static void transformXMLMatchingPatternWithStylesheet(String pattern, String derivate, String stylesheet)
+        throws IOException {
+        MCRXSLTransformer transformer = new MCRXSLTransformer(stylesheet);
+        MCRPath derivateRoot = MCRPath.getPath(derivate, "/");
+        PathMatcher matcher = derivateRoot.getFileSystem().getPathMatcher(pattern);
+
+        Files.walkFileTree(derivateRoot, new SimpleFileVisitor<Path>() {
+            @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                throws IOException {
+                if (matcher.matches(file)) {
+                    LOGGER.info("The file " + file + " matches the pattern " + pattern);
+                    MCRContent sourceContent = new MCRPathContent(file);
+
+                    MCRContent resultContent = transformer.transform(sourceContent);
+                    try {
+                        Document source = sourceContent.asXML();
+                        Document result = resultContent.asXML();
+                        LOGGER.info("Transforming complete!");
+
+                        if (!MCRXMLHelper.deepEqual(source, result)) {
+                            LOGGER.info("Writing result..");
+                            resultContent.sendTo(file, StandardCopyOption.REPLACE_EXISTING);
+                        } else {
+                            LOGGER.info("Result and Source is the same..");
+                        }
+
+                    } catch (JDOMException | SAXException e) {
+                        throw new IOException("Error while processing file : " + file, e);
+                    }
+
+                }
+
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+    }
+
 
 }

@@ -193,41 +193,6 @@
           <plugin>
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
-            <version>1.0</version>
-            <configuration>
-              <workingDirectory>${basedir}</workingDirectory>
-            </configuration>
-            <executions>
-              <execution>
-                <id>install node and npm</id>
-                <goals>
-                  <goal>install-node-and-npm</goal>
-                </goals>
-                <phase>generate-resources</phase>
-                <configuration>
-                  <nodeVersion>${node.version}</nodeVersion>
-                  <npmVersion>${npm.version}</npmVersion>
-                </configuration>
-              </execution>
-              <execution>
-                <id>npm install</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <phase>generate-resources</phase>
-                <configuration>
-                  <arguments>install</arguments>
-                  <installDirectory>${basedir}</installDirectory>
-                </configuration>
-              </execution>
-              <execution>
-                <id>grunt build</id>
-                <goals>
-                  <goal>grunt</goal>
-                </goals>
-                <phase>generate-resources</phase>
-              </execution>
-            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>

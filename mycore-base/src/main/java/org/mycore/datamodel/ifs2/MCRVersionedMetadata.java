@@ -257,7 +257,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             revision = Optional.of(info.getNewRevision());
             LOGGER.info("SVN commit of delete finished, new revision " + getRevision());
         } catch (SVNException e) {
-            throw new IOException(e);
+        	LOGGER.error("Error while deleting " + id + " in SVN ", e);
         } finally {
             super.delete();
         }

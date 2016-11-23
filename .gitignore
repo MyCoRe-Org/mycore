@@ -155,3 +155,10 @@ $RECYCLE.BIN/
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
+
+# temporary file which get created when compiling .ts files (grunt-ts)
+# https://github.com/grunt-ts/grunt-ts/issues/77
+.baseDir.ts
+
+# dependency for compiling or frontend
+node_modules/

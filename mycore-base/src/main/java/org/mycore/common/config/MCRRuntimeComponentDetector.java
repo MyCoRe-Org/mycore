@@ -23,8 +23,11 @@
 
 package org.mycore.common.config;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -85,7 +88,7 @@ public class MCRRuntimeComponentDetector {
                 URL manifestURL = resources.nextElement();
                 try (InputStream manifestStream = manifestURL.openStream()) {
                     Manifest manifest = new Manifest(manifestStream);
-                    MCRComponent component = buildComponent(manifest);
+                    MCRComponent component = buildComponent(manifest, manifestURL);
 
                     if (component != null) {
                         components.add(component);
@@ -104,7 +107,7 @@ public class MCRRuntimeComponentDetector {
         }
     }
 
-    private static MCRComponent buildComponent(Manifest manifest) throws IOException {
+    private static MCRComponent buildComponent(Manifest manifest, URL manifestURL) throws IOException {
         Attributes mainAttributes = manifest.getMainAttributes();
         String artifactId = mainAttributes.getValue(ATT_MCR_ARTIFACT_ID);
         String pomPropertiesPath = mainAttributes.getValue(ATT_POM);
@@ -142,8 +145,20 @@ public class MCRRuntimeComponentDetector {
                 LOGGER.info("Using artifactId in " + pomPropertiesPath + ".");
             }
 
-            return new MCRComponent(artifactId, manifest);
+            return new MCRComponent(artifactId, manifest, extractJarFile(manifestURL));
         }
+        return null;
+    }
+
+    private static File extractJarFile(URL manifestURL) {
+        try {
+            if (manifestURL.toExternalForm().startsWith("jar:")) {
+                return new File(new URI(manifestURL.getPath().replaceAll("!.*$", "")));
+            }
+        } catch (URISyntaxException e) {
+            LOGGER.error("Couldn't extract jar file path from MANIFEST.MF url.", e);
+        }
+
         return null;
     }
 
