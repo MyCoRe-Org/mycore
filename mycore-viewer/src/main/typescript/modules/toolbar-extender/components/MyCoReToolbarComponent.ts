@@ -5,24 +5,23 @@ module mycore.viewer.components {
 
     export interface ToolbarExtenderEntry {
         id: string;
-        type: string; /* button */
+        type: string; /* button, group */
         label?: string;
         icon?: string;
         href?: string;
         tooltip?: string;
         action?: ()=>void;
-        inGroup: string;
+        inGroup?: string;
     }
 
     export interface ToolbarExtenderSettings extends MyCoReViewerSettings {
-        objId: string;
         toolbar: ToolbarExtenderEntry[];
     }
 
     export class MyCoReToolbarExtenderComponent extends ViewerComponent {
         private idEntryMapping = new MyCoReMap<string, ToolbarExtenderEntry>();
         private idButtonMapping = new MyCoReMap<string, ToolbarButton>();
-
+        private idGroupMapping = new MyCoReMap<string, ToolbarGroup>();
         constructor(private _settings: ToolbarExtenderSettings) {
             super();
         }
@@ -37,10 +36,14 @@ module mycore.viewer.components {
         public init() {
             if ("toolbar" in this._settings) {
                 this._settings.toolbar.forEach((settingsEntry: ToolbarExtenderEntry)=> {
-                    if (settingsEntry.type == "button") {
-                        this.idEntryMapping.set(settingsEntry.id, settingsEntry);
+                    if (settingsEntry.type == "group") {
+                        this.idGroupMapping.set(settingsEntry.id, new ToolbarGroup(settingsEntry.id));
+
+                    } else if (settingsEntry.type == "button") {
                         this.idButtonMapping.set(settingsEntry.id, new ToolbarButton(settingsEntry.id, settingsEntry.label, settingsEntry.tooltip || settingsEntry.label, settingsEntry.icon));
                     }
+
+                    this.idEntryMapping.set(settingsEntry.id, settingsEntry);
                 });
             }
 
@@ -52,6 +55,10 @@ module mycore.viewer.components {
             if (e.type == events.ProvideToolbarModelEvent.TYPE) {
                 var ptme = <events.ProvideToolbarModelEvent>e;
                 this.toolbarModel = ptme.model;
+
+                this.idGroupMapping.forEach((k,v)=>{
+                    ptme.model.addGroup(this.idGroupMapping.get(k));
+                });
 
                 this.idButtonMapping.forEach((k, v)=> {
                     var inGroup = this.idEntryMapping.get(k).inGroup;

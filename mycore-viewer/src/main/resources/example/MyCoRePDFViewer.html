@@ -38,12 +38,17 @@
                     enabled: true,
                     updateHistory: false
                 },
-                toolbar: [ {
-                    id: "test_button1",
-                    label: "test_button",
-                    type:"button",
-                    href:"http://google.de/",
-                    inGroup: "ActionControllGroup"
+                toolbar: [
+                    {
+                        id: "ExtraGroup",
+                        type: "group"
+                    },
+                    {
+                        id: "test_button1",
+                        label: "test_button",
+                        type:"button",
+                        href:"http://google.de/",
+                        inGroup: "ExtraGroup"
                 }]
             });
         }
