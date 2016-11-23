@@ -28,8 +28,8 @@
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <uniqueVersion>false</uniqueVersion>
-    <hibernate.version>5.2.0.Final</hibernate.version>
-    <hibernate.core.version>5.2.0.MCR2</hibernate.core.version>
+    <hibernate.version>5.2.2.Final</hibernate.version>
+    <hibernate.core.version>${hibernate.version}</hibernate.core.version>
     <httpcomponents.version>4.5.2</httpcomponents.version>
     <httpcore.version>4.4.5</httpcore.version>
     <xalan.version>2.7.2</xalan.version>
@@ -1057,7 +1057,7 @@
       <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
-        <version>2.4.6</version>
+        <version>2.5.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
