@@ -95,11 +95,6 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-session-listing</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mycore</groupId>
       <artifactId>mycore-solr</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -131,6 +126,11 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-webcli</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-webtools</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

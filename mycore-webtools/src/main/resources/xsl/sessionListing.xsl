@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   exclude-result-prefixes="i18n">
 
-  <xsl:template match="sessionListingJS">
+  <xsl:template match="sessionListing">
     <div id="sessionListingContainer" style="margin-top: 16px;">
 
       <div id="sessionListingLoadingSpinner">
@@ -85,7 +85,7 @@
       </div>
     </div>
 
-    <script src="{$WebApplicationBaseURL}modules/session-listing/js/sessionListing.js"></script>
+    <script src="{$WebApplicationBaseURL}modules/webtools/session/js/sessionListing.js"></script>
     <xsl:variable name="quot">
       <xsl:text>"</xsl:text>
     </xsl:variable>

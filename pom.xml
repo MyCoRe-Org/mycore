@@ -1710,7 +1710,6 @@
     <module>mycore-oai</module>
     <module>mycore-pi</module>
     <module>mycore-restapi</module>
-    <module>mycore-session-listing</module>
     <module>mycore-solr</module>
     <module>mycore-swf</module>
     <module>mycore-sword</module>
@@ -1719,6 +1718,7 @@
     <module>mycore-viewer</module>
     <module>mycore-wcms2</module>
     <module>mycore-webcli</module>
+    <module>mycore-webtools</module>
     <module>mycore-wfc</module>
     <module>mycore-xeditor</module>
     <module>mycore-complete</module>
