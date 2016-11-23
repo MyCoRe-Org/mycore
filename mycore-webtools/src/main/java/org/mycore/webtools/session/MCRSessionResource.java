@@ -1,4 +1,4 @@
-package org.mycore.frontend.jersey.resources;
+package org.mycore.webtools.session;
 
 import java.awt.Color;
 import java.net.InetAddress;
