@@ -47,6 +47,7 @@ module mycore.viewer.widgets.alto {
                     "height:" + line.getHeight() + "px;" +
                     "left: " + line.getHPos() + "px; " +
                     "font-size: " + line.getHeight() + "px; " +
+                    "z-index:3;"+
                     "transform: scale(" + scale + ",1);" +
                     "transform-origin: left top'>" + endecoderElem.innerHTML + "</p>";
             });

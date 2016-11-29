@@ -8,7 +8,7 @@ module mycore.viewer.widgets.canvas {
             super(true, false);
             this.container.addClass("overview");
             this.container.attr("style", "");
-            this.container.css("z-index", "3");
+            this.container.css("z-index", "4");
             jQuery(this.markCanvas).detach();
             //this.updateOverviewSize(_maxOverviewSize);
         }
