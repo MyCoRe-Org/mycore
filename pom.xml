@@ -785,7 +785,7 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-viewer</artifactId>
-        <version>0.10-SNAPSHOT</version>
+        <version>0.11-SNAPSHOT</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
