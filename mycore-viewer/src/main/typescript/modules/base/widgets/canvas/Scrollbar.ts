@@ -68,8 +68,8 @@ module mycore.viewer.widgets.canvas {
                 if (interv != -1) {
                     window.clearInterval(interv);
                     interv = -1;
+                    e.preventDefault();
                 }
-                e.preventDefault();
             });
         }
 

@@ -25,7 +25,8 @@ module mycore.viewer.widgets.canvas {
             var inputElement = jQuery(this._inputElement[0]);
 
             var MOUSE_MOVE_HANDLER = this.MMH = (e:JQueryMouseEventObject) => {
-                if(jQuery(e.target).hasClass("overview")){
+                let target = jQuery(e.target);
+                if(target.hasClass("overview") ||target.hasClass("altoLine")){
                     return;
                 }
                 var x = ((e.clientX + window.pageXOffset) - inputElement.offset().left)* window.devicePixelRatio;;
@@ -38,7 +39,8 @@ module mycore.viewer.widgets.canvas {
 
 
             var MOUSE_DOWN_HANDLER = (e:JQueryMouseEventObject) => {
-                if(jQuery(e.target).hasClass("overview")){
+                let target = jQuery(e.target);
+                if(target.hasClass("overview") ||target.hasClass("altoLine")){
                     return;
                 }
                 var x = ((e.clientX + window.pageXOffset) - inputElement.offset().left)* window.devicePixelRatio;
@@ -51,7 +53,8 @@ module mycore.viewer.widgets.canvas {
             };
 
             var MOUSE_UP_HANDLER = (e) => {
-                if(jQuery(e.target).hasClass("overview")){
+                let target = jQuery(e.target);
+                if(target.hasClass("overview") ||target.hasClass("altoLine")){
                     return;
                 }
                 if (typeof this._currentMouseSession != "undefined" && this._currentMouseSession != null) {
