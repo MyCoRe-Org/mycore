@@ -1,4 +1,3 @@
-/// <reference path="../widgets/canvas/GalleryLayout.ts" />
 
 module mycore.viewer.components {
 
@@ -14,7 +13,6 @@ module mycore.viewer.components {
 
         public init() {
             this.trigger(new events.ProvidePageLayoutEvent(this, new widgets.canvas.SinglePageLayout(), true));
-            //this.trigger(new events.ProvidePageLayoutEvent(this, new widgets.canvas.GalleryLayout(), true));
         }
     }
 

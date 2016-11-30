@@ -12,6 +12,11 @@ module mycore.viewer.model {
                     public _textContentPresent:boolean){
         }
 
+        /**
+         * will be used to calculate the default aspect ratio
+         */
+        public defaultPageDimension:Size2D;
+
         public get rootChapter() {
             return this._rootChapter;
         }

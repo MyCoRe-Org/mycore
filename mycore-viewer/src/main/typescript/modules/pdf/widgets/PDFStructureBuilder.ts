@@ -22,6 +22,8 @@ module mycore.viewer.widgets.pdf {
         private _rootChapter:model.StructureChapter;
         private _promise:ViewerPromise<PDFStructureModel, any> = new ViewerPromise<PDFStructureModel, any>();
         private static PDF_TEXT_HREF = "pdfText";
+        private completeWidth = 0;
+        private completeHeight = 0;
 
         public resolve() {
             this._resolveDestinations();
@@ -69,6 +71,11 @@ module mycore.viewer.widgets.pdf {
             var that = this;
             return function (page:PDFPageProxy) {
                 try {
+
+                    var pageRotation = (<any>page).pageInfo.rotate;
+                    that.completeWidth += (pageRotation == 90 || pageRotation == 270) ? page.view[ 3 ] - page.view[ 1 ] : page.view[ 2 ] - page.view[ 0 ];
+                    that.completeHeight += (pageRotation == 90 || pageRotation == 270) ? page.view[ 2 ] - page.view[ 0 ] : page.view[ 3 ] - page.view[ 1 ];
+
                     var ref:PDFRef = <any>page.ref;
                     var strRef = PDFStructureBuilder.destToString(ref);
                     that._refPageMap.set(strRef, page);
@@ -159,6 +166,7 @@ module mycore.viewer.widgets.pdf {
                 this._rootChapter.chapter = this.getChapterFromOutline(this._rootChapter, this._outline);
                 this._chapterPageMap.set(this._rootChapter.id, this._idPageMap.get(1));
                 this._structureModel = new PDFStructureModel(this._rootChapter, this._pages, this._chapterPageMap, new MyCoReMap<string, mycore.viewer.model.StructureChapter>(), this._refPageMap, this._idPdfPageMap);
+                this._structureModel.defaultPageDimension = new Size2D(this.completeWidth / this._pageCount, this.completeHeight / this._pageCount);
                 this._promise.resolve(this._structureModel);
             }
         }
