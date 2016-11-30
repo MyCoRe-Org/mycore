@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
@@ -38,6 +39,7 @@ import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Implements the MCRContentStore interface to store the content of
@@ -159,12 +161,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
      * For the given derivateID, returns the underlying IFS2 file collection storing the files of the derivate 
      */
     public MCRFileCollection getIFS2FileCollection(MCRObjectID derivateID) throws IOException {
-        String oid = derivateID.toString();
-        String base = getBase(oid);
-        MCRFileStore store = getStore(base);
-
-        int slotID = getSlotID(oid);
-        return store.retrieve(slotID);
+        return getSlot(derivateID);
     }
 
     @Override
@@ -202,10 +199,42 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
     @Override
     protected void doDeleteContent(String storageID) throws Exception {
-        MCRFile file = getFile(storageID);
-        MCRDirectory parent = (MCRDirectory) (file.getParent());
-        file.delete();
-        deleteEmptyParents(parent);
+        Optional<MCRFile> file;
+        try {
+            file = Optional.of(getFile(storageID));
+        } catch (IOException e) {
+            //file is not present
+            LOGGER.warn(e.getMessage());
+            file = Optional.empty();
+        }
+        Optional<MCRDirectory> parent;
+        try {
+            parent = Optional.of(file
+                .map(MCRFile::getParent)
+                .map(MCRDirectory.class::cast)
+                .orElseGet(() -> getParentDirectory(storageID)));
+        } catch (UncheckedIOException e) {
+            LOGGER.warn(e.getMessage());
+            parent = Optional.empty();
+        }
+        if (file.isPresent()) {
+            file.get().delete();
+        }
+        if (parent.isPresent()) {
+            deleteEmptyParents(parent.get());
+        }
+    }
+
+    private MCRDirectory getParentDirectory(String storageID) throws UncheckedIOException {
+        MCRPath relPath = MCRPath.getPath("", toPath(storageID));
+        String parentPath = relPath.getParent().getOwnerRelativePath();
+        MCRFileCollection slot;
+        try {
+            slot = getSlot(toDerivateID(storageID));
+            return (MCRDirectory) slot.getNodeByPath(parentPath);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private void deleteEmptyParents(MCRDirectory dir) throws IOException {
@@ -232,23 +261,34 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         return file.getLocalFile();
     }
 
-    private MCRFileCollection getSlot(String storageID) throws IOException {
-        int pos = storageID.indexOf("/");
-        String first = storageID.substring(0, pos);
-        pos = first.lastIndexOf("_");
-        String base = first.substring(0, pos);
-        int slotID = Integer.parseInt(first.substring(pos + 1));
-        return getStore(base).retrieve(slotID);
+    private MCRFileCollection getSlot(MCRObjectID derivateID) throws IOException {
+        return Optional
+            .ofNullable(getStore(derivateID.getBase()).retrieve(derivateID.getNumberAsInteger()))
+            .orElseThrow(() -> getIOException(derivateID.getBase(), derivateID.getNumberAsInteger()));
+    }
+    
+    private MCRObjectID toDerivateID(String storageID){
+        return MCRObjectID.getInstance(storageID.substring(0, storageID.indexOf("/")));
+    }
+
+    private String toPath(String storageID) {
+        int pos = storageID.indexOf("/") + 1;
+        String path = storageID.substring(pos);
+        return path;
     }
 
     private MCRFile getFile(String storageID) throws IOException {
-        MCRFileCollection slot = getSlot(storageID);
-        int pos = storageID.indexOf("/") + 1;
-        String path = storageID.substring(pos);
+        MCRFileCollection slot = getSlot(toDerivateID(storageID));
+        String path = toPath(storageID);
         return Optional
             .ofNullable(slot.getNodeByPath(path))
             .map(MCRFile.class::cast)
             .orElseThrow(() -> getIOException(slot, path, storageID));
+    }
+
+    private IOException getIOException(String base, int slotID) {
+        return new IOException(
+            "Could not resolve slot '" + slotID + "' of store: " + getStore(base).getID());
     }
     
     private IOException getIOException(MCRFileCollection slot, String path, String storageID) {
