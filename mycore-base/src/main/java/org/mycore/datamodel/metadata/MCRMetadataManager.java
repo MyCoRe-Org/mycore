@@ -271,6 +271,7 @@ public final class MCRMetadataManager {
         MCRPath rootPath = MCRPath.getPath(derivateID, "/");
         if (!Files.exists(rootPath)) {
             LOGGER.info("Derivate does not exist: " + derivateID);
+            return;
         }
         Files.walkFileTree(rootPath, MCRRecursiveDeleter.instance());
         rootPath.getFileSystem().removeRoot(derivateID);
