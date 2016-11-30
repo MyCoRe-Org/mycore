@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -84,7 +85,9 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -508,19 +511,17 @@ public class MCRXMLFunctions {
      *         otherwise
      */
     public static boolean hasDisplayableDerivates(String objectId) throws Exception {
-        MCRObjectID id = MCRObjectID.getInstance(objectId);
-        if (MCRMetadataManager.exists(id)) {
-            MCRObject obj = MCRMetadataManager.retrieveMCRObject(id);
-            List<MCRMetaLinkID> links = obj.getStructure().getDerivates();
-
-            for (MCRMetaLinkID aLink : links) {
-                MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(aLink.getXLinkHrefID());
-                if (derivate.getDerivate().isDisplayEnabled()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return Optional.of(MCRObjectID.getInstance(objectId))
+                       .filter(MCRMetadataManager::exists)
+                       .map(MCRMetadataManager::retrieveMCRObject)
+                       .map(MCRObject::getStructure)
+                       .map(MCRObjectStructure::getDerivates)
+                       .map(List::stream)
+                       .map(s -> s.map(MCRMetaLinkID::getXLinkHrefID)
+                                  .map(MCRMetadataManager::retrieveMCRDerivate)
+                                  .map(MCRDerivate::getDerivate)
+                                  .anyMatch(MCRObjectDerivate::isDisplayEnabled))
+                       .orElse(false);
     }
 
     /**

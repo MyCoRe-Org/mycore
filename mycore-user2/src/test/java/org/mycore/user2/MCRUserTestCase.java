@@ -25,10 +25,8 @@ package org.mycore.user2;
 
 import java.util.Map;
 
-import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;

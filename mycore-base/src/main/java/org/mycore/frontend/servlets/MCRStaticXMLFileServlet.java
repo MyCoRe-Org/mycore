@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -69,10 +71,8 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-
-        String docTypes = MCRConfiguration.instance().getString("MCR.EditorFramework.DocTypes", "MyCoReWebPage");
-        for (String docType : docTypes.split(","))
-            docTypesIncludingEditors.add(docType);
+        List<String> docTypes = MCRConfiguration.instance().getStrings("MCR.EditorFramework.DocTypes", Arrays.asList("MyCoReWebPage"));
+        docTypesIncludingEditors.addAll(docTypes);
     }
 
     @Override

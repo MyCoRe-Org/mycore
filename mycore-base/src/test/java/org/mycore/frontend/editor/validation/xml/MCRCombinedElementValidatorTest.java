@@ -1,16 +1,14 @@
 package org.mycore.frontend.editor.validation.xml;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.jdom2.Element;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mycore.frontend.editor.validation.MCRCombinedValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.MCRValidatorTest;
-import org.mycore.frontend.editor.validation.value.MCRMaxLengthValidator;
-import org.mycore.frontend.editor.validation.value.MCRMinLengthValidator;
 
 public class MCRCombinedElementValidatorTest extends MCRValidatorTest {
 

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -126,12 +127,10 @@ public class MCRFileNodeServlet extends MCRContentServlet {
      */
     public static String getOwnerID(HttpServletRequest request) {
         String pI = request.getPathInfo();
-        for (String fragment : pI.split("/")) {
-            if (patternDerivateID.matcher(fragment).matches()) {
-                return fragment;
-            }
-        }
-        return "";
+        return Arrays.stream(pI.split("/"))
+                     .filter(fragment -> patternDerivateID.matcher(fragment).matches())
+                     .findFirst()
+                     .orElse("");
     }
 
     /**

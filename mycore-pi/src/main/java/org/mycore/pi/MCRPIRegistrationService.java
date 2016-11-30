@@ -1,5 +1,7 @@
 package org.mycore.pi;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,8 +12,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -26,8 +26,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier> {
 

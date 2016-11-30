@@ -23,6 +23,10 @@
 
 package org.mycore.datamodel.classifications2.utils;
 
+import static org.jdom2.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,10 +42,6 @@ import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
-
-import static org.jdom2.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * 

@@ -11,11 +11,13 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -223,14 +225,7 @@ public class MCRMetsSave {
     private static void updateOnImageFile(Document mets, String fileId, String path) throws DataConversionException {
         LOGGER.debug("FILE is a image!");
         //check if custom files are present and save the ids
-        List<String> matches = new ArrayList<>();
         String[] customFileGroups = {TRANSCRIPTION_FILE_GROUP_USE, ALTO_FILE_GROUP_USE, TRANSLATION_FILE_GROUP_USE};
-        for (String customFileGroup : customFileGroups) {
-            String matchId = searchFileInGroup(mets, path, customFileGroup);
-            if (matchId != null) {
-                matches.add(matchId);
-            }
-        }
 
 
         // add to structMap physical
@@ -238,9 +233,11 @@ public class MCRMetsSave {
         PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE, newOrder);
         div.add(new Fptr(fileId));
 
-        for (String match : matches) {
-            div.add(new Fptr(match));
-        }
+        Arrays.stream(customFileGroups)
+              .map(customFileGroup -> searchFileInGroup(mets, path, customFileGroup))
+              .filter(Objects::nonNull)
+              .map(Fptr::new)
+              .forEach(div::add);
 
         // actually alter the mets document
         Element structMapPhys = getPhysicalStructmap(mets);

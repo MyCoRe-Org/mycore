@@ -1,13 +1,13 @@
 package org.mycore.frontend.editor.validation.xml;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 import org.mycore.frontend.editor.validation.MCRValidatorTest;
-import org.mycore.frontend.editor.validation.xml.MCRXSLConditionElementValidator;
 
 public class MCRXSLConditionElementValidatorTest extends MCRValidatorTest {
 

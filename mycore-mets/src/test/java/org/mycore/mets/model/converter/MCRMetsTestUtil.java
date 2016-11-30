@@ -66,13 +66,7 @@ public class MCRMetsTestUtil {
     }
 
     public static <T> boolean comparer(Comparator<T> comparator, T object, T... withList) {
-        for (T with : withList) {
-            if (comparator.compare(object, with) != 0) {
-                return false;
-            }
-        }
-
-        return true;
+        return Arrays.stream(withList).noneMatch(with -> comparator.compare(object, with) != 0);
     }
 
 

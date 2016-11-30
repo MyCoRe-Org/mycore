@@ -1,6 +1,7 @@
 package org.mycore.frontend.editor.validation.pair;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -8,8 +9,6 @@ import org.junit.Test;
 import org.mycore.frontend.editor.validation.MCRCombinedValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.editor.validation.MCRValidatorTest;
-import org.mycore.frontend.editor.validation.pair.MCRIntegerPairValidator;
-import org.mycore.frontend.editor.validation.pair.MCRStringPairValidator;
 
 public class MCRCombinedPairValidatorTest extends MCRValidatorTest {
 

@@ -23,9 +23,11 @@
 
 package org.mycore.common.content.streams;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
+
 import org.junit.Test;
 
 /**

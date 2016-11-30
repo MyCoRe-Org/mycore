@@ -36,11 +36,8 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
         Namespace... namespaces) {
         XPathExpression<T> jaxenCompiled = super.compile(expression, filter, variables, namespaces);
 
-        for (ExtensionFunction function : functions) {
-            if (function.isCalledIn(expression)) {
-                addExtensionFunctions(jaxenCompiled, namespaces);
-                break;
-            }
+        if (functions.stream().anyMatch(function -> function.isCalledIn(expression))) {
+            addExtensionFunctions(jaxenCompiled, namespaces);
         }
         return jaxenCompiled;
     }

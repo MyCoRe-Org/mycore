@@ -23,10 +23,11 @@
 
 package org.mycore.frontend.jersey.access;
 
-import com.sun.jersey.spi.container.ContainerRequest;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
+
+import com.sun.jersey.spi.container.ContainerRequest;
 
 /**
  * @author Thomas Scheffler (yagee)

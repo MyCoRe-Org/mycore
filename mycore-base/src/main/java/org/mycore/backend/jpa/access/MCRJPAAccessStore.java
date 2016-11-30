@@ -199,29 +199,22 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     public ArrayList<String> getMappedObjectId(String pool) {
 
         Session session = MCRHIBConnection.instance().getSession();
-        ArrayList<String> ret = new ArrayList<String>();
-
         List<MCRACCESS> l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'", MCRACCESS.class)
             .getResultList();
-        for (MCRACCESS aL : l) {
-            ret.add(aL.getKey().getObjid());
-        }
-
-        return ret;
+        return l.stream()
+                .map(aL -> aL.getKey().getObjid())
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
     public ArrayList<String> getPoolsForObject(String objid) {
 
         Session session = MCRHIBConnection.instance().getSession();
-        ArrayList<String> ret = new ArrayList<String>();
         List<MCRACCESS> l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'", MCRACCESS.class)
             .getResultList();
-        for (MCRACCESS access : l) {
-            ret.add(access.getKey().getAcpool());
-        }
-
-        return ret;
+        return l.stream()
+                .map(access -> access.getKey().getAcpool())
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override

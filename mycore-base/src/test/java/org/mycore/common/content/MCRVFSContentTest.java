@@ -23,7 +23,7 @@
 
 package org.mycore.common.content;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
 import java.net.URL;

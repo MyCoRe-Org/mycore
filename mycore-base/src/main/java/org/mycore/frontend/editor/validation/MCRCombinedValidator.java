@@ -18,21 +18,12 @@ public class MCRCombinedValidator extends MCRValidatorBase implements MCRValidat
     }
 
     public boolean hasRequiredProperties() {
-        for (MCRValidator validator : validators) {
-            if (validator.hasRequiredProperties())
-                return true;
-        }
-        return false;
+        return validators.stream().anyMatch(MCRValidator::hasRequiredProperties);
     }
 
     protected boolean isValidOrDie(Object... input) {
-        for (MCRValidator validator : validators) {
-            if (!validator.hasRequiredProperties())
-                continue;
-            if (!validator.isValid(input)) {
-                return false;
-            }
-        }
-        return true;
+        return validators.stream()
+                         .filter(MCRValidator::hasRequiredProperties)
+                         .allMatch(validator -> validator.isValid(input));
     }
 }

@@ -26,6 +26,7 @@ package org.mycore.frontend.xeditor.validation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
@@ -71,10 +72,9 @@ public class MCRXEditorValidator {
     }
 
     private boolean hasLegacyAttributes(NamedNodeMap attributes) {
-        for (int i = 0; i < attributes.getLength(); i++)
-            if ("maxLength minLenght min max type class method format".contains(attributes.item(i).getNodeName()))
-                return true;
-        return false;
+        return IntStream.range(0, attributes.getLength())
+                        .anyMatch(i -> "maxLength minLenght min max type class method format".contains(
+                            attributes.item(i).getNodeName()));
     }
 
     public void clearRules() {

@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.io.ByteArrayInputStream;
+
 import org.junit.Test;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs2.MCRFile;

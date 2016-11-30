@@ -78,12 +78,7 @@ public class MCRMediaParser {
      * @return boolean if true
      */
     public boolean isFileSupported(File file) {
-        for (MCRMediaParser parser : parsers) {
-            if (parser.isValid() && parser.isFileSupported(file))
-                return true;
-        }
-
-        return false;
+        return parsers.stream().anyMatch(parser -> parser.isValid() && parser.isFileSupported(file));
     }
 
     /**
@@ -92,12 +87,7 @@ public class MCRMediaParser {
      * @return boolean if true
      */
     public boolean isFileSupported(MCROldFile file) {
-        for (MCRMediaParser parser : parsers) {
-            if (parser.isValid() && parser.isFileSupported(file))
-                return true;
-        }
-
-        return false;
+        return parsers.stream().anyMatch(parser -> parser.isValid() && parser.isFileSupported(file));
     }
 
     /**
@@ -106,12 +96,7 @@ public class MCRMediaParser {
      * @return boolean if true
      */
     public boolean isFileSupported(org.mycore.datamodel.ifs.MCRFile file) {
-        for (MCRMediaParser parser : parsers) {
-            if (parser.isValid() && parser.isFileSupported(file))
-                return true;
-        }
-
-        return false;
+        return parsers.stream().anyMatch(parser -> parser.isValid() && parser.isFileSupported(file));
     }
 
     /**
@@ -120,12 +105,7 @@ public class MCRMediaParser {
      * @return boolean if true
      */
     public boolean isFileSupported(MCRFileReader file) {
-        for (MCRMediaParser parser : parsers) {
-            if (parser.isValid() && parser.isFileSupported(file))
-                return true;
-        }
-
-        return false;
+        return parsers.stream().anyMatch(parser -> parser.isValid() && parser.isFileSupported(file));
     }
 
     /**

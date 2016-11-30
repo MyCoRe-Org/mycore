@@ -25,10 +25,10 @@ package org.mycore.frontend.fileupload;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -86,11 +86,10 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     }
 
     private List<FileItem> getUploadedFiles(MCRRequestParameters rp) {
-        List<FileItem> files = new ArrayList<FileItem>();
-        for (FileItem file : rp.getFileList())
-            if (file.getSize() > 0)
-                files.add(file);
-        return files;
+        return rp.getFileList()
+                 .stream()
+                 .filter(file -> file.getSize() > 0)
+                 .collect(Collectors.toList());
     }
 
     private void guardWebsiteCurrentlyReadOnly() throws IOException {

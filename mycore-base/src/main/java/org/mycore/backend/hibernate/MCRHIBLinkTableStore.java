@@ -32,8 +32,8 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
-import org.hibernate.query.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.links.MCRLINKHREF;
 import org.mycore.backend.jpa.links.MCRLINKHREFPK;
@@ -171,8 +171,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             qBf.append(" and MCRFROM like \'%_").append(fromtype).append("_%\'");
         }
 
-        Query q = session.createQuery(qBf.toString());
-        returns = (Number) q.uniqueResult();
+        Query<Number> q = session.createQuery(qBf.toString(),Number.class);
+        returns = q.getSingleResult();
 
         return returns.intValue();
     }

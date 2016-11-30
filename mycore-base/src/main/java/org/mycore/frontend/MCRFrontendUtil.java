@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
@@ -268,18 +269,15 @@ public class MCRFrontendUtil {
             LOGGER.warn("Could not determine IP of local host serving:" + getBaseURL(), ex);
         }
 
-        TreeSet<String> sortedAdresses = new TreeSet<>();
         if (LOGGER.isDebugEnabled()) {
-            for (InetAddress address : trustedProxies) {
-                sortedAdresses.add(address.toString());
-            }
-            LOGGER.debug("Trusted proxies: " + sortedAdresses);
-            sortedAdresses.clear();
+            LOGGER.debug("Trusted proxies: " + trustedProxies.stream()
+                                                             .map(InetAddress::toString)
+                                                             .sorted()
+                                                             .collect(Collectors.joining(", ")));
         }
-        for (InetAddress address : trustedProxies) {
-            sortedAdresses.add(address.getHostAddress());
-        }
-        return sortedAdresses;
+        return trustedProxies.stream()
+                             .map(InetAddress::getHostAddress)
+                             .collect(Collectors.toCollection(TreeSet::new));
     }
 
     /**

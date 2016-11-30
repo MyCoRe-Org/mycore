@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -231,26 +232,15 @@ public class MCRUserAttributeMapper {
     }
 
     private List<Object> getAnnotatedFields(final Class<?> cls) {
-        List<Object> fields = new ArrayList<Object>();
-
-        for (Field field : cls.getDeclaredFields()) {
-            if (field.getAnnotation(MCRUserAttribute.class) != null) {
-                fields.add(field);
-            }
-        }
-
-        return fields;
+        return Arrays.stream(cls.getDeclaredFields())
+                     .filter(field -> field.getAnnotation(MCRUserAttribute.class) != null)
+                     .collect(Collectors.toList());
     }
 
     private List<Object> getAnnotatedMethods(final Class<?> cls) {
-        List<Object> methods = new ArrayList<Object>();
-        for (Method method : cls.getDeclaredMethods()) {
-            if (method.getAnnotation(MCRUserAttribute.class) != null) {
-                methods.add(method);
-            }
-        }
-
-        return methods;
+        return Arrays.stream(cls.getDeclaredMethods())
+                     .filter(method -> method.getAnnotation(MCRUserAttribute.class) != null)
+                     .collect(Collectors.toList());
     }
 
     private String getAttriutebName(final Object annotated) {

@@ -23,21 +23,10 @@
 
 package org.mycore.frontend.fileupload;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.text.Annotation;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;

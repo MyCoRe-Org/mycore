@@ -1,13 +1,11 @@
 package org.mycore.datamodel.ifs2.test;
 
-import static org.junit.Assert.*;
-
-import java.text.MessageFormat;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.mycore.datamodel.ifs2.MCRFileStore;
-import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
+import org.mycore.datamodel.ifs2.MCRStoreManager;
 
 
 public class MCRStoreManagerTest {

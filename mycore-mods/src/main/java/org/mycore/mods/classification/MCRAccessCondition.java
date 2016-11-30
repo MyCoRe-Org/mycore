@@ -61,13 +61,11 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
             }
         }
         Collection<MCRCategory> classes = MCRAuthorityWithURI.getCategoryByURI(authorityURI);
-        for (MCRCategory cat : classes) {
-            MCRCategoryID catId = new MCRCategoryID(cat.getId().getRootID(), categId);
-            if (DAO.exist(catId)) {
-                return catId;
-            }
-        }
-        return null;
+        return classes.stream()
+                      .map(cat -> new MCRCategoryID(cat.getId().getRootID(), categId))
+                      .filter(DAO::exist)
+                      .findFirst()
+                      .orElse(null);
     }
 
     /* (non-Javadoc)

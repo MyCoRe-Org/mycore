@@ -65,12 +65,10 @@ public class MCRRealmResolver implements URIResolver {
     private Element getElement(final String id) {
         Document realmsDocument = MCRRealmFactory.getRealmsDocument();
         List<Element> realms = realmsDocument.getRootElement().getChildren("realm");
-        for (Element realm : realms) {
-            if (id.equals(realm.getAttributeValue("id"))) {
-                return realm;
-            }
-        }
-        return null;
+        return realms.stream()
+                     .filter(realm -> id.equals(realm.getAttributeValue("id")))
+                     .findAny()
+                     .orElse(null);
     }
 
 }

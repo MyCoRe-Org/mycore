@@ -23,16 +23,11 @@
 
 package org.mycore.access.mcrimpl;
 
-import java.io.Serializable;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
@@ -81,7 +76,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
         accessStore = MCRAccessStore.getInstance();
         ruleStore = MCRRuleStore.getInstance();
-        accessComp = new MCRAccessConditionsComparator();
 
         nextFreeRuleID = new HashMap<String, Integer>();
 
@@ -89,8 +83,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     private static MCRAccessControlSystem singleton;
-
-    private static Comparator<Element> accessComp;
 
     private static HashMap<String, Integer> nextFreeRuleID;
 
@@ -394,54 +386,46 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
      */
     public Element normalize(Element rule) {
         Element newRule = new Element(rule.getName());
-        for (Attribute att : (Iterable<Attribute>) rule.getAttributes()) {
-            newRule.setAttribute((Attribute) att.clone());
-        }
-        List<Element> children = rule.getChildren();
-        if (children == null || children.size() == 0) {
-            return newRule;
-        }
-        List<Element> newList = new ArrayList<Element>();
-        for (Element el : children) {
-            newList.add((Element) el.clone());
-        }
-        Collections.sort(newList, accessComp);
-        for (Element el : newList) {
-            newRule.addContent(normalize(el));
-        }
+        rule.getAttributes()
+            .stream()
+            .map(Attribute::clone)
+            .forEach(newRule::setAttribute);
+        rule.getChildren()
+            .stream()
+            .map(Element::clone)
+            .map(this::normalize)
+            .sorted(MCRAccessControlSystem::compareAccessConditions)
+            .forEachOrdered(newRule::addContent);
         return newRule;
     }
 
     /**
      * A Comparator for the Condition Elements for normalizing the access conditions
      */
-    private static class MCRAccessConditionsComparator implements Comparator<Element>, Serializable {
-
-        public int compare(Element el0, Element el1) {
-            String nameEl0 = el0.getName();
-            String nameEl1 = el1.getName();
-            int nameCompare = nameEl0.compareTo(nameEl1);
-            // order "boolean" before "condition"
-            if (nameCompare != 0) {
-                return nameCompare;
-            }
-            if (nameEl0.equals("boolean")) {
-                String opEl0 = el0.getAttributeValue("operator");
-                String opEl1 = el0.getAttributeValue("operator");
-                return opEl0.compareToIgnoreCase(opEl1);
-            } else if (nameEl0.equals("condition")) {
-                String fieldEl0 = el0.getAttributeValue("field");
-                String fieldEl1 = el1.getAttributeValue("field");
-                int fieldCompare = fieldEl0.compareToIgnoreCase(fieldEl1);
-                if (fieldCompare != 0) {
-                    return fieldCompare;
-                }
-                String valueEl0 = el0.getAttributeValue("value");
-                String valueEl1 = el1.getAttributeValue("value");
-                return valueEl0.compareTo(valueEl1);
-            }
-            return 0;
+    private static int compareAccessConditions(Element el0, Element el1) {
+        String nameEl0 = el0.getName();
+        String nameEl1 = el1.getName();
+        int nameCompare = nameEl0.compareTo(nameEl1);
+        // order "boolean" before "condition"
+        if (nameCompare != 0) {
+            return nameCompare;
         }
+        if (nameEl0.equals("boolean")) {
+            String opEl0 = el0.getAttributeValue("operator");
+            String opEl1 = el0.getAttributeValue("operator");
+            return opEl0.compareToIgnoreCase(opEl1);
+        } else if (nameEl0.equals("condition")) {
+            String fieldEl0 = el0.getAttributeValue("field");
+            String fieldEl1 = el1.getAttributeValue("field");
+            int fieldCompare = fieldEl0.compareToIgnoreCase(fieldEl1);
+            if (fieldCompare != 0) {
+                return fieldCompare;
+            }
+            String valueEl0 = el0.getAttributeValue("value");
+            String valueEl1 = el1.getAttributeValue("value");
+            return valueEl0.compareTo(valueEl1);
+        }
+        return 0;
     }
 
 }

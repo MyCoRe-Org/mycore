@@ -1,5 +1,7 @@
 package org.mycore.mets.model.converter;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +16,6 @@ import org.mycore.mets.model.simple.MCRMetsSection;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
 
 import com.google.gson.GsonBuilder;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * This class converts JSON to MCRMetsSimpleModel.

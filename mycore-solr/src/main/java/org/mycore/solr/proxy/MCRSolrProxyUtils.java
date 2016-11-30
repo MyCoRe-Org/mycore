@@ -13,8 +13,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.util.NamedList;
-import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrConstants;
 
 class MCRSolrProxyUtils {
 

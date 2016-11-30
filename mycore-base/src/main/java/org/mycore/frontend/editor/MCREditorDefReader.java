@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -199,13 +200,11 @@ public class MCREditorDefReader {
         if (id.equals(candidate.getAttributeValue("id"))) {
             return candidate.cloneContent();
         } else {
-            for (Element child : (List<Element>) candidate.getChildren()) {
-                List<Content> found = findContent(child, id);
-                if (found != null) {
-                    return found;
-                }
-            }
-            return null;
+            return ((List<Element>) candidate.getChildren()).stream()
+                                                            .map(child -> findContent(child, id))
+                                                            .filter(Objects::nonNull)
+                                                            .findFirst()
+                                                            .orElse(null);
         }
     }
 
@@ -224,13 +223,11 @@ public class MCREditorDefReader {
         if (id.equals(candidate.getAttributeValue("id"))) {
             return candidate;
         } else {
-            for (Element child : (List<Element>) candidate.getChildren()) {
-                Element found = findElementByID(id, child);
-                if (found != null) {
-                    return found;
-                }
-            }
-            return null;
+            return ((List<Element>) candidate.getChildren()).stream()
+                                                            .map(child -> findElementByID(id, child))
+                                                            .filter(Objects::nonNull)
+                                                            .findFirst()
+                                                            .orElse(null);
         }
     }
 

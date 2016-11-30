@@ -24,12 +24,14 @@ package org.mycore.user2;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -656,11 +658,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     @Transient
     Collection<String> getRolesCollection() {
-        Collection<String> roles = new HashSet<String>();
-        for (MCRRole role : getRoles()) {
-            roles.add(role.getName());
-        }
-        return roles;
+        return Arrays.stream(getRoles()).map(MCRRole::getName).collect(Collectors.toSet());
     }
 
     @MCRUserAttribute(name = "roles", separator = ";")

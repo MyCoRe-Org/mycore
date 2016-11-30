@@ -2,10 +2,7 @@ package org.mycore.common.events.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;

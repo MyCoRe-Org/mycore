@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -18,10 +19,9 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRCategoryLink;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrClientFactory;
 
 import com.google.common.collect.Lists;
 
@@ -65,14 +65,11 @@ public abstract class MCRSolrClassificationUtil {
         Collection<String> linkTypes = linkService.getTypes();
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '" + linkType + "' links...");
-            List<SolrInputDocument> solrDocumentList = new ArrayList<>();
-            Collection<MCRCategoryLink> links = linkService.getLinks(linkType);
-            for (MCRCategoryLink link : links) {
-                MCRSolrCategoryLink solrink = new MCRSolrCategoryLink(link.getCategory().getId(),
-                    link.getObjectReference());
-                solrDocumentList.add(solrink.toSolrDocument());
-            }
-            bulkIndex(solrDocumentList);
+            bulkIndex(linkService.getLinks(linkType).stream()
+                                 .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
+                                        link.getObjectReference()))
+                                 .map(MCRSolrCategoryLink::toSolrDocument)
+                                 .collect(Collectors.toList()));
         }
     }
 
@@ -145,12 +142,10 @@ public abstract class MCRSolrClassificationUtil {
      * Creates a new list of {@link SolrInputDocument} based on the given category list.
      */
     public static List<SolrInputDocument> toSolrDocument(Collection<MCRCategory> categoryList) {
-        List<SolrInputDocument> solrDocumentList = new ArrayList<>();
-        for (MCRCategory category : categoryList) {
-            MCRSolrCategory mcrSolrCategory = new MCRSolrCategory(category);
-            solrDocumentList.add(mcrSolrCategory.toSolrDocument());
-        }
-        return solrDocumentList;
+        return categoryList.stream()
+                           .map(MCRSolrCategory::new)
+                           .map(MCRSolrCategory::toSolrDocument)
+                           .collect(Collectors.toList());
     }
 
     /**
@@ -158,12 +153,11 @@ public abstract class MCRSolrClassificationUtil {
      */
     public static List<SolrInputDocument> toSolrDocument(MCRCategLinkReference linkReference,
         Collection<MCRCategoryID> categories) {
-        List<SolrInputDocument> solrDocumentList = new ArrayList<>();
-        for (MCRCategoryID categoryId : categories) {
-            MCRSolrCategoryLink link = new MCRSolrCategoryLink(categoryId, linkReference);
-            solrDocumentList.add(link.toSolrDocument());
-        }
-        return solrDocumentList;
+        return categories.stream()
+                         .map(categoryId -> new MCRSolrCategoryLink(categoryId,
+                                                                 linkReference))
+                         .map(MCRSolrCategoryLink::toSolrDocument)
+                         .collect(Collectors.toList());
     }
 
     /**
