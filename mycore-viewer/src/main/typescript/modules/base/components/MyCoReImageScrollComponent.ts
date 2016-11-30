@@ -267,8 +267,8 @@ module mycore.viewer.components {
         };
 
         // Size of a 300DPI A4 page
-        private static PAGE_WIDTH = 2480;
-        private static PAGE_HEIGHT = 3508;
+        private pageWidth = 2480;
+        private pageHeight = 3508;
         private static DEFAULT_CANVAS_OVERVIEW_MIN_VISIBLE_SIZE = "800";
         private static OVERVIEW_VISIBLE_ICON = `glyphicon-triangle-top`;
         private static OVERVIEW_INVISIBLE_ICON = `glyphicon-triangle-bottom`;
@@ -506,6 +506,12 @@ module mycore.viewer.components {
             if (e.type == events.StructureModelLoadedEvent.TYPE) {
                 var structureModelLodedEvent = <events.StructureModelLoadedEvent>e;
                 this._structureImages = structureModelLodedEvent.structureModel.imageList;
+
+                if ("defaultPageDimension" in structureModelLodedEvent.structureModel) {
+                    this.pageWidth = structureModelLodedEvent.structureModel.defaultPageDimension.width;
+                    this.pageHeight = structureModelLodedEvent.structureModel.defaultPageDimension.height;
+                }
+
                 this._structureModelLoaded();
                 this.changeImage(this._currentImage, false);
                 this.update();
@@ -537,7 +543,7 @@ module mycore.viewer.components {
 
         private addLayout(layout:widgets.canvas.PageLayout) {
             this._layouts.push(layout);
-            layout.init(this._layoutModel, this._pageController, new Size2D(MyCoReImageScrollComponent.PAGE_WIDTH, MyCoReImageScrollComponent.PAGE_HEIGHT), this._horizontalScrollbar, this._verticalScrollbar, this._pageLoader);
+            layout.init(this._layoutModel, this._pageController, new Size2D(this.pageWidth, this.pageHeight), this._horizontalScrollbar, this._verticalScrollbar, this._pageLoader);
             this.synchronizeLayoutToolbarButton();
         }
 
