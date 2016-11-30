@@ -182,12 +182,10 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         if (set_lang == null) {
             return null;
         }
-        for (MCRMetaHistoryDateText text : texts) {
-            if (text.getLang().equals(set_lang)) {
-                return text;
-            }
-        }
-        return null;
+        return texts.stream()
+                    .filter(text -> text.getLang().equals(set_lang))
+                    .findFirst()
+                    .orElse(null);
     }
 
     /**

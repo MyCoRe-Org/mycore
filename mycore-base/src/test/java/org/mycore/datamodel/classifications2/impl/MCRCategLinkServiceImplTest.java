@@ -179,12 +179,11 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     private String getType(String objectID) {
-        for (MCRCategoryLinkImpl link : testLinks) {
-            if (link.getObjectReference().getObjectID().equals(objectID)) {
-                return link.getObjectReference().getType();
-            }
-        }
-        return null;
+        return testLinks.stream()
+                        .filter(link -> link.getObjectReference().getObjectID().equals(objectID))
+                        .findFirst()
+                        .map(link -> link.getObjectReference().getType())
+                        .orElse(null);
     }
 
     /**
@@ -259,13 +258,10 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         for (MCRCategLinkReference ref : references) {
             assertEquals("Type of reference is not correct.", type, ref.getType());
         }
-        int counter = 0;
-        for (MCRCategoryLinkImpl link : testLinks) {
-            if (link.getObjectReference().getType().equals(type)) {
-                counter++;
-            }
-        }
-        assertEquals("Collection is not complete", counter, references.size());
+        assertEquals("Collection is not complete",
+            testLinks.stream()
+                     .filter(link -> link.getObjectReference().getType().equals(type))
+                     .count(), references.size());
     }
 
     private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {

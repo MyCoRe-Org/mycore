@@ -37,11 +37,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.user2.MCRRealmFactory;
-import org.mycore.user2.MCRTransientUser;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserAttributeMapper;
-import org.mycore.user2.MCRUserManager;
 import org.mycore.user2.login.MCRShibbolethUserInformation;
 import org.mycore.user2.utils.MCRUserTransformer;
 

@@ -1,26 +1,23 @@
 package org.mycore.frontend.xeditor.tracker;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
+import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
-import static org.junit.Assert.*;
-
-import org.junit.Test;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.xeditor.MCRBinding;
-import org.mycore.frontend.xeditor.tracker.MCRAddedAttribute;
-import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
-import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
-import org.mycore.frontend.xeditor.tracker.MCRRemoveAttribute;
-import org.mycore.frontend.xeditor.tracker.MCRRemoveElement;
-import org.mycore.frontend.xeditor.tracker.MCRSetAttributeValue;
-import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
 
 public class MCRChangeTrackerTest extends MCRTestCase {
 

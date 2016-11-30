@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
@@ -273,21 +274,19 @@ public class MCRViewerConfiguration {
         @XmlElements({ @XmlElement(name = "resource") })
         @XmlElementWrapper(name = "resources")
         public final List<MCRIViewClientResource> getResources() {
-            List<MCRIViewClientResource> resourceList = new ArrayList<>();
-            for (Entry<ResourceType, String> entry : resources.entries()) {
-                resourceList.add(new MCRIViewClientResource(entry.getKey(), entry.getValue()));
-            }
-            return resourceList;
+            return resources.entries()
+                            .stream()
+                            .map(entry -> new MCRIViewClientResource(entry.getKey(), entry.getValue()))
+                            .collect(Collectors.toList());
         }
 
         @XmlElements({ @XmlElement(name = "property") })
         @XmlElementWrapper(name = "properties")
         public final List<MCRIViewClientProperty> getProperties() {
-            List<MCRIViewClientProperty> propertyList = new ArrayList<>();
-            for (Entry<String, Object> entry : properties.entrySet()) {
-                propertyList.add(new MCRIViewClientProperty(entry.getKey(), entry.getValue()));
-            }
-            return propertyList;
+            return properties.entrySet()
+                             .stream()
+                             .map(entry -> new MCRIViewClientProperty(entry.getKey(), entry.getValue()))
+                             .collect(Collectors.toList());
         }
 
     }

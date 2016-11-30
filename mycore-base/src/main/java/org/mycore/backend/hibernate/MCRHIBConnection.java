@@ -31,10 +31,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.metamodel.EntityType;
 
 import org.apache.log4j.Logger;
-import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
+import org.hibernate.query.Query;
 import org.hibernate.stat.Statistics;
 import org.jdom2.Element;
 import org.mycore.backend.jpa.MCREntityManagerProvider;

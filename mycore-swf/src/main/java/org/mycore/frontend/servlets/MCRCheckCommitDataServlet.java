@@ -23,6 +23,8 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -33,8 +35,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type

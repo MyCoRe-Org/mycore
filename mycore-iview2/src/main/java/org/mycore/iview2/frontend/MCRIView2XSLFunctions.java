@@ -26,6 +26,8 @@ package org.mycore.iview2.frontend;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -137,22 +139,18 @@ public class MCRIView2XSLFunctions {
 
     private static Node getElementById(Node base, String ID) {
         NamedNodeMap attributes = base.getAttributes();
-        for (int i = 0; i < attributes.getLength(); i++) {
-            Attr attr = (Attr) attributes.item(i);
-            if (attr.getLocalName().equalsIgnoreCase("id") && attr.getNodeValue().equals(ID)) {
-                return base;
-            }
+        if (IntStream.range(0, attributes.getLength())
+                     .mapToObj(i -> (Attr) attributes.item(i))
+                     .anyMatch(attr -> attr.getLocalName().equalsIgnoreCase("id") && attr.getNodeValue().equals(ID))) {
+            return base;
         }
         NodeList childNodes = base.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node child = childNodes.item(i);
-            if (child.getNodeType() == Node.ELEMENT_NODE) {
-                Node test = getElementById(child, ID);
-                if (test != null) {
-                    return test;
-                }
-            }
-        }
-        return null;
+        return IntStream.range(0, childNodes.getLength())
+                        .mapToObj(childNodes::item)
+                        .filter(child -> child.getNodeType() == Node.ELEMENT_NODE)
+                        .map(child -> getElementById(child, ID))
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null);
     }
 }

@@ -23,7 +23,7 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
@@ -32,7 +32,6 @@ import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
-import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen

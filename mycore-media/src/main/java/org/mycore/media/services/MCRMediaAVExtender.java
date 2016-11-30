@@ -24,7 +24,6 @@
 package org.mycore.media.services;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;

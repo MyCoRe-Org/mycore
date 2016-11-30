@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import javax.persistence.PersistenceException;
 
@@ -798,10 +799,11 @@ public final class MCRMetadataManager {
 
         // save the order of derivates and clean the structure
         mcrObject.getStructure().clearChildren();
-        List<String> derOrder = new ArrayList<String>();
-        for (MCRMetaLinkID derID : mcrObject.getStructure().getDerivates()) {
-            derOrder.add(derID.getXLinkHref());
-        }
+        List<String> derOrder = mcrObject.getStructure()
+                                         .getDerivates()
+                                         .stream()
+                                         .map(MCRMetaLink::getXLinkHref)
+                                         .collect(Collectors.toList());
         HashMap<String, String> newlinkTitles = new HashMap<String, String>();
         HashMap<String, String> newlinkLabels = new HashMap<String, String>();
         for (MCRMetaLinkID newlinkID : mcrObject.getStructure().getDerivates()) {

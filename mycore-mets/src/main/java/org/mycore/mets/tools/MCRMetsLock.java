@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;

@@ -34,10 +34,10 @@ import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
-import org.mycore.solr.index.cs.MCRSolrContentStream;
 import org.mycore.solr.index.cs.MCRSolrBulkXMLStream;
-import org.mycore.solr.index.handlers.stream.MCRSolrDefaultIndexHandler;
+import org.mycore.solr.index.cs.MCRSolrContentStream;
 import org.mycore.solr.index.handlers.stream.MCRSolrBulkXMLIndexHandler;
+import org.mycore.solr.index.handlers.stream.MCRSolrDefaultIndexHandler;
 import org.xml.sax.SAXException;
 
 /**

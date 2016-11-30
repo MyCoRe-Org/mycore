@@ -1,8 +1,8 @@
 package org.mycore.frontend.classeditor;
 
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.CHILDREN;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.ID;
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.HASLINK;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.ID;
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.LABELS;
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.PARENTID;
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.POSITION;

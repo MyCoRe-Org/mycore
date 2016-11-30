@@ -8,7 +8,6 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.ifs.MCROldFile;
-
 import org.mycore.media.MCRMediaObject;
 import org.mycore.media.MCRMediaParser;
 import org.mycore.media.services.MCRMediaIFSTools;

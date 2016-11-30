@@ -106,9 +106,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         notinherit = set_notinherit;
 
         if (set_list != null) {
-            for (MCRMetaInterface aSet_list : set_list) {
-                list.add(aSet_list);
-            }
+            list.addAll(set_list);
         }
     }
 

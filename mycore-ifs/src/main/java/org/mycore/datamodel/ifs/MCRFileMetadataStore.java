@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import org.mycore.common.MCRPersistenceException;

@@ -23,10 +23,9 @@
 
 package org.mycore.frontend.editor.validation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.mycore.frontend.editor.validation.value.MCRDateTimeValidator;
 

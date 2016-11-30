@@ -41,7 +41,6 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.content.MCRXMLContent;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 

@@ -48,6 +48,9 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public abstract class MCRStoredNode extends MCRNode {
 
+    private static final String LANG_ATT = "lang";
+    private static final String LABEL_ELEMENT = "label";
+    private static final String NAME_ATT = "name";
     /**
      * Any additional data of this node that is not stored in the file object
      */
@@ -82,7 +85,7 @@ public abstract class MCRStoredNode extends MCRNode {
     protected MCRStoredNode(MCRDirectory parent, String name, String type) throws IOException {
         super(parent, VFS.getManager().resolveFile(parent.fo, name));
         data = new Element(type);
-        data.setAttribute("name", name);
+        data.setAttribute(NAME_ATT, name);
         parent.data.addContent(data);
     }
 
@@ -120,7 +123,7 @@ public abstract class MCRStoredNode extends MCRNode {
         fo.moveTo(fNew);
         fo = fNew;
         fo.getContent().setLastModifiedTime(System.currentTimeMillis());
-        data.setAttribute("name", name);
+        data.setAttribute(NAME_ATT, name);
         getRoot().saveAdditionalData();
     }
 
@@ -142,21 +145,20 @@ public abstract class MCRStoredNode extends MCRNode {
      * @param label
      *            the label in this language
      */
-    @SuppressWarnings("unchecked")
     public void setLabel(String lang, String label) throws IOException {
-        Element found = null;
-        for (Element child : (List<Element>) data.getChildren("label")) {
-            if (lang.equals(child.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                found = child;
-                break;
-            }
-        }
 
-        if (found == null) {
-            found = new Element("label").setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-            data.addContent(found);
-        }
-        found.setText(label);
+        data.getChildren(LABEL_ELEMENT)
+            .stream()
+            .filter(child -> lang.equals(
+                                child.getAttributeValue(LANG_ATT,
+                                    Namespace.XML_NAMESPACE)))
+            .findAny()
+            .orElseGet(() -> {
+                Element newLabel = new Element(LABEL_ELEMENT).setAttribute(LANG_ATT, lang, Namespace.XML_NAMESPACE);
+                data.addContent(newLabel);
+                return newLabel;
+            })
+            .setText(label);
         getRoot().saveAdditionalData();
     }
 
@@ -164,7 +166,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * Removes all labels set
      */
     public void clearLabels() throws IOException {
-        data.removeChildren("label");
+        data.removeChildren(LABEL_ELEMENT);
         getRoot().saveAdditionalData();
     }
 
@@ -172,11 +174,10 @@ public abstract class MCRStoredNode extends MCRNode {
      * Returns a map of all labels, sorted by xml:lang, Key is xml:lang, value
      * is the label for that language.
      */
-    @SuppressWarnings("unchecked")
     public Map<String, String> getLabels() {
         Map<String, String> labels = new TreeMap<String, String>();
-        for (Element label : (List<Element>) data.getChildren("label")) {
-            labels.put(label.getAttributeValue("lang", Namespace.XML_NAMESPACE), label.getText());
+        for (Element label : (List<Element>) data.getChildren(LABEL_ELEMENT)) {
+            labels.put(label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE), label.getText());
         }
         return labels;
     }
@@ -188,14 +189,14 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the xml:lang language ID
      * @return the label, or null if there is no label for that language
      */
-    @SuppressWarnings("unchecked")
     public String getLabel(String lang) {
-        for (Element label : (List<Element>) data.getChildren("label")) {
-            if (lang.equals(label.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                return label.getText();
-            }
-        }
-        return null;
+        return data.getChildren(LABEL_ELEMENT)
+                   .stream()
+                   .filter(label -> lang.equals(
+                       label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE)))
+                   .findAny()
+                   .map(Element::getText)
+                   .orElse(null);
     }
 
     /**
@@ -217,7 +218,7 @@ public abstract class MCRStoredNode extends MCRNode {
             return label;
         }
 
-        return data.getChildText("label");
+        return data.getChildText(LABEL_ELEMENT);
     }
 
     /**

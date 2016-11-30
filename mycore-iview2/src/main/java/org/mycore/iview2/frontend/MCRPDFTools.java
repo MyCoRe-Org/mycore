@@ -23,19 +23,21 @@
 
 package org.mycore.iview2.frontend;
 
-import org.apache.log4j.Logger;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
-import org.mycore.common.content.MCRContent;
-import org.mycore.tools.MCRPNGTools;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+
+import org.apache.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.mycore.common.content.MCRContent;
+import org.mycore.tools.MCRPNGTools;
 
 /**
  * @author Thomas Scheffler (yagee)

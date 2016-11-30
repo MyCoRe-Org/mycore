@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.servlet.ServletContext;
 
@@ -75,19 +77,15 @@ public class MCRFileSystemPromoter implements AutoExecutable {
     @Override
     public void startUp(ServletContext servletContext) {
         if (servletContext != null) {
-            HashSet<String> installedSchemes = new HashSet<>();
-            for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
-                installedSchemes.add(provider.getScheme());
-            }
+            HashSet<String> installedSchemes = FileSystemProvider.installedProviders()
+                                                                 .stream()
+                                                                 .map(FileSystemProvider::getScheme)
+                                                                 .collect(Collectors.toCollection(HashSet::new));
             ServiceLoader<FileSystemProvider> sl = ServiceLoader.load(FileSystemProvider.class, getClass()
                 .getClassLoader());
-            List<FileSystemProvider> detectedProviders = new LinkedList<>();
-            for (FileSystemProvider provider : sl) {
-                if (!installedSchemes.contains(provider.getScheme())) {
-                    detectedProviders.add(provider);
-                }
-            }
-            promoteFileSystemProvider(detectedProviders);
+            promoteFileSystemProvider(StreamSupport.stream(sl.spliterator(),false)
+                                                   .filter(p -> !installedSchemes.contains(p.getScheme()))
+                                                   .collect(Collectors.toCollection(LinkedList::new)));
         }
     }
 

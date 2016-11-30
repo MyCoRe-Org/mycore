@@ -23,8 +23,6 @@
 
 package org.mycore.frontend.xeditor;
 
-import org.jaxen.JaxenException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -204,11 +203,7 @@ public class MCRBinding {
     }
 
     public boolean hasValue(String value) {
-        for (Object node : boundNodes)
-            if (value.equals(getValue(node)))
-                return true;
-
-        return false;
+        return boundNodes.stream().map(MCRBinding::getValue).anyMatch(value::equals);
     }
 
     public void setValue(String value) {

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.mycore.common.MCRException;
-import org.mycore.common.content.streams.MCRBlockingInputStream;
 
 /**
  * Provides the header of the stream that is read. 

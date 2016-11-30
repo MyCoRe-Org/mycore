@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -44,6 +45,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference_;
@@ -318,20 +320,16 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private static Collection<MCRCategoryID> getAllCategIDs(MCRCategory category) {
-        HashSet<MCRCategoryID> ids = new HashSet<MCRCategoryID>();
-        ids.add(category.getId());
-        for (MCRCategory cat : category.getChildren()) {
-            ids.addAll(getAllCategIDs(cat));
-        }
-        return ids;
+        return MCRStreamUtils.flatten(category, MCRCategory::getChildren, Collection::parallelStream)
+                      .map(MCRCategory::getId)
+                      .collect(Collectors.toCollection(HashSet::new));
     }
 
     private static Collection<MCRCategoryID> getAllChildIDs(MCRCategory category) {
-        HashSet<MCRCategoryID> ids = new HashSet<MCRCategoryID>();
-        for (MCRCategory cat : category.getChildren()) {
-            ids.add(cat.getId());
-        }
-        return ids;
+        return category.getChildren()
+                       .stream()
+                       .map(MCRCategory::getId)
+                       .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override

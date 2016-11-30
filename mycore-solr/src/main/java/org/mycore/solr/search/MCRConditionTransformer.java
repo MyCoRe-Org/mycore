@@ -335,14 +335,11 @@ public class MCRConditionTransformer {
         @SuppressWarnings("unchecked")
         List<MCRCondition> children = ((MCRSetCondition) cond).getChildren();
 
-        String index = getIndex(children.get(0));
-        for (int i = 1; i < children.size(); i++) {
-            String other = getIndex(children.get(i));
-            if (!index.equals(other)) {
-                return mixed; // mixed indexes here!
-            }
-        }
-        return index;
+        // mixed indexes here!
+        return children.stream()
+                       .map(MCRConditionTransformer::getIndex)
+                       .reduce((l, r) -> l.equals(r) ? l : mixed)
+                       .get();
     }
 
     public static String getIndex(String fieldName) {

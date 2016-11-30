@@ -13,10 +13,12 @@ package org.mycore.buildtools.anttasks;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -202,12 +204,9 @@ public class MCRIntegrateTask extends Task {
         if (excludedValue == null || excludedValue.trim().length() == 0)
             return Collections.emptySet();
         log("Excluding " + excludedValue + " from integration.");
-        HashSet<String> excludedComponents = new HashSet<String>();
-        String[] excludedValues = excludedValue.split(",");
-        for (String component : excludedValues) {
-            excludedComponents.add(component.trim());
-        }
-        return excludedComponents;
+        return Arrays.stream(excludedValue.split(","))
+                     .map(String::trim)
+                     .collect(Collectors.toCollection(HashSet::new));
     }
 
     private void writeIntegrationHelperFile() throws IOException, TransformerConfigurationException,

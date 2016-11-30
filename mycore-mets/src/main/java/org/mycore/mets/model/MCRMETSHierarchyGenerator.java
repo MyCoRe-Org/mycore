@@ -384,10 +384,11 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         if (fileId == null)
             return null;
         PhysicalDiv mainDiv = this.physicalStructMap.getDivContainer();
-        for (PhysicalSubDiv subDiv : mainDiv.getChildren())
-            if (subDiv.getId().contains(fileId))
-                return subDiv;
-        return null;
+        return mainDiv.getChildren()
+                      .stream()
+                      .filter(subDiv -> subDiv.getId().contains(fileId))
+                      .findFirst()
+                      .orElse(null);
     }
 
     /**

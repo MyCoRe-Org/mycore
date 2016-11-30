@@ -27,7 +27,6 @@ package org.mycore.datamodel.classifications2.utils;
 import java.text.Collator;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 

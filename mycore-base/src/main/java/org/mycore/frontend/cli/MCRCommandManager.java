@@ -17,12 +17,14 @@
 
 package org.mycore.frontend.cli;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
@@ -99,30 +101,15 @@ public class MCRCommandManager {
     }
 
     protected void addAnnotatedCLIClass(Class<?> cliClass) {
-        ArrayList<MCRCommand> commands = new ArrayList<MCRCommand>();
-        String groupName;
-        if (cliClass.isAnnotationPresent(MCRCommandGroup.class)) {
-            groupName = cliClass.getAnnotation(MCRCommandGroup.class).name();
-        } else {
-            groupName = cliClass.getSimpleName();
-        }
-        Method[] methods = cliClass.getDeclaredMethods();
+        String groupName=Optional.ofNullable(cliClass.getAnnotation(MCRCommandGroup.class))
+                                 .map(MCRCommandGroup::name)
+                                 .orElse(cliClass.getSimpleName());
         final Class<org.mycore.frontend.cli.annotation.MCRCommand> mcrCommandAnnotation = org.mycore.frontend.cli.annotation.MCRCommand.class;
-        Arrays.sort(methods, (m1, m2) -> {
-            int im1 = -1, im2 = -1;
-            if (m1.isAnnotationPresent(mcrCommandAnnotation)) {
-                im1 = m1.getAnnotation(mcrCommandAnnotation).order();
-            }
-            if (m2.isAnnotationPresent(mcrCommandAnnotation)) {
-                im2 = m2.getAnnotation(mcrCommandAnnotation).order();
-            }
-            return im1 - im2;
-        });
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(mcrCommandAnnotation)) {
-                commands.add(new MCRCommand(method));
-            }
-        }
+        ArrayList<MCRCommand> commands = Arrays.stream(cliClass.getDeclaredMethods())
+                         .filter(method -> method.isAnnotationPresent(mcrCommandAnnotation))
+                         .sorted(Comparator.comparingInt(m -> m.getAnnotation(mcrCommandAnnotation).order()))
+                         .map(MCRCommand::new)
+                         .collect(Collectors.toCollection(ArrayList::new));
         knownCommands.put(groupName, commands);
     }
 

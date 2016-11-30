@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Request;
@@ -316,11 +317,11 @@ public class MCRRestAPIObjectsHelper {
         Set<String> mcrIDs = new HashSet<String>();
         if (projectIDs.isEmpty()) {
             if (typeIDs.isEmpty()) {
-                for (String id : MCRXMLMetadataManager.instance().listIDs()) {
-                    if (!id.contains("_derivate_")) {
-                        mcrIDs.add(id);
-                    }
-                }
+                mcrIDs = MCRXMLMetadataManager.instance()
+                                              .listIDs()
+                                              .stream()
+                                              .filter(id -> !id.contains("_derivate_"))
+                                              .collect(Collectors.toSet());
             } else {
                 for (String t : typeIDs) {
                     mcrIDs.addAll(MCRXMLMetadataManager.instance().listIDsOfType(t));
@@ -463,24 +464,35 @@ public class MCRRestAPIObjectsHelper {
 
             //Parameters are checked - continue to retrieve data
 
-            MCRObject mcrO = retrieveMCRObject(mcrIDString);
-            List<String> l = new ArrayList<String>();
-            for (MCRMetaLinkID mcrmetaID : mcrO.getStructure().getDerivates()) {
-                if (MCRMetadataManager.exists(mcrmetaID.getXLinkHrefID())) {
-                    l.add(mcrmetaID.getXLinkHref());
-                }
-            }
-            List<MCRObjectIDDate> objIdDates = new ArrayList<MCRObjectIDDate>();
-            try {
-                objIdDates = MCRXMLMetadataManager.instance().retrieveObjectDates(l);
-            } catch (IOException e) {
-                //TODO
-            }
+            List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrIDString)
+                .getStructure()
+                .getDerivates()
+                .stream()
+                .map(MCRMetaLinkID::getXLinkHrefID)
+                .filter(MCRMetadataManager::exists)
+                .map(id -> {
+                    return new MCRObjectIDDate(){
+                        long lastModified;
+                        {
+                            try {
+                                lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+                            } catch (IOException e) {
+                                lastModified = 0;
+                                LOGGER.error("Exception while getting last modified of " + id, e);
+                            }
+                        }
 
-            //sort if necessary
-            if (sortObj != null) {
-                Collections.sort(objIdDates, new MCRRestAPISortObjectComparator(sortObj));
-            }
+                        @Override public String getId() {
+                            return id.toString();
+                        }
+
+                        @Override public Date getLastModified() {
+                            return new Date(lastModified);
+                        }
+                    };
+                })
+                .sorted(new MCRRestAPISortObjectComparator(sortObj)::compare)
+                .collect(Collectors.toList());
 
             //output as XML
             if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {

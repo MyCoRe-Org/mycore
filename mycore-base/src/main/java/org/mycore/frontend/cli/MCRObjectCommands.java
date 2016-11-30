@@ -26,6 +26,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -135,13 +140,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "delete all objects in topological order", help = "Removes all MCRObjects in topological order.", order = 25)
     public static List<String> deleteTopologicalAllObjects() throws MCRActiveLinkException {
         final List<String> objectIds = MCRXMLMetadataManager.instance().listIDs();
-        List<String> validObjectIds = new ArrayList<>();
-        for(String id: objectIds){
-            if(!id.contains("_derivate_")){
-                validObjectIds.add(id);
-            }
-        }
-        String[] objects = validObjectIds.toArray(new String[validObjectIds.size()]);
+        String[] objects = objectIds.stream().filter(id -> !id.contains("_derivate_")).toArray(String[]::new);
         MCRTopologicalSort ts = new MCRTopologicalSort();
         ts.prepareMCRObjects(objects);
         int[] order = ts.doTopoSort();
@@ -288,31 +287,26 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return null;
         }
 
-        List<String> cmds = new ArrayList<String>();
+        Predicate<String> isMetaXML = file -> file.endsWith(".xml") && !file.contains("derivate");
+        Function<String, String> cmdFromFile = file -> (update ? "update" : "load") + " object from file "
+            + new File(dir, file).getAbsolutePath();
         if (topological) {
             MCRTopologicalSort ts = new MCRTopologicalSort();
             ts.prepareData(list, dir);
-            int[] order = ts.doTopoSort();
-            if (order != null) {
-                for (int o : order) {
-                    String file = list[o];
-                    if (file.endsWith(".xml") && !file.contains("derivate")) {
-                        cmds.add((update ? "update" : "load") + " object from file "
-                            + new File(dir, file).getAbsolutePath());
-                    }
-                }
-            }
+            return Optional.ofNullable(ts.doTopoSort())
+                           .map(Arrays::stream)
+                           .map(is -> is.mapToObj(i -> list[i]))
+                           .orElse(Stream.empty())
+                           .filter(isMetaXML)
+                           .map(cmdFromFile)
+                           .collect(Collectors.toList());
         } else {
-            Arrays.sort(list);
-            for (String file : list) {
-                if (file.endsWith(".xml") && !file.contains("derivate")) {
-                    cmds.add((update ? "update" : "load") + " object from file "
-                        + new File(dir, file).getAbsolutePath());
-                }
-            }
+            return Arrays.stream(list)
+                         .filter(isMetaXML)
+                         .sorted()
+                         .map(cmdFromFile)
+                         .collect(Collectors.toList());
         }
-
-        return cmds;
     }
 
     /**
@@ -975,16 +969,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Calls the given command multiple times for all selected objects. The replacement is defined by an {x}. E.g. 'execute for selected set parent of {x} to myapp_container_00000001'",
         order = 450)
     public static List<String> executeForSelected(String command) throws Exception {
-        List<String> commandList = new ArrayList<>();
         if (!command.contains("{x}")) {
             LOGGER
                 .info("No replacement defined. Use the {x} variable in order to execute your command with all selected objects.");
-            return commandList;
+            return Collections.emptyList();
         }
-        for (String objID : getSelectedObjectIDs()) {
-            commandList.add(command.replaceAll("\\{x\\}", objID));
-        }
-        return commandList;
+        return getSelectedObjectIDs().stream()
+                                     .map(objID -> command.replaceAll("\\{x\\}", objID))
+                                     .collect(Collectors.toList());
     }
 
     /**

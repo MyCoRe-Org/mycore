@@ -26,8 +26,9 @@ package org.mycore.mods;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -71,13 +72,12 @@ public class MCRMODSCommands extends MCRAbstractCommands {
             LOGGER.warn("No files found in directory " + dir);
             return null;
         }
-        LinkedList<String> cmds = new LinkedList<String>();
-        for (String file : list) {
-            if (file.endsWith(".xml")) {
-                cmds.add(MessageFormat.format("load mods document from file {0} for project {1}", new File(dir, file).getAbsolutePath(), projectID));
-            }
-        }
-        return cmds;
+        return Arrays.stream(list)
+                     .filter(file -> file.endsWith(".xml"))
+                     .map(file -> MessageFormat.format(
+                         "load mods document from file {0} for project {1}",
+                         new File(dir, file).getAbsolutePath(), projectID))
+                     .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax="load mods document from file {0} for project {1}", help="Load MODS document {0} as MyCoRe Object for project {1}", order=20)

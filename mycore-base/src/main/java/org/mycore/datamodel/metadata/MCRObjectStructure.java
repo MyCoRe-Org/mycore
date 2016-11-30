@@ -274,12 +274,10 @@ public class MCRObjectStructure {
      * Returns the derivate link by id or null.
      */
     public final MCRMetaLinkID getDerivateLink(MCRObjectID derivateId) {
-        for (MCRMetaLinkID derivate : getDerivates()) {
-            if (derivate.getXLinkHrefID().equals(derivateId)) {
-                return derivate;
-            }
-        }
-        return null;
+        return getDerivates().stream()
+                             .filter(derivate -> derivate.getXLinkHrefID().equals(derivateId))
+                             .findAny()
+                             .orElse(null);
     }
 
     /** 

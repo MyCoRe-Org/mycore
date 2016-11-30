@@ -696,11 +696,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     }
 
     private static int countNodes(MCRCategory category) {
-        int i = 1;
-        for (MCRCategory child : category.getChildren()) {
-            i += countNodes(child);
-        }
-        return i;
+        return (int) MCRStreamUtils.flatten(category, MCRCategory::getChildren, Collection::parallelStream)
+                      .count();
     }
 
     private int checkLeftRightLevelValue(MCRCategoryImpl node, int leftStart, int levelStart) {

@@ -1,7 +1,7 @@
 package org.mycore.tools;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;

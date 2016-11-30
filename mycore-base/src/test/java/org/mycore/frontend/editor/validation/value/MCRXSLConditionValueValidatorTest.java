@@ -1,11 +1,11 @@
 package org.mycore.frontend.editor.validation.value;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 import org.mycore.frontend.editor.validation.MCRValidatorTest;
-import org.mycore.frontend.editor.validation.value.MCRXSLConditionValueValidator;
 
 public class MCRXSLConditionValueValidatorTest extends MCRValidatorTest {
 

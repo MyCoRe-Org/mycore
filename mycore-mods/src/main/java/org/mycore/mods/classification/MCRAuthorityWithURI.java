@@ -131,13 +131,11 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
                     return catId;
                 }
             }
-            Collection<MCRCategory> classes = getCategoryByURI(authorityURI);
-            for (MCRCategory cat : classes) {
-                MCRCategoryID catId = new MCRCategoryID(cat.getId().getRootID(), categId);
-                if (DAO.exist(catId)) {
-                    return catId;
-                }
-            }
+            return getCategoryByURI(authorityURI).stream()
+                                                 .map(cat -> new MCRCategoryID(cat.getId().getRootID(), categId))
+                                                 .filter(DAO::exist)
+                                                 .findFirst()
+                                                 .orElse(null);
         }
         return null;
     }
