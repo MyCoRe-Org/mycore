@@ -192,13 +192,10 @@ public class MCRThumbnailServlet extends MCRServlet {
         try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
             Path iviewFileRoot = fs.getRootDirectories().iterator().next();
             MCRTiledPictureProps props = MCRTiledPictureProps.getInstanceFromDirectory(iviewFileRoot);
-            if (props.getZoomlevel() == 0) {
-                return MCRIView2Tools.getZoomLevel(iviewFile, 0);
-            }
             //get next bigger zoomLevel and scale image to THUMBNAIL_SIZE
             ImageReader reader = MCRIView2Tools.getTileImageReader();
             try {
-                level1Image = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, reader, 1);
+                level1Image = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, reader, Math.min(1, props.getZoomlevel()));
             } finally {
                 reader.dispose();
             }
