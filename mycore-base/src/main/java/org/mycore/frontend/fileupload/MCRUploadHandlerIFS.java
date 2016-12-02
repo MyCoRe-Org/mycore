@@ -25,6 +25,7 @@ package org.mycore.frontend.fileupload;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.DirectoryStream;
@@ -35,8 +36,9 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -46,7 +48,6 @@ import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -101,9 +102,11 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     private static List<MCRPostUploadFileProcessor> initProcessorList() {
-        List<String> fileProcessorList = MCRConfiguration.instance().getStrings(FILE_PROCESSOR_PROPERTY, MCRConfiguration.emptyList());
+        List<String> fileProcessorList = MCRConfiguration.instance().getStrings(FILE_PROCESSOR_PROPERTY,
+            Collections.emptyList());
         return fileProcessorList.stream().map(fpClassName -> {
             try {
+                @SuppressWarnings("unchecked")
                 Class<MCRPostUploadFileProcessor> aClass = (Class<MCRPostUploadFileProcessor>) Class
                     .forName(fpClassName);
                 Constructor<MCRPostUploadFileProcessor> constructor = aClass.getConstructor();
@@ -115,27 +118,30 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             } catch (NoSuchMethodException e) {
                 throw new MCRConfigurationException(
                     "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY
-                        + " has no default constructor!", e);
+                        + " has no default constructor!",
+                    e);
             } catch (IllegalAccessException e) {
                 throw new MCRConfigurationException(
                     "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY
-                        + " has a private/protected constructor!", e);
+                        + " has a private/protected constructor!",
+                    e);
             } catch (InstantiationException e) {
                 throw new MCRConfigurationException(
                     "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY + " is abstract!", e);
             } catch (InvocationTargetException e) {
                 throw new MCRConfigurationException(
                     "The constrcutor of class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY
-                        + " threw a exception on invoke!", e);
+                        + " threw a exception on invoke!",
+                    e);
             }
         }).collect(Collectors.toList());
     }
 
     @Override
     public void startUpload(int numFiles) throws Exception {
-        this.numFiles=numFiles;
+        this.numFiles = numFiles;
     }
-    
+
     private synchronized void prepareUpload() throws MCRPersistenceException, MCRAccessException, IOException {
         if (this.derivate != null) {
             return;
@@ -164,7 +170,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             return MCRObjectID.getInstance(derivateID);
     }
 
-    private MCRDerivate createDerivate(MCRObjectID derivateID) throws MCRPersistenceException, IOException, MCRAccessException {
+    private MCRDerivate createDerivate(MCRObjectID derivateID)
+        throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateID);
         derivate.setLabel("data object from " + documentID);
@@ -230,23 +237,20 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     public synchronized long receiveFile(String path, InputStream in, long length, String checksum) throws Exception {
         LOGGER.debug("incoming receiveFile request: " + path + " " + checksum + " " + length + " bytes");
 
-        List<Path> tempFiles = new ArrayList<>();
+        List<Path> tempFiles = new LinkedList<>();
 
         Supplier<Path> tempFileSupplier = () -> {
             try {
-                Path tempFile = Files
-                    .createTempFile("upload-" + derivateID + Math.random(),
-                        ".stream");
+                Path tempFile = Files.createTempFile(derivateID + "-" + path.hashCode(), ".upload");
                 tempFiles.add(tempFile);
                 return tempFile;
             } catch (IOException e) {
-                throw new MCRException("Error while creating temp File!", e);
+                throw new UncheckedIOException("Error while creating temp File!", e);
             }
         };
 
-        Path currentTempFile = tempFileSupplier.get();
-
         try {
+            Path currentTempFile = tempFileSupplier.get();
             Files.copy(in, currentTempFile, StandardCopyOption.REPLACE_EXISTING);
             long myLength = Files.size(currentTempFile);
             if (length != 0 && length != myLength) {
@@ -297,7 +301,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             if (dirStream.iterator().hasNext()) {
                 updateMainFile();
             } else {
-                throw new IllegalStateException("No files were uploaded, delete entry in database for " + derivate.getId().toString()+"!");
+                throw new IllegalStateException(
+                    "No files were uploaded, delete entry in database for " + derivate.getId().toString() + "!");
             }
         }
     }
