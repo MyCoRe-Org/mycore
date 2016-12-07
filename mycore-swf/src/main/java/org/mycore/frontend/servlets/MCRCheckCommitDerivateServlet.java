@@ -23,6 +23,11 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.jdom2.Namespace.XML_NAMESPACE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -40,11 +45,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
-
-import static org.jdom2.Namespace.XML_NAMESPACE;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type

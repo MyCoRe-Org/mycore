@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -242,20 +244,11 @@ public class MCRObjectService {
             return null;
         }
 
-        int i = -1;
-
-        for (int j = 0; j < dates.size(); j++) {
-            if (dates.get(j).getType().equals(type)) {
-                i = j;
-                break;
-            }
-        }
-
-        if (i == -1) {
-            return null;
-        }
-
-        return dates.get(i);
+        return IntStream.range(0, dates.size())
+                        .mapToObj(i -> dates.get(i))
+                        .filter(d -> d.getType().equals(type))
+                        .findAny()
+                        .orElse(null);
     }
 
     /**
@@ -390,13 +383,9 @@ public class MCRObjectService {
      * @return a list of flag values
      */
     protected final ArrayList<MCRMetaLangText> getFlagsAsMCRMetaLangText(String type) {
-        ArrayList<MCRMetaLangText> flagList = new ArrayList<MCRMetaLangText>();
-        for (MCRMetaLangText metaLangText : flags) {
-            if (metaLangText.getType() != null && metaLangText.getType().equals(type)) {
-                flagList.add(metaLangText);
-            }
-        }
-        return flagList;
+        return flags.stream()
+                    .filter(metaLangText -> type.equals(metaLangText.getType()))
+                    .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -407,12 +396,9 @@ public class MCRObjectService {
      * @return a list of flag values
      */
     public final ArrayList<String> getFlags(String type) {
-        ArrayList<String> flagList = new ArrayList<String>();
-        ArrayList<MCRMetaLangText> internalList = getFlagsAsMCRMetaLangText(type);
-        for (MCRMetaLangText metaLangText : internalList) {
-            flagList.add(metaLangText.getText());
-        }
-        return flagList;
+        return getFlagsAsMCRMetaLangText(type).stream()
+                                              .map(MCRMetaLangText::getText)
+                                              .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -593,17 +579,14 @@ public class MCRObjectService {
      * @return the index of a permission in the rules list
      */
     public final int getRuleIndex(String permission) {
-        int ret = -1;
+        int notFound = -1;
         if (permission == null || permission.trim().length() == 0) {
-            return ret;
+            return notFound;
         }
-        for (int i = 0; i < rules.size(); i++) {
-            if (rules.get(i).getPermission().equals(permission)) {
-                ret = i;
-                break;
-            }
-        }
-        return ret;
+        return IntStream.range(0, rules.size())
+                       .filter(i -> rules.get(i).getPermission().equals(permission))
+                       .findAny()
+                       .orElse(notFound);
     }
 
     /**

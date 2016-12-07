@@ -12,8 +12,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.mycore.frontend.servlets.MCRClassificationBrowser2.MCRQueryAdapter;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrConstants;
 
 public class MCRSolrQueryAdapter implements MCRQueryAdapter {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrQueryAdapter.class);

@@ -29,13 +29,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -685,15 +686,12 @@ public class MCRXMLMetadataManager {
      * @see MCRObjectID#getTypeId()
      */
     public Collection<String> getObjectTypes() {
-        Set<String> set = new java.util.HashSet<>();
-        File[] projectDirectories = getProjectDirectories();
-        for (File projectDirectory : projectDirectories) {
-            File[] objectTypeDirectories = getObjectTypeDirectories(projectDirectory);
-            for (File objectTypeDirectory : objectTypeDirectories) {
-                set.add(objectTypeDirectory.getName());
-            }
-        }
-        return set;
+        return Arrays.stream(getProjectDirectories())
+                     .map(this::getObjectTypeDirectories)
+                     .flatMap(Arrays::stream)
+                     .map(File::getName)
+                     .distinct()
+                     .collect(Collectors.toSet());
     }
 
     /**

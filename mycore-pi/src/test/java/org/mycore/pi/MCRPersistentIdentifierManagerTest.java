@@ -1,12 +1,16 @@
 package org.mycore.pi;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRJPATestCase;
@@ -22,6 +26,9 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     private MCRPersistentIdentifierManager managerInstance;
     private static final String MOCK_INSCRIBER = "MockInscriber";
     private static final String MOCK_PID_GENERATOR = "MockIDGenerator";
+
+    @Rule
+    public TemporaryFolder baseDir=new TemporaryFolder();
 
     @Test
     public void testGet() {
@@ -87,8 +94,12 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     protected Map<String, String> getTestProperties() {
         HashMap<String, String> configuration = new HashMap<>();
 
-        configuration.put("MCR.Metadata.Store.BaseDir", "/tmp");
-        configuration.put("MCR.Metadata.Store.SVNBase", "/tmp/versions");
+        configuration.put("MCR.Metadata.Store.BaseDir", baseDir.getRoot().getAbsolutePath());
+        try {
+            configuration.put("MCR.Metadata.Store.SVNBase", baseDir.newFolder("versions").getAbsolutePath());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         configuration.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         configuration.put("MCR.Metadata.Type.mock", "true");
 

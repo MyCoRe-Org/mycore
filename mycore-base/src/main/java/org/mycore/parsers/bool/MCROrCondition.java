@@ -42,11 +42,6 @@ public class MCROrCondition<T> extends MCRSetCondition<T> {
 
     @Override
     public boolean evaluate(T o) {
-        for (MCRCondition<T> child : children) {
-            if (child.evaluate(o)) {
-                return true;
-            }
-        }
-        return false;
+        return children.stream().anyMatch(child -> child.evaluate(o));
     }
 }

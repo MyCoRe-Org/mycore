@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.stream.Collectors;
 
 import org.jdom2.Element;
 
@@ -109,11 +110,7 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
 
     @Override
     public boolean addAll(int index, Collection<? extends MCRBasketEntry> collection) {
-        List<MCRBasketEntry> copy = new ArrayList<MCRBasketEntry>();
-        for (MCRBasketEntry entry : collection)
-            if (!contains(entry))
-                copy.add(entry);
-        return list.addAll(index, copy);
+        return list.addAll(index, collection.stream().filter(entry -> !contains(entry)).collect(Collectors.toList()));
     }
 
     @Override
@@ -142,10 +139,7 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
      * @param id the ID of the basket entry.
      */
     public MCRBasketEntry get(String id) {
-        for (MCRBasketEntry entry : this)
-            if (id.equals(entry.getID()))
-                return entry;
-        return null;
+        return this.stream().filter(entry -> id.equals(entry.getID())).findFirst().orElse(null);
     }
 
     @Override

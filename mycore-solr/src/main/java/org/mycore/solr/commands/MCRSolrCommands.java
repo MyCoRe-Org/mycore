@@ -3,8 +3,8 @@
  */
 package org.mycore.solr.commands;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
@@ -126,10 +126,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     public static void rebuildMetadataIndexForObject(String id) {
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
         List<MCRObject> objectList = MCRObjectUtils.getDescendantsAndSelf(mcrObject);
-        List<String> idList = new ArrayList<>();
-        for (MCRObject obj : objectList) {
-            idList.add(obj.getId().toString());
-        }
+        List<String> idList = objectList.stream().map(obj -> obj.getId().toString()).collect(Collectors.toList());
         MCRSolrIndexer.rebuildMetadataIndex(idList);
     }
 

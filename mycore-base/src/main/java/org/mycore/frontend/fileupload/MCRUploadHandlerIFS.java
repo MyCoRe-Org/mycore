@@ -25,6 +25,9 @@ package org.mycore.frontend.fileupload;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystemException;
 import java.nio.file.FileVisitResult;
@@ -34,7 +37,12 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessException;
@@ -42,6 +50,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -67,6 +76,10 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     private static final String ID_TYPE = "derivate";
 
+    private static final String FILE_PROCESSOR_PROPERTY = "MCR.MCRUploadHandlerIFS.FileProcessors";
+
+    private static final List<MCRPostUploadFileProcessor> FILE_PROCESSORS = initProcessorList();
+
     protected String documentID;
 
     protected String derivateID;
@@ -84,17 +97,51 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     public MCRUploadHandlerIFS(String documentID, String derivateID, String returnURL) {
-        super();
+        this(documentID, derivateID);
         this.url = Objects.requireNonNull(returnURL, "Return URL may not be 'null'.");
-        this.documentID = Objects.requireNonNull(documentID, "Document ID may not be 'null'.");
-        this.derivateID = derivateID;
+    }
+
+    private static List<MCRPostUploadFileProcessor> initProcessorList() {
+        List<String> fileProcessorList = MCRConfiguration.instance().getStrings(FILE_PROCESSOR_PROPERTY,
+            Collections.emptyList());
+        return fileProcessorList.stream().map(fpClassName -> {
+            try {
+                @SuppressWarnings("unchecked")
+                Class<MCRPostUploadFileProcessor> aClass = (Class<MCRPostUploadFileProcessor>) Class
+                    .forName(fpClassName);
+                Constructor<MCRPostUploadFileProcessor> constructor = aClass.getConstructor();
+
+                return constructor.newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new MCRConfigurationException(
+                    "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY + " was not found!", e);
+            } catch (NoSuchMethodException e) {
+                throw new MCRConfigurationException(
+                    "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY
+                        + " has no default constructor!",
+                    e);
+            } catch (IllegalAccessException e) {
+                throw new MCRConfigurationException(
+                    "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY
+                        + " has a private/protected constructor!",
+                    e);
+            } catch (InstantiationException e) {
+                throw new MCRConfigurationException(
+                    "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY + " is abstract!", e);
+            } catch (InvocationTargetException e) {
+                throw new MCRConfigurationException(
+                    "The constrcutor of class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY
+                        + " threw a exception on invoke!",
+                    e);
+            }
+        }).collect(Collectors.toList());
     }
 
     @Override
     public void startUpload(int numFiles) throws Exception {
-        this.numFiles=numFiles;
+        this.numFiles = numFiles;
     }
-    
+
     private synchronized void prepareUpload() throws MCRPersistenceException, MCRAccessException, IOException {
         if (this.derivate != null) {
             return;
@@ -123,7 +170,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             return MCRObjectID.getInstance(derivateID);
     }
 
-    private MCRDerivate createDerivate(MCRObjectID derivateID) throws MCRPersistenceException, IOException, MCRAccessException {
+    private MCRDerivate createDerivate(MCRObjectID derivateID)
+        throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateID);
         derivate.setLabel("data object from " + documentID);
@@ -189,27 +237,49 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     public synchronized long receiveFile(String path, InputStream in, long length, String checksum) throws Exception {
         LOGGER.debug("incoming receiveFile request: " + path + " " + checksum + " " + length + " bytes");
 
-        Path tempFile = Files.createTempFile("upload" + derivateID + (checksum != null ? checksum : path.hashCode()),
-            ".stream");
+        List<Path> tempFiles = new LinkedList<>();
+
+        Supplier<Path> tempFileSupplier = () -> {
+            try {
+                Path tempFile = Files.createTempFile(derivateID + "-" + path.hashCode(), ".upload");
+                tempFiles.add(tempFile);
+                return tempFile;
+            } catch (IOException e) {
+                throw new UncheckedIOException("Error while creating temp File!", e);
+            }
+        };
+
         try {
-            Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
-            long myLength = Files.size(tempFile);
+            Path currentTempFile = tempFileSupplier.get();
+            Files.copy(in, currentTempFile, StandardCopyOption.REPLACE_EXISTING);
+            long myLength = Files.size(currentTempFile);
             if (length != 0 && length != myLength) {
                 throw new IOException("Length of transmitted data does not match promised length: " + myLength + "!="
                     + length);
             }
+
+            for (MCRPostUploadFileProcessor pufp : FILE_PROCESSORS) {
+                if (pufp.isProcessable(path)) {
+                    currentTempFile = pufp.processFile(path, currentTempFile, tempFileSupplier);
+                }
+            }
+
             if (rootDir == null) {
                 //MCR-1376: Create derivate only if at least one file was successfully uploaded
                 prepareUpload();
             }
             MCRPath file = getFile(path);
-            LOGGER.info("Moving " + tempFile + " to " + file + ".");
-            Files.copy(tempFile, file, StandardCopyOption.REPLACE_EXISTING);
+            LOGGER.info("Moving " + currentTempFile + " to " + file + ".");
+            Files.copy(currentTempFile, file, StandardCopyOption.REPLACE_EXISTING);
             return myLength;
         } finally {
-            if (Files.exists(tempFile)) {
-                Files.delete(tempFile);
-            }
+            tempFiles.stream().filter(Files::exists).forEach((tempFilePath) -> {
+                try {
+                    Files.delete(tempFilePath);
+                } catch (IOException e) {
+                    LOGGER.error("Could not delete temp file " + tempFilePath.toString());
+                }
+            });
         }
     }
 
@@ -231,7 +301,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             if (dirStream.iterator().hasNext()) {
                 updateMainFile();
             } else {
-                throw new IllegalStateException("No files were uploaded, delete entry in database for " + derivate.getId().toString()+"!");
+                throw new IllegalStateException(
+                    "No files were uploaded, delete entry in database for " + derivate.getId().toString() + "!");
             }
         }
     }

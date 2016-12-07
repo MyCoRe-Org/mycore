@@ -1,13 +1,5 @@
 package org.mycore.frontend.jersey.resources;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.content.MCRContent;
-import org.mycore.frontend.jersey.MCRJerseyUtil;
-import org.mycore.frontend.servlets.MCRErrorServlet;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -17,6 +9,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRContent;
+import org.mycore.frontend.jersey.MCRJerseyUtil;
+import org.mycore.frontend.servlets.MCRErrorServlet;
 
 /**
  * Handles jersey web application exceptions. By default this class

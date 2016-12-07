@@ -3,6 +3,7 @@ package org.mycore.wcms2.resources;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
@@ -91,14 +92,12 @@ public class MCRWCMSNavigationResource {
     @Path("templates")
     @Produces(MediaType.APPLICATION_JSON)
     public String getTemplates(@Context ServletContext servletContext) throws Exception {
-        HashSet<String> entries = new HashSet<String>();
-
         // templates of navigation.xml
         Document xml = MCRWCMSNavigationManager.getNavigationAsXML();
         List<Element> elementList = TEMPLATE_PATH.evaluate(xml);
-        for (Element e : elementList) {
-            entries.add(e.getAttributeValue("template"));
-        }
+        HashSet<String> entries = elementList.stream()
+                                             .map(e -> e.getAttributeValue("template"))
+                                             .collect(Collectors.toCollection(HashSet::new));
 
         // templates by folder
         String templatePath = MCRConfiguration.instance().getString("MCR.WCMS2.templatePath", "/templates/master/");

@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfigurationDir;
 
@@ -38,13 +40,15 @@ import org.mycore.common.config.MCRConfigurationDir;
 public class MCRCoreVersion {
     private static Properties prop = loadVersionProperties();
 
-    public static final String VERSION = prop.getProperty("mycore.version");
+    public static final String VERSION = prop.getProperty("git.build.version");
 
     public static final String BRANCH = prop.getProperty("git.branch");
 
-    public static final String REVISION = getRevisionFromProperty();
+    public static final String REVISION = prop.getProperty("git.commit.id.full");
+    
+    public static final String DESCRIBE = prop.getProperty("git.commit.id.describe");
 
-    public static final String COMPLETE = VERSION + " " + BRANCH + ":" + REVISION;
+    public static final String COMPLETE = VERSION + " " + BRANCH + ":" + DESCRIBE;
 
     public static String getVersion() {
         return VERSION;
@@ -52,20 +56,27 @@ public class MCRCoreVersion {
 
     private static Properties loadVersionProperties() {
         Properties props = new Properties();
-        URL propURL = MCRCoreVersion.class.getResource("/org/mycore/version.properties");
-        try {
-            InputStream propStream = propURL.openStream();
-            try {
-                props.load(propStream);
-            } finally {
-                propStream.close();
-            }
+        URL gitPropURL = MCRCoreVersion.class.getResource("/org/mycore/git.properties");
+        try (InputStream gitPropStream = getInputStream(gitPropURL);) {
+            props.load(gitPropStream);
         } catch (IOException e) {
             throw new MCRException("Error while initializing MCRCoreVersion.", e);
         }
         return props;
     }
-    
+
+    private static InputStream getInputStream(URL gitPropURL) throws IOException {
+        if (gitPropURL == null) {
+            return new InputStream() {
+                @Override
+                public int read() throws IOException {
+                    return -1;
+                }
+            };
+        }
+        return gitPropURL.openStream();
+    }
+
     public static String getBranch() {
         return BRANCH;
     }
@@ -74,16 +85,23 @@ public class MCRCoreVersion {
         return REVISION;
     }
 
+    public static String getGitDescribe() {
+        return DESCRIBE;
+    }
+
     public static String getCompleteVersion() {
         return COMPLETE;
     }
-
-    public static void main(String arg[]) {
-        System.out.printf(Locale.ROOT, "MyCoRe\tver: %s\tbranch: %s\tcommit: %s%n", VERSION, BRANCH, REVISION);
-        System.out.printf(Locale.ROOT, "Config directory: %s%n", MCRConfigurationDir.getConfigurationDirectory());
+    
+    public static Map<String,String> getVersionProperties(){
+        return prop.entrySet()
+            .stream()
+            .collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().toString()));
     }
 
-    private static String getRevisionFromProperty() {
-        return prop.getProperty("revision.number");
+    public static void main(String arg[]) throws IOException {
+        System.out.printf(Locale.ROOT, "MyCoRe\tver: %s\tbranch: %s\tcommit: %s%n", VERSION, BRANCH, DESCRIBE);
+        System.out.printf(Locale.ROOT, "Config directory: %s%n", MCRConfigurationDir.getConfigurationDirectory());
+        prop.store(System.out, "Values of '/org/mycore/version.properties' resource");
     }
 }

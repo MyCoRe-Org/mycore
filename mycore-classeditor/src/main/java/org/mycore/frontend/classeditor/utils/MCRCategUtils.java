@@ -1,7 +1,6 @@
 package org.mycore.frontend.classeditor.utils;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -30,29 +29,6 @@ public class MCRCategUtils {
         return rootID + "." + (id == null ? "" : id);
     }
 
-    /**
-     * Parses JSON String and extracts all category ids.
-     * @param json
-     * @return may return null if JSON Parser finds no JSON object or primitives.
-     */
-    public static Set<MCRCategoryID> getCategoryIDs(String json) {
-        HashSet<MCRCategoryID> categories = new HashSet<>();
-        JsonStreamParser jsonStreamParser = new JsonStreamParser(json);
-        if (jsonStreamParser.hasNext()) {
-            JsonArray saveObjArray = jsonStreamParser.next().getAsJsonArray();
-            for (JsonElement jsonElement : saveObjArray) {
-                //jsonObject.item.id.rootid
-                JsonObject root = jsonElement.getAsJsonObject();
-                String rootId = root.getAsJsonObject("item").getAsJsonObject("id").getAsJsonPrimitive("rootid")
-                    .getAsString();
-                categories.add(MCRCategoryID.rootID(rootId));
-            }
-        } else {
-            return null;
-        }
-        return categories;
-    }
-
     public static HashMap<MCRCategoryID, String> getCategoryIDMap(String json) {
         HashMap<MCRCategoryID, String> categories = new HashMap<>();
         JsonStreamParser jsonStreamParser = new JsonStreamParser(json);
@@ -78,21 +54,4 @@ public class MCRCategUtils {
         return categories;
     }
 
-    /**
-     * Parses JSON String and extracts all category ids and returns a list of effected root category ids.
-     * @param json
-     * @return may return null if JSON Parser finds no JSON object or primitives.
-     */
-    public static Set<MCRCategoryID> getRootCategoryIDs(String json) {
-        Set<MCRCategoryID> categories = getCategoryIDs(json);
-        if (categories == null) {
-            return null;
-        }
-        HashSet<MCRCategoryID> rootCategories = new HashSet<>();
-        for (MCRCategoryID category : categories) {
-            rootCategories.add(MCRCategoryID.rootID(category.getRootID()));
-        }
-        return rootCategories;
-    }
-    
 }

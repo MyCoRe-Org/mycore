@@ -25,7 +25,6 @@ package org.mycore.services.fieldquery;
 
 import org.jdom2.Element;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.parsers.bool.MCRParseException;
 
 /**
  * Represents a simple query condition, which consists of a search field,

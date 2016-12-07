@@ -31,9 +31,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -202,15 +204,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             return null;
         }
 
-        List<String> cmds = new ArrayList<String>();
-        for (String file : list) {
-            if (file.endsWith(".xml")) {
-                cmds.add((update ? "update" : "load") + " classification from file "
-                    + new File(dir, file).getAbsolutePath());
-            }
-        }
-
-        return cmds;
+        return Arrays.stream(list)
+                     .filter(file -> file.endsWith(".xml"))
+                     .map(file -> (update ? "update" : "load") + " classification from file " + new File(
+                                      dir, file).getAbsolutePath())
+                     .collect(Collectors.toList());
     }
 
     /**

@@ -27,9 +27,7 @@ package org.mycore.tools;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -254,13 +253,11 @@ public class MCRTopologicalSort {
         // L <-array that will contain the sorted elements
         int[] result = new int[nodes.size()];
         // S <- Set of all nodes with no incoming edges
-        List<Integer> leafs = new ArrayList<Integer>();
-        for (Integer i : nodes.keySet()) {
-            if (!edgeSources.containsKey(i)) {
-                leafs.add(i);
-            }
-        }
-        Collections.sort(leafs);
+        List<Integer> leafs = nodes.keySet()
+                                   .stream()
+                                   .filter(i -> !edgeSources.containsKey(i))
+                                   .sorted()
+                                   .collect(Collectors.toList());
         int cursor = result.length - 1;
 
         // while S is non-empty do

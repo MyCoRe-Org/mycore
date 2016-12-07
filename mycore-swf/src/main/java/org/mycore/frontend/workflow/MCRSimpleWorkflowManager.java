@@ -24,6 +24,8 @@
 // package
 package org.mycore.frontend.workflow;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -60,8 +62,6 @@ import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.xml.sax.SAXParseException;
-
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 /**
  * This class holds methods to manage the workflow file system of MyCoRe.

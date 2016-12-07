@@ -243,13 +243,11 @@ public class MCRURNAdder {
      * @return the number of files with urn referenced by the derivate
      */
     private int getFilesWithURNCount(MCRDerivate derivate) throws Exception {
-        int size = 0;
-        for (MCRFileMetadata fileMetadata : derivate.getDerivate().getFileMetadata()) {
-            if (fileMetadata.getUrn() != null) {
-                size++;
-            }
-        }
-        return size;
+        return (int) derivate.getDerivate()
+                             .getFileMetadata()
+                             .stream()
+                             .filter(fileMetadata -> fileMetadata.getUrn() != null)
+                             .count();
     }
 
     /**

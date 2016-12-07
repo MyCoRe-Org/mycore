@@ -269,6 +269,7 @@ public final class MCRMetadataManager {
         MCRPath rootPath = MCRPath.getPath(derivateID, "/");
         if (!Files.exists(rootPath)) {
             LOGGER.info("Derivate does not exist: " + derivateID);
+            return;
         }
         Files.walkFileTree(rootPath, MCRRecursiveDeleter.instance());
         rootPath.getFileSystem().removeRoot(derivateID);
@@ -803,13 +804,11 @@ public final class MCRMetadataManager {
                                            .map(MCRMetaLinkID::getXLinkHref)
                                            .collect(Collectors.toList());
         mcrObject.getStructure().clearChildren();
-
-        final List<String> derOrder = mcrObject.getStructure()
+        List<String> derOrder = mcrObject.getStructure()
                                          .getDerivates()
                                          .stream()
-                                         .map(MCRMetaLinkID::getXLinkHref)
+                                         .map(MCRMetaLink::getXLinkHref)
                                          .collect(Collectors.toList());
-
         HashMap<String, String> newlinkTitles = new HashMap<String, String>();
         HashMap<String, String> newlinkLabels = new HashMap<String, String>();
         for (MCRMetaLinkID newlinkID : mcrObject.getStructure().getDerivates()) {

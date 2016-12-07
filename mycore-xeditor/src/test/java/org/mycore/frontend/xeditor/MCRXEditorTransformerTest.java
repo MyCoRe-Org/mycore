@@ -23,21 +23,20 @@
 
 package org.mycore.frontend.xeditor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
-
-import org.jaxen.JaxenException;
-
 import java.util.HashMap;
 
 import javax.xml.transform.TransformerException;
 
+import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
-
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRContent;

@@ -5,7 +5,6 @@ package org.mycore.backend.jpa.deleteditems;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.EmbeddedId;

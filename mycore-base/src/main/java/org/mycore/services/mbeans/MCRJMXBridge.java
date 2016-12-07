@@ -94,12 +94,10 @@ public class MCRJMXBridge implements Closeable {
                 mbs.unregisterMBean(name);
             }
             // As WeakReference does not overwrite Object.equals():
-            for (WeakReference<ObjectName> wr : ONAME_LIST) {
-                if (name.equals(wr.get())) {
-                    ONAME_LIST.remove(wr);
-                    break;
-                }
-            }
+            ONAME_LIST.stream()
+                      .filter(wr -> name.equals(wr.get()))
+                      .findFirst()
+                      .ifPresent(ONAME_LIST::remove);
         } catch (Exception e) {
             e.printStackTrace();
         }

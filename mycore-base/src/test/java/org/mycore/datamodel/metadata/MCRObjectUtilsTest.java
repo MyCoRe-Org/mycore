@@ -11,10 +11,6 @@ import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectUtils;
 
 public class MCRObjectUtilsTest extends MCRStoreTestCase {
 

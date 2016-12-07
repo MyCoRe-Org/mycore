@@ -253,12 +253,7 @@ public class MCROAISetManager {
      * @return the set with setSpec
      */
     public static Set get(String setSpec, OAIDataList<Set> setList) {
-        for (Set s : setList) {
-            if (s.getSpec().equals(setSpec)) {
-                return s;
-            }
-        }
-        return null;
+        return setList.stream().filter(s -> s.getSpec().equals(setSpec)).findFirst().orElse(null);
     }
 
     /**

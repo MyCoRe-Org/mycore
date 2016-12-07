@@ -1,6 +1,6 @@
 package org.mycore.datamodel.classifications2;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;

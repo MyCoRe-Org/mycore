@@ -1,10 +1,9 @@
 package org.mycore.frontend.editor.validation.pair;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
 import org.junit.Before;
-import org.mycore.frontend.editor.validation.pair.MCRStringPairValidator;
+import org.junit.Test;
 
 public class MCRStringPairValidatorTest extends MCRComparingValidatorTest {
 

@@ -39,6 +39,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -173,8 +174,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             LOGGER.info("Skipping tiling of derivate " + derivateID + " as it's main file is not supported by IView2.");
             return null;
         }
-        List<String> returns = new ArrayList<String>();
-
         MCRPath derivateRoot = MCRPath.getPath(derivateID, "/");
 
         if (!Files.exists(derivateRoot)) {
@@ -182,10 +181,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
 
         List<MCRPath> supportedFiles = getSupportedFiles(derivateRoot);
-        for (MCRPath image : supportedFiles) {
-            returns.add(MessageFormat.format(batchCommandSyntax, derivateID, image.subpathComplete().toString()));
-        }
-        return returns;
+        return supportedFiles.stream()
+                             .map(image -> MessageFormat.format(batchCommandSyntax, derivateID,
+                                  image.subpathComplete().toString()))
+                             .collect(Collectors.toList());
     }
 
     private static final String CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX = "check tiles of image {0} {1}";

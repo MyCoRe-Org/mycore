@@ -27,10 +27,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jdom2.Element;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.frontend.cli.MCRExternalProcess;
-
-import org.jdom2.Element;
 
 /**
  * This Class represents the technical metadata of an Videostream.

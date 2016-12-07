@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
@@ -398,12 +399,11 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             return null;
         }
         PhysicalDiv mainDiv = this.physicalStructMap.getDivContainer();
-        for (PhysicalSubDiv subDiv : mainDiv.getChildren()) {
-            if (subDiv.getFptr(fileId) != null) {
-                return subDiv;
-            }
-        }
-        return null;
+        return mainDiv.getChildren()
+                      .stream()
+                      .filter(subDiv -> Objects.nonNull(subDiv.getFptr(fileId)))
+                      .findAny()
+                      .orElse(null);
     }
 
     /**

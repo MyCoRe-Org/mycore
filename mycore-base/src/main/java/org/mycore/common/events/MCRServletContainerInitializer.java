@@ -23,15 +23,6 @@
 
 package org.mycore.common.events;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.xml.MCRURIResolver;
-import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
-
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -39,6 +30,17 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Enumeration;
 import java.util.Set;
+
+import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.xml.MCRURIResolver;
+
+import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 
 /**
  * @author Thomas Scheffler (yagee)

@@ -25,6 +25,7 @@ package org.mycore.access.mcrimpl;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.stream.IntStream;
 
 /**
  * A class for representing an IP Address, or a range of IP addresses
@@ -79,13 +80,8 @@ public class MCRIPAddress {
             return false;
         }
 
-        for (int t = 0; t < address.length; t++) {
-            if ((address[t] & mask[t]) != (other.address[t] & mask[t])) {
-                return false;
-            }
-        }
-
-        return true;
+        return IntStream.range(0, address.length)
+                        .noneMatch(t -> (address[t] & mask[t]) != (other.address[t] & mask[t]));
     }
 
     public byte[] getAddress(){

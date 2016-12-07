@@ -23,6 +23,8 @@
 
 package org.mycore.mods;
 
+import static org.mycore.mods.MCRMODSEmbargoUtils.POOLPRIVILEGE_EMBARGO;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
@@ -47,8 +49,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.i18n.MCRTranslation;
-
-import static org.mycore.mods.MCRMODSEmbargoUtils.POOLPRIVILEGE_EMBARGO;
 
 /**
  * Enforces embargo of mods documents to {@link MCRFileNodeServlet}.

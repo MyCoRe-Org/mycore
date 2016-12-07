@@ -1,9 +1,6 @@
 package org.mycore.wcms2.datamodel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -45,11 +42,10 @@ public abstract class MCRNavigationI18nItem implements MCRNavigationBaseItem {
 
     @XmlElement(name = "label")
     public Label[] getLabelArray() {
-        List<Label> list = new ArrayList<Label>();
-        for (Entry<String, String> entry : this.labelMap.entrySet()) {
-            list.add(new Label(entry.getKey(), entry.getValue()));
-        }
-        return list.toArray(new Label[list.size()]);
+        return this.labelMap.entrySet()
+                            .stream()
+                            .map(entry -> new Label(entry.getKey(), entry.getValue()))
+                            .toArray(Label[]::new);
     }
     public void setLabelArray(Label[] labelArray) {
         for(Label label : labelArray) {

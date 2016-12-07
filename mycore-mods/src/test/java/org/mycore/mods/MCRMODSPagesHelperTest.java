@@ -22,12 +22,12 @@
 
 package org.mycore.mods;
 
-import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRTestCase;
+import static org.junit.Assert.assertEquals;
+
 import org.jdom2.Element;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRTestCase;
 
 public class MCRMODSPagesHelperTest extends MCRTestCase {
 

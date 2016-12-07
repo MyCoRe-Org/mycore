@@ -23,7 +23,13 @@
 
 package org.mycore.common.xml;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
@@ -33,7 +39,6 @@ import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.xml.MCRNodeBuilder;
 
 /**
  * @author Frank L\u00FCtzenkirchen

@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata.share;
 
+import java.util.stream.StreamSupport;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
@@ -66,7 +68,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
             return false;
         }
         int numheritablemd = 0;
-        int numheritablemdold = 0;
+        int numheritablemdold;
         for (int i = 0; i < md.size(); i++) {
             final MCRMetaElement melm = md.getMetadataElement(i);
             if (melm.isHeritable()) {
@@ -90,12 +92,9 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
                 }
             }
         }
-        for (int i = 0; i < mdold.size(); i++) {
-            final MCRMetaElement melmold = mdold.getMetadataElement(i);
-            if (melmold.isHeritable()) {
-                numheritablemdold++;
-            }
-        }
+        numheritablemdold = (int) StreamSupport.stream(mdold.spliterator(), false)
+                                               .filter(MCRMetaElement::isHeritable)
+                                               .count();
         if (numheritablemd != numheritablemdold) {
             return true;
         }

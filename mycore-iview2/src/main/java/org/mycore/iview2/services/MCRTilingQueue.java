@@ -16,8 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.persistence.NoResultException;
 
 import org.apache.log4j.Logger;
-import org.hibernate.query.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;

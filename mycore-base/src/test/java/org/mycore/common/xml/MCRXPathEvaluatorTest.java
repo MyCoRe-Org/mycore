@@ -23,7 +23,7 @@
 
 package org.mycore.common.xml;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +35,6 @@ import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.xml.MCRNodeBuilder;
-import org.mycore.common.xml.MCRXPathEvaluator;
 
 /**
  * @author Frank L\u00FCtzenkirchen

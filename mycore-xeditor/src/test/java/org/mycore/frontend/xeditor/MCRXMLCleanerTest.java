@@ -23,10 +23,9 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.jaxen.JaxenException;
-
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.junit.Test;

@@ -22,6 +22,8 @@
  */
 
 package org.mycore.frontend.servlets;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -33,8 +35,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type

@@ -350,9 +350,8 @@ public class MCRParameterCollector {
     public int hashCode() {
         if (modified) {
             int result = LOGGER.hashCode();
-            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-                result += entry.hashCode();//order of map should not harm result
-            }
+            //order of map should not harm result
+            result += parameters.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
             hashCode = result;
             modified = false;
         }

@@ -1,5 +1,6 @@
 package org.mycore.frontend.editor.validation;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,11 +21,7 @@ public class MCRValidationResults {
     }
 
     public boolean validationFailed(String... sortNrs) {
-        for (String sortNr : sortNrs)
-            if (failed.containsKey(sortNr))
-                return true;
-
-        return false;
+        return Arrays.stream(sortNrs).anyMatch(sortNr -> failed.containsKey(sortNr));
     }
 
     public Element buildXML() {

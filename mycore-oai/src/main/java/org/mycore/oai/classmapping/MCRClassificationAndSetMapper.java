@@ -23,7 +23,6 @@
 package org.mycore.oai.classmapping;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -51,12 +50,12 @@ public class MCRClassificationAndSetMapper {
      */
     public static String mapClassificationToSet(String prefix, String classid) {
         Map<String, String> props = config.getPropertiesMap(prefix + PROP_SUFFIX);
-        for (Entry<String, String> entry : props.entrySet()) {
-            if (entry.getValue().equals(classid)) {
-                return entry.getKey().substring(entry.getKey().lastIndexOf(".") + 1);
-            }
-        }
-        return classid;
+        return props.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getValue().equals(classid))
+                    .findFirst()
+                    .map(entry -> entry.getKey().substring(entry.getKey().lastIndexOf(".") + 1))
+                    .orElse(classid);
     }
 
     /**

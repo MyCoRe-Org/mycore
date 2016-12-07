@@ -24,12 +24,13 @@
 package org.mycore.datamodel.classifications2.mapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
@@ -65,27 +66,14 @@ public abstract class MCRCategoryMapperBase {
 
     private boolean alreadyContainsCategoryOfSameClassification(Collection<MCRCategoryID> collection, MCRCategoryID candidate) {
         String classificationID = candidate.getRootID();
-
-        for (MCRCategoryID existing : collection) {
-            if (existing.getRootID().equals(classificationID))
-                return true;
-        }
-        
-        return false;
+        return collection.stream().map(MCRCategoryID::getRootID).anyMatch(classificationID::equals);
     }
 
     private List<MCRCategoryID> getMappings(MCRCategoryID categoryID) {
-        List<MCRCategoryID> mappedIDs = new ArrayList<MCRCategoryID>();
-    
         String mappingRule = getMappingRule(categoryID);
         String[] mappings = mappingRule.split("\\s+");
-        
-        for (String mapping : mappings) {
-            MCRCategoryID mappedID = buildMappedID(mapping);
-            mappedIDs.add(mappedID);
-        }
-    
-        return mappedIDs;
+
+        return Arrays.stream(mappings).map(this::buildMappedID).collect(Collectors.toList());
     }
 
     private MCRCategoryID buildMappedID(String mapping) {
