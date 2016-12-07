@@ -1,7 +1,7 @@
 module mycore.viewer.widgets.tei {
     export class TEILayer implements model.Layer {
 
-        constructor(private _id:string, private _label:string, private mapping:MyCoReMap<string,string>, private contentLocation:string) {
+        constructor(private _id: string, private _label: string, private mapping: MyCoReMap<string,string>, private contentLocation: string, private teiStylesheet: string) {
         }
 
         getId():string {
@@ -21,7 +21,7 @@ module mycore.viewer.widgets.tei {
                     callback(true,jQuery(data));
                 };
 
-                jQuery.ajax(this.contentLocation + this.mapping.get(pageHref) + "?XSL.Style=html", settings);
+                jQuery.ajax(this.contentLocation + this.mapping.get(pageHref) + "?XSL.Style=" + this.teiStylesheet, settings);
             } else {
                 callback(false);
             }

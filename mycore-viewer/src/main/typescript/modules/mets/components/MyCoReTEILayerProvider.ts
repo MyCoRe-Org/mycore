@@ -58,7 +58,7 @@ module mycore.viewer.components {
                 });
 
                 if (transcriptions.keys.length != 0) {
-                    this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer("transcription", "transcription", transcriptions, this.contentLocation)));
+                    this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer("transcription", "transcription", transcriptions, this.contentLocation, this._settings.teiStylesheet || "html")));
                 }
 
                 var order = [ "de", "en" ];
@@ -73,7 +73,7 @@ module mycore.viewer.components {
                         })
                         .forEach((language)=> {
                             var translationMap = translations.get(language);
-                            this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer("translation_" + language, "translation_" + language, translationMap, this.contentLocation)));
+                            this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer("translation_" + language, "translation_" + language, translationMap, this.contentLocation, this._settings.teiStylesheet || "html")));
                         });
                 }
 
