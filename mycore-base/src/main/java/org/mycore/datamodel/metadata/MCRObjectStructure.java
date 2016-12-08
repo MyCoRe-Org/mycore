@@ -28,7 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -69,7 +70,7 @@ public class MCRObjectStructure {
 
     private final ArrayList<MCRMetaLinkID> derivates;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRObjectStructure.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The constructor initializes NL (non-static, in order to enable different
@@ -177,7 +178,9 @@ public class MCRObjectStructure {
      * @return boolean true, if successfully completed
      */
     public final boolean removeChild(MCRObjectID href) {
-        LOGGER.debug("Remove child ID " + href);
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Remove child ID " + href);
+        }
         return removeMetaLink(getChildren().iterator(), href);
     }
 
@@ -191,7 +194,9 @@ public class MCRObjectStructure {
      * @return boolean true, if successfully completed
      */
     public final boolean removeDerivate(MCRObjectID href) {
-        LOGGER.debug("Remove derivate ID " + href);
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Remove derivate ID " + href);
+        }
         return removeMetaLink(getDerivates().iterator(), href);
     }
 

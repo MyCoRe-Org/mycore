@@ -27,7 +27,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
@@ -62,7 +63,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
     // logger
-    static Logger LOGGER = Logger.getLogger(MCRMetaElement.class.getName());
+    static Logger LOGGER = LogManager.getLogger();
 
     private Class<? extends MCRMetaInterface> clazz = null;
 
@@ -474,12 +475,14 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        LOGGER.debug("ClassName          = " + getClassName());
-        LOGGER.debug("Tag                = " + tag);
-        LOGGER.debug("Heritable          = " + String.valueOf(heritable));
-        LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
-        LOGGER.debug("Elements           = " + String.valueOf(list.size()));
-        LOGGER.debug(" ");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("ClassName          = " + getClassName());
+            LOGGER.debug("Tag                = " + tag);
+            LOGGER.debug("Heritable          = " + String.valueOf(heritable));
+            LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
+            LOGGER.debug("Elements           = " + String.valueOf(list.size()));
+            LOGGER.debug(" ");
+        }
         for (MCRMetaInterface aList : list) {
             aList.debug();
         }

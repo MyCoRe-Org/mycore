@@ -26,7 +26,8 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -49,7 +50,7 @@ import com.google.gson.JsonObject;
 public class MCRMetaXML extends MCRMetaDefault {
     List<Content> content;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaXML.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -177,7 +178,9 @@ public class MCRMetaXML extends MCRMetaDefault {
     @Override
     public void debug() {
         super.debugDefault();
-        LOGGER.debug("Number of contents  = \n" + content.size());
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Number of contents  = \n" + content.size());
+        }
     }
 
     @Override

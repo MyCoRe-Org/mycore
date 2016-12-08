@@ -27,7 +27,8 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xerces.util.XMLChar;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -61,7 +62,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     protected String to;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaLink.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -466,13 +467,15 @@ public class MCRMetaLink extends MCRMetaDefault {
     @Override
     public final void debug() {
         super.debugDefault();
-        LOGGER.debug("Link Type          = " + linktype);
-        LOGGER.debug("Label              = " + label);
-        LOGGER.debug("Title              = " + title);
-        LOGGER.debug("HREF               = " + href);
-        LOGGER.debug("ROLE               = " + role);
-        LOGGER.debug("FROM               = " + from);
-        LOGGER.debug("TO                 = " + to);
-        LOGGER.debug("");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Link Type          = " + linktype);
+            LOGGER.debug("Label              = " + label);
+            LOGGER.debug("Title              = " + title);
+            LOGGER.debug("HREF               = " + href);
+            LOGGER.debug("ROLE               = " + role);
+            LOGGER.debug("FROM               = " + from);
+            LOGGER.debug("TO                 = " + to);
+            LOGGER.debug("");
+        }
     }
 }

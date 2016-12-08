@@ -25,7 +25,8 @@ package org.mycore.datamodel.metadata.share;
 
 import java.util.stream.StreamSupport;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
@@ -44,7 +45,7 @@ import org.mycore.datamodel.metadata.MCRObjectMetadata;
  */
 class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRDefaultMetadataShareAgent.class);
+    private final static Logger LOGGER = LogManager.getLogger();
 
     /* (non-Javadoc)
      * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)

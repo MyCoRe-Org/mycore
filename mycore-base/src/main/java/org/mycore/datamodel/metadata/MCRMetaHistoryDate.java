@@ -26,7 +26,8 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRCalendar;
@@ -48,7 +49,7 @@ import com.ibm.icu.util.GregorianCalendar;
 public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /** Logger */
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaHistoryDate.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The maximal length of 'text' */
     public static final int MCRHISTORYDATE_MAX_TEXT = 512;
@@ -508,16 +509,18 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     @Override
     public void debug() {
         super.debugDefault();
-        for (MCRMetaHistoryDateText text : texts) {
-            LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());
+        if(LOGGER.isDebugEnabled()) {
+            for (MCRMetaHistoryDateText text : texts) {
+                LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());
+            }
+            LOGGER.debug("Calendar           = " + calendar);
+            LOGGER.debug("Von (String)       = " + getVonToString());
+            LOGGER.debug("Von (JulianDay)    = " + ivon);
+            LOGGER.debug("Bis (String)       = " + getBisToString());
+            LOGGER.debug("Bis (JulianDay)    = " + ibis);
+            LOGGER.debug("Stop");
+            LOGGER.debug("");
         }
-        LOGGER.debug("Calendar           = " + calendar);
-        LOGGER.debug("Von (String)       = " + getVonToString());
-        LOGGER.debug("Von (JulianDay)    = " + ivon);
-        LOGGER.debug("Bis (String)       = " + getBisToString());
-        LOGGER.debug("Bis (JulianDay)    = " + ibis);
-        LOGGER.debug("Stop");
-        LOGGER.debug("");
     }
 
     /**

@@ -27,7 +27,8 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
@@ -81,7 +82,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
 
     private String measurement;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaNumber.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
@@ -374,9 +375,11 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     @Override
     public final void debug() {
         super.debugDefault();
-        LOGGER.debug("Measurement        = " + measurement);
-        LOGGER.debug("Dimension          = " + dimension);
-        LOGGER.debug("Value              = " + number.toPlainString());
-        LOGGER.debug("");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Measurement        = " + measurement);
+            LOGGER.debug("Dimension          = " + dimension);
+            LOGGER.debug("Value              = " + number.toPlainString());
+            LOGGER.debug("");
+        }
     }
 }

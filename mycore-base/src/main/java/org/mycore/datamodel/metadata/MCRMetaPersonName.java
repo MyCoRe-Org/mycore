@@ -20,7 +20,9 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -56,7 +58,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     private String affix;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaPersonName.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -430,16 +432,18 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     @Override
     public final void debug() {
         super.debugDefault();
-        LOGGER.debug("First name         = " + firstname);
-        LOGGER.debug("Call name          = " + callname);
-        LOGGER.debug("Surname            = " + surname);
-        LOGGER.debug("Full name          = " + fullname);
-        LOGGER.debug("Academic           = " + academic);
-        LOGGER.debug("Peerage            = " + peerage);
-        LOGGER.debug("Numeration         = " + numeration);
-        LOGGER.debug("Title              = " + title);
-        LOGGER.debug("Prefix             = " + prefix);
-        LOGGER.debug("Affix              = " + affix);
-        LOGGER.debug("");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("First name         = " + firstname);
+            LOGGER.debug("Call name          = " + callname);
+            LOGGER.debug("Surname            = " + surname);
+            LOGGER.debug("Full name          = " + fullname);
+            LOGGER.debug("Academic           = " + academic);
+            LOGGER.debug("Peerage            = " + peerage);
+            LOGGER.debug("Numeration         = " + numeration);
+            LOGGER.debug("Title              = " + title);
+            LOGGER.debug("Prefix             = " + prefix);
+            LOGGER.debug("Affix              = " + affix);
+            LOGGER.debug("");
+        }
     }
 }

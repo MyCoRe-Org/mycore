@@ -30,7 +30,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -72,7 +73,7 @@ import com.google.gson.JsonObject;
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
-	private static Logger LOGGER = Logger.getLogger(MCRObjectService.class);
+	private static Logger LOGGER = LogManager.getLogger();
 
     /**
      * constant for create date

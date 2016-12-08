@@ -25,7 +25,8 @@ package org.mycore.datamodel.metadata;
 
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -45,7 +46,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     protected String form;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaLangText.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -265,9 +266,11 @@ public class MCRMetaLangText extends MCRMetaDefault {
     @Override
     public final void debug() {
         super.debugDefault();
-        LOGGER.debug("Format             = " + form);
-        LOGGER.debug("Text               = " + text);
-        LOGGER.debug(" ");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Format             = " + form);
+            LOGGER.debug("Text               = " + text);
+            LOGGER.debug(" ");
+        }
     }
 
     @Override

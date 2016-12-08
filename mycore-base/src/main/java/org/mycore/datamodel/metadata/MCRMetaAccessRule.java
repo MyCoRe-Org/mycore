@@ -23,7 +23,9 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -41,7 +43,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     protected String permission;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaAccessRule.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -204,8 +206,10 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     @Override
     public final void debug() {
         super.debugDefault();
-        LOGGER.debug("Permission         = " + permission);
-        LOGGER.debug("Rule               = " + "condition");
-        LOGGER.debug(" ");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Permission         = " + permission);
+            LOGGER.debug("Rule               = " + "condition");
+            LOGGER.debug(" ");
+        }
     }
 }

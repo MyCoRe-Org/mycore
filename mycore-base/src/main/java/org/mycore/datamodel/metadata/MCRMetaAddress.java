@@ -23,7 +23,9 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -51,7 +53,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
 
     private String number;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaAddress.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -183,13 +185,15 @@ final public class MCRMetaAddress extends MCRMetaDefault {
     @Override
     public final void debug() {
         super.debugDefault();
-        LOGGER.debug("Country            = " + country);
-        LOGGER.debug("State              = " + state);
-        LOGGER.debug("Zipcode            = " + zipCode);
-        LOGGER.debug("City               = " + city);
-        LOGGER.debug("Street             = " + street);
-        LOGGER.debug("Number             = " + number);
-        LOGGER.debug(" ");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Country            = " + country);
+            LOGGER.debug("State              = " + state);
+            LOGGER.debug("Zipcode            = " + zipCode);
+            LOGGER.debug("City               = " + city);
+            LOGGER.debug("Street             = " + street);
+            LOGGER.debug("Number             = " + number);
+            LOGGER.debug(" ");
+        }
     }
 
     /**

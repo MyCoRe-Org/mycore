@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -54,7 +55,7 @@ import com.google.gson.JsonObject;
  * @version $Revision$ $Date$
  */
 public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
-    private static final Logger LOGGER = Logger.getLogger(MCRObjectMetadata.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     // common data
     private boolean herited_xml = true;
@@ -235,7 +236,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                         meta_list.get(pos)
                                  .addMetaObject(obj);
                     } else if (LOGGER.isDebugEnabled()) {
-                        LOGGER.info("Found equal tags: \n\r"
+                        LOGGER.debug("Found equal tags: \n\r"
                             + new XMLOutputter(Format.getPrettyFormat()).outputString(obj.createXML()));
                     }
                 }
