@@ -62,7 +62,6 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.common.MCRMarkManager.Operation;
-import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
@@ -219,7 +218,9 @@ public final class MCRMetadataManager {
         der.setSubTag("derobject");
 
         try {
-            LOGGER.debug("adding Derivate in data store");
+            if(LOGGER.isDebugEnabled()) {
+                LOGGER.debug("adding Derivate in data store");
+            }
             MCRMetadataManager.addOrUpdateDerivateToObject(objid, der);
         } catch (final Exception e) {
             MCRMetadataManager.restore(mcrDerivate, objid, objectBackup);
@@ -243,7 +244,9 @@ public final class MCRMetadataManager {
                 final File f = new File(sourcepath);
                 if (f.exists()) {
                     try {
-                        LOGGER.debug("Starting File-Import");
+                        if(LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Starting File-Import");
+                        }
                         importDerivate(derId.toString(), f.toPath());
                         BasicFileAttributes attrs = Files.readAttributes(rootPath, BasicFileAttributes.class);
                         if (!(attrs.fileKey() instanceof String)) {
@@ -319,7 +322,9 @@ public final class MCRMetadataManager {
         final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
         MCRObject parent = null;
         if (parent_id != null) {
-            LOGGER.debug("Parent ID = " + parent_id.toString());
+            if(LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Parent ID = " + parent_id.toString());
+            }
             parent = MCRMetadataManager.retrieveMCRObject(parent_id);
         }
 
@@ -422,7 +427,9 @@ public final class MCRMetadataManager {
         // check for active links
         final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcr_id,
                 MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
-        LOGGER.debug("Sources size:" + sources.size());
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Sources size:" + sources.size());
+        }
         if (sources.size() > 0) {
             final MCRActiveLinkException activeLinks = new MCRActiveLinkException("Error while deleting object " + id
                     + ". This object is still referenced by other objects and can not be removed until all links are released.");
@@ -850,7 +857,9 @@ public final class MCRMetadataManager {
 
         if (oldParentID != null && exists(oldParentID) && (newParentID == null || !newParentID.equals(oldParentID))) {
             // remove child from the old parent
-            LOGGER.debug("Parent ID = " + oldParentID);
+            if(LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Parent ID = " + oldParentID);
+            }
             final MCRObject parent = MCRMetadataManager.retrieveMCRObject(oldParentID);
             parent.getStructure().removeChild(id);
             MCRMetadataManager.fireUpdateEvent(parent);

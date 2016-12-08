@@ -23,7 +23,9 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -47,7 +49,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
     // MCRMetaBoolean data
     private boolean value;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaBoolean.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -197,7 +199,9 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
     @Override
     public void debug() {
         super.debugDefault();
-        LOGGER.debug("Value              = " + Boolean.toString(value));
-        LOGGER.debug(" ");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Value              = " + Boolean.toString(value));
+            LOGGER.debug(" ");
+        }
     }
 }

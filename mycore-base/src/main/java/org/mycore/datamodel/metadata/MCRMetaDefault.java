@@ -25,7 +25,8 @@ package org.mycore.datamodel.metadata;
 
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
@@ -61,7 +62,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     protected static final int DEFAULT_INHERITED = 0;
 
     // logger
-    private static Logger LOGGER = Logger.getLogger(MCRMetaDefault.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     // MetaLangText data
     protected String subtag;
@@ -389,18 +390,20 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      */
     public void debug() {
         debugDefault();
-        LOGGER.debug(" ");
     }
 
     /**
      * This method put common debug data to the logger (for the debug mode).
      */
     public final void debugDefault() {
-        LOGGER.debug("SubTag             = " + subtag);
-        LOGGER.debug("Language           = " + lang);
-        LOGGER.debug("Type               = " + type);
-        LOGGER.debug("DataPart           = " + datapart);
-        LOGGER.debug("Inhreited          = " + String.valueOf(inherited));
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("SubTag             = " + subtag);
+            LOGGER.debug("Language           = " + lang);
+            LOGGER.debug("Type               = " + type);
+            LOGGER.debug("DataPart           = " + datapart);
+            LOGGER.debug("Inhreited          = " + String.valueOf(inherited));
+            LOGGER.debug(" ");
+        }
     }
 
     @Override

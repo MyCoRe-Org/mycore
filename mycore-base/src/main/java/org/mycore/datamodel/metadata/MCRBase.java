@@ -30,7 +30,8 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 import java.io.IOException;
 import java.net.URI;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRCoreVersion;
@@ -84,7 +85,7 @@ public abstract class MCRBase {
     protected boolean importMode = false;
 
     // logger
-    private static final Logger LOGGER = Logger.getLogger(MCRBase.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Load static data for all MCRObjects
@@ -97,7 +98,9 @@ public abstract class MCRBase {
 
         // Default Encoding
         mcr_encoding = mcr_conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
-        LOGGER.debug("Encoding = " + mcr_encoding);
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Encoding = " + mcr_encoding);
+        }
     }
 
     /**

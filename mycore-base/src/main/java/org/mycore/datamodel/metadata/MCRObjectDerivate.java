@@ -30,7 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -45,7 +46,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  */
 public class MCRObjectDerivate {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRObjectDerivate.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     // derivate data
     private MCRMetaLinkID linkmeta;

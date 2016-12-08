@@ -31,7 +31,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
@@ -51,7 +52,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 public class MCRFileMetaEventHandler extends MCREventHandlerBase {
     private static MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
-    private static Logger LOGGER = Logger.getLogger(MCRFileMetaEventHandler.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRFileMetaEventHandler.class);
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {

@@ -6,7 +6,8 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
@@ -19,7 +20,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
 
     private static final String ATTRIBUTE = "lang";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaDerivateLink.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private HashMap<String, String> map;
 

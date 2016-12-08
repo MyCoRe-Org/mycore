@@ -28,7 +28,8 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.output.Format;
@@ -62,7 +63,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     private MCRISO8601Date isoDate;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetaISO8601Date.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * constructs a empty instance.
@@ -219,18 +220,20 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        LOGGER.debug("Start Class : MCRMetaISO8601Date");
-        super.debugDefault();
-        LOGGER.debug("Date=" + isoDate.getISOString());
-        MCRISO8601Format isoFormat = isoDate.getIsoFormat();
-        LOGGER.debug("Format=" + (isoFormat != null ? isoFormat.toString() : "null"));
-        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        StringWriter sw = new StringWriter();
-        try {
-            xout.output(export, sw);
-            LOGGER.debug("JDOM=" + sw.toString());
-        } catch (IOException e) {
-            //ignore
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Start Class : MCRMetaISO8601Date");
+            super.debugDefault();
+            LOGGER.debug("Date=" + isoDate.getISOString());
+            MCRISO8601Format isoFormat = isoDate.getIsoFormat();
+            LOGGER.debug("Format=" + (isoFormat != null ? isoFormat.toString() : "null"));
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            StringWriter sw = new StringWriter();
+            try {
+                xout.output(export, sw);
+                LOGGER.debug("JDOM=" + sw.toString());
+            } catch (IOException e) {
+                //ignore
+            }
         }
     }
 

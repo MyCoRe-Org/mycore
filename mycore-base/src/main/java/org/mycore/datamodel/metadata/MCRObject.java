@@ -26,7 +26,8 @@ package org.mycore.datamodel.metadata;
 import java.io.IOException;
 import java.net.URI;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -53,7 +54,7 @@ final public class MCRObject extends MCRBase {
 
     private final MCRObjectMetadata mcr_metadata;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRObject.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor of the MCRObject class. It creates an instance of
@@ -186,14 +187,16 @@ final public class MCRObject extends MCRBase {
      * The method print all informations about this MCRObject.
      */
     public final void debug() {
-        if (mcr_id == null) {
-            LOGGER.debug("MCRObject ID : missing");
-        } else {
-            LOGGER.debug("MCRObject ID : " + mcr_id.toString());
+        if(LOGGER.isDebugEnabled()) {
+            if (mcr_id == null) {
+                LOGGER.debug("MCRObject ID : missing");
+            } else {
+                LOGGER.debug("MCRObject ID : " + mcr_id.toString());
+            }
+            LOGGER.debug("MCRObject Label : " + mcr_label);
+            LOGGER.debug("MCRObject Schema : " + mcr_schema);
+            LOGGER.debug("");
         }
-        LOGGER.debug("MCRObject Label : " + mcr_label);
-        LOGGER.debug("MCRObject Schema : " + mcr_schema);
-        LOGGER.debug("");
         mcr_struct.debug();
         mcr_metadata.debug();
     }
