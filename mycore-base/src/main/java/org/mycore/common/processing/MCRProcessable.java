@@ -5,12 +5,12 @@ import java.time.Instant;
 
 /**
  * Describes an object which can be processed. A processable has a
- * name, a status, a create-, start- and end time and is 
+ * name, a user id, a status, a create-, start- and end time and is 
  * {@link MCRProgressable}.
  * 
  * @author Matthas Eichner
  */
-public interface MCRProcessable extends MCRProgressable {
+public interface MCRProcessable extends MCRListenableProgressable {
 
     /**
      * Returns a human readable name.
@@ -18,6 +18,13 @@ public interface MCRProcessable extends MCRProgressable {
      * @return name of this process
      */
     public String getName();
+
+    /**
+     * Returns the id of the user who created this processable.
+     * 
+     * @return the user id responsible for the processable
+     */
+    public String getUserId();
 
     /**
      * The status of this process.
