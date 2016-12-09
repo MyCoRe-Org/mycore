@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
@@ -121,7 +122,8 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         InputStream in = file.getInputStream();
         String path = MCRUploadHelper.getFileName(file.getName());
 
-        if (path.toLowerCase(Locale.ROOT).endsWith(".zip"))
+        MCRConfiguration config = MCRConfiguration.instance();
+        if (config.getBoolean("MCR.FileUpload.DecompressZip", true) && path.toLowerCase(Locale.ROOT).endsWith(".zip"))
             handleZipFile(handler, in);
         else
             handleUploadedFile(handler, file.getSize(), path, in);
