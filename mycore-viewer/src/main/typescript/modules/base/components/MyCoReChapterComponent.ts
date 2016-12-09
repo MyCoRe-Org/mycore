@@ -190,6 +190,9 @@ module mycore.viewer.components {
 
         private setChapter(id:string) {
             var newSelectedChapter = this._chapterWidget.getChapterById(id);
+            if(newSelectedChapter == null) {
+                return;
+            }
             var firstImageOfChapter = this._structureModel._chapterToImageMap.get(id);
             this._currentChapter = <model.StructureChapter>newSelectedChapter;
 
