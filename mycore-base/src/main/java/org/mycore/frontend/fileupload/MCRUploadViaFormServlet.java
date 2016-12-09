@@ -123,7 +123,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         String path = MCRUploadHelper.getFileName(file.getName());
 
         MCRConfiguration config = MCRConfiguration.instance();
-        if (!config.getString("MCR.FileUpload.Zip").isEmpty() && path.toLowerCase(Locale.ROOT).endsWith(config.getString("MCR.FileUpload.Zip")))
+        if (config.getBoolean("MCR.FileUpload.DecompressZip", true) && path.toLowerCase(Locale.ROOT).endsWith(".zip"))
             handleZipFile(handler, in);
         else
             handleUploadedFile(handler, file.getSize(), path, in);
