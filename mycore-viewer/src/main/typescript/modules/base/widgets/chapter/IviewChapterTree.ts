@@ -22,6 +22,9 @@ module mycore.viewer.widgets.chaptertree {
             if (this._model.selected != null) {
                 this._view.setSelected(this._model.selected.id, false);
             }
+            if(element == null) {
+                return;
+            }
             this._model.selected = element;
             this._view.setSelected(this._model.selected.id, true);
         }
@@ -49,7 +52,10 @@ module mycore.viewer.widgets.chaptertree {
             this.insertChapterView(this._model.root);
         }
 
-        public jumpToChapter(chapter: ChapterTreeChapter){
+        public jumpToChapter(chapter: ChapterTreeChapter) {
+            if(chapter == null) {
+                return;
+            }
             this._view.jumpTo(chapter.id);
         }
 

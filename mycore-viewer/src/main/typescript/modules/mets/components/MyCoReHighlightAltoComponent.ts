@@ -30,7 +30,7 @@ module mycore.viewer.components {
             if (e.type == events.ChapterChangedEvent.TYPE) {
                 let cce = <events.ChapterChangedEvent>e;
                 this.marker.clearAll(CanvasMarkerType.AREA);
-                if (cce.chapter.additional.has("blocklist")) {
+                if (cce && cce.chapter && cce.chapter.additional.has("blocklist")) {
                     let blocklist:Array<{
                         fileId:string,
                         fromId:string,
