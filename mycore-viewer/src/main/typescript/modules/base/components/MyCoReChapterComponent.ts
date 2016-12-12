@@ -43,6 +43,7 @@ module mycore.viewer.components {
         private _initialized: boolean = false;
         private _sidebarLabel = jQuery("<span>strukturübersicht</span>");
         private _chapterToActivate:string = null;
+        private _autoPagination = true;
 
         public init() {
             if (this._enabled) {
@@ -110,6 +111,13 @@ module mycore.viewer.components {
                 let model = structureModelLoadedEvent.structureModel._rootChapter;
 
                 this._structureModel = structureModelLoadedEvent.structureModel;
+
+                this._structureModel._imageList.forEach(img=>{
+                   if("orderLabel" in img && img.orderLabel != null){
+                       this._autoPagination = false;
+                   }
+                });
+
                 let chapterLabelMap = this.createChapterLabelMap(this._structureModel);
                 this._chapterWidgetSettings = new mycore.viewer.widgets.chaptertree.DefaultChapterTreeSettings(this._container, chapterLabelMap, model, this._settings.mobile, this);
                 this._chapterWidget = new mycore.viewer.widgets.chaptertree.IviewChapterTree(this._chapterWidgetSettings);
@@ -174,7 +182,7 @@ module mycore.viewer.components {
         private createChapterLabelMap(model: model.StructureModel): MyCoReMap<string, string> {
             var chapterLabelMap = new MyCoReMap<string, string>();
             model.chapterToImageMap.forEach((k: string, v: model.StructureImage) => {
-                chapterLabelMap.set(k, v.orderLabel || v.order.toString(10));
+                chapterLabelMap.set(k, v.orderLabel || (this._autoPagination ? v.order.toString(10) : ""));
             });
             return chapterLabelMap;
         }
