@@ -3,10 +3,6 @@
   "version": "0.1.1",
   "description": "mycore-webcli",
   "main": "app.js",
-  "scripts": {
-    "postinstall": "typings install",
-    "typings": "typings"
-  },
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",
     "@angular/compiler": "2.0.0-rc.1",
@@ -37,8 +33,7 @@
     "grunt-newer": "^0.7.0",
     "grunt-svninfo": "^0.1.4",
     "grunt-ts": "5.5.1",
-    "typescript": "^1.8.10",
-    "typings":"^1.0.4"
+    "typescript": "^1.8.10"
   },
   "author": "Michel Buechner <michel.buechner@uni-jena.de>",
   "license": "GPL-2.0"
