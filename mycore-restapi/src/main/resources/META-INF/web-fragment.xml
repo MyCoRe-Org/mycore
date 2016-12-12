@@ -3,11 +3,11 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0"
   metadata-complete="true">
   <servlet>
-    <servlet-name>MyCoRe REST API v1</servlet-name>
+    <servlet-name>MyCoRe REST API</servlet-name>
     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
     <init-param>
-      <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>org.mycore.restapi.v1</param-value>
+      <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
+      <param-value>org.mycore.restapi.MCRRESTResourceConfig</param-value>
     </init-param>
     <init-param>
       <param-name>com.sun.jersey.spi.container.ResourceFilters</param-name>
@@ -16,12 +16,12 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>MyCoRe REST API v1</servlet-name>
+    <servlet-name>MyCoRe REST API</servlet-name>
     <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>MCRUserAgentFilter</filter-name>
-    <servlet-name>MyCoRe REST API v1</servlet-name>
+    <servlet-name>MyCoRe REST API</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 </web-fragment>
