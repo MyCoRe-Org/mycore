@@ -16,11 +16,12 @@
   <properties>
     <java.target.version>1.8</java.target.version>
     <jetty.port>9201</jetty.port>
-    <TestResultDir>${project.build.directory}</TestResultDir>
-    <selenium.version>2.53.1</selenium.version>
+    <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
+    <selenium.version>3.0.1</selenium.version>
     <HostName>127.0.0.1</HostName>
     <node.version>v6.2.0</node.version>
     <npm.version>3.9.3</npm.version>
+    <selenium-utils.version>0.5-SNAPSHOT</selenium-utils.version>
   </properties>
   <dependencies>
     <dependency>
@@ -41,7 +42,7 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>selenium-utils</artifactId>
-      <version>0.3</version>
+      <version>${selenium-utils.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -96,6 +97,19 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>analyze</id>
+            <configuration>
+              <ignoredDependencies>
+                <ignoredDependency>org.seleniumhq.selenium:selenium-remote-driver</ignoredDependency>
+              </ignoredDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Clean should not remove target node_modules because we dont want do download them every build -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -215,83 +229,6 @@
       </build>
     </profile>
     <profile>
-      <id>remote-testing</id>
-      <activation>
-        <property>
-          <name>RemoteDriverURL</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>start-jetty</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>start</goal>
-                </goals>
-                <configuration>
-                  <scanIntervalSeconds>0</scanIntervalSeconds>
-                </configuration>
-              </execution>
-              <execution>
-                <id>stop-jetty</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>stop</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>remote-firefox</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <configuration>
-                  <argLine>-DDriverProvider=org.mycore.common.selenium.drivers.MCRRemoteFirefoxDriverFactory -Dtest.application.url.port=${jetty.port}</argLine>
-                  <excludes>
-                    <exclude>org/mycore/iview/tests/base/PDFImageSectionTest.java</exclude>
-                  </excludes>
-                  <reportsDirectory>${TestResultDir}/failsafe-reports/firefox-reports</reportsDirectory>
-                  <systemPropertyVariables>
-                    <ResultFolder>${TestResultDir}/failsafe-reports/firefox-reports</ResultFolder>
-                    <BaseUrlPort>${jetty.port}</BaseUrlPort>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-              <execution>
-                <id>remote-chrome</id>
-                <phase>integration-test</phase>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-                <configuration>
-                  <argLine>-DDriverProvider=org.mycore.common.selenium.drivers.MCRRemoteChromeDriverFactory -Dtest.viewer.skipDownload=true -Dtest.application.url.port=${jetty.port}</argLine>
-                  <excludes>
-                    <exclude>org/mycore/iview/tests/base/PDFImageSectionTest.java</exclude>
-                  </excludes>
-                  <reportsDirectory>${TestResultDir}/failsafe-reports/chrome-reports</reportsDirectory>
-                  <systemPropertyVariables>
-                    <ResultFolder>${TestResultDir}/failsafe-reports/chrome-reports</ResultFolder>
-                    <BaseUrlPort>${jetty.port}</BaseUrlPort>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>local-testing</id>
       <build>
         <plugins>
@@ -321,24 +258,26 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <project.build.directory>${project.build.directory}</project.build.directory>
+                <BaseUrlPort>${jetty.port}</BaseUrlPort>
+                <ResultFolder>${TestResultDir}</ResultFolder>
+              </systemPropertyVariables>
+              <trimStackTrace>false</trimStackTrace>
+            </configuration>
             <executions>
               <execution>
-                <id>firefox</id>
+                <id>integration-tests</id>
                 <goals>
                   <goal>integration-test</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>verify-results</id>
+                <goals>
                   <goal>verify</goal>
                 </goals>
-                <configuration>
-                  <argLine>-DDriverProvider=org.mycore.common.selenium.drivers.MCRFirefoxDriverFactory -Dtest.application.url.port=${jetty.port}</argLine>
-                  <excludes>
-                    <exclude>org/mycore/iview/tests/base/PDFImageSectionTest.java</exclude>
-                  </excludes>
-                  <reportsDirectory>${TestResultDir}/failsafe-reports/local-firefox-reports</reportsDirectory>
-                  <systemPropertyVariables>
-                    <ResultFolder>${TestResultDir}/failsafe-reports/local-firefox-reports</ResultFolder>
-                    <BaseUrlPort>${jetty.port}</BaseUrlPort>
-                  </systemPropertyVariables>
-                </configuration>
               </execution>
             </executions>
           </plugin>
