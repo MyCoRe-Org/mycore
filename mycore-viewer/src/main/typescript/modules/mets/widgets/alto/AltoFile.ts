@@ -1,3 +1,4 @@
+/// <reference path="AltoStyle.ts" />
 /// <reference path="AltoElement.ts" />
 
 
@@ -7,6 +8,8 @@ module mycore.viewer.widgets.alto {
             return this._allElements;
         }
 
+        private _allStyles:{[id: string]: AltoStyle} = {};
+
         private _rootChilds:Array<AltoElement> = new Array<AltoElement>();
         private _allElements:Array<AltoElement> = new Array<AltoElement>();
         private _allTextBlocks:Array<AltoElement> = new Array<AltoElement>();
@@ -15,9 +18,24 @@ module mycore.viewer.widgets.alto {
         private _allComposedBlock:Array<AltoElement> = new Array<AltoElement>();
         private _allGraphicalElements:Array<AltoElement> = new Array<AltoElement>();
 
-        constructor(elem:Element){
-            this._rootChilds = this.extractElements(elem);
+        constructor(styles:Element, printSpace:Element) {
+            var styleList:NodeList = styles.getElementsByTagName("TextStyle");
+            for(var index = 0; index < styleList.length; index++) {
+                var style:Element = <Element>styleList.item(index);
+                var altoStyle:AltoStyle = this.createAltoStyle(style);
+                this._allStyles[altoStyle.getId()] = altoStyle;
+            }
+
+            this._rootChilds = this.extractElements(printSpace);
             this._allElements = this._allTextBlocks.concat(this._allIllustrations).concat(this._allComposedBlock).concat(this._allLines).concat(this._allGraphicalElements);
+        }
+
+        private createAltoStyle(src:Element):AltoStyle {
+            var id:string         = src.getAttribute("ID");
+            var fontFamily:string = src.getAttribute("FONTFAMILY");
+            var fontSize:number   = parseFloat(src.getAttribute("FONTSIZE"));
+            var fontStyle:string  = src.getAttribute("FONTSTYLE");
+            return new AltoStyle(id, fontFamily, fontSize, fontStyle);
         }
 
         //erstellt ein neues Alto-Element mit Mindestanforderungen
@@ -27,7 +45,15 @@ module mycore.viewer.widgets.alto {
             var hpos:number   = parseFloat(src.getAttribute("HPOS"));
             var vpos:number   = parseFloat(src.getAttribute("VPOS"));
             var id:string     = src.getAttribute("ID");
-            return new AltoElement(parent, type, id, width, height, hpos, vpos);
+            var styleID:string  = src.getAttribute("STYLEREFS");
+            var altoElement:AltoElement = new AltoElement(parent, type, id, width, height, hpos, vpos);
+            if(styleID != null) {
+                var style:AltoStyle = this._allStyles[styleID];
+                if(style != null) {
+                    altoElement.setAltoStyle(style);
+                }
+            }
+            return altoElement;
         }
 
         //Aufruf: PrintSpace->ermittle alle Kinder des Typs Textblock -> ermittle davon alle Kinder (TextLines) -> hole die Kinder der Textlines
@@ -89,7 +115,7 @@ module mycore.viewer.widgets.alto {
         public getBlocks():Array<AltoElement> {
             return this._allTextBlocks;
         }
-
+        
         public getBlockContent(id:string): string {
             var content:string = "";
             for (var index = 0; index < this._allTextBlocks.length; index++) {

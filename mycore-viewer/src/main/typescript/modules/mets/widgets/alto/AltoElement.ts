@@ -1,3 +1,5 @@
+/// <reference path="AltoStyle.ts" />
+
 enum AltoElementType {ComposedBlock, Illustration, GraphicalElement,TextBlock, TextLine, String, SP, HYP}
 
 module mycore.viewer.widgets.alto {
@@ -7,6 +9,7 @@ module mycore.viewer.widgets.alto {
         //Attribute der Elemente (die hier genannten MÜSSEN vorliegen)
         private _children:Array<AltoElement> = new Array<AltoElement>();
         private _content:string = null;
+        private _style:AltoStyle = null;
 
         constructor(private _parent:AltoElement,
                     private _type: AltoElementType,
@@ -56,6 +59,14 @@ module mycore.viewer.widgets.alto {
 
         public setContent(content: string): void {
             this._content = content;
+        }
+
+        public getStyle(): AltoStyle {
+            return this._style;
+        }
+
+        public setAltoStyle( style: AltoStyle ): void {
+            this._style = style;
         }
 
         public getParent(): AltoElement {
