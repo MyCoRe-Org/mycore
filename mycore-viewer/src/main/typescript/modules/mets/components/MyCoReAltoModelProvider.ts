@@ -131,11 +131,14 @@ module mycore.viewer.components {
                                xml:any,
                                callback:(altoContainer:widgets.alto.AltoFile)=>void):void {
 
+            var pageStyles:NodeListOf<HTMLAreaElement> = xml.getElementsByTagName("Styles");
+            var styles:Element = pageStyles.item(0);
+
             var pageContent:NodeListOf<HTMLAreaElement> = xml.getElementsByTagName("PrintSpace");
             var printSpace:Element = pageContent.item(0);
 
-            if (printSpace != null) {
-                var altoContainer = new widgets.alto.AltoFile(printSpace);
+            if (styles != null && printSpace != null) {
+                var altoContainer = new widgets.alto.AltoFile(styles, printSpace);
                 MyCoReAltoModelProvider.altoHrefModelMap.set(altoHref, altoContainer);
                 callback(altoContainer);
             }
