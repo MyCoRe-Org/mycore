@@ -712,7 +712,7 @@
                     <xsl:value-of select="$link" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:variable name="uriResolved" select="document(concat($link,'?format=xml'))//rdf:Description[@rdf:about=normalize-space($link)]/*[local-name() = 'page']/@rdf:resource" />
+                    <xsl:variable xmlns:foaf="http://xmlns.com/foaf/0.1/" name="uriResolved" select="document(concat($link,'?format=xml'))//rdf:Description[@rdf:about=normalize-space($link)]/foaf:page/@rdf:resource" />
                     <xsl:choose>
                       <xsl:when test="string-length($uriResolved) &gt; 0"><xsl:value-of select="$uriResolved" /></xsl:when>
                       <xsl:otherwise><xsl:value-of select="$link" /></xsl:otherwise>
