@@ -54,12 +54,14 @@ public class MCRIIIFPresentationResource {
 
     private static final String IMPL = "impl";
 
-    @GET
-    @Produces(APPLICATION_LD_JSON)
-    @Path("{impl}/collection/{name}")
-    public Response getCollection(@PathParam(IMPL) String impl, @PathParam("name") String name) {
-        return null;
-    }
+    /* currently not supported by MyCoRe
+        @GET
+        @Produces(APPLICATION_LD_JSON)
+        @Path("{impl}/collection/{name}")
+        public Response getCollection(@PathParam(IMPL) String impl, @PathParam("name") String name) {
+            return null;
+        }
+    */
 
     @GET
     @Produces(APPLICATION_LD_JSON)
