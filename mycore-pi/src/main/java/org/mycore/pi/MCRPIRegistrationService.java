@@ -61,7 +61,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         return registrationServiceID;
     }
 
-    protected MCRPersistentIdentifierInscriber<T> getInscriber() {
+    public MCRPersistentIdentifierInscriber<T> getInscriber() {
         String inscriberName = getProperties().get("Inscriber");
         String inscriberPropertyKey = INSCRIBER_CONFIG_PREFIX + inscriberName;
         String className = MCRConfiguration.instance().getString(inscriberPropertyKey);
@@ -167,9 +167,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         T identifier = this.registerIdentifier(obj, additional);
         this.getInscriber().insertIdentifier(identifier, obj, additional);
 
-        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-                this.getRegistrationServiceID(), provideRegisterDate(obj, additional));
-        MCRHIBConnection.instance().getSession().save(databaseEntry);
+        MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier);
 
         addFlagToObject(obj, databaseEntry);
 
@@ -187,6 +185,13 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     protected Date provideRegisterDate(MCRBase obj, String additional) {
         return new Date();
+    }
+
+    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier) {
+        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
+            this.getRegistrationServiceID(), provideRegisterDate(obj, additional));
+        MCRHIBConnection.instance().getSession().save(databaseEntry);
+        return databaseEntry;
     }
 
     public final String getType() {

@@ -19,8 +19,15 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -44,6 +51,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
@@ -162,6 +170,48 @@ public class MCRIFS2Commands {
         fixMCRFSNODESForDerivate(content_store, derivate_id, false);
         LOGGER.info("Stop repair of MCRFSNODES for derivate " + derivate_id);
     }
+
+    @MCRCommand(syntax = "repair unicode in database {0}", help = "this fixes consequences of MCR-1423 in Database. If "
+        + "{0} is false then nothing will be done (dry run).")
+    public static void repairUnicodeInDatabase(String execute) {
+        boolean dry = execute.toLowerCase(Locale.ROOT).equals(Boolean.FALSE.toString().toLowerCase(Locale.ROOT));
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRFSNODES> getQuery = cb.createQuery(MCRFSNODES.class);
+
+        List<MCRFSNODES> resultList = em.createQuery(getQuery.select(getQuery.from(MCRFSNODES.class))).getResultList();
+
+        resultList.stream().forEach(node -> {
+            String unnormalName = node.getName();
+            String normalName = MCRXMLFunctions.normalizeUnicode(unnormalName);
+            if (!unnormalName.equals(normalName)) {
+                LOGGER.info("{} node {} with name {}", (dry) ? "Would Fix" : "Fixing", node.getId(), unnormalName);
+                if (!dry) {
+                    node.setName(normalName);
+                }
+            }
+        });
+    }
+
+    @MCRCommand(syntax = "repair unicode in content stores {0}", help = "this fixes consequences of MCR-1423 in content"
+        + " stores . If {0} is false then nothing will be done (dry run).")
+    public static void repairUnicodeInContentStores(String execute) {
+        boolean dry = execute.toLowerCase(Locale.ROOT).equals(Boolean.FALSE.toString().toLowerCase(Locale.ROOT));
+        MCRContentStoreFactory.getAvailableStores().forEach((name, cs) -> {
+            LOGGER.info("{} store: {} ", dry ? "would fix" : "fixing", name);
+
+            try {
+                Path path = cs.getBaseDir().toPath();
+                LOGGER.info("Starting with path : " + path.toString());
+                java.nio.file.Files.walkFileTree(path, new MCRUnicodeFilenameNormalizer(dry));
+            } catch (IOException e) {
+                throw new MCRException("Error while get basedir of content store " + name, e);
+            }
+        });
+    }
+
+
+
 
     private static void fixMCRFSNODESForDerivate(String content_store, String derivate_id, boolean check_only) {
         // check input
@@ -475,4 +525,56 @@ public class MCRIFS2Commands {
     private static int countCharacter(String haystack, char needle, int i) {
         return ((i = haystack.indexOf(needle, i)) == -1) ? 0 : 1 + countCharacter(haystack, needle, i + 1);
     }
+
+    public static class MCRUnicodeFilenameNormalizer extends SimpleFileVisitor<Path> {
+
+        private boolean dry;
+
+        public MCRUnicodeFilenameNormalizer(final boolean dry) {
+            super();
+            this.dry = dry;
+        }
+
+        @Override public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+            LOGGER.debug("Checking: {}", dir.toString());
+
+            if (canNormalize(dir)) {
+                LOGGER.info("{} Directory {}", dry ? "Would fix" : "Fixing", dir.toString());
+                Path normalizedPath = getNormalizedPath(dir);
+                if (!dry) {
+                    java.nio.file.Files.move(dir, normalizedPath, StandardCopyOption.ATOMIC_MOVE);
+                }
+            }
+
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            LOGGER.debug("Checking: {}", file.toString());
+
+            if (canNormalize(file)) {
+                LOGGER.info("{} File {}", dry ? "Would fix" : "Fixing", file.toString());
+                Path normalizedPath = getNormalizedPath(file);
+                if(!dry){
+                    java.nio.file.Files.createDirectory(normalizedPath);
+                }
+            }
+
+            return FileVisitResult.CONTINUE;
+        }
+
+        public boolean canNormalize(Path file) {
+            String maybeWrongName = file.getFileName().toString();
+            String normalName = MCRXMLFunctions.normalizeUnicode(maybeWrongName);
+            return !maybeWrongName.equals(normalName);
+        }
+
+        public Path getNormalizedPath(Path file) {
+            String maybeWrongName = file.getFileName().toString();
+            String normalName = MCRXMLFunctions.normalizeUnicode(maybeWrongName);
+            return file.getParent().resolve(normalName);
+        }
+    }
+
+
 }

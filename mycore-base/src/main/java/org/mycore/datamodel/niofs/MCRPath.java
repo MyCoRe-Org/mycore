@@ -23,9 +23,6 @@
 
 package org.mycore.datamodel.niofs;
 
-import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
-import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
-
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
@@ -42,6 +39,7 @@ import java.nio.file.WatchEvent.Modifier;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.MessageFormat;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -50,6 +48,9 @@ import java.util.Objects;
 import org.mycore.common.MCRException;
 
 import com.google.common.primitives.Ints;
+
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
 /**
  *  IFS implementation of the {@link Path} interface.
@@ -105,21 +106,23 @@ public abstract class MCRPath implements Path {
      * @throws InvalidPathException if <code>uncleanPath</code> contains invalid characters
      */
     static String normalizeAndCheck(final String uncleanPath) {
+        String unicodeNormalizedUncleanPath = Normalizer.normalize(uncleanPath, Normalizer.Form.NFC);
+
         char prevChar = 0;
         final boolean afterSeparator = false;
-        for (int i = 0; i < uncleanPath.length(); i++) {
-            final char c = uncleanPath.charAt(i);
-            checkCharacter(uncleanPath, c, afterSeparator);
+        for (int i = 0; i < unicodeNormalizedUncleanPath.length(); i++) {
+            final char c = unicodeNormalizedUncleanPath.charAt(i);
+            checkCharacter(unicodeNormalizedUncleanPath, c, afterSeparator);
             if (c == SEPARATOR && prevChar == SEPARATOR) {
-                return normalize(uncleanPath, uncleanPath.length(), i - 1);
+                return normalize(unicodeNormalizedUncleanPath, unicodeNormalizedUncleanPath.length(), i - 1);
             }
             prevChar = c;
         }
         if (prevChar == SEPARATOR) {
             //remove final slash
-            return normalize(uncleanPath, uncleanPath.length(), uncleanPath.length() - 1);
+            return normalize(unicodeNormalizedUncleanPath, unicodeNormalizedUncleanPath.length(), unicodeNormalizedUncleanPath.length() - 1);
         }
-        return uncleanPath;
+        return unicodeNormalizedUncleanPath;
     }
 
     private static void checkCharacter(final String input, final char c, final boolean afterSeparator) {
