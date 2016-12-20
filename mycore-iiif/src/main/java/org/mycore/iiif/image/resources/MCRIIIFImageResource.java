@@ -65,10 +65,14 @@ public class MCRIIIFImageResource {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    public static final String IMPL_PARAM = "impl";
+
+    public static final String IDENTIFIER_PARAM = "identifier";
+
     @GET
     @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
-    @Path("{identifier}/info.json")
-    public Response getInfo(@PathParam("impl") String implString, @PathParam("identifier") String identifier) {
+    @Path("{" + IDENTIFIER_PARAM + "}/info.json")
+    public Response getInfo(@PathParam(IMPL_PARAM) String implString, @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
             MCRIIIFImageImpl impl = getImpl(implString);
             MCRIIIFImageInformation information = impl.getInformation(identifier);
@@ -94,8 +98,9 @@ public class MCRIIIFImageResource {
     }
 
     @GET
-    @Path("{identifier}")
-    public Response getInfoRedirect(@PathParam("impl") String impl, @PathParam("identifier") String identifier) {
+    @Path("{" + IDENTIFIER_PARAM + "}")
+    public Response getInfoRedirect(@PathParam(IMPL_PARAM) String impl,
+        @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
             String uriString = getIIIFURL(getImpl(impl)) + URLEncoder.encode(identifier, "UTF-8") + "/info.json";
             return Response.temporaryRedirect(new URI(uriString)).build();
@@ -105,9 +110,8 @@ public class MCRIIIFImageResource {
     }
 
     @GET
-    @Path("{identifier}/{region}/{size}/{rotation}/{quality}.{format}")
-    public Response getImage(@PathParam("impl") String implStr,
-        @PathParam("identifier") String identifier,
+    @Path("{" + IDENTIFIER_PARAM + "}/{region}/{size}/{rotation}/{quality}.{format}")
+    public Response getImage(@PathParam(IMPL_PARAM) String implStr, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam("region") String region,
         @PathParam("size") String size,
         @PathParam("rotation") String rotation,
@@ -157,7 +161,7 @@ public class MCRIIIFImageResource {
     @GET
     @Path("profile.json")
     @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
-    public Response getDereferencedProfile(@PathParam("impl") String implStr) {
+    public Response getDereferencedProfile(@PathParam(IMPL_PARAM) String implStr) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         MCRIIIFImageProfile profile = getProfile(getImpl(implStr));
         profile.setContext(MCRIIIFBase.API_IMAGE_2);
