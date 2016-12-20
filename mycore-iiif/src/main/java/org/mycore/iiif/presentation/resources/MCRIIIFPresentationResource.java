@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
+import org.mycore.iiif.common.MCRIIIFMediaType;
 import org.mycore.iiif.presentation.MCRIIIFPresentationManifestQuickAccess;
 import org.mycore.iiif.presentation.impl.MCRIIIFPresentationImpl;
 import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
@@ -42,7 +43,7 @@ import com.google.gson.GsonBuilder;
 
 import static org.mycore.iiif.presentation.MCRIIIFPresentationUtil.correctIDs;
 
-@Path("/iiif/presentation")
+@Path("/iiif/presentation/{impl}")
 public class MCRIIIFPresentationResource {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -50,23 +51,23 @@ public class MCRIIIFPresentationResource {
     private static final MCRCache<String, MCRIIIFPresentationManifestQuickAccess> cache = new MCRCache<>(1000,
         MCRIIIFPresentationResource.class.getName().toString());
 
-    private static final String APPLICATION_LD_JSON = "application/ld+json";
+    private static final String IMPL_PARAM = "impl";
 
-    private static final String IMPL = "impl";
+    private static final String NAME_PARAM = "name";
 
-    /* currently not supported by MyCoRe
-        @GET
-        @Produces(APPLICATION_LD_JSON)
-        @Path("{impl}/collection/{name}")
-        public Response getCollection(@PathParam(IMPL) String impl, @PathParam("name") String name) {
-            return null;
-        }
-    */
+    private static final String IDENTIFIER_PARAM = "identifier";
 
     @GET
-    @Produces(APPLICATION_LD_JSON)
-    @Path("{impl}/{identifier}/manifest")
-    public Response getManifest(@PathParam(IMPL) String impl, @PathParam("identifier") String identifier)
+    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Path("collection/{" + NAME_PARAM + "}")
+    public Response getCollection(@PathParam(IMPL_PARAM) String impl, @PathParam(NAME_PARAM) String name) {
+        return null;
+    }
+
+    @GET
+    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Path("{" + IDENTIFIER_PARAM + "}/manifest")
+    public Response getManifest(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier)
         throws CloneNotSupportedException {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
         String manifestAsJSON = getGson().toJson(quickAccess.getManifest());
@@ -95,7 +96,7 @@ public class MCRIIIFPresentationResource {
         return builder
             .header("Link",
                 "<http://iiif.io/api/presentation/2/context.json>\n;rel=\"http://www.w3.org/ns/json-ld#context\";type=\""
-                    + APPLICATION_LD_JSON + "\"")
+                    + MCRIIIFMediaType.APPLICATION_LD_JSON + "\"")
             .header("Access-Control-Allow-Origin", "*");
     }
 
@@ -106,48 +107,48 @@ public class MCRIIIFPresentationResource {
     }
 
     @GET
-    @Produces(APPLICATION_LD_JSON)
-    @Path("{impl}/{identifier}/sequence/{name}")
-    public Response getSequence(@PathParam(IMPL) String impl, @PathParam("identifier") String identifier,
-        @PathParam("name") String name) {
+    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Path("{" + IDENTIFIER_PARAM + "}/sequence/{" + NAME_PARAM + "}")
+    public Response getSequence(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
+        @PathParam(NAME_PARAM) String name) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
         String sequenceAsJSON = getGson().toJson(quickAccess.getSequence(name));
         return addHeaders(Response.ok()).entity(sequenceAsJSON).build();
     }
 
     @GET
-    @Produces(APPLICATION_LD_JSON)
-    @Path("{impl}/{identifier}/canvas/{name}")
-    public Response getCanvas(@PathParam(IMPL) String impl, @PathParam("identifier") String identifier,
-        @PathParam("name") String name) {
+    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Path("{" + IDENTIFIER_PARAM + "}/canvas/{" + NAME_PARAM + "}")
+    public Response getCanvas(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
+        @PathParam(NAME_PARAM) String name) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
         String canvasAsJSON = getGson().toJson(quickAccess.getCanvas(name));
         return addHeaders(Response.ok()).entity(canvasAsJSON).build();
     }
 
     @GET
-    @Produces(APPLICATION_LD_JSON)
-    @Path("{impl}/{identifier}/annotation/{name}")
-    public Response getAnnotation(@PathParam(IMPL) String impl, @PathParam("identifier") String identifier,
-        @PathParam("name") String name) {
+    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Path("{" + IDENTIFIER_PARAM + "}/annotation/{" + NAME_PARAM + "}")
+    public Response getAnnotation(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
+        @PathParam(NAME_PARAM) String name) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
         String annotationAsJSON = getGson().toJson(quickAccess.getAnnotationBase(name));
         return addHeaders(Response.ok()).entity(annotationAsJSON).build();
     }
 
     @GET
-    @Produces(APPLICATION_LD_JSON)
-    @Path("{impl}/{identifier}/list/{name}")
-    public Response getAnnotationList(@PathParam(IMPL) String impl, @PathParam("identifier") String identifier,
-        @PathParam("name") String name) {
+    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Path("{" + IDENTIFIER_PARAM + "}/list/{" + NAME_PARAM + "}")
+    public Response getAnnotationList(@PathParam(IMPL_PARAM) String impl,
+        @PathParam(IDENTIFIER_PARAM) String identifier, @PathParam(NAME_PARAM) String name) {
         return getAnnotation(impl, identifier, name);
     }
 
     @GET
-    @Produces(APPLICATION_LD_JSON)
-    @Path("{impl}/{identifier}/range/{name}")
-    public Response getRange(@PathParam(IMPL) String impl, @PathParam("identifier") String identifier,
-        @PathParam("name") String name) {
+    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Path("{" + IDENTIFIER_PARAM + "}/range/{" + NAME_PARAM + "}")
+    public Response getRange(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
+        @PathParam(NAME_PARAM) String name) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
         String rangeAsJSON = getGson().toJson(quickAccess.getRange(name));
         return addHeaders(Response.ok()).entity(rangeAsJSON).build();
@@ -156,17 +157,17 @@ public class MCRIIIFPresentationResource {
     // layers and resources are not supported currently
 
     @GET
-    @Produces(APPLICATION_LD_JSON)
-    @Path("{impl}/{identifier}/layer/{name}")
-    public Response getLayer(@PathParam(IMPL) String impl, @PathParam("identifier") String identifier,
-        @PathParam("name") String name) {
+    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Path("{" + IDENTIFIER_PARAM + "}/layer/{" + NAME_PARAM + "}")
+    public Response getLayer(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
+        @PathParam(NAME_PARAM) String name) {
         return null;
     }
 
     @GET
-    @Path("{impl}/{identifier}/res/{name}[.]{format}")
-    public Response getContent(@PathParam(IMPL) String impl, @PathParam("identifier") String identifier,
-        @PathParam("name") String name, @PathParam("format") String format) {
+    @Path("{" + IDENTIFIER_PARAM + "}/res/{" + NAME_PARAM + "}[.]{format}")
+    public Response getContent(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
+        @PathParam(NAME_PARAM) String name, @PathParam("format") String format) {
         return null;
     }
 
