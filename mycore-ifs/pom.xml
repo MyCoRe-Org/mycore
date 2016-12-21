@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2016.07-SNAPSHOT</version>
+    <version>2016.12</version>
   </parent>
   <artifactId>mycore-ifs</artifactId>
   <name>MyCoRe IFS1</name>
