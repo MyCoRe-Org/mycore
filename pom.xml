@@ -4,11 +4,11 @@
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>30</version>
+    <version>31-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2016.12</version>
+  <version>2017.01-SNAPSHOT</version>
   <name>MyCoRe</name>
   <description>
     MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -79,7 +79,7 @@
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>v2016.12</tag>
+    <tag>HEAD</tag>
   </scm>
   <profiles>
     <profile>
@@ -796,7 +796,7 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.11</version>
+        <version>1.12-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
