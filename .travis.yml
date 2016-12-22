@@ -1,15 +1,41 @@
 language: java
-sudo: true
+sudo: false
 dist: trusty
+group: beta
+install: true
+addons:
+  firefox: "latest-esr"
 cache:
   directories:
-    - $HOME/.m2
+    - $HOME/.m2/repository
+    - geckodriver
 env:
   global:
     - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
-install:
-  - sudo apt-get update -qq
+    - GECKODRIVER_VERSION="0.11.1"
+    - XVFBARGS=":99 -ac -screen 0 1280x1024x24 -ac +extension GLX +extension RANDR +render -noreset"
+    - FIREFOX_BIN=$(which firefox)
+before_install:
+  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- $XVFBARGS"
+
+  # geckodriver
+  - |
+        export PATH=$PWD/geckodriver:$PATH && \
+        if ! type geckodriver > /dev/null 2>&1; then \
+            rm -rf geckodriver && \
+            mkdir geckodriver && \
+            wget https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz -O geckodriver/geckodriver.tar.gz && \
+            tar -xvf geckodriver/geckodriver.tar.gz -C geckodriver && \
+            rm geckodriver/geckodriver.tar.gz; \
+        fi; \
+        geckodriver --version
+
+before_script:
+  - export DISPLAY=:99.0
+  - sleep 3
 script:
-  - mvn -B clean install && mvn -B javadoc:javadoc
+  - mkdir ${HOME}/tmp
+  - export TMPDIR="${HOME}/tmp"
+  - mvn -B -Plocal-testing clean install -Dwebdriver.firefox.marionette=false -Dwebdriver.firefox.bin=${FIREFOX_BIN} && mvn -B javadoc:javadoc
 after_script:
   - mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
