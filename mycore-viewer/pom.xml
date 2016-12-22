@@ -212,14 +212,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>jar</goal>
-                  <goal>test-jar</goal>
-                </goals>
-              </execution>
-            </executions>
             <configuration>
               <excludes>
                 <exclude>example/**</exclude>
