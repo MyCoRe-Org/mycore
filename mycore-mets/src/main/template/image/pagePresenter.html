@@ -1,0 +1,7 @@
+{{pagePresenter.currentPage=metsEditorCtrl.model.metsModel.metsPageList[metsEditorCtrl.model.pageSelection.to];""}}
+<div class="presenter" ng-if="pagePresenter.currentPage!=null">
+    <div image-zoom low-res-src="{{pagePresenter.getPreviewURL(pagePresenter.currentPage.fileList)}}"
+         high-res-src="{{pagePresenter.getImageURL(pagePresenter.currentPage.fileList)}}"
+         alt="{{pagePresenter.currentPage.orderLabel}}">
+    </div>
+</div>

@@ -11,14 +11,29 @@
   <packaging>jar</packaging>
   <name>MyCoRe METS</name>
   <properties>
+    <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
+    <jetty.port>9301</jetty.port>
     <manifest.priority>45</manifest.priority>
   </properties>
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.18.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-junit47</artifactId>
+            <version>2.18.1</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
   <dependencies>
     <dependency>
@@ -59,6 +74,10 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>selenium-utils</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.mycore.mets</groupId>
       <artifactId>mets-editor-frontend</artifactId>
     </dependency>
@@ -70,5 +89,95 @@
       <groupId>org.mycore.mets</groupId>
       <artifactId>mets-validator</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-support</artifactId>
+    </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <id>local-testing</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>${jetty.version}</version>
+            <configuration>
+              <webAppSourceDirectory>${basedir}/target/</webAppSourceDirectory>
+              <scanIntervalSeconds>10</scanIntervalSeconds>
+              <stopKey>foo</stopKey>
+              <stopPort>9202</stopPort>
+              <webApp>
+                <webInfIncludeJarPattern>doNotIncludeAnyJarsPattern</webInfIncludeJarPattern>
+              </webApp>
+              <systemProperties>
+                <force>true</force>
+                <systemProperty>
+                  <name>jetty.port</name>
+                  <value>${jetty.port}</value>
+                </systemProperty>
+                <systemProperty>
+                  <name>MCR.Persistence.Database.Enable</name>
+                  <value>false</value>
+                </systemProperty>
+              </systemProperties>
+            </configuration>
+            <executions>
+              <execution>
+                <id>start-jetty</id>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <scanIntervalSeconds>0</scanIntervalSeconds>
+                </configuration>
+              </execution>
+              <execution>
+                <id>stop-jetty</id>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+                <phase>post-integration-test</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <project.build.directory>${project.build.directory}</project.build.directory>
+                <BaseUrlPort>${jetty.port}</BaseUrlPort>
+                <ResultFolder>${TestResultDir}</ResultFolder>
+              </systemPropertyVariables>
+              <trimStackTrace>false</trimStackTrace>
+              <runOrder>alphabetical</runOrder>
+              <argLine>${env.MAVEN_OPTS}</argLine>
+            </configuration>
+            <executions>
+              <execution>
+                <id>firefox</id>
+                <goals>
+                  <goal>integration-test</goal>
+                </goals>
+                <phase>integration-test</phase>
+              </execution>
+              <execution>
+                <id>verify-results</id>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

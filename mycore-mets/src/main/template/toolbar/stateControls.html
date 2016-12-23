@@ -1,0 +1,14 @@
+<form class="navbar-form navbar-left" role="state" id="mets-editor-toolbar-state-controls">
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default {{stateCtrl.canBack()? '':'disabled'}}" ng-click="stateCtrl.backClicked()" title="{{stateCtrl.i18nModel.messages['undo'] || '???undo???'}}">
+            <span class="glyphicon glyphicon-share-alt flipH"/>
+        </button>
+        <button type="button" class="btn btn-default {{stateCtrl.canForward()? '':'disabled'}}" ng-click="stateCtrl.nextClicked()" title="{{stateCtrl.i18nModel.messages['redo'] || '???redo???'}}">
+            <span class="glyphicon glyphicon-share-alt"/>
+        </button>
+    </div>
+    <button type="button" class="btn btn-default {{stateCtrl.canBack()? '':'disabled'}}" ng-click="stateCtrl.listClicked()" title="{{stateCtrl.i18nModel.messages['showChanges'] || '???showChanges???'}}">
+        <span class="glyphicon glyphicon-list-alt"/>
+        {{stateCtrl.i18nModel.messages['showChanges'] || '???showChanges???'}}
+    </button>
+</form>

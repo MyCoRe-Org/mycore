@@ -1,0 +1,134 @@
+@import "mixins";
+
+[pane-anchor=center] .navbar {
+  margin-bottom: 0px;
+}
+
+.pageList {
+
+  .edit {
+    padding: 0;
+    height: 21px;
+    width: 40px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  table {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+
+    .listEntry:nth-of-type(2n) {
+      background-color: #f8f8f8;
+    }
+
+    thead {
+      background-color: #dddddd;
+      tr th {
+        text-align: center;
+        height: 35px;
+        border-right: 1px solid lightgray;
+        padding-right: 10px;
+        padding-left: 10px;
+      }
+    }
+    .hrefList {
+      list-style: none;
+    }
+  }
+
+  text-align: center;
+
+  .selected {
+    .gradient(#337ab7, #2b669a, #337ab7);
+    border-color: #2b669a;
+    border-radius: 6px;
+    color: white;
+
+    .caption {
+      color: black;
+    }
+  }
+
+  &.highlighting {
+
+  }
+
+  .thumbnail {
+    &.childOnly {
+      background-color: #BABABA;
+    }
+
+    &.unfocus:not(.selected) {
+      @filterString: ~"blur(1px) brightness(90%) grayscale(1)";
+      .filter(@filterString);
+      opacity: 0.8;
+    }
+
+    .box-shadow(0px, 0px, 17px, 0px);
+    display: inline-block;
+
+    img {
+      cursor: -webkit-zoom-in;
+      cursor: -moz-zoom-in;
+      cursor: zoom-in;
+      max-width: 200px;
+      max-height: 200px;
+    }
+
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+
+  .thumbnail-label{
+    display: block;
+    color: black;
+  }
+
+  .thumbnail-container {
+    display: inline;
+    margin-right: 15px;
+  }
+
+  .linked {
+
+  }
+
+  .caption {
+    text-align: center;
+  }
+
+  .active input {
+    color: black;
+  }
+
+  .ng-invalid-required {
+    background-color: darkred;
+  }
+
+  .list-group {
+    box-shadow: none;
+  }
+
+  .preview {
+    max-width: 200px;
+  }
+
+  .list .thumb {
+    max-width: 100%;
+    max-height: 260px;
+  }
+
+  .thListElement {
+    .btn-group {
+      display: inline-block;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    padding: 20px;
+  }
+
+}
