@@ -63,6 +63,7 @@ module mycore.viewer.components {
             if (e.type == events.LanguageModelLoadedEvent.TYPE) {
                 var languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
                 this._modalWindow.closeLabel = languageModelLoadedEvent.languageModel.getTranslation("permalink.close");
+                this._modalWindow.title = languageModelLoadedEvent.languageModel.getTranslation("permalink.title");
             }
 
             if (e.type == widgets.toolbar.events.ButtonPressedEvent.TYPE) {
