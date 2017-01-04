@@ -36,10 +36,13 @@ public class MCRViewerMetadataConfiguration extends MCRViewerConfiguration {
         // properties
         setProperty("objId", objectID.toString());
         String urlFormat = "%sreceive/%s?XSL.Transformer=%s";
-        setProperty(
+        MCRConfiguration mcrConfiguration = MCRConfiguration.instance();
+        String transformer = mcrConfiguration.getString("MCR.Viewer.metadata.transformer", null);
+        if (transformer != null) {
+            setProperty(
                 "metadataURL",
-                String.format(Locale.ROOT, urlFormat, MCRFrontendUtil.getBaseURL(), objectID,
-                        MCRConfiguration.instance().getString("MCR.Viewer.metadata.transformer", "")));
+                String.format(Locale.ROOT, urlFormat, MCRFrontendUtil.getBaseURL(), objectID, transformer));
+        }
 
         // script
         addLocalScript("iview-client-metadata.js", isDebugParameterSet(request));
