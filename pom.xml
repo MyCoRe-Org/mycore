@@ -1483,12 +1483,6 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>wsdl4j</groupId>
-        <artifactId>wsdl4j</artifactId>
-        <version>1.6.3</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
         <version>2.7</version>
@@ -1994,7 +1988,6 @@
     <module>mycore-wfc</module>
     <module>mycore-xeditor</module>
     <module>mycore-complete</module>
-    <module>iview2-addons</module>
     <module>mycore-coma</module>
   </modules>
 </project>
