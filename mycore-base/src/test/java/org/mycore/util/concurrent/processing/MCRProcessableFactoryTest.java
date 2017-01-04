@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,24 +29,30 @@ public class MCRProcessableFactoryTest extends MCRTestCase {
         MCRProcessableCollection collection = new MCRProcessableDefaultCollection("test");
         registry.register(collection);
 
-        ExecutorService es = Executors.newFixedThreadPool(3);
+        int nThreads = 3;
+        ExecutorService es = Executors.newFixedThreadPool(nThreads);
         MCRProcessableExecutor pes = MCRProcessableFactory.newPool(es, collection);
 
-        assertEquals(0, collection.stream().count());
-        assertEquals(1, registry.stream().count());
+        assertEquals("No runnables should be queued right now.", 0, collection.stream().count());
+        assertEquals("Only the 'test' collection should be registered.", 1, registry.stream().count());
 
-        MCRProcessableSupplier<?> sup1 = pes.submit(sleepyThread());
-        MCRProcessableSupplier<?> sup2 = pes.submit(sleepyThread());
-        MCRProcessableSupplier<?> sup3 = pes.submit(sleepyThread());
+        Semaphore semaphore = new Semaphore(nThreads);
+        semaphore.acquire(nThreads); //lock threads until ready
+
+        MCRProcessableSupplier<?> sup1 = pes.submit(sleepyThread(semaphore));
+        MCRProcessableSupplier<?> sup2 = pes.submit(sleepyThread(semaphore));
+        MCRProcessableSupplier<?> sup3 = pes.submit(sleepyThread(semaphore));
 
         MCRProcessableStatus s1 = sup1.getStatus();
         MCRProcessableStatus s2 = sup2.getStatus();
         MCRProcessableStatus s3 = sup3.getStatus();
-        assertTrue(MCRProcessableStatus.processing == s1 || MCRProcessableStatus.created == s1);
-        assertTrue(MCRProcessableStatus.processing == s2 || MCRProcessableStatus.created == s2);
-        assertTrue(MCRProcessableStatus.processing == s3 || MCRProcessableStatus.created == s3);
+        String msgPrefix = "Job should be created or in processing: ";
+        assertTrue(msgPrefix + s1, MCRProcessableStatus.processing == s1 || MCRProcessableStatus.created == s1);
+        assertTrue(msgPrefix + s2, MCRProcessableStatus.processing == s2 || MCRProcessableStatus.created == s2);
+        assertTrue(msgPrefix + s3, MCRProcessableStatus.processing == s3 || MCRProcessableStatus.created == s3);
 
         assertEquals(3, collection.stream().count());
+        semaphore.release(nThreads); //go
 
         CompletableFuture.allOf(sup1.getFuture(), sup2.getFuture(), sup3.getFuture()).get();
 
@@ -57,15 +64,17 @@ public class MCRProcessableFactoryTest extends MCRTestCase {
         es.awaitTermination(10, TimeUnit.SECONDS);
     }
 
-    private Runnable sleepyThread() {
+    private Runnable sleepyThread(Semaphore semaphore) {
         return new Runnable() {
 
             @Override
             public void run() {
                 try {
-                    Thread.sleep(100);
+                    semaphore.acquire();
                 } catch (InterruptedException e) {
                     LOGGER.warn("test thread interrupted", e);
+                } finally {
+                    semaphore.release();
                 }
 
             }
