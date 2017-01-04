@@ -13,6 +13,7 @@ module mycore.viewer.components {
 
         private _container:JQuery;
         private _spinner:JQuery = jQuery("<img />");
+        private _enabled:boolean = true;
 
         public init() {
             this._container = jQuery("<div></div>");
@@ -32,11 +33,13 @@ module mycore.viewer.components {
                     url : metsURL,
                     success : (response) => {
                         var htmlElement = <any>singleSelectShim(<any>response, xpath, XMLUtil.NS_MAP);
-                        if ("xml" in htmlElement) {
+                        if (htmlElement != null && "xml" in htmlElement) {
                             // htmlElement is IXMLDOMElement
                             htmlElement = jQuery((<any>htmlElement).xml);
+                            this._container.append(htmlElement);
+                        } else {
+                            this._container.remove();
                         }
-                        this._container.append(htmlElement);
                     },
                     error : (request, status, exception) => {
                         console.log(status);
@@ -45,6 +48,9 @@ module mycore.viewer.components {
                 };
 
                 jQuery.ajax(settings);
+            } else {
+                this._enabled = false;
+                return;
             }
 
             this.trigger(new events.ComponentInitializedEvent(this));
@@ -63,9 +69,8 @@ module mycore.viewer.components {
         }
 
         public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
-            if (e.type == events.ShowContentEvent.TYPE) {
+            if (this._enabled && e.type == events.ShowContentEvent.TYPE) {
                 var sce = <events.ShowContentEvent>e;
-
                 if (sce.component instanceof MyCoReChapterComponent) {
                     sce.content.prepend(this._container);
                 }
