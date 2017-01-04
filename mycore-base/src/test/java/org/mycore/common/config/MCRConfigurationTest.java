@@ -13,12 +13,11 @@ import org.mycore.common.MCRTestCase;
  */
 public class MCRConfigurationTest extends MCRTestCase {
 
-    @Test
+    @Test(expected = MCRConfigurationException.class)
     public final void testDeprecatedProperties() {
         String deprecatedProperty = "MCR.nameOfProject";
-        String validProperty = "MCR.NameOfProject";
         MCRConfiguration config = MCRConfiguration.instance();
-        assertEquals(config.getString(validProperty), config.getString(deprecatedProperty));
+        config.getString(deprecatedProperty, "MyCoRe");
     }
 
 }

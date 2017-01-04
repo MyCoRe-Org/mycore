@@ -47,7 +47,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.ParameterizedMessage;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPropertiesResolver;
 
@@ -289,18 +288,6 @@ public class MCRConfiguration {
      */
     protected synchronized void resolveProperties() {
         MCRProperties tmpProperties = MCRProperties.copy(getBaseProperties());
-        Enumeration<Object> names = getDeprecatedProperties().keys();
-        while (names.hasMoreElements()) {
-            String deprecatedName = (String) names.nextElement();
-            if (getBaseProperties().containsKey(deprecatedName)) {
-                String newName = getDeprecatedProperties().getProperty(deprecatedName);
-                LogManager.getLogger().warn(new ParameterizedMessage(
-                    "DEPRECATED: User should rename property {} to {}.", deprecatedName, newName));
-                if (!getBaseProperties().containsKey(newName)) {
-                    tmpProperties.put(newName, getBaseProperties().get(deprecatedName).toString());
-                }
-            }
-        }
         MCRPropertiesResolver resolver = new MCRPropertiesResolver(tmpProperties);
         resolvedProperties = MCRProperties.copy(resolver.resolveAll(tmpProperties));
     }
@@ -320,6 +307,26 @@ public class MCRConfiguration {
             in.close();
         } catch (Exception exc) {
             throw new MCRConfigurationException("Could not load configuration file deprecated.properties", exc);
+        }
+    }
+
+    private void checkForDeprecatedProperties(Map<String, String> props) {
+        Map<String, String> depUsedProps = props.entrySet().stream()
+            .filter(e -> getDeprecatedProperties().containsKey(e.getKey()))
+            .collect(Collectors.toMap(Entry::getKey, e -> getDeprecatedProperties().getAsMap().get(e.getKey())));
+        if (!depUsedProps.isEmpty()) {
+            throw new MCRConfigurationException(
+                depUsedProps.entrySet().stream().map(e -> e.getKey() + " ==> " + e.getValue())
+                    .collect(Collectors.joining("\n",
+                        "Found deprecated properties that are defined but will NOT BE USED. Please use the replacements:\n",
+                        "\n")));
+        }
+    }
+
+    private void checkForDeprecatedProperty(String name) throws MCRConfigurationException {
+        if (getDeprecatedProperties().containsKey(name)) {
+            throw new MCRConfigurationException("Cannot set deprecated property " + name + ". Please use "
+                + getDeprecatedProperties().getProperty(name) + " instead.");
         }
     }
 
@@ -559,14 +566,8 @@ public class MCRConfiguration {
         if (getBaseProperties().isEmpty()) {
             throw new MCRConfigurationException("MCRConfiguration is still not initialized");
         }
-        MCRProperties properties = getResolvedProperties();
-        String newName = getDeprecatedProperties().getProperty(name);
-        if (newName != null) {
-            LogManager.getLogger().warn(
-                new ParameterizedMessage("DEPRECATED: Developer should rename property {} to {}.", name, newName));
-        }
-        String value = properties.getProperty(name);
-        return value == null ? newName == null ? defaultValue : getString(newName, defaultValue) : value.trim();
+        checkForDeprecatedProperty(name);
+        return getResolvedProperties().getProperty(name, defaultValue);
     }
 
     /**
@@ -758,6 +759,7 @@ public class MCRConfiguration {
      *            null</CODE>
      */
     public void set(String name, String value) {
+        checkForDeprecatedProperty(name);
         if (value == null) {
             getBaseProperties().remove(name);
         } else {
@@ -767,6 +769,7 @@ public class MCRConfiguration {
     }
 
     public synchronized void initialize(Map<String, String> props, boolean clear) {
+        checkForDeprecatedProperties(props);
         HashMap<String, String> copy = new HashMap<>(props);
         copy.remove(null);
         if (clear) {
