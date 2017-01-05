@@ -14,7 +14,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -25,7 +25,7 @@ import org.mycore.mods.MCRMODSWrapper;
 import org.xml.sax.SAXParseException;
 
 
-public class MCRClassificationMappingEventHandlerTest extends MCRHibTestCase {
+public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
     public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationMappingEventHandlerTest.class);

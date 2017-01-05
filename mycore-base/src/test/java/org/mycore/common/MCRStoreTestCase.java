@@ -8,7 +8,7 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
-public abstract class MCRStoreTestCase extends MCRHibTestCase {
+public abstract class MCRStoreTestCase extends MCRJPATestCase {
 
     private static MCRXMLMetadataManager store;
 

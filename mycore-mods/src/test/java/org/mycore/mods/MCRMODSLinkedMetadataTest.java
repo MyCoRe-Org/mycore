@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Thomas Scheffler (yagee)
  */
-public class MCRMODSLinkedMetadataTest extends MCRHibTestCase {
+public class MCRMODSLinkedMetadataTest extends MCRJPATestCase {
 
     MCRObjectID seriesID, bookID;
 

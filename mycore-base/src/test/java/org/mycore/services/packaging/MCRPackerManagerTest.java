@@ -7,11 +7,11 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.services.queuedjob.MCRJob;
 
-public class MCRPackerManagerTest extends MCRHibTestCase {
+public class MCRPackerManagerTest extends MCRJPATestCase {
 
     public static final String TEST_PACKER_ID = "testPacker";
 

@@ -29,13 +29,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRJPATestCase;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public class MCRJobQueueTest extends MCRHibTestCase {
+public class MCRJobQueueTest extends MCRJPATestCase {
 
     @Test
     public void testOffer() throws InterruptedException {
