@@ -7,12 +7,12 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.urn.services.MCRURN;
 import org.mycore.urn.services.MCRURNManager;
 
-public class MCRURNGeneratorTest extends MCRHibTestCase {
+public class MCRURNGeneratorTest extends MCRJPATestCase {
     @Test
     public void testChecksum() {
         assertEquals(true, MCRURN.isValid("urn:nbn:de:gbv:28-diss2015-0237-9"));

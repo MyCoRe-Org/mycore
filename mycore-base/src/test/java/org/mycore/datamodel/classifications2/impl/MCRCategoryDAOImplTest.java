@@ -59,7 +59,7 @@ import org.junit.Test;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.content.MCRVFSContent;
@@ -73,7 +73,7 @@ import org.mycore.datamodel.classifications2.utils.MCRStringTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.xml.sax.SAXParseException;
 
-public class MCRCategoryDAOImplTest extends MCRHibTestCase {
+public class MCRCategoryDAOImplTest extends MCRJPATestCase {
 
     static final String WORLD_CLASS_RESOURCE_NAME = "/worldclass.xml";
 
@@ -718,7 +718,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
             try {
                 Statement statement = connection.createStatement();
                 try {
-                    ResultSet resultSet = statement.executeQuery("SELECT * FROM MCRCategory");
+                    String tableName = getDefaultSchema().map(s -> s + ".").orElse("") + "MCRCategory";
+                    ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
                     printResultSet(resultSet, System.out);
                 } catch (SQLException e1) {
                     LogManager.getLogger().warn("Error while querying MCRCategory", e1);

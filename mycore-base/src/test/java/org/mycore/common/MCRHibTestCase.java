@@ -24,14 +24,7 @@
 package org.mycore.common;
 
 /**
- * @author Thomas Scheffler (yagee) Need to insert some things here
+ * @author Thomas Scheffler (yagee)
  */
-public abstract class MCRHibTestCase extends MCRJPATestCase {
-
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-}
+@Deprecated
+public abstract class MCRHibTestCase extends MCRJPATestCase{}
