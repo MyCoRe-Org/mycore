@@ -17,7 +17,6 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
 
-import org.apache.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.junit.After;
 import org.junit.Before;
@@ -63,7 +62,7 @@ public class MCRJPATestCase extends MCRTestCase {
     public void setUp() throws Exception {
         // Configure logging etc.
         super.setUp();
-        Logger.getLogger(MCRHibTestCase.class).debug("Setup JPA");
+        LogManager.getLogger().debug("Setup JPA");
         MCRJPABootstrapper.initializeJPA();
         exportSchema();
         MCRHibernateConfigHelper
@@ -104,7 +103,7 @@ public class MCRJPATestCase extends MCRTestCase {
         }
     }
 
-    private Optional<String> getDefaultSchema() {
+    protected Optional<String> getDefaultSchema() {
         return Optional.ofNullable(MCREntityManagerProvider
             .getEntityManagerFactory()
             .getProperties()
@@ -123,11 +122,14 @@ public class MCRJPATestCase extends MCRTestCase {
 
     @After
     public void tearDown() throws Exception {
-        endTransaction();
-        entityManager.close();
-        dropSchema();
-        super.tearDown();
-        entityManager = null;
+        try {
+            endTransaction();
+        } finally {
+            entityManager.close();
+            dropSchema();
+            super.tearDown();
+            entityManager = null;
+        }
     }
 
     protected void beginTransaction() {

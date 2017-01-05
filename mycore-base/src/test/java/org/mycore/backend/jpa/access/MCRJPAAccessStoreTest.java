@@ -37,14 +37,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRJPATestCase;
 
 /**
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
  */
-public class MCRJPAAccessStoreTest extends MCRHibTestCase {
+public class MCRJPAAccessStoreTest extends MCRJPATestCase {
 
     private static final MCRACCESSRULE TRUE_RULE = getTrueRule();
 

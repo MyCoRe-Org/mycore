@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Ignore;
-import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRJPATestCase;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -38,7 +38,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest;
  *
  */
 @Ignore
-public class MCRUserTestCase extends MCRHibTestCase {
+public class MCRUserTestCase extends MCRJPATestCase {
 
     @Before
     @Override

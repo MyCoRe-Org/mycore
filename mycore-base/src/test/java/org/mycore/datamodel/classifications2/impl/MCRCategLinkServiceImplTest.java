@@ -35,7 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRHibTestCase;
+import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -47,7 +47,7 @@ import org.xml.sax.SAXParseException;
 /**
  * @author Thomas Scheffler (yagee) Need to insert some things here
  */
-public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
+public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
     private static final MCRCategLinkReference ENGLAND_REFERENCE = new MCRCategLinkReference("England", "state");
 
     private static final MCRCategLinkReference LONDON_REFERENCE = new MCRCategLinkReference("London", "city");
