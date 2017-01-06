@@ -19,6 +19,7 @@ import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -35,6 +36,7 @@ import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIRegistrationService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 
 /**
@@ -50,6 +52,10 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String TYPE = "doi";
+
+    private static final int ERR_CODE_1_1 = 0x1001;
+
+    private static final int MAX_URL_LENGTH = 255;
 
     private String username;
 
@@ -77,6 +83,22 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         transformer = properties.get("Transformer");
         this.registerURL = properties.get("RegisterBaseURL");
         host = "mds.datacite.org";
+    }
+
+    @Override
+    public void validateRegistration(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException, MCRAccessException {
+        List<Map.Entry<String, URI>> mediaList = getMediaList((MCRObject) obj);
+
+        for (Map.Entry<String, URI> stringURIEntry : mediaList) {
+            if (stringURIEntry.getValue().toString().length() > MAX_URL_LENGTH) {
+                throw new MCRPersistentIdentifierException(
+                    "The URI " + stringURIEntry + " from media-list is to long!", MCRTranslation.translate("component.pi.register.error.001001"),
+                    ERR_CODE_1_1);
+            }
+        }
+
+        super.validateRegistration(obj, additional);
     }
 
     private static void insertDOI(Document datacite, MCRDigitalObjectIdentifier doi)
