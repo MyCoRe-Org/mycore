@@ -27,47 +27,44 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRAbstractFileStore;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 
 /**
  * Tools class with common methods for IView2.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRIView2Tools {
@@ -143,59 +140,27 @@ public class MCRIView2Tools {
 
     /**
      * Checks for a given derivate id whether all files in that derivate are tiled.
-     * 
+     *
      * @return true if all files in belonging to the derivate are tiled, false otherwise
      */
     public static boolean isCompletelyTiled(String derivateId) throws IOException {
         if (!MCRMetadataManager.exists(MCRObjectID.getInstance(derivateId))) {
             return false;
         }
-        MCRPath derivatePath = MCRPath.getPath(derivateId, "/");
-        TileCompleteFileVisitor tileCompleteFileVisitor = new TileCompleteFileVisitor();
-        try {
-            Files.walkFileTree(derivatePath, tileCompleteFileVisitor);
-        } catch (Exception ex) {
-            LOGGER.warn("Could not check tile status of derivate", ex);
-            return false;
-        }
-        return tileCompleteFileVisitor.isTiled();
-    }
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
-    private static class TileCompleteFileVisitor extends SimpleFileVisitor<Path> {
+        TypedQuery<Number> namedQuery = em
+            .createNamedQuery("MCRTileJob.countByStateListByDerivate", Number.class)
+            .setParameter("derivateId", derivateId)
+            .setParameter("states", MCRJobState.notCompleteStates().stream().map(MCRJobState::toChar).collect(
+                Collectors.toSet()));
 
-        private boolean isTiled = true;
-
-        public boolean isTiled() {
-            return isTiled;
-        }
-
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            MCRPath mcrFile = MCRPath.toMCRPath(file);
-            if (isFileSupported(mcrFile)) {
-                if (!MCRIView2Tools.isTiled(mcrFile)) {
-                    isTiled = false;
-                    return FileVisitResult.TERMINATE;
-                }
-            }
-            return super.visitFile(file, attrs);
-        }
-    }
-
-    /**
-     * @param file
-     *            image file
-     * @return true if {@link MCRImage#getTiledFile(Path, String, String)} exists
-     * @see #getTileDir()
-     */
-    public static boolean isTiled(MCRPath file) {
-        Path tiledFile = MCRImage.getTiledFile(getTileDir(), file.getOwner(), file.subpathComplete().toString());
-        return Files.exists(tiledFile);
+        return namedQuery.getSingleResult().intValue() == 0;
     }
 
     /**
      * combines image tiles of specified zoomLevel to one image.
-     * 
+     *
      * @param iviewFile
      *            .iview2 file
      * @param zoomLevel
@@ -222,7 +187,7 @@ public class MCRIView2Tools {
 
     /**
      * combines image tiles of specified zoomLevel to one image.
-     * 
+     *
      * @param iviewFileRoot
      *            root directory of .iview2 file
      * @param imageProperties
@@ -341,34 +306,13 @@ public class MCRIView2Tools {
 
     /**
      * short for <code>MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, defaultProp);</code>
-     * 
+     *
      * @param propName
      *            any suffix
      * @return null or property value
      */
     public static String getIView2Property(String propName, String defaultProp) {
         return MCRConfiguration.instance().getString(CONFIG_PREFIX + propName, defaultProp);
-    }
-
-    /**
-     * Calculates the url to the image viewer displaying the given file.
-     * 
-     * @param file
-     *            the file to display
-     * @return the url to the image viewer displaying given file unless {@link MCRIView2Tools#isFileSupported(Path)}
-     *         returns <code>false</code> in this case <code>null</code> is returned
-     * @see MCRIView2Tools#isFileSupported(Path)
-     */
-    public static String getViewerURL(MCRPath file) throws URISyntaxException, IOException {
-        if (!MCRIView2Tools.isFileSupported(file)) {
-            return null;
-        }
-        MCRObjectID mcrObjectID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(file.getOwner()), 10, TimeUnit.SECONDS);
-        String params = MCRXMLFunctions.encodeURIPath(MessageFormat.format("jumpback=true&maximized=true&page={0}&derivate={1}",
-                file.subpathComplete(), file.getOwner()));
-        String url = MessageFormat.format("{0}receive/{1}?{2}", MCRFrontendUtil.getBaseURL(), mcrObjectID, params);
-
-        return url;
     }
 
     public static String getFilePath(String derID, String derPath) throws IOException {
