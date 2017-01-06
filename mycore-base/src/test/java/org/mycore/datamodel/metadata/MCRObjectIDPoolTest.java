@@ -26,8 +26,14 @@ package org.mycore.datamodel.metadata;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.function.Supplier;
 
+import org.apache.logging.log4j.LogManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -48,24 +54,36 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
 
     @Test
     public void getInstance() {
-        runGarbageCollection();
+        Duration maxGCTime = Duration.ofSeconds(30);
+        runGarbageCollection(new LinkedList<>(Arrays.asList(false, false, true))::poll, maxGCTime);
         long before = MCRObjectIDPool.getSize();
         String id = "MyCoRe_test_11111111";
         @SuppressWarnings("unused")
         MCRObjectID mcrId = MCRObjectIDPool.getMCRObjectID(id);
         assertEquals("ObjectIDPool size is different", before + 1, MCRObjectIDPool.getSize());
         mcrId = null;
-        runGarbageCollection();
+        runGarbageCollection(() -> MCRObjectIDPool.getIfPresent(id) == null, maxGCTime);
         assertNull("ObjectIDPool should not contain ID anymore.", MCRObjectIDPool.getIfPresent(id));
         assertEquals("ObjectIDPool size is different", before, MCRObjectIDPool.getSize());
     }
 
-    private void runGarbageCollection() {
-        final int garbageIterations = 2;
-        for (int i = 0; i < garbageIterations; i++) {
+    private void runGarbageCollection(Supplier<Boolean> test, Duration maxTime) {
+        LocalDateTime start = LocalDateTime.now();
+        int runs = 0;
+        boolean succeed=test.get();
+        while (!maxTime.minus(Duration.between(start, LocalDateTime.now())).isNegative()) {
+            if (succeed) {
+                break;
+            }
+            runs++;
             System.gc();
             System.runFinalization();
+            succeed = test.get();
         }
+        if (!succeed) {
+            LogManager.getLogger().warn("Maximum wait time for garbage collector of {} exceeded.", maxTime);
+        }
+        LogManager.getLogger().info("Garbage collector ran {} times.", runs);
     }
 
     @Override
