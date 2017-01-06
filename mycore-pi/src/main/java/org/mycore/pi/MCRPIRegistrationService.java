@@ -75,9 +75,13 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
                 "There is already a " + type + " in the Object " + id.toString());
         }
 
-        if (!MCRAccessManager.checkPermission(obj.getId(), PERMISSION_WRITE)) {
-            throw MCRAccessException.missingPermission("Update object.", obj.getId().toString(),
-                PERMISSION_WRITE);
+        String missingPermission;
+        if (!MCRAccessManager.checkPermission(obj.getId(), missingPermission = PERMISSION_WRITE) ||
+            !MCRAccessManager
+                .checkPermission(obj.getId(), missingPermission = "register-" + getRegistrationServiceID())) {
+            throw MCRAccessException
+                .missingPermission("Register a " + type + " & Update object.", obj.getId().toString(),
+                    missingPermission);
         }
     }
 
@@ -187,7 +191,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     protected final T getNewIdentifier(MCRObjectID id, String additional) throws MCRPersistentIdentifierException {
         MCRPersistentIdentifierGenerator<T> persitentIdentifierGenerator = MCRConfiguration.instance()
-            .<MCRPersistentIdentifierGenerator<T>> getInstanceOf(
+            .<MCRPersistentIdentifierGenerator<T>>getInstanceOf(
                 GENERATOR_CONFIG_PREFIX + getProperties().get("Generator"));
         return persitentIdentifierGenerator.generate(id, additional);
     }
