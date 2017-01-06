@@ -375,7 +375,7 @@ public final class MCRURIResolver implements URIResolver {
     static URI resolveURI(String href, String base) {
         URI hrefURI = Optional.ofNullable(base)
             .map(URI::create)
-            .map(u -> u.resolve(base))
+            .map(u -> u.resolve(href))
             .orElse(URI.create(href));
         return hrefURI;
     }
