@@ -34,6 +34,11 @@
   <xsl:template match="mets:dmdSec"></xsl:template>
   <xsl:template match="mets:metsHdr"></xsl:template>
 
+
+  <xsl:template match="mets:mptr">
+    <!-- don't meed mets:mptr -->
+  </xsl:template>
+
   <xsl:template match="@ADMID|@DMDID">
   </xsl:template>
 
