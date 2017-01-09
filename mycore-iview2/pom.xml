@@ -39,7 +39,6 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
-      <version>${project.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.ibm.icu</groupId>
@@ -54,7 +53,6 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-iiif</artifactId>
-      <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
