@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <description>Interface to IView 2 Web Services</description>
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.mycore.iview2</groupId>
     <artifactId>iview2-addons</artifactId>
     <version>2017.01-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
   <groupId>org.mycore.iview2</groupId>
   <artifactId>remote-adapter</artifactId>
   <name>MyCoRe IView2 Remote Adapter</name>
+  <description>Interface to IView 2 Web Services</description>
   <properties>
     <!-- Code is generated -->
     <forbiddenapis.skip>true</forbiddenapis.skip>
@@ -20,6 +20,13 @@
       <plugin>
         <groupId>org.jvnet.jax-ws-commons</groupId>
         <artifactId>jaxws-maven-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.mycore</groupId>
+            <artifactId>mycore-iview2</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <id>consume-wsdl</id>
@@ -33,13 +40,6 @@
             </configuration>
           </execution>
         </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.mycore</groupId>
-            <artifactId>mycore-iview2</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -61,8 +61,7 @@
       </plugin>
     </plugins>
   </reporting>
-  <dependencies>
-  </dependencies>
+  <dependencies />
   <profiles>
     <profile>
       <id>java8-disable-strict-javadoc</id>
