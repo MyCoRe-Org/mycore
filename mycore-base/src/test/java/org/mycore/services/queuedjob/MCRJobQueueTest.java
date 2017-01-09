@@ -41,19 +41,31 @@ public class MCRJobQueueTest extends MCRJPATestCase {
     public void testOffer() throws InterruptedException {
         MCRJobQueue queue = MCRJobQueue.getInstance(MCRTestJobAction.class);
 
-        MCRJob job = new MCRJob(MCRTestJobAction.class);
-        job.setParameter("count", "1");
+        MCRJob job;
+        for (int c = 10; c > 0; c--) {
+            job = new MCRJob(MCRTestJobAction.class);
+            job.setParameter("count", Integer.toString(c));
 
-        assertTrue("job should be offered", queue.offer(job));
+            assertTrue("job should be offered", queue.offer(job));
 
-        endTransaction();
-        Thread.sleep(1000);
-        startNewTransaction();
+            endTransaction();
+            startNewTransaction();
+        }
 
         Map<String, String> params = new HashMap<>();
         params.put("count", "1");
 
         job = queue.getJob(params);
+
+        while (job.getStatus() != MCRJobStatus.FINISHED) {
+            endTransaction();
+            startNewTransaction();
+
+            synchronized (queue) {
+                queue.wait();
+            }
+            job = queue.getJob(params);
+        }
 
         assertNotNull("job shouldn't null", job);
         assertTrue("job should be done", Boolean.parseBoolean(job.getParameter("done")));
