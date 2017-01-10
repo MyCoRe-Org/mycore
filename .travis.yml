@@ -36,6 +36,4 @@ before_script:
 script:
   - mkdir ${HOME}/tmp
   - export TMPDIR="${HOME}/tmp"
-  - mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dwebdriver.firefox.bin=${FIREFOX_BIN} && mvn -B javadoc:javadoc
-after_script:
-  - mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
+  - mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dwebdriver.firefox.bin=${FIREFOX_BIN} && mvn -B javadoc:javadoc && mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false

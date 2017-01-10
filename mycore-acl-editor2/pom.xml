@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
+    <artifactId>mycore</artifactId>
     <version>2017.01-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
@@ -14,9 +14,20 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-1.2-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -24,21 +35,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.jdom</groupId>
-      <artifactId>jdom2</artifactId> 
+      <artifactId>jdom2</artifactId>
       <scope>provided</scope>
     </dependency>
-	<dependency>
-	  <groupId>org.apache.logging.log4j</groupId>
-	  <artifactId>log4j-1.2-api</artifactId>
-	</dependency>
   </dependencies>
 </project>

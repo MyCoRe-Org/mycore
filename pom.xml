@@ -2,430 +2,64 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
+    <artifactId>mycore-parent</artifactId>
     <version>31-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <packaging>pom</packaging>
   <version>2017.01-SNAPSHOT</version>
+  <packaging>pom</packaging>
   <name>MyCoRe</name>
-  <description>
-    MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
+  <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
     archives, or similar repositories.
     Applications based on MyCoRe use a common core, which provides the functionality typically required for such
-    applications, for example metadata management, querying, OAI harvesting interface, or an image viewer module.
-  </description>
+    applications, for example metadata management, querying, OAI harvesting interface, or an image viewer module.</description>
+  <url>http://www.mycore.de/generated/mycore${site.suffix}</url>
   <licenses>
     <license>
       <name>GNU General Public License, version 3</name>
-      <distribution>repo</distribution>
       <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
-  <properties>
-    <java.target.version>1.8</java.target.version>
-    <maven.compiler.target>${java.target.version}</maven.compiler.target>
-    <maven.compiler.arg>-Werror</maven.compiler.arg>
-    <uniqueVersion>false</uniqueVersion>
-    <hibernate.version>5.2.2.Final</hibernate.version>
-    <hibernate.core.version>${hibernate.version}</hibernate.core.version>
-    <httpcomponents.version>4.5.2</httpcomponents.version>
-    <httpcore.version>4.4.5</httpcore.version>
-    <xalan.version>2.7.2</xalan.version>
-    <jersey.version>2.23.2</jersey.version>
-    <guice.version>4.1.0</guice.version>
-    <hk2.version>2.5.0-b16</hk2.version>
-    <changelog.since>2016-06-27</changelog.since>
-    <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2016.12</changes.version>
-    <site.suffix />
-    <!-- lowest is 99, highest is 0 -->
-    <manifest.priority>99</manifest.priority>
-    <node.version>v6.9.1</node.version>
-    <yarn.version>v0.16.1</yarn.version>
-    <frontend.maven.plugin.version>1.3</frontend.maven.plugin.version>
-    <jetty.version>9.3.14.v20161028</jetty.version>
-  </properties>
-  <url>http://www.mycore.de/generated/mycore${site.suffix}</url>
-  <distributionManagement>
-    <site>
-      <id>MyCoRe HQ</id>
-      <name>MyCoRe HQ-sites</name>
-      <url>scp://server.mycore.de/mcr/mycore.de/generated/mycore${site.suffix}</url>
-    </site>
-  </distributionManagement>
   <issueManagement>
     <system>JIRA</system>
     <url>https://mycore.atlassian.net/browse/MCR</url>
   </issueManagement>
-  <ciManagement>
-    <system>jenkins</system>
-    <url>http://jenkins.mycore.de/job/MyCoRe/</url>
-    <notifiers>
-      <notifier>
-        <type>mail</type>
-        <configuration>
-          <recipients>mycore-developer@lists.sourceforge.net</recipients>
-        </configuration>
-        <sendOnError>true</sendOnError>
-        <sendOnFailure>true</sendOnFailure>
-        <sendOnSuccess>true</sendOnSuccess>
-        <sendOnWarning>true</sendOnWarning>
-      </notifier>
-    </notifiers>
-  </ciManagement>
   <scm>
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
     <tag>HEAD</tag>
   </scm>
-  <profiles>
-    <profile>
-      <id>release-profile</id>
-      <properties>
-        <site.suffix>-${project.version}</site.suffix>
-      </properties>
-    </profile>
-    <profile>
-      <id>development</id>
-      <activation>
-        <property>
-          <name>env</name>
-          <value>dev</value>
-        </property>
-      </activation>
-    </profile>
-    <profile>
-      <id>deployment</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-changes-plugin</artifactId>
-            <configuration>
-              <issueManagementSystems>
-                <issueManagementSystem>JIRA</issueManagementSystem>
-              </issueManagementSystems>
-              <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
-              <smtpPort implementation="java.lang.Integer">25</smtpPort>
-              <toAddresses>
-                <toAddress implementation="java.lang.String">mycore-user@lists.sourceforge.net</toAddress>
-              </toAddresses>
-              <mailSender>
-                <name>${changes.mailSender.name}</name>
-                <email>${changes.mailSender.email}</email>
-              </mailSender>
-              <template>announcement.vm</template>
-              <useJql>true</useJql>
-              <templateDirectory>src/changes</templateDirectory>
-              <!-- <statusIds>10002,Done</statusIds> -->
-              <!-- due to: http://jira.codehaus.org/browse/MCHANGES-333 -->
-              <maxEntries>1000</maxEntries>
-            </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>verify</phase>
-                <goals>
-                  <goal>pmd</goal>
-                  <goal>cpd</goal>
-                </goals>
-                <configuration>
-                  <targetJdk>${java.target.version}</targetJdk>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-      <reporting>
-        <plugins>
-          <plugin>
-            <artifactId>maven-changelog-plugin</artifactId>
-            <configuration>
-              <!-- simple regex until http://jira.codehaus.org/browse/MCHANGELOG-125 is fixed -->
-              <issueIDRegexPattern>\d{3,}</issueIDRegexPattern>
-              <issueLinkUrl>http://sourceforge.net/p/mycore/bugs/%ISSUE%</issueLinkUrl>
-              <type>date</type>
-              <dates>
-                <date implementation="java.lang.String">${changelog.since}</date>
-              </dates>
-              <dateFormat>yyyy-MM-dd</dateFormat>
-            </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-changes-plugin</artifactId>
-            <version>2.11</version>
-            <inherited>false</inherited>
-            <reportSets>
-              <reportSet>
-                <reports>
-                  <report>jira-report</report>
-                </reports>
-              </reportSet>
-            </reportSets>
-            <configuration>
-              <fixVersionIds>${changes.version}</fixVersionIds>
-              <useJql>true</useJql>
-              <columnNames>Type,Key,Summary,Assignee,Status,Resolution,Component</columnNames>
-              <sortColumnNames>Type,Component,Key DESC</sortColumnNames>
-            </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <quiet>true</quiet>
-              <source>${java.target.version}</source>
-              <groups>
-                <group>
-                  <title>MyCoRe Datamodel</title>
-                  <packages>org.mycore.datamodel*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Authorization System</title>
-                  <packages>org.mycore.access*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Persistence Backend Implementations</title>
-                  <packages>org.mycore.backend*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe User Interface Frontend</title>
-                  <packages>org.mycore.frontend*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Common Functionality</title>
-                  <packages>org.mycore.common*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Services</title>
-                  <packages>org.mycore.services*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe User and Group Management</title>
-                  <packages>org.mycore.user*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: BuildTools</title>
-                  <packages>org.mycore.buildtools*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: IView 2</title>
-                  <packages>org.mycore.iview2*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Import/Export</title>
-                  <packages>org.mycore.impex*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Migration 2.1 -&gt; 2013.06</title>
-                  <packages>org.mycore.migration21_22*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Media</title>
-                  <packages>org.mycore.media*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: METS</title>
-                  <packages>org.mycore.mets*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: MODS</title>
-                  <packages>org.mycore.mods*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: OAI</title>
-                  <packages>org.mycore.oai*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: REST API</title>
-                  <packages>org.mycore.restapi*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: SOLR</title>
-                  <packages>org.mycore.solr*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Sword</title>
-                  <packages>org.mycore.sword*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: Web-CLI</title>
-                  <packages>org.mycore.webcli*</packages>
-                </group>
-                <group>
-                  <title>MyCoRe Component: WFC</title>
-                  <packages>org.mycore.wfc*</packages>
-                </group>
-              </groups>
-              <links>
-                <link>http://docs.oracle.com/javase/8/docs/api/</link>
-                <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
-                <link>http://www.jdom.org/docs/apidocs/</link>
-                <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-                <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
-                <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-                <link>http://lucene.apache.org/solr/6_1_0/solr-solrj/</link>
-              </links>
-            </configuration>
-            <reportSets>
-              <reportSet>
-                <id>default</id>
-                <configuration>
-                </configuration>
-                <reports>
-                  <report>javadoc-no-fork</report>
-                  <report>test-javadoc-no-fork</report>
-                </reports>
-              </reportSet>
-              <reportSet>
-                <id>aggregate</id>
-                <configuration>
-                  <!-- FIX for remote-adapter -->
-                  <additionalparam>-Xdoclint:all -Xdoclint:-syntax -Xdoclint:-reference</additionalparam>
-                </configuration>
-                <reports>
-                  <report>aggregate</report>
-                  <report>test-aggregate</report>
-                </reports>
-              </reportSet>
-            </reportSets>
-          </plugin>
-          <plugin>
-            <artifactId>maven-jxr-plugin</artifactId>
-            <configuration>
-              <aggregate>true</aggregate>
-            </configuration>
-          </plugin>
-        </plugins>
-      </reporting>
-    </profile>
-    <profile>
-      <id>bamboo</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <configuration>
-              <archive>
-                <manifest>
-                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                </manifest>
-                <manifestEntries>
-                  <Specification-Title>${project.name}</Specification-Title>
-                  <Specification-Version>${project.version}</Specification-Version>
-                  <Implementation-Version>${bambooPlanRepositoryBranchName}</Implementation-Version>
-                  <Implementation-Build>${bambooBuildNumber}</Implementation-Build>
-                  <Implementation-Revision>${bambooPlanRepositoryRevision}</Implementation-Revision>
-                  <Git-Repository>${bambooPlanRepositoryRepositoryUrl}</Git-Repository>
-                  <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
-                  <Priority>${manifest.priority}</Priority>
-                </manifestEntries>
-              </archive>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>keepNode</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-clean-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>default-clean</id>
-                <configuration>
-                  <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                  <filesets>
-                    <fileset>
-                      <directory>target</directory>
-                      <excludes>
-                        <exclude>node_build/node_modules/</exclude>
-                        <exclude>node_build/node/</exclude>
-                      </excludes>
-                      <followSymlinks>false</followSymlinks>
-                    </fileset>
-                  </filesets>
-                </configuration>
-                <phase>initialize</phase>
-                <goals>
-                  <goal>clean</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-  <repositories>
-    <repository>
-      <id>central</id>
-      <name>Central Repository</name>
-      <url>https://repo.maven.apache.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>MyCoRe HQ</id>
-      <url>http://artifactory.mycore.de/mycore-releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>MyCoRe HQ Snapshots</id>
-      <url>http://artifactory.mycore.de/mycore-snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>central</id>
-      <name>Central Repository</name>
-      <url>https://repo.maven.apache.org/maven2</url>
-      <releases>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>MyCoRe HQ</id>
-      <url>http://artifactory.mycore.de/mycore-releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>MyCoRe HQ Snapshots</id>
-      <url>http://artifactory.mycore.de/mycore-snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
+  <properties>
+    <changelog.since>2016-06-27</changelog.since>
+    <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
+    <changes.version>2016.12</changes.version>
+    <frontend.maven.plugin.version>1.3</frontend.maven.plugin.version>
+    <guice.version>4.1.0</guice.version>
+    <hibernate.core.version>${hibernate.version}</hibernate.core.version>
+    <hibernate.version>5.2.2.Final</hibernate.version>
+    <hk2.version>2.5.0-b31</hk2.version>
+    <httpcomponents.version>4.5.2</httpcomponents.version>
+    <httpcore.version>4.4.5</httpcore.version>
+    <java.target.version>1.8</java.target.version>
+    <jersey.version>2.25</jersey.version>
+    <jetty.version>9.3.14.v20161028</jetty.version>
+    <!-- lowest is 99, highest is 0 -->
+    <manifest.priority>99</manifest.priority>
+    <maven.compiler.arg>-Werror</maven.compiler.arg>
+    <maven.compiler.target>${java.target.version}</maven.compiler.target>
+    <node.version>v6.9.1</node.version>
+    <selenium.version>3.0.1</selenium.version>
+    <site.suffix />
+    <sortpom.sortDeps>scope,groupId,artifactId</sortpom.sortDeps>
+    <sortpom.sortFile>https://gist.githubusercontent.com/yagee-de/dfd3698c1b49173dbf251f74eb6a9297/raw/406460c088ff3cb6354e4ae6b40535e6f841607d/mycore_sort.xml</sortpom.sortFile>
+    <sortpom.sortProps>true</sortpom.sortProps>
+    <uniqueVersion>false</uniqueVersion>
+    <xalan.version>2.7.2</xalan.version>
+    <yarn.version>v0.16.1</yarn.version>
+  </properties>
   <build>
     <pluginManagement>
       <plugins>
@@ -436,14 +70,29 @@
         </plugin>
         <plugin>
           <artifactId>maven-enforcer-plugin</artifactId>
+          <dependencies>
+            <dependency>
+              <groupId>org.commonjava.maven.enforcer</groupId>
+              <artifactId>enforce-managed-deps-rule</artifactId>
+              <version>1.0</version>
+            </dependency>
+          </dependencies>
           <executions>
             <execution>
-              <id>enforce-banned-dependencies</id>
+              <id>enforce</id>
               <goals>
                 <goal>enforce</goal>
               </goals>
               <configuration>
                 <rules>
+                  <requireManagedDeps implementation="org.commonjava.maven.enforcer.rule.EnforceManagedDepsRule">
+                    <checkProfiles>true</checkProfiles>
+                    <failOnViolation>true</failOnViolation>
+                  </requireManagedDeps>
+                  <!-- Disabled, https://issues.apache.org/jira/browse/MENFORCER-189 -->
+                  <!--
+                  <reactorModuleConvergence />
+                  -->
                   <bannedDependencies>
                     <excludes>
                       <exclude>log4j</exclude>
@@ -580,11 +229,11 @@
           <artifactId>maven-dependency-plugin</artifactId>
           <executions>
             <execution>
-              <inherited>true</inherited>
               <id>analyze</id>
               <goals>
                 <goal>analyze-only</goal>
               </goals>
+              <inherited>true</inherited>
               <configuration>
                 <failOnWarning>true</failOnWarning>
                 <ignoreNonCompile>true</ignoreNonCompile>
@@ -611,6 +260,9 @@
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <argLine>${env.MAVEN_OPTS}</argLine>
+          </configuration>
         </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
         <plugin>
@@ -650,17 +302,17 @@
           <executions>
             <execution>
               <id>install-node-and-yarn</id>
-              <phase>generate-resources</phase>
               <goals>
                 <goal>install-node-and-yarn</goal>
               </goals>
+              <phase>generate-resources</phase>
             </execution>
             <execution>
               <id>yarn-install</id>
-              <phase>generate-resources</phase>
               <goals>
                 <goal>yarn</goal>
               </goals>
+              <phase>generate-resources</phase>
               <configuration>
                 <arguments>install</arguments>
               </configuration>
@@ -678,6 +330,26 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>com.github.ekryd.sortpom</groupId>
+        <artifactId>sortpom-maven-plugin</artifactId>
+        <version>2.4.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>sort</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <expandEmptyElements>false</expandEmptyElements>
+              <keepBlankLines>true</keepBlankLines>
+              <sortDependencies>${sortpom.sortDeps}</sortDependencies>
+              <sortOrderFile>${sortpom.sortFile}</sortOrderFile>
+              <sortProperties>${sortpom.sortProps}</sortProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <compilerArgs>
@@ -688,6 +360,18 @@
       <plugin>
         <groupId>org.bsc.maven</groupId>
         <artifactId>maven-processor-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>20.0</version>
+          </dependency>
+          <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>${hibernate.version}</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <id>process</id>
@@ -702,18 +386,6 @@
             </configuration>
           </execution>
         </executions>
-        <dependencies>
-          <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-          </dependency>
-          <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>${hibernate.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -739,11 +411,11 @@
         <executions>
           <execution>
             <id>attach-sources</id>
-            <phase>verify</phase>
             <goals>
               <goal>jar-no-fork</goal>
               <goal>test-jar-no-fork</goal>
             </goals>
+            <phase>verify</phase>
           </execution>
         </executions>
       </plugin>
@@ -776,10 +448,10 @@
           </execution>
           <execution>
             <id>report</id>
-            <phase>test</phase>
             <goals>
               <goal>report</goal>
             </goals>
+            <phase>test</phase>
           </execution>
         </executions>
       </plugin>
@@ -791,66 +463,477 @@
       </plugin>
     </plugins>
   </build>
+  <ciManagement>
+    <system>jenkins</system>
+    <url>http://jenkins.mycore.de/job/MyCoRe/</url>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <sendOnError>true</sendOnError>
+        <sendOnFailure>true</sendOnFailure>
+        <sendOnSuccess>true</sendOnSuccess>
+        <sendOnWarning>true</sendOnWarning>
+        <configuration>
+          <recipients>mycore-developer@lists.sourceforge.net</recipients>
+        </configuration>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>MyCoRe HQ</id>
+      <url>http://artifactory.mycore.de/mycore-releases</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>MyCoRe HQ Snapshots</id>
+      <url>http://artifactory.mycore.de/mycore-snapshots</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </pluginRepository>
+    <pluginRepository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>MyCoRe HQ</id>
+      <url>http://artifactory.mycore.de/mycore-releases</url>
+    </pluginRepository>
+    <pluginRepository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>MyCoRe HQ Snapshots</id>
+      <url>http://artifactory.mycore.de/mycore-snapshots</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <distributionManagement>
+    <site>
+      <id>MyCoRe HQ</id>
+      <name>MyCoRe HQ-sites</name>
+      <url>scp://server.mycore.de/mcr/mycore.de/generated/mycore${site.suffix}</url>
+    </site>
+  </distributionManagement>
+  <profiles>
+    <profile>
+      <id>release-profile</id>
+      <properties>
+        <site.suffix>-${project.version}</site.suffix>
+      </properties>
+    </profile>
+    <profile>
+      <id>development</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>dev</value>
+        </property>
+      </activation>
+    </profile>
+    <profile>
+      <id>deployment</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-changes-plugin</artifactId>
+            <configuration>
+              <issueManagementSystems>
+                <issueManagementSystem>JIRA</issueManagementSystem>
+              </issueManagementSystems>
+              <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
+              <smtpPort implementation="java.lang.Integer">25</smtpPort>
+              <toAddresses>
+                <toAddress implementation="java.lang.String">mycore-user@lists.sourceforge.net</toAddress>
+              </toAddresses>
+              <mailSender>
+                <name>${changes.mailSender.name}</name>
+                <email>${changes.mailSender.email}</email>
+              </mailSender>
+              <template>announcement.vm</template>
+              <useJql>true</useJql>
+              <templateDirectory>src/changes</templateDirectory>
+              <!-- <statusIds>10002,Done</statusIds> -->
+              <!-- due to: http://jira.codehaus.org/browse/MCHANGES-333 -->
+              <maxEntries>1000</maxEntries>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>pmd</goal>
+                  <goal>cpd</goal>
+                </goals>
+                <phase>verify</phase>
+                <configuration>
+                  <targetJdk>${java.target.version}</targetJdk>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <reporting>
+        <plugins>
+          <plugin>
+            <artifactId>maven-changelog-plugin</artifactId>
+            <configuration>
+              <!-- simple regex until http://jira.codehaus.org/browse/MCHANGELOG-125 is fixed -->
+              <issueIDRegexPattern>\d{3,}</issueIDRegexPattern>
+              <issueLinkUrl>http://sourceforge.net/p/mycore/bugs/%ISSUE%</issueLinkUrl>
+              <type>date</type>
+              <dates>
+                <date implementation="java.lang.String">${changelog.since}</date>
+              </dates>
+              <dateFormat>yyyy-MM-dd</dateFormat>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-changes-plugin</artifactId>
+            <version>2.11</version>
+            <inherited>false</inherited>
+            <configuration>
+              <fixVersionIds>${changes.version}</fixVersionIds>
+              <useJql>true</useJql>
+              <columnNames>Type,Key,Summary,Assignee,Status,Resolution,Component</columnNames>
+              <sortColumnNames>Type,Component,Key DESC</sortColumnNames>
+            </configuration>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>jira-report</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <quiet>true</quiet>
+              <source>${java.target.version}</source>
+              <groups>
+                <group>
+                  <title>MyCoRe Datamodel</title>
+                  <packages>org.mycore.datamodel*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Authorization System</title>
+                  <packages>org.mycore.access*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Persistence Backend Implementations</title>
+                  <packages>org.mycore.backend*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe User Interface Frontend</title>
+                  <packages>org.mycore.frontend*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Common Functionality</title>
+                  <packages>org.mycore.common*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Services</title>
+                  <packages>org.mycore.services*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe User and Group Management</title>
+                  <packages>org.mycore.user*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: BuildTools</title>
+                  <packages>org.mycore.buildtools*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: IView 2</title>
+                  <packages>org.mycore.iview2*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: Import/Export</title>
+                  <packages>org.mycore.impex*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: Migration 2.1 -&gt; 2013.06</title>
+                  <packages>org.mycore.migration21_22*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: Media</title>
+                  <packages>org.mycore.media*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: METS</title>
+                  <packages>org.mycore.mets*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: MODS</title>
+                  <packages>org.mycore.mods*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: OAI</title>
+                  <packages>org.mycore.oai*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: REST API</title>
+                  <packages>org.mycore.restapi*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: SOLR</title>
+                  <packages>org.mycore.solr*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: Sword</title>
+                  <packages>org.mycore.sword*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: Web-CLI</title>
+                  <packages>org.mycore.webcli*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: WFC</title>
+                  <packages>org.mycore.wfc*</packages>
+                </group>
+              </groups>
+              <links>
+                <link>http://docs.oracle.com/javase/8/docs/api/</link>
+                <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
+                <link>http://www.jdom.org/docs/apidocs/</link>
+                <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
+                <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
+                <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
+                <link>http://lucene.apache.org/solr/6_1_0/solr-solrj/</link>
+              </links>
+            </configuration>
+            <reportSets>
+              <reportSet>
+                <id>default</id>
+                <reports>
+                  <report>javadoc-no-fork</report>
+                  <report>test-javadoc-no-fork</report>
+                </reports>
+                <configuration />
+              </reportSet>
+              <reportSet>
+                <id>aggregate</id>
+                <reports>
+                  <report>aggregate</report>
+                  <report>test-aggregate</report>
+                </reports>
+                <configuration>
+                  <!-- FIX for remote-adapter -->
+                  <additionalparam>-Xdoclint:all -Xdoclint:-syntax -Xdoclint:-reference</additionalparam>
+                </configuration>
+              </reportSet>
+            </reportSets>
+          </plugin>
+          <plugin>
+            <artifactId>maven-jxr-plugin</artifactId>
+            <configuration>
+              <aggregate>true</aggregate>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+    <profile>
+      <id>bamboo</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <archive>
+                <manifest>
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                </manifest>
+                <manifestEntries>
+                  <Specification-Title>${project.name}</Specification-Title>
+                  <Specification-Version>${project.version}</Specification-Version>
+                  <Implementation-Version>${bambooPlanRepositoryBranchName}</Implementation-Version>
+                  <Implementation-Build>${bambooBuildNumber}</Implementation-Build>
+                  <Implementation-Revision>${bambooPlanRepositoryRevision}</Implementation-Revision>
+                  <Git-Repository>${bambooPlanRepositoryRepositoryUrl}</Git-Repository>
+                  <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
+                  <Priority>${manifest.priority}</Priority>
+                </manifestEntries>
+              </archive>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>keepNode</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-clean</id>
+                <goals>
+                  <goal>clean</goal>
+                </goals>
+                <phase>initialize</phase>
+                <configuration>
+                  <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                  <filesets>
+                    <fileset>
+                      <directory>target</directory>
+                      <excludes>
+                        <exclude>node_build/node_modules/</exclude>
+                        <exclude>node_build/node/</exclude>
+                      </excludes>
+                      <followSymlinks>false</followSymlinks>
+                    </fileset>
+                  </filesets>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.mycore.iview2</groupId>
-        <artifactId>image-tiler</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>2.8.5</version>
       </dependency>
       <dependency>
-        <groupId>org.mycore.mets</groupId>
-        <artifactId>mets-model</artifactId>
-        <version>0.10</version>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.8.5</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-jaxb-annotations</artifactId>
+        <version>2.8.5</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.8.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>20.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.zxing</groupId>
+        <artifactId>core</artifactId>
+        <version>3.3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ibm.icu</groupId>
+        <artifactId>icu4j</artifactId>
+        <version>58.2</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+        <version>1.9.3</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.3.2</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.5</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.6</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>jsr250-api</artifactId>
+        <version>1.0</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>1.4.7</version>
         <exclusions>
           <exclusion>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <!-- provided by JRE since 1.6 -->
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.mycore.mets</groupId>
-        <artifactId>mets-editor-frontend</artifactId>
-        <version>0.3</version>
-        <scope>runtime</scope>
+        <groupId>javax.websocket</groupId>
+        <artifactId>javax.websocket-api</artifactId>
+        <version>1.1</version>
       </dependency>
       <dependency>
-        <groupId>org.mycore.mets</groupId>
-        <artifactId>mets-validator</artifactId>
-        <version>1.2</version>
+        <groupId>javax.ws.rs</groupId>
+        <artifactId>javax.ws.rs-api</artifactId>
+        <version>2.0.1</version>
       </dependency>
       <dependency>
-        <groupId>org.mycore</groupId>
-        <artifactId>oaipmh</artifactId>
-        <version>0.7</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mycore</groupId>
-        <artifactId>oaipmh-dataprovider</artifactId>
-        <version>0.7</version>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.12</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.jasig.cas</groupId>
-        <artifactId>cas-client-core</artifactId>
-        <version>3.1.10</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.jdom</groupId>
-        <artifactId>jdom2</artifactId>
-        <version>2.0.6</version>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.2.12</version>
       </dependency>
       <dependency>
         <groupId>jaxen</groupId>
@@ -872,85 +955,34 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.apache.abdera</groupId>
+        <artifactId>abdera-core</artifactId>
+        <version>1.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.abdera</groupId>
+        <artifactId>abdera-i18n</artifactId>
+        <version>1.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.avalon.framework</groupId>
+        <artifactId>avalon-framework-api</artifactId>
+        <version>4.3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.avalon.framework</groupId>
+        <artifactId>avalon-framework-impl</artifactId>
+        <version>4.3.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.12</version>
+        <version>1.13</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-vfs2</artifactId>
         <version>2.1</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.inject</groupId>
-        <artifactId>javax.inject</artifactId>
-        <version>1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.7</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.code.findbugs</groupId>
-        <artifactId>annotations</artifactId>
-        <version>3.0.1u2</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.google.zxing</groupId>
-        <artifactId>core</artifactId>
-        <version>3.2.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>19.0</version>
-      </dependency>
-      <dependency>
-        <!-- required for commons-vfs -->
-        <groupId>com.jcraft</groupId>
-        <artifactId>jsch</artifactId>
-        <version>0.1.53</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-bom</artifactId>
-        <version>2.6.1</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.6</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.solr</groupId>
-        <artifactId>solr-solrj</artifactId>
-        <version>6.1.0</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpmime</artifactId>
-        <version>${httpcomponents.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcore</artifactId>
-        <version>${httpcore.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -963,81 +995,30 @@
         <version>${httpcomponents.version}</version>
       </dependency>
       <dependency>
-        <groupId>xerces</groupId>
-        <artifactId>xercesImpl</artifactId>
-        <version>2.11.0.SP4</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>${httpcore.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.ibm.icu</groupId>
-        <artifactId>icu4j</artifactId>
-        <version>57.1</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-        <version>1.4.7</version>
-        <exclusions>
-          <exclusion>
-            <!-- provided by JRE since 1.6 -->
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>xalan</artifactId>
-        <version>${xalan.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>serializer</artifactId>
-        <version>${xalan.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>xom</groupId>
-        <artifactId>xom</artifactId>
-        <version>1.2.5</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <version>1.3.2</version>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpmime</artifactId>
+        <version>${httpcomponents.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.4</version>
       </dependency>
       <dependency>
-        <groupId>org.tmatesoft.svnkit</groupId>
-        <artifactId>svnkit</artifactId>
-        <version>1.8.12</version>
-      </dependency>
-      <dependency>
-        <groupId>net.java.dev.jna</groupId>
-        <artifactId>jna</artifactId>
-        <version>4.2.2</version>
-        <optional>true</optional>
-        <scope>runtime</scope>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-solrj</artifactId>
+        <version>6.3.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
@@ -1078,20 +1059,49 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.1.0</version>
-        <scope>provided</scope>
+        <groupId>org.codehaus.cargo</groupId>
+        <artifactId>cargo-core-api-module</artifactId>
+        <version>1.4.3</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jdom</groupId>
+            <artifactId>jdom2</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.apache.avalon.framework</groupId>
-        <artifactId>avalon-framework-impl</artifactId>
-        <version>4.3.1</version>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>guice-bridge</artifactId>
+        <version>${hk2.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.avalon.framework</groupId>
-        <artifactId>avalon-framework-api</artifactId>
-        <version>4.3.1</version>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>hk2-api</artifactId>
+        <version>${hk2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet-core</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-client</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-multipart</artifactId>
+        <version>${jersey.version}</version>
       </dependency>
       <dependency>
         <groupId>org.hibernate</groupId>
@@ -1110,158 +1120,213 @@
         <version>1.0.0.Final</version>
       </dependency>
       <dependency>
-        <groupId>com.zaxxer</groupId>
-        <artifactId>HikariCP</artifactId>
-        <version>2.5.1</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-hikaricp</artifactId>
-        <version>${hibernate.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.ant</groupId>
-        <artifactId>ant</artifactId>
-        <version>1.9.7</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.hsqldb</groupId>
-        <artifactId>hsqldb</artifactId>
-        <version>2.3.4</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>1.4.192</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.javassist</groupId>
-        <artifactId>javassist</artifactId>
-        <version>3.20.0-GA</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>ant-contrib</groupId>
-        <artifactId>ant-contrib</artifactId>
-        <version>1.0b3</version>
-        <optional>true</optional>
-        <scope>runtime</scope>
+        <groupId>org.jasig.cas</groupId>
+        <artifactId>cas-client-core</artifactId>
+        <version>3.1.10</version>
         <exclusions>
           <exclusion>
-            <groupId>ant</groupId>
-            <artifactId>ant</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>commons-discovery</groupId>
-        <artifactId>commons-discovery</artifactId>
-        <version>0.5</version>
-        <scope>runtime</scope>
+        <groupId>org.jdom</groupId>
+        <artifactId>jdom2</artifactId>
+        <version>2.0.6</version>
       </dependency>
       <dependency>
-        <groupId>wsdl4j</groupId>
-        <artifactId>wsdl4j</artifactId>
-        <version>1.6.3</version>
-        <scope>runtime</scope>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-acl-editor2</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>javax.ws.rs-api</artifactId>
-        <version>2.0.1</version>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-base</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>jsr250-api</artifactId>
-        <version>1.0</version>
-        <type>jar</type>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-broadcasting</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-server</artifactId>
-        <version>${jersey.version}</version>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-buildtools</artifactId>
+        <version>${project.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-core-api-module</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-client</artifactId>
-        <version>${jersey.version}</version>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-classbrowser</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.media</groupId>
-        <artifactId>jersey-media-multipart</artifactId>
-        <version>${jersey.version}</version>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-classeditor</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-servlet-core</artifactId>
-        <version>${jersey.version}</version>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-coma</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-grizzly2-http</artifactId>
-        <version>${jersey.version}</version>
-        <scope>test</scope>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-ifs</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.test-framework</groupId>
-        <artifactId>jersey-test-framework-core</artifactId>
-        <version>${jersey.version}</version>
-        <scope>test</scope>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-iiif</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-        <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
-        <version>${jersey.version}</version>
-        <scope>test</scope>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-indexing</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-grizzly2-servlet</artifactId>
-        <version>${jersey.version}</version>
-        <scope>test</scope>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-iview2</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.grizzly</groupId>
-        <artifactId>grizzly-http-server</artifactId>
-        <version>2.3.23</version>
-        <scope>test</scope>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-media</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.grizzly</groupId>
-        <artifactId>grizzly-http-servlet</artifactId>
-        <version>2.3.23</version>
-        <scope>test</scope>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-meta</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
       </dependency>
       <dependency>
-        <groupId>com.google.inject</groupId>
-        <artifactId>guice</artifactId>
-        <version>${guice.version}</version>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-mets</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.hk2</groupId>
-        <artifactId>hk2-api</artifactId>
-        <version>${hk2.version}</version>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-migration-2015</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.hk2</groupId>
-        <artifactId>guice-bridge</artifactId>
-        <version>${hk2.version}</version>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-mods</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
-        <version>1.3</version>
-        <scope>test</scope>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-oai</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>javax.websocket</groupId>
-        <artifactId>javax.websocket-api</artifactId>
-        <version>1.1</version>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-pi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-restapi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-solr</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-swf</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-sword</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-urn</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-user2</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-viewer</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-wcms2</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-webcli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-webtools</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-wfc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-xeditor</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>oaipmh</artifactId>
+        <version>0.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>oaipmh-dataprovider</artifactId>
+        <version>0.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore.iview2</groupId>
+        <artifactId>image-tiler</artifactId>
+        <version>1.12-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore.iview2</groupId>
+        <artifactId>remote-adapter</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore.mets</groupId>
+        <artifactId>mets-model</artifactId>
+        <version>0.10</version>
+        <exclusions>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore.mets</groupId>
+        <artifactId>mets-validator</artifactId>
+        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.sword</groupId>
@@ -1279,19 +1344,19 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>xml-resolver</groupId>
-        <artifactId>xml-resolver</artifactId>
-        <version>1.2</version>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>9.4.1212</version>
       </dependency>
       <dependency>
-        <groupId>commons-httpclient</groupId>
-        <artifactId>commons-httpclient</artifactId>
-        <version>3.1</version>
+        <groupId>org.tmatesoft.svnkit</groupId>
+        <artifactId>svnkit</artifactId>
+        <version>1.8.12</version>
       </dependency>
       <dependency>
         <groupId>se.jiderhamn</groupId>
         <artifactId>classloader-leak-prevention</artifactId>
-        <version>1.15.2</version>
+        <version>1.15.4</version>
         <exclusions>
           <exclusion>
             <groupId>javax.servlet</groupId>
@@ -1300,46 +1365,232 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>xalan</groupId>
+        <artifactId>serializer</artifactId>
+        <version>${xalan.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>xalan</groupId>
+        <artifactId>xalan</artifactId>
+        <version>${xalan.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.11.0.SP5</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>xml-resolver</groupId>
+        <artifactId>xml-resolver</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>xom</groupId>
+        <artifactId>xom</artifactId>
+        <version>1.2.5</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>annotations</artifactId>
+        <version>3.0.1u2</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ant</groupId>
+        <artifactId>ant</artifactId>
+        <version>1.10.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>ant-contrib</groupId>
+        <artifactId>ant-contrib</artifactId>
+        <version>1.0b3</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!-- required for commons-vfs -->
+        <groupId>com.jcraft</groupId>
+        <artifactId>jsch</artifactId>
+        <version>0.1.54</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>2.5.1</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-discovery</groupId>
+        <artifactId>commons-discovery</artifactId>
+        <version>0.5</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna</artifactId>
+        <version>4.2.2</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk16</artifactId>
         <version>1.46</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.apache.abdera</groupId>
-        <artifactId>abdera-i18n</artifactId>
-        <version>1.1.3</version>
+        <groupId>org.javassist</groupId>
+        <artifactId>javassist</artifactId>
+        <version>3.20.0-GA</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.apache.abdera</groupId>
-        <artifactId>abdera-core</artifactId>
-        <version>1.1.3</version>
+        <groupId>org.mycore.mets</groupId>
+        <artifactId>mets-editor-frontend</artifactId>
+        <version>0.3</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>commons-beanutils</groupId>
-        <artifactId>commons-beanutils</artifactId>
-        <version>1.9.2</version>
+        <groupId>wsdl4j</groupId>
+        <artifactId>wsdl4j</artifactId>
+        <version>1.6.3</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>9.4.1208</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>2.8.4</version>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-bom</artifactId>
+        <version>2.7</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>2.8.4</version>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>1.4.193</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>com.fasterxml.jackson.module</groupId>
-        <artifactId>jackson-module-jaxb-annotations</artifactId>
-        <version>2.8.4</version>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.grizzly</groupId>
+        <artifactId>grizzly-http-server</artifactId>
+        <version>2.3.28</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.grizzly</groupId>
+        <artifactId>grizzly-http-servlet</artifactId>
+        <version>2.3.28</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-grizzly2-http</artifactId>
+        <version>${jersey.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-grizzly2-servlet</artifactId>
+        <version>${jersey.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.test-framework</groupId>
+        <artifactId>jersey-test-framework-core</artifactId>
+        <version>${jersey.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+        <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+        <version>${jersey.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-core</artifactId>
+        <version>1.3</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-hikaricp</artifactId>
+        <version>${hibernate.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hsqldb</groupId>
+        <artifactId>hsqldb</artifactId>
+        <version>2.3.4</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-base</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>selenium-utils</artifactId>
+        <version>0.5</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-api</artifactId>
+        <version>${selenium.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-java</artifactId>
+        <version>${selenium.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-support</artifactId>
+        <version>${selenium.version}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1348,108 +1599,108 @@
     <developer>
       <id>mcrfluet</id>
       <name>Frank Lützenkirchen</name>
-      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
       <email>luetzenkirchen (at) ub.uni-duisburg-essen.de</email>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
       <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>architect</role>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrkpont</id>
       <name>Kerstin Ponten</name>
-      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
       <email>ponten (at) ub.uni-duisburg-essen.de</email>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
       <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>tester</role>
         <role>Assistent to Coordination Office</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrhrich</id>
       <name>Harald Richter</name>
-      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
       <email>richter (at) ub.uni-duisburg-essen.de</email>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
       <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrnverh</id>
       <name>Nils Verheyen</name>
-      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
       <email>nils.verheyen (at) uni-duisburg-essen.de</email>
+      <organization>Universität Duisburg-Essen, Universitätsbibliothek</organization>
       <organizationUrl>http://www.uni-due.de/ub/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <!-- Freiburg -->
     <developer>
       <id>mcrddege</id>
       <name>Dr. Detlev Degenhardt</name>
-      <organization>Albert-Ludwigs-Universität Freiburg, Rechenzentrum</organization>
       <email>detlev.degenhardt (at) rz.uni-freiburg.de</email>
+      <organization>Albert-Ludwigs-Universität Freiburg, Rechenzentrum</organization>
       <organizationUrl>http://portal.uni-freiburg.de/rz</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <!-- Hamburg -->
     <developer>
       <id>mcrkrebs</id>
       <name>Kathleen Neumann</name>
-      <organization>Verbundzentrale des GBV (VZG), Document Management System</organization>
       <email>Kathleen.Neumann (at) gbv.de</email>
+      <organization>Verbundzentrale des GBV (VZG), Document Management System</organization>
       <organizationUrl>http://www.gbv.de</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>coordination</role>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrwoelt</id>
       <name>Dr. Wiebke Oeltjen</name>
       <email>wiebke.oeltjen (at) rrz.uni-hamburg.de</email>
-      <timezone>+1</timezone>
       <organization>Universität Hamburg, Regionales Rechenzentrum</organization>
       <organizationUrl>http://www.rrz.uni-hamburg.de/</organizationUrl>
       <roles>
         <role>Head of Coordination Office</role>
         <role>tester</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrhruem</id>
       <name>Hinnerk Ruemenapf</name>
       <email>hinnerk.ruemenapf (at) rrz.uni-hamburg.de</email>
-      <timezone>+1</timezone>
       <organization>Universität Hamburg, Regionales Rechenzentrum</organization>
       <organizationUrl>http://www.rrz.uni-hamburg.de/</organizationUrl>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <!-- Ilmenau -->
     <developer>
       <id>mcradler</id>
       <name>René Adler</name>
-      <organization>Technischen Universität Ilmenau, Universitätsbibliothek</organization>
       <email>rene.adler (at) tu-ilmenau.de</email>
+      <organization>Technischen Universität Ilmenau, Universitätsbibliothek</organization>
       <organizationUrl>http://www.tu-ilmenau.de/ilmedia/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <!-- Jena -->
     <developer>
@@ -1457,149 +1708,149 @@
       <name>Michael Brendel</name>
       <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrmibue</id>
       <name>Michel Büchner</name>
-      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <email>michel.buechner (at) uni-jena.de</email>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrmeich</id>
       <name>Matthias Eichner</name>
-      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <email>matthias.eichner (at) uni-jena.de</email>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrmhegn</id>
       <name>Mathias Hegner</name>
       <organization>Friedrich-Schiller-Universität Jena, Universitätsrechenzentrum</organization>
       <organizationUrl>http://www.urz.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrheinz</id>
       <name>Philipp Heinze</name>
       <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrsherm</id>
       <name>Silvio Hermann</name>
-      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <email>s.hermann (at) uni-jena.de</email>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrshofm</id>
       <name>Sebastian Hofmann</name>
-      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <email>vo62xat (at) uni-jena.de</email>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrckoch</id>
       <name>Christoph Koch</name>
       <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrkuhnt</id>
       <name>Nicky Kuhnt</name>
       <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrkynas</id>
       <name>Clemens Kynast</name>
-      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <email>clemens.kynast (at) uni-jena.de</email>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrradic</id>
       <name>Radi Radichev</name>
       <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrsroeh</id>
       <name>Sebastian Röher</name>
-      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <email>sebastian.roeher (at) thulb.uni-jena.de</email>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrtchef</id>
       <name>Thomas Scheffler</name>
-      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <email>thomas.scheffler (at) uni-jena.de</email>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>architect</role>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrvuchi</id>
       <name>Hu Chi Vu</name>
-      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <email>chi (at) thulb.uni-jena.de</email>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <!-- Leipzig -->
     <developer>
@@ -1608,10 +1859,10 @@
       <email>freitag (at) rz.uni-leipzig.de</email>
       <organization>Universität Leipzig, Universitätsrechenzentrum</organization>
       <organizationUrl>http://www.urz.uni-leipzig.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrjkupf</id>
@@ -1619,11 +1870,11 @@
       <email>kupferschmidt (at) rz.uni-leipzig.de</email>
       <organization>Universität Leipzig, Universitätsrechenzentrum</organization>
       <organizationUrl>http://www.urz.uni-leipzig.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
         <role>architect</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrawerm</id>
@@ -1631,10 +1882,10 @@
       <email>andy_wermke (at) web.de</email>
       <organization>Universität Leipzig, Universitätsbibliothek</organization>
       <organizationUrl>http://www.ub.uni-leipzig.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>programmer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <!-- München -->
     <developer>
@@ -1642,30 +1893,30 @@
       <name>Heiko Helmbrecht</name>
       <organization>TU München, Universitätsbibliothek</organization>
       <organizationUrl>http://www.ub.tum.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrkramm</id>
       <name>Matthias Kramm</name>
       <organization>TU München, Universitätsbibliothek</organization>
       <organizationUrl>http://www.ub.tum.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcraseif</id>
       <name>Arne Seifert</name>
       <organization>TU München, Universitätsbibliothek</organization>
       <organizationUrl>http://www.ub.tum.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <!-- Münster -->
     <developer>
@@ -1673,42 +1924,42 @@
       <name>Werner Greßhoff</name>
       <organization>Westfälische Wilhelms-Universität Münster, Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.ulb.uni-muenster.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrbsuse</id>
       <name>Benno Süselbeck</name>
       <organization>Westfälische Wilhelms-Universität Münster, Universitäts- und Landesbibliothek</organization>
       <organizationUrl>http://www.ulb.uni-muenster.de/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <!-- Rostock -->
     <developer>
       <id>mcrsteph</id>
       <name>Robert Stephan</name>
-      <organization>Universität Rostock, Universitätsbibliothek</organization>
       <email>robert.stephan (at) uni-rostock.de</email>
+      <organization>Universität Rostock, Universitätsbibliothek</organization>
       <organizationUrl>http://www.ub.uni-rostock.de/ub/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <id>mcrascha</id>
       <name>Anja Schaar</name>
       <organization>Universität Rostock, Universitätsbibliothek</organization>
       <organizationUrl>http://www.ub.uni-rostock.de/ub/</organizationUrl>
-      <timezone>+1</timezone>
       <roles>
         <role>developer</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
   </developers>
   <modules>
