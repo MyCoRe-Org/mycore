@@ -244,6 +244,7 @@
                 <ResultFolder>${TestResultDir}</ResultFolder>
               </systemPropertyVariables>
               <trimStackTrace>false</trimStackTrace>
+              <argLine>${env.MAVEN_OPTS}</argLine>
             </configuration>
             <executions>
               <execution>
