@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jaxen.Function;
 import org.jaxen.XPath;
 import org.jaxen.XPathFunctionContext;
@@ -20,7 +21,7 @@ import org.mycore.common.MCRConstants;
  */
 public class MCRJaxenXPathFactory extends JaxenXPathFactory {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRJaxenXPathFactory.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRJaxenXPathFactory.class);
 
     private List<ExtensionFunction> functions = new ArrayList<ExtensionFunction>();
 

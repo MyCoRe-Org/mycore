@@ -30,7 +30,8 @@ import java.net.URL;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xsl.MCRParameterCollector;
@@ -44,7 +45,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected final static Logger LOGGER = Logger.getLogger(MCRStaticXEditorFileServlet.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCRStaticXEditorFileServlet.class);
 
     @Override
     protected MCRContent expandEditorElements(HttpServletRequest request, HttpServletResponse response, URL resource)

@@ -11,7 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.jdom2.Document;
 import org.jdom2.output.XMLOutputter;
@@ -28,7 +29,7 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRQLSearchServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchServlet.class);
 
     /** Default search field */
     private String defaultSearchField;

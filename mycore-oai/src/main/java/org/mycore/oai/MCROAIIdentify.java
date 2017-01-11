@@ -26,7 +26,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.common.config.MCRConfiguration;
@@ -48,7 +49,7 @@ import org.mycore.oai.pmh.SimpleIdentify;
  */
 public class MCROAIIdentify extends SimpleIdentify {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCROAIIdentify.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCROAIIdentify.class);
 
     private MCRConfiguration config;
 

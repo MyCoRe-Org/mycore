@@ -1,6 +1,7 @@
 package org.mycore.iview.tests.image.api;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public abstract class Selection {
 
-    private static final Logger LOGGER = org.apache.log4j.Logger.getLogger(Selection.class);
+    private static final Logger LOGGER = LogManager.getLogger(Selection.class);
 
     /**
      * @return a List of all Pixel wich contains this selection

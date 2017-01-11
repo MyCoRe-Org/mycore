@@ -18,7 +18,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.selenium.MCRSeleniumTestBase;
 import org.mycore.iview.tests.TestProperties;
 import org.mycore.iview.tests.model.TestDerivate;
@@ -38,7 +39,7 @@ public class DefaultApplicationController extends ApplicationController {
 
     private static Map<TestDerivate, String> derivateHTMLMapping;
 
-    private static final Logger LOGGER = Logger.getLogger(DefaultApplicationController.class);
+    private static final Logger LOGGER = LogManager.getLogger(DefaultApplicationController.class);
 
     private static Properties PROPERTIES = TestProperties.getInstance();
 

@@ -45,7 +45,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRUserInformation;
@@ -84,7 +85,7 @@ import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
  */
 public class MCRUserAttributeMapper {
 
-    private static Logger LOGGER = Logger.getLogger(MCRUserAttributeMapper.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
 
     private HashMap<String, List<Attribute>> attributeMapping = new HashMap<String, List<Attribute>>();
 

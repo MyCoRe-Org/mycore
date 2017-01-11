@@ -22,7 +22,8 @@
  */
 package org.mycore.user2.events;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -36,7 +37,7 @@ import org.mycore.user2.MCRUserManager;
  */
 public class MCRPersistTransientUserEventHandler extends MCREventHandlerBase {
 
-    private static Logger LOGGER = Logger.getLogger(MCRPersistTransientUserEventHandler.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRPersistTransientUserEventHandler.class);
 
     /**
      * Persists {@link MCRTransientUser} if an {@link MCRObject} was created.

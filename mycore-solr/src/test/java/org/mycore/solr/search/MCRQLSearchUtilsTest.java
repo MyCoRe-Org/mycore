@@ -5,7 +5,7 @@ package org.mycore.solr.search;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class MCRQLSearchUtilsTest extends MCRTestCase {
     }
 
     private MCRQuery getMCRQuery(String mcrql) {
-        Logger.getLogger(getClass()).info("Building query from condition: " + mcrql);
+        LogManager.getLogger(getClass()).info("Building query from condition: " + mcrql);
         Element query = new Element("query").setAttribute("numPerPage", "20");
         Element conditions = new Element("conditions").setAttribute("format", "xml");
         MCRCondition<Object> condition = new MCRQueryParser().parse(mcrql);

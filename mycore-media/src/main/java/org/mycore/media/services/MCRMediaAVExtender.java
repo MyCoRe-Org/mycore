@@ -26,7 +26,8 @@ package org.mycore.media.services;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
@@ -52,7 +53,7 @@ import org.mycore.media.MCRVideoObject;
  */
 public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     /** The logger */
-    private final static Logger LOGGER = Logger.getLogger(MCRMediaAVExtender.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRMediaAVExtender.class);
 
     /** The asset file this extender belongs to */
     protected MCRFileReader file;

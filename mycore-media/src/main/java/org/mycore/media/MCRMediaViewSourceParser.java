@@ -34,7 +34,8 @@ import java.net.URLConnection;
 import java.util.StringTokenizer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -55,7 +56,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     private static final String[] supportedFileExts = { "ogg", "ogm", "avi", "wav", "mpeg", "mpg", "vob", "mp4", "mpgv", "mpv", "m1v",
             "m2v", "mp2", "mp3", "asf", "wma", "wmv", "qt", "mov", "rm", "rmvb", "ra", "flv", "f4v", "flac", "dat", "w64" };
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMediaViewSourceParser.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMediaViewSourceParser.class);
 
     private static MCRMediaViewSourceParser instance = new MCRMediaViewSourceParser();
 

@@ -2,7 +2,8 @@ package org.mycore.iview.tests.base;
 
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -17,7 +18,7 @@ import org.openqa.selenium.UnsupportedCommandException;
 @Category(org.mycore.iview.tests.groups.ImageViewerTests.class)
 public class SideBarIT extends ViewerTestBase {
 
-    private static final Logger LOGGER = Logger.getLogger(SideBarIT.class);
+    private static final Logger LOGGER = LogManager.getLogger(SideBarIT.class);
 
     @Test
     public void testSideBarPresent() throws Exception {

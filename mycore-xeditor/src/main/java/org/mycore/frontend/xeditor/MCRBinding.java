@@ -29,7 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -57,7 +58,7 @@ import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
  */
 public class MCRBinding {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRBinding.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRBinding.class);
 
     protected String name;
 

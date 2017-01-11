@@ -8,7 +8,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
@@ -23,7 +24,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 
 public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
-    final static Logger LOGGER = Logger.getLogger(MCRSolrFileIndexHandler.class);
+    final static Logger LOGGER = LogManager.getLogger(MCRSolrFileIndexHandler.class);
 
     final static float DEFAULT_BOOST = (new SolrInputField(null)).getBoost(); //normally 1.0f
 

@@ -7,7 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
@@ -32,7 +33,7 @@ import com.google.common.collect.Lists;
  */
 public abstract class MCRSolrClassificationUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrClassificationUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrClassificationUtil.class);
 
     private static final Object CREATE_LOCK = new Object();
 

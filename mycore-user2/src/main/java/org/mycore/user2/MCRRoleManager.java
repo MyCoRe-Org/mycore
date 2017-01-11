@@ -30,7 +30,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -49,7 +50,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
  */
 public class MCRRoleManager {
 
-    private static Logger LOGGER = Logger.getLogger(MCRRoleManager.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRRoleManager.class);
 
     /** Map of defined roles, key is the unique role name */
     private static HashMap<String, MCRRole> rolesByName = new HashMap<String, MCRRole>();

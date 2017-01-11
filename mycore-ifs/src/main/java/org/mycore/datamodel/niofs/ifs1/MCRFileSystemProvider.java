@@ -63,7 +63,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -86,7 +87,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
 
     private static MCRAbstractFileSystem FILE_SYSTEM_INSTANCE;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRFileSystemProvider.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFileSystemProvider.class);
 
     private static final Set<? extends CopyOption> SUPPORTED_COPY_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING));

@@ -28,7 +28,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
@@ -53,7 +54,7 @@ import org.mycore.common.xml.MCRURIResolver;
  */
 public class MCRFileContentTypeFactory {
 
-    static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
+    static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
     /** Table for looking up all file content types by ID */
     protected static Hashtable<String, MCRFileContentType> typesTable = new Hashtable<>();

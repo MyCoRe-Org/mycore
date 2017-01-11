@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.CannotDisseminateFormatException;
@@ -51,7 +52,7 @@ import org.mycore.oai.pmh.dataprovider.OAIAdapter;
  */
 public class MCROAIAdapter implements OAIAdapter {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCROAIAdapter.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCROAIAdapter.class);
 
     public final static String PREFIX = "MCR.OAIDataProvider.";
 

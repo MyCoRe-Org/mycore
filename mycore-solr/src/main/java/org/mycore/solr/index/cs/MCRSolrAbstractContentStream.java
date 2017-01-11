@@ -7,7 +7,8 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.common.util.ContentStreamBase;
 
@@ -21,7 +22,7 @@ import org.apache.solr.common.util.ContentStreamBase;
  * */
 public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase {
 
-    final static Logger LOGGER = Logger.getLogger(MCRSolrAbstractContentStream.class);
+    final static Logger LOGGER = LogManager.getLogger(MCRSolrAbstractContentStream.class);
 
     protected boolean setup;
 

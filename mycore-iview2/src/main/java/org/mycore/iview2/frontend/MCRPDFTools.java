@@ -33,7 +33,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mycore.common.content.MCRContent;
@@ -48,7 +49,7 @@ class MCRPDFTools implements AutoCloseable {
 
     private static final Color TRANSPARENT_WHITE = new Color(255, 255, 255, 0);
 
-    private static Logger LOGGER = Logger.getLogger(MCRPDFTools.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRPDFTools.class);
 
     private MCRPNGTools pngTools;
 

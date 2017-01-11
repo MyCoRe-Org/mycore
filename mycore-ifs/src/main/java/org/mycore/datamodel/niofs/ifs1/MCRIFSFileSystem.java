@@ -32,7 +32,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.stream.StreamSupport;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -103,10 +103,10 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
         try {
             rootDirectory = new MCRDirectory(owner);
         } catch (RuntimeException e) {
-            Logger.getLogger(getClass()).warn("Catched run time exception while creating new root directory.", e);
+            LogManager.getLogger(getClass()).warn("Catched run time exception while creating new root directory.", e);
             throw new FileSystemException(rootPath.toString(), null, e.getMessage());
         }
-        Logger.getLogger(getClass()).info("Created root directory: " + rootPath);
+        LogManager.getLogger(getClass()).info("Created root directory: " + rootPath);
     }
 
     @Override
@@ -125,10 +125,10 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
         try {
             rootDirectory.delete();
         } catch (RuntimeException e) {
-            Logger.getLogger(getClass()).warn("Catched run time exception while removing root directory.", e);
+            LogManager.getLogger(getClass()).warn("Catched run time exception while removing root directory.", e);
             throw new FileSystemException(rootPath.toString(), null, e.getMessage());
         }
-        Logger.getLogger(getClass()).info("Removed root directory: " + rootPath);
+        LogManager.getLogger(getClass()).info("Removed root directory: " + rootPath);
     }
 
 }

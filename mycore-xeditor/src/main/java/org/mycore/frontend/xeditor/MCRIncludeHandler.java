@@ -10,7 +10,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xalan.extensions.ExpressionContext;
 import org.apache.xpath.NodeSet;
 import org.apache.xpath.objects.XNodeSet;
@@ -21,7 +22,7 @@ import org.w3c.dom.NodeList;
 
 public class MCRIncludeHandler {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRIncludeHandler.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRIncludeHandler.class);
 
     private final static Map<String, Node> includesPerApplication = new ConcurrentHashMap<String, Node>();
 

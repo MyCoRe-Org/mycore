@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
@@ -41,7 +42,7 @@ import org.swordapp.server.UriRegistry;
  */
 public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCRFileValidator {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCRSwordMediaHandler.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCRSwordMediaHandler.class);
 
     private MCRSwordLifecycleConfiguration configuration;
 

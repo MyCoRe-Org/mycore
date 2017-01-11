@@ -45,7 +45,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -61,7 +62,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
-    static Logger LOGGER = Logger.getLogger(MCRDirectoryStream.class);
+    static Logger LOGGER = LogManager.getLogger(MCRDirectoryStream.class);
 
     private MCRDirectory dir;
 

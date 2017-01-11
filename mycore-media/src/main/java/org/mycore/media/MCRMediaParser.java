@@ -28,7 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.datamodel.ifs.MCROldFile;
@@ -41,7 +42,7 @@ import org.mycore.datamodel.ifs.MCROldFile;
  */
 @SuppressWarnings("deprecation")
 public class MCRMediaParser {
-    private static final Logger LOGGER = Logger.getLogger(MCRMediaParser.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMediaParser.class);
 
     private static MCRConfiguration config = MCRConfiguration.instance();
 

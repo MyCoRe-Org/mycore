@@ -26,7 +26,8 @@ package org.mycore.mods;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.filter.Filter;
@@ -48,7 +49,7 @@ import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
-    private static Logger LOGGER = Logger.getLogger(MCRMODSMetadataShareAgent.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRMODSMetadataShareAgent.class);
 
     private static final String HOST_SECTION_XPATH = "mods:relatedItem[@type='host']";
 

@@ -36,7 +36,8 @@ import java.util.Vector;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -70,7 +71,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
     public MCRSimpleFCTDetector() {
     }
 
-    private static Logger logger = Logger.getLogger(MCRSimpleFCTDetector.class);
+    private static Logger logger = LogManager.getLogger(MCRSimpleFCTDetector.class);
 
     /**
      * Adds a detection rule from the file content type definition XML file. The

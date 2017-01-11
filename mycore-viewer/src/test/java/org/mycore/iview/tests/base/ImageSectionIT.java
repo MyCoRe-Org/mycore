@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.MessageFormat;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -24,7 +26,7 @@ public class ImageSectionIT extends ViewerTestBase {
 
     private static final int TOLERANCE = 20;
 
-    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(ImageSectionIT.class);
+    private static final Logger LOGGER = LogManager.getLogger(ImageSectionIT.class);
     private static final int DELAY_TIME = 3000;
 
     @Test

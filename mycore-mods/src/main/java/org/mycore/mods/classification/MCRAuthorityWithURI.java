@@ -2,7 +2,8 @@ package org.mycore.mods.classification;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -33,7 +34,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
      */
     private static final String LABEL_LANG_URI = "x-uri";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMODSClassificationSupport.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMODSClassificationSupport.class);
 
     /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.

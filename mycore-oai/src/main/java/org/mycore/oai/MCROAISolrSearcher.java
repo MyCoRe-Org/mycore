@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -17,7 +18,7 @@ import org.mycore.solr.MCRSolrClientFactory;
 
 public class MCROAISolrSearcher extends MCROAISearcher {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCROAISolrSearcher.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCROAISolrSearcher.class);
 
     private Set set;
 

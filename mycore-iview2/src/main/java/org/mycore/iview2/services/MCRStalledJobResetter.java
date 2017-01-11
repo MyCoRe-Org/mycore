@@ -7,7 +7,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 
@@ -22,7 +23,7 @@ public class MCRStalledJobResetter implements Runnable {
 
     private static int maxTimeDiff = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset"));
 
-    private static Logger LOGGER = Logger.getLogger(MCRStalledJobResetter.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRStalledJobResetter.class);
 
     private static int maxResetCount = Integer.parseInt(MCRIView2Tools.getIView2Property("MaxResetCount"));
 

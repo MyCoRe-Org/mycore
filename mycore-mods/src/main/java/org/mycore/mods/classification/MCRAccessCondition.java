@@ -6,7 +6,8 @@ package org.mycore.mods.classification;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
@@ -25,7 +26,7 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static final Logger LOGGER = Logger.getLogger(MCRAccessCondition.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRAccessCondition.class);
 
     public MCRAccessCondition(String href) {
         this.href = href;

@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.sword.application.MCRSwordCollectionProvider;
 import org.mycore.sword.application.MCRSwordLifecycleConfiguration;
@@ -18,7 +19,7 @@ import org.mycore.sword.application.MCRSwordLifecycleConfiguration;
  */
 public class MCRSword {
 
-    private static Logger LOGGER = Logger.getLogger(MCRSword.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSword.class);
     private static Hashtable<String, MCRSwordCollectionProvider> collections = null;
     private static Hashtable<String, List<String>> workspaceCollectionTable = null;
 

@@ -16,7 +16,8 @@ import java.io.IOException;
 import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.streams.MCRDevNull;
@@ -31,7 +32,7 @@ import org.mycore.common.content.streams.MCRMD5InputStream;
  */
 public class MCRFileImportExport {
 
-    private static Logger LOGGER = Logger.getLogger(MCRFileImportExport.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRFileImportExport.class);
 
     /**
      * Imports the contents of a local file or directory into a newly created MCRDirectory that is owned by the given owner ID. The new MCRDirectory will have

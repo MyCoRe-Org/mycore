@@ -31,7 +31,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.config.MCRConfiguration;
@@ -53,7 +54,7 @@ import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
  */
 public abstract class MCRSolrIndexHandlerFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexHandlerFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexHandlerFactory.class);
 
     private static MCRSolrIndexHandlerFactory instance = (MCRSolrIndexHandlerFactory) MCRConfiguration.instance()
         .getInstanceOf(CONFIG_PREFIX + "IndexHandler.Factory",

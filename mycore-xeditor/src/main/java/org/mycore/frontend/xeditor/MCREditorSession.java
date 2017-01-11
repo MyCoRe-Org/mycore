@@ -34,7 +34,8 @@ import java.util.regex.Pattern;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -53,7 +54,7 @@ import org.xml.sax.SAXException;
  */
 public class MCREditorSession {
 
-    private final static Logger LOGGER = Logger.getLogger(MCREditorSession.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCREditorSession.class);
 
     private String id;
 

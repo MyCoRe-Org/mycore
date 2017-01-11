@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -21,7 +22,7 @@ class MCRSolrProxyUtils {
     private static final SolrQuery mbeansQuery = new SolrQuery().setParam("cat", "QUERYHANDLER")
         .setParam(CommonParams.OMIT_HEADER, true).setRequestHandler("/admin/mbeans");
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrProxyUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrProxyUtils.class);
 
     private MCRSolrProxyUtils() {
     }

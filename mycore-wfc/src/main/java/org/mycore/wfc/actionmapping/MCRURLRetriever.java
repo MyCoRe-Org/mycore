@@ -30,7 +30,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -48,7 +49,7 @@ public final class MCRURLRetriever {
     private MCRURLRetriever() {
     }
 
-    private static final Logger LOGGER = Logger.getLogger(MCRURLRetriever.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRURLRetriever.class);
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 

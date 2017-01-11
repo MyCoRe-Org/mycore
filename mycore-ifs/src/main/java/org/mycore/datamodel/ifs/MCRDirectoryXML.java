@@ -30,7 +30,8 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
@@ -44,7 +45,7 @@ import org.mycore.common.content.MCRContent;
  */
 public class MCRDirectoryXML {
 
-    static Logger LOGGER = Logger.getLogger(MCRDirectoryXML.class);
+    static Logger LOGGER = LogManager.getLogger(MCRDirectoryXML.class);
 
     private static final String dateFormat = "dd.MM.yyyy HH:mm:ss";
 

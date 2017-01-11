@@ -1,6 +1,7 @@
 package org.mycore.wcms2.navigation;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.wcms2.datamodel.MCRNavigation;
@@ -22,7 +23,7 @@ import com.google.gson.JsonObject;
  * @author Matthias Eichner
  */
 public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvider {
-    private static final Logger LOGGER = Logger.getLogger(MCRWCMSDefaultSectionProvider.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRWCMSDefaultSectionProvider.class);
 
     private static Gson gson;
 

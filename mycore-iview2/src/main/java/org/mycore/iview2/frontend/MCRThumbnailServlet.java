@@ -49,7 +49,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.datamodel.niofs.MCRPathUtils;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -76,7 +77,7 @@ public class MCRThumbnailServlet extends MCRServlet {
 
     private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
 
-    private static Logger LOGGER = Logger.getLogger(MCRThumbnailServlet.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRThumbnailServlet.class);
 
     private int thumbnailSize = MCRImage.getTileSize();
 

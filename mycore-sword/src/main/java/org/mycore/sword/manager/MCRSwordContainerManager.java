@@ -7,7 +7,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.abdera.i18n.iri.IRI;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -30,7 +31,7 @@ import org.swordapp.server.UriRegistry;
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordContainerManager implements ContainerManager {
-    private static Logger LOGGER = Logger.getLogger(MCRSwordContainerManager.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSwordContainerManager.class);
 
     public static void throwObjectDoesNotExist(String objectIdString) throws SwordError {
         throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND, "The object '" + objectIdString + "' does not exist!");

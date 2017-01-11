@@ -27,7 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.datamodel.ifs.MCROldFile;
 import org.mycore.frontend.cli.MCRExternalProcess;
@@ -61,7 +62,7 @@ public class MCRMediaInfoParser extends MCRMediaParser {
             "ape", "mac", "flv", "f4v", "flac", "dat", "aiff", "aifc", "au", "iff", "paf", "sd2", "irca", "w64", "mat", "pvf", "xi", "sds",
             "avr" };
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMediaInfoParser.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMediaInfoParser.class);
 
     private static final NativeLibExporter libExporter = NativeLibExporter.getInstance();
 

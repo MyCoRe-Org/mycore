@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.pmh.Identify.DeletedRecordPolicy;
@@ -16,7 +17,7 @@ import org.mycore.oai.pmh.Set;
 
 public abstract class MCROAISearcher {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCROAISearcher.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCROAISearcher.class);
 
     protected MetadataFormat metadataFormat;
 

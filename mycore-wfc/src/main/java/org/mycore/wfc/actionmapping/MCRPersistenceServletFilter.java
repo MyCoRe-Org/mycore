@@ -34,7 +34,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -45,7 +46,7 @@ import org.mycore.frontend.servlets.MCRServlet;
  */
 public class MCRPersistenceServletFilter implements Filter {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRPersistenceServletFilter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRPersistenceServletFilter.class);
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()

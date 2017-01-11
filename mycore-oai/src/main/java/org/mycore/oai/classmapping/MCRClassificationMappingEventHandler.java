@@ -24,7 +24,8 @@ package org.mycore.oai.classmapping;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
@@ -54,7 +55,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static Logger LOGGER = Logger.getLogger(MCRClassificationMappingEventHandler.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 
     private MCRMetaElement oldMappings = null;
 

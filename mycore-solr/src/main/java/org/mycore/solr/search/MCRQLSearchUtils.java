@@ -12,7 +12,8 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -30,7 +31,7 @@ import org.mycore.services.fieldquery.MCRSortBy;
 
 public class MCRQLSearchUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRQLSearchUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
     private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query",
         "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));

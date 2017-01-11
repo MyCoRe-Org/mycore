@@ -31,7 +31,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.xml.parsers.DocumentBuilder;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.urn.hibernate.MCRURN;
@@ -48,7 +49,7 @@ import org.w3c.dom.NodeList;
  */
 public class MCRXMLFunctions {
 
-    private static Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
 
     private MCRXMLFunctions() {
     }

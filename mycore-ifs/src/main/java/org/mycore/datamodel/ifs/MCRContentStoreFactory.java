@@ -26,7 +26,8 @@ package org.mycore.datamodel.ifs;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -56,7 +57,7 @@ public class MCRContentStoreFactory {
     /** The MCRContentStoreSelector implementation that will be used */
     protected static MCRContentStoreSelector STORE_SELECTOR;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRContentStoreFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRContentStoreFactory.class);
 
     public static Map<String, MCRContentStore> getAvailableStores() {
         Map<String, String> properties = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX);

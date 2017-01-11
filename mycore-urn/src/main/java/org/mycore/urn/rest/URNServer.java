@@ -13,7 +13,8 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.urn.epicurlite.EpicurLite;
@@ -25,7 +26,7 @@ import org.mycore.urn.hibernate.MCRURN;
  */
 public class URNServer {
 
-    private static final Logger LOGGER = Logger.getLogger(URNServer.class);
+    private static final Logger LOGGER = LogManager.getLogger(URNServer.class);
 
     protected URNServerConfiguration configuration;
 

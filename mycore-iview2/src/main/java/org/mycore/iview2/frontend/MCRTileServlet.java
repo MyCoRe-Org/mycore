@@ -35,7 +35,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
@@ -53,7 +54,7 @@ public class MCRTileServlet extends HttpServlet {
 
     private static final long serialVersionUID = 3805114872438336791L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRTileServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTileServlet.class);
 
     /**
      * Extracts tile or image properties from iview2 file and transmits it.

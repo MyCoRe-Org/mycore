@@ -5,7 +5,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.abdera.i18n.iri.IRI;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -27,7 +28,7 @@ import org.swordapp.server.UriRegistry;
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordMediaManager implements MediaResourceManager {
-    protected static Logger LOGGER = Logger.getLogger(MCRSwordMediaManager.class);
+    protected static Logger LOGGER = LogManager.getLogger(MCRSwordMediaManager.class);
 
     public static MCRSwordMediaHandler getMediaProvider(String collection) {
         return MCRSword.getCollection(collection).getMediaHandler();

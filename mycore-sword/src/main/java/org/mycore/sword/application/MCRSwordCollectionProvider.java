@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.sword.MCRSwordContainerHandler;
@@ -17,7 +18,7 @@ import org.swordapp.server.SwordError;
  */
 public abstract class MCRSwordCollectionProvider implements MCRSwordLifecycle {
 
-    protected static Logger LOGGER = Logger.getLogger(MCRSwordCollectionProvider.class);
+    protected static Logger LOGGER = LogManager.getLogger(MCRSwordCollectionProvider.class);
     private MCRSwordContainerHandler mcrSwordContainerHandler;
     private MCRSwordMediaHandler mcrSwordMediaHandler;
 

@@ -32,7 +32,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Transaction;
 import org.jdom2.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -73,7 +74,7 @@ import org.mycore.oai.set.MCROAISetHandler;
  */
 public class MCROAISetManager {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCROAISetManager.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCROAISetManager.class);
 
     protected String configPrefix;
 

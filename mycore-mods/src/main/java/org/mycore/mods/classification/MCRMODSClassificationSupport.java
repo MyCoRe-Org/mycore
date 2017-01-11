@@ -27,7 +27,8 @@ import java.text.MessageFormat;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -42,7 +43,7 @@ import org.w3c.dom.NodeList;
  */
 public final class MCRMODSClassificationSupport {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMODSClassificationSupport.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMODSClassificationSupport.class);
 
     private MCRMODSClassificationSupport() {
     }

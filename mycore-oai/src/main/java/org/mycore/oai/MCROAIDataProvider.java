@@ -29,7 +29,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.ProcessingInstruction;
@@ -53,7 +54,7 @@ import org.mycore.oai.pmh.dataprovider.jaxb.JAXBOAIProvider;
 public class MCROAIDataProvider extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    protected final static Logger LOGGER = Logger.getLogger(MCROAIDataProvider.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCROAIDataProvider.class);
 
     /**
      * Map of all MyCoRe oai adapter.

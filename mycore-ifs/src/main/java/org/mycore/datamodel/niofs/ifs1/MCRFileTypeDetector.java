@@ -29,7 +29,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.spi.FileTypeDetector;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
@@ -42,7 +43,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  */
 public class MCRFileTypeDetector extends FileTypeDetector {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRFileTypeDetector.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFileTypeDetector.class);
 
     private String defaultMimeType;
 

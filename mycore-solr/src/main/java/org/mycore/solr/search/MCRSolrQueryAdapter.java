@@ -6,7 +6,8 @@ import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -16,7 +17,7 @@ import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 
 public class MCRSolrQueryAdapter implements MCRQueryAdapter {
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrQueryAdapter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrQueryAdapter.class);
 
     private String fieldName;
 

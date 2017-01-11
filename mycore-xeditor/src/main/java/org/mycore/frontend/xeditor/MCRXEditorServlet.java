@@ -28,7 +28,8 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -39,7 +40,7 @@ import org.mycore.frontend.xeditor.target.MCREditorTarget;
  */
 public class MCRXEditorServlet extends MCRServlet {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCRXEditorServlet.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCRXEditorServlet.class);
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {

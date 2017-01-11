@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
@@ -25,7 +26,7 @@ import org.mycore.datamodel.metadata.MCRBase;
  */
 public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRContent> {
 
-    final static Logger LOGGER = Logger.getLogger(MCRSolrContentStream.class);
+    final static Logger LOGGER = LogManager.getLogger(MCRSolrContentStream.class);
 
     private final static MCRContentTransformer TRANSFORMER;
 

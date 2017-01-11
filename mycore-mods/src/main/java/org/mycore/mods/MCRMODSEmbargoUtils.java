@@ -30,7 +30,8 @@ import java.time.ZoneId;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRSessionMgr;
@@ -50,7 +51,7 @@ public class MCRMODSEmbargoUtils {
 
     private static final int CAPACITY = 10000;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMODSEmbargoUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMODSEmbargoUtils.class);
 
     private static final String EMPTY_VALUE = "";
 

@@ -20,7 +20,8 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
@@ -59,7 +60,7 @@ import org.mycore.mets.model.struct.StructLink;
  */
 public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMETSHierarchyGenerator.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMETSHierarchyGenerator.class);
 
     protected MCRDerivate mcrDer;
 

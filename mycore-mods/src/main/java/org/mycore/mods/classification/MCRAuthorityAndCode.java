@@ -1,6 +1,7 @@
 package org.mycore.mods.classification;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -16,7 +17,7 @@ import org.w3c.dom.Element;
 class MCRAuthorityAndCode extends MCRAuthorityInfo {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static final Logger LOGGER = Logger.getLogger(MCRAuthorityAndCode.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRAuthorityAndCode.class);
 
     /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.

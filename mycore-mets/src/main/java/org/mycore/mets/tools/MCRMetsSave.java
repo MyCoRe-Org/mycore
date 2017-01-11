@@ -20,7 +20,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -62,7 +63,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRMetsSave {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRMetsSave.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRMetsSave.class);
 
     public static final String ALTO_FILE_GROUP_USE = "ALTO";
 

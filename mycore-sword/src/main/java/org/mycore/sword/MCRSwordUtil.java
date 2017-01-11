@@ -48,7 +48,8 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
@@ -81,7 +82,7 @@ public class MCRSwordUtil {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
     private static final int COPY_BUFFER_SIZE = 32 * 1024;
-    private static Logger LOGGER = Logger.getLogger(MCRSwordUtil.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSwordUtil.class);
 
     public static MCRDerivate createDerivate(String documentID) throws MCRPersistenceException, IOException, MCRAccessException {
         final String projectId = MCRObjectID.getInstance(documentID).getProjectId();
@@ -447,7 +448,7 @@ public class MCRSwordUtil {
     public static class BuildLinkUtil {
 
         public static final String DEFAULT_URL_ENCODING = "UTF-8";
-        private static Logger LOGGER = Logger.getLogger(BuildLinkUtil.class);
+        private static Logger LOGGER = LogManager.getLogger(BuildLinkUtil.class);
 
 
         public static String getEditHref(String collection, String id) {

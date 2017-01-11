@@ -33,7 +33,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -60,7 +61,7 @@ public class MCRMETSServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMETSServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMETSServlet.class);
 
     public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration.instance().getBoolean("MCR.Mets.storeMetsOnGenerate");
 

@@ -26,7 +26,8 @@ package org.mycore.media;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -47,7 +48,7 @@ public class MCRMediaPDFParser extends MCRMediaParser {
 
     private static MCRMediaPDFParser instance = new MCRMediaPDFParser();
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMediaPDFParser.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMediaPDFParser.class);
 
     public static MCRMediaPDFParser getInstance() {
         return instance;

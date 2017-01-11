@@ -25,7 +25,8 @@ package org.mycore.mods;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
@@ -70,7 +71,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         extractRelatedItems(evt, obj);
     }
 
-    private final static Logger LOGGER = Logger.getLogger(MCRExtractRelatedItemsEventHandler.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRExtractRelatedItemsEventHandler.class);
 
     private void extractRelatedItems(final MCREvent evt, final MCRObject object) {
         if (!MCRMODSWrapper.isSupported(object)){

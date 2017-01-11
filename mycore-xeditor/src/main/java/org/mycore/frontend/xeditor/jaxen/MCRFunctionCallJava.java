@@ -5,13 +5,14 @@ import java.util.List;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.reflect.MethodUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jaxen.Context;
 import org.jaxen.FunctionCallException;
 
 class MCRFunctionCallJava implements org.jaxen.Function {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRFunctionCallJava.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRFunctionCallJava.class);
 
     @Override
     public Object call(Context context, List args) throws FunctionCallException {

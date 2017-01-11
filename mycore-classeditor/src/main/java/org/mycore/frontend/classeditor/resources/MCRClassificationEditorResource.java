@@ -32,7 +32,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -90,7 +91,7 @@ import com.google.gson.JsonStreamParser;
  */
 @Path("classifications")
 public class MCRClassificationEditorResource {
-    private static final Logger LOGGER = Logger.getLogger(MCRClassificationEditorResource.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRClassificationEditorResource.class);
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 

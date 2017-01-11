@@ -36,7 +36,8 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRUsageException;
@@ -87,7 +88,7 @@ import org.mycore.user2.utils.MCRUserTransformer;
  */
 public class MCRLDAPClient {
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRLDAPClient.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRLDAPClient.class);
 
     private static MCRLDAPClient instance = new MCRLDAPClient();
 

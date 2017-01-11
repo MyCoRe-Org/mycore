@@ -37,7 +37,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -67,7 +68,7 @@ import org.xml.sax.SAXParseException;
     name = "User Commands")
 public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRUserCommands.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(MCRUserCommands.class.getName());
 
     private static final String SYSTEM = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName")
         + ":";

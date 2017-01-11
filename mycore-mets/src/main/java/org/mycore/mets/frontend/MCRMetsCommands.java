@@ -9,7 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -34,7 +35,7 @@ import org.mycore.mets.validator.validators.ValidationException;
 @MCRCommandGroup(name = "Mets Commands")
 public class MCRMetsCommands extends MCRAbstractCommands {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMetsCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMetsCommands.class);
 
     public static ConcurrentLinkedQueue<String> invalidMetsQueue = new ConcurrentLinkedQueue<>();
 

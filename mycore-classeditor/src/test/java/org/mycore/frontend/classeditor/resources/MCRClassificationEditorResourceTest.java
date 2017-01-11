@@ -12,7 +12,8 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.jdom2.Document;
@@ -42,7 +43,7 @@ import org.mycore.frontend.jersey.resources.MCRJerseyTest;
 public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     private CategoryDAOMock categDAO;
 
-    static Logger LOGGER = Logger.getLogger(MCRClassificationEditorResourceTest.class);
+    static Logger LOGGER = LogManager.getLogger(MCRClassificationEditorResourceTest.class);
 
     @Override
     protected Map<String, String> getTestProperties() {

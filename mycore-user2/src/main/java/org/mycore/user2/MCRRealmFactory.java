@@ -34,7 +34,8 @@ import java.util.List;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -61,7 +62,7 @@ public class MCRRealmFactory {
 
     static final String REALMS_URI_CFG_KEY = MCRUser2Constants.CONFIG_PREFIX + "Realms.URI";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRRealm.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRealm.class);
 
     private static final int REFRESH_DELAY = 5000;
 

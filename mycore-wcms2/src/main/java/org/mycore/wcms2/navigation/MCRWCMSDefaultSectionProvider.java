@@ -7,7 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -29,7 +30,7 @@ import com.google.gson.JsonObject;
  * @author Matthias Eichner
  */
 public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
-    private static final Logger LOGGER = Logger.getLogger(MCRWCMSDefaultSectionProvider.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRWCMSDefaultSectionProvider.class);
 
     private static final List<String> HTML_TAG_LIST = Arrays.asList("html", "head", "title", "base", "link", "meta",
         "style", "script", "noscript", "body", "body", "section", "nav", "article", "aside", "h1", "h2", "h3", "h4",

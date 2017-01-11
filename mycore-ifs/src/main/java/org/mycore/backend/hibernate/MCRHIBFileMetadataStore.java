@@ -36,7 +36,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRFSNODES_;
@@ -54,7 +55,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  */
 public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     // LOGGER
-    private static Logger LOGGER = Logger.getLogger(MCRHIBFileMetadataStore.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRHIBFileMetadataStore.class);
 
     private Session getSession() {
         return MCRHIBConnection.instance().getSession();

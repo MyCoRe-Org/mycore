@@ -31,7 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
@@ -52,7 +53,7 @@ import org.mycore.solr.MCRSolrUtils;
  *
  */
 public class MCRConditionTransformer {
-    private static final Logger LOGGER = Logger.getLogger(MCRConditionTransformer.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRConditionTransformer.class);
 
     /**
      * If a condition references fields from multiple indexes, this constant is

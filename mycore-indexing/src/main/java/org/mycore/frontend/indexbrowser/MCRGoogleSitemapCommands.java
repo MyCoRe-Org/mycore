@@ -25,7 +25,8 @@ package org.mycore.frontend.indexbrowser;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
@@ -49,7 +50,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
 
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRGoogleSitemapCommands.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommands.class.getName());
 
     /**
      * The build and store method.

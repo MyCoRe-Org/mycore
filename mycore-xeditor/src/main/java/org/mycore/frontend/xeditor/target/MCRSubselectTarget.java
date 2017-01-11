@@ -28,7 +28,8 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.ServletContext;
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
@@ -41,7 +42,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
 
     public static final String PARAM_SUBSELECT_SESSION = "_xed_subselect_session";
 
-    private final static Logger LOGGER = Logger.getLogger(MCRSubselectTarget.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRSubselectTarget.class);
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {

@@ -9,7 +9,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 
 /**
@@ -19,7 +20,7 @@ import org.apache.solr.client.solrj.SolrClient;
  */
 public abstract class MCRSolrClientFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrClientFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrClientFactory.class);
 
     private static String DEFAULT_CORE_NAME;
 

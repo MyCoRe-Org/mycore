@@ -1,18 +1,12 @@
 package org.mycore.iview.tests.base;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.mycore.iview.tests.TestProperties;
-import org.mycore.iview.tests.TestUtil;
 import org.mycore.iview.tests.model.TestDerivate;
 
 public class BaseTestConstants {
     public static final int TIME_OUT_IN_SECONDS = 30;
-    private static final Logger LOGGER = Logger.getLogger(BaseTestConstants.class);
     protected static final TestDerivate RGB_TEST_DERIVATE = new TestDerivate() {
 
         @Override

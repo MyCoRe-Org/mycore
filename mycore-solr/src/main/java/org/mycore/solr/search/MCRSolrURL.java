@@ -13,7 +13,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
@@ -23,7 +24,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
  * @author shermann
  */
 public class MCRSolrURL {
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrURL.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrURL.class);
 
     public static final String FIXED_URL_PART = MessageFormat.format("{0}?version={1}", QUERY_PATH, QUERY_XML_PROTOCOL_VERSION);
 
