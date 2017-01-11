@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jdom2.Namespace;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.config.MCRConfiguration;
@@ -124,7 +124,7 @@ public final class MCRConstants {
                     Namespace namespace = (Namespace) f.get(null);
                     registerNamespace(namespace);
                 } catch (Exception e) {
-                    Logger.getLogger(MCRConstants.class).error("Error while initialising Namespace list and HashMap",
+                    LogManager.getLogger(MCRConstants.class).error("Error while initialising Namespace list and HashMap",
                         e);
                 }
             }

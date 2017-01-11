@@ -35,7 +35,8 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Transaction;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -62,7 +63,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRUploadViaFormServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUploadViaFormServlet.class);
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {

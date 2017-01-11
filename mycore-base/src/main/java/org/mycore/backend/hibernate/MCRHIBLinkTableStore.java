@@ -31,7 +31,8 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -48,7 +49,7 @@ import org.mycore.datamodel.common.MCRLinkTableInterface;
  */
 public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     // logger
-    static Logger LOGGER = Logger.getLogger(MCRHIBLinkTableStore.class);
+    static Logger LOGGER = LogManager.getLogger(MCRHIBLinkTableStore.class);
 
     private String classname = MCRLINKHREF.class.getCanonicalName();
 

@@ -35,7 +35,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
@@ -55,7 +56,7 @@ public class MCRLayoutService {
 
     private static final int INITIAL_BUFFER_SIZE = 32 * 1024;
 
-    final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
+    final static Logger LOGGER = LogManager.getLogger(MCRLayoutService.class);
 
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
 

@@ -14,7 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.tools.MCRPNGTools;
@@ -34,7 +35,7 @@ public class MCRQRCodeServlet extends MCRContentServlet {
 
     private static final long CACHE_TIME = TimeUnit.SECONDS.convert(1000L, TimeUnit.DAYS);
 
-    private static final Logger LOGGER = Logger.getLogger(MCRQRCodeServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRQRCodeServlet.class);
 
     private static final Pattern REQUEST_PATTERN = Pattern.compile("/(\\d*)/(.*)");
 

@@ -25,7 +25,8 @@ package org.mycore.common.content.transformer;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 
 /**
@@ -36,7 +37,7 @@ import org.mycore.common.content.MCRContent;
  */
 public class MCRDebuggingTransformer extends MCRContentTransformer {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRDebuggingTransformer.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRDebuggingTransformer.class);
 
     @Override
     public MCRContent transform(MCRContent source) throws IOException {

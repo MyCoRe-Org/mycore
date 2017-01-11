@@ -31,7 +31,8 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.datamodel.language.MCRLanguageFactory;
@@ -45,7 +46,7 @@ import com.google.common.collect.Lists;
  * @since 2014.04
  */
 public class MCRCombinedResourceBundleControl extends Control {
-    private static Logger LOGGER = Logger.getLogger(MCRCombinedResourceBundleControl.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRCombinedResourceBundleControl.class);
 
     private Locale defaultLocale = MCRLanguageFactory.instance().getDefaultLanguage().getLocale();
 

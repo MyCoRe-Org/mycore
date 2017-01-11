@@ -47,7 +47,8 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -68,7 +69,7 @@ public class MCRTranslation {
 
     private static final String DEPRECATED_MESSAGES_PROPERTIES = "/deprecated-messages.properties";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRTranslation.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTranslation.class);
 
     private static final Pattern ARRAY_DETECTOR = Pattern.compile(";");
 

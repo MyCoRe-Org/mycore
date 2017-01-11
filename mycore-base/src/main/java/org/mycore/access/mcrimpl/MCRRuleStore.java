@@ -25,7 +25,8 @@ package org.mycore.access.mcrimpl;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
@@ -54,7 +55,7 @@ public abstract class MCRRuleStore {
 
     public abstract int getNextFreeRuleID(String prefix);
 
-    private static final Logger LOGGER = Logger.getLogger(MCRRuleStore.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRuleStore.class);
 
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 

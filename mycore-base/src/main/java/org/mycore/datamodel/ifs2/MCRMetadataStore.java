@@ -26,7 +26,7 @@ package org.mycore.datamodel.ifs2;
 import java.io.IOException;
 
 import org.apache.commons.vfs2.FileObject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
@@ -71,7 +71,7 @@ public class MCRMetadataStore extends MCRStore {
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
         if (forceXML) {
             forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".ForceDocType", null);
-            Logger.getLogger(MCRMetadataStore.class).info("Set doctype for " + type + " to " + forceDocType);
+            LogManager.getLogger(MCRMetadataStore.class).info("Set doctype for " + type + " to " + forceDocType);
         }
     }
 
@@ -89,7 +89,7 @@ public class MCRMetadataStore extends MCRStore {
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML", true);
         if (forceXML) {
             forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType", null);
-            Logger.getLogger(MCRMetadataStore.class).info("Set doctype for " + config.getID() + " to " + forceDocType);
+            LogManager.getLogger(MCRMetadataStore.class).info("Set doctype for " + config.getID() + " to " + forceDocType);
         }
     }
 

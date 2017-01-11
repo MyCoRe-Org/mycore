@@ -26,7 +26,8 @@ package org.mycore.access.strategies;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 
 /**
@@ -47,7 +48,7 @@ import org.mycore.access.MCRAccessManager;
  * @version $Revision: 26482 $ $Date: 2013-03-13 10:16:11 +0100 (Mi, 13. Mär 2013) $
  */
 public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy {
-    private static final Logger LOGGER = Logger.getLogger(MCRObjectBaseStrategy.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRObjectBaseStrategy.class);
 
     private static final Pattern BASE_PATTERN = Pattern.compile("([^_]*_[^_]*)_*");
 

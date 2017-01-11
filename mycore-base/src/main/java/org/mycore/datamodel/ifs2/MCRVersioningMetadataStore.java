@@ -30,7 +30,8 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 
 import org.apache.commons.vfs2.FileObject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
@@ -56,7 +57,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
  */
 public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCRVersioningMetadataStore.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCRVersioningMetadataStore.class);
 
     protected SVNURL repURL;
 

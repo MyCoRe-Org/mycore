@@ -25,7 +25,8 @@ package org.mycore.access;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.access.strategies.MCRDerivateIDStrategy;
@@ -42,7 +43,7 @@ public class MCRAccessManager {
 
     private static final MCRAccessCacheManager ACCESS_CACHE = new MCRAccessCacheManager();
 
-    public static final Logger LOGGER = Logger.getLogger(MCRAccessManager.class);
+    public static final Logger LOGGER = LogManager.getLogger(MCRAccessManager.class);
 
     public static final String PERMISSION_READ = "read";
 
@@ -273,7 +274,7 @@ public class MCRAccessManager {
             accessAllowed = checkPermission(objectId, PERMISSION_READ) && checkPermission(derID, PERMISSION_READ);
         } else {
             accessAllowed = checkPermission(derID, PERMISSION_READ);
-            Logger.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
+            LogManager.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
         }
         return accessAllowed;
     }

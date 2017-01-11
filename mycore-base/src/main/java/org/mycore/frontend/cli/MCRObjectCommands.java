@@ -45,7 +45,8 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.transform.JDOMResult;
@@ -102,7 +103,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static final String EXPORT_OBJECT_TO_DIRECTORY_COMMAND = "export object {0} to directory {1} with {2}";
 
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRObjectCommands.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRObjectCommands.class);
 
     /** Default transformer script */
     public static final String DEFAULT_TRANSFORMER = "save-object.xsl";

@@ -11,13 +11,14 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 
 public class MCRPNGTools implements AutoCloseable {
-    private static Logger LOGGER = Logger.getLogger(MCRPNGTools.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRPNGTools.class);
 
     private static AtomicInteger maxPngSize = new AtomicInteger(64 * 1024);
 

@@ -59,7 +59,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.mycore.common.MCRCache;
@@ -144,7 +145,7 @@ public class MCRXMLFunctions {
     private final static Pattern HTML_MATCH_PATTERN = Pattern
             .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")", Pattern.DOTALL);
 
-    private static final Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
 
     private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000, "Derivate display value cache");
 

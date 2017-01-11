@@ -29,7 +29,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.ibm.icu.text.SimpleDateFormat;
 import com.ibm.icu.util.BuddhistCalendar;
@@ -53,7 +54,7 @@ import com.ibm.icu.util.JapaneseCalendar;
 public class MCRCalendar {
 
     /** Logger */
-    static Logger LOGGER = Logger.getLogger(MCRCalendar.class.getName());
+    static Logger LOGGER = LogManager.getLogger(MCRCalendar.class.getName());
 
     /** Tag for Buddhistic calendar */
     public static final String TAG_BUDDHIST = "buddhist";

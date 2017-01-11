@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.events.MCRSessionListener;
 import org.mycore.util.concurrent.MCRReadWriteGuard;
 
@@ -208,11 +208,11 @@ public class MCRSessionMgr {
             for (MCRSession session : var.toArray(new MCRSession[var.size()])) {
                 session.close();
             }
-            Logger.getLogger(MCRSessionMgr.class).info("Removing thread locals...");
+            LogManager.getLogger(MCRSessionMgr.class).info("Removing thread locals...");
             isSessionAttached = null;
             theThreadLocalSession = null;
             listeners.clear();
-            Logger.getLogger(MCRSessionMgr.class).info("...done.");
+            LogManager.getLogger(MCRSessionMgr.class).info("...done.");
         });
         listenersGuard = null;
     }

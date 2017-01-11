@@ -36,7 +36,8 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.ClassUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -51,7 +52,7 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public class MCRCommand {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRCommand.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCommand.class);
 
     /** The input format used for invoking this command */
     protected MessageFormat messageFormat;

@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 
@@ -131,12 +131,12 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
         try {
             md5Sum = MCRUtils.getMD5Sum(Files.newInputStream(path));
         } catch (IOException e) {
-            Logger.getLogger(getClass()).error("Could not verify path: " + path, e);
+            LogManager.getLogger(getClass()).error("Could not verify path: " + path, e);
             return false;
         }
         boolean returns = md5Sum.matches(attrs.md5sum());
         if (!returns) {
-            Logger.getLogger(getClass()).warn("MD5sum does not match: " + path);
+            LogManager.getLogger(getClass()).warn("MD5sum does not match: " + path);
         }
         return returns;
     }

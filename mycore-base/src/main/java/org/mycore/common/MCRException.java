@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Instances of this class represent a general exception thrown by any part of
@@ -95,7 +95,7 @@ public class MCRException extends RuntimeException {
             pw.flush();
             return sw.toString();
         } catch (IOException e) {
-            Logger.getLogger(MCRException.class).warn("Error while transforming stack trace to String.", e);
+            LogManager.getLogger(MCRException.class).warn("Error while transforming stack trace to String.", e);
             return null;
         }
 

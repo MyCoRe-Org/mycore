@@ -25,7 +25,8 @@ package org.mycore.frontend.export;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.frontend.basket.MCRBasket;
@@ -61,7 +62,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRExportServlet extends MCRServlet {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRExportServlet.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRExportServlet.class);
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {

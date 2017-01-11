@@ -29,7 +29,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -88,7 +89,7 @@ public class MCREventManager {
 
     }
 
-    private static Logger logger = Logger.getLogger(MCREventManager.class);
+    private static Logger logger = LogManager.getLogger(MCREventManager.class);
 
     private static MCREventManager instance;
 

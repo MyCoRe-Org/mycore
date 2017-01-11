@@ -30,7 +30,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -57,7 +58,7 @@ public class MCRMetaXMLTest extends MCRTestCase {
     public void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaXML
         if (LOGGER == null) {
-            LOGGER = Logger.getLogger(MCRMetaXMLTest.class);
+            LOGGER = LogManager.getLogger(MCRMetaXMLTest.class);
         }
     }
 

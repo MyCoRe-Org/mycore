@@ -31,7 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.xml.transform.Transformer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -48,7 +49,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRParameterCollector {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRParameterCollector.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRParameterCollector.class);
 
     /** The collected parameters */
     private Map<String, Object> parameters = new HashMap<String, Object>();

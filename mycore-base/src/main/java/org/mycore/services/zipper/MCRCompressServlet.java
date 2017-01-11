@@ -45,7 +45,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -85,7 +86,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
 
     private static Pattern PATH_INFO_PATTERN = Pattern.compile("\\A([\\w]+)/([\\w/]+)\\z");
 
-    private static Logger LOGGER = Logger.getLogger(MCRCompressServlet.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRCompressServlet.class);
 
     @Override
     protected void think(MCRServletJob job) throws Exception {

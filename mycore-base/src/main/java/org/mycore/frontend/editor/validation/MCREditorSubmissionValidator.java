@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
@@ -16,7 +17,7 @@ import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
 
 public class MCREditorSubmissionValidator {
 
-    private final static Logger LOGGER = Logger.getLogger(MCREditorSubmissionValidator.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCREditorSubmissionValidator.class);
 
     private MCREditorSubmission sub;
 

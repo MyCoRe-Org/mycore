@@ -28,7 +28,8 @@ import java.net.URL;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRJDOMContent;
@@ -69,7 +70,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Frank L\u00fctzenkirchen
  **/
 public class MCRBasketServlet extends MCRServlet {
-    private final static Logger LOGGER = Logger.getLogger(MCRBasketServlet.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRBasketServlet.class);
 
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();

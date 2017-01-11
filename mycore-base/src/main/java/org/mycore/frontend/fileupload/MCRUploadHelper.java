@@ -31,7 +31,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
@@ -45,7 +46,7 @@ import org.mycore.common.MCRException;
  */
 public abstract class MCRUploadHelper {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRUploadHelper.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRUploadHelper.class);
 
     private final static Pattern PATH_SEPERATOR = Pattern.compile(Pattern.quote(File.separator.replace('\\', '/')));
 

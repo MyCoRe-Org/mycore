@@ -19,7 +19,8 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
@@ -32,7 +33,7 @@ public class MCRISO8601Date {
 
     public static final String PROPERTY_STRICT_PARSING = "MCR.Metadata.SimpleDateFormat.StrictParsing";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRISO8601Date.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRISO8601Date.class);
 
     private DateTimeFormatter dateTimeFormatter = MCRISO8601FormatChooser.getFormatter(null, null);
 

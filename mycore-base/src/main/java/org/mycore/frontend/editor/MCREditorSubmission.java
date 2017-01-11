@@ -32,7 +32,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -57,7 +58,7 @@ import org.mycore.frontend.editor.validation.value.MCRRequiredValidator;
  *          2010) $
  */
 public class MCREditorSubmission {
-    private final static Logger LOGGER = Logger.getLogger(MCREditorSubmission.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCREditorSubmission.class);
 
     private List variables = new ArrayList();
 

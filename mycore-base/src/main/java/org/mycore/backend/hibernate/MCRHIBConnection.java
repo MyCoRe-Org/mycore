@@ -30,7 +30,8 @@ import java.text.MessageFormat;
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.EntityType;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -49,7 +50,7 @@ import org.mycore.common.config.MCRConfiguration;
 public class MCRHIBConnection {
     static MCRHIBConnection SINGLETON;
 
-    private static Logger LOGGER = Logger.getLogger(MCRHIBConnection.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRHIBConnection.class);
 
     @Override
     protected void finalize() throws Throwable {

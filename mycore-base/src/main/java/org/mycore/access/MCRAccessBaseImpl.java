@@ -27,7 +27,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
@@ -52,7 +53,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
         "MCR.Access.AccessPermissions", "read,write,delete");
 
     /** the logger */
-    private static final Logger LOGGER = Logger.getLogger(MCRAccessBaseImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRAccessBaseImpl.class);
 
     public MCRAccessBaseImpl() {
     }

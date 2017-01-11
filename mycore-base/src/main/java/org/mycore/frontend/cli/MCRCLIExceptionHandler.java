@@ -21,7 +21,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 
@@ -32,7 +33,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
  */
 public class MCRCLIExceptionHandler {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRCLIExceptionHandler.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRCLIExceptionHandler.class);
 
     public static void handleException(InvocationTargetException ex) {
         handleException(ex.getTargetException());

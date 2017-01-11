@@ -41,7 +41,8 @@ import java.util.Objects;
 import java.util.Vector;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xerces.util.XMLCatalogResolver;
 import org.apache.xerces.xni.XMLResourceIdentifier;
 import org.apache.xerces.xni.XNIException;
@@ -64,7 +65,7 @@ import org.xml.sax.ext.EntityResolver2;
  */
 public class MCREntityResolver implements EntityResolver2, LSResourceResolver, XMLEntityResolver {
 
-    public static final Logger LOGGER = Logger.getLogger(MCREntityResolver.class);
+    public static final Logger LOGGER = LogManager.getLogger(MCREntityResolver.class);
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 

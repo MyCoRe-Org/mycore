@@ -29,7 +29,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +59,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
 
     private static MCRCategLinkServiceImpl SERVICE = null;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImplTest.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCategLinkServiceImplTest.class);
 
     /*
      * (non-Javadoc)

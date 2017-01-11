@@ -24,7 +24,8 @@ package org.mycore.common.xsl;
 
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xalan.templates.ElemTemplate;
 import org.apache.xalan.templates.ElemTemplateElement;
 import org.apache.xalan.trace.GenerateEvent;
@@ -43,7 +44,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRTraceListener implements TraceListener {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRTraceListener.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRTraceListener.class);
 
     /**
      * Traces the execution of xsl stylesheet elements in debug mode. The trace

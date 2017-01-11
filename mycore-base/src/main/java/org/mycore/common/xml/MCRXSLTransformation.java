@@ -41,7 +41,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.output.SAXOutputter;
@@ -83,7 +84,7 @@ import org.jdom2.transform.JDOMSource;
  * @version $Revision: 1.0 $ $Date: 2003/02/03 14:57:25 $
  */
 public class MCRXSLTransformation {
-    private static Logger LOGGER = Logger.getLogger(MCRXSLTransformation.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRXSLTransformation.class);
 
     private static SAXTransformerFactory saxFactory = null;
 

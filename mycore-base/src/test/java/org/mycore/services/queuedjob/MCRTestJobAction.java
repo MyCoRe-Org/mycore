@@ -24,7 +24,8 @@ package org.mycore.services.queuedjob;
 
 import java.util.concurrent.ExecutionException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -32,7 +33,7 @@ import org.apache.log4j.Logger;
  */
 public class MCRTestJobAction extends MCRJobAction {
 
-    private static Logger LOGGER = Logger.getLogger(MCRTestJobAction.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRTestJobAction.class);
 
     /**
      * 

@@ -23,7 +23,8 @@
 
 package org.mycore.common.xml;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 
@@ -34,7 +35,7 @@ import org.xml.sax.SAXParseException;
  */
 public class MCRXMLParserErrorHandler implements ErrorHandler {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRXMLParserErrorHandler.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRXMLParserErrorHandler.class);
 
     protected boolean silent;
 

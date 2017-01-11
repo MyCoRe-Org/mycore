@@ -66,8 +66,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
-import org.apache.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -128,7 +128,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRURIResolver implements URIResolver {
-    static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
+    static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
     private static Map<String, URIResolver> SUPPORTED_SCHEMES;
 
@@ -765,7 +765,7 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             String classname = href.substring(href.indexOf(":") + 1, href.indexOf("?"));
             Class<?> cl = null;
-            Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
+            LogManager.getLogger(this.getClass()).debug("Loading Class: " + classname);
             Object o;
             try {
                 cl = Class.forName(classname);
@@ -1285,7 +1285,7 @@ public final class MCRURIResolver implements URIResolver {
      * @returns A xsl file with the includes as href.
      */
     private static class MCRXslIncludeResolver implements URIResolver {
-        private static Logger LOGGER = Logger.getLogger(MCRXslIncludeResolver.class);
+        private static Logger LOGGER = LogManager.getLogger(MCRXslIncludeResolver.class);
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
@@ -1556,7 +1556,7 @@ public final class MCRURIResolver implements URIResolver {
      * no variable substitution takes place Example: MCR.URIResolver.redirect.alias=webapp:path/to/alias.xml
      */
     private static class MCRRedirectResolver implements URIResolver {
-        private static Logger LOGGER = Logger.getLogger(MCRRedirectResolver.class);
+        private static Logger LOGGER = LogManager.getLogger(MCRRedirectResolver.class);
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {

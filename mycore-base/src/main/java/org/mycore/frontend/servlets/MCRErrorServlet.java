@@ -34,8 +34,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -57,7 +58,7 @@ public class MCRErrorServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRErrorServlet.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRErrorServlet.class);
 
     private static MCRLayoutService LAYOUT_SERVICE = MCRLayoutService.instance();
 

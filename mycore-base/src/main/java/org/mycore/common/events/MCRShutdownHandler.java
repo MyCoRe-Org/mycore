@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -115,7 +115,7 @@ public class MCRShutdownHandler {
     }
 
     void shutDown() {
-        Logger logger = Logger.getLogger(MCRShutdownHandler.class);
+        Logger logger = LogManager.getLogger(MCRShutdownHandler.class);
         String cfgSystemName = "MyCoRe:";
         try {
             cfgSystemName = MCRConfiguration.instance().getString(PROPERTY_SYSTEM_NAME) + ":";

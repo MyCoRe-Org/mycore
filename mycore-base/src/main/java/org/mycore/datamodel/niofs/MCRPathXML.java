@@ -38,7 +38,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
@@ -56,7 +57,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRPathXML {
 
-    static Logger LOGGER = Logger.getLogger(MCRPathXML.class);
+    static Logger LOGGER = LogManager.getLogger(MCRPathXML.class);
 
     private MCRPathXML() {
     }

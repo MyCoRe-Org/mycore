@@ -34,7 +34,8 @@ import java.util.stream.StreamSupport;
 
 import javax.servlet.ServletContext;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
@@ -47,7 +48,7 @@ import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
  */
 public class MCRFileSystemPromoter implements AutoExecutable {
 
-    private static Logger LOGGER = Logger.getLogger(MCRFileSystemPromoter.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRFileSystemPromoter.class);
 
     /**
      * 

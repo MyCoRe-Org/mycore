@@ -32,7 +32,8 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -48,7 +49,7 @@ import org.mycore.common.xml.MCRXMLParserFactory;
  * Resolves includes and prepares editor form for output.
  */
 public class MCREditorDefReader {
-    private final static Logger LOGGER = Logger.getLogger(MCREditorDefReader.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCREditorDefReader.class);
 
     private Element editor;
 

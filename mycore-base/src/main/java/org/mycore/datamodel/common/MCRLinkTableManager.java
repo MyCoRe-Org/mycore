@@ -28,7 +28,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -54,7 +55,7 @@ public class MCRLinkTableManager {
     protected static MCRLinkTableManager singleton;
 
     // logger
-    static Logger logger = Logger.getLogger(MCRLinkTableManager.class.getName());
+    static Logger logger = LogManager.getLogger(MCRLinkTableManager.class.getName());
 
     private MCRLinkTableInterface persistenceclass = null;
 

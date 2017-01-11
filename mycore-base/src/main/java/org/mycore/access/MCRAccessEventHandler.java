@@ -26,7 +26,8 @@ package org.mycore.access;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRStringContent;
@@ -46,7 +47,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 public class MCRAccessEventHandler extends MCREventHandlerBase {
 
     // the logger
-    private static Logger LOGGER = Logger.getLogger(MCRAccessEventHandler.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRAccessEventHandler.class);
 
     private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 

@@ -48,7 +48,7 @@ import javax.xml.transform.Source;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
@@ -111,11 +111,11 @@ public abstract class MCRContent {
         try {
             path = new URL(systemId).getPath();
         } catch (MalformedURLException e) {
-            Logger.getLogger(getClass()).debug("Could not get file name from URL.", e);
+            LogManager.getLogger(getClass()).debug("Could not get file name from URL.", e);
             try {
                 path = new URI(systemId).getPath();
             } catch (URISyntaxException e2) {
-                Logger.getLogger(getClass()).debug("Could not get file name from URI.", e2);
+                LogManager.getLogger(getClass()).debug("Could not get file name from URI.", e2);
             }
         }
         if (path != null) {

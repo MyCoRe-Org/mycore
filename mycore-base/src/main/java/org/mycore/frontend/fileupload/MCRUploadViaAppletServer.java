@@ -35,7 +35,8 @@ import java.util.zip.ZipInputStream;
 
 import javax.servlet.ServletException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Transaction;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
@@ -55,7 +56,7 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public final class MCRUploadViaAppletServer implements Runnable {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRUploadViaAppletServer.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRUploadViaAppletServer.class);
 
     private final static int bufferSize = 65536; // 64 KByte
 

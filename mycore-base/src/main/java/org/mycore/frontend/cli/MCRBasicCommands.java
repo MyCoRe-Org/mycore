@@ -28,7 +28,8 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -47,7 +48,7 @@ import org.xml.sax.SAXParseException;
 
 @MCRCommandGroup(name = "Basic Commands")
 public class MCRBasicCommands {
-    private static Logger LOGGER = Logger.getLogger(MCRBasicCommands.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRBasicCommands.class);
 
     /**
      * Shows a list of commands understood by the command line interface and

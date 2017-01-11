@@ -3,8 +3,12 @@
  */
 package org.mycore.frontend.cli;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
@@ -16,7 +20,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 @MCRCommandGroup(name="Logging Commands")
 public class MCRLoggingCommands extends MCRAbstractCommands {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRLoggingCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRLoggingCommands.class);
 
    /**
      * @param name
@@ -39,13 +43,17 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
             return;
         }
 
-        Logger log = Logger.getLogger(name);
+        Logger log = LogManager.getLogger(name);
         if (log == null) {
             LOGGER.error("Could not get logger for \"" + name + "\"");
             return;
         }
 
         LOGGER.info("Change log level from " + log.getLevel() + " to " + newLevel);
-        log.setLevel(newLevel);
+        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        Configuration config = ctx.getConfiguration();
+        LoggerConfig loggerConfig = config.getLoggerConfig(log.getName());
+        loggerConfig.setLevel(newLevel);
+        ctx.updateLoggers();
     }
 }

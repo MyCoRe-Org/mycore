@@ -58,7 +58,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -105,7 +106,7 @@ public class MCRMailer extends MCRServlet {
         job.getResponse().sendRedirect(goTo);
     }
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMailer.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMailer.class);
 
     private static Session mailSession;
 

@@ -34,7 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.content.MCRContent;
@@ -64,7 +65,7 @@ import org.xml.sax.SAXException;
 public class MCRFileNodeServlet extends MCRContentServlet {
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRFileNodeServlet.class);
 
     private static Pattern patternDerivateID = Pattern.compile(".+_derivate_[0-9]+");
 

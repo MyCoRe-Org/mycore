@@ -39,7 +39,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.query.Query;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -67,7 +68,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static MCRHIBConnection HIB_CONNECTION_INSTANCE;
 
-    private static Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImpl.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRCategLinkServiceImpl.class);
 
     private static Class<MCRCategoryLinkImpl> LINK_CLASS = MCRCategoryLinkImpl.class;
 

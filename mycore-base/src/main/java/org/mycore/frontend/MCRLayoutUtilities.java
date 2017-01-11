@@ -26,7 +26,8 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -76,7 +77,7 @@ public class MCRLayoutUtilities {
 
     public final static int ALL2BLOCKER_TRUE = 3;
 
-    private final static Logger LOGGER = Logger.getLogger(MCRLayoutUtilities.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
 
     private static HashMap<String, Element> itemStore = new HashMap<String, Element>();
 

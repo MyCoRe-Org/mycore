@@ -31,7 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Invalidates a session and sends redirect to referring page.
@@ -44,7 +45,7 @@ public class MCRLogoutServlet extends HttpServlet {
 
     private static final String LOGOUT_REDIRECT_URL_PARAMETER = "url";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRLogoutServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRLogoutServlet.class);
 
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)

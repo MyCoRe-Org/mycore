@@ -38,7 +38,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
@@ -253,7 +254,7 @@ public class MCRXMLMetadataManager {
 
     public static final int REV_LATEST = -1;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRXMLMetadataManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXMLMetadataManager.class);
 
     /**
      * Returns IFS2 MCRMetadataStore for the given project and object type

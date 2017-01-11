@@ -28,7 +28,8 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -43,7 +44,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRContainerLoginServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRContainerLoginServlet.class);
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.servlets.MCRServlet#think(org.mycore.frontend.servlets.MCRServletJob)
@@ -99,7 +100,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
         }
 
         protected Optional<HttpServletRequest> getCurrentRequest() {
-            Logger.getLogger(getClass()).debug("Getting request from session: " + session.getID());
+            LogManager.getLogger(getClass()).debug("Getting request from session: " + session.getID());
             return session.getServletRequest();
         }
     }

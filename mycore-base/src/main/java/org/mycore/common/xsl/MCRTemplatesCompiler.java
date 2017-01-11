@@ -32,7 +32,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXTransformerFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xml.utils.WrappedRuntimeException;
 import org.mycore.common.MCRExceptionCauseFinder;
@@ -47,7 +48,7 @@ import org.mycore.common.xml.MCRURIResolver;
  */
 public class MCRTemplatesCompiler {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRTemplatesCompiler.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRTemplatesCompiler.class);
 
     /** The XSL transformer factory to use */
     private static SAXTransformerFactory factory;

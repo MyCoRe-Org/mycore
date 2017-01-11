@@ -7,7 +7,8 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -23,7 +24,7 @@ import org.mycore.frontend.MCRFrontendUtil;
 public class MCRDisplayHideDerivateServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRDisplayHideDerivateServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRDisplayHideDerivateServlet.class);
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {

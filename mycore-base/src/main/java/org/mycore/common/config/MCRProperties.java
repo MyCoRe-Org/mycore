@@ -26,7 +26,7 @@ package org.mycore.common.config;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Like {@link Properties} but with in-place replacement of properties that want to append a value.
@@ -59,7 +59,7 @@ public class MCRProperties extends Properties {
     private Object putString(String key, String value) {
         String systemProperty = System.getProperties().getProperty(key);
         if (systemProperty != null && !systemProperty.equals(value)) {
-            Logger.getLogger(getClass()).error("Cannot overwrite system property: " + key + "=" + value);
+            LogManager.getLogger(getClass()).error("Cannot overwrite system property: " + key + "=" + value);
             return systemProperty;
         }
         String oldValue = (String) super.get(key);

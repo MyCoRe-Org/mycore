@@ -38,7 +38,8 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -64,7 +65,7 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     private static Map<String, MCRJobMaster> INSTANCES = new HashMap<String, MCRJobMaster>();
 
-    private static Logger LOGGER = Logger.getLogger(MCRJobMaster.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRJobMaster.class);
 
     private final MCRJobQueue JOB_QUEUE;
 
