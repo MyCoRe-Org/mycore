@@ -1244,11 +1244,6 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-swf</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mycore</groupId>
         <artifactId>mycore-sword</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1983,7 +1978,6 @@
     <module>mycore-pi</module>
     <module>mycore-restapi</module>
     <module>mycore-solr</module>
-    <module>mycore-swf</module>
     <module>mycore-sword</module>
     <module>mycore-urn</module>
     <module>mycore-user2</module>
