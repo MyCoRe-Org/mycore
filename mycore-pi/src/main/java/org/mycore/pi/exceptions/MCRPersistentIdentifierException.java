@@ -23,7 +23,13 @@ public class MCRPersistentIdentifierException extends MCRCatchException {
     }
 
     public MCRPersistentIdentifierException(String message, String translatedAdditionalInformation, int code) {
-        super(message);
+        this(message, translatedAdditionalInformation, code, null);
+    }
+
+    public MCRPersistentIdentifierException(String message, String translatedAdditionalInformation, int code,
+        Exception cause) {
+        super(message, cause);
+
         this.translatedAdditionalInformation = translatedAdditionalInformation;
         this.code = code;
     }
