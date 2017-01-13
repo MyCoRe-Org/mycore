@@ -3,12 +3,17 @@ package org.mycore.pi.doi;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +22,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
+import org.jdom2.transform.JDOMSource;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
@@ -53,9 +59,21 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
 
     private static final String TYPE = "doi";
 
+    /**
+     * A media URL is longer then 255 chars
+     */
     private static final int ERR_CODE_1_1 = 0x1001;
 
+    /**
+     * The datacite document is not valid
+     */
+    private static final int ERR_CODE_1_2 = 0x1002;
+
     private static final int MAX_URL_LENGTH = 255;
+
+    private static final String DATACITE_SCHEMA_PATH = "xsd/datacite/metadata.xsd";
+
+    private static final String TRANSLATE_PREFIX = "component.pi.register.error.";
 
     private String username;
 
@@ -67,11 +85,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
 
     private String registerURL;
 
-    private boolean useTestPrefix = false;
-
-    public String getRegisterURL() {
-        return registerURL;
-    }
+    private boolean useTestPrefix;
 
     public MCRDOIRegistrationService(String serviceID) {
         super(serviceID, TYPE);
@@ -79,26 +93,10 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         Map<String, String> properties = getProperties();
         username = properties.get("Username");
         password = properties.get("Password");
-        useTestPrefix = (properties.containsKey(TEST_PREFIX)) ? Boolean.valueOf(properties.get(TEST_PREFIX)) : false;
+        useTestPrefix = properties.containsKey(TEST_PREFIX) && Boolean.valueOf(properties.get(TEST_PREFIX));
         transformer = properties.get("Transformer");
         this.registerURL = properties.get("RegisterBaseURL");
         host = "mds.datacite.org";
-    }
-
-    @Override
-    public void validateRegistration(MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException, MCRAccessException {
-        List<Map.Entry<String, URI>> mediaList = getMediaList((MCRObject) obj);
-
-        for (Map.Entry<String, URI> stringURIEntry : mediaList) {
-            if (stringURIEntry.getValue().toString().length() > MAX_URL_LENGTH) {
-                throw new MCRPersistentIdentifierException(
-                    "The URI " + stringURIEntry + " from media-list is to long!", MCRTranslation.translate("component.pi.register.error.001001"),
-                    ERR_CODE_1_1);
-            }
-        }
-
-        super.validateRegistration(obj, additional);
     }
 
     private static void insertDOI(Document datacite, MCRDigitalObjectIdentifier doi)
@@ -122,6 +120,39 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             doiElement.setAttribute("identifierType", "DOI");
             doiElement.setText(doi.asString());
         }
+    }
+
+    private static Schema loadDataciteSchema() throws SAXException {
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
+        URL localSchemaURL = MCRDOIRegistrationService.class.getClassLoader().getResource(DATACITE_SCHEMA_PATH);
+
+        if (localSchemaURL == null) {
+            throw new MCRException(DATACITE_SCHEMA_PATH + " was not found!");
+        }
+        Schema schema = schemaFactory.newSchema(localSchemaURL);
+        return schema;
+    }
+
+    public String getRegisterURL() {
+        return registerURL;
+    }
+
+    @Override
+    public void validateRegistration(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException, MCRAccessException {
+        List<Map.Entry<String, URI>> mediaList = getMediaList((MCRObject) obj);
+
+        for (Map.Entry<String, URI> stringURIEntry : mediaList) {
+            if (stringURIEntry.getValue().toString().length() > MAX_URL_LENGTH) {
+                throw new MCRPersistentIdentifierException(
+                    "The URI " + stringURIEntry + " from media-list is to long!",
+                    MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_1_1),
+                    ERR_CODE_1_1);
+            }
+        }
+
+        super.validateRegistration(obj, additional);
     }
 
     @Override
@@ -195,6 +226,17 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             MCRContent transform = MCRContentTransformerFactory.getTransformer(this.transformer).transform(content);
             Document dataciteDocument = transform.asXML();
             insertDOI(dataciteDocument, doi);
+
+            Schema dataciteSchema = loadDataciteSchema();
+
+            try {
+                dataciteSchema.newValidator().validate(new JDOMSource(dataciteDocument));
+            } catch (SAXException e) {
+                String translatedInformation = MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_1_2);
+                throw new MCRPersistentIdentifierException(
+                    "The document " + id.toString() + " does not generate well formed Datacite!",
+                    translatedInformation, ERR_CODE_1_2, e);
+            }
             return dataciteDocument;
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRPersistentIdentifierException(
