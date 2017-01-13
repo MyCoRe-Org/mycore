@@ -46,14 +46,14 @@ import org.mycore.wfc.MCRConstants;
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRURLRetriever {
-    private MCRURLRetriever() {
-    }
-
     private static final Logger LOGGER = LogManager.getLogger(MCRURLRetriever.class);
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
-
+    
     private static Map<String, MCRCollection> COLLECTION_MAP = initActionsMappings();
+
+    private MCRURLRetriever() {
+    }
 
     private static Map<String, MCRCollection> initActionsMappings() {
         try {

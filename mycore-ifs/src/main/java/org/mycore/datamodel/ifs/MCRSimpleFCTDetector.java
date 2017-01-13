@@ -67,11 +67,11 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
     /** Keys are file content types, values are vectors of MCRDetectionRule */
     private Hashtable rulesTable = new Hashtable();
 
+    private static Logger logger = LogManager.getLogger(MCRSimpleFCTDetector.class);
+
     /** Creates a new detector */
     public MCRSimpleFCTDetector() {
     }
-
-    private static Logger logger = LogManager.getLogger(MCRSimpleFCTDetector.class);
 
     /**
      * Adds a detection rule from the file content type definition XML file. The

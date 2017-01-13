@@ -5,12 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class MCRClassTools {
-    private static final Logger LOGGER = LogManager.getLogger(MCRClassTools.class);
-
     public static Object loadClassFromURL(String classPath, String className) throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException{
         
         return loadClassFromURL(new File(classPath), className);

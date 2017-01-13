@@ -47,6 +47,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
 
+    private final static Logger LOGGER = LogManager.getLogger(MCRExtractRelatedItemsEventHandler.class);
+
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
@@ -70,8 +72,6 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
     protected void handleObjectRepaired(final MCREvent evt, final MCRObject obj) {
         extractRelatedItems(evt, obj);
     }
-
-    private final static Logger LOGGER = LogManager.getLogger(MCRExtractRelatedItemsEventHandler.class);
 
     private void extractRelatedItems(final MCREvent evt, final MCRObject object) {
         if (!MCRMODSWrapper.isSupported(object)){

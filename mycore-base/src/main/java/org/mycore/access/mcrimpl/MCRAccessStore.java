@@ -65,25 +65,25 @@ public abstract class MCRAccessStore {
 
     public abstract boolean isRuleInUse(String ruleid);
 
+    private static final Logger LOGGER = LogManager.getLogger(MCRAccessStore.class);
+    
+    final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
+    
+    final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule",
+            "MCRACCESSRULE");
+    
+    final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Map",
+            "MCRACCESS");
+    
+    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "read,write,delete");
+    
+    static private MCRAccessStore implementation;
+
     /**
      * 
      * @return a collection of all String IDs an access rule is assigned to
      */
     public abstract Collection<String> getDistinctStringIDs();
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRAccessStore.class);
-
-    final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
-
-    final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule",
-            "MCRACCESSRULE");
-
-    final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Map",
-            "MCRACCESS");
-
-    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "read,write,delete");
-
-    static private MCRAccessStore implementation;
 
     public static MCRAccessStore getInstance() {
         try {

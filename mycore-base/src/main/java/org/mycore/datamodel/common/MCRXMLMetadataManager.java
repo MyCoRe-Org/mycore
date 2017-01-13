@@ -99,6 +99,42 @@ import org.xml.sax.SAXException;
  */
 public class MCRXMLMetadataManager {
 
+    /** The singleton */
+    private static MCRXMLMetadataManager SINGLETON;
+    
+    private HashSet<String> createdStores;
+    
+    /**
+     * The default IFS2 Metadata store class to use, set by MCR.Metadata.Store.DefaultClass
+     */
+    private String defaultClass;
+
+    /**
+     * The default subdirectory slot layout for IFS2 metadata store, is 4-2-2 for 8-digit IDs,
+     * that means DocPortal_document_0000001 will be stored in the file
+     * DocPortal/document/0000/00/DocPortal_document_00000001.xml
+     */
+    private String defaultLayout;
+
+    /**
+     * The base directory for all IFS2 metadata stores used, set by MCR.Metadata.Store.BaseDir
+     */
+    private File baseDir;
+
+    /**
+     * The local base directory for IFS2 versioned metadata using SVN, set URI by MCR.Metadata.Store.SVNBase
+     */
+    private File svnDir;
+
+    /**
+     * The local file:// uri of all SVN versioned metadata, set URI by MCR.Metadata.Store.SVNBase
+     */
+    private URI svnBase;
+
+    public static final int REV_LATEST = -1;
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRXMLMetadataManager.class);
+
     private static final class StoreModifiedHandle implements MCRCache.ModifiedHandle {
         private final long expire;
 
@@ -119,11 +155,6 @@ public class MCRXMLMetadataManager {
             return MCRXMLMetadataManager.instance().getLastModified(id);
         }
     }
-
-    /** The singleton */
-    private static MCRXMLMetadataManager SINGLETON;
-
-    private HashSet<String> createdStores;
 
     /** Returns the singleton */
     public static synchronized MCRXMLMetadataManager instance() {
@@ -226,37 +257,6 @@ public class MCRXMLMetadataManager {
     }
 
     /**
-     * The default IFS2 Metadata store class to use, set by MCR.Metadata.Store.DefaultClass
-     */
-    private String defaultClass;
-
-    /**
-     * The default subdirectory slot layout for IFS2 metadata store, is 4-2-2 for 8-digit IDs,
-     * that means DocPortal_document_0000001 will be stored in the file
-     * DocPortal/document/0000/00/DocPortal_document_00000001.xml
-     */
-    private String defaultLayout;
-
-    /**
-     * The base directory for all IFS2 metadata stores used, set by MCR.Metadata.Store.BaseDir
-     */
-    private File baseDir;
-
-    /**
-     * The local base directory for IFS2 versioned metadata using SVN, set URI by MCR.Metadata.Store.SVNBase
-     */
-    private File svnDir;
-
-    /**
-     * The local file:// uri of all SVN versioned metadata, set URI by MCR.Metadata.Store.SVNBase
-     */
-    private URI svnBase;
-
-    public static final int REV_LATEST = -1;
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRXMLMetadataManager.class);
-
-    /**
      * Returns IFS2 MCRMetadataStore for the given project and object type
      *
      * @param project the project, e.g. DocPortal
@@ -313,10 +313,8 @@ public class MCRXMLMetadataManager {
                 LOGGER.info("Resolved " + relativeURI + " to " + repURI.toASCIIString() + " for " + property);
                 config.set(property, repURI.toASCIIString());
                 File projectDir = new File(svnDir, project);
-                if (!projectDir.exists()) {
-                    if (!projectDir.mkdirs()) {
-                        throwStoreDirException(projectDir, project, objectType, configPrefix);
-                    }
+                if (!projectDir.exists() && !projectDir.mkdirs()) {
+                    throwStoreDirException(projectDir, project, objectType, configPrefix);
                 }
             }
         }
@@ -328,10 +326,8 @@ public class MCRXMLMetadataManager {
 
         File projectDir = new File(baseDir, project);
         File typeDir = new File(projectDir, objectType);
-        if (!typeDir.exists()) {
-            if(!typeDir.mkdirs()){
-                throwStoreDirException(typeDir, project, objectType, configPrefix);
-            }
+        if (!typeDir.exists() && !typeDir.mkdirs()) {
+            throwStoreDirException(typeDir, project, objectType, configPrefix);
         }
 
         config.set(configPrefix + "BaseDir", typeDir.getAbsolutePath());
