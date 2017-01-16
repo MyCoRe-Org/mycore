@@ -71,8 +71,10 @@ public class MCRMODSWrapper {
     private static List<String> topLevelElementOrder = new ArrayList<String>();
 
     static {
+        topLevelElementOrder.add("typeOfResource");
         topLevelElementOrder.add("titleInfo");
         topLevelElementOrder.add("name");
+        topLevelElementOrder.add("genre");
         topLevelElementOrder.add("originInfo");
         topLevelElementOrder.add("language");
         topLevelElementOrder.add("abstract");

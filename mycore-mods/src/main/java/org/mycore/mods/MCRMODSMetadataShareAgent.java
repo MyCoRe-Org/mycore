@@ -149,8 +149,10 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         Element hostContainer = childWrapper.getElement(HOST_SECTION_XPATH);
         if (hostContainer == null) {
             LOGGER.info("Adding new relatedItem[@type='host'])");
-            hostContainer = new Element("relatedItem", MCRConstants.MODS_NAMESPACE).setAttribute("type", "host");
-            childWrapper.getMODS().addContent(hostContainer);
+            hostContainer = new Element("relatedItem", MCRConstants.MODS_NAMESPACE)
+                .setAttribute("href", parentWrapper.getMCRObject().getId().toString(), MCRConstants.XLINK_NAMESPACE)
+                .setAttribute("type", "host");
+            childWrapper.addElement(hostContainer);
         }
         hostContainer.addContent(parentWrapper.getMODS().cloneContent());
     }
