@@ -28,11 +28,13 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.EntityManager;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -49,6 +51,8 @@ import org.jdom2.JDOMException;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.backend.jpa.MCRStreamQuery;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
@@ -143,7 +147,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "delete all objects in topological order", help = "Removes all MCRObjects in topological order.", order = 25)
-    public static List<String> deleteTopologicalAllObjects() throws MCRActiveLinkException {
+    public static List<String> deleteTopologicalAllObjects() {
         final List<String> objectIds = MCRXMLMetadataManager.instance().listIDs();
         String[] objects = objectIds.stream().filter(id -> !id.contains("_derivate_")).toArray(String[]::new);
         MCRTopologicalSort ts = new MCRTopologicalSort();
@@ -1021,6 +1025,42 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRBase obj = MCRMetadataManager.retrieve(mid);
         MCRMetadataManager.fireRepairEvent(obj);
         LOGGER.info("Repaired " + mid.toString());
+    }
+
+    @MCRCommand(
+        syntax = "repair mcrlinkhref table",
+        help = "Runs through the whole table and checks for already deleted mcr objects and deletes them.", order = 185)
+    public static void repairMCRLinkHrefTable() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRStreamQuery<String> fromQuery = MCRStreamQuery
+            .getInstance(em,
+                "SELECT DISTINCT m.key.mcrfrom FROM MCRLINKHREF m",
+                String.class);
+        MCRStreamQuery<String> toQuery = MCRStreamQuery
+            .getInstance(em,
+                "SELECT DISTINCT m.key.mcrto FROM MCRLINKHREF m",
+                String.class);
+        // open streams
+        Set<String> idSet;
+        try (Stream<String> fromStream = fromQuery.getResultStream()) {
+            try (Stream<String> toStream = toQuery.getResultStream()) {
+                // build list and close db stream
+                idSet = Stream.concat(fromStream, toStream).collect(Collectors.toSet());
+            }
+        }
+
+        // collect invalid identifiers and join them with comma
+        List<String> invalidIds = idSet.stream()
+              .filter(MCRObjectID::isValid)
+              .map(MCRObjectID::getInstance)
+              .filter(id -> !MCRMetadataManager.exists(id))
+              .map(MCRObjectID::toString)
+              .collect(Collectors.toList());
+
+        // delete
+        em.createQuery("DELETE FROM MCRLINKHREF m WHERE m.key.mcrfrom IN (:invalidIds) or m.key.mcrto IN (:invalidIds)")
+          .setParameter("invalidIds", invalidIds)
+          .executeUpdate();
     }
 
     @MCRCommand(syntax = "merge derivates of object {0}",
