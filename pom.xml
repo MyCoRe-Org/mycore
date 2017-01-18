@@ -109,6 +109,24 @@
                 <fail>true</fail>
               </configuration>
             </execution>
+            <execution>
+              <id>enforce LOG4J-2.x API</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <bannedDependencies>
+                    <searchTransitive>false</searchTransitive>
+                    <excludes>
+                      <exclude>org.apache.logging.log4j:log4j-1.2-api</exclude>
+                    </excludes>
+                    <message>MCR-1509: Do not use LOG4J 1.2 API anymore</message>
+                  </bannedDependencies>
+                </rules>
+                <fail>true</fail>
+              </configuration>
+            </execution>
           </executions>
         </plugin>
         <plugin>
