@@ -722,7 +722,7 @@
               </xsl:attribute>
               <xsl:choose>
                 <xsl:when test="contains($link, 'PPN=')"><xsl:value-of select="substring-after($link, 'PPN=')" /></xsl:when>
-                <xsl:otherwise><xsl:value-of select="substring-after($link, ':ppn:')"/></xsl:otherwise>
+                <xsl:otherwise><xsl:value-of select="mcrxsl:decodeURIPath(substring-after($link, ':ppn:'))"/></xsl:otherwise>
               </xsl:choose>
             </a>
           </xsl:when>
