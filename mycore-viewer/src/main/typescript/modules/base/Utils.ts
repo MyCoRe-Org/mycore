@@ -801,7 +801,7 @@ class ViewerParameterMap extends MyCoReMap<string, string> {
             for (var currentElementIndex in mapElements) {
                 var currentElement = mapElements[currentElementIndex];
                 var keyValueArray = currentElement.split("=");
-                map.set(keyValueArray[0], keyValueArray[1]);
+                map.set(keyValueArray[0], decodeURIComponent(keyValueArray[1]));
             }
         }
 
