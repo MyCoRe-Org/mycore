@@ -48,14 +48,15 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
 public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
-    private static Logger LOGGER = Logger.getLogger(MCRJobQueue.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRJobQueue.class);
 
     protected static Map<String, MCRJobQueue> INSTANCES = new HashMap<String, MCRJobQueue>();
 

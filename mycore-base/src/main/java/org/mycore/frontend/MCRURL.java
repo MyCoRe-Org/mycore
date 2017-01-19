@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -17,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class MCRURL {
 
-    static Logger LOGGER = Logger.getLogger(MCRURL.class);
+    static Logger LOGGER = LogManager.getLogger(MCRURL.class);
 
     private URL url;
 

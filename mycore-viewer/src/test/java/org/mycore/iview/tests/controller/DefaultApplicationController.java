@@ -18,7 +18,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.selenium.MCRSeleniumTestBase;
 import org.mycore.iview.tests.TestProperties;
 import org.mycore.iview.tests.model.TestDerivate;
@@ -31,19 +32,19 @@ public class DefaultApplicationController extends ApplicationController {
 
     private static final String webpath = "target/test-classes/testFiles";
 
+    private static Map<TestDerivate, String> derivateHTMLMapping;
+    
+    private static final Logger LOGGER = LogManager.getLogger(DefaultApplicationController.class);
+    
+    private static Properties PROPERTIES = TestProperties.getInstance();
+    
+    private static Boolean SKIP_DOWNLOAD = Boolean
+            .parseBoolean(PROPERTIES.getProperty("test.viewer.skipDownload", "False"));
+    
     @Override
     public void init() {
         DefaultApplicationController.derivateHTMLMapping = new HashMap<TestDerivate, String>();
     }
-
-    private static Map<TestDerivate, String> derivateHTMLMapping;
-
-    private static final Logger LOGGER = Logger.getLogger(DefaultApplicationController.class);
-
-    private static Properties PROPERTIES = TestProperties.getInstance();
-
-    private static Boolean SKIP_DOWNLOAD = Boolean
-        .parseBoolean(PROPERTIES.getProperty("test.viewer.skipDownload", "False"));
 
     @Override
     public void setUpDerivate(WebDriver webdriver, TestDerivate testDerivate) {

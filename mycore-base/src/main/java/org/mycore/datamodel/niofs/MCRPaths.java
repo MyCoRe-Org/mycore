@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
@@ -73,7 +73,7 @@ final class MCRPaths {
         URI uri;
         try {
             uri = getURI(scheme, owner, path);
-            Logger.getLogger(MCRPaths.class).debug("Generated path URI:" + uri);
+            LogManager.getLogger(MCRPaths.class).debug("Generated path URI:" + uri);
         } catch (URISyntaxException e) {
             throw new InvalidPathException(path, "URI syntax error (" + e.getMessage() + ") for path");
         }

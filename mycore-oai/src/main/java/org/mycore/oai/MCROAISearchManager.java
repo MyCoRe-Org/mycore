@@ -6,7 +6,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.DefaultResumptionToken;
@@ -19,7 +20,7 @@ import org.mycore.oai.pmh.Set;
 
 public class MCROAISearchManager {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCROAISearchManager.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCROAISearchManager.class);
 
     protected final static String TOKEN_DELIMITER = "@";
 

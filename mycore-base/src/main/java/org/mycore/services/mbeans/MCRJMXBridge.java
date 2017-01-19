@@ -34,7 +34,8 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
@@ -43,7 +44,7 @@ public class MCRJMXBridge implements Closeable {
 
     static final WeakReference<MCRJMXBridge> SINGLETON = new WeakReference<MCRJMXBridge>(new MCRJMXBridge());
 
-    private static final Logger LOGGER = Logger.getLogger(MCRJMXBridge.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRJMXBridge.class);
 
     private static java.util.List<WeakReference<ObjectName>> ONAME_LIST = new ArrayList<WeakReference<ObjectName>>();
 

@@ -38,7 +38,8 @@ import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.Selectors;
 import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -83,7 +84,7 @@ public class MCRCStoreVFS extends MCRContentStore {
 
     private String uri;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRCStoreVFS.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCStoreVFS.class);
 
     @Override
     protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {

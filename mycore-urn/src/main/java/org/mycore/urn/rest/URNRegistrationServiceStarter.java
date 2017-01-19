@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRStartupHandler;
@@ -20,7 +21,7 @@ import org.mycore.common.events.MCRStartupHandler;
  */
 public class URNRegistrationServiceStarter implements MCRStartupHandler.AutoExecutable, MCRShutdownHandler.Closeable {
 
-    private static final Logger LOGGER = Logger.getLogger(URNRegistrationServiceStarter.class);
+    private static final Logger LOGGER = LogManager.getLogger(URNRegistrationServiceStarter.class);
 
     private ScheduledExecutorService scheduler;
 

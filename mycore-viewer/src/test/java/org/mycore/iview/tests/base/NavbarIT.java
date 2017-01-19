@@ -4,7 +4,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -33,7 +34,7 @@ public class NavbarIT extends ViewerTestBase {
 
     private static final int TOLERANCE = 20;
 
-    private static final Logger LOGGER = Logger.getLogger(NavbarIT.class);
+    private static final Logger LOGGER = LogManager.getLogger(NavbarIT.class);
 
     @Test
     public void testBasicElementsPresent() throws Exception {

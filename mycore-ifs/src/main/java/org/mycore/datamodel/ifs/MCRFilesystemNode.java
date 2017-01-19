@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -41,7 +42,7 @@ import org.mycore.datamodel.niofs.ifs1.MCRFileSystemProvider;
  * @version $Revision$ $Date$
  */
 public abstract class MCRFilesystemNode {
-    private static final Logger LOGGER = Logger.getLogger(MCRFilesystemNode.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFilesystemNode.class);
 
     protected static MCRFileMetadataManager manager = MCRFileMetadataManager.instance();
 

@@ -34,7 +34,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Document;
@@ -71,7 +72,7 @@ import org.mycore.urn.services.MCRURNManager;
  */
 public class MCRURNEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRURNEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRURNEventHandler.class);
 
     /**
      * Handles object created events. This method updates the urn store.

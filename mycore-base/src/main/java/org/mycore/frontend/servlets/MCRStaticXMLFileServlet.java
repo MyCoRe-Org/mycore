@@ -37,7 +37,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
@@ -63,7 +64,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     private static final long serialVersionUID = -9213353868244605750L;
 
-    protected final static Logger LOGGER = Logger.getLogger(MCRStaticXMLFileServlet.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCRStaticXMLFileServlet.class);
 
     /** XML document types that may contain editor forms */
     protected Set<String> docTypesIncludingEditors = new HashSet<String>();

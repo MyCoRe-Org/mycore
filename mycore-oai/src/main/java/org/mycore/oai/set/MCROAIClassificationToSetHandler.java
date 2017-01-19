@@ -1,6 +1,7 @@
 package org.mycore.oai.set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -18,7 +19,7 @@ import org.mycore.solr.MCRSolrClientFactory;
  */
 public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCROAIClassificationToSetHandler.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCROAIClassificationToSetHandler.class);
 
     public void apply(Set set, SolrQuery query) {
         String origSet = MCROAIUtils.getSetSpecValue(set);

@@ -32,7 +32,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -47,7 +48,7 @@ import org.mycore.solr.index.document.jaxb.MCRSolrInputField;
  *
  */
 public class MCRSolrInputDocumentGenerator {
-    private static Logger LOGGER = Logger.getLogger(MCRSolrInputDocumentGenerator.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentGenerator.class);
 
     public static final JAXBContext JAXB_CONTEXT = initContext();
 

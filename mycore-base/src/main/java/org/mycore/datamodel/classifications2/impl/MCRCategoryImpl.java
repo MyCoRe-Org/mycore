@@ -55,7 +55,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCRURIConverter;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -115,7 +116,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     private static final long serialVersionUID = -7431317191711000317L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRCategoryImpl.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRCategoryImpl.class);
 
     private int left, right, internalID;
 

@@ -29,7 +29,8 @@ import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -62,7 +63,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
     private boolean ignoreOwnerBase;
 
-    private final static Logger LOGGER = Logger.getLogger(MCRCStoreIFS2.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRCStoreIFS2.class);
 
     @Override
     public void init(String storeID) {

@@ -58,7 +58,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -90,6 +91,15 @@ import org.xml.sax.SAXParseException;
  */
 public class MCRMailer extends MCRServlet {
 
+    private static final Logger LOGGER = LogManager.getLogger(MCRMailer.class);
+    
+    private static Session mailSession;
+    
+    protected static final String encoding;
+    
+    /** How often should MCRMailer try to send mail? */
+    protected static int numTries;
+    
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -104,15 +114,6 @@ public class MCRMailer extends MCRServlet {
 
         job.getResponse().sendRedirect(goTo);
     }
-
-    private static final Logger LOGGER = Logger.getLogger(MCRMailer.class);
-
-    private static Session mailSession;
-
-    protected static final String encoding;
-
-    /** How often should MCRMailer try to send mail? */
-    protected static int numTries;
 
     /** Initializes the class */
     static {

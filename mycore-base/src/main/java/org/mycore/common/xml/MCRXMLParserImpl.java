@@ -28,7 +28,8 @@ import java.net.URI;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaderJDOMFactory;
@@ -103,7 +104,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
     private static class XercesBugFixResolver implements EntityResolver2 {
         private EntityResolver2 fallback;
 
-        private static Logger LOGGER = Logger.getLogger(MCRXMLParserImpl.class);
+        private static Logger LOGGER = LogManager.getLogger(MCRXMLParserImpl.class);
 
         private static URI baseDirURI = Paths.get("").toAbsolutePath().toUri();
 

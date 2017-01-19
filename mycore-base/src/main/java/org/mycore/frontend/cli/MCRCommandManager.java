@@ -26,7 +26,8 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -38,7 +39,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * @author Robert Stephan
  */
 public class MCRCommandManager {
-    private final static Logger LOGGER = Logger.getLogger(MCRCommandManager.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRCommandManager.class);
 
     protected static TreeMap<String, List<MCRCommand>> knownCommands = new TreeMap<String, List<MCRCommand>>();
 

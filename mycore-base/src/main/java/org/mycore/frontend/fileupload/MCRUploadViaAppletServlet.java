@@ -36,7 +36,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
@@ -59,7 +60,7 @@ public final class MCRUploadViaAppletServlet extends MCRServlet {
 
     private static final long serialVersionUID = -1452027276006825044L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRUploadViaAppletServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUploadViaAppletServlet.class);
 
     private static MCRUploadViaAppletServer uploadServer;
 

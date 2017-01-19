@@ -28,7 +28,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -49,7 +50,7 @@ public class MCRLayoutTransformerFactory {
     /** Map of transformer instances by ID */
     private static HashMap<String, MCRContentTransformer> transformers = new HashMap<String, MCRContentTransformer>();
 
-    private static Logger LOGGER = Logger.getLogger(MCRLayoutTransformerFactory.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRLayoutTransformerFactory.class);
 
     private static MCRFopper fopper = new MCRFopper();
 

@@ -1,10 +1,11 @@
 package org.mycore.urn.rest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class DefaultURNServerConfiguration implements URNServerConfiguration {
 
-    static final Logger LOGGER = Logger.getLogger(DefaultURNServerConfiguration.class);
+    static final Logger LOGGER = LogManager.getLogger(DefaultURNServerConfiguration.class);
 
     /**
      * The base url for the urn registration service 

@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
@@ -44,7 +45,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRSolrInputDocumentHandlerFactory extends MCRSolrIndexHandlerFactory {
 
-    private static Logger LOGGER = Logger.getLogger(MCRSolrInputDocumentHandlerFactory.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentHandlerFactory.class);
 
     /* (non-Javadoc)
      * @see org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory#getIndexHandler(org.mycore.common.content.MCRContent, org.mycore.datamodel.metadata.MCRObjectID)

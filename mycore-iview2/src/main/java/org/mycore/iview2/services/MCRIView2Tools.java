@@ -51,7 +51,8 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -80,7 +81,7 @@ public class MCRIView2Tools {
 
     private static Path TILE_DIR = Paths.get(MCRIView2Tools.getIView2Property("DirectoryForTiles"));
 
-    private static Logger LOGGER = Logger.getLogger(MCRIView2Tools.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRIView2Tools.class);
 
     /**
      * @return directory for tiles

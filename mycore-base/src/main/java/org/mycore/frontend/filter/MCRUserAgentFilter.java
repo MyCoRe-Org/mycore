@@ -35,7 +35,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
@@ -50,7 +51,7 @@ import org.mycore.common.config.MCRConfiguration;
 public class MCRUserAgentFilter implements Filter {
     private static Pattern agentPattern;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRUserAgentFilter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUserAgentFilter.class);
 
     @Override
     public void init(final FilterConfig arg0) throws ServletException {

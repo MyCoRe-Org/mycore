@@ -37,7 +37,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -72,7 +73,7 @@ import com.google.gson.stream.JsonWriter;
 @Path("/v1/classifications")
 public class MCRRestAPIClassifications {
 
-    private static Logger LOGGER = Logger.getLogger(MCRRestAPIClassifications.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
 
     public static final String FORMAT_JSON = "json";
 
@@ -239,7 +240,7 @@ public class MCRRestAPIClassifications {
                 return Response.ok(xml).type("application/xml; charset=UTF-8").build();
             }
         } catch (Exception e) {
-            Logger.getLogger(this.getClass()).error("Error outputting classification", e);
+            LogManager.getLogger(this.getClass()).error("Error outputting classification", e);
             //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error outputting classification");
         }
         return null;

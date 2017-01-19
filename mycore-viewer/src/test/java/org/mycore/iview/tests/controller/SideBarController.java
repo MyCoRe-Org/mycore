@@ -4,7 +4,8 @@ import java.util.List;
 import java.text.MessageFormat;
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -13,7 +14,7 @@ public class SideBarController extends WebDriverController {
 
     public static final String SIDEBAR_CLOSE_SELECTOR = "//button[@class=\"close\"]";
 
-    private static final Logger LOGGER = Logger.getLogger(SideBarController.class);
+    private static final Logger LOGGER = LogManager.getLogger(SideBarController.class);
 
     public SideBarController(WebDriver webdriver) {
         super(webdriver);

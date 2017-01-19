@@ -26,7 +26,7 @@ package org.mycore.webcli.cli;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRCommandManager;
 
@@ -42,7 +42,7 @@ public class MCRWebCLICommandManager extends MCRCommandManager {
 
     @Override
     protected void handleInitException(Exception ex) {
-        Logger.getLogger(getClass()).error("Exception while initializing commands.", ex);
+        LogManager.getLogger(getClass()).error("Exception while initializing commands.", ex);
     }
 
     @Override

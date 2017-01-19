@@ -27,7 +27,8 @@ import java.net.URL;
 
 import javax.xml.transform.sax.SAXSource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.xml.MCREntityResolver;
@@ -47,7 +48,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class MCRTemplatesSource {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRTemplatesSource.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRTemplatesSource.class);
 
     /** The path to the XSL resource */
     private String resource;

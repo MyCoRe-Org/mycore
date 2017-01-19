@@ -22,13 +22,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 
 public class MCRExternalProcess {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRExternalProcess.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRExternalProcess.class);
 
     private String[] command;
 
@@ -87,7 +88,7 @@ public class MCRExternalProcess {
 
 class MCRStreamSucker extends Thread {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRStreamSucker.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRStreamSucker.class);
 
     /** The input stream to read from */
     private InputStream in;

@@ -12,7 +12,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Simple {@link FileVisitor} that recursive copies a directory
@@ -20,7 +21,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class MCRTreeCopier implements FileVisitor<Path> {
-    private static final Logger LOGGER = Logger.getLogger(MCRTreeCopier.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTreeCopier.class);
 
     private final Path source;
 

@@ -5,7 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.common.MCRMarkManager;
@@ -22,7 +23,7 @@ import org.mycore.mets.tools.MCRMetsSave;
  * @author shermann
  */
 public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBase {
-    private static final Logger LOGGER = Logger.getLogger(MCRUpdateMetsOnDerivateChangeEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUpdateMetsOnDerivateChangeEventHandler.class);
 
     private String mets = MCRMetsSave.getMetsFileName();
 

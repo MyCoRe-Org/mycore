@@ -10,7 +10,7 @@ import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -134,7 +134,7 @@ public class MCRFileStore extends MCRAbstractFileStore {
             MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(path, false, false);
             return mcrFile.getLocalFile().toPath();
         } catch (IOException e) {
-            Logger.getLogger(getClass()).info(e.getMessage());
+            LogManager.getLogger(getClass()).info(e.getMessage());
             return null;
         }
     }

@@ -37,7 +37,8 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.io.output.TeeOutputStream;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
@@ -48,7 +49,7 @@ import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
  */
 public class MCRWebPagesSynchronizer implements AutoExecutable {
 
-    private static Logger LOGGER = Logger.getLogger(MCRWebPagesSynchronizer.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRWebPagesSynchronizer.class);
 
     private static final int FAT_PRECISION = 2000;
 

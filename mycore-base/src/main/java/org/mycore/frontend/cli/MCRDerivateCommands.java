@@ -40,7 +40,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -82,7 +83,7 @@ import org.xml.sax.SAXParseException;
 @MCRCommandGroup(name = "Derivate Commands")
 public class MCRDerivateCommands extends MCRAbstractCommands {
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRDerivateCommands.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(MCRDerivateCommands.class.getName());
 
     /** The ACL interface */
     private static final MCRAccessInterface ACCESS_IMPL = MCRAccessManager.getAccessImpl();

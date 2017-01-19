@@ -46,7 +46,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.comparator.NameFileComparator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
@@ -83,7 +84,7 @@ public class MCRIFSCommands {
 
     public static final String MCRFILESYSTEMNODE_TOUCH_METHOD_NAME = "touch";
 
-    private static Logger LOGGER = Logger.getLogger(MCRIFSCommands.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRIFSCommands.class);
 
     private static abstract class FSNodeChecker {
         public abstract String getName();

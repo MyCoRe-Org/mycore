@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jdom2.Element;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -66,18 +66,18 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
     public boolean checkAccess(String userID, Date date, MCRIPAddress ip) {
         if (parsedRule == null) {
             if (userID.equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
-                Logger.getLogger(MCRAccessRule.class).debug("No rule defined, grant access to super user.");
+                LogManager.getLogger(MCRAccessRule.class).debug("No rule defined, grant access to super user.");
                 return true;
             }
             return false;
         }
-        Logger.getLogger(this.getClass()).debug("new MCRAccessData");
+        LogManager.getLogger(this.getClass()).debug("new MCRAccessData");
         MCRAccessData data = new MCRAccessData(userID, date, ip);
-        Logger.getLogger(this.getClass()).debug("new MCRAccessData done.");
+        LogManager.getLogger(this.getClass()).debug("new MCRAccessData done.");
 
-        Logger.getLogger(this.getClass()).debug("evaluate MCRAccessData");
+        LogManager.getLogger(this.getClass()).debug("evaluate MCRAccessData");
         boolean returns = parsedRule.evaluate(data);
-        Logger.getLogger(this.getClass()).debug("evaluate MCRAccessData done.");
+        LogManager.getLogger(this.getClass()).debug("evaluate MCRAccessData done.");
         return returns;
     }
 
@@ -148,7 +148,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
         try {
             mcripAddress = new MCRIPAddress(session.getCurrentIP());
         } catch (UnknownHostException e) {
-            Logger.getLogger(MCRAccessRule.class).warn("Error while checking rule.", e);
+            LogManager.getLogger(MCRAccessRule.class).warn("Error while checking rule.", e);
             return false;
         }
         return checkAccess(userID, new Date(), mcripAddress);

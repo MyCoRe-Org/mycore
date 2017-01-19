@@ -11,7 +11,8 @@ import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.jersey.filter.MCRDBTransactionFilter;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
@@ -29,7 +30,7 @@ import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 @Provider
 public class MCRJerseyDefaultFeature implements DynamicFeature {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRJerseyDefaultFeature.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRJerseyDefaultFeature.class);
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {

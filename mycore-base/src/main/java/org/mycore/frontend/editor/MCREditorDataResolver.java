@@ -30,7 +30,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
@@ -44,7 +45,7 @@ import org.jdom2.xpath.XPathFactory;
  * @author Frank L\u00fctzenkirchen
  */
 public class MCREditorDataResolver implements URIResolver {
-    protected final static Logger LOGGER = Logger.getLogger(MCREditorDataResolver.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCREditorDataResolver.class);
 
     /**
      * Returns the current editor input from the form with the given editor session ID.

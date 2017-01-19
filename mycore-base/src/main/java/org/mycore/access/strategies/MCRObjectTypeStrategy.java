@@ -26,7 +26,8 @@ package org.mycore.access.strategies;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -47,7 +48,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Pattern TYPE_PATTERN = Pattern.compile("[^_]*_([^_]*)_[0-9]*");
 
-    private static final Logger LOGGER = Logger.getLogger(MCRObjectIDStrategy.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRObjectIDStrategy.class);
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 

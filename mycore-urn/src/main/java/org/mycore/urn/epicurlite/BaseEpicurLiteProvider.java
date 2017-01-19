@@ -10,7 +10,8 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
@@ -34,7 +35,7 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
     
     private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration.instance().getString("MCR.URN.URNGranular.SupportedContentTypes", "");
 
-    static final Logger LOGGER = Logger.getLogger(BaseEpicurLiteProvider.class);
+    static final Logger LOGGER = LogManager.getLogger(BaseEpicurLiteProvider.class);
 
     /* (non-Javadoc)
      * @see org.mycore.urn.epicurlite.IEpicurLiteProvider#getEpicurLiteWrapper(org.mycore.backend.hibernate.tables.MCRURN)

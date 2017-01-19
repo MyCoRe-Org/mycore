@@ -8,14 +8,15 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
-    private static Logger LOGGER = Logger.getLogger(MCRBasicFileAttributeViewImpl.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRBasicFileAttributeViewImpl.class);
 
     public MCRBasicFileAttributeViewImpl() {
         super();

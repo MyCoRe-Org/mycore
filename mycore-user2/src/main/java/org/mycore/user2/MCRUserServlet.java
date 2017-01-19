@@ -37,7 +37,8 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -69,7 +70,7 @@ public class MCRUserServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     /** The logger */
-    private final static Logger LOGGER = Logger.getLogger(MCRUserServlet.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRUserServlet.class);
 
     /**
      * Handles requests. The parameter 'action' selects what to do, possible

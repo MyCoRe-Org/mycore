@@ -42,7 +42,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 
 import com.google.common.collect.BiMap;
@@ -68,7 +69,7 @@ import com.google.common.collect.HashBiMap;
  *
  */
 public class MCRTopologicalSort {
-    private static final Logger LOGGER = Logger.getLogger(MCRTopologicalSort.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTopologicalSort.class);
 
     /** store the edges as adjacent list
      *  for each target node a list of corresponding source node is stored 

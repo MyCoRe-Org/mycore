@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
@@ -32,7 +33,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
  */
 public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrFilesIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrFilesIndexHandler.class);
 
     protected String mcrID;
 

@@ -11,7 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -32,7 +33,7 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 public class MCRImageTiler implements Runnable, Closeable {
     private static MCRImageTiler instance = null;
 
-    private static Logger LOGGER = Logger.getLogger(MCRImageTiler.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRImageTiler.class);
 
     private static final MCRTilingQueue tq = MCRTilingQueue.getInstance();
 

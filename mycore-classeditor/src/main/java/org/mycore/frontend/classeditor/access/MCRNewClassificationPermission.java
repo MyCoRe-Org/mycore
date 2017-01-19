@@ -27,7 +27,8 @@ import java.text.MessageFormat;
 
 import javax.ws.rs.container.ContainerRequestContext;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
@@ -38,7 +39,7 @@ import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
  */
 public class MCRNewClassificationPermission implements MCRResourceAccessChecker {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRNewClassificationPermission.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRNewClassificationPermission.class);
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker#isPermitted(com.sun.jersey.spi.container.ContainerRequest)

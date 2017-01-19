@@ -1,7 +1,8 @@
 package org.mycore.urn.rest;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSession;
@@ -15,7 +16,7 @@ import org.mycore.urn.services.MCRURNManager;
 
 public class URNProcessor {
 
-    private static final Logger LOGGER = Logger.getLogger(URNProcessor.class);
+    private static final Logger LOGGER = LogManager.getLogger(URNProcessor.class);
 
     protected URNServer server;
 

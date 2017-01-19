@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.iview.tests.TestProperties;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -19,7 +20,7 @@ import org.openqa.selenium.WebDriver;
 
 public class ControllerUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(ControllerUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger(ControllerUtil.class);
 
     private static final Properties TEST_PROPERTIES = TestProperties.getInstance();
     public static final String RESULT_FOLDER = "test.result.folder";

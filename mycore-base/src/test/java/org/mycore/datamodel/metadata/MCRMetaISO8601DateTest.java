@@ -34,7 +34,8 @@ import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -60,7 +61,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
     public void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaISO8601Date
         if (LOGGER == null) {
-            LOGGER = Logger.getLogger(MCRMetaISO8601DateTest.class);
+            LOGGER = LogManager.getLogger(MCRMetaISO8601DateTest.class);
         }
     }
 

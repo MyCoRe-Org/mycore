@@ -3,7 +3,8 @@ package org.mycore.iview.tests.controller;
 import java.text.MessageFormat;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -35,7 +36,7 @@ public class ToolBarController extends WebDriverController {
 
     private static final String SELECTBOX_SELECTOR = "[data-id=ImageChangeControllGroup] select.dropdown";
 
-    private static final Logger LOGGER = Logger.getLogger(ToolBarController.class);
+    private static final Logger LOGGER = LogManager.getLogger(ToolBarController.class);
 
     public ToolBarController(WebDriver webdriver) {
         super(webdriver);

@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
@@ -23,7 +24,7 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRXPathEvaluator {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRXPathEvaluator.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRXPathEvaluator.class);
 
     private final static Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
 

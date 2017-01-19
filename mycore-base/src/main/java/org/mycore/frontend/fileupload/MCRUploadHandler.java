@@ -24,7 +24,8 @@ package org.mycore.frontend.fileupload;
 
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Transaction;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -47,7 +48,7 @@ import org.mycore.frontend.MCRWebsiteWriteProtection;
  */
 public abstract class MCRUploadHandler {
     /** The LOGGER * */
-    private static Logger LOGGER = Logger.getLogger(MCRUploadHandler.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRUploadHandler.class);
 
     /** The unique ID of this upload session * */
     protected String uploadID;

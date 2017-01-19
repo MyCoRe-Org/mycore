@@ -23,7 +23,8 @@
 
 package org.mycore.frontend.fileupload;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -41,7 +42,7 @@ public class MCRUploadHandlerManager {
     /** Cache of currently active upload handler sessions */
     protected static MCRCache<String, MCRUploadHandlerCacheEntry> handlers = new MCRCache<String, MCRUploadHandlerCacheEntry>(100, "UploadHandlerManager UploadHandlers");
 
-    private static Logger logger = Logger.getLogger(MCRUploadHandlerManager.class);
+    private static Logger logger = LogManager.getLogger(MCRUploadHandlerManager.class);
 
     static void register(MCRUploadHandler handler) {
         logger.debug("Registering " + handler.getClass().getName() + " with upload ID " + handler.getID());

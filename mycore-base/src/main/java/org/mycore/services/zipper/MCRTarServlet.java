@@ -8,7 +8,8 @@ import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
@@ -21,7 +22,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRTarServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTarServlet.class);
 
     @Override
     protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs,

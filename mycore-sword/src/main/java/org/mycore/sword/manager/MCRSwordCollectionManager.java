@@ -8,7 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Feed;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.sword.MCRSword;
 import org.mycore.sword.MCRSwordConstants;
 import org.mycore.sword.MCRSwordUtil;
@@ -28,7 +29,7 @@ import org.swordapp.server.UriRegistry;
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordCollectionManager implements CollectionListManager, CollectionDepositManager {
-    private static Logger LOGGER = Logger.getLogger(MCRSwordCollectionManager.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSwordCollectionManager.class);
 
     @Override
     public Feed listCollectionContents(IRI collectionIRI, AuthCredentials authCredentials, SwordConfiguration config) throws SwordServerException, SwordAuthException, SwordError {

@@ -1,6 +1,7 @@
 package org.mycore.mods.classification;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -19,7 +20,7 @@ import org.w3c.dom.Element;
  */
 abstract class MCRAuthorityInfo {
 
-    private static Logger LOGGER = Logger.getLogger(MCRAuthorityInfo.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRAuthorityInfo.class);
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 

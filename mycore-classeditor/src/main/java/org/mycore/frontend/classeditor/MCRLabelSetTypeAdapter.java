@@ -8,7 +8,8 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRJSONTypeAdapter;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.classeditor.wrapper.MCRLabelSetWrapper;
@@ -22,7 +23,7 @@ import com.google.gson.JsonSerializationContext;
 
 public class MCRLabelSetTypeAdapter extends MCRJSONTypeAdapter<MCRLabelSetWrapper> {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRLabelSetTypeAdapter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRLabelSetTypeAdapter.class);
 
     @Override
     public JsonElement serialize(MCRLabelSetWrapper labelSetWrapper, Type typeOfSrc, JsonSerializationContext context) {

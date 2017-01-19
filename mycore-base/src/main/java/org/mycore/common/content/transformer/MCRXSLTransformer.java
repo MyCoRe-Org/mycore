@@ -46,7 +46,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.transformer.TransformerImpl;
 import org.mycore.common.MCRCache;
@@ -82,11 +83,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static final MCREntityResolver ENTITY_RESOLVER = MCREntityResolver.instance();
 
-    private static Logger LOGGER = Logger.getLogger(MCRXSLTransformer.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRXSLTransformer.class);
 
     private static MCRTraceListener TRACE_LISTENER = new MCRTraceListener();
 
-    private static boolean TRACE_LISTENER_ENABLED = Logger.getLogger(MCRTraceListener.class).isDebugEnabled();
+    private static boolean TRACE_LISTENER_ENABLED = LogManager.getLogger(MCRTraceListener.class).isDebugEnabled();
 
     private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSLTransformer>(100,
         "MCRXSLTransformer instance cache");

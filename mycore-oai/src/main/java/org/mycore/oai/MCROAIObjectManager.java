@@ -24,7 +24,8 @@ package org.mycore.oai;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -51,7 +52,7 @@ import org.mycore.oai.pmh.SimpleMetadata;
  */
 public class MCROAIObjectManager {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCROAIObjectManager.class);
+    protected final static Logger LOGGER = LogManager.getLogger(MCROAIObjectManager.class);
 
     protected String configPrefix;
 

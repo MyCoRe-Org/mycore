@@ -25,7 +25,8 @@ package org.mycore.frontend.indexbrowser;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRFileContent;
@@ -50,7 +51,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRGoogleSitemapServlet.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapServlet.class.getName());
 
     /**
      * This method implement the doGetPost method of MCRServlet. It build a XML

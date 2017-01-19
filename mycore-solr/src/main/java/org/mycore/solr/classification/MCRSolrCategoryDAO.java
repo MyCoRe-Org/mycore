@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -24,7 +25,7 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
  */
 public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrCategoryDAO.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrCategoryDAO.class);
 
     @Override
     public MCRCategory setURI(MCRCategoryID id, URI uri) {

@@ -26,8 +26,6 @@ package org.mycore.common.events;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Logger;
-
 /**
  * is a shutdown hook for the current <code>ServletContext</code>. For this class to register itself as a shutdown hook
  * to the current ServletContext please add the following code to your web.xml (allready done in MyCoRe-shipped
@@ -44,8 +42,6 @@ import org.apache.log4j.Logger;
  * @since 1.3
  */
 public class MCRServletContextListener implements ServletContextListener {
-
-    private static final Logger LOGGER = Logger.getLogger(MCRServletContextListener.class);
 
     public void contextInitialized(ServletContextEvent sce) {
     }

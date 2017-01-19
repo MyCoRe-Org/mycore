@@ -34,7 +34,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -72,7 +73,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
     private static final String TRANSLATION = "translation";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMETSGenerator.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMETSGenerator.class);
 
     private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList(new String[] { "alto", "tei" });
 

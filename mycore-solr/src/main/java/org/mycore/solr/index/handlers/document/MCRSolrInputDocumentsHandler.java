@@ -28,7 +28,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
@@ -51,7 +52,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
 
     List<MCRSolrIndexHandler> subHandlerList;
 
-    private static Logger LOGGER = Logger.getLogger(MCRSolrInputDocumentsHandler.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentsHandler.class);
 
     public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents) {
         this(documents, MCRSolrClientFactory.getSolrClient());

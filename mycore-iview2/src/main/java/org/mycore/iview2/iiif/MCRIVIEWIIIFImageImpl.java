@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
@@ -49,7 +50,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     public static final String MAX_BYTES = "MCR.IIIFImage.Iview.MaxImageBytes";
     private static final String TILE_FILE_PROVIDER_PROPERTY = "TileFileProvider";
 
-    private static Logger LOGGER = Logger.getLogger(MCRIVIEWIIIFImageImpl.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRIVIEWIIIFImageImpl.class);
     private java.util.List<String> transparentFormats;
     private MCRTileFileProvider tileFileProvider;
 

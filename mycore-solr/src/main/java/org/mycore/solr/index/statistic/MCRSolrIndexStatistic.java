@@ -26,7 +26,8 @@ package org.mycore.solr.index.statistic;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -34,7 +35,7 @@ import org.apache.log4j.Logger;
  */
 public class MCRSolrIndexStatistic {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexStatistic.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexStatistic.class);
 
     AtomicInteger documents;
 

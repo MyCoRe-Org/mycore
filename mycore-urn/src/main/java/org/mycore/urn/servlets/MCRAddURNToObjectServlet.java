@@ -9,7 +9,8 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -32,7 +33,7 @@ import org.mycore.urn.services.MCRURNManager;
  * @author shermann
  */
 public class MCRAddURNToObjectServlet extends MCRServlet {
-    private static final Logger LOGGER = Logger.getLogger(MCRAddURNToObjectServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRAddURNToObjectServlet.class);
 
     /***/
     private static final long serialVersionUID = 1L;

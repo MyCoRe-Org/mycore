@@ -8,7 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -42,7 +43,7 @@ import org.xml.sax.SAXException;
 @MCRCommandGroup(name = "MyCoRe migration 2015.0x")
 public class MCRMigrationCommands {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMigrationCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMigrationCommands.class);
 
     @MCRCommand(syntax = "migrate author servflags", help = "Create missing servflags for createdby and modifiedby. (MCR-786)", order = 20)
     public static List<String> addServFlags() {

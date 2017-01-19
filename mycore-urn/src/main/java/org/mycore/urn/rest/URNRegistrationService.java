@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.urn.epicurlite.BaseEpicurLiteProvider;
 import org.mycore.urn.epicurlite.IEpicurLiteProvider;
@@ -19,7 +20,7 @@ import org.mycore.urn.services.MCRURNManager;
  */
 public class URNRegistrationService extends TimerTask implements Closeable {
 
-    protected static final Logger LOGGER = Logger.getLogger(URNRegistrationService.class);
+    protected static final Logger LOGGER = LogManager.getLogger(URNRegistrationService.class);
 
     protected URNServer server;
 

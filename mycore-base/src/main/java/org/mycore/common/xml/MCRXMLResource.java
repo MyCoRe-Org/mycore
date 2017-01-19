@@ -31,7 +31,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration;
@@ -53,7 +54,7 @@ public class MCRXMLResource {
 
     private static MCRXMLResource instance = new MCRXMLResource();
 
-    private static Logger LOGGER = Logger.getLogger(MCRXMLResource.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRXMLResource.class);
 
     private MCRXMLResource() {
         resourceCache = new MCRCache<String, CacheEntry>(MCRConfiguration.instance().getInt(

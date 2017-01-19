@@ -39,7 +39,8 @@ import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Sets;
 
@@ -53,7 +54,7 @@ import com.google.common.collect.Sets;
  */
 public class MCRRuntimeComponentDetector {
 
-    private static Logger LOGGER = Logger.getLogger(MCRRuntimeComponentDetector.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRRuntimeComponentDetector.class);
 
     private static final Name ATT_POM = new Name("POM");
 

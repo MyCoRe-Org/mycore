@@ -30,7 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -59,7 +60,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
 
     public static final String MODS_V3_XSD_URI = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMODSCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMODSCommands.class);
 
     @MCRCommand(syntax="load all mods documents from directory {0} for project {1}", help="Load all MODS documents as MyCoRe Objects for project {1} from directory {0}", order=10)
     public static List<String> loadFromDirectory(String directory, String projectID) {

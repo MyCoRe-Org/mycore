@@ -34,7 +34,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
@@ -64,7 +65,7 @@ import com.google.common.io.Files;
  */
 public class MCRSolrPathDocumentFactory {
 
-    private static Logger LOGGER = Logger.getLogger(MCRSolrPathDocumentFactory.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSolrPathDocumentFactory.class);
 
     private static MCRSolrPathDocumentFactory instance = MCRConfiguration.instance()
         .<MCRSolrPathDocumentFactory> getInstanceOf(CONFIG_PREFIX + "SolrInputDocument.Path.Factory", (String) null);

@@ -47,7 +47,8 @@ import java.util.zip.ZipFile;
 import javax.imageio.ImageReader;
 import javax.xml.ws.Endpoint;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -74,7 +75,7 @@ import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
 
 @MCRCommandGroup(name = "IView2 Tile Commands")
 public class MCRIView2Commands extends MCRAbstractCommands {
-    private static final Logger LOGGER = Logger.getLogger(MCRIView2Commands.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRIView2Commands.class);
 
     private static Endpoint tileService;
 

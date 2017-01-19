@@ -29,7 +29,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -42,7 +43,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * @author Jens Kupferschmidt
  */
 public abstract class MCREventHandlerBase implements MCREventHandler {
-    private static Logger logger = Logger.getLogger(MCREventHandlerBase.class);
+    private static Logger logger = LogManager.getLogger(MCREventHandlerBase.class);
 
     /**
      * This method handle all calls for EventHandler for the event types

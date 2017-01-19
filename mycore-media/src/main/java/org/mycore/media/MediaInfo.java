@@ -27,7 +27,8 @@ import static java.util.Collections.singletonMap;
 
 import java.lang.reflect.Method;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.sun.jna.FunctionMapper;
 import com.sun.jna.Library;
@@ -38,7 +39,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 
 public class MediaInfo {
-    private static final Logger LOGGER = Logger.getLogger( MediaInfo.class );
+    private static final Logger LOGGER = LogManager.getLogger( MediaInfo.class );
     
     static
     {

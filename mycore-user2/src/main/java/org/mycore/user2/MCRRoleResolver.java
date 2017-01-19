@@ -30,7 +30,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
@@ -43,7 +44,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  */
 public class MCRRoleResolver implements URIResolver {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRRoleResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRoleResolver.class);
 
     public static Element getAssignableGroupsForUser() throws MCRAccessException {
         LOGGER.warn("Please fix http://sourceforge.net/p/mycore/bugs/568/");

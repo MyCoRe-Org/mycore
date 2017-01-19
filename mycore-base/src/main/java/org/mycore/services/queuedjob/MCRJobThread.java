@@ -30,7 +30,8 @@ import java.util.concurrent.ExecutionException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -50,7 +51,7 @@ import org.mycore.common.processing.MCRProcessableStatus;
 public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
     protected MCRJob job = null;
 
-    private static Logger LOGGER = Logger.getLogger(MCRJobThread.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRJobThread.class);
 
     public MCRJobThread(MCRJob job) {
         this.job = job;

@@ -10,7 +10,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
@@ -40,7 +41,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     public static final String GENERATOR_SUFFIX = "-mycore";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRClassificationMappingEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 

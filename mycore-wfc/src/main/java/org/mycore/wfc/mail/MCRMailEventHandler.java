@@ -29,7 +29,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -52,7 +53,7 @@ import org.mycore.datamodel.niofs.MCRPathXML;
  */
 public class MCRMailEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMailEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMailEventHandler.class);
 
     private void sendNotificationMail(MCREvent evt, MCRContent doc, String description) throws Exception {
         LOGGER.info("Preparing mail for: " + description);

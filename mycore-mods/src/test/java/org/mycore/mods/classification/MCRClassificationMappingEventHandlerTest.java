@@ -3,7 +3,6 @@ package org.mycore.mods.classification;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -28,7 +27,6 @@ import org.xml.sax.SAXParseException;
 public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
     public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
-    private static final Logger LOGGER = Logger.getLogger(MCRClassificationMappingEventHandlerTest.class);
 
     public MCRCategoryDAO getDAO() {
         return MCRCategoryDAOFactory.getInstance();

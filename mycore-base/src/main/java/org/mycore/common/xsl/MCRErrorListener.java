@@ -27,7 +27,8 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xml.utils.WrappedRuntimeException;
 
 /**
@@ -35,7 +36,7 @@ import org.apache.xml.utils.WrappedRuntimeException;
  *
  */
 public class MCRErrorListener implements ErrorListener {
-    private static Logger LOGGER = Logger.getLogger(MCRErrorListener.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRErrorListener.class);
 
     private TransformerException exceptionThrown;
 

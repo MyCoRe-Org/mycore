@@ -43,7 +43,8 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Servlet Filter for adding debug information to servlet output.
@@ -51,7 +52,7 @@ import org.apache.log4j.Logger;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRURIResolverFilter implements Filter {
-    private static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
     static ThreadLocal<List<String>> uriList = new ThreadLocal<List<String>>() {
         @Override

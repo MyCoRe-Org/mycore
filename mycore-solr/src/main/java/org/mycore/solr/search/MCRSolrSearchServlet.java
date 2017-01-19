@@ -18,7 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -59,7 +60,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         QueryParameter, SolrParameter, SortParameter, TypeParameter
     }
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrSearchServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrSearchServlet.class);
 
     private static final String JOIN_PATTERN = "{!join from=returnId to=id}";
 

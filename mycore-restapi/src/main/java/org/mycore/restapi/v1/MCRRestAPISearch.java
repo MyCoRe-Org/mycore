@@ -41,7 +41,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.solr.MCRSolrConstants;
 
 /**
@@ -53,7 +54,7 @@ import org.mycore.solr.MCRSolrConstants;
  */
 @Path("/v1/search")
 public class MCRRestAPISearch {
-    private static Logger LOGGER = Logger.getLogger(MCRRestAPISearch.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 
     public static final String FORMAT_JSON = "json";
 

@@ -50,7 +50,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -94,7 +95,7 @@ import com.google.gson.stream.JsonWriter;
  * @version $Revision: $ $Date: $
  */
 public class MCRRestAPIObjectsHelper {
-    private static Logger LOGGER = Logger.getLogger(MCRRestAPIObjectsHelper.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRRestAPIObjectsHelper.class);
 
     private static SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 

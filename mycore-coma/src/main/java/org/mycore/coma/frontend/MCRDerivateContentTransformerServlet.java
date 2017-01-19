@@ -8,7 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -25,7 +26,7 @@ import org.xml.sax.SAXException;
 public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
 
     private static final int CACHE_TIME = 24 * 60 * 60;
-    private static final Logger LOGGER = Logger.getLogger(MCRDerivateContentTransformerServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRDerivateContentTransformerServlet.class);
 
     @Override
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {

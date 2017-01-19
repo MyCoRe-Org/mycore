@@ -31,7 +31,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.ibm.icu.lang.UCharacter;
 import com.ibm.icu.lang.UScript;
@@ -45,7 +46,7 @@ import com.ibm.icu.lang.UScript;
  * @version $Revision$ $Date$
  */
 public class MCRLanguageDetector {
-    private static Logger LOGGER = Logger.getLogger(MCRLanguageDetector.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRLanguageDetector.class);
 
     private static Properties words = new Properties();
 

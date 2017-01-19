@@ -35,7 +35,8 @@ import java.nio.file.Path;
 import javax.xml.transform.Source;
 
 import org.apache.commons.vfs2.FileObject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -48,7 +49,7 @@ import org.xml.sax.SAXException;
  */
 public abstract class MCRWrappedContent extends MCRContent {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRWrappedContent.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRWrappedContent.class);
 
     private MCRContent baseContent;
 

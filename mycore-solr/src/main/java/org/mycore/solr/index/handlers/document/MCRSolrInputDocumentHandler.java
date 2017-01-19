@@ -25,7 +25,8 @@ package org.mycore.solr.index.handlers.document;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
@@ -41,7 +42,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
  */
 public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
 
-    private static Logger LOGGER = Logger.getLogger(MCRSolrInputDocumentHandler.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentHandler.class);
 
     SolrInputDocument document;
 

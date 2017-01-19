@@ -33,7 +33,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -47,7 +48,7 @@ import org.mycore.urn.services.MCRURNStore;
  */
 public class MCRHIBURNStore implements MCRURNStore {
     // logger
-    static Logger logger = Logger.getLogger(MCRHIBURNStore.class.getName());
+    static Logger logger = LogManager.getLogger(MCRHIBURNStore.class.getName());
 
     private String classname = MCRURN.class.getName();
 

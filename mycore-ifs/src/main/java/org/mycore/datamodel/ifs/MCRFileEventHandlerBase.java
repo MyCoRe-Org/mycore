@@ -6,7 +6,8 @@ package org.mycore.datamodel.ifs;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.niofs.ifs1.MCRIFSFileSystem;
@@ -19,7 +20,7 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
 
     private static final String MCRFILE_EVENT_KEY = "file";
 
-    private static Logger LOGGER = Logger.getLogger(MCRFileEventHandlerBase.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRFileEventHandlerBase.class);
 
     final static public String FILE_TYPE = "MCRFile";
 

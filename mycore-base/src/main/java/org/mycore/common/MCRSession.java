@@ -51,7 +51,8 @@ import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
@@ -98,7 +99,7 @@ public class MCRSession implements Cloneable {
     };
 
     /** the logger */
-    static Logger LOGGER = Logger.getLogger(MCRSession.class.getName());
+    static Logger LOGGER = LogManager.getLogger(MCRSession.class.getName());
 
     /** The user ID of the session */
     private MCRUserInformation userInformation;

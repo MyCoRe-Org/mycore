@@ -29,7 +29,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -45,6 +46,21 @@ import org.mycore.common.config.MCRConfigurationException;
  * @author Frank Lützenkirchen
  */
 public class MCREventManager {
+    
+    private static Logger logger = LogManager.getLogger(MCREventManager.class);
+
+    private static MCREventManager instance;
+
+    public static final String CONFIG_PREFIX = "MCR.EventHandler.";
+    
+    /** Table of all configured event handlers * */
+    private Hashtable<String, List<MCREventHandler>> handlers;
+    
+    /** Call event handlers in forward direction (create, update) */
+    public final static boolean FORWARD = true;
+    
+    /** Call event handlers in backward direction (delete) */
+    public final static boolean BACKWARD = false;
 
     /**
      * Parse the property key of event handlers, extract type and mode.
@@ -88,12 +104,6 @@ public class MCREventManager {
 
     }
 
-    private static Logger logger = Logger.getLogger(MCREventManager.class);
-
-    private static MCREventManager instance;
-
-    public static final String CONFIG_PREFIX = "MCR.EventHandler.";
-
     /**
      * The singleton manager instance
      * 
@@ -106,9 +116,6 @@ public class MCREventManager {
 
         return instance;
     }
-
-    /** Table of all configured event handlers * */
-    private Hashtable<String, List<MCREventHandler>> handlers;
 
     private MCREventManager() {
         handlers = new Hashtable<String, List<MCREventHandler>>();
@@ -157,12 +164,6 @@ public class MCREventManager {
 
         return eventHandlerList;
     }
-
-    /** Call event handlers in forward direction (create, update) */
-    public final static boolean FORWARD = true;
-
-    /** Call event handlers in backward direction (delete) */
-    public final static boolean BACKWARD = false;
 
     /**
      * This method is called by the component that created the event and acts as

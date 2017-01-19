@@ -27,7 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
 import org.jaxen.dom.DocumentNavigator;
@@ -51,7 +52,7 @@ import org.mycore.common.MCRConstants;
  */
 public class MCRNodeBuilder {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRNodeBuilder.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRNodeBuilder.class);
 
     private Map<String, Object> variables;
 

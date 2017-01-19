@@ -4,7 +4,8 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -16,7 +17,7 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeData;
 
 public class MCRSubselectReturnTarget implements MCREditorTarget {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRSubselectReturnTarget.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRSubselectReturnTarget.class);
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {

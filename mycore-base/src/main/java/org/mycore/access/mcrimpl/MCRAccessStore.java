@@ -29,7 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
@@ -44,6 +45,20 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * @version $Revision$ $Date$
  */
 public abstract class MCRAccessStore {
+    private static final Logger LOGGER = LogManager.getLogger(MCRAccessStore.class);
+    
+    final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
+    
+    final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule",
+            "MCRACCESSRULE");
+    
+    final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Map",
+            "MCRACCESS");
+    
+    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "read,write,delete");
+    
+    static private MCRAccessStore implementation;
+    
     public abstract String getRuleID(String objID, String ACPool);
 
     public abstract void createAccessDefinition(MCRRuleMapping accessdata);
@@ -69,20 +84,6 @@ public abstract class MCRAccessStore {
      * @return a collection of all String IDs an access rule is assigned to
      */
     public abstract Collection<String> getDistinctStringIDs();
-
-    private static final Logger LOGGER = Logger.getLogger(MCRAccessStore.class);
-
-    final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
-
-    final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule",
-            "MCRACCESSRULE");
-
-    final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Map",
-            "MCRACCESS");
-
-    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "read,write,delete");
-
-    static private MCRAccessStore implementation;
 
     public static MCRAccessStore getInstance() {
         try {

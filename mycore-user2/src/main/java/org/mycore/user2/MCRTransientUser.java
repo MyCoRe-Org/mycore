@@ -27,7 +27,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
@@ -40,7 +41,7 @@ public class MCRTransientUser extends MCRUser {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRTransientUser.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTransientUser.class);
 
     private MCRUserInformation userInfo;
 

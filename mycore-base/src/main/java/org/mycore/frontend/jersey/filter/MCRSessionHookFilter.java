@@ -11,7 +11,8 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -25,7 +26,7 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
     @Inject
     private HttpServletResponse httpResponse;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSessionHookFilter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSessionHookFilter.class);
 
     @Override
     public void filter(ContainerRequestContext request) throws IOException {

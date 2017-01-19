@@ -32,7 +32,8 @@ import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -58,7 +59,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 @MCRCommandGroup(name = "Access Commands")
 public class MCRAccessCommands extends MCRAbstractCommands {
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRAccessCommands.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(MCRAccessCommands.class.getName());
 
     /**
      * Check the file name

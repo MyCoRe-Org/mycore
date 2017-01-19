@@ -12,7 +12,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -35,7 +36,7 @@ public class MCRCORSFilter implements Filter {
     private String allowOriginValue;
 
     static {
-        LOGGER = Logger.getLogger(MCRCORSFilter.class);
+        LOGGER = LogManager.getLogger(MCRCORSFilter.class);
     }
 
 

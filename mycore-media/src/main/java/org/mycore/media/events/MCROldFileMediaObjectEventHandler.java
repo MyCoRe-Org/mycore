@@ -2,7 +2,8 @@ package org.mycore.media.events;
 
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
@@ -15,7 +16,7 @@ import org.mycore.media.services.MCRMediaIFSTools;
 
 @SuppressWarnings("deprecation")
 public class MCROldFileMediaObjectEventHandler implements MCREventHandler {
-    private static Logger LOGGER = Logger.getLogger( MCREventManager.class );
+    private static Logger LOGGER = LogManager.getLogger( MCREventManager.class );
     
     public void doHandleEvent( MCREvent evt ) throws MCRException
     {

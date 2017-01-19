@@ -31,7 +31,8 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.RollbackException;
 import javax.persistence.TypedQuery;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 
@@ -45,7 +46,7 @@ public class MCRStalledJobResetter implements Runnable {
 
     private static HashMap<String, MCRStalledJobResetter> INSTANCES = new HashMap<String, MCRStalledJobResetter>();
 
-    private static Logger LOGGER = Logger.getLogger(MCRStalledJobResetter.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRStalledJobResetter.class);
 
     private int maxTimeDiff = MCRConfiguration.instance().getInt(MCRJobQueue.CONFIG_PREFIX + "TimeTillReset", 10);
 

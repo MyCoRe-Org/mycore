@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Test;
 
 /**
@@ -52,7 +52,7 @@ public class MCRUtilsTest extends MCRTestCase {
             assertEquals("SHA-1 string has not the right length", TEST_SHA1.length(), sha1String.length());
             assertEquals("SHA-1 string does not match", TEST_SHA1, sha1String);
         } catch (NoSuchAlgorithmException e) {
-            Logger.getLogger(this.getClass()).warn("SHA-1 algorithm not available");
+            LogManager.getLogger(this.getClass()).warn("SHA-1 algorithm not available");
         }
     }
 
@@ -66,7 +66,7 @@ public class MCRUtilsTest extends MCRTestCase {
             assertEquals("MD5 string has not the right length", TEST_MD5.length(), md5String.length());
             assertEquals("MD5 string does not match", TEST_MD5, md5String);
         } catch (NoSuchAlgorithmException e) {
-            Logger.getLogger(this.getClass()).warn("MD5 algorithm not available");
+            LogManager.getLogger(this.getClass()).warn("MD5 algorithm not available");
         }
     }
 }

@@ -27,7 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
@@ -49,7 +50,7 @@ import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
  */
 public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexEventHandler.class);
 
     @Override
     synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {

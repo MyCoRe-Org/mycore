@@ -4,7 +4,8 @@ import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
@@ -20,7 +21,7 @@ import org.mycore.common.events.MCRShutdownHandler;
  */
 public class MCRSolrCore {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrCore.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrCore.class);
 
     private static boolean USE_CONCURRENT_SERVER;
 

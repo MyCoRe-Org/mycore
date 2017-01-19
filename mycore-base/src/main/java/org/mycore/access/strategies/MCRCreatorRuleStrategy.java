@@ -25,7 +25,8 @@ package org.mycore.access.strategies;
 
 import java.util.concurrent.ExecutionException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
@@ -56,7 +57,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  */
 public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy {
-    private static final Logger LOGGER = Logger.getLogger(MCRCreatorRuleStrategy.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCreatorRuleStrategy.class);
 
     private static final String SUBMITTED_CATEGORY = MCRConfiguration.instance()
             .getString("MCR.Access.Strategy.SubmittedCategory", "state:submitted");

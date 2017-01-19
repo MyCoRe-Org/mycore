@@ -49,7 +49,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -74,7 +75,7 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     private static final float QUALITY = 0.75f;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRTileCombineServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTileCombineServlet.class);
 
     private ThreadLocal<ImageWriter> imageWriter = new ThreadLocal<ImageWriter>() {
 

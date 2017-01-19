@@ -25,7 +25,8 @@ package org.mycore.iview2.events;
 
 import javax.servlet.ServletContext;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.iview2.services.MCRImageTiler;
 
@@ -35,7 +36,7 @@ import org.mycore.iview2.services.MCRImageTiler;
  *
  */
 public class MCRIView2TilingThreadStarter implements MCRStartupHandler.AutoExecutable {
-    private static Logger LOGGER = Logger.getLogger(MCRIView2TilingThreadStarter.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRIView2TilingThreadStarter.class);
 
     @Override
     public String getName() {

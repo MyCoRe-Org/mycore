@@ -35,7 +35,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -73,7 +74,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public final class MCRGoogleSitemapCommon {
 
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRGoogleSitemapCommon.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
 
     /** Zone information **/
     private static final Locale SITEMAP_LOCALE = Locale.ROOT;

@@ -33,7 +33,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.frontend.classeditor.utils.MCRCategUtils;
@@ -46,7 +47,7 @@ import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
 public class MCRClassificationWritePermission implements MCRResourceAccessChecker {
     public static final String PERMISSION_CREATE = "create-class";
 
-    private static Logger LOGGER = Logger.getLogger(MCRClassificationWritePermission.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRClassificationWritePermission.class);
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker#isPermitted(com.sun.jersey.spi.container.ContainerRequest)

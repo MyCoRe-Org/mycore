@@ -44,7 +44,8 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
@@ -70,7 +71,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  */
 public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRUploadHandlerIFS.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUploadHandlerIFS.class);
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 

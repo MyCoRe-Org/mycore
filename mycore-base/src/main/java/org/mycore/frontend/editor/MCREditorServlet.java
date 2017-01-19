@@ -44,7 +44,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.ElementFilter;
@@ -73,7 +74,7 @@ import org.xml.sax.SAXException;
 public class MCREditorServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private final static Logger LOGGER = Logger.getLogger(MCREditorServlet.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCREditorServlet.class);
 
     public void doGetPost(MCRServletJob job) throws ServletException, IOException, TransformerException, SAXException {
         MCRRequestParameters parms = new MCRRequestParameters(job.getRequest());

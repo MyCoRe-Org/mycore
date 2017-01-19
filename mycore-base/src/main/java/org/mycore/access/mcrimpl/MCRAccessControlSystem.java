@@ -29,7 +29,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessBaseImpl;
@@ -64,7 +65,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     static Hashtable<String, String> ruleIDTable = new Hashtable<String, String>();
 
-    private static final Logger LOGGER = Logger.getLogger(MCRAccessControlSystem.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRAccessControlSystem.class);
 
     private MCRAccessControlSystem() {
         MCRConfiguration config = MCRConfiguration.instance();

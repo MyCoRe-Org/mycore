@@ -2,7 +2,8 @@ package org.mycore.media.services;
 
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRByteContent;
@@ -15,7 +16,7 @@ import org.mycore.datamodel.ifs2.MCRNode;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
 
 public class MCRMediaIFSTools {
-    private static final Logger LOGGER = Logger.getLogger(MCRMediaIFSTools.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMediaIFSTools.class);
 
     private static MCRConfiguration config = MCRConfiguration.instance();
 

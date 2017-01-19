@@ -15,7 +15,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.NoResultException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -29,7 +30,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     private static ScheduledExecutorService StalledJobScheduler;
 
-    private static Logger LOGGER = Logger.getLogger(MCRTilingQueue.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRTilingQueue.class);
 
     private final ReentrantLock pollLock;
 

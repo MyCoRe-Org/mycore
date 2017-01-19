@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -46,7 +47,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRSolrContentStreamHandlerFactory extends MCRSolrIndexHandlerFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrContentStreamHandlerFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrContentStreamHandlerFactory.class);
 
     /* (non-Javadoc)
      * @see org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory#getIndexHandler(org.mycore.common.content.MCRContent, org.mycore.datamodel.metadata.MCRObjectID)

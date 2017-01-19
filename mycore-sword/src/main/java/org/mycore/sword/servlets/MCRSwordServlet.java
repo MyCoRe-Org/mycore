@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -17,7 +18,7 @@ import org.mycore.frontend.servlets.MCRServlet;
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordServlet extends HttpServlet {
-    private static Logger LOGGER = Logger.getLogger(MCRSwordServlet.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRSwordServlet.class);
 
     protected void prepareRequest(HttpServletRequest req, HttpServletResponse resp){
         if (req.getAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE) == null) {

@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -47,7 +47,7 @@ public abstract class MCRPathUtils {
             //we expect that file may not exist
         } catch (IOException e) {
             //any other IOException is catched
-            Logger.getLogger(MCRPathUtils.class).info("Error while retrieving attributes of file: " + path, e);
+            LogManager.getLogger(MCRPathUtils.class).info("Error while retrieving attributes of file: " + path, e);
         }
         return null;
     }

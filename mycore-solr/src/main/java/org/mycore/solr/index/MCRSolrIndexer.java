@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
@@ -52,7 +53,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @author Matthias Eichner
  */
 public class MCRSolrIndexer {
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexer.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexer.class);
 
     /**
      * Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is

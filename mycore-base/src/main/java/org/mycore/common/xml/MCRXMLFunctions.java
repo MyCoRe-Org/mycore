@@ -59,7 +59,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.mycore.common.MCRCache;
@@ -105,6 +106,39 @@ import com.ibm.icu.util.GregorianCalendar;
  * @author Ren\u00E9 Adler (eagle)
  */
 public class MCRXMLFunctions {
+    static MCRConfiguration CONFIG = MCRConfiguration.instance();
+    
+    private static final String HOST_PREFIX = "MCR.remoteaccess_";
+    
+    private static final String QUERY_SUFFIX = "_query_servlet";
+    
+    private static final String IFS_SUFFIX = "_ifs_servlet";
+    
+    private static final String HOST_SUFFIX = "_host";
+    
+    private static final String PORT_SUFFIX = "_port";
+    
+    private static final String PROTOCOLL_SUFFIX = "_protocol";
+    
+    private static final String DEFAULT_PORT = "80";
+    
+    private final static String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)\\>";
+    
+    private final static String TAG_END = "\\</\\w+\\>";
+    
+    private final static String TAG_SELF_CLOSING = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)/\\>";
+    
+    private final static String HTML_ENTITY = "&[a-zA-Z][a-zA-Z0-9]+;";
+    
+    private final static Pattern TAG_PATTERN = Pattern.compile(TAG_START + "((.*?[^\\<]))" + TAG_END, Pattern.DOTALL);
+    
+    private final static Pattern HTML_MATCH_PATTERN = Pattern
+            .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")", Pattern.DOTALL);
+    
+    private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
+    
+    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000, "Derivate display value cache");
+    
 
     //use holder to not initialize MCRXMLMetadataManager to early (simplifies junit testing)
     private static class MCRXMLMetaDataManagerHolder {
@@ -114,39 +148,6 @@ public class MCRXMLFunctions {
     private static class MCRCategLinkServiceHolder {
         public static final MCRCategLinkService instance = MCRCategLinkServiceFactory.getInstance();
     }
-
-    static MCRConfiguration CONFIG = MCRConfiguration.instance();
-
-    private static final String HOST_PREFIX = "MCR.remoteaccess_";
-
-    private static final String QUERY_SUFFIX = "_query_servlet";
-
-    private static final String IFS_SUFFIX = "_ifs_servlet";
-
-    private static final String HOST_SUFFIX = "_host";
-
-    private static final String PORT_SUFFIX = "_port";
-
-    private static final String PROTOCOLL_SUFFIX = "_protocol";
-
-    private static final String DEFAULT_PORT = "80";
-
-    private final static String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)\\>";
-
-    private final static String TAG_END = "\\</\\w+\\>";
-
-    private final static String TAG_SELF_CLOSING = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)/\\>";
-
-    private final static String HTML_ENTITY = "&[a-zA-Z][a-zA-Z0-9]+;";
-
-    private final static Pattern TAG_PATTERN = Pattern.compile(TAG_START + "((.*?[^\\<]))" + TAG_END, Pattern.DOTALL);
-
-    private final static Pattern HTML_MATCH_PATTERN = Pattern
-            .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")", Pattern.DOTALL);
-
-    private static final Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
-
-    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000, "Derivate display value cache");
 
     /**
      * returns the given String trimmed

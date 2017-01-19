@@ -34,7 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
@@ -57,7 +58,7 @@ import org.xml.sax.SAXException;
 public class MCRClassificationBrowser2 extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRClassificationBrowser2.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRClassificationBrowser2.class);
 
     protected MCRQueryAdapter getQueryAdapter(final String fieldName) {
         MCRQueryAdapter adapter = MCRConfiguration.instance().getInstanceOf("MCR.Module-classbrowser.QueryAdapter");

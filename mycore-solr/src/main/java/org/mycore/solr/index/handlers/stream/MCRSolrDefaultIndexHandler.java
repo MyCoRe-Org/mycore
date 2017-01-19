@@ -6,7 +6,8 @@ import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
@@ -23,7 +24,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
  */
 public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRSolrDefaultIndexHandler.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRSolrDefaultIndexHandler.class);
 
     final static String STYLESHEET = MCRConfiguration.instance().getString(CONFIG_PREFIX + "IndexHandler.ContentStream.ServerStyleSheet");
 

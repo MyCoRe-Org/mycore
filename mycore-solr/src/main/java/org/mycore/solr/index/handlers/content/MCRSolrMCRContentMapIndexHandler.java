@@ -29,7 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
@@ -52,7 +53,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
  */
 public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrMCRContentMapIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrMCRContentMapIndexHandler.class);
 
     private List<MCRSolrIndexHandler> subhandlers;
 

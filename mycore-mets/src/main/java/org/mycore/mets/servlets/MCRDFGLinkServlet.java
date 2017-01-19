@@ -33,7 +33,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
@@ -71,7 +72,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRDFGLinkServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRDFGLinkServlet.class);
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {

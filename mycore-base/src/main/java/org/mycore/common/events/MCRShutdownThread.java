@@ -23,7 +23,8 @@
  **/
 package org.mycore.common.events;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * is a shutdown hook for the current <code>Runtime</code>.
@@ -39,7 +40,7 @@ import org.apache.log4j.Logger;
  */
 public class MCRShutdownThread extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRShutdownThread.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRShutdownThread.class);
 
     private static final MCRShutdownThread SINGLETON = new MCRShutdownThread();
 

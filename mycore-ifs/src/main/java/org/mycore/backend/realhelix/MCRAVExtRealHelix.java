@@ -28,7 +28,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
@@ -58,7 +59,7 @@ import org.mycore.datamodel.ifs.MCRFileReader;
 public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
 
     /** The logger */
-    private final static Logger LOGGER = Logger.getLogger(MCRAVExtRealHelix.class);
+    private final static Logger LOGGER = LogManager.getLogger(MCRAVExtRealHelix.class);
 
     public MCRAVExtRealHelix() {
     }

@@ -26,7 +26,8 @@ package org.mycore.solr.index.handlers;
 import java.io.IOException;
 import java.text.MessageFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
@@ -37,7 +38,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
  *
  */
 public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrOptimizeIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrOptimizeIndexHandler.class);
 
     @Override
     public void index() throws IOException, SolrServerException {

@@ -3,7 +3,8 @@ package org.mycore.frontend.support;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRSessionEvent;
@@ -14,7 +15,7 @@ public class MCRObjectIDLockTable implements MCRSessionListener {
 
     private static final MCRObjectIDLockTable SINGLETON = new MCRObjectIDLockTable();
 
-    private static Logger LOGGER = Logger.getLogger(MCRObjectIDLockTable.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRObjectIDLockTable.class);
 
     private ConcurrentMap<MCRObjectID, MCRSession> lockMap;
 

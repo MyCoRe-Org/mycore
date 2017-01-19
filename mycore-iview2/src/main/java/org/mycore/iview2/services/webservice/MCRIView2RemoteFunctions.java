@@ -40,7 +40,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.iview2.services.MCRIView2Tools;
@@ -61,7 +62,7 @@ public class MCRIView2RemoteFunctions {
 
     private static EntityManagerFactory emFactory = MCREntityManagerProvider.getEntityManagerFactory();
 
-    private static Logger LOGGER = Logger.getLogger(MCRIView2RemoteFunctions.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRIView2RemoteFunctions.class);
 
     /**
      * Asks web service to get next image in the tiling queue.

@@ -1,11 +1,12 @@
 package org.mycore.datamodel.ifs2;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
 public class MCRStoreManager {
-    private static final Logger LOGGER = Logger.getLogger(MCRStoreManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRStoreManager.class);
 
     public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass) throws InstantiationException, IllegalAccessException {
         return createStore(new MCRStoreDefaultConfig(ID), storeClass);
