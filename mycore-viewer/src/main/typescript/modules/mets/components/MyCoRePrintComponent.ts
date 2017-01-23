@@ -4,31 +4,34 @@
 module mycore.viewer.components {
     export class MyCoRePrintComponent extends ViewerComponent {
 
-        constructor(private _settings:MetsSettings) {
+        constructor(private _settings: MetsSettings) {
             super();
         }
 
-        private _modalWindow:widgets.modal.IviewPrintModalWindow;
-        private _currentImage:model.StructureImage;
-        private _structureModel:model.StructureModel;
-        private _languageModel:model.LanguageModel;
-        private _maxPages:number;
-        private _printButton:widgets.toolbar.ToolbarButton;
-        private _enabled = this._settings.pdfCreatorStyle != null && this._settings.pdfCreatorStyle.length != 0;
+        private _modalWindow: widgets.modal.IviewPrintModalWindow;
+        private _currentImage: model.StructureImage;
+        private _structureModel: model.StructureModel;
+        private _languageModel: model.LanguageModel;
+        private _maxPages: number;
+        private _printButton: widgets.toolbar.ToolbarButton;
+        private _enabled = (this._settings.pdfCreatorStyle != null && this._settings.pdfCreatorStyle.length != 0) ||
+            this._settings.pdfCreatorURI;
 
-        private buildRequestLink(pages:string) {
-            var metsLocation = "{location}/mets.xml?XSL.Style={creatorStyle}"
-            var formatString = "{creator}?mets={metsLocation}&pages={pages}";
-            var params = {
-                creator : this._settings.pdfCreatorURI,
-                metsLocation : encodeURIComponent(ViewerFormatString(metsLocation, {
-                    location : this._settings.metsURL,
-                    creatorStyle : this._settings.pdfCreatorStyle
-                })),
-                pages : pages
-            };
+        private buildPDFRequestLink(pages?: string) {
+            let metsLocationFormatString = "{metsURL}/mets.xml?XSL.Style={pdfCreatorStyle}";
+            let defaultFormatString = "{pdfCreatorURI}?mets={metsLocation}&pages={pages}";
 
-            return ViewerFormatString(formatString, params);
+            let metsLocation = encodeURIComponent(ViewerFormatString(metsLocationFormatString, this._settings));
+
+            this._settings[ "metsLocation" ] = metsLocation;
+            this._settings[ "pages" ] = pages;
+
+            return ViewerFormatString(this._settings.pdfCreatorFormatString || defaultFormatString, this._settings);
+        }
+
+        private buildRestrictionLink(){
+            let defaultFormatString = "{pdfCreatorURI}?getRestrictions";
+            return ViewerFormatString(this._settings.pdfCreatorRestrictionFormatString || defaultFormatString, this._settings);
         }
 
         public init() {
@@ -43,7 +46,7 @@ module mycore.viewer.components {
         }
 
 
-        public handle(e:mycore.viewer.widgets.events.ViewerEvent) {
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent) {
             if (e.type == events.ProvideToolbarModelEvent.TYPE) {
                 var ptme = <events.ProvideToolbarModelEvent>e;
                 this._printButton = new widgets.toolbar.ToolbarButton("PrintButton", "PDF", "", "");
@@ -68,19 +71,19 @@ module mycore.viewer.components {
                 this._modalWindow.maximalPageMessage = languageModelLoadedEvent.languageModel.getTranslation("createPdf.maximalPages")
                 var that = this;
 
-                this._modalWindow.checkEventHandler = (wich:string) => {
+                this._modalWindow.checkEventHandler = (wich: string) => {
                     if (wich == "range") {
                         that._modalWindow.rangeInputEnabled = false;
                         this._modalWindow.validationMessage = "";
                         that._modalWindow.previewImageSrc = null;
 
-                        that._modalWindow.rangeInputEventHandler = (ip:string) => {
+                        that._modalWindow.rangeInputEventHandler = (ip: string) => {
                             var validationResult = that.validateRange(ip);
 
                             if (validationResult.valid) {
                                 that._modalWindow.validationMessage = "";
                                 that._modalWindow.validationResult = true;
-                                that._structureModel.imageList[ validationResult.firstPage ].requestImgdataUrl((url:string) => {
+                                that._structureModel.imageList[ validationResult.firstPage ].requestImgdataUrl((url: string) => {
                                     that._modalWindow.previewImageSrc = url;
                                 });
                             } else {
@@ -103,13 +106,13 @@ module mycore.viewer.components {
                                 that._modalWindow.previewImageSrc = null;
                             } else {
                                 that._modalWindow.validationResult = true;
-                                that._structureModel.imageList[ 0 ].requestImgdataUrl((url:string) => {
+                                that._structureModel.imageList[ 0 ].requestImgdataUrl((url: string) => {
                                     that._modalWindow.previewImageSrc = url;
                                 });
                             }
                         } else if (wich == "current") {
                             that._modalWindow.validationMessage = "";
-                            this._currentImage.requestImgdataUrl((url:string) => {
+                            this._currentImage.requestImgdataUrl((url: string) => {
                                 that._modalWindow.previewImageSrc = url;
                             });
 
@@ -133,7 +136,7 @@ module mycore.viewer.components {
                         page = that._modalWindow.rangeInputVal;
                     }
 
-                    window.location.href = that.buildRequestLink(page);
+                    window.location.href = that.buildPDFRequestLink(page);
                 };
                 this._modalWindow.currentChecked = true;
 
@@ -160,7 +163,7 @@ module mycore.viewer.components {
                 this._currentImage = ice.image;
                 if (this._modalWindow.currentChecked) {
                     if (typeof this._currentImage != "undefined") {
-                        this._currentImage.requestImgdataUrl((url:string) => {
+                        this._currentImage.requestImgdataUrl((url: string) => {
                             this._modalWindow.previewImageSrc = url;
                         });
                     }
@@ -175,12 +178,12 @@ module mycore.viewer.components {
             jQuery.ajax({
                 type : 'GET',
                 dataType : 'json',
-                url : this._settings.pdfCreatorURI + "?getRestrictions",
+                url : this.buildRestrictionLink(),
                 crossDomain : true,
                 complete : function (jqXHR, textStatus) {
                     //jQuery.support.cors = corsSupport;
                 },
-                success : function (data:any) {
+                success : function (data: any) {
                     that._maxPages = parseInt(data.maxPages);
                     that._modalWindow.maximalPages = that._maxPages.toString();
                 }
@@ -197,7 +200,7 @@ module mycore.viewer.components {
          * @param range
          * @returns {valid:boolean;text:string;firstPage?:number}
          */
-        private validateRange(range:string):{
+        private validateRange(range: string): {
             valid: boolean; text: string
             firstPage?: number
         } {
@@ -277,14 +280,14 @@ module mycore.viewer.components {
             return {valid : true, text : "", firstPage : firstPage - 1};
         }
 
-        private isValidPage(page:string) {
+        private isValidPage(page: string) {
             if (typeof this._structureModel._imageList[ parseInt(page) - 1 ] != "undefined") {
                 return !isNaN(<any>page);
             }
             return false;
         }
 
-        public get handlesEvents():string[] {
+        public get handlesEvents(): string[] {
             if (this._settings.doctype == 'mets' && this._enabled) {
                 return [ widgets.toolbar.events.ButtonPressedEvent.TYPE, events.LanguageModelLoadedEvent.TYPE, events.StructureModelLoadedEvent.TYPE, events.ImageChangedEvent.TYPE, events.ProvideToolbarModelEvent.TYPE ];
             } else {
