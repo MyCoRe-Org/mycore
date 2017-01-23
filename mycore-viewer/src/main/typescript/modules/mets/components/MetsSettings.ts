@@ -5,6 +5,8 @@ module mycore.viewer.components {
         pageRange: number;
         pdfCreatorURI: string;
         pdfCreatorStyle: string;
+        pdfCreatorFormatString?:string;
+        pdfCreatorRestrictionFormatString?:string;
         teiStylesheet: string;
     }
 }
