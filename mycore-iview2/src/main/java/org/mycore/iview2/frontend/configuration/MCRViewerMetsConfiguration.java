@@ -2,6 +2,7 @@ package org.mycore.iview2.frontend.configuration;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
 
@@ -13,8 +14,9 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
 
         // properties
         setProperty("metsURL", MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + getDerivate(request));
-        String imageXmlPath = MCRIView2Tools.getIView2Property("BaseURL"); // Parameter can be used to provide multiple urls
-        
+        String imageXmlPath = MCRIView2Tools
+            .getIView2Property("BaseURL"); // Parameter can be used to provide multiple urls
+
         if (imageXmlPath == null || imageXmlPath.isEmpty()) {
             imageXmlPath = MCRServlet.getServletBaseURL() + "MCRTileServlet/";
         }
@@ -23,10 +25,17 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
             imageXmlPath = imageXmlPath.split(",")[0];
         }
         setProperty("imageXmlPath", imageXmlPath);
-        
+
         setProperty("pdfCreatorStyle", MCRIView2Tools.getIView2Property("PDFCreatorStyle"));
         setProperty("pdfCreatorURI", MCRIView2Tools.getIView2Property("PDFCreatorURI"));
         setProperty("text.enabled", MCRIView2Tools.getIView2Property("text.enabled", "false"));
+
+        MCRConfiguration configuration = MCRConfiguration.instance();
+        setProperty("pdfCreatorFormatString",
+            configuration.getString("MCR.Viewer.PDFCreatorFormatString", null));
+        setProperty("pdfCreatorRestrictionFormatString", configuration
+            .getString("MCR.Viewer.PDFCreatorRestrictionFormatString", null));
+
         // script
         addLocalScript("iview-client-mets.js", isDebugParameterSet(request));
 
