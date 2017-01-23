@@ -10,7 +10,6 @@
 
   <xsl:template match="mycorederivate/derivate/internals/internal" mode="iview2">
     <xsl:if test="@maindoc and iview2Tool:isFileSupported(@maindoc)">
-      <xsl:message>detected supported iview file</xsl:message>
       <field name="iviewFile">
         <xsl:value-of select="@maindoc" />
       </field>
