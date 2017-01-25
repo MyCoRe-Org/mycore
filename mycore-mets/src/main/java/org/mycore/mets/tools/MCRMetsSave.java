@@ -27,6 +27,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
+import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -85,9 +86,12 @@ public class MCRMetsSave {
      * the derivate with the given id. The name of the file depends on property
      * 'MCR.Mets.Filename'. If this property has not been set 'mets.xml' is used
      * as a default filename.
+     * 
+     * @return
+     *          true if the given document was successfully saved, otherwise false
      */
-    public static synchronized void saveMets(Document document, MCRObjectID derivateId) {
-        saveMets(document, derivateId, true);
+    public static synchronized boolean saveMets(Document document, MCRObjectID derivateId) {
+        return saveMets(document, derivateId, true, true);
     }
 
     /**
@@ -95,26 +99,38 @@ public class MCRMetsSave {
      * the derivate with the given id. The name of the file depends on property
      * 'MCR.Mets.Filename'. If this property has not been set 'mets.xml' is used
      * as a default filename.
+     * 
      * @param overwrite 
      *          if true existing mets-file will be overwritten
+     * @param validate
+     *          if true the document will be validated before its stored
+     * @return
+     *          true if the given document was successfully saved, otherwise false
      */
-    public static synchronized void saveMets(Document document, MCRObjectID derivateId, boolean overwrite) {
+    public static synchronized boolean saveMets(Document document, MCRObjectID derivateId, boolean overwrite, boolean validate) {
         // add the file to the existing derivate in ifs
         MCRPath metsFile = getMetsFile(derivateId.toString());
 
         if (metsFile == null) {
             metsFile = createMetsFile(derivateId.toString());
         } else if (!overwrite) {
-            return;
+            return false;
+        }
+
+        if (validate && !Mets.isValid(document)) {
+            LOGGER.warn("Storing mets.xml for " + derivateId + " failed cause the given document was invalid.");
+            return false;
         }
 
         try (OutputStream metsOut = Files.newOutputStream(metsFile)) {
-            XMLOutputter xout = new XMLOutputter();
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             xout.output(document, metsOut);
             LOGGER.info("Storing file content from \"" + getMetsFileName() + "\" to derivate \"" + derivateId + "\"");
         } catch (Exception e) {
             LOGGER.error(e);
+            return false;
         }
+        return true;
     }
 
     public static String getMetsFileName() {
