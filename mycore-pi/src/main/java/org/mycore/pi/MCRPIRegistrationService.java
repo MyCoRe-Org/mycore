@@ -69,8 +69,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         try {
             Class<MCRPersistentIdentifierInscriber<T>> classObject = (Class<MCRPersistentIdentifierInscriber<T>>) Class.forName(className);
             Constructor<MCRPersistentIdentifierInscriber<T>> constructor = classObject.getConstructor(String.class);
-            MCRPersistentIdentifierInscriber<T> identifierInscriber = constructor.newInstance(inscriberName);
-            return identifierInscriber;
+            return constructor.newInstance(inscriberName);
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException("Configurated class (" + inscriberPropertyKey + ") not found: " + className, e);
         } catch (NoSuchMethodException e) {
@@ -88,8 +87,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         try {
             Class<MCRPersistentIdentifierGenerator<T>> classObject = (Class<MCRPersistentIdentifierGenerator<T>>) Class.forName(className);
             Constructor<MCRPersistentIdentifierGenerator<T>> constructor = classObject.getConstructor(String.class);
-            MCRPersistentIdentifierGenerator<T> identifierGenerator = constructor.newInstance(generatorName);
-            return identifierGenerator;
+            return constructor.newInstance(generatorName);
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException("Configurated class (" + inscriberPropertyKey + ") not found: " + className, e);
         } catch (NoSuchMethodException e) {
@@ -165,7 +163,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * @throws MCRActiveLinkException           the {@link MCRPersistentIdentifierInscriber} lets {@link MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
-    public MCRPersistentIdentifier fullRegister(MCRBase obj, String additional)
+    public T fullRegister(MCRBase obj, String additional)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
         T identifier = this.registerIdentifier(obj, additional);
@@ -276,7 +274,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
         Map<String, String> shortened = new HashMap<>();
 
-        propertiesMap.keySet().stream().forEach(key -> {
+        propertiesMap.keySet().forEach(key -> {
             String newKey = key.substring(REGISTRATION_CONFIG_PREFIX.length() + registrationServiceID.length() + 1);
             shortened.put(newKey, propertiesMap.get(key));
         });
