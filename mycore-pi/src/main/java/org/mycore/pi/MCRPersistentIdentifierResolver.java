@@ -11,16 +11,16 @@ public abstract class MCRPersistentIdentifierResolver<T extends MCRPersistentIde
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private String name;
+    private final String name;
 
     public MCRPersistentIdentifierResolver(String name) {
         this.name = name;
     }
 
 
-    public abstract Stream<String> resolve(MCRPersistentIdentifier identifier) throws MCRIdentifierUnresolvableException;
+    public abstract Stream<String> resolve(T identifier) throws MCRIdentifierUnresolvableException;
 
-    public Stream<String> resolveSuppress(MCRPersistentIdentifier identifier) {
+    public Stream<String> resolveSuppress(T identifier) {
         try {
             return resolve(identifier);
         } catch (MCRIdentifierUnresolvableException e) {

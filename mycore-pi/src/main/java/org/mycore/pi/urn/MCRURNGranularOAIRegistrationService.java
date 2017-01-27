@@ -25,7 +25,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRFileCollectingFileVisitor;
 import org.mycore.pi.MCRPIRegistrationService;
-import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -53,7 +52,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
     }
 
     @Override
-    public MCRPersistentIdentifier fullRegister(MCRBase obj, String additional) throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+    public MCRDNBURN fullRegister(MCRBase obj, String additional) throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
 
         MCRObjectDerivate derivate = ((MCRDerivate) obj).getDerivate();
@@ -122,9 +121,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
 
         List<MCRPath> pathList = collectingFileVisitor.getPaths()
                 .stream()
-                .filter(file -> {
-                    return !predicateList.stream().filter(p -> p.test(file.toString().split(":")[1])).findAny().isPresent();
-                })
+                .filter(file -> !predicateList.stream().filter(p -> p.test(file.toString().split(":")[1])).findAny().isPresent())
                 .map(p -> (MCRPath) p)
                 .sorted()
                 .collect(Collectors.toList());
