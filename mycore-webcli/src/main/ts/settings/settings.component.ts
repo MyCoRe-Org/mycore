@@ -48,6 +48,11 @@ export class WebCliSettingsComponent {
     this._restService.setContinueIfOneFails(event.srcElement.checked);
   }
 
+  deleteCommandHistory() {
+    this._communicationService.setCommandHistory([]);
+    localStorage.removeItem("commandHistory");
+  }
+
   private getSettingsFromCookie(defaultHSize: number, defaultComHSize: number, defaultAutoScroll: boolean, defaultContinueIfOneFails: boolean) {
     var storageHSize = localStorage.getItem("historySize");
     if (storageHSize != undefined && storageHSize != ""){

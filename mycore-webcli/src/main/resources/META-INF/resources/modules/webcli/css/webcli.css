@@ -227,3 +227,17 @@ div.web-cli-queue > pre{
     -moz-border-radius: 6px 0 6px 6px;
     border-radius: 6px 0 6px 6px;
 }
+
+.comHistoryDeleteButton {
+    color: rgba(255,255,255,.5);
+    font-size: 20px;
+    cursor: pointer;
+    padding-top: 7px;
+}
+
+.comHistoryList {
+    height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 10px;
+}

@@ -30,6 +30,12 @@
           Clear Command Queue
         </span>
       </li>
+      <li class="nav-item" (click)="showCommandHistory()" [hidden]="commandHistory.length <= 0">
+        <span class="nav-link">
+          <i class="fa fa-archive"></i>
+          Command History
+        </span>
+      </li>
       <li class="nav-item" data-toggle="collapse" data-target="#exCollapsingNavbar">
         <span class="nav-link">
           <i class="fa fa-cog"></i>
@@ -73,3 +79,20 @@
   <div class="row tab-pane fade in active" id="log" role="tabpanel" web-cli-log></div>
   <div class="row tab-pane fade" id="queue" role="tabpanel" web-cli-queue></div>
 </div>
+  <div class="modal fade" id="comHistoryModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h5 class="modal-title">Command History</h5>
+        </div>
+        <div class="modal-body">
+          <ul class="comHistoryList list-group" *ngIf="commandHistory">
+            <li *ngFor="let com of commandHistory" class="list-group-item list-group-item-action"><a href="#" (click)="onSelectCommand(com)" onclick='return false;' title="{{com}}">{{com}}</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
