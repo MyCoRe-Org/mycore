@@ -14,14 +14,14 @@ import org.mycore.common.MCRSessionMgr;
  */
 public class MCRTransactionableRunnable implements Runnable {
 
-    protected final static Logger LOGGER = LogManager.getLogger();
+    private final static Logger LOGGER = LogManager.getLogger();
 
-    private Runnable decorator;
+    protected Runnable runnable;
 
     private MCRSession session;
 
     /**
-     * Creates a new {@link Runnable} decorating the {@link #run()} method with a new
+     * Creates a new {@link Runnable} encapsulating the {@link #run()} method with a new
      * {@link MCRSession} and a database transaction. Afterwards the transaction will
      * be committed and the session will be released and closed.
      * 
@@ -29,23 +29,23 @@ public class MCRTransactionableRunnable implements Runnable {
      * session use the {@link MCRTransactionableRunnable#MCRTransactionableRunnable(Runnable, MCRSession)}
      * constructor instead.
      * 
-     * @param decorator the runnable to decorate
+     * @param runnable the runnable to execute within a session and transaction
      */
-    public MCRTransactionableRunnable(Runnable decorator) {
-        this.decorator = decorator;
+    public MCRTransactionableRunnable(Runnable runnable) {
+        this.runnable = Objects.requireNonNull(runnable, "runnable must not be null");
     }
 
     /**
-     * Creates a new {@link Runnable} decorating the {@link #run()} method with a new
+     * Creates a new {@link Runnable} encapsulating the {@link #run()} method with a new
      * a database transaction. The transaction will be created in the context of the
      * given session. Afterwards the transaction will be committed and the session
      * will be released (but not closed!).
      * 
-     * @param decorator the runnable to decorate
+     * @param runnable the runnable to execute within a session and transaction
      * @param session the session to use
      */
-    public MCRTransactionableRunnable(Runnable decorator, MCRSession session) {
-        this.decorator = Objects.requireNonNull(decorator, "decorator must not be null");
+    public MCRTransactionableRunnable(Runnable runnable, MCRSession session) {
+        this.runnable = Objects.requireNonNull(runnable, "runnable must not be null");
         this.session = Objects.requireNonNull(session, "session must not be null");
     }
 
@@ -59,7 +59,7 @@ public class MCRTransactionableRunnable implements Runnable {
         MCRSessionMgr.setCurrentSession(this.session);
         session.beginTransaction();
         try {
-            this.decorator.run();
+            this.runnable.run();
         } finally {
             try {
                 session.commitTransaction();
@@ -77,6 +77,15 @@ public class MCRTransactionableRunnable implements Runnable {
                 }
             }
         }
+    }
+
+    /**
+     * Returns the main task.
+     * 
+     * @return the runnable to execute
+     */
+    public Runnable getRunnable() {
+        return runnable;
     }
 
 }
