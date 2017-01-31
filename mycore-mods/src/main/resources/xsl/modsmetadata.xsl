@@ -69,6 +69,10 @@
     <a href="{@valueURI}" title="Link zu GND"><sup>GND</sup></a>
   </xsl:template>
 
+  <xsl:template match="mods:geographic[@authority='gnd']" mode="gnd">
+    <a href="{@valueURI}" title="Link zu GND"><sup>GND</sup></a>
+  </xsl:template>
+
   <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued|mods:dateCaptured|mods:dateModified" mode="present">
     <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name()))" />
     <xsl:if test="not(@point='end' and (preceding-sibling::*[name(current())=name()][@point='start']  or following-sibling::*[name(current())=name()][@point='start']))">
