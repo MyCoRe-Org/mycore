@@ -42,6 +42,7 @@ import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 import org.mycore.solr.search.MCRSolrSearchUtils;
+import org.mycore.util.concurrent.MCRSystemCallable;
 import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 import org.mycore.util.concurrent.processing.MCRProcessableSupplier;
@@ -362,9 +363,10 @@ public class MCRSolrIndexer {
      *            index handler to submit
      */
     public static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
-        MCRSolrIndexTask indexTask = new MCRSolrIndexTask(indexHandler);
+        MCRSystemCallable<List<MCRSolrIndexHandler>> indexTask = new MCRSystemCallable<>(
+            new MCRSolrIndexTask(indexHandler));
         MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = SOLR_EXECUTOR.submit(indexTask);
-        supplier.getFuture().whenComplete(afterIndex());
+        supplier.getFuture().whenCompleteAsync(afterIndex(), SOLR_EXECUTOR.getExecutor());
     }
 
     private static BiConsumer<? super List<MCRSolrIndexHandler>, ? super Throwable> afterIndex() {
@@ -442,8 +444,7 @@ public class MCRSolrIndexer {
      * the same documents as the store. All solr zombie documents will be removed, and all not indexed mycore objects
      * will be indexed.
      */
-    public static void synchronizeMetadataIndex(String objectType)
-        throws IOException, SolrServerException {
+    public static void synchronizeMetadataIndex(String objectType) throws IOException, SolrServerException {
         LOGGER.info("synchronize " + objectType);
         // get ids from store
         LOGGER.info("fetching mycore store...");

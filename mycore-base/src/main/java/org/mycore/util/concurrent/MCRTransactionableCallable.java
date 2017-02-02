@@ -9,20 +9,20 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 /**
- * Decorates a {@link Callable} with a mycore session and a database transaction.
+ * Encapsulates a {@link Callable} with a mycore session and a database transaction.
  * 
  * @author Matthias Eichner
  */
 public class MCRTransactionableCallable<V> implements Callable<V> {
 
-    protected final static Logger LOGGER = LogManager.getLogger();
+    private final static Logger LOGGER = LogManager.getLogger();
 
-    private Callable<V> decorator;
+    private Callable<V> callable;
 
-    private MCRSession session;
+    protected MCRSession session;
 
     /**
-     * Creates a new {@link Callable} decorating the {@link #call()} method with a new
+     * Creates a new {@link Callable} encapsulating the {@link #call()} method with a new
      * {@link MCRSession} and a database transaction. Afterwards the transaction will
      * be committed and the session will be released and closed.
      * 
@@ -30,23 +30,23 @@ public class MCRTransactionableCallable<V> implements Callable<V> {
      * session use the {@link MCRTransactionableCallable#MCRTransactionableCallable(Callable, MCRSession)}
      * constructor instead.
      * 
-     * @param decorator the callable to decorate
+     * @param callable the callable to execute within a session and transaction
      */
-    public MCRTransactionableCallable(Callable<V> decorator) {
-        this.decorator = decorator;
+    public MCRTransactionableCallable(Callable<V> callable) {
+        this.callable = Objects.requireNonNull(callable, "callable must not be null");
     }
 
     /**
-     * Creates a new {@link Callable} decorating the {@link #call()} method with a new
+     * Creates a new {@link Callable} encapsulating the {@link #call()} method with a new
      * a database transaction. The transaction will be created in the context of the
      * given session. Afterwards the transaction will be committed and the session
      * will be released (but not closed!).
      * 
-     * @param decorator the callable to decorate
+     * @param callable the callable to execute within a session and transaction
      * @param session the session to use
      */
-    public MCRTransactionableCallable(Callable<V> decorator, MCRSession session) {
-        this.decorator = Objects.requireNonNull(decorator, "decorator must not be null");
+    public MCRTransactionableCallable(Callable<V> callable, MCRSession session) {
+        this.callable = Objects.requireNonNull(callable, "callable must not be null");
         this.session = Objects.requireNonNull(session, "session must not be null");
     }
 
@@ -60,7 +60,7 @@ public class MCRTransactionableCallable<V> implements Callable<V> {
         MCRSessionMgr.setCurrentSession(this.session);
         session.beginTransaction();
         try {
-            return this.decorator.call();
+            return this.callable.call();
         } finally {
             try {
                 session.commitTransaction();
@@ -78,6 +78,15 @@ public class MCRTransactionableCallable<V> implements Callable<V> {
                 }
             }
         }
+    }
+
+    /**
+     * Returns the main task.
+     * 
+     * @return the callable to execute
+     */
+    public Callable<V> getCallable() {
+        return callable;
     }
 
 }
