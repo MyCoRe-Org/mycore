@@ -26,21 +26,29 @@ export class WebCliCommandInputComponent {
       settings => {
         this.recentCommandsMaxLength = settings.comHistorySize;
       }
-    )
+    );
+    this._comunicationService.commandHistory.subscribe(
+      commands => {
+        this.recentCommands = commands;
+      }
+    );
     var commandHistory = localStorage.getItem("commandHistory");
     if (commandHistory != undefined && commandHistory != "") {
       this.recentCommands = JSON.parse(commandHistory);
     }
+    this._comunicationService.setCommandHistory(this.recentCommands);
   }
 
   execute(command: string) {
-    if (this.commandIndex != 0) {
-      this.recentCommands.pop();
+    if (command != undefined && command != "") {
+      if (this.commandIndex != 0) {
+        this.recentCommands.pop();
+      }
+      this._restService.executeCommand(command);
+      this.addCommandToRecentCommands(command);
+      this.commandIndex = 0;
+      this.command = "";
     }
-    this._restService.executeCommand(command);
-    this.addCommandToRecentCommands(command);
-    this.commandIndex = 0;
-    this.command = "";
   }
 
   addCommandToRecentCommands(command: string) {
@@ -52,6 +60,7 @@ export class WebCliCommandInputComponent {
       if (this.recentCommands.length > this.recentCommandsMaxLength) {
         this.recentCommands = this.recentCommands.splice(this.recentCommandsMaxLength * -1, this.recentCommandsMaxLength);
       }
+      this._comunicationService.setCommandHistory(this.recentCommands);
       this.updateCommandListInLocalStorage();
     }
   }
@@ -61,7 +70,7 @@ export class WebCliCommandInputComponent {
       this.execute(this.command);
     }
     if (keyCode == "38") {
-      if (this.commandIndex == 0) {
+      if (this.commandIndex == 0 && this.command != undefined) {
         this.recentCommands.push(this.command);
         this.commandIndex++;
       }

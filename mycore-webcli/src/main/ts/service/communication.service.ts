@@ -8,9 +8,11 @@ import {Subject} from 'rxjs/Subject';
 export class CommunicationService {
   private _currentCommand = new Subject<string>();
   private _settings = new Subject<Settings>();
+  private _commandHistory = new Subject<string[]>();
 
   currentCommand = this._currentCommand.asObservable();
   settings = this._settings.asObservable();
+  commandHistory = this._commandHistory.asObservable();
 
   setCurrentCommand(command: string) {
     this._currentCommand.next(command);
@@ -18,5 +20,9 @@ export class CommunicationService {
 
   setSettings(setting: Settings) {
     this._settings.next(setting);
+  }
+
+  setCommandHistory(history: string[]) {
+    this._commandHistory.next(history);
   }
 }
