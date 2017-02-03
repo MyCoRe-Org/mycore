@@ -8,11 +8,11 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 /**
- * Decorates a {@link Runnable} with a mycore session and a database transaction.
+ * Encapsulates a {@link Runnable} with a mycore session and a database transaction.
  * 
  * @author Matthias Eichner
  */
-public class MCRTransactionableRunnable implements Runnable {
+public class MCRTransactionableRunnable implements Runnable, MCRDecorator<Runnable> {
 
     private final static Logger LOGGER = LogManager.getLogger();
 
@@ -79,13 +79,9 @@ public class MCRTransactionableRunnable implements Runnable {
         }
     }
 
-    /**
-     * Returns the main task.
-     * 
-     * @return the runnable to execute
-     */
-    public Runnable getRunnable() {
-        return runnable;
+    @Override
+    public Runnable get() {
+        return this.runnable;
     }
 
 }

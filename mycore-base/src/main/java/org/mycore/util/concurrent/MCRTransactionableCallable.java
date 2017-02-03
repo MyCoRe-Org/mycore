@@ -13,7 +13,7 @@ import org.mycore.common.MCRSessionMgr;
  * 
  * @author Matthias Eichner
  */
-public class MCRTransactionableCallable<V> implements Callable<V> {
+public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<Callable<V>> {
 
     private final static Logger LOGGER = LogManager.getLogger();
 
@@ -80,12 +80,8 @@ public class MCRTransactionableCallable<V> implements Callable<V> {
         }
     }
 
-    /**
-     * Returns the main task.
-     * 
-     * @return the callable to execute
-     */
-    public Callable<V> getCallable() {
+    @Override
+    public Callable<V> get() {
         return callable;
     }
 
