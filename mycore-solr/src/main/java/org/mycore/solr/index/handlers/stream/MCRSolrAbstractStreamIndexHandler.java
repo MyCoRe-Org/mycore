@@ -31,7 +31,7 @@ public abstract class MCRSolrAbstractStreamIndexHandler extends MCRSolrAbstractI
 
     @Override
     public String toString() {
-        return getStream().getSourceInfo();
+        return "index " + getStream().getName();
     }
 
 }

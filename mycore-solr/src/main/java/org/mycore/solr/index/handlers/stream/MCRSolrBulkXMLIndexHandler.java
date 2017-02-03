@@ -63,4 +63,9 @@ public class MCRSolrBulkXMLIndexHandler extends MCRSolrDefaultIndexHandler {
         return docs;
     }
 
+    @Override
+    public String toString() {
+        return "bulk index " + docs + " documents";
+    }
+
 }

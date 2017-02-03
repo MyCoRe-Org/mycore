@@ -9,8 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 
 /**
- * Solr index task which handles <code>MCRSolrIndexHandler</code>'s. Surrounds the indexHandler with a hibernate
- * session.
+ * Solr index task which handles <code>MCRSolrIndexHandler</code>'s.
  * 
  * @author Matthias Eichner
  */
@@ -38,6 +37,11 @@ public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>> {
         indexHandler.getStatistic().addDocument(indexHandler.getDocuments());
         indexHandler.getStatistic().addTime(end - start);
         return this.indexHandler.getSubHandlers();
+    }
+
+    @Override
+    public String toString() {
+        return "Solr: " + this.indexHandler.toString();
     }
 
 }

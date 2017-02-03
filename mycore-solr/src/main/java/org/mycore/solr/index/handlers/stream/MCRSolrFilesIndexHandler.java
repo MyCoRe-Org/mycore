@@ -123,4 +123,9 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return "index files of " + this.mcrID;
+    }
+
 }
