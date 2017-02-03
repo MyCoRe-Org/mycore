@@ -75,4 +75,9 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
         return MCRSolrIndexStatisticCollector.documents;
     }
 
+    @Override
+    public String toString() {
+        return "index " + document.getFieldValue("id");
+    }
+
 }

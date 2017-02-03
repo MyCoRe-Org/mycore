@@ -106,4 +106,9 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         return 1;
     }
 
+    @Override
+    public String toString() {
+        return "index " + getStream().getSource().getFileName().toString();
+    }
+
 }

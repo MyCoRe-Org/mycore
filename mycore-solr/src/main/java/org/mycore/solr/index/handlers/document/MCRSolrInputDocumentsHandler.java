@@ -127,4 +127,10 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
     public int getDocuments() {
         return documents.size();
     }
+
+    @Override
+    public String toString() {
+        return "index " + this.documents.size() + " mycore documents";
+    }
+
 }

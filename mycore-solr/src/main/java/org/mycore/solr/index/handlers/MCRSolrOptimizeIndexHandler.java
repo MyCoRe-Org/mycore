@@ -44,13 +44,18 @@ public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
     public void index() throws IOException, SolrServerException {
         LOGGER.info("Sending optimize request to solr");
         UpdateResponse response = getSolrClient().optimize();
-        LOGGER.info(MessageFormat.format("Optimize was {0}({1}ms)", (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"),
-            response.getElapsedTime()));
+        LOGGER.info(MessageFormat.format("Optimize was {0}({1}ms)",
+            (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"), response.getElapsedTime()));
     }
 
     @Override
     public MCRSolrIndexStatistic getStatistic() {
         return MCRSolrIndexStatisticCollector.operations;
+    }
+
+    @Override
+    public String toString() {
+        return "optimize index";
     }
 
 }
