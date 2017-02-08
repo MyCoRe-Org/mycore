@@ -88,7 +88,7 @@ public class MCRJobThread implements Runnable {
 
             // notify the queue we have processed the job
             synchronized (queue) {
-                queue.notify();
+                queue.notifyAll();
             }
         } catch (Exception e) {
             LOGGER.error("Error while getting next job.", e);
