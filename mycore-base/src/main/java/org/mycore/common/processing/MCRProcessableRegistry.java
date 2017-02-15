@@ -31,4 +31,18 @@ public interface MCRProcessableRegistry {
      */
     public Stream<MCRProcessableCollection> stream();
 
+    /**
+     * Adds a new listener.
+     * 
+     * @param listener the listener to add
+     */
+    public void addListener(MCRProcessableRegistryListener listener);
+
+    /**
+     * Removes a listener.
+     * 
+     * @param listener the listener to remove
+     */
+    public void removeListener(MCRProcessableRegistryListener listener);
+
 }

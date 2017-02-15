@@ -1,0 +1,243 @@
+package org.mycore.webtools.processing.socket;
+
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.common.processing.MCRListenableProgressable;
+import org.mycore.common.processing.MCRProcessable;
+import org.mycore.common.processing.MCRProcessableCollection;
+import org.mycore.common.processing.MCRProcessableCollectionListener;
+import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.common.processing.MCRProcessableRegistryListener;
+import org.mycore.common.processing.MCRProcessableStatus;
+import org.mycore.common.processing.MCRProcessableStatusListener;
+import org.mycore.common.processing.MCRProgressable;
+import org.mycore.common.processing.MCRProgressableListener;
+import org.mycore.frontend.ws.common.MCRWebsocketDefaultConfigurator;
+import org.mycore.frontend.ws.common.MCRWebsocketJSONDecoder;
+import org.mycore.frontend.ws.endoint.MCRAbstractEndpoint;
+
+import com.google.gson.JsonObject;
+import com.google.inject.Inject;
+
+@ServerEndpoint(value = "/ws/mycore-webtools/processing", configurator = MCRWebsocketDefaultConfigurator.class, decoders = {
+    MCRWebsocketJSONDecoder.class })
+public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static Map<String, SessionData> SESSIONS;
+
+    static {
+        SESSIONS = Collections.synchronizedMap(new HashMap<>());
+    }
+
+    private MCRProcessableRegistry registry;
+
+    private MCRProcessableWebsocketSender sender;
+
+    @Inject
+    public MCRProcessingEndpoint(MCRProcessableRegistry registry, MCRProcessableWebsocketSender sender) {
+        this.registry = registry;
+        this.sender = sender;
+    }
+
+    @OnMessage
+    public void onMessage(Session session, JsonObject request) {
+        sessionized(session, () -> {
+            if (!MCRAccessManager.checkPermission("use-processable")) {
+                this.sender.sendError(session, 403);
+                return;
+            }
+            handleMessage(session, request);
+        });
+    }
+
+    @OnError
+    public void onError(Session session, Throwable error) {
+        if (error instanceof SocketTimeoutException) {
+            this.close(session);
+            LOGGER.warn("processing websocket timeout for session " + session.getId());
+            return;
+        }
+        LOGGER.error("websocket error", error);
+    }
+
+    @OnClose
+    public void close(Session session) {
+        SessionData sessionData = SESSIONS.get(session.getId());
+        sessionData.detachListeners(this.registry);
+        SESSIONS.remove(session.getId());
+    }
+
+    private void handleMessage(Session session, JsonObject request) {
+        String type = request.get("type").getAsString();
+
+        if (type.equals("connect")) {
+            connect(session);
+            return;
+        }
+
+    }
+
+    private void connect(Session session) {
+        this.sender.sendRegistry(session, this.registry);
+        if (SESSIONS.containsKey(session.getId())) {
+            return;
+        }
+        final SessionData sessionData = new SessionData(session, this.sender);
+        registry.addListener(sessionData);
+        this.registry.stream().forEach(collection -> {
+            sessionData.attachCollection(collection);
+        });
+        SESSIONS.put(session.getId(), sessionData);
+    }
+
+    private static class SessionData implements MCRProcessableRegistryListener, MCRProcessableCollectionListener,
+        MCRProcessableStatusListener, MCRProgressableListener {
+
+        private Session session;
+
+        private MCRProcessableWebsocketSender sender;
+
+        public SessionData(Session session, MCRProcessableWebsocketSender sender) {
+            this.session = session;
+            this.sender = sender;
+        }
+
+        @Override
+        public void onProgressChange(MCRProgressable source, Integer oldProgress, Integer newProgress) {
+            if (isClosed()) {
+                return;
+            }
+            if (source instanceof MCRProcessable) {
+                this.sender.updateProcessable(session, (MCRProcessable) source);
+            }
+        }
+
+        @Override
+        public void onProgressTextChange(MCRProgressable source, String oldProgressText, String newProgressText) {
+            if (isClosed()) {
+                return;
+            }
+
+            if (source instanceof MCRProcessable) {
+                this.sender.updateProcessable(session, (MCRProcessable) source);
+            }
+        }
+
+        @Override
+        public void onStatusChange(MCRProcessable source, MCRProcessableStatus oldStatus,
+            MCRProcessableStatus newStatus) {
+            if (isClosed()) {
+                return;
+            }
+            this.sender.updateProcessable(session, source);
+        }
+
+        @Override
+        public void onAdd(MCRProcessableRegistry source, MCRProcessableCollection collection) {
+            if (isClosed()) {
+                return;
+            }
+            this.attachCollection(collection);
+            this.sender.addCollection(session, source, collection);
+        }
+
+        @Override
+        public void onRemove(MCRProcessableRegistry source, MCRProcessableCollection collection) {
+            if (isClosed()) {
+                return;
+            }
+            this.sender.removeCollection(session, collection);
+        }
+
+        @Override
+        public void onAdd(MCRProcessableCollection source, MCRProcessable processable) {
+            if (isClosed()) {
+                return;
+            }
+            attachProcessable(processable);
+            this.sender.addProcessable(session, source, processable);
+        }
+
+        @Override
+        public void onRemove(MCRProcessableCollection source, MCRProcessable processable) {
+            processable.removeStatusListener(this);
+            if (isClosed()) {
+                return;
+            }
+            this.sender.removeProcessable(session, processable);
+        }
+
+        protected boolean isClosed() {
+            if (!this.session.isOpen()) {
+                try {
+                    this.session.close(new CloseReason(CloseCodes.GOING_AWAY, "client disconnected"));
+                } catch (IOException ioExc) {
+                    LOGGER.error("Unable to close websocket connection", ioExc);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Attaches the given collection to this {@link SessionData} object by
+         * adding all relevant listeners.
+         * 
+         * @param collection the collection to attach to this object
+         */
+        public void attachCollection(MCRProcessableCollection collection) {
+            collection.addListener(this);
+            collection.stream().forEach(processable -> {
+                attachProcessable(processable);
+            });
+        }
+
+        /**
+         * Attaches the given processable to this {@link SessionData} object by
+         * adding all relevant listeners.
+         * 
+         * @param processable the processable to attach to this object
+         */
+        private void attachProcessable(MCRProcessable processable) {
+            processable.addStatusListener(this);
+            if (processable instanceof MCRListenableProgressable) {
+                ((MCRListenableProgressable) processable).addProgressListener(this);
+            }
+        }
+
+        /**
+         * Removes this session data object from all listeners of the given registry.
+         * 
+         * @param registry the registry to detach from
+         */
+        public void detachListeners(MCRProcessableRegistry registry) {
+            registry.removeListener(this);
+            registry.stream().forEach(collection -> {
+                collection.removeListener(this);
+                collection.stream().forEach(processable -> {
+                    processable.removeProgressListener(this);
+                    processable.removeStatusListener(this);
+                });
+            });
+        }
+
+    }
+
+}

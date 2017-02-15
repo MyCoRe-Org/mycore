@@ -7,10 +7,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import org.mycore.common.processing.MCRProcessableTask;
 import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableStatus;
+import org.mycore.common.processing.MCRProcessableTask;
 import org.mycore.common.processing.MCRProgressable;
+import org.mycore.util.concurrent.MCRDecorator;
 import org.mycore.util.concurrent.MCRPrioritySupplier;
 
 /**
@@ -25,8 +26,6 @@ import org.mycore.util.concurrent.MCRPrioritySupplier;
 public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> implements Supplier<R> {
 
     protected CompletableFuture<R> future;
-
-    protected Exception error;
 
     /**
      * Creates a new {@link MCRProcessableSupplier} by the already committed task and its future.
@@ -50,7 +49,8 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
      * @param priority the priority
      * @return a new processable supplier
      */
-    public static <T> MCRProcessableSupplier<T> of(Callable<T> task, ExecutorService executorService, Integer priority) {
+    public static <T> MCRProcessableSupplier<T> of(Callable<T> task, ExecutorService executorService,
+        Integer priority) {
         MCRProcessableSupplier<T> ps = new MCRProcessableSupplier<>(task);
         CompletableFuture<T> future = CompletableFuture.supplyAsync(new MCRPrioritySupplier<T>(ps, priority),
             executorService);
@@ -159,7 +159,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     public String getName() {
         String name = super.getName();
         if (name == null) {
-            return this.task.getClass().getSimpleName();
+            return MCRDecorator.get(this.task).orElse(this.task).toString();
         }
         return name;
     }

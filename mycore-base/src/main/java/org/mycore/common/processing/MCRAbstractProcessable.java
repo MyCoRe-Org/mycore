@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.mycore.common.MCRSessionMgr;
+
 /**
  * Can be used as base class for an {@link MCRProcessable}. This class offers some
  * convenient methods but does not handle everything.
@@ -21,6 +23,8 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
 
     protected String name;
 
+    protected String userId;
+
     protected MCRProcessableStatus status;
 
     protected Throwable error;
@@ -36,6 +40,10 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
     public MCRAbstractProcessable() {
         super();
         this.name = null;
+        if(MCRSessionMgr.hasCurrentSession()) {
+            // do not create a new session! (getCurrentSession() is wrong named!)
+            this.userId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
+        }
         this.status = MCRProcessableStatus.created;
         this.error = null;
 
@@ -58,6 +66,20 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
     @Override
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Sets the user identifier responsible for this processable.
+     * 
+     * @param userId the user id
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    @Override
+    public String getUserId() {
+        return this.userId;
     }
 
     @Override

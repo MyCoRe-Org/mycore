@@ -5,12 +5,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Base implementation of a processable collection.
  * 
  * @author Matthias Eichner
  */
 public class MCRProcessableDefaultCollection implements MCRProcessableCollection {
+
+    private static Logger LOGGER = LogManager.getLogger();
 
     private String name;
 
@@ -66,7 +71,11 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
     protected void fireAdded(MCRProcessable processable) {
         synchronized (this.listenerList) {
             this.listenerList.forEach(listener -> {
-                listener.onAdd(this, processable);
+                try {
+                    listener.onAdd(this, processable);
+                } catch (Exception exc) {
+                    LOGGER.error("Unable to inform collection listener due internal error", exc);
+                }
             });
         }
     }
@@ -74,7 +83,11 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
     protected void fireRemoved(MCRProcessable processable) {
         synchronized (this.listenerList) {
             this.listenerList.forEach(listener -> {
-                listener.onRemove(this, processable);
+                try {
+                    listener.onRemove(this, processable);
+                } catch (Exception exc) {
+                    LOGGER.error("Unable to inform collection listener due internal error", exc);
+                }
             });
         }
     }

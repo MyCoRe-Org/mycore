@@ -1,0 +1,15 @@
+<div class="alert alert-danger" *ngIf="errorCode" [ngSwitch]="errorCode">
+	<div *ngSwitchCase="403">Sie haben nicht die notwendigen Rechte um das MyCoRe Processing Modul zu verwenden.</div>
+	<div *ngSwitchDefault>Es ist ein unbekannter Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</div>
+</div>
+
+<h1>MyCoRe Processing</h1>
+
+<div *ngIf="registry" class="registry">
+	<div *ngIf="!errorCode && registry.collections?.length == 0" class="alert alert-info">Es sind noch keine Collections registriert.</div>
+	<div *ngFor="let collection of registry.collections">
+		<div>
+			<collection [model]="collection"></collection>
+		</div>
+	</div>
+</div>
