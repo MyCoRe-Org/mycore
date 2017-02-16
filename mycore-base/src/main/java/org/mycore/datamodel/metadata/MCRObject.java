@@ -152,7 +152,7 @@ final public class MCRObject extends MCRBase {
             elm.addContent(mcr_service.createXML());
             return doc;
         } catch(MCRException exc) {
-            throw new MCRException("The content of '" + mcr_id + "' is invalid.");
+            throw new MCRException("The content of '" + mcr_id + "' is invalid.", exc);
         }
     }
 
