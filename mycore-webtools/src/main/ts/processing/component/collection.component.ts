@@ -4,6 +4,7 @@ import { Collection } from '../model/model';
 @Component( {
     selector: 'collection',
     templateUrl: 'html/collection.html',
+    styleUrls:  ['css/collection.css']
 })
 export class CollectionComponent {
 
