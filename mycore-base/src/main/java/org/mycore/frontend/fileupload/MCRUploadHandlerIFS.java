@@ -52,6 +52,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.processing.MCRProcessableStatus;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -91,10 +92,13 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     private int numFiles;
 
+    private int filesUploaded;
+
     public MCRUploadHandlerIFS(String documentID, String derivateID) {
         super();
         this.documentID = Objects.requireNonNull(documentID, "Document ID may not be 'null'.");
         this.derivateID = derivateID;
+        this.setName(this.derivateID);
     }
 
     public MCRUploadHandlerIFS(String documentID, String derivateID, String returnURL) {
@@ -139,8 +143,12 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     @Override
-    public void startUpload(int numFiles) throws Exception {
+    public void startUpload(int numFiles) {
         this.numFiles = numFiles;
+        this.filesUploaded = 0;
+        this.setStatus(MCRProcessableStatus.processing);
+        this.setProgress(0);
+        this.setProgressText("start upload...");
     }
 
     private synchronized void prepareUpload() throws MCRPersistenceException, MCRAccessException, IOException {
@@ -235,11 +243,12 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     @Override
-    public synchronized long receiveFile(String path, InputStream in, long length, String checksum) throws Exception {
+    public synchronized long receiveFile(String path, InputStream in, long length, String checksum) throws IOException, MCRPersistenceException, MCRAccessException {
         LOGGER.debug("incoming receiveFile request: " + path + " " + checksum + " " + length + " bytes");
 
-        List<Path> tempFiles = new LinkedList<>();
+        this.setProgressText(path);
 
+        List<Path> tempFiles = new LinkedList<>();
         Supplier<Path> tempFileSupplier = () -> {
             try {
                 Path tempFile = Files.createTempFile(derivateID + "-" + path.hashCode(), ".upload");
@@ -281,6 +290,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                     LOGGER.error("Could not delete temp file " + tempFilePath.toString());
                 }
             });
+            this.filesUploaded++;
+            int progress = (int)(((float)this.filesUploaded / (float)this.numFiles) * 100f);
+            this.setProgress(progress);
         }
     }
 
@@ -294,7 +306,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     @Override
-    public synchronized void finishUpload() throws Exception {
+    public synchronized void finishUpload() throws IOException {
         if (this.derivate == null) {
             return;
         }
@@ -306,6 +318,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                     "No files were uploaded, delete entry in database for " + derivate.getId().toString() + "!");
             }
         }
+        this.setStatus(MCRProcessableStatus.successful);
     }
 
     private void updateMainFile() throws IOException {
@@ -322,20 +335,23 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     protected String getPathOfMainFile() throws IOException {
-        MainFileFinder mainFileFinder = new MainFileFinder(rootDir);
+        MainFileFinder mainFileFinder = new MainFileFinder();
         Files.walkFileTree(rootDir, mainFileFinder);
         Path mainFile = mainFileFinder.getMainFile();
         return mainFile == null ? "" : mainFile.subpath(0, mainFile.getNameCount()).toString();
     }
 
+    public String getDerivateID() {
+        return derivateID;
+    }
+
+    public String getDocumentID() {
+        return documentID;
+    }
+
     private static class MainFileFinder extends SimpleFileVisitor<Path> {
+
         private Path mainFile;
-
-        private Path rootPath;
-
-        public MainFileFinder(Path rootPath) {
-            this.rootPath = rootPath;
-        }
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

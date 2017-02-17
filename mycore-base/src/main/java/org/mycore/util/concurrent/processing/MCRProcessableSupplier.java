@@ -159,7 +159,12 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     public String getName() {
         String name = super.getName();
         if (name == null) {
-            return MCRDecorator.get(this.task).orElse(this.task).toString();
+            return MCRDecorator.get(this.task).map(object -> {
+                if (object instanceof MCRProcessable) {
+                    return ((MCRProcessable) object).getName();
+                }
+                return object.toString();
+            }).orElse(this.task.toString());
         }
         return name;
     }
