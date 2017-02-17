@@ -10,6 +10,7 @@ import org.mycore.common.processing.MCRListenableProgressable;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProgressable;
 import org.mycore.common.processing.MCRProgressableListener;
+import org.mycore.util.concurrent.MCRDecorator;
 
 /**
  * Factory and utility methods for {@link MCRProcessableExecutor}.
@@ -125,7 +126,8 @@ public abstract class MCRProcessableFactory {
     /**
      * A callable that runs given task and returns given result
      */
-    private static final class RunnableProgressableAdapter<T> implements Callable<T>, MCRListenableProgressable {
+    private static final class RunnableProgressableAdapter<T>
+        implements Callable<T>, MCRListenableProgressable, MCRDecorator<Runnable> {
         final Runnable task;
 
         RunnableProgressableAdapter(Runnable task) {
@@ -166,6 +168,12 @@ public abstract class MCRProcessableFactory {
                 ((MCRListenableProgressable) task).removeProgressListener(listener);
             }
         }
+
+        @Override
+        public Runnable get() {
+            return task;
+        }
+
     }
 
 }
