@@ -3,6 +3,7 @@ package org.mycore.common.xml;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -105,7 +106,7 @@ public class MCRXPathEvaluator {
 
     public Object evaluateFirst(String xPathExpression) {
         try {
-            List<Namespace> namespaces = MCRConstants.getStandardNamespaces();
+            Collection<Namespace> namespaces = MCRConstants.getStandardNamespaces();
             XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables, namespaces);
             return xPath.evaluateFirst(context);
         } catch (Exception ex) {
