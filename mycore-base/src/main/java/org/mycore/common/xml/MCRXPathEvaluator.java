@@ -105,8 +105,8 @@ public class MCRXPathEvaluator {
 
     public Object evaluateFirst(String xPathExpression) {
         try {
-            List<Namespace> namespaces = MCRConstants.getStandardNamespaces();
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables, namespaces);
+            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables,
+                MCRConstants.getStandardNamespaces());
             return xPath.evaluateFirst(context);
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
