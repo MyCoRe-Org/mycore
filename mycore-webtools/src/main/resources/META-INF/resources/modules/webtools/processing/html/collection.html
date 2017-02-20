@@ -1,21 +1,13 @@
-<table class="table">
-	<caption>{{model.name}}</caption>
-	<thead>
-		<tr>
-			<th>#</th>
-			<th>Name</th>
-			<th>Status</th>
-			<th>User</th>
-			<th>Created</th>
-			<th>Started</th>
-			<th>Progress</th>
-		</tr>
-	</thead>
-	<tbody>
-    <tr *ngIf="model.processables?.length == 0">
-      <td colspan="6">no active process</td>
-    </tr>
-		<tr *ngFor="let processable of model.processables" processable [model]="processable">
-		</tr>
-	</tbody>
-</table>
+<div>
+	<h1>{{model.name}}</h1>
+	<div class="row header">
+		<div class="col-md-4">Name</div>
+		<div class="col-md-2">User</div>
+		<div class="col-md-2">Create Date</div>
+		<div class="col-md-4">Progress</div>
+	</div>
+  <div class="noActiveProcess" *ngIf="model.processables?.length == 0">
+    no active process
+  </div>
+  <div class="content" *ngFor="let processable of model.processables" processable [model]="processable"></div>
+</div>

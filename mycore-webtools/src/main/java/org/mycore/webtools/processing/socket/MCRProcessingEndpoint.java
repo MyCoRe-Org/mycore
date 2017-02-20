@@ -87,7 +87,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
     private void handleMessage(Session session, JsonObject request) {
         String type = request.get("type").getAsString();
 
-        if (type.equals("connect")) {
+        if ("connect".equals(type)) {
             connect(session);
             return;
         }

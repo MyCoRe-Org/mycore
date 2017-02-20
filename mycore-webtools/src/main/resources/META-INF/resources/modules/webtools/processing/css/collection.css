@@ -1,0 +1,20 @@
+@CHARSET "UTF-8";
+
+h1 {
+	font-size: 0.9rem;
+	color: #888;
+	text-transform: uppercase;
+}
+
+.header {
+	font-weight: bold;
+	margin-bottom: 6px;
+}
+
+.row.content {
+	margin: 4px -15px 4px -15px;
+}
+
+.noActiveProcess {
+	color: #888;
+}
