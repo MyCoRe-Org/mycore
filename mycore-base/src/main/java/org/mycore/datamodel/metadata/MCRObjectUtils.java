@@ -2,6 +2,7 @@ package org.mycore.datamodel.metadata;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,7 +32,7 @@ public abstract class MCRObjectUtils {
     private static XPathExpression<Element> META_CLASS;
 
     static {
-        List<Namespace> ns = MCRConstants.getStandardNamespaces();
+        Collection<Namespace> ns = MCRConstants.getStandardNamespaces();
 
         // META_LINK_HREF
         String linkExp = "./mycoreobject/metadata/*[@class='MCRMetaLinkID']/*/@xlink:href";
