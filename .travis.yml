@@ -1,15 +1,20 @@
 language: java
-sudo: true
+sudo: false
+group: beta
 dist: trusty
+install: true
 cache:
   directories:
-    - $HOME/.m2
+    - $HOME/.m2/repository
 env:
   global:
     - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
-install:
-  - sudo apt-get update -qq
+before_script:
+  |-
+   echo "BUILD START: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 script:
-  - mvn -B clean install && mvn -B javadoc:javadoc
+  - mvn -B -P!standard-with-extra-repos clean install && mvn -B -P!standard-with-extra-repos javadoc:javadoc
 after_script:
-  - mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
+  - mvn -P!standard-with-extra-repos com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
+after_failure:
+  - sh travis/autodeploy.sh "$TRAVIS_BUILD_NUMBER-$TRAVIS_EVENT_TYPE-$TRAVIS_PULL_REQUEST" "https://MyCoRe-Travis:$GITHUB_TOKEN@github.com/MyCoRe-Travis/test_artifacts.git"
