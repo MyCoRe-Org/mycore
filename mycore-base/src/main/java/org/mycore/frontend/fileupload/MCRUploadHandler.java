@@ -30,6 +30,7 @@ import org.hibernate.Transaction;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
+import org.mycore.common.processing.MCRAbstractProcessable;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 
 /**
@@ -46,7 +47,7 @@ import org.mycore.frontend.MCRWebsiteWriteProtection;
  * 
  * @see MCRUploadHandlerManager
  */
-public abstract class MCRUploadHandler {
+public abstract class MCRUploadHandler extends MCRAbstractProcessable {
     /** The LOGGER * */
     private static Logger LOGGER = LogManager.getLogger(MCRUploadHandler.class);
 
@@ -66,6 +67,7 @@ public abstract class MCRUploadHandler {
 
         uploadID = Long.toString(System.currentTimeMillis(), 36);
         MCRUploadHandlerManager.register(this);
+        this.setName(uploadID);
     }
 
     /** Returns the unique ID of this upload session * */

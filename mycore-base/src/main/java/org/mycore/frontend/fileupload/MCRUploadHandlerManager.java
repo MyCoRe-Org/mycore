@@ -29,6 +29,10 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.inject.MCRInjectorConfig;
+import org.mycore.common.processing.MCRProcessableCollection;
+import org.mycore.common.processing.MCRProcessableDefaultCollection;
+import org.mycore.common.processing.MCRProcessableRegistry;
 
 /**
  * @author Frank Lützenkirchen
@@ -39,21 +43,32 @@ import org.mycore.common.MCRUsageException;
  */
 public class MCRUploadHandlerManager {
 
-    /** Cache of currently active upload handler sessions */
-    protected static MCRCache<String, MCRUploadHandlerCacheEntry> handlers = new MCRCache<String, MCRUploadHandlerCacheEntry>(100, "UploadHandlerManager UploadHandlers");
+    private static Logger LOGGER = LogManager.getLogger(MCRUploadHandlerManager.class);
 
-    private static Logger logger = LogManager.getLogger(MCRUploadHandlerManager.class);
+    /** Cache of currently active upload handler sessions */
+    protected static MCRCache<String, MCRUploadHandlerCacheEntry> HANDLERS;
+
+    protected static MCRProcessableCollection COLLECTION;
+
+    static {
+        HANDLERS = new MCRCache<String, MCRUploadHandlerCacheEntry>(100, "UploadHandlerManager UploadHandlers");
+        COLLECTION = new MCRProcessableDefaultCollection("Upload Manager");
+        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+        registry.register(COLLECTION);
+
+    }
 
     static void register(MCRUploadHandler handler) {
-        logger.debug("Registering " + handler.getClass().getName() + " with upload ID " + handler.getID());
+        LOGGER.debug("Registering " + handler.getClass().getName() + " with upload ID " + handler.getID());
         String sessionID = MCRSessionMgr.getCurrentSession().getID();
-        handlers.put(handler.getID(), new MCRUploadHandlerCacheEntry(sessionID, handler));
+        HANDLERS.put(handler.getID(), new MCRUploadHandlerCacheEntry(sessionID, handler));
+        COLLECTION.add(handler);
     }
 
     public static MCRUploadHandler getHandler(String uploadID) {
 
         long yesterday = System.currentTimeMillis() - 86400000;
-        MCRUploadHandlerCacheEntry entry = handlers.getIfUpToDate(uploadID, yesterday);
+        MCRUploadHandlerCacheEntry entry = HANDLERS.getIfUpToDate(uploadID, yesterday);
 
         if (entry == null)
             throw new MCRUsageException("Upload session " + uploadID + " timed out");
@@ -70,29 +85,31 @@ public class MCRUploadHandlerManager {
     }
 
     public static void unregister(String uploadID) {
-        handlers.remove(uploadID);
-    }
-}
-
-/** Represents a cache entry of currently active upload handler session */
-class MCRUploadHandlerCacheEntry {
-
-    /** The ID of the MCRSession this upload is associated with */
-    private String sessionID;
-
-    /** The MCRUploadHander instance to be used */
-    private MCRUploadHandler handler;
-
-    public MCRUploadHandlerCacheEntry(String sessionID, MCRUploadHandler handler) {
-        this.sessionID = sessionID;
-        this.handler = handler;
+        MCRUploadHandlerCacheEntry cacheEntry = HANDLERS.get(uploadID);
+        HANDLERS.remove(uploadID);
+        COLLECTION.remove(cacheEntry.handler);
     }
 
-    public String getSessionID() {
-        return sessionID;
-    }
+    /** Represents a cache entry of currently active upload handler session */
+    private static class MCRUploadHandlerCacheEntry {
 
-    public MCRUploadHandler getUploadHandler() {
-        return handler;
+        /** The ID of the MCRSession this upload is associated with */
+        private String sessionID;
+
+        /** The MCRUploadHander instance to be used */
+        private MCRUploadHandler handler;
+
+        public MCRUploadHandlerCacheEntry(String sessionID, MCRUploadHandler handler) {
+            this.sessionID = sessionID;
+            this.handler = handler;
+        }
+
+        public String getSessionID() {
+            return sessionID;
+        }
+
+        public MCRUploadHandler getUploadHandler() {
+            return handler;
+        }
     }
 }
