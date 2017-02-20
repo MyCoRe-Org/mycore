@@ -43,6 +43,10 @@
     </mods:originInfo>
   </xsl:template>
 
+  <!-- add encoding to a mods:dateIssued without encoding -->
+  <!-- but only if there is no start or end Point with encoding -->
+  <!-- and only if there is no other mods:dateIssued -->
+  <!-- so you dont have multiple mods:dateIssued with the same encoding -->
   <xsl:template match="mods:dateIssued[not(@encoding)]">
       <xsl:if test="not(../mods:dateIssued[@point='start' or @point='end' and @encoding]) and not(following-sibling::mods:dateIssued)">
         <!-- TODO: check date format first! -->
