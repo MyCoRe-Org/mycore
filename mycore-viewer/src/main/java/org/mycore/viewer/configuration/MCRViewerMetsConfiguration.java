@@ -27,6 +27,13 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
         setProperty("pdfCreatorStyle", MCRConfiguration.instance().getString("MCR.Viewer.PDFCreatorStyle", null));
         setProperty("pdfCreatorURI", MCRConfiguration.instance().getString("MCR.Viewer.PDFCreatorURI", null));
         setProperty("text.enabled", MCRConfiguration.instance().getString("MCR.Viewer.text.enabled", "false"));
+
+        MCRConfiguration configuration = MCRConfiguration.instance();
+        setProperty("pdfCreatorFormatString",
+            configuration.getString("MCR.Viewer.PDFCreatorFormatString", null));
+        setProperty("pdfCreatorRestrictionFormatString", configuration
+            .getString("MCR.Viewer.PDFCreatorRestrictionFormatString", null));
+
         // script
         addLocalScript("iview-client-mets.js", isDebugParameterSet(request));
 

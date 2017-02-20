@@ -49,14 +49,18 @@ import org.mycore.common.processing.MCRProcessableStatus;
  *
  */
 public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
-    protected MCRJob job = null;
 
     private static Logger LOGGER = LogManager.getLogger(MCRJobThread.class);
+
+    protected MCRJobQueue queue = null;
+
+    protected MCRJob job = null;
 
     public MCRJobThread(MCRJob job) {
         this.job = job;
         setName(this.job.getAction().getSimpleName());
         setStatus(MCRProcessableStatus.created);
+        this.queue = MCRJobQueue.getInstance(job.getAction());
     }
 
     public void run() {
@@ -90,6 +94,11 @@ public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
             }
             em.merge(job);
             transaction.commit();
+
+            // notify the queue we have processed the job
+            synchronized (queue) {
+                queue.notifyAll();
+            }
         } catch (Exception e) {
             LOGGER.error("Error while getting next job.", e);
             if (transaction != null) {

@@ -69,6 +69,10 @@
     <a href="{@valueURI}" title="Link zu GND"><sup>GND</sup></a>
   </xsl:template>
 
+  <xsl:template match="mods:geographic[@authority='gnd']" mode="gnd">
+    <a href="{@valueURI}" title="Link zu GND"><sup>GND</sup></a>
+  </xsl:template>
+
   <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued|mods:dateCaptured|mods:dateModified" mode="present">
     <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name()))" />
     <xsl:if test="not(@point='end' and (preceding-sibling::*[name(current())=name()][@point='start']  or following-sibling::*[name(current())=name()][@point='start']))">
@@ -712,7 +716,7 @@
                     <xsl:value-of select="$link" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:variable xmlns:foaf="http://xmlns.com/foaf/0.1/" name="uriResolved" select="document(concat($link,'?format=xml'))//rdf:Description[@rdf:about=normalize-space($link)]/foaf:page/@rdf:resource" />
+                    <xsl:variable xmlns:foaf="http://xmlns.com/foaf/0.1/" name="uriResolved" select="document(mcrxsl:normalizeAbsoluteURL(concat($link,'?format=xml')))//rdf:Description[@rdf:about=normalize-space($link)]/foaf:page/@rdf:resource" />
                     <xsl:choose>
                       <xsl:when test="string-length($uriResolved) &gt; 0"><xsl:value-of select="$uriResolved" /></xsl:when>
                       <xsl:otherwise><xsl:value-of select="$link" /></xsl:otherwise>

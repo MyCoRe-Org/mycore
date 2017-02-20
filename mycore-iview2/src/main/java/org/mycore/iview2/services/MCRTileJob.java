@@ -8,6 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -17,7 +20,14 @@ import javax.persistence.UniqueConstraint;
  *
  */
 @Entity
-@Table(name = "MCRTileJob", uniqueConstraints = @UniqueConstraint(columnNames = { "derivate", "path" }) )
+@Table(name = "MCRTileJob", uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "derivate", "path" }),
+}, indexes = {
+    @Index(columnList = "derivate,status")
+})
+@NamedQueries({
+    @NamedQuery(name = "MCRTileJob.countByStateListByDerivate", query = "SELECT count(job) FROM MCRTileJob as job WHERE job.derivate= :derivateId AND job.status IN (:states)")
+})
 public class MCRTileJob implements Cloneable {
 
     @Id

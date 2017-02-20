@@ -35,7 +35,7 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     @Column(length = 4096)
     private String additional;
 
-    @Column()
+    @Column(length = 128)
     private String service;
 
     @Column(nullable = false)
