@@ -10,7 +10,8 @@ env:
   global:
     - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
 before_script:
-  |- echo "BUILD START: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+  |-
+   echo "BUILD START: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 script:
   - mvn -B -P!standard-with-extra-repos clean install && mvn -B -P!standard-with-extra-repos javadoc:javadoc
 after_script:
