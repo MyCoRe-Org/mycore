@@ -33,7 +33,7 @@ before_install:
 before_script:
   - export DISPLAY=:99.0
   - sleep 3
-  |-
+  - |
    echo "BUILD START: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 script:
   - mkdir ${HOME}/tmp
