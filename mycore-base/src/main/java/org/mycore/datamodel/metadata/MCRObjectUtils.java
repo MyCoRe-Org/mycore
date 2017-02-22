@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
-import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -31,15 +30,15 @@ public abstract class MCRObjectUtils {
     private static XPathExpression<Element> META_CLASS;
 
     static {
-        List<Namespace> ns = MCRConstants.getStandardNamespaces();
-
         // META_LINK_HREF
         String linkExp = "./mycoreobject/metadata/*[@class='MCRMetaLinkID']/*/@xlink:href";
-        META_LINK_HREF = XPathFactory.instance().compile(linkExp, Filters.attribute(), null, ns);
+        META_LINK_HREF = XPathFactory.instance().compile(linkExp, Filters.attribute(), null,
+            MCRConstants.getStandardNamespaces());
 
         // META_CLASS
         String classExp = "./mycoreobject/metadata/*[@class='MCRMetaClassification']/*";
-        META_CLASS = XPathFactory.instance().compile(classExp, Filters.element(), null, ns);
+        META_CLASS = XPathFactory.instance().compile(classExp, Filters.element(), null,
+            MCRConstants.getStandardNamespaces());
     }
 
     /**

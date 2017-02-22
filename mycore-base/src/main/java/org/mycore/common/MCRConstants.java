@@ -25,9 +25,8 @@
 package org.mycore.common;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -109,13 +108,10 @@ public final class MCRConstants {
 
     public final static Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
 
-    private final static List<Namespace> namespaces;
-
     private final static HashMap<String, Namespace> namespacesByPrefix;
 
     static {
         namespacesByPrefix = new HashMap<String, Namespace>();
-        namespaces = new ArrayList<Namespace>();
 
         Field[] fields = MCRConstants.class.getFields();
         for (Field f : fields) {
@@ -147,7 +143,6 @@ public final class MCRConstants {
         String prefix = namespace.getPrefix();
 
         if ((prefix != null) && !prefix.isEmpty()) {
-            namespaces.add(namespace);
             namespacesByPrefix.put(prefix, namespace);
         }
     }
@@ -157,8 +152,8 @@ public final class MCRConstants {
      * namespaces can be configured using properties like
      * MCR.Namespace.&lt;prefix&gt;=&lt;uri&gt;
      */
-    public static List<Namespace> getStandardNamespaces() {
-        return namespaces;
+    public static Collection<Namespace> getStandardNamespaces() {
+        return namespacesByPrefix.values();
     }
 
     /**
