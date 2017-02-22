@@ -1,0 +1,1 @@
+"/home/matthias/workspace/mycore/mycore-viewer/src/main/typescript/modules/frame/module.ts" "/home/matthias/workspace/mycore/mycore-viewer/target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts" --declaration --removeComments --target ES5 --out target/classes/META-INF/resources/modules/iview2/js/iview-client-frame.js

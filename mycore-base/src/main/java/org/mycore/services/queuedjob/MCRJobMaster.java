@@ -72,7 +72,9 @@ public class MCRJobMaster implements Runnable, Closeable {
     private Class<? extends MCRJobAction> action;
 
     private MCRProcessableExecutor jobServe;
-    
+
+    private MCRProcessableCollection processableCollection;
+
     private volatile boolean running = true;
 
     private ReentrantLock runLock;
@@ -82,6 +84,10 @@ public class MCRJobMaster implements Runnable, Closeable {
         this.action = action;
         runLock = new ReentrantLock();
         JOB_QUEUE = MCRJobQueue.getInstance(action);
+
+        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+        registry.register(processableCollection);
+        processableCollection = new MCRProcessableDefaultCollection(getName());
     }
 
     /**
@@ -137,14 +143,10 @@ public class MCRJobMaster implements Runnable, Closeable {
      */
     @Override
     public void run() {
-        final String preLabel = (MCRJobQueue.singleQueue ? "Job" : action.getSimpleName());
-        Thread.currentThread().setName(preLabel + "Master");
+        Thread.currentThread().setName(getName());
         //get this MCRSession a speaking name
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-
-        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
-        MCRProcessableCollection jobCollection = new MCRProcessableDefaultCollection("MCR Job");
 
         boolean activated = CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated", true);
         activated = activated
@@ -164,7 +166,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                 ThreadGroup tg = new ThreadGroup("MCRJob slave job thread group");
 
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(tg, r, preLabel + "Slave#" + tNum.incrementAndGet());
+                    Thread t = new Thread(tg, r, getPreLabel() + "Slave#" + tNum.incrementAndGet());
                     return t;
                 }
             };
@@ -186,8 +188,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                 }
             };
 
-            registry.register(jobCollection);
-            jobServe = MCRProcessableFactory.newPool(executor, jobCollection);
+            jobServe = MCRProcessableFactory.newPool(executor, processableCollection);
 
             LOGGER.info("JobMaster" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " with "
                     + jobThreadCount + " thread(s) is started");
@@ -271,9 +272,8 @@ public class MCRJobMaster implements Runnable, Closeable {
                 }
             } // while(running)
         }
-        LOGGER.info(preLabel + "Master thread finished");
+        LOGGER.info(getName()+ " thread finished");
         MCRSessionMgr.releaseCurrentSession();
-        registry.unregister(jobCollection);
     }
 
     /**
@@ -324,6 +324,28 @@ public class MCRJobMaster implements Runnable, Closeable {
     @Override
     public int getPriority() {
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY - 1;
+    }
+
+    protected String getPreLabel() {
+        return (MCRJobQueue.singleQueue ? "Job" : action.getSimpleName());
+    }
+
+    /**
+     * Returns the name of this job master.
+     * 
+     * @return
+     */
+    public String getName() {
+        return getPreLabel() + "Master";
+    }
+
+    /**
+     * Returns the processable collection assigned to this job master.
+     * 
+     * @return the processable collection
+     */
+    public MCRProcessableCollection getProcessableCollection() {
+        return processableCollection;
     }
 
     private static MCRJobAction toMCRJobAction(Class<? extends MCRJobAction> actionClass) {
