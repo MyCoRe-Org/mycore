@@ -38,7 +38,7 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         setProperty("i18nURL", MCRFrontendUtil.getBaseURL(request)+ "rsc/locale/translate/{lang}/component.mets.*,component.iview2.*");
         setProperty("derivateURL", MCRServlet.getServletBaseURL() + "MCRFileNodeServlet/" + getDerivate(request) + "/");
         setProperty("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
-        setProperty("adminMail", MCRConfiguration.instance().getString("MCR.Mail.Sender"));
+        setProperty("adminMail", MCRConfiguration.instance().getString("MCR.Mail.Recipients"));
 
         final String canvasOverviewEnabled = MCRIView2Tools.getIView2Property("canvas.overview.enabled");
         if(canvasOverviewEnabled != null){
