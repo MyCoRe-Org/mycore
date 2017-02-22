@@ -45,7 +45,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.imageio.ImageReader;
-import javax.xml.ws.Endpoint;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,7 +64,6 @@ import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.iview2.services.MCRImageTiler;
 import org.mycore.iview2.services.MCRTileJob;
 import org.mycore.iview2.services.MCRTilingQueue;
-import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
 
 /**
  * Provides commands for Image Viewer.
@@ -76,8 +74,6 @@ import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
 @MCRCommandGroup(name = "IView2 Tile Commands")
 public class MCRIView2Commands extends MCRAbstractCommands {
     private static final Logger LOGGER = LogManager.getLogger(MCRIView2Commands.class);
-
-    private static Endpoint tileService;
 
     /**
      * meta command to tile all images of all derivates.
@@ -422,29 +418,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         };
         Files.walkFileTree(rootNode, test);
         return files;
-    }
-
-    /**
-     * Starts tile webservice ({@link MCRIView2RemoteFunctions}) on this address.
-     * @param address a URI to bind web service to
-     */
-    @MCRCommand(syntax = "start tile webservice on {0}", help = "start a tile web service on address {0}, e.g. 'http//localhost:8084/tileService', and stopping any other running service", order = 120)
-    public static void startTileWebService(String address) {
-        stopTileWebService();
-        tileService = Endpoint.publish(address, new MCRIView2RemoteFunctions());
-    }
-
-    /**
-     * Stops web service started by {@link #startTileWebService(String)}.
-     */
-    @MCRCommand(syntax = "stop tile webservice", help = "stops the tile web service", order = 130)
-    public static void stopTileWebService() {
-        if (tileService == null || !tileService.isPublished()) {
-            LOGGER.info("Currently there is no tiling service running");
-            return;
-        }
-        LOGGER.info("Closing web service.");
-        tileService.stop();
     }
 
 }
