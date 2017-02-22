@@ -12,29 +12,6 @@
   <properties>
     <manifest.priority>50</manifest.priority>
   </properties>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.jvnet.jax-ws-commons</groupId>
-        <artifactId>jaxws-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-wsdl</id>
-            <goals>
-              <goal>wsgen</goal>
-            </goals>
-            <configuration>
-              <pluginArtifacts />
-              <sei>org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions</sei>
-              <keep>true</keep>
-              <verbose>true</verbose>
-              <genWsdl>true</genWsdl>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>
