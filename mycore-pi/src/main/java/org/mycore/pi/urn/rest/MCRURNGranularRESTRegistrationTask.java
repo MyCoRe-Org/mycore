@@ -2,19 +2,17 @@ package org.mycore.pi.urn.rest;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.BiConsumer;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
-import org.mycore.pi.urn.*;
+import org.mycore.pi.urn.MCRDNBURN;
+import org.mycore.pi.urn.MCRDNBURNParser;
 import org.mycore.pi.urn.MCRURNUtils;
 
 import java.io.Closeable;
