@@ -102,7 +102,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
 
         long numOfUnregisteredPI = managerInstance
-                .getUnregisteredIdenifiers(MCRMockIdentifierRegistrationService.TYPE)
+                .getUnregisteredIdenifiers("Unregistered")
                 .stream()
                 .count();
 
@@ -110,8 +110,8 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     }
 
     private MCRPI generateMCRPI() throws MCRPersistentIdentifierException {
-        MCRObjectID mycoreID = MCRObjectID.getNextFreeId("test", "mock");
-        return new MCRPI(generatePIFor(mycoreID).asString(), MCRMockIdentifierRegistrationService.TYPE,
+        MCRObjectID mycoreID = MCRObjectID.getNextFreeId("test_unregisterd");
+        return new MCRPI(generatePIFor(mycoreID).asString(), "Unregistered",
                          mycoreID.toString(), null);
     }
 
@@ -141,6 +141,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         }
         configuration.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         configuration.put("MCR.Metadata.Type.mock", "true");
+        configuration.put("MCR.Metadata.Type.unregisterd", "true");
 
         configuration.put("MCR.PI.Resolvers", MCRMockResolver.class.getName());
 

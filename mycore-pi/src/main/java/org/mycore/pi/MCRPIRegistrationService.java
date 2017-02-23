@@ -236,36 +236,11 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         throws MCRPersistentIdentifierException;
 
     public boolean isCreated(MCRObjectID id, String additional) {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Number> query = cb.createQuery(Number.class);
-        Root<MCRPI> pi = query.from(MCRPI.class);
-        return em.createQuery(
-            query
-                .select(cb.count(pi))
-                .where(
-                    cb.equal(pi.get(MCRPI_.mycoreID), id.toString()),
-                    cb.equal(pi.get(MCRPI_.type), type),
-                    cb.equal(pi.get(MCRPI_.additional), additional),
-                    cb.equal(pi.get(MCRPI_.service), registrationServiceID)))
-            .getSingleResult().shortValue() > 0;
+        return MCRPersistentIdentifierManager.getInstance().isCreated(id, additional, type, registrationServiceID);
     }
 
     public boolean isRegistered(MCRObjectID id, String additional) {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Number> query = cb.createQuery(Number.class);
-        Root<MCRPI> pi = query.from(MCRPI.class);
-        return em.createQuery(
-                query
-                        .select(cb.count(pi))
-                        .where(
-                                cb.equal(pi.get(MCRPI_.mycoreID), id.toString()),
-                                cb.equal(pi.get(MCRPI_.type), type),
-                                cb.equal(pi.get(MCRPI_.additional), additional),
-                                cb.equal(pi.get(MCRPI_.service), registrationServiceID),
-                                cb.isNotNull(pi.get(MCRPI_.registered))))
-                .getSingleResult().shortValue() > 0;
+        return MCRPersistentIdentifierManager.getInstance().isRegistered(id, additional, type, registrationServiceID);
     }
 
     protected final Map<String, String> getProperties() {
