@@ -89,7 +89,8 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
         int count = Math.toIntExact(derivate.getFileMetadata().stream().filter(file -> file.getUrn() != null).count());
         MCRDNBURN dnbURN = newURN = (MCRDNBURN) MCRPersistentIdentifierManager.getInstance().get(derivate.getURN()).findFirst().get();
 
-        MCRDNBURN urntoAssign = dnbURN.toGranular(count + 1, count + 1);
+        String setID = obj.getId().getNumberAsString();
+        MCRDNBURN urntoAssign = dnbURN.toGranular(setID, count + 1, count + 1);
         derivate.getOrCreateFileMetadata(filePath, urntoAssign.asString()).setUrn(urntoAssign.asString());
         MCRPI databaseEntry = new MCRPI(urntoAssign.asString(), getType(), obj.getId().toString(), additional,
                 this.getRegistrationServiceID(), new Date());
@@ -127,11 +128,14 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
                 .collect(Collectors.toList());
 
         MCRDNBURN newURN = getNewIdentifier(obj.getId(), additional);
+        String setID = obj.getId().getNumberAsString();
+
         for (int pathListIndex = 0; pathListIndex < pathList.size(); pathListIndex++) {
-            MCRDNBURN subURN = newURN.toGranular(pathListIndex + 1, pathList.size());
+            MCRDNBURN subURN = newURN.toGranular(setID, pathListIndex + 1, pathList.size());
             derivate.getOrCreateFileMetadata(pathList.get(pathListIndex), subURN.asString()).setUrn(subURN.asString());
-            MCRPI databaseEntry = new MCRPI(subURN.asString(), getType(), obj.getId().toString(), pathList.get(pathListIndex).toString(),
-                    this.getRegistrationServiceID(), null);
+            MCRPI databaseEntry = new MCRPI(subURN.asString(), getType(), obj.getId().toString(),
+                                            pathList.get(pathListIndex).getOwnerRelativePath(),
+                                            this.getRegistrationServiceID(), null);
             session.save(databaseEntry);
         }
 
