@@ -1,14 +1,20 @@
 package org.mycore.pi.urn.rest;
 
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolException;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.HttpContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.BiConsumer;
@@ -20,7 +26,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Created by chi on 25.01.17.
@@ -50,6 +55,7 @@ public class MCRURNServer {
         return HttpClientBuilder
                 .create()
                 .setDefaultCredentialsProvider(basicCredentialsProvider)
+                .setRedirectStrategy(new URNRedirectStrategy())
                 .build();
     }
 
@@ -105,6 +111,38 @@ public class MCRURNServer {
             httpPut.setEntity(new StringEntity(content, "UTF-8"));
 
             callback.accept(httpClient.execute(httpPut), elp);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private class URNRedirectStrategy implements RedirectStrategy{
+
+        @Override
+        public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)
+                throws ProtocolException {
+            LOGGER.info("Want redirect to: " + request.toString());
+            return false;
+        }
+
+        @Override
+        public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context)
+                throws ProtocolException {
+            return null;
+        }
+    }
+    public int put(MCRPIRegistrationInfo urnInfo) {
+        try (CloseableHttpClient httpClient = getHttpClient()) {
+            MCREpicurLite elp = createEpicureLite(urnInfo);
+
+            String content = new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite());
+            LOGGER.debug("EpicurLite \"put\" for urn " + elp.getUrn().getIdentifier() + "\n" + content);
+
+            HttpPut httpPut = new HttpPut(getServiceURL() + elp.getUrn().getIdentifier());
+            httpPut.addHeader("content-type", "application/xml");
+            httpPut.setEntity(new StringEntity(content, "UTF-8"));
+
+            return httpClient.execute(httpPut).getStatusLine().getStatusCode();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
