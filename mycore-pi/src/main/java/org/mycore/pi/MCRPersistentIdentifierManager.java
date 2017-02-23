@@ -21,6 +21,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
 
@@ -123,6 +124,38 @@ public class MCRPersistentIdentifierManager {
                         .where(cb.equal(pi.get(MCRPI_.mycoreID), mycoreID))
                         .where(cb.equal(pi.get(MCRPI_.service), service))).getSingleResult();
 
+    }
+
+    private static final String countCreated = "select count(u) from MCRPI u "
+            + "where u.mycoreID = :id "
+            + "and u.type = :type "
+            + "and u.additional = :additional "
+            + "and u.service = :service";
+
+    private static final String countRegistered = countCreated + " and u.registered is not null";
+
+    public boolean isCreated(MCRObjectID id, String additional, String type, String registrationServiceID) {
+        return MCREntityManagerProvider
+                .getCurrentEntityManager()
+                .createQuery(countCreated, Number.class)
+                .setParameter("id", id.toString())
+                .setParameter("type", type)
+                .setParameter("additional", additional)
+                .setParameter("service", registrationServiceID)
+                .getSingleResult()
+                .shortValue() > 0;
+    }
+
+    public boolean isRegistered(MCRObjectID id, String additional, String type, String registrationServiceID) {
+        return MCREntityManagerProvider
+                .getCurrentEntityManager()
+                .createQuery(countRegistered, Number.class)
+                .setParameter("id", id.toString())
+                .setParameter("type", type)
+                .setParameter("additional", additional)
+                .setParameter("service", registrationServiceID)
+                .getSingleResult()
+                .shortValue() > 0;
     }
 
     public int getCount(String type) {
