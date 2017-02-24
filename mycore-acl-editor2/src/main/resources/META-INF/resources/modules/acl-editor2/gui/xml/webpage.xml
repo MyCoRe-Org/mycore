@@ -4,7 +4,7 @@
   <section xml:lang="all" title="ACL Editor">
     <div id="mycore-acl-editor2">
       	<link href="gui/css/webpage.css" rel="stylesheet" type="text/css" />
-      	<link href="gui/select2/select2.css" rel="stylesheet" type="text/css" />
+      	<link href="gui/bower_components/select2/select2.css" rel="stylesheet" type="text/css" />
       	<div id="acle2-header">
         	<span>          		
           		<text i18n="ACLE.labels.header"/>
@@ -23,9 +23,9 @@
       	<div class="tab-content">
 	      	<div class="tab-pane active" id="acle2-ruleAllocation" style="display:none">
 	      		<div id="acle2-access-filter" class="row">
-	      			<div class="col-lg-4"><input id="acle2-access-filter-input-id" type="text" placeholder="i18n:ACLE.placeholder.filter.id" class="input-sm acle2-access-filter-input form-control"></input></div>
-	      			<div class="col-lg-4"><input id="acle2-access-filter-input-pool" type="text" placeholder="i18n:ACLE.placeholder.filter.pool" class="input-sm acle2-access-filter-input form-control"></input></div>
-	      			<div class="col-lg-4"><input id="acle2-access-filter-input-rule" type="text" placeholder="i18n:ACLE.placeholder.filter.rule" class="input-sm acle2-access-filter-input form-control"></input></div>
+	      			<div class="col-lg-4"><input id="acle2-access-filter-input-id" type="text" placeholder="i18n:ACLE.placeholder.filter.id" class="input-sm acle2-access-filter-input form-control i18n"></input></div>
+	      			<div class="col-lg-4"><input id="acle2-access-filter-input-pool" type="text" placeholder="i18n:ACLE.placeholder.filter.pool" class="input-sm acle2-access-filter-input form-control i18n"></input></div>
+	      			<div class="col-lg-4"><input id="acle2-access-filter-input-rule" type="text" placeholder="i18n:ACLE.placeholder.filter.rule" class="input-sm acle2-access-filter-input form-control i18n"></input></div>
 	      			<i id="acle2-button-access-filter" class="glyphicon glyphicon-search acle2-icon" title="i18n:ACLE.title.filter"></i>
 	      		</div>
 		      	<table id="acle2-access-table" class="table table-hover table-condensed" cellspacing="0">
@@ -161,9 +161,9 @@
       	<script type="text/javascript" src="gui/js/mycore-acl-editor-ruleSelector.js" />
       	<script type="text/javascript" src="gui/js/mycore-acl-editor-accessTable.js" />
       	<script type="text/javascript" src="gui/js/mycore-acl-editor-ruleList.js" />
-    	<script type="text/javascript" src="gui/select2/select2.js" />
-    	<script type="text/javascript" src="gui/js/stupidtable.js" />
-    	<script type="text/javascript" src="gui/js/typeahead.min.js" />
+    	<script type="text/javascript" src="gui/bower_components/select2/select2.min.js" />
+    	<script type="text/javascript" src="gui/bower_components/stupidtable.min.js" />
+    	<script type="text/javascript" src="gui/bower_components/bootstrap3-typeahead.min.js" />
     </div>
   </section>
 </MyCoReWebPage>

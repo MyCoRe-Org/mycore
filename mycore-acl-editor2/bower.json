@@ -1,0 +1,11 @@
+{
+  "name": "mycore-acl-editor2",
+  "description": "mycore-acl-editor2",
+  "version": "1.0.0",
+  "author": "Michel Buechner <michel.buechner@uni-jena.de>",
+  "devDependencies": {
+    "bootstrap3-typeahead": "3.1.0",
+    "select2": "3.3.2",
+    "jquery-stupid-table": "1.0.2"
+  }
+}
