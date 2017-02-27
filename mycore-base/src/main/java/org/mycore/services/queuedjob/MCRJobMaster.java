@@ -73,7 +73,7 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     private MCRProcessableExecutor jobServe;
 
-    private MCRProcessableCollection processableCollection;
+    private MCRProcessableDefaultCollection processableCollection;
 
     private volatile boolean running = true;
 
@@ -86,8 +86,8 @@ public class MCRJobMaster implements Runnable, Closeable {
         JOB_QUEUE = MCRJobQueue.getInstance(action);
 
         MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
-        registry.register(processableCollection);
         processableCollection = new MCRProcessableDefaultCollection(getName());
+        registry.register(processableCollection);
     }
 
     /**
@@ -189,6 +189,7 @@ public class MCRJobMaster implements Runnable, Closeable {
             };
 
             jobServe = MCRProcessableFactory.newPool(executor, processableCollection);
+            processableCollection.setProperty("running", running);
 
             LOGGER.info("JobMaster" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " with "
                     + jobThreadCount + " thread(s) is started");
@@ -209,6 +210,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                                 transaction.begin();
 
                                 job = JOB_QUEUE.poll();
+                                processableCollection.setProperty("queue size", JOB_QUEUE.size());
 
                                 if (job != null) {
                                     action = toMCRJobAction(job.getAction());
@@ -271,6 +273,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                     LOGGER.error("Keep running while catching exceptions.", e);
                 }
             } // while(running)
+            processableCollection.setProperty("running", running);
         }
         LOGGER.info(getName()+ " thread finished");
         MCRSessionMgr.releaseCurrentSession();
@@ -336,7 +339,7 @@ public class MCRJobMaster implements Runnable, Closeable {
      * @return
      */
     public String getName() {
-        return getPreLabel() + "Master";
+        return getPreLabel() + " Master";
     }
 
     /**

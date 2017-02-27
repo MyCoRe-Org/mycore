@@ -2,7 +2,9 @@ package org.mycore.common.processing;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +23,8 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
 
     private List<MCRProcessable> processables;
 
+    private Map<String, Object> properties;
+
     private List<MCRProcessableCollectionListener> listenerList;
 
     /**
@@ -31,6 +35,7 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
     public MCRProcessableDefaultCollection(String name) {
         this.name = name;
         this.processables = Collections.synchronizedList(new ArrayList<>());
+        this.properties = new HashMap<>();
         this.listenerList = Collections.synchronizedList(new ArrayList<>());
     }
 
@@ -56,6 +61,28 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
     @Override
     public Stream<MCRProcessable> stream() {
         return this.processables.stream();
+    }
+
+    @Override
+    public Map<String, Object> getProperties() {
+        return this.properties;
+    }
+
+    public void setProperty(String propertyName, Object propertyValue) {
+        Object oldValue = this.properties.get(propertyName);
+        if (oldValue == null && propertyValue == null) {
+            return;
+        }
+        if (propertyValue == null) {
+            this.properties.remove(propertyName);
+            firePropertyChanged(propertyName, oldValue, propertyValue);
+            return;
+        }
+        if (propertyValue.equals(oldValue)) {
+            return;
+        }
+        this.properties.put(propertyName, propertyValue);
+        firePropertyChanged(propertyName, oldValue, propertyValue);
     }
 
     @Override
@@ -85,6 +112,18 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
             this.listenerList.forEach(listener -> {
                 try {
                     listener.onRemove(this, processable);
+                } catch (Exception exc) {
+                    LOGGER.error("Unable to inform collection listener due internal error", exc);
+                }
+            });
+        }
+    }
+
+    protected void firePropertyChanged(String propertyName, Object oldValue, Object newValue) {
+        synchronized (this.listenerList) {
+            this.listenerList.forEach(listener -> {
+                try {
+                    listener.onPropertyChange(this, propertyName, oldValue, newValue);
                 } catch (Exception exc) {
                     LOGGER.error("Unable to inform collection listener due internal error", exc);
                 }

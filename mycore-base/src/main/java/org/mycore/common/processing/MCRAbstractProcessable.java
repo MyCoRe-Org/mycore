@@ -3,7 +3,9 @@ package org.mycore.common.processing;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mycore.common.MCRSessionMgr;
 
@@ -35,12 +37,14 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
 
     protected Instant endTime;
 
+    protected Map<String, Object> properties;
+
     protected List<MCRProcessableStatusListener> statusListener;
 
     public MCRAbstractProcessable() {
         super();
         this.name = null;
-        if(MCRSessionMgr.hasCurrentSession()) {
+        if (MCRSessionMgr.hasCurrentSession()) {
             // do not create a new session! (getCurrentSession() is wrong named!)
             this.userId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         }
@@ -50,6 +54,8 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
         this.createTime = Instant.now();
         this.startTime = null;
         this.endTime = null;
+
+        this.properties = new HashMap<>();
 
         this.statusListener = Collections.synchronizedList(new ArrayList<>());
     }
@@ -132,6 +138,11 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
     @Override
     public Instant getEndTime() {
         return this.endTime;
+    }
+
+    @Override
+    public Map<String, Object> getProperties() {
+        return this.properties;
     }
 
     @Override

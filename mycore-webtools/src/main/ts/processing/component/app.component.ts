@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
 
 import { CollectionComponent } from './collection.component';
 import { ProcessingService } from './../service/processing.service';
@@ -9,6 +9,8 @@ import { Subject } from 'rxjs/Rx';
 @Component( {
     selector: 'processing',
     templateUrl: 'html/app.html',
+    styleUrls: ['css/app.css'],
+    encapsulation: ViewEncapsulation.None,
     providers: [ProcessingService]
 })
 export class AppComponent {
@@ -43,7 +45,6 @@ export class AppComponent {
     }
 
     handleMessage( data: any ) {
-        console.log( data );
         var dataType = data.type;
 
         if ( dataType == "error" ) {
@@ -57,6 +58,7 @@ export class AppComponent {
         if ( dataType == "addCollection" ) {
             var collection: Collection = new Collection();
             this.mixin( data, collection );
+            collection.updatePropertyKeys();
             this.registry.collections.push( collection );
         }
         if ( dataType == "addProcessable" ) {
@@ -82,6 +84,14 @@ export class AppComponent {
             if ( oldProcessable == null ) {
                 console.log( "Unable to remove processable with id " + data.id + " cause its not in any collection." );
             }
+        }
+        if( dataType == "updateCollectionProperty") {
+            var collection: Collection = this.registry.getCollection(data.id);
+            if(collection == null) {
+                console.log("Unable to find collection with id " + data.id);
+                return;
+            }
+            collection.setProperty(data.propertyName, data.propertyValue);
         }
     }
 

@@ -184,6 +184,14 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
             this.sender.removeProcessable(session, processable);
         }
 
+        @Override
+        public void onPropertyChange(MCRProcessableCollection source, String name, Object oldValue, Object newValue) {
+            if (isClosed()) {
+                return;
+            }
+            this.sender.updateProperty(session, source, name, newValue);
+        }
+
         protected boolean isClosed() {
             if (!this.session.isOpen()) {
                 try {

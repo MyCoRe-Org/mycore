@@ -29,7 +29,6 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.inject.MCRInjectorConfig;
-import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -64,6 +63,8 @@ public class MCRSolrIndexer {
 
     final static MCRProcessableExecutor SOLR_EXECUTOR;
 
+    final static MCRProcessableDefaultCollection SOLR_COLLECTION;
+
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
     static {
@@ -72,9 +73,13 @@ public class MCRSolrIndexer {
         int poolSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.ThreadCount", 4);
         final ExecutorService threadPool = Executors.newFixedThreadPool(poolSize,
             new ThreadFactoryBuilder().setNameFormat("SOLR-Indexer-#%d").build());
-        MCRProcessableCollection solrCollection = new MCRProcessableDefaultCollection("Solr Indexer");
-        registry.register(solrCollection);
-        SOLR_EXECUTOR = MCRProcessableFactory.newPool(threadPool, solrCollection);
+        SOLR_COLLECTION = new MCRProcessableDefaultCollection("Solr Indexer");
+        SOLR_COLLECTION.setProperty("pool size (threads)", poolSize);
+        SOLR_COLLECTION.setProperty("bulk size", BULK_SIZE);
+        SOLR_COLLECTION.setProperty("commit within (ms)", BATCH_AUTO_COMMIT_WITHIN_MS);
+
+        registry.register(SOLR_COLLECTION);
+        SOLR_EXECUTOR = MCRProcessableFactory.newPool(threadPool, SOLR_COLLECTION);
 
         MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
 

@@ -1,12 +1,12 @@
 package org.mycore.webtools.processing;
 
+import java.util.Map;
+
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.processing.MCRProcessable;
-import org.mycore.common.processing.MCRProcessableCollection;
-import org.mycore.common.processing.MCRProcessableRegistry;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
@@ -15,34 +15,6 @@ import com.google.gson.JsonObject;
  * @author Matthias Eichner
  */
 public abstract class MCRProcessableJSONUtil {
-
-    /**
-     * Converts a registry to json. Returns a json array including
-     * every {@link MCRProcessableCollection}.
-     * 
-     * @param registry the registry to convert
-     * @return json array including processable collection
-     */
-    public static JsonArray toJSON(MCRProcessableRegistry registry) {
-        JsonArray registryJSON = new JsonArray();
-        registry.stream().map(MCRProcessableJSONUtil::toJSON).forEach(registryJSON::add);
-        return registryJSON;
-    }
-
-    /**
-     * Converts a processable collection to json.
-     * 
-     * @param collection the collection to convert
-     * @return json object of the collection
-     */
-    public static JsonObject toJSON(MCRProcessableCollection collection) {
-        JsonObject collectionJSON = new JsonObject();
-        collectionJSON.addProperty("name", collection.getName());
-        JsonArray processablesJSON = new JsonArray();
-        collectionJSON.add("processables", processablesJSON);
-        collection.stream().map(MCRProcessableJSONUtil::toJSON).forEach(processablesJSON::add);
-        return collectionJSON;
-    }
 
     /**
      * Converts a processable to json.
@@ -75,6 +47,28 @@ public abstract class MCRProcessableJSONUtil {
             processableJSON.addProperty("progressText", processable.getProgressText());
         }
         return processableJSON;
+    }
+
+    /**
+     * Converts a map of properties to a json representation.
+     * 
+     * @param properties the properties to convert
+     * @return a json object containing the properties
+     */
+    public static JsonObject toJSON(Map<String, Object> properties) {
+        Gson gson = MCRJSONManager.instance().createGson();
+        return gson.toJsonTree(properties).getAsJsonObject();
+    }
+
+    /**
+     * Converts a object to a json.
+     * 
+     * @param value the value to convert
+     * @return a json element
+     */
+    public static JsonElement toJSON(Object value) {
+        Gson gson = MCRJSONManager.instance().createGson();
+        return gson.toJsonTree(value);
     }
 
 }

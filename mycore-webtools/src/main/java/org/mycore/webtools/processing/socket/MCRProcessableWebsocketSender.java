@@ -13,8 +13,8 @@ import org.mycore.common.processing.MCRProcessableRegistry;
  */
 public interface MCRProcessableWebsocketSender {
 
-    public enum Type {
-        error, registry, addCollection, removeCollection, addProcessable, removeProcessable, updateProcessable
+    enum Type {
+        error, registry, addCollection, removeCollection, addProcessable, removeProcessable, updateProcessable, updateCollectionProperty
     }
 
     /**
@@ -23,7 +23,7 @@ public interface MCRProcessableWebsocketSender {
      * @param session the websocket session
      * @param errorCode the error code
      */
-    public void sendError(Session session, Integer errorCode);
+    void sendError(Session session, Integer errorCode);
 
     /**
      * Sends the whole registry.
@@ -31,7 +31,7 @@ public interface MCRProcessableWebsocketSender {
      * @param session the websocket session
      * @param registry the registry to send
      */
-    public void sendRegistry(Session session, MCRProcessableRegistry registry);
+    void sendRegistry(Session session, MCRProcessableRegistry registry);
 
     /**
      * Appends the given collection to the registry.
@@ -40,7 +40,7 @@ public interface MCRProcessableWebsocketSender {
      * @param registry where to add the collection
      * @param collection the collection to add
      */
-    public void addCollection(Session session, MCRProcessableRegistry registry, MCRProcessableCollection collection);
+    void addCollection(Session session, MCRProcessableRegistry registry, MCRProcessableCollection collection);
 
     /**
      * Removes the given collection.
@@ -48,7 +48,7 @@ public interface MCRProcessableWebsocketSender {
      * @param session the websocket session
      * @param collection the collection to remove
      */
-    public void removeCollection(Session session, MCRProcessableCollection collection);
+    void removeCollection(Session session, MCRProcessableCollection collection);
 
     /**
      * Appends the given processable to the collection.
@@ -57,7 +57,7 @@ public interface MCRProcessableWebsocketSender {
      * @param collection where to add the processable
      * @param processable the processable to add
      */
-    public void addProcessable(Session session, MCRProcessableCollection collection, MCRProcessable processable);
+    void addProcessable(Session session, MCRProcessableCollection collection, MCRProcessable processable);
 
     /**
      * Removes the given processable.
@@ -65,7 +65,7 @@ public interface MCRProcessableWebsocketSender {
      * @param session the websocket session
      * @param processable the processable to remove
      */
-    public void removeProcessable(Session session, MCRProcessable processable);
+    void removeProcessable(Session session, MCRProcessable processable);
 
     /**
      * Updates the content of the given processable.
@@ -73,6 +73,16 @@ public interface MCRProcessableWebsocketSender {
      * @param session the websocket session
      * @param processable the processable to update
      */
-    public void updateProcessable(Session session, MCRProcessable processable);
+    void updateProcessable(Session session, MCRProcessable processable);
+
+    /**
+     * Updates a property of the given processable collection.
+     * 
+     * @param session the websocket session
+     * @param collection the collection to update
+     * @param name name of the property
+     * @param value value of the property
+     */
+    void updateProperty(Session session, MCRProcessableCollection collection, String name, Object value);
 
 }
