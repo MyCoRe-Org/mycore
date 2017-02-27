@@ -24,6 +24,7 @@ package org.mycore.services.queuedjob;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,14 +58,15 @@ public class MCRJobQueueTest extends MCRJPATestCase {
 
         job = queue.getJob(params);
 
+        int abortAfter = 600;
         while (job.getStatus() != MCRJobStatus.FINISHED) {
+            Thread.sleep(100);
+            job = queue.getJob(params);
             endTransaction();
             startNewTransaction();
-
-            synchronized (queue) {
-                queue.wait();
+            if (abortAfter-- == 0) {
+                fail("Couldn't finish MCRJobQueueTest in one minute.");
             }
-            job = queue.getJob(params);
         }
 
         assertNotNull("job shouldn't null", job);
