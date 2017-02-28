@@ -17,6 +17,7 @@
     <xsl:variable name="jsPath" select="concat($WebApplicationBaseURL, 'modules/wcms2/js')" />
     <xsl:variable name="imgPath" select="concat($WebApplicationBaseURL, 'modules/wcms2/images')" />
     <xsl:variable name="cssPath" select="concat($WebApplicationBaseURL, 'modules/wcms2/css')" />
+    <xsl:variable name="wcmsBasePath" select="concat($WebApplicationBaseURL, 'modules/wcms2')" />
 
     <html dir="ltr">
       <head>
@@ -40,17 +41,16 @@
           djConfig = {
             isDebug: true,
             parseOnLoad: true,
-            baseUrl: webApplicationBaseURL,
+            baseUrl: webApplicationBaseURL + "modules/wcms2/bower_components/dojo/",
             modulePaths: {
-            "dojoclasses": "modules/wcms2/js/dojoclasses"
+            "dojoclasses": "../../js/dojoclasses"
             },
             xdWaitSeconds: 10
           };
         </script>
 
         <!-- do includes -->
-        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/dojo/{$dojoV}/dojo/dojo.xd.js"></script>
-        <!--<script type="text/javascript" src="http://yandex.st/dojo/{$dojoV}/dojo/dojo.xd.js"></script> -->
+        <script type="text/javascript" src="{$wcmsBasePath}/bower_components/dojo/dojo.js"></script>
 
         <script type="text/javascript" src="{$jsPath}/dojoInclude.js"></script>
         <!-- util -->
@@ -103,15 +103,13 @@
         <script type="text/javascript" src="{$jsPath}/navigation/undo/EditUndo.js"></script>
         <script type="text/javascript" src="{$jsPath}/navigation/undo/RestoreUndo.js"></script>
 
-<!--         <script type="text/javascript" src="//cdn.mmcreation.com/javascript/ckSource/ckeditor-3.5/ckeditor.js"></script> -->
-        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ckeditor/4.2/ckeditor.js"></script>
+        <script type="text/javascript" src="{$wcmsBasePath}/bower_components/ckeditor/ckeditor.js"></script>
         <!-- main -->
         <script type="text/javascript" src="{$jsPath}/Header.js"></script>
         <script type="text/javascript" src="{$jsPath}/WCMS2.js"></script>
 
         <link rel="stylesheet" type="text/css"
-          href="//ajax.googleapis.com/ajax/libs/dojo/{$dojoV}/dijit/themes/claro/claro.css"></link>
-        <!--<link rel="stylesheet" type="text/css" href="http://yandex.st/dojo/{$dojoV}/dijit/themes/claro/claro.css"></link> -->
+          href="{$wcmsBasePath}/bower_components/dijit/themes/claro/claro.css"></link>
         <link rel="stylesheet" type="text/css" href="{$cssPath}/wcms2.css"></link>
         <link rel="stylesheet" type="text/css" href="{$cssPath}/dojo.treetable.css"></link>
 

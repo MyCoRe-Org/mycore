@@ -1,0 +1,10 @@
+{
+  "name": "mycore-wcms2",
+  "description": "mycore-wcms2",
+  "version": "1.0.0",
+  "devDependencies": {
+    "dojo": "1.6.2",
+    "dijit": "1.6.2",
+    "ckeditor": "#full/4.3.3"
+  }
+}
