@@ -22,13 +22,13 @@
             ready(function() {
               domUtil.updateBodyTheme();
               var preloadCSS = [
-                domUtil.loadCSS("//ajax.googleapis.com/ajax/libs/dojo/"+classeditor.dojoVersion +"/dijit/themes/claro/claro.css"),
+                domUtil.loadCSS(classeditor.settings.webURL + "/bower_components/dijit/themes/claro/claro.css"),
                 domUtil.loadCSS(classeditor.settings.cssURL + "/classificationEditor.css"),
                 domUtil.loadCSS(classeditor.settings.cssURL + "/mycore.dojo.css")
               ];
               // check if font-awesome is already loaded
               if(query("link[href*='font-awesome']").length == 0) {
-                preloadCSS.push(domUtil.loadCSS(classeditor.settings.cssURL + "/font-awesome.min.css"));
+                preloadCSS.push(domUtil.loadCSS(classeditor.settings.webURL + "/bower_components/font-awesome/css/font-awesome.min.css"));
               }
               all(preloadCSS).then(function() {
                 try {
