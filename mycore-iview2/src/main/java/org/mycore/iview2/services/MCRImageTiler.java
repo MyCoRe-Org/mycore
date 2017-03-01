@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -24,6 +25,11 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
+import org.mycore.common.inject.MCRInjectorConfig;
+import org.mycore.common.processing.MCRProcessableDefaultCollection;
+import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
+import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
 /**
  * Master image tiler thread.
@@ -37,7 +43,7 @@ public class MCRImageTiler implements Runnable, Closeable {
 
     private static final MCRTilingQueue tq = MCRTilingQueue.getInstance();
 
-    private ThreadPoolExecutor tilingServe;
+    private MCRProcessableExecutor tilingServe;
 
     private volatile boolean running = true;
 
@@ -52,8 +58,8 @@ public class MCRImageTiler implements Runnable, Closeable {
         MCRShutdownHandler.getInstance().addCloseable(this);
         runLock = new ReentrantLock();
         try {
-            Class<? extends MCRTilingAction> tilingActionImpl = (Class<? extends MCRTilingAction>) Class
-                .forName(MCRConfiguration.instance().getString(MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl",
+            Class<? extends MCRTilingAction> tilingActionImpl = (Class<? extends MCRTilingAction>) Class.forName(
+                MCRConfiguration.instance().getString(MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl",
                     MCRTilingAction.class.getName()));
             tilingActionConstructor = tilingActionImpl.getConstructor(MCRTileJob.class);
         } catch (Exception e) {
@@ -94,6 +100,11 @@ public class MCRImageTiler implements Runnable, Closeable {
         LOGGER.info("Local Tiling is " + (activated ? "activated" : "deactivated"));
         ImageIO.scanForPlugins();
         LOGGER.info("Supported image file types for reading: " + Arrays.toString(ImageIO.getReaderFormatNames()));
+
+        MCRProcessableDefaultCollection imageTilerCollection = new MCRProcessableDefaultCollection("Image Tiler");
+        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+        registry.register(imageTilerCollection);
+
         if (activated) {
             int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
             ThreadFactory slaveFactory = new ThreadFactory() {
@@ -108,8 +119,8 @@ public class MCRImageTiler implements Runnable, Closeable {
             };
             final AtomicInteger activeThreads = new AtomicInteger();
             final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
-            tilingServe = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1, TimeUnit.DAYS, workQueue,
-                slaveFactory) {
+            ThreadPoolExecutor baseExecutor = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1,
+                TimeUnit.DAYS, workQueue, slaveFactory) {
 
                 @Override
                 protected void afterExecute(Runnable r, Throwable t) {
@@ -123,6 +134,8 @@ public class MCRImageTiler implements Runnable, Closeable {
                     activeThreads.incrementAndGet();
                 }
             };
+            this.tilingServe = MCRProcessableFactory.newPool(baseExecutor, imageTilerCollection);
+            imageTilerCollection.setProperty("running", running);
             LOGGER.info("TilingMaster is started");
             while (running) {
                 try {
@@ -138,6 +151,8 @@ public class MCRImageTiler implements Runnable, Closeable {
                             try {
                                 transaction = session.beginTransaction();
                                 job = tq.poll();
+                                imageTilerCollection.setProperty("queue",
+                                    tq.stream().map(MCRTileJob::getPath).collect(Collectors.toList()));
                                 transaction.commit();
                             } catch (HibernateException e) {
                                 LOGGER.error("Error while getting next tiling job.", e);
@@ -151,9 +166,9 @@ public class MCRImageTiler implements Runnable, Closeable {
                             } finally {
                                 session.close();
                             }
-                            if (job != null && !tilingServe.isShutdown()) {
+                            if (job != null && !tilingServe.getExecutor().isShutdown()) {
                                 LOGGER.info("Creating:" + job.getPath());
-                                tilingServe.execute(getTilingAction(job));
+                                tilingServe.submit(getTilingAction(job));
                             } else {
                                 try {
                                     synchronized (tq) {
@@ -185,6 +200,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                     LOGGER.error("Keep running while catching exceptions.", e);
                 }
             } // while(running)
+            imageTilerCollection.setProperty("running", false);
         }
         LOGGER.info("Tiling thread finished");
         MCRSessionMgr.releaseCurrentSession();
@@ -216,10 +232,10 @@ public class MCRImageTiler implements Runnable, Closeable {
         try {
             if (tilingServe != null) {
                 LOGGER.debug("Shutdown tiling executor jobs.");
-                tilingServe.shutdown();
+                tilingServe.getExecutor().shutdown();
                 try {
                     LOGGER.debug("Await termination of tiling executor jobs.");
-                    tilingServe.awaitTermination(60, TimeUnit.SECONDS);
+                    tilingServe.getExecutor().awaitTermination(60, TimeUnit.SECONDS);
                     LOGGER.debug("All jobs finished.");
                 } catch (InterruptedException e) {
                     LOGGER.debug("Could not wait 60 seconds...", e);
@@ -234,11 +250,11 @@ public class MCRImageTiler implements Runnable, Closeable {
      * Shuts down this thread and every local tiling threads spawned by {@link #run()}.
      */
     public void close() {
-        if (tilingServe != null && !tilingServe.isShutdown()) {
+        if (tilingServe != null && !tilingServe.getExecutor().isShutdown()) {
             LOGGER.info("We are in a hurry, closing tiling service right now");
-            tilingServe.shutdownNow();
+            tilingServe.getExecutor().shutdownNow();
             try {
-                tilingServe.awaitTermination(60, TimeUnit.SECONDS);
+                tilingServe.getExecutor().awaitTermination(60, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 LOGGER.debug("Could not wait  60 seconds...", e);
             }

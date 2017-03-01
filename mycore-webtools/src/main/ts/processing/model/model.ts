@@ -39,6 +39,13 @@ export class Collection {
 
     processables: Array<Processable> = [];
 
+    properties: {[name: string]: any} = {};
+
+    /**
+     * Double storage of property keys due performance reasons.
+     */
+    propertyKeys: Array<string> = [];
+
     public getProcessable( id: number ): Processable {
         for ( var processable of this.processables ) {
             if ( processable.id == id ) {
@@ -57,6 +64,22 @@ export class Collection {
             return p.id !== id;
         });
         return oldProcessable;
+    }
+
+    public setProperty(name: string, value: any): void {
+        var updateKeys: boolean = name in this.properties;
+        this.properties[name] = value;
+        if(updateKeys) {
+            this.updatePropertyKeys();
+        }
+    }
+
+    /**
+     * Should be called every time the properties object
+     * is updated.
+     */
+    public updatePropertyKeys(): void {
+        this.propertyKeys = Object.keys(this.properties);
     }
 
 }

@@ -52,6 +52,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
         JsonObject addCollectionMessage = new JsonObject();
         addCollectionMessage.addProperty("id", getId(collection));
         addCollectionMessage.addProperty("name", collection.getName());
+        addCollectionMessage.add("properties", MCRProcessableJSONUtil.toJSON(collection.getProperties()));
         send(session, addCollectionMessage, Type.addCollection);
 
         collection.stream().forEach(processable -> {
@@ -97,6 +98,15 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
         JsonObject addProcessableMessage = MCRProcessableJSONUtil.toJSON(processable);
         addProcessableMessage.addProperty("id", getId(processable));
         send(session, addProcessableMessage, Type.updateProcessable);
+    }
+
+    @Override
+    public void updateProperty(Session session, MCRProcessableCollection collection, String name, Object value) {
+        JsonObject updatePropertyMessage = new JsonObject();
+        updatePropertyMessage.addProperty("id", getId(collection));
+        updatePropertyMessage.addProperty("propertyName", name);
+        updatePropertyMessage.add("propertyValue", MCRProcessableJSONUtil.toJSON(value));
+        send(session, updatePropertyMessage, Type.updateCollectionProperty);
     }
 
     public synchronized Integer getId(Object object) {

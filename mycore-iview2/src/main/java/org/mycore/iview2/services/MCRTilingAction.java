@@ -109,4 +109,13 @@ public class MCRTilingAction implements Runnable {
     public MCRTilingAction(MCRTileJob image) {
         this.tileJob = image;
     }
+
+    @Override
+    public String toString() {
+        if(tileJob == null) {
+            return "unassigned tiling action";
+        }
+        return tileJob.toString();
+    }
+
 }

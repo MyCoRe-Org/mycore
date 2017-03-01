@@ -2,6 +2,7 @@ package org.mycore.common.processing;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 
 /**
  * Describes an object which can be processed. A processable has a
@@ -17,28 +18,28 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * 
      * @return name of this process
      */
-    public String getName();
+    String getName();
 
     /**
      * Returns the id of the user who created this processable.
      * 
      * @return the user id responsible for the processable
      */
-    public String getUserId();
+    String getUserId();
 
     /**
      * The status of this process.
      * 
      * @return the status
      */
-    public MCRProcessableStatus getStatus();
+    MCRProcessableStatus getStatus();
 
     /**
      * Returns true if this task was created but not started yet.
      * 
      * @return true if this task is just created.
      */
-    public default boolean isCreated() {
+    default boolean isCreated() {
         return MCRProcessableStatus.created.equals(getStatus());
     }
 
@@ -47,7 +48,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * 
      * @return true if this task is processing
      */
-    public default boolean isProcessing() {
+    default boolean isProcessing() {
         return MCRProcessableStatus.processing.equals(getStatus());
     }
 
@@ -56,7 +57,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * 
      * @return true if this task is cancelled
      */
-    public default boolean isCanceled() {
+    default boolean isCanceled() {
         return MCRProcessableStatus.canceled.equals(getStatus());
     }
 
@@ -66,7 +67,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * 
      * @return true if the process failed
      */
-    public default boolean isFailed() {
+    default boolean isFailed() {
         return MCRProcessableStatus.failed.equals(getStatus());
     }
 
@@ -75,7 +76,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * 
      * @return true if this task was successful
      */
-    public default boolean isSuccessful() {
+    default boolean isSuccessful() {
         return MCRProcessableStatus.successful.equals(getStatus());
     }
 
@@ -85,7 +86,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * 
      * @return true if this processable completed
      */
-    public default boolean isDone() {
+    default boolean isDone() {
         return isCanceled() || isFailed() || isSuccessful();
     }
 
@@ -95,21 +96,21 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * 
      * @return the error occurred while processing
      */
-    public Throwable getError();
+    Throwable getError();
 
     /**
      * Time (instant) the process was started. Returns null if the process was not started yet.
      * 
      * @return the time the process was started
      */
-    public Instant getStartTime();
+    Instant getStartTime();
 
     /**
      * Time (instant) this processable was created.
      * 
      * @return the time the processable was created
      */
-    public Instant getCreateTime();
+    Instant getCreateTime();
 
     /**
      * Time (instant) this processable finished. Either successfully, canceled
@@ -118,14 +119,14 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * 
      * @return the time the processable finished
      */
-    public Instant getEndTime();
+    Instant getEndTime();
 
     /**
      * Calculates the duration between starting and finishing the processable.
      * 
      * @return the duration or null if the processable is not finished yet
      */
-    public default Duration took() {
+    default Duration took() {
         if (getStartTime() == null || getEndTime() == null) {
             return null;
         }
@@ -133,17 +134,52 @@ public interface MCRProcessable extends MCRListenableProgressable {
     }
 
     /**
+     * Returns a map of properties assigned to this processable.
+     * 
+     * @return the properties map
+     */
+    Map<String, Object> getProperties();
+
+    /**
+     * A shortcut for getProperties().get(name).
+     * 
+     * @param name the name of the property
+     * @return the property value or null
+     */
+    default Object getProperty(String name) {
+        return getProperties().get(name);
+    }
+
+    /**
+     * Returns the property for the given name. The property
+     * will be cast to the specified type. Be aware that a
+     * ClassCastException is thrown if the type does not match.
+     * 
+     * @param name name of property
+     * @param type object type of the property
+     * @return the property value or null
+     */
+    @SuppressWarnings("unchecked")
+    default <T> T getPropertyAs(String name, Class<T> type) {
+        Object property = getProperty(name);
+        if (property == null) {
+            return null;
+        }
+        return (T) property;
+    }
+
+    /**
      * Adds a new {@link MCRProcessableStatusListener} to this {@link MCRProcessable}.
      * 
      * @param listener the listener to add
      */
-    public void addStatusListener(MCRProcessableStatusListener listener);
+    void addStatusListener(MCRProcessableStatusListener listener);
 
     /**
      * Removes a {@link MCRProcessableStatusListener} from this {@link MCRProcessable}.
      * 
      * @param listener the listener to remove
      */
-    public void removeStatusListener(MCRProcessableStatusListener listener);
+    void removeStatusListener(MCRProcessableStatusListener listener);
 
 }

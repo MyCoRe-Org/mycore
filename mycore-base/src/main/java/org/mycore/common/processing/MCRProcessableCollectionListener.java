@@ -16,7 +16,7 @@ public interface MCRProcessableCollectionListener extends EventListener {
      * @param source the source collection
      * @param processable the processable added
      */
-    public void onAdd(MCRProcessableCollection source, MCRProcessable processable);
+    void onAdd(MCRProcessableCollection source, MCRProcessable processable);
 
     /**
      * Fired when a processable was removed.
@@ -24,6 +24,16 @@ public interface MCRProcessableCollectionListener extends EventListener {
      * @param source the source collection
      * @param processable the processable removed
      */
-    public void onRemove(MCRProcessableCollection source, MCRProcessable processable);
+    void onRemove(MCRProcessableCollection source, MCRProcessable processable);
+
+    /**
+     * Fired when a property changed.
+     * 
+     * @param source the source collection
+     * @param name the name of the property
+     * @param oldValue the old value
+     * @param newValue the new value
+     */
+    void onPropertyChange(MCRProcessableCollection source, String name, Object oldValue, Object newValue);
 
 }

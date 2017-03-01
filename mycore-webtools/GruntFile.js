@@ -60,7 +60,15 @@ module.exports = function (grunt) {
                           src: [
                               '**'
                           ]
-                      }
+                        },
+                        {
+                          expand: true,
+                          cwd: './node_modules/ng2-bootstrap/bundles',
+                          dest: './target/classes/META-INF/resources/modules/webtools/node_modules/ng2-bootstrap',
+                          src: [
+                              '**'
+                          ]
+                        }
                     ]
                 }
             }

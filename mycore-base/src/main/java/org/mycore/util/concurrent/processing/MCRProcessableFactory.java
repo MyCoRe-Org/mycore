@@ -2,7 +2,6 @@ package org.mycore.util.concurrent.processing;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.mycore.common.events.MCRShutdownHandler;
@@ -33,9 +32,6 @@ public abstract class MCRProcessableFactory {
     public static Callable<Object> progressableCallable(Runnable task) {
         if (task == null) {
             throw new NullPointerException();
-        }
-        if (!(task instanceof MCRProgressable)) {
-            return Executors.callable(task);
         }
         return new RunnableProgressableAdapter<Object>(task);
     }
@@ -172,6 +168,10 @@ public abstract class MCRProcessableFactory {
         @Override
         public Runnable get() {
             return task;
+        }
+
+        public String toString() {
+            return task.toString();
         }
 
     }
