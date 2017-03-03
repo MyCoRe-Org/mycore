@@ -383,7 +383,7 @@ public class MCRRestAPIObjectsHelper {
                 Element eMcrObject = new Element("mycoreobject");
                 eMcrObject.setAttribute("ID", oid.getId());
                 eMcrObject.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
-                eMcrObject.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build((Object[]) null)
+                eMcrObject.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build()
                     .toString());
 
                 eMcrobjects.addContent(eMcrObject);
@@ -414,7 +414,7 @@ public class MCRRestAPIObjectsHelper {
                     writer.name("ID").value(oid.getId());
                     writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
                     writer.name("href").value(
-                        info.getAbsolutePathBuilder().path(oid.getId()).build((Object[]) null).toString());
+                        info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
                     writer.endObject();
                 }
                 writer.endArray();
@@ -511,7 +511,7 @@ public class MCRRestAPIObjectsHelper {
                     }
                     eDerObject.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
                     eDerObject.setAttribute("href",
-                        info.getAbsolutePathBuilder().path(oid.getId()).build((Object[]) null).toString());
+                        info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
 
                     eDerObjects.addContent(eDerObject);
                 }
@@ -547,7 +547,7 @@ public class MCRRestAPIObjectsHelper {
                         }
                         writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
                         writer.name("href").value(
-                            info.getAbsolutePathBuilder().path(oid.getId()).build((Object[]) null).toString());
+                            info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
                         writer.endObject();
                     }
                     writer.endArray();

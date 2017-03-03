@@ -101,7 +101,7 @@ public class MCRRestAPIClassifications {
             for (MCRCategory cat : DAO.getRootCategories()) {
                 eRoot.addContent(new Element("mycoreclass").setAttribute("ID", cat.getId().getRootID()).setAttribute(
                     "href",
-                    info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build((Object[]) null).toString()));
+                    info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString()));
             }
             try {
                 xout.output(docOut, sw);
@@ -123,7 +123,7 @@ public class MCRRestAPIClassifications {
                     writer.beginObject();
                     writer.name("ID").value(cat.getId().getRootID());
                     writer.name("href").value(
-                        info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build((Object[]) null).toString());
+                        info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString());
                     writer.endObject();
                 }
                 writer.endArray();
