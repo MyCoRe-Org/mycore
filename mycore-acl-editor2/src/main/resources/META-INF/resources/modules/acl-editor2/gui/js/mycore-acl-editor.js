@@ -310,6 +310,7 @@ var ACLEditor = function(){
 			var lang = $("#mycore-acl-editor2").attr("lang");
 			jQuery.getJSON("../../servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
 				i18nKeys = data;
+				replacei18n();
 				getAccess();
 			});
 			//Fix: Select2 doesn't work when embedded in a bootstrap modal
@@ -621,7 +622,7 @@ var ACLEditor = function(){
 		});
 		$("#acle2-access-filter-input-id").typeahead({
 			  name: 'access-ids',
-			  local: ids
+              source: ids
 			});
 		
 		var pools = new Array();
@@ -632,7 +633,7 @@ var ACLEditor = function(){
 		});
 		$("#acle2-access-filter-input-pool").typeahead({
 			  name: 'access-pools',
-			  local: pools
+              source: pools
 			});
 		
 		var rules = new Array();
@@ -646,7 +647,7 @@ var ACLEditor = function(){
 		});
 		$("#acle2-access-filter-input-rule").typeahead({
 			  name: 'access-rules',
-			  local: rules
+			  source: rules
 			});
 	}
 	
@@ -792,17 +793,20 @@ var ACLEditor = function(){
 			return "";
 		}
 	}
+
+    function replacei18n() {
+		$(".i18n").each(function () {
+            var placeholder = $(this).attr("placeholder")
+			if (placeholder !== undefined && placeholder !== false && placeholder !== "") {
+				if (placeholder.indexOf("i18n:") > -1) {
+                    $(this).attr("placeholder", geti18n(placeholder.split(":")[1]));
+				}
+			}
+        });
+    }
 }
 
 $(document).ready(function() {
 	var aclEditorInstance = new ACLEditor();
-    if (!$.isFunction(jQuery.fn.tab)){
-    	$.getScript('gui/js/bootstrap.min.js')
-    		.done(function() {
-    			aclEditorInstance.init(new RuleSelector(), new AccessTable(), new RuleList());
-    		});
-    }
-    else{
-    	aclEditorInstance.init(new RuleSelector(), new AccessTable(), new RuleList());
-    }
+	aclEditorInstance.init(new RuleSelector(), new AccessTable(), new RuleList());
 });
