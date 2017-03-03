@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.websocket.Session;
 
@@ -48,7 +47,14 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.inject.MCRInjectorConfig;
+import org.mycore.common.processing.MCRProcessableCollection;
+import org.mycore.common.processing.MCRProcessableDefaultCollection;
+import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
+import org.mycore.util.concurrent.processing.MCRProcessableFactory;
+import org.mycore.util.concurrent.processing.MCRProcessableSupplier;
 import org.mycore.webcli.cli.MCRWebCLICommandManager;
 import org.mycore.webcli.observable.CommandListObserver;
 import org.mycore.webcli.observable.LogEventDequeObserver;
@@ -68,7 +74,7 @@ import com.google.gson.JsonPrimitive;
  * @since 2.0
  */
 public class MCRWebCLIContainer {
-    Future<Boolean> curFuture;
+    MCRProcessableSupplier<Boolean> curFuture;
 
     private static Map<String, List<MCRCommand>> knownCommands;
 
@@ -76,7 +82,18 @@ public class MCRWebCLIContainer {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final ExecutorService executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "WebCLI"));
+    private static final MCRProcessableExecutor EXECUTOR;
+
+    private static final MCRProcessableCollection PROCESSABLE_COLLECTION;
+
+    static {
+        PROCESSABLE_COLLECTION = new MCRProcessableDefaultCollection("Web CLI");
+        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+        registry.register(PROCESSABLE_COLLECTION);
+
+        ExecutorService service = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "WebCLI"));
+        EXECUTOR = MCRProcessableFactory.newPool(service, PROCESSABLE_COLLECTION);
+    }
 
     /**
      * Will instantiate this container with a list of supported commands.
@@ -102,7 +119,7 @@ public class MCRWebCLIContainer {
         LOGGER.info("appending command: " + cmd);
         processCallable.commands.add(cmd);
         if (!isRunning()) {
-            curFuture = executor.submit(processCallable);
+            curFuture = EXECUTOR.submit(processCallable);
         }
     }
 
@@ -161,7 +178,6 @@ public class MCRWebCLIContainer {
         this.processCallable.changeWebSocketSession(webSocketSession);
     }
 
-
     public void stopLogging() {
         this.processCallable.stopLogging();
     }
@@ -173,11 +189,11 @@ public class MCRWebCLIContainer {
     public void setContinueIfOneFails(boolean con) {
         this.processCallable.setContinueIfOneFails(con);
     }
-    
+
     public void setContinueIfOneFails(boolean con, boolean sendMessage) {
         this.processCallable.setContinueIfOneFails(con, sendMessage);
     }
-    
+
     public void clearCommandList() {
         this.processCallable.clearCommandList();
     }
@@ -226,7 +242,7 @@ public class MCRWebCLIContainer {
         public void startLogging() {
             this.logEventQueueObserver.startSendMessages();
         }
-        
+
         public void setContinueIfOneFails(boolean con) {
             setContinueIfOneFails(con, false);
         }
@@ -244,7 +260,7 @@ public class MCRWebCLIContainer {
                 }
             }
         }
-        
+
         public void clearCommandList() {
             this.commands.clear();
             setCurrentCommand("");
@@ -300,8 +316,8 @@ public class MCRWebCLIContainer {
             return true;
         }
 
-        private List<String> runCommand(String command, List<MCRCommand> commandList) throws IllegalAccessException,
-            InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+        private List<String> runCommand(String command, List<MCRCommand> commandList)
+            throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
             List<String> commandsReturned = null;
             for (MCRCommand currentCommand : commandList) {
                 commandsReturned = currentCommand.invoke(command, this.getClass().getClassLoader());
@@ -319,7 +335,7 @@ public class MCRWebCLIContainer {
             return commandsReturned;
         }
 
-        protected void saveQueue(String lastCommand, LinkedList<String> failedQueue) throws IOException {
+        protected void saveQueue(String lastCommand, LinkedList<String> failedQueue) {
             // lastCommand is null if work is not stopped at first error
             if (lastCommand == null) {
                 LOGGER.error("Some commands failed.");
@@ -329,7 +345,8 @@ public class MCRWebCLIContainer {
             if (!commands.isEmpty()) {
                 LOGGER.printf(Level.INFO, "There are %d other commands still unprocessed.", commands.size());
             }
-            String unprocessedCommandsFile = MCRConfiguration.instance().getString("MCR.WebCLI.UnprocessedCommandsFile");
+            String unprocessedCommandsFile = MCRConfiguration.instance()
+                                                             .getString("MCR.WebCLI.UnprocessedCommandsFile");
             File file = new File(unprocessedCommandsFile);
             LOGGER.info("Writing unprocessed commands to file " + file.getAbsolutePath());
 
@@ -340,8 +357,8 @@ public class MCRWebCLIContainer {
                 }
                 for (String command : commands.getCopyAsArrayList())
                     pw.println(command);
-                if(failedQueue != null && !failedQueue.isEmpty()){
-                    for (String failedCommand : failedQueue){
+                if (failedQueue != null && !failedQueue.isEmpty()) {
+                    for (String failedCommand : failedQueue) {
                         pw.println(failedCommand);
                     }
                 }
@@ -412,11 +429,18 @@ public class MCRWebCLIContainer {
                 }
             }
         }
+
+        @Override
+        public String toString() {
+            if (this.commands.isEmpty()) {
+                return "no active command";
+            }
+            return this.commands.getCopyAsArrayList().get(0);
+        }
+
     }
 
     private static class Log4JGrabber extends AbstractAppender {
-
-        private static final long serialVersionUID = 1L;
 
         protected Log4JGrabber(String name, Filter filter, Layout<? extends Serializable> layout) {
             super(name, filter, layout);
