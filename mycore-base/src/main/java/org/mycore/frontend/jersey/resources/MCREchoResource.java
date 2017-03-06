@@ -38,6 +38,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.frontend.jersey.access.MCRRequireLogin;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 
@@ -123,6 +124,7 @@ public class MCREchoResource {
 
     @GET
     @Path("ping")
+    @MCRStaticContent
     public Response ping() {
         return Response.ok("pong").build();
     }

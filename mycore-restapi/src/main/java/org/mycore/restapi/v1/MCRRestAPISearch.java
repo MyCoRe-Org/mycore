@@ -43,6 +43,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.solr.MCRSolrConstants;
 
 /**
@@ -53,6 +54,7 @@ import org.mycore.solr.MCRSolrConstants;
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/search")
+@MCRStaticContent
 public class MCRRestAPISearch {
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 

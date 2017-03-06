@@ -38,6 +38,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.utils.MCRRestAPIObjectsHelper;
 
@@ -49,6 +50,7 @@ import org.mycore.restapi.v1.utils.MCRRestAPIObjectsHelper;
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/objects")
+@MCRStaticContent
 public class MCRRestAPIObjects {
     public static final String STYLE_DERIVATEDETAILS = "derivatedetails";
 
