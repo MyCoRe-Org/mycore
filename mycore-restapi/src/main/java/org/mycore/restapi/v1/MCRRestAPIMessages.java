@@ -45,6 +45,7 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.stream.JsonWriter;
@@ -59,6 +60,7 @@ import com.google.gson.stream.JsonWriter;
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/messages")
+@MCRStaticContent
 public class MCRRestAPIMessages {
     public static final String FORMAT_JSON = "json";
 

@@ -38,6 +38,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
+import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.iiif.common.MCRIIIFMediaType;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
@@ -60,6 +61,7 @@ import com.google.gson.GsonBuilder;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.*;
 
 @Path("/iiif/image/{impl}")
+@MCRStaticContent
 public class MCRIIIFImageResource {
     public static final String IIIF_IMAGE_API_2_LEVEL2 = "http://iiif.io/api/image/2/level2.json";
 

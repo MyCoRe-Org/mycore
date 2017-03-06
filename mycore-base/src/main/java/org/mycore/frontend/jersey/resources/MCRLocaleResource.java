@@ -16,9 +16,11 @@ import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
+import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.services.i18n.MCRTranslation;
 
 @Path("locale")
+@MCRStaticContent
 public class MCRLocaleResource {
 
     @Context
