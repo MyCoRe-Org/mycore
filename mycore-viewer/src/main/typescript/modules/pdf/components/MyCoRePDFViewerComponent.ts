@@ -11,7 +11,6 @@ module mycore.viewer.components {
             var that = this;
 
             // see MV-53
-            (<any>PDFJS).disableStream=true;
             (<any>PDFJS).disableAutoFetch=true;
         }
 
@@ -51,8 +50,7 @@ module mycore.viewer.components {
                 var that = this;
                 var pdfLocation = this._pdfUrl;
                 PDFJS.getDocument(pdfLocation).then((pdfDoc) => {
-                    that._pdfDocument = <PDFDocumentProxy>pdfDoc;
-
+                    this._pdfDocument = <PDFDocumentProxy>pdfDoc;
                     that._structureBuilder = new mycore.viewer.widgets.pdf.PDFStructureBuilder(that._pdfDocument, this._settings.filePath);
                     var promise = that._structureBuilder.resolve();
                     promise.then((structure:widgets.pdf.PDFStructureModel) => {
@@ -83,8 +81,10 @@ module mycore.viewer.components {
         public handle(e:mycore.viewer.widgets.events.ViewerEvent) {
             if (e.type == events.RequestPageEvent.TYPE) {
                 var rpe = <events.RequestPageEvent> e;
-                if (!this._pageCache.has(Number(rpe._pageId))) {
-                    var promise = this._pdfDocument.getPage(Number(rpe._pageId));
+
+                let pageID = rpe._pageId;
+                if (!this._pageCache.has(Number(pageID))) {
+                    var promise = this._pdfDocument.getPage(Number(pageID));
                     promise.then((page:PDFPageProxy) => {
                             var pdfPage = new widgets.canvas.PDFPage(rpe._pageId, page);
                             this._pageCache.set(Number(rpe._pageId), pdfPage);
@@ -95,7 +95,7 @@ module mycore.viewer.components {
                             console.error("Reason: " + reason);
                         });
                 } else {
-                    rpe._onResolve(rpe._pageId, this._pageCache.get(Number(rpe._pageId)));
+                    rpe._onResolve(pageID, this._pageCache.get(Number(pageID)));
                 }
             }
 

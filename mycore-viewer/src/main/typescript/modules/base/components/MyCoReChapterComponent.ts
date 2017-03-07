@@ -20,6 +20,7 @@
 
 module mycore.viewer.components {
 
+    import StructureImage = mycore.viewer.model.StructureImage;
     /**
      * Settings
      * chapter.enabled: boolean // enables the chapter in toolbar dropdown menu
@@ -44,6 +45,7 @@ module mycore.viewer.components {
         private _sidebarLabel = jQuery("<span>strukturübersicht</span>");
         private _chapterToActivate:string = null;
         private _autoPagination = true;
+        private _idImageMap: MyCoReMap<String, StructureImage> = new MyCoReMap<String, StructureImage>();
 
         public init() {
             if (this._enabled) {
@@ -113,6 +115,7 @@ module mycore.viewer.components {
                 this._structureModel = structureModelLoadedEvent.structureModel;
 
                 this._structureModel._imageList.forEach(img=>{
+                    this._idImageMap.set(img.id, img);
                    if("orderLabel" in img && img.orderLabel != null){
                        this._autoPagination = false;
                    }
@@ -192,24 +195,43 @@ module mycore.viewer.components {
 
         registerNode(node: JQuery, id: string): void {
             node.click(() => {
-                this.setChapter(id);
+                this.setChapter(id , node);
             });
         }
 
-        private setChapter(id:string) {
-            var newSelectedChapter = this._chapterWidget.getChapterById(id);
+        private setChapter(id: string, node?: JQuery) {
+            let newSelectedChapter = this._chapterWidget.getChapterById(id);
             if(newSelectedChapter == null) {
                 return;
             }
-            var firstImageOfChapter = this._structureModel._chapterToImageMap.get(id);
-            this._currentChapter = <model.StructureChapter>newSelectedChapter;
+            let changeChapter = (firstImageOfChapter) => {
+                if (typeof firstImageOfChapter != "undefined" && firstImageOfChapter !== null) {
+                    this._currentChapter = <model.StructureChapter>newSelectedChapter;
 
-            this._chapterWidget.setChapterExpanded(<model.StructureChapter>newSelectedChapter, true);
-            this._chapterWidget.setChapterSelected(<model.StructureChapter>newSelectedChapter);
-            this._chapterWidget.jumpToChapter(<model.StructureChapter>newSelectedChapter);
+                    this._chapterWidget.setChapterExpanded(<model.StructureChapter>newSelectedChapter, true);
+                    this._chapterWidget.setChapterSelected(<model.StructureChapter>newSelectedChapter);
+                    this._chapterWidget.jumpToChapter(<model.StructureChapter>newSelectedChapter);
 
-            this.trigger(new events.ChapterChangedEvent(this, <model.StructureChapter>newSelectedChapter));
-            this.trigger(new events.ImageSelectedEvent(this, firstImageOfChapter));
+                    this.trigger(new events.ChapterChangedEvent(this, <model.StructureChapter>newSelectedChapter));
+                    this.trigger(new events.ImageSelectedEvent(this, firstImageOfChapter));
+                }
+            };
+
+            if (this._structureModel._chapterToImageMap.has(id)) {
+                let firstImageOfChapter = this._structureModel._chapterToImageMap.get(id);
+                changeChapter(firstImageOfChapter);
+            } else {
+                if (typeof node != "undefined") {
+                    var oldVal = node.css("cursor");
+                    node.css("cursor", "wait");
+                }
+                newSelectedChapter.resolveDestination((targetId) => {
+                    if (typeof node != "undefined") {
+                        node.css("cursor", oldVal);
+                    }
+                    changeChapter(this._idImageMap.get(targetId));
+                });
+            }
         }
 
         registerExpander(expander: JQuery, id: string): void {

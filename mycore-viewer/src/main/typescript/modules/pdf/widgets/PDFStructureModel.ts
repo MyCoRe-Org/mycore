@@ -12,7 +12,7 @@ module mycore.viewer.widgets.pdf {
          * @param refPageMap
          * @param idPdfPageMap
          */
-            constructor(_rootChapter:mycore.viewer.model.StructureChapter, _imageList:Array<mycore.viewer.model.StructureImage>, _chapterToImageMap:MyCoReMap<string,mycore.viewer.model.StructureImage>, _imageToChapterMap:MyCoReMap<string,mycore.viewer.model.StructureChapter>, public refPageMap:MyCoReMap<string, PDFPageProxy>, public idPdfPageMap:MyCoReMap<string, PDFPageProxy>) {
+            constructor(_rootChapter:mycore.viewer.model.StructureChapter, _imageList:Array<mycore.viewer.model.StructureImage>, _chapterToImageMap:MyCoReMap<string,mycore.viewer.model.StructureImage>, _imageToChapterMap:MyCoReMap<string,mycore.viewer.model.StructureChapter>, public refPageMap:MyCoReMap<string, PDFPageProxy>) {
             super(_rootChapter, _imageList, _chapterToImageMap, _imageToChapterMap, true);
         }
 

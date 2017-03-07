@@ -1,12 +1,22 @@
 module mycore.viewer.model {
     export class StructureChapter {
+        /**
+         * Creates a new structure chapter.
+         * @param _parent the parent chapter or null if its the root
+         * @param _type the type of the chapter (currently not used)
+         * @param _id a unique id
+         * @param _label the label of the structure element
+         * @param _chapter a array with all child chapters
+         * @param _additional a map with additional objects eg. blocklist for the alto plugin
+         * @param _destinationResolver this will be used to resolve destination on runtime (better use chapterToImageMap of StructureModel)
+         */
         constructor(private _parent:StructureChapter,
                     private _type:string,
                     private _id:string,
-                    private _order:number,
                     private _label:string,
                     private _chapter:Array<StructureChapter> = new Array<StructureChapter>(),
-                    private _additional:MyCoReMap<string, any> = new MyCoReMap<string,any>()) {
+                    private _additional: MyCoReMap<string, any> = new MyCoReMap<string,any>(),
+                    private _destinationResolver: (callbackFn: (targetId) => void) => void = () => null) {
         }
 
         public get parent() {
@@ -36,6 +46,10 @@ module mycore.viewer.model {
 
         public get additional():MyCoReMap<string, any> {
             return this._additional;
+        }
+
+        public resolveDestination(callbackFn: (targetId) => void): void {
+            this._destinationResolver(callbackFn);
         }
 
     }
