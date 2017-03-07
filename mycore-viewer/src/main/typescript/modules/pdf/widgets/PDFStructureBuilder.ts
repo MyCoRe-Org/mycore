@@ -114,7 +114,7 @@ module mycore.viewer.widgets.pdf {
                             return;
                         } else {
                             this._document.getPageIndex(destination[ 0 ]).then((pageNumber) => {
-                                if (pageNumber) {
+                                if (typeof pageNumber != "undefined" && pageNumber != null) {
                                     if (pageNumber > this._pageCount) {
                                         console.error("Destination outside of Document! (" + pageNumber + ")");
                                     } else {

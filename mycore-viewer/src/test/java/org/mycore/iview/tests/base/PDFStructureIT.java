@@ -17,21 +17,21 @@ public class PDFStructureIT extends StructureOverviewIT {
 
     @Override
     public String getGreenLabel() {
-        return "2";
+        return "g.png";
     }
 
     @Override
     public String getRedLabel() {
-        return "1";
+        return "r.png";
     }
 
     @Override
     public String getBlueLabel() {
-        return "3";
+        return "b.png";
     }
 
     @Override
     public String getRgbLabel() {
-        return "4";
+        return "rgb.png";
     }
 }
