@@ -40,7 +40,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static Map<String, SessionData> SESSIONS;
+    private static Map<String, SessionListener> SESSIONS;
 
     static {
         SESSIONS = Collections.synchronizedMap(new HashMap<>());
@@ -71,17 +71,19 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
     public void onError(Session session, Throwable error) {
         if (error instanceof SocketTimeoutException) {
             this.close(session);
-            LOGGER.warn("processing websocket timeout for session " + session.getId());
+            LOGGER.warn("Websocket error " + session.getId() + ": websocket timeout");
             return;
         }
-        LOGGER.error("websocket error", error);
+        LOGGER.error("Websocket error " + session.getId(), error);
     }
 
     @OnClose
     public void close(Session session) {
-        SessionData sessionData = SESSIONS.get(session.getId());
-        sessionData.detachListeners(this.registry);
-        SESSIONS.remove(session.getId());
+        SessionListener sessionListener = SESSIONS.get(session.getId());
+        if(session != null) {
+            sessionListener.detachListeners(this.registry);
+            SESSIONS.remove(session.getId());
+        }
     }
 
     private void handleMessage(Session session, JsonObject request) {
@@ -99,22 +101,22 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         if (SESSIONS.containsKey(session.getId())) {
             return;
         }
-        final SessionData sessionData = new SessionData(session, this.sender);
-        registry.addListener(sessionData);
+        final SessionListener sessionListener = new SessionListener(session, this.sender);
+        registry.addListener(sessionListener);
         this.registry.stream().forEach(collection -> {
-            sessionData.attachCollection(collection);
+            sessionListener.attachCollection(collection);
         });
-        SESSIONS.put(session.getId(), sessionData);
+        SESSIONS.put(session.getId(), sessionListener);
     }
 
-    private static class SessionData implements MCRProcessableRegistryListener, MCRProcessableCollectionListener,
+    private static class SessionListener implements MCRProcessableRegistryListener, MCRProcessableCollectionListener,
         MCRProcessableStatusListener, MCRProgressableListener {
 
         private Session session;
 
         private MCRProcessableWebsocketSender sender;
 
-        public SessionData(Session session, MCRProcessableWebsocketSender sender) {
+        public SessionListener(Session session, MCRProcessableWebsocketSender sender) {
             this.session = session;
             this.sender = sender;
         }
@@ -197,7 +199,8 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
                 try {
                     this.session.close(new CloseReason(CloseCodes.GOING_AWAY, "client disconnected"));
                 } catch (IOException ioExc) {
-                    LOGGER.error("Unable to close websocket connection", ioExc);
+                    LOGGER.error("Websocket error " + session.getId() + ": Unable to close websocket connection",
+                        ioExc);
                 }
                 return true;
             }
@@ -205,7 +208,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         }
 
         /**
-         * Attaches the given collection to this {@link SessionData} object by
+         * Attaches the given collection to this {@link SessionListener} object by
          * adding all relevant listeners.
          * 
          * @param collection the collection to attach to this object
@@ -218,7 +221,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         }
 
         /**
-         * Attaches the given processable to this {@link SessionData} object by
+         * Attaches the given processable to this {@link SessionListener} object by
          * adding all relevant listeners.
          * 
          * @param processable the processable to attach to this object

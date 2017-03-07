@@ -3,10 +3,16 @@ package org.mycore.webtools.processing.socket.impl;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.websocket.Session;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
@@ -130,7 +136,68 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
     private void send(Session session, JsonObject responseMessage, Type type) {
         responseMessage.addProperty("type", type.name());
         String msg = responseMessage.toString();
-        session.getAsyncRemote().sendText(msg);
+        AsyncSender.send(session, msg);
+    }
+
+    /**
+     * Tomcat does not support async sending of messages. We have to implement
+     * our own sender.
+     * 
+     * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=56026">tomcat bug</a>
+     */
+    private static class AsyncSender {
+
+        private static Logger LOGGER = LogManager.getLogger();
+
+        private static ExecutorService SERVICE;
+
+        static {
+            SERVICE = Executors.newSingleThreadExecutor();
+            MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
+
+                @Override
+                public void prepareClose() {
+                    SERVICE.shutdown();
+                }
+
+                @Override
+                public void close() {
+                    if (!SERVICE.isTerminated()) {
+                        try {
+                            SERVICE.awaitTermination(10, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            LOGGER.warn("Error while waiting for shutdown.", e);
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Sends a text to the session
+         * 
+         * @param session session to send to
+         * @param msg the message
+         */
+        public static void send(Session session, String msg) {
+            SERVICE.submit(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (session != null && !session.isOpen()) {
+                        return;
+                    }
+                    try {
+                        session.getBasicRemote().sendText(msg);
+                    } catch (Exception exc) {
+                        LOGGER.error("Websocket error " + session.getId() + ": Unable to send message " + msg);
+                    }
+                }
+
+            });
+
+        }
+
     }
 
 }
