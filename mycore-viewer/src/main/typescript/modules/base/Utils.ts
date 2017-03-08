@@ -298,7 +298,7 @@ class Utils {
         return image;
     }
 
-    public static getVar<T>(obj:any, path:string, defaultReturn:T = null, check = (extracted:T) => true) {
+    public static getVar<T>(obj:any, path:string, defaultReturn:T = null, check = (extracted:T) => true):T {
         // check direct
         if (path in obj) {
             if (check(obj[ path ])) {

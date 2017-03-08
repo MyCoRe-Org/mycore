@@ -35,6 +35,7 @@ module mycore.viewer.components {
         private _sidebarLabel = jQuery("<span>Bildübersicht</span>");
         private _currentImageId:string = null;
         private _idMetsImageMap: MyCoReMap<string, model.StructureImage>;
+        private _spinner: JQuery = null;
 
         public init() {
             if (this._enabled) {
@@ -42,6 +43,18 @@ module mycore.viewer.components {
                 this._idMetsImageMap = new MyCoReMap<String, model.StructureImage>();
                 this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
                 this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
+
+                let showImageOverViewOnStart = Utils.getVar<string>(this._settings, "leftShowOnStart", "chapterOverview")
+                    == "imageOverview";
+                if (this._settings.mobile == false && showImageOverViewOnStart) {
+                    this._spinner = jQuery(`<div class='spinner'><img src='${this._settings.webApplicationBaseURL}` +
+                        `/modules/iview2/img/spinner.gif'></div>`);
+                    this._container.append(this._spinner);
+
+                    let direction = (this._settings.mobile)
+                        ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_WEST;
+                    this.trigger(new events.ShowContentEvent(this, this._container, direction, 300, this._sidebarLabel));
+                }
             } else {
                 this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
             }
@@ -52,7 +65,7 @@ module mycore.viewer.components {
         }
 
         public get handlesEvents(): string[] {
-            var handles = new Array<string>();
+            let handles = new Array<string>();
 
             if (this._enabled) {
                 handles.push(events.StructureModelLoadedEvent.TYPE);
@@ -95,7 +108,9 @@ module mycore.viewer.components {
                 this._overview.jumpToThumbnail(startImage);
                 this._overview.setThumbnailSelected(startImage);
                 this._currentImageId = startImage;
-
+                if (this._spinner != null) {
+                    this._spinner.detach();
+                }
                 this.trigger(new events.ComponentInitializedEvent(this));
             }
 
