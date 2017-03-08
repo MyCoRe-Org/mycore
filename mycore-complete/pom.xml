@@ -132,6 +132,9 @@
           <dependencySourceIncludes>
             <dependencySourceInclude>${include.dependencies}</dependencySourceInclude>
           </dependencySourceIncludes>
+          <dependencySourceExcludes>
+            <dependencySourceExclude>mycore-meta:*</dependencySourceExclude>
+          </dependencySourceExcludes>
         </configuration>
       </plugin>
       <plugin>
