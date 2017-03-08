@@ -55,11 +55,17 @@ module mycore.viewer.components {
                 this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
                 this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
 
-                var showChapterOnStart = Utils.getVar<boolean>(this._settings, "chapter.showOnStart", window.innerWidth >= 1200);
+                let oldProperty = Utils.getVar<boolean>(this._settings, "chapter.showOnStart",
+                    window.innerWidth >= 1200);
+                let showChapterOnStart = Utils.getVar<string>(this._settings,
+                        "leftShowOnStart", oldProperty ? "chapterOverview" : "none") == "chapterOverview";
+
                 if (this._settings.mobile == false && showChapterOnStart) {
-                    this._spinner = jQuery("<div class='spinner' ><img src='" + this._settings.webApplicationBaseURL +"/modules/iview2/img/spinner.gif'></div>");
+                    this._spinner = jQuery(`<div class='spinner'><img src='${this._settings.webApplicationBaseURL}` +
+                        `/modules/iview2/img/spinner.gif'></div>`);
                     this._container.append(this._spinner);
-                    var direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_WEST;
+                    let direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER :
+                        events.ShowContentEvent.DIRECTION_WEST;
                     this.trigger(new events.ShowContentEvent(this, this._container, direction, 300, this._sidebarLabel));
                 }
             } else {
@@ -68,11 +74,13 @@ module mycore.viewer.components {
         }
 
         private updateContainerSize () {
-            this._container.css({"height": (this._container.parent().height() - this._sidebarLabel.parent().outerHeight()) + "px"});
+            this._container.css({
+                "height" : (this._container.parent().height() - this._sidebarLabel.parent().outerHeight()) + "px"
+            });
         }
 
         public get handlesEvents(): string[] {
-            var handles = new Array<string>();
+            let handles = new Array<string>();
 
             if (this._enabled) {
                 handles.push(events.StructureModelLoadedEvent.TYPE);
@@ -123,7 +131,9 @@ module mycore.viewer.components {
                 this._chapterWidget = new mycore.viewer.widgets.chaptertree.IviewChapterTree(this._chapterWidgetSettings);
                 this._initialized = true;
                 this.trigger(new events.ComponentInitializedEvent(this));
-                this._spinner==null || this._spinner.detach();
+                if (this._spinner != null) {
+                    this._spinner.detach();
+                }
                 if(this._chapterToActivate!=null){
                     this.setChapter(this._chapterToActivate);
                 }
