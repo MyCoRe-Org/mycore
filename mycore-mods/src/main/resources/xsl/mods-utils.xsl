@@ -274,9 +274,19 @@
     <!-- split category ID e.g "cc_by_4.0" -->
     <xsl:variable name="licenseVersion" select="substring-after(substring-after(@xlink:href, '#cc_'), '_')" />
     <xsl:variable name="licenseString" select="substring-before(substring-after(@xlink:href, '#cc_'), '_')" />
-    <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
-      <img src="//i.creativecommons.org/l/{$licenseString}/{$licenseVersion}/88x31.png" />
-    </a>
+    <xsl:choose>
+      <!-- public domain -->
+      <xsl:when test="$licenseString='zero' or $licenseString='mark'">
+        <a rel="license" href="http://creativecommons.org/publicdomain/{$licenseString}/{$licenseVersion}/">
+          <img src="//i.creativecommons.org/p/{$licenseString}/{$licenseVersion}/88x31.png" />
+        </a>
+      </xsl:when>
+      <xsl:otherwise>
+        <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
+          <img src="//i.creativecommons.org/l/{$licenseString}/{$licenseVersion}/88x31.png" />
+        </a>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="mods:accessCondition" mode="oa-logo">
