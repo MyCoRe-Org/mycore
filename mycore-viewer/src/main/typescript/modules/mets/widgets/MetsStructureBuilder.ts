@@ -132,7 +132,7 @@ module mycore.viewer.widgets.mets {
                     return;
             }
 
-            var chapterObject = new model.StructureChapter(parent, chapter.getAttribute("TYPE"), chapter.getAttribute("ID"), parseInt(chapter.getAttribute("ORDER") || defaultOrder+""), chapter.getAttribute("LABEL"));
+            var chapterObject = new model.StructureChapter(parent, chapter.getAttribute("TYPE"), chapter.getAttribute("ID"), chapter.getAttribute("LABEL"));
             var chapterChildren = chapter.childNodes;
 
             this._chapterIdMap.set(chapterObject.id, chapterObject);

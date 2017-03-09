@@ -98,6 +98,10 @@ interface PDFDocumentProxy {
      **/
     getDestinations(): PDFPromise<any[]>;
 
+    getDestination(obj: any): PDFPromise<any[]>;
+
+    getPageIndex(refObj: any): PDFPromise<number>;
+
     /**
      *  A promise that is resolved with an array of all the JavaScript strings in the name tree.
      **/

@@ -5,6 +5,7 @@ module mycore.viewer.widgets.chaptertree {
         id: string;
         label: string;
         chapter: Array<ChapterTreeChapter>;
+        resolveDestination(callbackFn: (targetId) => void): void;
     }
 
 }

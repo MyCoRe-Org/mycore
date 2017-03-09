@@ -1,32 +1,30 @@
 /// <reference path="../definitions/pdf.d.ts" />
 /// <reference path="PDFStructureModel.ts" />
 
+
 module mycore.viewer.widgets.pdf {
+    import StructureChapter = mycore.viewer.model.StructureChapter;
     export class PDFStructureBuilder {
 
         constructor(private _document:PDFDocumentProxy, private _name:string) {
             this._pageCount = <any>(this._document.numPages);
         }
 
-        private _structureModel:PDFStructureModel;
-        private _pageChapterMap:MyCoReMap<string, model.StructureChapter> = new MyCoReMap<String, mycore.viewer.model.StructureChapter>();
+        private _structureModel: PDFStructureModel = null;
         private _chapterPageMap:MyCoReMap<string, model.StructureImage> = new MyCoReMap<String, mycore.viewer.model.StructureImage>();
         private _pages:Array<model.StructureImage> = new Array<model.StructureImage>();
         private _pageCount:number = 0;
-        private _destinations:Array<any>;
         private _refPageMap:MyCoReMap<string, PDFPageProxy> = new MyCoReMap<String, PDFPageProxy>();
-        private _idPdfPageMap:MyCoReMap<string, PDFPageProxy> = new MyCoReMap<String, PDFPageProxy>();
         private _idPageMap:MyCoReMap<number, model.StructureImage> = new MyCoReMap<Number, mycore.viewer.model.StructureImage>();
         private _loadedPageCount:number;
         private _outline:Array<PDFTreeNode>;
         private _rootChapter:model.StructureChapter;
         private _promise:ViewerPromise<PDFStructureModel, any> = new ViewerPromise<PDFStructureModel, any>();
+        private _outlineTodoCount = 0;
         private static PDF_TEXT_HREF = "pdfText";
-        private completeWidth = 0;
-        private completeHeight = 0;
+
 
         public resolve() {
-            this._resolveDestinations();
             this._resolvePages();
             this._resolveOutline();
             return <GivenViewerPromise<PDFStructureModel, any>>this._promise;
@@ -40,11 +38,9 @@ module mycore.viewer.widgets.pdf {
                 var callback = this._createThumbnailDrawer(i);
                 var additionalHref = new MyCoReMap<string,string>();
                 additionalHref.set(PDFStructureBuilder.PDF_TEXT_HREF, i + "");
-                var img = new model.StructureImage("pdfPage", i + "", i, null, i + "", "pdfPage", callback, additionalHref);
-                that._pages.push(img);
-                that._idPageMap.set(i, img);
-                var promise = that._document.getPage(i);
-                promise.then(this._createPageLoadCallback(i));
+                var structureImage = new model.StructureImage("pdfPage", i + "", i, null, i + "", "pdfPage", callback, additionalHref);
+                that._pages.push(structureImage);
+                that._idPageMap.set(i, structureImage);
             }
         }
 
@@ -54,41 +50,14 @@ module mycore.viewer.widgets.pdf {
             var collectedCallbacks = new Array<(string)=>void>();
             return (callback:(string)=>void)=> {
                 if (imgData == null) {
-                    if (collectedCallbacks.length == 0) {
-                        collectedCallbacks.push((imgDataToSet)=> {
-                            imgData = imgDataToSet;
-                        });
-                        that._renderPage(collectedCallbacks, that._idPdfPageMap.get(i));
-                    }
                     collectedCallbacks.push(callback);
+                    if (collectedCallbacks.length == 1) {
+                        that._document.getPage(i).then((page) => {
+                            that._renderPage(collectedCallbacks, page);
+                        });
+                    }
                 } else {
                     callback(imgData);
-                }
-            }
-        }
-
-        private _createPageLoadCallback(i) {
-            var that = this;
-            return function (page:PDFPageProxy) {
-                try {
-
-                    var pageRotation = (<any>page).pageInfo.rotate;
-                    that.completeWidth += (pageRotation == 90 || pageRotation == 270) ? page.view[ 3 ] - page.view[ 1 ] : page.view[ 2 ] - page.view[ 0 ];
-                    that.completeHeight += (pageRotation == 90 || pageRotation == 270) ? page.view[ 2 ] - page.view[ 0 ] : page.view[ 3 ] - page.view[ 1 ];
-
-                    var ref:PDFRef = <any>page.ref;
-                    var strRef = PDFStructureBuilder.destToString(ref);
-                    that._refPageMap.set(strRef, page);
-                    that._idPdfPageMap.set(i + "", page);
-                    var sImage = that._idPageMap.get(i);
-
-                    // if thumbnail panel or Imagebar need preview page
-
-                    that._loadedPageCount++;
-                    that.resolveStructure();
-                } catch (e) {
-                    console.log(e);
-                    that._promise.reject(e);
                 }
             }
         }
@@ -117,7 +86,6 @@ module mycore.viewer.widgets.pdf {
 
         }
 
-
         private _resolveOutline() {
             var that = this;
             this._document.getOutline().then(function (nodes:Array<PDFTreeNode>) {
@@ -126,33 +94,49 @@ module mycore.viewer.widgets.pdf {
             });
         }
 
-        private _resolveDestinations() {
-            var that = this;
-            this._document.getDestinations().then(function (dest:Array<any>) {
-                that._destinations = dest;
-                that.resolveStructure()
-            });
-        }
 
         private getChapterFromOutline(parent:model.StructureChapter, nodes:Array<PDFTreeNode>):Array<model.StructureChapter> {
-            var o = 0;
-            var chapterArr = new Array<model.StructureChapter>();
-            for (var nodeIndex in nodes) {
-                var currentNode = nodes[nodeIndex];
-                var chapter = new model.StructureChapter(parent, "pdfChapter", Utils.hash(currentNode.title).toString(), ++o, currentNode.title, null);
-                var children = this.getChapterFromOutline(chapter, currentNode.items);
+            let chapterArr = new Array<model.StructureChapter>();
+            for (let nodeIndex in nodes) {
+                let currentNode = nodes[nodeIndex];
+                let destResolver = ((copyChapter) => (callback) => {
+                    let promise;
+                    if (typeof copyChapter.dest === 'string') {
+                        promise = this._document.getDestination(copyChapter.dest);
+                    } else {
+                        promise = (<any>window).Promise.resolve(copyChapter.dest);
+                    }
+
+
+                    promise.then((destination) => {
+                        if (!(destination instanceof Array)) {
+                            console.error("Invalid destination " + destination);
+                            return;
+                        } else {
+                            this._document.getPageIndex(destination[ 0 ]).then((pageNumber) => {
+                                if (typeof pageNumber != "undefined" && pageNumber != null) {
+                                    if (pageNumber > this._pageCount) {
+                                        console.error("Destination outside of Document! (" + pageNumber + ")");
+                                    } else {
+                                        callback(pageNumber + 1);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                })(currentNode);
+                let chapter = new model.StructureChapter(parent, "pdfChapter", Utils.hash(currentNode.title).toString(), currentNode.title, null, null,destResolver);
+                let children = this.getChapterFromOutline(chapter, currentNode.items);
                 chapter.chapter = children;
                 chapterArr.push(chapter);
-                var dest:PDFRef = <any>this.getDestOfNode(currentNode);
-                if(dest !== null && this._refPageMap.has(<any>dest)) {
-                    var pageDest = this._refPageMap.get(<any>dest);
-                    this._chapterPageMap.set(chapter.id, this._idPageMap.get(<any>pageDest.pageNumber));
-                } else {
-                    console.log("Could not find dest for " + chapter.id);
-                }
             }
 
             return chapterArr;
+        }
+
+        private checkResolvable() {
+            if (this._structureModel != null && this._outlineTodoCount == 0)
+                this._promise.resolve(this._structureModel);
         }
 
         /**
@@ -160,37 +144,13 @@ module mycore.viewer.widgets.pdf {
          * Executes the Callback.
          */
         private resolveStructure() {
-            if (this._loadedPageCount == this._pageCount && typeof this._outline != "undefined" && typeof this._destinations != "undefined") {
+            if (typeof this._outline != "undefined") {
                 var that = this;
-                this._rootChapter = new model.StructureChapter(null, "pdf", "0", 0, this._name, null);
+                this._rootChapter = new model.StructureChapter(null, "pdf", "0", this._name, null, null, () => 1);
                 this._rootChapter.chapter = this.getChapterFromOutline(this._rootChapter, this._outline);
-                this._chapterPageMap.set(this._rootChapter.id, this._idPageMap.get(1));
-                this._structureModel = new PDFStructureModel(this._rootChapter, this._pages, this._chapterPageMap, new MyCoReMap<string, mycore.viewer.model.StructureChapter>(), this._refPageMap, this._idPdfPageMap);
-                this._structureModel.defaultPageDimension = new Size2D(this.completeWidth / this._pageCount, this.completeHeight / this._pageCount);
-                this._promise.resolve(this._structureModel);
+                this._structureModel = new PDFStructureModel(this._rootChapter, this._pages, this._chapterPageMap, new MyCoReMap<string, mycore.viewer.model.StructureChapter>(), this._refPageMap);
+                this.checkResolvable();
             }
-        }
-
-        /**
-         * Resolves the destination of a node. A destination can be a
-         * @param node
-         * @returns {string}
-         */
-        private getDestOfNode(node:PDFTreeNode):string {
-            if(node == null ) {
-                return null;
-            }
-
-            if(node.dest == null) {
-                return null;
-            }
-
-            var chapterDestination = (typeof node.dest == "object") ? node.dest : this._destinations[node.dest];
-            if (chapterDestination == null || chapterDestination[ 0 ] == null) {
-                return null;
-            }
-
-            return PDFStructureBuilder.destToString(chapterDestination[0]);
         }
 
         /**
