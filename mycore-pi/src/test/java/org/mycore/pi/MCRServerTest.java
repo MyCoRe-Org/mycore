@@ -1,7 +1,7 @@
 package org.mycore.pi;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -12,26 +12,22 @@ import org.junit.Test;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBPIDefProvider;
 import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.pi.urn.MCRUUIDURNGenerator;
 import org.mycore.pi.urn.rest.MCREpicurLite;
-import org.mycore.pi.urn.rest.MCRURNGranularRESTRegistrationTask;
-import org.mycore.pi.urn.rest.MCRURNServer;
+import org.mycore.pi.urn.rest.MCRDNBURNClient;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
-import java.util.UUID;
+import java.util.stream.Stream;
+
+import static org.mycore.pi.MCRPIUtils.*;
 
 /**
  * Created by chi on 01.02.17.
@@ -56,7 +52,7 @@ public class MCRServerTest extends MCRStoreTestCase {
 
     @Test
     public void connectionTest() throws Exception {
-        MCRURNServer mcrurnServer = getMCRURNServer();
+        MCRDNBURNClient dnburnClient = getMCRURNClient();
 
         MCRPIRegistrationInfo info = generateMCRPI(randomFilename());
 
@@ -64,14 +60,14 @@ public class MCRServerTest extends MCRStoreTestCase {
         //        epicurLite.setUrl(new URL("http://localhost:8291/deriv_0001/" + randomFilename()));
         //
         //        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-        //        xmlOutputter.output(epicurLite.getEpicurLite(), System.out);
+        //        xmlOutputter.output(epicurLite.toXML(), System.out);
 
-        mcrurnServer
-                .put(info, this::callback);
+//        dnburnClient
+//                .put(info, this::callback);
 
-        //        System.out.println("HEAD: " + mcrurnServer.head(info));
-//                System.out.println("PUT: " + mcrurnServer.put(info));
-        //        System.out.println("POST: " + mcrurnServer.post(epicurLite));
+        //        System.out.println("HEAD: " + dnburnClient.head(info));
+//                        System.out.println("PUT: " + dnburnClient.put(info));
+        //        System.out.println("POST: " + dnburnClient.post(epicurLite));
 
         //        new MCRDNBURNParser().parse(info.getIdentifier())
         //                             .ifPresent(urn -> resolveURN(urn));
@@ -80,9 +76,18 @@ public class MCRServerTest extends MCRStoreTestCase {
 
     private void callback(HttpResponse response, MCREpicurLite mcrEpicurLite) {
         System.out.println("PUT: " + response.getStatusLine().getStatusCode());
+        System.out.println("PUT: " + response.getStatusLine().getReasonPhrase());
+        Stream.of(response.getAllHeaders())
+              .filter(header -> header.getName().equals("Date"))
+              .map(Header::getValue)
+              .map("HEADER: "::concat)
+              .forEach(System.out::println);
+
+
+
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         try {
-            xmlOutputter.output(mcrEpicurLite.getEpicurLite(), System.out);
+            xmlOutputter.output(mcrEpicurLite.toXML(), System.out);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,51 +101,6 @@ public class MCRServerTest extends MCRStoreTestCase {
         } catch (MCRIdentifierUnresolvableException | IOException e) {
             e.printStackTrace();
         }
-    }
-
-
-    private MCRURNServer getMCRURNServer() {
-        return new MCRURNServer(new UsernamePasswordCredentials("test", "test"), this::getUrl);
-    }
-
-    private String randomFilename() {
-        return UUID.randomUUID()
-                   .toString()
-                   .concat(".tif");
-    }
-
-    private MCRPI generateMCRPI(String fileName) throws MCRPersistentIdentifierException {
-        MCRObjectID mycoreID = MCRObjectID.getNextFreeId("MyCoRe_test");
-        return new MCRPI(generateURNFor(mycoreID).asString(), MCRDNBURN.TYPE,
-                         mycoreID.toString(), fileName);
-    }
-
-    private MCRDNBURN generateURNFor(MCRObjectID mycoreID) throws
-            MCRPersistentIdentifierException {
-        MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator("testGenerator");
-        return mcruuidurnGenerator.generate(mycoreID, "");
-    }
-
-    @Test
-    public void testTimerTask() throws Exception {
-        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
-        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
-        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
-        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
-
-        MCRURNGranularRESTRegistrationTask registrationTask = new MCRURNGranularRESTRegistrationTask(getMCRURNServer());
-
-        registrationTask.run();
-    }
-
-    private URL getUrl(MCRPIRegistrationInfo info) {
-        try {
-            return new URL("http://localhost:8291/deriv_0001/" + info.getAdditional());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     @Test

@@ -2,20 +2,16 @@ package org.mycore.pi;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
@@ -127,7 +123,7 @@ public class MCRPersistentIdentifierManager {
     }
 
     private static final String countCreated = "select count(u) from MCRPI u "
-            + "where u.mycoreID = :id "
+            + "where u.mycoreID = :mcrId "
             + "and u.type = :type "
             + "and u.additional = :additional "
             + "and u.service = :service";
@@ -138,7 +134,7 @@ public class MCRPersistentIdentifierManager {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
                 .createQuery(countCreated, Number.class)
-                .setParameter("id", id.toString())
+                .setParameter("mcrId", id.toString())
                 .setParameter("type", type)
                 .setParameter("additional", additional)
                 .setParameter("service", registrationServiceID)
@@ -146,11 +142,19 @@ public class MCRPersistentIdentifierManager {
                 .shortValue() > 0;
     }
 
-    public boolean isRegistered(MCRObjectID id, String additional, String type, String registrationServiceID) {
+    public boolean isRegistered(MCRPI mcrPi) {
+        return isRegistered(mcrPi.getMycoreID(), mcrPi.getAdditional(), mcrPi.getType(), mcrPi.getService());
+    }
+
+    public boolean isRegistered(MCRObjectID mcrId, String additional, String type, String registrationServiceID) {
+        return isRegistered(mcrId.toString(), additional, type, registrationServiceID);
+    }
+
+    public boolean isRegistered(String mcrId, String additional, String type, String registrationServiceID) {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
                 .createQuery(countRegistered, Number.class)
-                .setParameter("id", id.toString())
+                .setParameter("mcrId", mcrId)
                 .setParameter("type", type)
                 .setParameter("additional", additional)
                 .setParameter("service", registrationServiceID)
@@ -224,17 +228,28 @@ public class MCRPersistentIdentifierManager {
                 .getResultList();
     }
 
-    public List<MCRPIRegistrationInfo> getUnregisteredIdenifiers(String type) {
+    public void setRegisteredDateForUnregisteredIdenifiers(String type,
+                                                           Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider) {
+        getUnregisteredIdenifiers(type)
+                .parallelStream()
+                .forEach(mcrPi -> dateProvider.apply(mcrPi)
+                                              .ifPresent(mcrPi::setRegistered));
+
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MCRPIRegistrationInfo> cq = cb.createQuery(MCRPIRegistrationInfo.class);
-        Root<MCRPI> pi = cq.from(MCRPI.class);
 
-        cq.select(pi)
-          .where(pi.get(MCRPI_.type).in(type), pi.get(MCRPI_.registered).isNull());
+        if (!em.getTransaction().isActive()) {
+            em.getTransaction().begin();
+        }
 
-        return em.createQuery(cq)
-                 .getResultList();
+        em.getTransaction().commit();
+    }
+
+    public List<MCRPI> getUnregisteredIdenifiers(String type) {
+        return MCREntityManagerProvider
+                .getCurrentEntityManager()
+                .createQuery("select pi from MCRPI pi where pi.type = :type and pi.registered is null", MCRPI.class)
+                .setParameter("type", type)
+                .getResultList();
     }
 
     public List<MCRPIRegistrationInfo> getRegistered(MCRObject object) {

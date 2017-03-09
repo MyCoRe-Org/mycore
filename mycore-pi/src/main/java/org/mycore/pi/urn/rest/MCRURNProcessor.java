@@ -51,7 +51,7 @@ public class MCRURNProcessor {
 //                    // setting attribute in database
 //                    urnInfo.setRegistered(true);
 //                }
-//                elp = epicurLiteProvider.getEpicurLite(urnInfo);
+//                elp = epicurLiteProvider.toXML(urnInfo);
 //
 //                if (elp.getUrl() == null) {
 //                    LOGGER.warn("The url for " + urnInfo + " is " + null + ". Canceling request");
@@ -78,7 +78,7 @@ public class MCRURNProcessor {
 //            // urnInfo not registered
 //            case HttpStatus.SC_NOT_FOUND:
 //                LOGGER.info("URN " + urnInfo + " is NOT registered");
-//                elp = epicurLiteProvider.getEpicurLite(urnInfo);
+//                elp = epicurLiteProvider.toXML(urnInfo);
 //                int putStatus = server.put(elp);
 //                switch (putStatus) {
 //                case HttpStatus.SC_CREATED:
@@ -101,7 +101,7 @@ public class MCRURNProcessor {
 //                    break;
 //                default:
 //                    LOGGER.warn("Could not handle urnInfo request: status=" + putStatus + ", urnInfo=" + urnInfo + ", url=" + elp.getUrl()
-//                                        + "\nEpicur Lite:\n\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite()));
+//                                        + "\nEpicur Lite:\n\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(elp.toXML()));
 //                }
 //                break;
 //            default:
