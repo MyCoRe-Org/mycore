@@ -148,4 +148,8 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     public void setService(String service) {
         this.service = service;
     }
+
+    public int getId() {
+        return id;
+    }
 }

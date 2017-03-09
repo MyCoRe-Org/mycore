@@ -3,6 +3,9 @@ package org.mycore.pi.urn;
 
 import org.mycore.pi.MCRPersistentIdentifier;
 
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
+
 public class MCRUniformResourceName implements MCRPersistentIdentifier {
 
     public String getPREFIX() {

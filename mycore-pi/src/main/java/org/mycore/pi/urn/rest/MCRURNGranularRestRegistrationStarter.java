@@ -7,7 +7,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.servlet.ServletContext;
 
@@ -45,7 +44,8 @@ public class MCRURNGranularRestRegistrationStarter
         MCRShutdownHandler.getInstance().addCloseable(this);
 
         getUsernamePassword()
-                .map(this::getURNServer)
+                .map(this::getEpicureProvider)
+                .map(MCRDNBURNClient::new)
                 .map(MCRURNGranularRESTRegistrationTask::new)
                 .map(this::startTimerTask)
                 .orElseGet(this::couldNotStartTask)
@@ -93,8 +93,9 @@ public class MCRURNGranularRestRegistrationStarter
         return logger -> logger.info("Started task " + task.getClass().getSimpleName() + ", refresh every 60 seconds");
     }
 
-    private MCRURNServer getURNServer(UsernamePasswordCredentials usernamePassword) {
-        return new MCRURNServer(usernamePassword, MCRDerivateURNUtils::getURL);
+    private Function<MCRPIRegistrationInfo, MCREpicurLite> getEpicureProvider(UsernamePasswordCredentials credentials) {
+        return urn -> MCREpicurLite.instance(urn, MCRDerivateURNUtils.getURL(urn))
+                                   .setCredentials(credentials);
     }
 
     private Optional<UsernamePasswordCredentials> getUsernamePassword() {
