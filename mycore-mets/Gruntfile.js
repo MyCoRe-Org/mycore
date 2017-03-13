@@ -96,11 +96,12 @@ module.exports = function (grunt) {
                     latest: false,
                     config: 'tsd.json',
                     opts: (function () {
-                        if (typeof process.env.GITHUB_TOKEN != "undefined" && process.env.GITHUB_TOKEN != null) {
+                        if (typeof process.env.GITHUB_TOKEN != "undefined") {
                             console.log("Found GITHUB_TOKEN in env!");
                             return {"token": process.env.GITHUB_TOKEN}
                         } else {
-                            console.log("Could not find GITHUB_TOKEN so use default authentication for Github.");
+                            console.log("Could not find GITHUB_TOKEN. " +
+                                "TSD will try to use 'TSD_GITHUB_TOKEN' or uses the default Github api authentication..");
                             return {};
                         }
                     })()
