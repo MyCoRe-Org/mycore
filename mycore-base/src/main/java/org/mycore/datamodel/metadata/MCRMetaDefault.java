@@ -371,18 +371,22 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      */
     public void debug() {
         debugDefault();
-        LOGGER.debug(" ");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug(" ");
+        }
     }
 
     /**
      * This method put common debug data to the logger (for the debug mode).
      */
     public final void debugDefault() {
-        LOGGER.debug("SubTag             = " + subtag);
-        LOGGER.debug("Language           = " + lang);
-        LOGGER.debug("Type               = " + type);
-        LOGGER.debug("DataPart           = " + datapart);
-        LOGGER.debug("Inhreited          = " + String.valueOf(inherited));
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("SubTag             = " + subtag);
+            LOGGER.debug("Language           = " + lang);
+            LOGGER.debug("Type               = " + type);
+            LOGGER.debug("DataPart           = " + datapart);
+            LOGGER.debug("Inhreited          = " + String.valueOf(inherited));
+        }
     }
 
     @Override

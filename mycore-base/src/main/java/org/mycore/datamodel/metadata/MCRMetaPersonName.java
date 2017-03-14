@@ -431,17 +431,19 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        super.debugDefault();
-        LOGGER.debug("First name         = " + firstname);
-        LOGGER.debug("Call name          = " + callname);
-        LOGGER.debug("Surname            = " + surname);
-        LOGGER.debug("Full name          = " + fullname);
-        LOGGER.debug("Academic           = " + academic);
-        LOGGER.debug("Peerage            = " + peerage);
-        LOGGER.debug("Numeration         = " + numeration);
-        LOGGER.debug("Title              = " + title);
-        LOGGER.debug("Prefix             = " + prefix);
-        LOGGER.debug("Affix              = " + affix);
-        LOGGER.debug("");
+        if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
+            LOGGER.debug("First name         = " + firstname);
+            LOGGER.debug("Call name          = " + callname);
+            LOGGER.debug("Surname            = " + surname);
+            LOGGER.debug("Full name          = " + fullname);
+            LOGGER.debug("Academic           = " + academic);
+            LOGGER.debug("Peerage            = " + peerage);
+            LOGGER.debug("Numeration         = " + numeration);
+            LOGGER.debug("Title              = " + title);
+            LOGGER.debug("Prefix             = " + prefix);
+            LOGGER.debug("Affix              = " + affix);
+            LOGGER.debug("");
+        }
     }
 }

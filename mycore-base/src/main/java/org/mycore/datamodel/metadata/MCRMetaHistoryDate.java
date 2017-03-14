@@ -510,17 +510,19 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        super.debugDefault();
-        for (MCRMetaHistoryDateText text : texts) {
-            LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());
+        if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
+            for (MCRMetaHistoryDateText text : texts) {
+                LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());
+            }
+            LOGGER.debug("Calendar           = " + calendar);
+            LOGGER.debug("Von (String)       = " + getVonToString());
+            LOGGER.debug("Von (JulianDay)    = " + ivon);
+            LOGGER.debug("Bis (String)       = " + getBisToString());
+            LOGGER.debug("Bis (JulianDay)    = " + ibis);
+            LOGGER.debug("Stop");
+            LOGGER.debug("");
         }
-        LOGGER.debug("Calendar           = " + calendar);
-        LOGGER.debug("Von (String)       = " + getVonToString());
-        LOGGER.debug("Von (JulianDay)    = " + ivon);
-        LOGGER.debug("Bis (String)       = " + getBisToString());
-        LOGGER.debug("Bis (JulianDay)    = " + ibis);
-        LOGGER.debug("Stop");
-        LOGGER.debug("");
     }
 
     /**

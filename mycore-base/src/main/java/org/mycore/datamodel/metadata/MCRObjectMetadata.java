@@ -534,8 +534,10 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        for (MCRMetaElement sub : this) {
-            sub.debug();
+        if(LOGGER.isDebugEnabled()) {
+            for (MCRMetaElement sub : this) {
+                sub.debug();
+            }
         }
     }
 

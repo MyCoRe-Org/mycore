@@ -165,10 +165,12 @@ final public class MCRDerivate extends MCRBase {
      * The method print all informations about this MCRObject.
      */
     public final void debug() {
-        LOGGER.debug("MCRDerivate ID : " + mcr_id);
-        LOGGER.debug("MCRDerivate Label : " + mcr_label);
-        LOGGER.debug("MCRDerivate Schema : " + mcr_schema);
-        LOGGER.debug("");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("MCRDerivate ID : " + mcr_id);
+            LOGGER.debug("MCRDerivate Label : " + mcr_label);
+            LOGGER.debug("MCRDerivate Schema : " + mcr_schema);
+            LOGGER.debug("");
+        }
     }
 
     @Override
