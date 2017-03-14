@@ -214,9 +214,11 @@ public class MCRMetaClassification extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        super.debugDefault();
-        LOGGER.debug("Category            = " + category);
-        LOGGER.debug(" ");
+        if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
+            LOGGER.debug("Category            = " + category);
+            LOGGER.debug(" ");
+        }
     }
 
     @Override

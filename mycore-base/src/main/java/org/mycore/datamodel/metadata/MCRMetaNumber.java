@@ -384,10 +384,12 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        super.debugDefault();
-        LOGGER.debug("Measurement        = " + measurement);
-        LOGGER.debug("Dimension          = " + dimension);
-        LOGGER.debug("Value              = " + number.toPlainString());
-        LOGGER.debug("");
+        if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
+            LOGGER.debug("Measurement        = " + measurement);
+            LOGGER.debug("Dimension          = " + dimension);
+            LOGGER.debug("Value              = " + number.toPlainString());
+            LOGGER.debug("");
+        }
     }
 }

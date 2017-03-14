@@ -196,8 +196,10 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        super.debugDefault();
-        LOGGER.debug("Value              = " + Boolean.toString(value));
-        LOGGER.debug(" ");
+        if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
+            LOGGER.debug("Value              = " + Boolean.toString(value));
+            LOGGER.debug(" ");
+        }
     }
 }

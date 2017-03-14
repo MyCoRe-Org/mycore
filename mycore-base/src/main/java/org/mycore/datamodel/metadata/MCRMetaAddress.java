@@ -182,14 +182,16 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        super.debugDefault();
-        LOGGER.debug("Country            = " + country);
-        LOGGER.debug("State              = " + state);
-        LOGGER.debug("Zipcode            = " + zipCode);
-        LOGGER.debug("City               = " + city);
-        LOGGER.debug("Street             = " + street);
-        LOGGER.debug("Number             = " + number);
-        LOGGER.debug(" ");
+        if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
+            LOGGER.debug("Country            = " + country);
+            LOGGER.debug("State              = " + state);
+            LOGGER.debug("Zipcode            = " + zipCode);
+            LOGGER.debug("City               = " + city);
+            LOGGER.debug("Street             = " + street);
+            LOGGER.debug("Number             = " + number);
+            LOGGER.debug(" ");
+        }
     }
 
     /**

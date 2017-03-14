@@ -460,14 +460,16 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        LOGGER.debug("ClassName          = " + getClassName());
-        LOGGER.debug("Tag                = " + tag);
-        LOGGER.debug("Heritable          = " + String.valueOf(heritable));
-        LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
-        LOGGER.debug("Elements           = " + String.valueOf(list.size()));
-        LOGGER.debug(" ");
-        for (MCRMetaInterface aList : list) {
-            aList.debug();
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("ClassName          = " + getClassName());
+            LOGGER.debug("Tag                = " + tag);
+            LOGGER.debug("Heritable          = " + String.valueOf(heritable));
+            LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
+            LOGGER.debug("Elements           = " + String.valueOf(list.size()));
+            LOGGER.debug(" ");
+            for (MCRMetaInterface aList : list) {
+                aList.debug();
+            }
         }
     }
 
