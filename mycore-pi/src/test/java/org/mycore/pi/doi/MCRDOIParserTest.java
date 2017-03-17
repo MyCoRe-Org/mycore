@@ -21,7 +21,21 @@ public class MCRDOIParserTest {
 
     private static final String EXAMPLE_DOI2 = EXAMPLE_DOI2_PREFIX + "/" + EXAMPLE_DOI2_SUFFIX;
 
-    private MCRDOIParser parser;
+    private static MCRDOIParser parser;
+
+    private static void testDOI(String doi, String expectedPrefix, String expectedSuffix) {
+        Optional<MCRPersistentIdentifier> parsedDOIOptional = parser.parse(doi);
+
+        Assert.assertTrue("DOI should be parsable!", parsedDOIOptional.isPresent());
+
+        MCRDigitalObjectIdentifier parsedDOI = (MCRDigitalObjectIdentifier) parsedDOIOptional.get();
+
+        Assert.assertEquals("DOI Prefix should match!", expectedPrefix,
+            parsedDOI.getPrefix());
+
+        Assert.assertEquals("DOI Suffix should match", expectedSuffix,
+            parsedDOI.getSuffix());
+    }
 
     @Before
     public void setUp() {
@@ -40,20 +54,6 @@ public class MCRDOIParserTest {
      */
     public void parseRegistrantCodeDOI() {
         testDOI(EXAMPLE_DOI2, EXAMPLE_DOI2_PREFIX, EXAMPLE_DOI2_SUFFIX);
-    }
-
-    private void testDOI(String doi, String expectedPrefix, String expectedSuffix) {
-        Optional<MCRPersistentIdentifier> parsedDOIOptional = parser.parse(doi);
-
-        Assert.assertTrue("DOI should be parsable!", parsedDOIOptional.isPresent());
-
-        MCRDigitalObjectIdentifier parsedDOI = (MCRDigitalObjectIdentifier) parsedDOIOptional.get();
-
-        Assert.assertEquals("DOI Prefix should match!", expectedPrefix,
-            parsedDOI.getPrefix());
-
-        Assert.assertEquals("DOI Suffix should match", expectedSuffix,
-            parsedDOI.getSuffix());
     }
 
 }
