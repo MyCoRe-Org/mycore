@@ -52,7 +52,7 @@ public class MCRDOIParserTest {
         Assert.assertEquals("DOI Prefix should match!", expectedPrefix,
             parsedDOI.getPrefix());
 
-        Assert.assertEquals("DOU Suffix should match", expectedSuffix,
+        Assert.assertEquals("DOI Suffix should match", expectedSuffix,
             parsedDOI.getSuffix());
     }
 
