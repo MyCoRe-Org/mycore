@@ -34,6 +34,14 @@ public class MCRDOIParserTest {
 
     }
 
+    @Test
+    /**
+     * MCR-1562
+     */
+    public void parseRegistrantCodeDOI() {
+        testDOI(EXAMPLE_DOI2, EXAMPLE_DOI2_PREFIX, EXAMPLE_DOI2_SUFFIX);
+    }
+
     private void testDOI(String doi, String expectedPrefix, String expectedSuffix) {
         Optional<MCRPersistentIdentifier> parsedDOIOptional = parser.parse(doi);
 
@@ -46,14 +54,6 @@ public class MCRDOIParserTest {
 
         Assert.assertEquals("DOU Suffix should match", expectedSuffix,
             parsedDOI.getSuffix());
-    }
-
-    @Test
-    /**
-     * JUNIT Test for MCR-1562
-     */
-    public void parseRegistrantCodeDOI() {
-        testDOI(EXAMPLE_DOI2, EXAMPLE_DOI2_PREFIX, EXAMPLE_DOI2_SUFFIX);
     }
 
 }
