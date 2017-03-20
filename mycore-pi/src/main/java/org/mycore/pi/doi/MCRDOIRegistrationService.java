@@ -134,7 +134,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         return schema;
     }
 
-    public boolean isTestPrefix() {
+    public boolean usesTestPrefix() {
         return useTestPrefix;
     }
 
