@@ -247,9 +247,12 @@ module mycore.viewer.widgets.mets {
             });
 
             this._imageList = this._imageList.sort((x, y)=>x.order - y.order);
-            this._imageList.forEach((o, i)=> o.order = i + 1);
 
             this.makeLinks();
+
+            this._imageList = this._imageList.filter((el => this._imageChapterMap.has(el.id)));
+            this._imageList.forEach((o, i)=> o.order = i + 1);
+
         }
 
         private makeLinks() {
