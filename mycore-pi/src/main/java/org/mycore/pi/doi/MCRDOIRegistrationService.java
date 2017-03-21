@@ -134,6 +134,10 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         return schema;
     }
 
+    public boolean usesTestPrefix() {
+        return useTestPrefix;
+    }
+
     public String getRegisterURL() {
         return registerURL;
     }
