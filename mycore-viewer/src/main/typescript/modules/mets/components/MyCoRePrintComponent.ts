@@ -51,12 +51,16 @@ module mycore.viewer.components {
                 var ptme = <events.ProvideToolbarModelEvent>e;
                 this._printButton = new widgets.toolbar.ToolbarButton("PrintButton", "PDF", "", "");
 
+
                 if (this._settings.mobile) {
                     this._printButton.icon = "file-pdf-o";
                     this._printButton.label = "";
                 }
-
-                ptme.model._actionControllGroup.addComponent(this._printButton);
+                if(ptme.model.name == "MyCoReFrameToolbar"){
+                    ptme.model._zoomControllGroup.addComponent(this._printButton);
+                } else {
+                    ptme.model._actionControllGroup.addComponent(this._printButton);
+                }
             }
 
             if (e.type == events.LanguageModelLoadedEvent.TYPE) {

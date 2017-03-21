@@ -10,7 +10,7 @@ module mycore.viewer.model {
 
     export class MyCoReBasicToolbarModel extends widgets.toolbar.ToolbarModel {
         constructor(id: string) {
-            super("MyCoReDesktopToolbar");
+            super(id);
             this.initComponents();
             this.addComponents();
         }
