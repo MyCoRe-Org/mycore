@@ -127,7 +127,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     @Override
     public Date getEarliestTimestamp() {
         String sortBy = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.SortBy", "modified asc");
-        String fieldName = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.fieldName", "modified");
+        String fieldName = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.FieldName", "modified");
         String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.add("sort", sortBy);
