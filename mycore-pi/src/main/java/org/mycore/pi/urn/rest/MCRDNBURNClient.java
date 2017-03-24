@@ -92,6 +92,7 @@ public class MCRDNBURNClient {
 
             return handler.apply(httpClient.execute(httpPut), elp);
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

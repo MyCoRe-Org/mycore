@@ -46,7 +46,7 @@ public class MCRServerTest extends MCRStoreTestCase {
 
     @Test
     public void testURNGerating() throws Exception {
-        MCRPIRegistrationInfo info = generateMCRPI(randomFilename());
+        MCRPIRegistrationInfo info = generateMCRPI(randomFilename(), BASE_ID);
         System.out.println(info.getIdentifier());
     }
 
@@ -54,22 +54,22 @@ public class MCRServerTest extends MCRStoreTestCase {
     public void connectionTest() throws Exception {
         MCRDNBURNClient dnburnClient = getMCRURNClient();
 
-        MCRPIRegistrationInfo info = generateMCRPI(randomFilename());
+        MCRPIRegistrationInfo info = generateMCRPI(randomFilename(), BASE_ID);
 
-        //        MCREpicurLite epicurLite = new MCREpicurLite(info);
+        //        MCREpicurLite epicurLite = new MCREpicurLite(accu);
         //        epicurLite.setUrl(new URL("http://localhost:8291/deriv_0001/" + randomFilename()));
         //
         //        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         //        xmlOutputter.output(epicurLite.toXML(), System.out);
 
 //        dnburnClient
-//                .put(info, this::callback);
+//                .put(accu, this::callback);
 
-        //        System.out.println("HEAD: " + dnburnClient.head(info));
-//                        System.out.println("PUT: " + dnburnClient.put(info));
+        //        System.out.println("HEAD: " + dnburnClient.head(accu));
+//                        System.out.println("PUT: " + dnburnClient.put(accu));
         //        System.out.println("POST: " + dnburnClient.post(epicurLite));
 
-        //        new MCRDNBURNParser().parse(info.getIdentifier())
+        //        new MCRDNBURNParser().parse(accu.getIdentifier())
         //                             .ifPresent(urn -> resolveURN(urn));
 
     }
@@ -105,8 +105,8 @@ public class MCRServerTest extends MCRStoreTestCase {
 
     @Test
     public void saveIdentifierToDB() throws Exception {
-        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
-        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
+        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename(), BASE_ID));
+        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename(), BASE_ID));
 
         EntityManager em = MCREntityManagerProvider
                 .getCurrentEntityManager();
@@ -131,8 +131,8 @@ public class MCRServerTest extends MCRStoreTestCase {
 
     @Test
     public void getUnregisteredPITest() throws Exception {
-        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
-        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
+        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename(), BASE_ID));
+        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename(), BASE_ID));
 
         MCRPersistentIdentifierManager.getInstance()
                                       .getUnregisteredIdenifiers(MCRDNBURN.TYPE)

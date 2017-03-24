@@ -171,12 +171,20 @@ public class MCRDNBURN extends MCRUniformResourceName {
         return valueS;
     }
 
-    public MCRDNBURN toGranular(String setID, int i, int max) {
-        return new MCRDNBURN(getSubNamespace(), getGranularNamespaceSpecificString(setID, i, max));
+    public MCRDNBURN toGranular(String setID, String index) {
+        return new MCRDNBURN(getSubNamespace(), getGranularNamespaceSpecificString(setID, index));
     }
 
-    private String getGranularNamespaceSpecificString(String setID, int i, int max) {
-        return getNamespaceSpecificString()+ "-" + setID + "-" + addLeadingZeroes(max, i);
+    public MCRDNBURN withSuffix(String suffix) {
+        return new MCRDNBURN(getSubNamespace(), getNamespaceSpecificString() + suffix);
+    }
+
+    public MCRDNBURN toGranular(String setID, int i, int max) {
+        return toGranular(setID, addLeadingZeroes(max, i));
+    }
+
+    private String getGranularNamespaceSpecificString(String setID, String index) {
+        return getNamespaceSpecificString()+ "-" + setID + "-" + index;
     }
 
     @Override
