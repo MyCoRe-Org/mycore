@@ -4,9 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
@@ -130,6 +129,22 @@ public class MCRPersistentIdentifierManager {
 
     private static final String countRegistered = countCreated + " and u.registered is not null";
 
+    private static final String createdIdentifiers = "select u from MCRPI u "
+            + "where u.mycoreID = :mcrId "
+            + "and u.type = :type "
+            + "and u.additional != '' "
+            + "and u.service = :service";
+
+    public List<MCRPIRegistrationInfo> getCreatedIdentifiers(MCRObjectID id, String type, String registrationServiceID) {
+        return MCREntityManagerProvider
+                .getCurrentEntityManager()
+                .createQuery(createdIdentifiers, MCRPIRegistrationInfo.class)
+                .setParameter("mcrId", id.toString())
+                .setParameter("type", type)
+                .setParameter("service", registrationServiceID)
+                .getResultList();
+    }
+
     public boolean isCreated(MCRObjectID id, String additional, String type, String registrationServiceID) {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
@@ -231,7 +246,7 @@ public class MCRPersistentIdentifierManager {
     public void setRegisteredDateForUnregisteredIdenifiers(String type,
                                                            Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider) {
         getUnregisteredIdenifiers(type)
-                .parallelStream()
+                .stream()
                 .forEach(mcrPi -> dateProvider.apply(mcrPi)
                                               .ifPresent(mcrPi::setRegistered));
 

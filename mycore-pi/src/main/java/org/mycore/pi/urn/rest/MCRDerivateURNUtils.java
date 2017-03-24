@@ -4,21 +4,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFileNodeServlet;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.*;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.pi.MCRPIRegistrationInfo;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.Optional;
 
 /**
  * Created by chi on 07.02.17.
@@ -32,11 +33,15 @@ public class MCRDerivateURNUtils {
 
     public static URL getURL(MCRPIRegistrationInfo piInfo) {
         String derivateID = piInfo.getMycoreID();
+
+        if (piInfo.getService().endsWith("-dfg")) {
+            return getDFGViewerURL(piInfo);
+        }
+
         try {
             // the base urn, links to frontpage (metadata + viewer)
             if (piInfo.getAdditional() == null || piInfo.getAdditional().trim().length() == 0) {
-                MCRDerivate derivate = (MCRDerivate) MCRMetadataManager.retrieve(MCRObjectID.getInstance(
-                        derivateID));
+                MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
                 return new URL(
                         MCRFrontendUtil.getBaseURL() + "receive/" + derivate.getOwnerID() + "?derivate=" + derivateID);
             }
@@ -54,7 +59,8 @@ public class MCRDerivateURNUtils {
                                         + " as url");
                     String filePath = "/" + file.getOwner() + file.toString();
                     return new URL(
-                            MCRFrontendUtil.getBaseURL()+ "servlets/" + MCRFileNodeServlet.class.getSimpleName() + filePath);
+                            MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
+                                    + filePath);
                 }
 
                 return new URL(getViewerURL(file));
@@ -77,6 +83,38 @@ public class MCRDerivateURNUtils {
                                     file.getFileName().toString());
     }
 
+    public static URL getDFGViewerURL(MCRPIRegistrationInfo urn) {
+        URL url = null;
+        try {
+            MCRObjectID derivateId = MCRObjectID.getInstance(urn.getMycoreID());
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
+            String mainDoc = Optional.ofNullable(derivate.getDerivate())
+                                     .map(MCRObjectDerivate::getInternals)
+                                     .map(MCRMetaIFS::getMainDoc)
+                                     .orElseThrow(() -> new RuntimeException(
+                                             "Could not get main doc for " + derivateId.toString()));
+
+            String spec = null;
+            String baseURL = MCRFrontendUtil.getBaseURL();
+            String id = URLEncoder.encode(derivateId.toString(), "UTF-8");
+            if (mainDoc != null && mainDoc.length() > 0) {
+                String mainDocEnc = URLEncoder.encode(mainDoc, "UTF-8");
+                spec = MessageFormat
+                        .format(baseURL + "servlets/MCRDFGLinkServlet?deriv={0}&file={1}",
+                                id, mainDocEnc);
+            } else {
+                spec = baseURL + "servlets/MCRDFGLinkServlet?deriv="
+                        + id;
+            }
+
+            LOGGER.debug("Generated URL for urn " + urn.getIdentifier() + " is " + spec);
+            url = new URL(spec);
+        } catch (UnsupportedEncodingException | MalformedURLException e) {
+            LOGGER.error("Could not create dfg viewer url", e);
+        }
+        return url;
+    }
+
     /**
      * @param file
      *            image file
@@ -91,5 +129,6 @@ public class MCRDerivateURNUtils {
         }
 
         return false;
+//        return true;
     }
 }

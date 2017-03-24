@@ -5,14 +5,17 @@ import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.servlet.ServletContext;
 
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.BiConsumer;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRStartupHandler;
@@ -22,12 +25,25 @@ import org.mycore.pi.MCRPIRegistrationInfo;
  * @author shermann
  *
  */
-public class MCRURNGranularRestRegistrationStarter
+public class MCRURNGranularRESTRegistrationStarter
         implements MCRStartupHandler.AutoExecutable, MCRShutdownHandler.Closeable {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final long period;
+
+    private final TimeUnit timeUnit;
+
     private ScheduledExecutorService scheduler;
+
+    public MCRURNGranularRESTRegistrationStarter() {
+        this(1, TimeUnit.MINUTES);
+    }
+
+    public MCRURNGranularRESTRegistrationStarter(long period, TimeUnit timeUnit) {
+        this.period = period;
+        this.timeUnit = timeUnit;
+    }
 
     @Override
     public String getName() {
@@ -43,13 +59,23 @@ public class MCRURNGranularRestRegistrationStarter
     public void startUp(ServletContext servletContext) {
         MCRShutdownHandler.getInstance().addCloseable(this);
 
-        getUsernamePassword()
-                .map(this::getEpicureProvider)
-                .map(MCRDNBURNClient::new)
-                .map(MCRURNGranularRESTRegistrationTask::new)
-                .map(this::startTimerTask)
-                .orElseGet(this::couldNotStartTask)
-                .accept(LOGGER);
+        UsernamePasswordCredentials usernamePassword = getUsernamePassword()
+                .orElseThrow(() -> new RuntimeException("could not get credentials"));
+        Function<MCRPIRegistrationInfo, MCREpicurLite> epicureProvider = getEpicureProvider(usernamePassword);
+
+        MCRDNBURNClient mcrdnburnClient = new MCRDNBURNClient(epicureProvider);
+        MCRURNGranularRESTRegistrationTask registrationTask = new MCRURNGranularRESTRegistrationTask(mcrdnburnClient);
+
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(registrationTask, 0, 2, TimeUnit.SECONDS);
+
+        //        getUsernamePassword()
+        //                .map(this::getEpicureProvider)
+        //                .map(MCRDNBURNClient::new)
+        //                .map(MCRURNGranularRESTRegistrationTask::new)
+        //                .map(this::startTimerTask)
+        //                .orElseGet(this::couldNotStartTask)
+        //                .accept(LOGGER);
 
         //        URNRegistrationService urnRegistrationService = null;
         //        DFGURNRegistrationService dfgURNRegistrationService = null;
@@ -85,20 +111,28 @@ public class MCRURNGranularRestRegistrationStarter
                 .warn("Could not start Task " + MCRURNGranularRESTRegistrationTask.class.getSimpleName());
     }
 
-    private Consumer<Logger> startTimerTask(TimerTask task) {
-        LOGGER.info("Starting executor service...");
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.MINUTES);
+    private ScheduledExecutorService getScheduler() {
+        if (scheduler == null) {
+            LOGGER.info("Starting executor service...");
+            scheduler = Executors.newSingleThreadScheduledExecutor();
+        }
 
-        return logger -> logger.info("Started task " + task.getClass().getSimpleName() + ", refresh every 60 seconds");
+        return scheduler;
     }
 
-    private Function<MCRPIRegistrationInfo, MCREpicurLite> getEpicureProvider(UsernamePasswordCredentials credentials) {
+    private Consumer<Logger> startTimerTask(TimerTask task) {
+        getScheduler().scheduleAtFixedRate(task, 0, period, timeUnit);
+        return logger -> logger
+                .info("Started task " + task.getClass().getSimpleName() + ", refresh every " + period + timeUnit
+                        .toString());
+    }
+
+    public Function<MCRPIRegistrationInfo, MCREpicurLite> getEpicureProvider(UsernamePasswordCredentials credentials) {
         return urn -> MCREpicurLite.instance(urn, MCRDerivateURNUtils.getURL(urn))
                                    .setCredentials(credentials);
     }
 
-    private Optional<UsernamePasswordCredentials> getUsernamePassword() {
+    public Optional<UsernamePasswordCredentials> getUsernamePassword() {
         String username = MCRConfiguration.instance().getString("MCR.URN.DNB.Credentials.Login", null);
         String password = MCRConfiguration.instance().getString("MCR.URN.DNB.Credentials.Password", null);
 

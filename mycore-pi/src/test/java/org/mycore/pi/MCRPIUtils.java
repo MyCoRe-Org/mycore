@@ -18,17 +18,19 @@ import java.util.UUID;
  * @author Huu Chi Vu
  */
 public class MCRPIUtils {
-    public static MCRPI generateMCRPI(String fileName) throws MCRPersistentIdentifierException {
+    public static MCRPI generateMCRPI(String fileName, String serviceID) throws MCRPersistentIdentifierException {
         MCRObjectID mycoreID = getNextFreeID();
+//        String serviceID = "TestService";
         return new MCRPI(generateURNFor(mycoreID).asString(), MCRDNBURN.TYPE,
-                         mycoreID.toString(), fileName, "TestService", null);
+                         mycoreID.toString(), fileName, serviceID, null);
     }
 
     public static MCRObjectID getNextFreeID() {return MCRObjectID.getNextFreeId("MyCoRe_test");}
 
     private static MCRDNBURN generateURNFor(MCRObjectID mycoreID) throws
             MCRPersistentIdentifierException {
-        MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator("testGenerator");
+        String testGenerator = "testGenerator";
+        MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator(testGenerator);
         return mcruuidurnGenerator.generate(mycoreID, "");
     }
 

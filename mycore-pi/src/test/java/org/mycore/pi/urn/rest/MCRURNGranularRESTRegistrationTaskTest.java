@@ -12,7 +12,6 @@ import org.mycore.pi.MCRPIUtils;
 import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.pi.urn.MCRURNUtils;
 import org.mycore.pi.urn.MCRUUIDURNGenerator;
 
 import javax.persistence.EntityManager;
@@ -34,7 +33,7 @@ import static org.mycore.pi.MCRPIUtils.randomFilename;
 public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
     @Test
     public void run() throws Exception {
-        MCRPI urn1 = generateMCRPI(randomFilename());
+        MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered);
         MCREntityManagerProvider.getCurrentEntityManager()
                                 .persist(urn1);
 
@@ -83,8 +82,8 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
     public void timerTask() throws Exception {
         System.out.println("Start: " + new Date());
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRPI urn1 = generateMCRPI(randomFilename());
-        MCRPI urn2 = generateMCRPI(randomFilename());
+        MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered);
+        MCRPI urn2 = generateMCRPI(randomFilename(), countRegistered);
         em.persist(urn1);
         em.persist(urn2);
         em.getTransaction().commit();

@@ -75,10 +75,21 @@
       <artifactId>mycore-ifs</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- don't change order of jmockit and junit prior junit 5+ -->
+    <!-- jmockit have to be load before junit to run properly -->
+    <dependency>
+      <groupId>org.jmockit</groupId>
+      <artifactId>jmockit</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-urn</artifactId>
     </dependency>
   </dependencies>
 
