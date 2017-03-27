@@ -95,7 +95,7 @@ module mycore.viewer.widgets.pdf {
         }
 
 
-        private getChapterFromOutline(parent:model.StructureChapter, nodes:Array<PDFTreeNode>):Array<model.StructureChapter> {
+        private getChapterFromOutline(parent:model.StructureChapter, nodes:Array<PDFTreeNode>, currentCount:number):Array<model.StructureChapter> {
             let chapterArr = new Array<model.StructureChapter>();
             for (let nodeIndex in nodes) {
                 let currentNode = nodes[nodeIndex];
@@ -125,8 +125,8 @@ module mycore.viewer.widgets.pdf {
                         }
                     });
                 })(currentNode);
-                let chapter = new model.StructureChapter(parent, "pdfChapter", Utils.hash(currentNode.title).toString(), currentNode.title, null, null,destResolver);
-                let children = this.getChapterFromOutline(chapter, currentNode.items);
+                let chapter = new model.StructureChapter(parent, "pdfChapter", Utils.hash(currentNode.title+currentCount++).toString(), currentNode.title, null, null,destResolver);
+                let children = this.getChapterFromOutline(chapter, currentNode.items, currentCount++);
                 chapter.chapter = children;
                 chapterArr.push(chapter);
             }
@@ -147,7 +147,7 @@ module mycore.viewer.widgets.pdf {
             if (typeof this._outline != "undefined") {
                 var that = this;
                 this._rootChapter = new model.StructureChapter(null, "pdf", "0", this._name, null, null, () => 1);
-                this._rootChapter.chapter = this.getChapterFromOutline(this._rootChapter, this._outline);
+                this._rootChapter.chapter = this.getChapterFromOutline(this._rootChapter, this._outline,1);
                 this._structureModel = new PDFStructureModel(this._rootChapter, this._pages, this._chapterPageMap, new MyCoReMap<string, mycore.viewer.model.StructureChapter>(), this._refPageMap);
                 this.checkResolvable();
             }
