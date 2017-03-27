@@ -57,53 +57,13 @@ public class MCRURNGranularRESTRegistrationStarter
 
     @Override
     public void startUp(ServletContext servletContext) {
-        MCRShutdownHandler.getInstance().addCloseable(this);
-
-        UsernamePasswordCredentials usernamePassword = getUsernamePassword()
-                .orElseThrow(() -> new RuntimeException("could not get credentials"));
-        Function<MCRPIRegistrationInfo, MCREpicurLite> epicureProvider = getEpicureProvider(usernamePassword);
-
-        MCRDNBURNClient mcrdnburnClient = new MCRDNBURNClient(epicureProvider);
-        MCRURNGranularRESTRegistrationTask registrationTask = new MCRURNGranularRESTRegistrationTask(mcrdnburnClient);
-
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(registrationTask, 0, 2, TimeUnit.SECONDS);
-
-        //        getUsernamePassword()
-        //                .map(this::getEpicureProvider)
-        //                .map(MCRDNBURNClient::new)
-        //                .map(MCRURNGranularRESTRegistrationTask::new)
-        //                .map(this::startTimerTask)
-        //                .orElseGet(this::couldNotStartTask)
-        //                .accept(LOGGER);
-
-        //        URNRegistrationService urnRegistrationService = null;
-        //        DFGURNRegistrationService dfgURNRegistrationService = null;
-        //        boolean supportDfgViewerURN = MCRConfiguration.instance().getBoolean("MCR.URN.Display.DFG.Viewer.URN",
-        //                                                                             false);
-        //        try {
-        //            urnRegistrationService = new URNRegistrationService();
-        //            if (supportDfgViewerURN) {
-        //                dfgURNRegistrationService = new DFGURNRegistrationService();
-        //            }
-        //
-        //        } catch (Exception e) {
-        //            LOGGER.error("Could not instantiate " + URNRegistrationService.class.getName(), e);
-        //            return;
-        //
-        //        }
-        //        LOGGER.info("Starting executor service...");
-        //        scheduler = Executors.newSingleThreadScheduledExecutor();
-        //
-        //        LOGGER.info("Starting " + URNRegistrationService.class.getSimpleName());
-        //        // refresh every 60 seconds
-        //        scheduler.scheduleAtFixedRate(urnRegistrationService, 0, 1, TimeUnit.MINUTES);
-        //
-        //        if (dfgURNRegistrationService != null) {
-        //            LOGGER.info("Starting " + DFGURNRegistrationService.class.getSimpleName());
-        //            // refresh every 60 seconds
-        //            scheduler.scheduleAtFixedRate(dfgURNRegistrationService, 0, 1, TimeUnit.MINUTES);
-        //        }
+        getUsernamePassword()
+                .map(this::getEpicureProvider)
+                .map(MCRDNBURNClient::new)
+                .map(MCRURNGranularRESTRegistrationTask::new)
+                .map(this::startTimerTask)
+                .orElseGet(this::couldNotStartTask)
+                .accept(LOGGER);
     }
 
     private Consumer<Logger> couldNotStartTask() {
