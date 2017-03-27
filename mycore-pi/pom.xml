@@ -87,10 +87,6 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.mycore</groupId>
-      <artifactId>mycore-urn</artifactId>
-    </dependency>
   </dependencies>
 
 </project>
