@@ -2,15 +2,13 @@ package org.mycore.pi;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
@@ -56,11 +54,11 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     @Test
     public void testRegistrationService()
             throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        MockMetadataManager mockMetadataManager = new MockMetadataManager();
+
         MCRPIRegistrationService<MCRMockIdentifier> registrationService = MCRPIRegistrationServiceManager.getInstance()
                                                                                                          .getRegistrationService(
                                                                                                                  MOCK_SERVICE);
-
-        MockMetadataManager mockMetadataManager = new MockMetadataManager();
 
         MCRObject mcrObject = new MCRObject();
         MCRObjectID id = MCRObjectID.getNextFreeId("test", "mock");
@@ -123,12 +121,29 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         return mcruuidurnGenerator.generate(mycoreID, "");
     }
 
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        managerInstance = MCRPersistentIdentifierManager.getInstance();
+//    @Before
+//    @Override
+//    public void setUp() throws Exception {
+//        super.setUp();
+//
+//    }
 
+    @Before
+    public void startUp(){
+        managerInstance = MCRPersistentIdentifierManager.getInstance();
+    }
+
+    @After
+    public void cleanup(){
+        try {
+            Field instance = MCRPersistentIdentifierManager.class.getDeclaredField("instance");
+            instance.setAccessible(true);
+            instance.set(null, null);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
