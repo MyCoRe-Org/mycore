@@ -26,7 +26,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
     private static final String MOCK_SERVICE = "MockService";
 
-    private MCRPersistentIdentifierManager managerInstance;
+    //    private MCRPersistentIdentifierManager managerInstance;
 
     private static final String MOCK_INSCRIBER = "MockInscriber";
 
@@ -38,7 +38,10 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     @Test
     public void testGet() {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
-        Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = managerInstance.get(mockString).findAny();
+        Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = MCRPersistentIdentifierManager
+                .getInstance()
+                .get(mockString)
+                .findAny();
 
         Assert.assertTrue(mockIdentifierOptional.isPresent());
         Assert.assertEquals(mockIdentifierOptional.get().asString(), mockString);
@@ -47,7 +50,10 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     @Test
     public void testParseIdentifier() {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
-        Optional<? extends MCRPersistentIdentifier> mcrMockIdentifier = managerInstance.get(mockString).findFirst();
+        Optional<? extends MCRPersistentIdentifier> mcrMockIdentifier = MCRPersistentIdentifierManager
+                .getInstance()
+                .get(mockString)
+                .findFirst();
         Assert.assertEquals(mcrMockIdentifier.get().asString(), mockString);
     }
 
@@ -101,7 +107,8 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
 
-        long numOfUnregisteredPI = managerInstance
+        long numOfUnregisteredPI = MCRPersistentIdentifierManager
+                .getInstance()
                 .getUnregisteredIdenifiers("Unregistered")
                 .stream()
                 .count();
@@ -121,20 +128,8 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         return mcruuidurnGenerator.generate(mycoreID, "");
     }
 
-//    @Before
-//    @Override
-//    public void setUp() throws Exception {
-//        super.setUp();
-//
-//    }
-
-    @Before
-    public void startUp(){
-        managerInstance = MCRPersistentIdentifierManager.getInstance();
-    }
-
     @After
-    public void cleanup(){
+    public void cleanup() {
         try {
             Field instance = MCRPersistentIdentifierManager.class.getDeclaredField("instance");
             instance.setAccessible(true);
