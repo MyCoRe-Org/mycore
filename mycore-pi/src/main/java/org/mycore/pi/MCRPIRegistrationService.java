@@ -147,7 +147,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
                 String name = fieldAttributes.getName();
 
                 return Stream.of("mcrRevision", "mycoreID", "id", "mcrVersion")
-                             .filter(name::equals)
+                             .filter(field -> field.equals(name))
                              .findFirst()
                              .isPresent();
             }
