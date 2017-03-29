@@ -41,6 +41,7 @@ public class MCRPersistentIdentifierManager {
                 @SuppressWarnings("unchecked")
                 Class<? extends MCRPersistentIdentifierParser<?>> parserClass = (Class<? extends MCRPersistentIdentifierParser<?>>) Class
                         .forName(v);
+                System.out.println("Parser: " + k + " - " + v);
                 registerParser(type, parserClass);
             } catch (ClassNotFoundException e) {
                 throw new MCRConfigurationException("Could not load class " + v + " defined in " + k);
@@ -129,25 +130,11 @@ public class MCRPersistentIdentifierManager {
 
     }
 
-    private static final String countCreated = "select count(u) from MCRPI u "
-            + "where u.mycoreID = :mcrId "
-            + "and u.type = :type "
-            + "and u.additional = :additional "
-            + "and u.service = :service";
-
-    private static final String countRegistered = countCreated + " and u.registered is not null";
-
-    private static final String createdIdentifiers = "select u from MCRPI u "
-            + "where u.mycoreID = :mcrId "
-            + "and u.type = :type "
-            + "and u.additional != '' "
-            + "and u.service = :service";
-
     public List<MCRPIRegistrationInfo> getCreatedIdentifiers(MCRObjectID id, String type,
                                                              String registrationServiceID) {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
-                .createQuery(createdIdentifiers, MCRPIRegistrationInfo.class)
+                .createNamedQuery("Get.PI.Created", MCRPIRegistrationInfo.class)
                 .setParameter("mcrId", id.toString())
                 .setParameter("type", type)
                 .setParameter("service", registrationServiceID)
@@ -157,7 +144,7 @@ public class MCRPersistentIdentifierManager {
     public boolean isCreated(MCRObjectID id, String additional, String type, String registrationServiceID) {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
-                .createQuery(countCreated, Number.class)
+                .createNamedQuery("Count.PI.Created", Number.class)
                 .setParameter("mcrId", id.toString())
                 .setParameter("type", type)
                 .setParameter("additional", additional)
@@ -177,7 +164,7 @@ public class MCRPersistentIdentifierManager {
     public boolean isRegistered(String mcrId, String additional, String type, String registrationServiceID) {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
-                .createQuery(countRegistered, Number.class)
+                .createNamedQuery("Count.PI.Registered", Number.class)
                 .setParameter("mcrId", mcrId)
                 .setParameter("type", type)
                 .setParameter("additional", additional)
@@ -320,6 +307,7 @@ public class MCRPersistentIdentifierManager {
 
     public Stream<? extends MCRPersistentIdentifier> get(String pi) {
         return parserList.stream()
+                         .peek(p -> System.out.println("parser Stream: " + p.getName()))
                          .map(MCRPersistentIdentifierManager::getParserInstance)
                          .map(p -> p.parse(pi))
                          .filter(Optional::isPresent)
