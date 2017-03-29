@@ -41,6 +41,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = MCRPersistentIdentifierManager
                 .getInstance()
                 .get(mockString)
+                .peek(p -> System.out.println("testGet: " + p.getClass().getName()))
                 .findFirst();
 
         Assert.assertTrue(mockIdentifierOptional.isPresent());
