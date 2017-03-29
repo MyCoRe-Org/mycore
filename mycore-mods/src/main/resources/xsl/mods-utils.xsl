@@ -332,7 +332,7 @@
       <xsl:choose>
         <xsl:when test="count($nameIdentifier) &gt; 0">
           <xsl:value-of
-            select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=mods.nameIdentifier:', $nameIdentifier/@type, '\:', $nameIdentifier/@id, '&amp;owner=createdby:', $owner)" />
+            select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=mods.nameIdentifier:', $nameIdentifier/@type, '%5C:', $nameIdentifier/@id, '&amp;owner=createdby:', $owner)" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=', '+mods.name:&quot;')" />
