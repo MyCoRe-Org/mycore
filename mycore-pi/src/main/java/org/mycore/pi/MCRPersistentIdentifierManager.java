@@ -35,6 +35,7 @@ public class MCRPersistentIdentifierManager {
 
     private MCRPersistentIdentifierManager() {
         Map<String, String> parserPropertiesMap = MCRConfiguration.instance().getPropertiesMap(PARSER_CONFIGURATION);
+        System.out.println("ParserMap: " + parserPropertiesMap.size());
         parserPropertiesMap.forEach((k, v) -> {
             String type = k.substring(PARSER_CONFIGURATION.length());
             try {
