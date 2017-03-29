@@ -311,6 +311,7 @@ public class MCRPersistentIdentifierManager {
                          .peek(p -> System.out.println("parser Stream: " + p.getName()))
                          .map(MCRPersistentIdentifierManager::getParserInstance)
                          .map(p -> p.parse(pi))
+                         .peek(p -> System.out.println("parser pi: " + p.isPresent() + " for " + pi))
                          .filter(Optional::isPresent)
                          .map(Optional::get);
     }
