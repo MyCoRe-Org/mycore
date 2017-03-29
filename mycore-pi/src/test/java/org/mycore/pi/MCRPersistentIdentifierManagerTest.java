@@ -60,11 +60,13 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
                                                                                                          .getRegistrationService(
                                                                                                                  MOCK_SERVICE);
 
+        MockMetadataManager mockMetadataManager = new MockMetadataManager();
+
         MCRObject mcrObject = new MCRObject();
         MCRObjectID id = MCRObjectID.getNextFreeId("test", "mock");
         mcrObject.setId(id);
         mcrObject.setSchema("http://www.w3.org/2001/XMLSchema");
-        MCRMetadataManager.create(mcrObject);
+        mockMetadataManager.put(id, mcrObject);
 
         MCRMockIdentifierRegistrationService casted = (MCRMockIdentifierRegistrationService) registrationService;
 
@@ -72,7 +74,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         Assert.assertFalse("Register should not have been called!", casted.isRegisterCalled());
         Assert.assertFalse("Update should not have been called!", casted.isUpdatedCalled());
 
-        MCRMockIdentifier identifier = (MCRMockIdentifier) registrationService.fullRegister(mcrObject, "");
+        MCRMockIdentifier identifier = registrationService.fullRegister(mcrObject, "");
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertTrue("The identifier " + identifier.asString() + " should be registered now!",

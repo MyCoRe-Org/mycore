@@ -3,16 +3,15 @@ package org.mycore.pi.urn.rest;
 import mockit.Mock;
 import mockit.MockUp;
 import org.junit.Test;
-import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.pi.MCRPIUtils;
+import org.mycore.pi.MockMetadataManager;
 import org.mycore.pi.urn.MCRUUIDURNGenerator;
 
 import java.io.IOException;
@@ -93,34 +92,6 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
         @Mock
         public void validate() throws MCRException {
             // allways valid
-        }
-    }
-
-    public class MockMetadataManager extends MockUp<MCRMetadataManager> {
-        HashMap<MCRObjectID, MCRBase> objMap;
-
-        public MockMetadataManager() {
-            objMap = new HashMap<>();
-        }
-
-        @Mock
-        public void update(final MCRDerivate mcrDerivate) throws MCRPersistenceException, IOException,
-                MCRAccessException {
-            System.out.println("Update: " + mcrDerivate.getId().toString());
-        }
-
-        @Mock
-        public MCRBase retrieve(final MCRObjectID id) throws MCRPersistenceException {
-            return objMap.get(id);
-        }
-
-        @Mock
-        public MCRDerivate retrieveMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
-            return (MCRDerivate) objMap.get(id);
-        }
-
-        public void put(MCRObjectID id, MCRBase obj) {
-            objMap.put(id, obj);
         }
     }
 
