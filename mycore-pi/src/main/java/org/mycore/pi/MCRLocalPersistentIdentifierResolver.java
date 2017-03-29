@@ -8,10 +8,11 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 
 public class MCRLocalPersistentIdentifierResolver extends MCRPersistentIdentifierResolver<MCRPersistentIdentifier> {
+    private final Function<String, String> toReceiveObjectURL = mcrID -> MCRFrontendUtil.getBaseURL() + "receive/" + mcrID;
+
     public MCRLocalPersistentIdentifierResolver() {
         super("Local-Resolver");
     }
-    private final Function<String, String> toReceiveObjectURL = mcrID -> MCRFrontendUtil.getBaseURL() + "receive/" + mcrID;
 
     @Override
     public Stream<String> resolve(MCRPersistentIdentifier identifier) throws MCRIdentifierUnresolvableException {
