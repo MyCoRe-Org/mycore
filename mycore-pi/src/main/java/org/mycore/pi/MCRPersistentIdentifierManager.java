@@ -1,17 +1,5 @@
 package org.mycore.pi;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -20,11 +8,26 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
 public class MCRPersistentIdentifierManager {
 
-    public static final String PARSER_CONFIGURATION = "MCR.PI.Parsers.";
+    private static MCRPersistentIdentifierManager instance;
 
-    public static final String RESOLVER_CONFIGURATION = "MCR.PI.Resolvers";
+    private static final String PARSER_CONFIGURATION = "MCR.PI.Parsers.";
+
+    private static final String RESOLVER_CONFIGURATION = "MCR.PI.Resolvers";
+
 
     private List<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverList = new ArrayList<>();
 
@@ -75,7 +78,12 @@ public class MCRPersistentIdentifierManager {
     private Map<String, Class<? extends MCRPersistentIdentifierParser>> typeParserMap = new ConcurrentHashMap<>();
 
     public static MCRPersistentIdentifierManager getInstance() {
-        return ManagerInstanceHolder.instance;
+        if(instance == null){
+            System.out.println("instance is null");
+            instance = new MCRPersistentIdentifierManager();
+        }
+
+        return instance;
     }
 
     private static MCRPersistentIdentifierParser<?> getParserInstance(
@@ -135,7 +143,8 @@ public class MCRPersistentIdentifierManager {
             + "and u.additional != '' "
             + "and u.service = :service";
 
-    public List<MCRPIRegistrationInfo> getCreatedIdentifiers(MCRObjectID id, String type, String registrationServiceID) {
+    public List<MCRPIRegistrationInfo> getCreatedIdentifiers(MCRObjectID id, String type,
+                                                             String registrationServiceID) {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
                 .createQuery(createdIdentifiers, MCRPIRegistrationInfo.class)
@@ -246,7 +255,6 @@ public class MCRPersistentIdentifierManager {
     public void setRegisteredDateForUnregisteredIdenifiers(String type,
                                                            Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider) {
         getUnregisteredIdenifiers(type)
-                .stream()
                 .forEach(mcrPi -> dateProvider.apply(mcrPi)
                                               .ifPresent(mcrPi::setRegistered));
 
@@ -317,9 +325,4 @@ public class MCRPersistentIdentifierManager {
                          .filter(Optional::isPresent)
                          .map(Optional::get);
     }
-
-    private static final class ManagerInstanceHolder {
-        public static final MCRPersistentIdentifierManager instance = new MCRPersistentIdentifierManager();
-    }
-
 }

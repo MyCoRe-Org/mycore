@@ -1,40 +1,28 @@
 package org.mycore.pi;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.mycore.access.MCRAccessException;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.metadata.*;
+import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.pi.backend.MCRPI;
-import org.mycore.pi.backend.MCRPI_;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier> {
 
@@ -157,8 +145,11 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes) {
                 String name = fieldAttributes.getName();
-                return name.equals("mcrRevision") || name.equals("mycoreID") || name.equals("id") || name
-                        .equals("mcrVersion");
+
+                return Stream.of("mcrRevision", "mycoreID", "id", "mcrVersion")
+                             .filter(name::equals)
+                             .findFirst()
+                             .isPresent();
             }
 
             @Override
