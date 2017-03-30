@@ -221,18 +221,11 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     @Override
     public void debug() {
         if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Start Class : MCRMetaISO8601Date");
             super.debugDefault();
-            LOGGER.debug("Date=" + isoDate.getISOString());
-            MCRISO8601Format isoFormat = isoDate.getIsoFormat();
-            LOGGER.debug("Format=" + (isoFormat != null ? isoFormat.toString() : "null"));
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            StringWriter sw = new StringWriter();
-            try {
-                xout.output(export, sw);
-                LOGGER.debug("JDOM=" + sw.toString());
-            } catch (IOException e) {
-                //ignore
+            LOGGER.debug("Date=" + (isoDate != null ? isoDate.getISOString() : "null"));
+            if (isoDate != null) {
+                MCRISO8601Format isoFormat = isoDate.getIsoFormat();
+                LOGGER.debug("Format=" + isoFormat.toString());
             }
         }
     }

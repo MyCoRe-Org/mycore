@@ -508,8 +508,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        super.debugDefault();
         if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
             for (MCRMetaHistoryDateText text : texts) {
                 LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());
             }

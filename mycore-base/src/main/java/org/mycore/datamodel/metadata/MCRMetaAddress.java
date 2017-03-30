@@ -184,8 +184,8 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        super.debugDefault();
         if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
             LOGGER.debug("Country            = " + country);
             LOGGER.debug("State              = " + state);
             LOGGER.debug("Zipcode            = " + zipCode);

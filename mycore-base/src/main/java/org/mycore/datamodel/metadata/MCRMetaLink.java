@@ -466,15 +466,15 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        super.debugDefault();
         if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
             LOGGER.debug("Link Type          = " + linktype);
             LOGGER.debug("Label              = " + label);
             LOGGER.debug("Title              = " + title);
             LOGGER.debug("HREF               = " + href);
-            LOGGER.debug("ROLE               = " + role);
-            LOGGER.debug("FROM               = " + from);
-            LOGGER.debug("TO                 = " + to);
+            LOGGER.debug("Role               = " + role);
+            LOGGER.debug("From               = " + from);
+            LOGGER.debug("To                 = " + to);
             LOGGER.debug("");
         }
     }

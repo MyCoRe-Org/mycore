@@ -426,14 +426,16 @@ public class MCRObjectStructure {
      * The method print all informations about this MCRObjectStructure.
      */
     public final void debug() {
-        for (MCRMetaLinkID linkID : derivates) {
-            linkID.debug();
-        }
-        if (parent != null) {
-            parent.debug();
-        }
-        for (MCRMetaLinkID linkID : children) {
-            linkID.debug();
+        if(LOGGER.isDebugEnabled()) {
+            for (MCRMetaLinkID linkID : derivates) {
+                linkID.debug();
+            }
+            if (parent != null) {
+                parent.debug();
+            }
+            for (MCRMetaLinkID linkID : children) {
+                linkID.debug();
+            }
         }
     }
 

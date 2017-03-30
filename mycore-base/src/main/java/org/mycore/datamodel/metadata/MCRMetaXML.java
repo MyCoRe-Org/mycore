@@ -177,8 +177,8 @@ public class MCRMetaXML extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        super.debugDefault();
         if(LOGGER.isDebugEnabled()) {
+            super.debugDefault();
             LOGGER.debug("Number of contents  = \n" + content.size());
         }
     }
