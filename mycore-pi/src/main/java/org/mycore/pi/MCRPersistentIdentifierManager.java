@@ -307,32 +307,11 @@ public class MCRPersistentIdentifierManager {
     }
 
     public Stream<MCRPersistentIdentifier> get(String pi) {
-        List<Optional> list = parserList
+        return parserList
                 .stream()
-                .peek(p -> System.out.println("parser Stream: " + p.getName()))
                 .map(MCRPersistentIdentifierManager::getParserInstance)
                 .map(p -> p.parse(pi))
-                .peek(p -> System.out.println("parser pi: " + p.isPresent() + " for " + pi))
-                .filter(Optional::isPresent).collect(Collectors.toList());
-
-        System.out.println("get Parser list: " + list.size());
-        list.stream()
-            .map(Optional::get)
-            .map(MCRPersistentIdentifier.class::cast)
-            .map(p -> p.getClass().getName())
-            .map("Parser list: "::concat)
-            .forEach(System.out::println);
-
-        Stream<MCRPersistentIdentifier> mcrPersistentIdentifierStream = list
-                .stream()
-                .map(Optional::get)
-                .map(MCRPersistentIdentifier.class::cast);
-
-        Optional<MCRPersistentIdentifier> first = mcrPersistentIdentifierStream.findFirst();
-        System.out.println("find first: " + first.isPresent());
-
-
-        return list.stream()
+                .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(MCRPersistentIdentifier.class::cast);
     }

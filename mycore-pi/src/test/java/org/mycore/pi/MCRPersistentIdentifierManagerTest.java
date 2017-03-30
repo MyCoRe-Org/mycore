@@ -26,8 +26,6 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
     private static final String MOCK_SERVICE = "MockService";
 
-    //    private MCRPersistentIdentifierManager managerInstance;
-
     private static final String MOCK_INSCRIBER = "MockInscriber";
 
     private static final String MOCK_PID_GENERATOR = "MockIDGenerator";
@@ -37,23 +35,11 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
     @Test
     public void testGet() {
-        MCRConfiguration.instance().getPropertiesMap()
-                        .forEach((k,v) -> System.out.println("Props: " + k + " - " + v));
-
-        MCRConfiguration.instance().getPropertiesMap("MCR.PI.")
-                        .forEach((k,v) -> System.out.println("PI Props: " + k + " - " + v));
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
-        Stream<MCRPersistentIdentifier> mcrPersistentIdentifierStream = MCRPersistentIdentifierManager
+
+        Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = MCRPersistentIdentifierManager
                 .getInstance()
-                .get(mockString);
-
-        List<MCRPersistentIdentifier> collect = mcrPersistentIdentifierStream.collect(Collectors.toList());
-        System.out.println("test Parser List: " + collect.size());
-
-        collect.forEach(p -> System.out.println("test Parser List: " + p.getClass().getName()));
-
-        Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = collect.stream()
-                .peek(p -> System.out.println("testGet: " + p.getClass().getName()))
+                .get(mockString)
                 .findFirst();
 
         Assert.assertTrue(mockIdentifierOptional.isPresent());
