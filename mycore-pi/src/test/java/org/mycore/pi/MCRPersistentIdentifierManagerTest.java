@@ -37,9 +37,16 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     @Test
     public void testGet() {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
-        Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = MCRPersistentIdentifierManager
+        Stream<MCRPersistentIdentifier> mcrPersistentIdentifierStream = MCRPersistentIdentifierManager
                 .getInstance()
-                .get(mockString)
+                .get(mockString);
+
+        List<MCRPersistentIdentifier> collect = mcrPersistentIdentifierStream.collect(Collectors.toList());
+        System.out.println("test Parser List: " + collect.size());
+
+        collect.forEach(p -> System.out.println("test Parser List: " + p.getClass().getName()));
+
+        Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = mcrPersistentIdentifierStream
                 .peek(p -> System.out.println("testGet: " + p.getClass().getName()))
                 .findFirst();
 
@@ -54,10 +61,6 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
                 .getInstance()
                 .get(mockString);
 
-        List<MCRPersistentIdentifier> collect = mcrPersistentIdentifierStream.collect(Collectors.toList());
-        System.out.println("test Parser List: " + collect.size());
-
-        collect.forEach(p -> System.out.println("test Parser List: " + p.getClass().getName()));
 
         Optional<? extends MCRPersistentIdentifier> mcrMockIdentifier = mcrPersistentIdentifierStream
                 .findFirst();
