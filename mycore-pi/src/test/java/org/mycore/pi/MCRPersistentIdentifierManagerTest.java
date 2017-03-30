@@ -13,6 +13,7 @@ import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRJPATestCase;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -36,6 +37,11 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
     @Test
     public void testGet() {
+        MCRConfiguration.instance().getPropertiesMap()
+                        .forEach((k,v) -> System.out.println("Props: " + k + " - " + v));
+
+        MCRConfiguration.instance().getPropertiesMap("MCR.PI.")
+                        .forEach((k,v) -> System.out.println("PI Props: " + k + " - " + v));
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
         Stream<MCRPersistentIdentifier> mcrPersistentIdentifierStream = MCRPersistentIdentifierManager
                 .getInstance()
