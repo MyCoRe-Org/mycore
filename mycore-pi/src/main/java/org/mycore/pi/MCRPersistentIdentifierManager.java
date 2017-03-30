@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MCRPersistentIdentifierManager {
@@ -27,7 +28,6 @@ public class MCRPersistentIdentifierManager {
     private static final String PARSER_CONFIGURATION = "MCR.PI.Parsers.";
 
     private static final String RESOLVER_CONFIGURATION = "MCR.PI.Resolvers";
-
 
     private List<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverList = new ArrayList<>();
 
@@ -80,7 +80,7 @@ public class MCRPersistentIdentifierManager {
     private Map<String, Class<? extends MCRPersistentIdentifierParser>> typeParserMap = new ConcurrentHashMap<>();
 
     public static MCRPersistentIdentifierManager getInstance() {
-        if(instance == null){
+        if (instance == null) {
             System.out.println("instance is null");
             instance = new MCRPersistentIdentifierManager();
         }
@@ -88,7 +88,7 @@ public class MCRPersistentIdentifierManager {
         return instance;
     }
 
-    private static MCRPersistentIdentifierParser<?> getParserInstance(
+    private static MCRPersistentIdentifierParser getParserInstance(
             Class<? extends MCRPersistentIdentifierParser> detectorClass) {
         try {
             return detectorClass.newInstance();
@@ -306,13 +306,18 @@ public class MCRPersistentIdentifierManager {
         return this.resolverList;
     }
 
-    public Stream<? extends MCRPersistentIdentifier> get(String pi) {
-        return parserList.stream()
-                         .peek(p -> System.out.println("parser Stream: " + p.getName()))
-                         .map(MCRPersistentIdentifierManager::getParserInstance)
-                         .map(p -> p.parse(pi))
-                         .peek(p -> System.out.println("parser pi: " + p.isPresent() + " for " + pi))
-                         .filter(Optional::isPresent)
-                         .map(Optional::get);
+    public Stream<MCRPersistentIdentifier> get(String pi) {
+        List<Optional> list = parserList
+                .stream()
+                .peek(p -> System.out.println("parser Stream: " + p.getName()))
+                .map(MCRPersistentIdentifierManager::getParserInstance)
+                .map(p -> p.parse(pi))
+                .peek(p -> System.out.println("parser pi: " + p.isPresent() + " for " + pi))
+                .filter(Optional::isPresent).collect(Collectors.toList());
+
+        System.out.println("get Parser list: " + list.size());
+        return list.stream()
+                .map(Optional::get)
+                .map(MCRPersistentIdentifier.class::cast);
     }
 }
