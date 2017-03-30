@@ -144,8 +144,8 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         return mcruuidurnGenerator.generate(mycoreID, "");
     }
 
-    @After
-    public void cleanup() {
+    @Before
+    public void resetManagerInstance() {
         try {
             Field instance = MCRPersistentIdentifierManager.class.getDeclaredField("instance");
             instance.setAccessible(true);
