@@ -3,10 +3,9 @@ package org.mycore.pi;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -51,9 +50,16 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     @Test
     public void testParseIdentifier() {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
-        Optional<? extends MCRPersistentIdentifier> mcrMockIdentifier = MCRPersistentIdentifierManager
+        Stream<MCRPersistentIdentifier> mcrPersistentIdentifierStream = MCRPersistentIdentifierManager
                 .getInstance()
-                .get(mockString)
+                .get(mockString);
+
+        List<MCRPersistentIdentifier> collect = mcrPersistentIdentifierStream.collect(Collectors.toList());
+        System.out.println("test Parser List: " + collect.size());
+
+        collect.forEach(p -> System.out.println("test Parser List: " + p.getClass().getName()));
+
+        Optional<? extends MCRPersistentIdentifier> mcrMockIdentifier = mcrPersistentIdentifierStream
                 .findFirst();
         Assert.assertEquals(mcrMockIdentifier.get().asString(), mockString);
     }

@@ -323,6 +323,15 @@ public class MCRPersistentIdentifierManager {
             .map("Parser list: "::concat)
             .forEach(System.out::println);
 
+        Stream<MCRPersistentIdentifier> mcrPersistentIdentifierStream = list
+                .stream()
+                .map(Optional::get)
+                .map(MCRPersistentIdentifier.class::cast);
+
+        Optional<MCRPersistentIdentifier> first = mcrPersistentIdentifierStream.findFirst();
+        System.out.println("find first: " + first.isPresent());
+
+
         return list.stream()
                 .map(Optional::get)
                 .map(MCRPersistentIdentifier.class::cast);
