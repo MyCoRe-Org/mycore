@@ -316,6 +316,13 @@ public class MCRPersistentIdentifierManager {
                 .filter(Optional::isPresent).collect(Collectors.toList());
 
         System.out.println("get Parser list: " + list.size());
+        list.stream()
+            .map(Optional::get)
+            .map(MCRPersistentIdentifier.class::cast)
+            .map(p -> p.getClass().getName())
+            .map("Parser list: "::concat)
+            .forEach(System.out::println);
+
         return list.stream()
                 .map(Optional::get)
                 .map(MCRPersistentIdentifier.class::cast);
