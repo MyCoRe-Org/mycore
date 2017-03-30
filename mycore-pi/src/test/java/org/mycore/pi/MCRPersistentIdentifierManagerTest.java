@@ -46,7 +46,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
         collect.forEach(p -> System.out.println("test Parser List: " + p.getClass().getName()));
 
-        Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = mcrPersistentIdentifierStream
+        Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = collect.stream()
                 .peek(p -> System.out.println("testGet: " + p.getClass().getName()))
                 .findFirst();
 
