@@ -3,12 +3,11 @@ package org.mycore.pi.urn;
 import org.mycore.pi.MCRPersistentIdentifier;
 
 public class MCRUniformResourceName implements MCRPersistentIdentifier {
+    public static final String PREFIX = "urn:";
 
     public String getPREFIX() {
         return PREFIX;
     }
-
-    public static final String PREFIX = "urn:";
 
     protected MCRUniformResourceName(){
     };

@@ -1,6 +1,8 @@
 package org.mycore.pi;
 
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -15,12 +17,14 @@ import java.util.UUID;
 
 /**
  * Created by chi on 23.02.17.
+ *
  * @author Huu Chi Vu
  */
 public class MCRPIUtils {
+    private static Logger LOGGER = LogManager.getLogger();
+
     public static MCRPI generateMCRPI(String fileName, String serviceID) throws MCRPersistentIdentifierException {
         MCRObjectID mycoreID = getNextFreeID();
-//        String serviceID = "TestService";
         return new MCRPI(generateURNFor(mycoreID).asString(), MCRDNBURN.TYPE,
                          mycoreID.toString(), fileName, serviceID, null);
     }
@@ -41,10 +45,12 @@ public class MCRPIUtils {
     }
 
     public static URL getUrl(MCRPIRegistrationInfo info) {
+        String url = "http://localhost:8291/deriv_0001/" + info.getAdditional();
         try {
-            return new URL("http://localhost:8291/deriv_0001/" + info.getAdditional());
+            return new URL(url);
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            LOGGER.error("Malformed URL: " + url);
         }
 
         return null;

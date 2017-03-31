@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  * @author Huu Chi Vu
  */
 public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase {
-    int numOfDerivFiles = 15;
+    private int numOfDerivFiles = 15;
 
     @Test
     public void fullRegister() throws Exception {
@@ -127,6 +127,7 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
     public class MockFrontendUtil extends MockUp<MCRFrontendUtil> {
         @Mock
         public void prepareBaseURLs(String baseURL) {
+            System.out.println("prepare nothing");
         }
 
         @Mock

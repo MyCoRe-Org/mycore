@@ -36,8 +36,8 @@ public class MCRURNGranularRESTRegistrationStarter
         this(1, TimeUnit.MINUTES);
     }
 
-    public MCRURNGranularRESTRegistrationStarter(long period, TimeUnit timeUnit) {
-        this.period = period;
+    public MCRURNGranularRESTRegistrationStarter(long taskPeriod, TimeUnit timeUnit) {
+        this.period = taskPeriod;
         this.timeUnit = timeUnit;
     }
 
@@ -115,7 +115,7 @@ public class MCRURNGranularRESTRegistrationStarter
             try {
                 scheduler.awaitTermination(60, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("Interrupted while waiting.", e);
             }
             scheduler.shutdownNow();
         }

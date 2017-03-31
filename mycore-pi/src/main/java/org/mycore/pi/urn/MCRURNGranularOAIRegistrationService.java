@@ -29,7 +29,6 @@ import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-
 /**
  * Service for assigning granular URNs to Derivate.
  * You can call it with a Derivate-ID and it will assign a Base-URN for the Derivate and granular URNs for every file in the Derivate (except IgnoreFileNames).
@@ -52,7 +51,8 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
     }
 
     @Override
-    public MCRDNBURN fullRegister(MCRBase obj, String additional) throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+    public MCRDNBURN fullRegister(MCRBase obj, String additional)
+            throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
 
         MCRObjectDerivate derivate = ((MCRDerivate) obj).getDerivate();
@@ -76,7 +76,8 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
 
     }
 
-    private MCRDNBURN registerSingleURN(MCRBase obj, String additional, MCRObjectDerivate derivate) throws MCRPersistentIdentifierException {
+    private MCRDNBURN registerSingleURN(MCRBase obj, String additional, MCRObjectDerivate derivate)
+            throws MCRPersistentIdentifierException {
         MCRDNBURN newURN;
         LOGGER.info("Add single urn to " + obj.getId().toString() + " / " + additional);
 
@@ -87,18 +88,20 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
         }
 
         int count = Math.toIntExact(derivate.getFileMetadata().stream().filter(file -> file.getUrn() != null).count());
-        MCRDNBURN dnbURN = newURN = (MCRDNBURN) MCRPersistentIdentifierManager.getInstance().get(derivate.getURN()).findFirst().get();
+        MCRDNBURN dnbURN = newURN = (MCRDNBURN) MCRPersistentIdentifierManager.getInstance().get(derivate.getURN())
+                                                                              .findFirst().get();
 
         String setID = obj.getId().getNumberAsString();
         MCRDNBURN urntoAssign = dnbURN.toGranular(setID, count + 1, count + 1);
         derivate.getOrCreateFileMetadata(filePath, urntoAssign.asString()).setUrn(urntoAssign.asString());
         MCRPI databaseEntry = new MCRPI(urntoAssign.asString(), getType(), obj.getId().toString(), additional,
-                this.getRegistrationServiceID(), new Date());
+                                        this.getRegistrationServiceID(), new Date());
         session.save(databaseEntry);
         return newURN;
     }
 
-    private MCRDNBURN registerURNsDerivate(MCRBase obj, String additional, MCRObjectDerivate derivate) throws MCRPersistentIdentifierException {
+    private MCRDNBURN registerURNsDerivate(MCRBase obj, String additional, MCRObjectDerivate derivate)
+            throws MCRPersistentIdentifierException {
         LOGGER.info("Add URNs to all files of " + obj.getId().toString());
 
         Session session = MCRHIBConnection.instance().getSession();
@@ -121,11 +124,13 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
                 .collect(Collectors.toList());
 
         List<MCRPath> pathList = collectingFileVisitor.getPaths()
-                .stream()
-                .filter(file -> !predicateList.stream().filter(p -> p.test(file.toString().split(":")[1])).findAny().isPresent())
-                .map(p -> (MCRPath) p)
-                .sorted()
-                .collect(Collectors.toList());
+                                                      .stream()
+                                                      .filter(file -> !predicateList.stream().filter(p -> p
+                                                              .test(file.toString().split(":")[1])).findAny()
+                                                                                    .isPresent())
+                                                      .map(p -> (MCRPath) p)
+                                                      .sorted()
+                                                      .collect(Collectors.toList());
 
         MCRDNBURN newURN = getNewIdentifier(obj.getId(), additional);
         String setID = obj.getId().getNumberAsString();
@@ -141,14 +146,14 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
 
         derivate.setURN(newURN.asString());
         MCRPI databaseEntry = new MCRPI(newURN.asString(), getType(), obj.getId().toString(), "",
-                this.getRegistrationServiceID(), new Date());
+                                        this.getRegistrationServiceID(), new Date());
         session.save(databaseEntry);
         return newURN;
     }
 
-
     @Override
-    protected void validateAlreadyInscribed(MCRBase obj, String additional, String type, MCRObjectID id) throws MCRPersistentIdentifierException {
+    protected void validateAlreadyInscribed(MCRBase obj, String additional, String identType, MCRObjectID id)
+            throws MCRPersistentIdentifierException {
     }
 
     private List<String> getIgnoreFileList() {
@@ -168,13 +173,14 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
         return null;
     }
 
-
     @Override
-    protected void delete(MCRDNBURN identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected void delete(MCRDNBURN identifier, MCRBase obj, String additional)
+            throws MCRPersistentIdentifierException {
         throw new MCRPersistentIdentifierException("Delete is not supported for " + getType());
     }
 
     @Override
-    protected void update(MCRDNBURN identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
+            throws MCRPersistentIdentifierException {
     }
 }

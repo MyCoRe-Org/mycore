@@ -54,7 +54,6 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
                 .getInstance()
                 .get(mockString);
 
-
         Optional<? extends MCRPersistentIdentifier> mcrMockIdentifier = mcrPersistentIdentifierStream
                 .findFirst();
         Assert.assertEquals(mcrMockIdentifier.get().asString(), mockString);
@@ -65,9 +64,9 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
             throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         MockMetadataManager mockMetadataManager = new MockMetadataManager();
 
-        MCRPIRegistrationService<MCRMockIdentifier> registrationService = MCRPIRegistrationServiceManager.getInstance()
-                                                                                                         .getRegistrationService(
-                                                                                                                 MOCK_SERVICE);
+        MCRPIRegistrationService<MCRMockIdentifier> registrationService = MCRPIRegistrationServiceManager
+                .getInstance()
+                .getRegistrationService(MOCK_SERVICE);
 
         MCRObject mcrObject = new MCRObject();
         MCRObjectID id = MCRObjectID.getNextFreeId("test", "mock");

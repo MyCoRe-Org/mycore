@@ -11,14 +11,23 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.*;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -40,9 +49,9 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     private final String type;
 
-    public MCRPIRegistrationService(String registrationServiceID, String type) {
+    public MCRPIRegistrationService(String registrationServiceID, String identType) {
         this.registrationServiceID = registrationServiceID;
-        this.type = type;
+        this.type = identType;
     }
 
     public final String getRegistrationServiceID() {
@@ -125,11 +134,12 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         }
     }
 
-    protected void validateAlreadyInscribed(MCRBase obj, String additional, String type, MCRObjectID id)
+    protected void validateAlreadyInscribed(MCRBase obj, String additional, String identType, MCRObjectID id)
             throws MCRPersistentIdentifierException {
+
         if (getInscriber().hasIdentifier(obj, additional)) {
             throw new MCRPersistentIdentifierException(
-                    "There is already a " + type + " in the Object " + id.toString());
+                    "There is already a " + identType + " in the Object " + id.toString());
         }
     }
 
@@ -166,7 +176,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * @param obj the object which has to be identified
      * @return the assigned Identifier
      * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException           the {@link MCRPersistentIdentifierInscriber} lets {@link MCRMetadataManager#update(MCRObject)} throw this
+     * @throws MCRActiveLinkException           the {@link MCRPersistentIdentifierInscriber} lets {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
     public T fullRegister(MCRBase obj, String additional)

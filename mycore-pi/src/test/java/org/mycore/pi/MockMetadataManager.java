@@ -17,7 +17,7 @@ import java.util.HashMap;
  * @author Huu Chi Vu
  */
 public class MockMetadataManager extends MockUp<MCRMetadataManager> {
-    HashMap<MCRObjectID, MCRBase> objMap;
+    private HashMap<MCRObjectID, MCRBase> objMap;
 
     public MockMetadataManager() {
         objMap = new HashMap<>();

@@ -16,12 +16,24 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class MCRPersistentIdentifierManager {
+    private static final String TYPE = "type";
+
+    private static final String MCRID = "mcrId";
+
+    private static final String SERVICE = "service";
+
+    private static final String ADDITIONAL = "additional";
 
     private static MCRPersistentIdentifierManager instance;
 
@@ -29,19 +41,25 @@ public class MCRPersistentIdentifierManager {
 
     private static final String RESOLVER_CONFIGURATION = "MCR.PI.Resolvers";
 
-    private List<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverList = new ArrayList<>();
+    private List<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverList;
 
-    private List<Class<? extends MCRPersistentIdentifierParser<? extends MCRPersistentIdentifier>>> parserList = new ArrayList<>();
+    private List<Class<? extends MCRPersistentIdentifierParser<? extends MCRPersistentIdentifier>>> parserList;
+
+    private Map<String, Class<? extends MCRPersistentIdentifierParser>> typeParserMap;
 
     private MCRPersistentIdentifierManager() {
+        resolverList = new ArrayList<>();
+        parserList = new ArrayList<>();
+        typeParserMap = new ConcurrentHashMap<>();
+
         Map<String, String> parserPropertiesMap = MCRConfiguration.instance().getPropertiesMap(PARSER_CONFIGURATION);
         System.out.println("ParserMap: " + parserPropertiesMap.size());
         parserPropertiesMap.forEach((k, v) -> {
             String type = k.substring(PARSER_CONFIGURATION.length());
             try {
                 @SuppressWarnings("unchecked")
-                Class<? extends MCRPersistentIdentifierParser<?>> parserClass = (Class<? extends MCRPersistentIdentifierParser<?>>) Class
-                        .forName(v);
+                Class<? extends MCRPersistentIdentifierParser<?>> parserClass =
+                        (Class<? extends MCRPersistentIdentifierParser<?>>) Class.forName(v);
                 System.out.println("Parser: " + k + " - " + v);
                 registerParser(type, parserClass);
             } catch (ClassNotFoundException e) {
@@ -52,10 +70,11 @@ public class MCRPersistentIdentifierManager {
         Stream.of(MCRConfiguration.instance().getString(RESOLVER_CONFIGURATION).split(","))
               .forEach(className -> {
                   try {
-                      Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClass = (Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>>) Class
-                              .forName(className);
-                      Constructor<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClassConstructor = resolverClass
-                              .getConstructor();
+                      Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClass =
+                              (Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>>) Class
+                                      .forName(className);
+                      Constructor<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClassConstructor =
+                              resolverClass.getConstructor();
                       MCRPersistentIdentifierResolver<MCRPersistentIdentifier> resolver = resolverClassConstructor
                               .newInstance();
                       resolverList.add(resolver);
@@ -76,8 +95,6 @@ public class MCRPersistentIdentifierManager {
               });
 
     }
-
-    private Map<String, Class<? extends MCRPersistentIdentifierParser>> typeParserMap = new ConcurrentHashMap<>();
 
     public static MCRPersistentIdentifierManager getInstance() {
         if (instance == null) {
@@ -136,9 +153,9 @@ public class MCRPersistentIdentifierManager {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
                 .createNamedQuery("Get.PI.Created", MCRPIRegistrationInfo.class)
-                .setParameter("mcrId", id.toString())
-                .setParameter("type", type)
-                .setParameter("service", registrationServiceID)
+                .setParameter(MCRID, id.toString())
+                .setParameter(TYPE, type)
+                .setParameter(SERVICE, registrationServiceID)
                 .getResultList();
     }
 
@@ -146,10 +163,10 @@ public class MCRPersistentIdentifierManager {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
                 .createNamedQuery("Count.PI.Created", Number.class)
-                .setParameter("mcrId", id.toString())
-                .setParameter("type", type)
-                .setParameter("additional", additional)
-                .setParameter("service", registrationServiceID)
+                .setParameter(MCRID, id.toString())
+                .setParameter(TYPE, type)
+                .setParameter(ADDITIONAL, additional)
+                .setParameter(SERVICE, registrationServiceID)
                 .getSingleResult()
                 .shortValue() > 0;
     }
@@ -166,10 +183,10 @@ public class MCRPersistentIdentifierManager {
         return MCREntityManagerProvider
                 .getCurrentEntityManager()
                 .createNamedQuery("Count.PI.Registered", Number.class)
-                .setParameter("mcrId", mcrId)
-                .setParameter("type", type)
-                .setParameter("additional", additional)
-                .setParameter("service", registrationServiceID)
+                .setParameter(MCRID, mcrId)
+                .setParameter(TYPE, type)
+                .setParameter(ADDITIONAL, additional)
+                .setParameter(SERVICE, registrationServiceID)
                 .getSingleResult()
                 .shortValue() > 0;
     }
@@ -240,8 +257,9 @@ public class MCRPersistentIdentifierManager {
                 .getResultList();
     }
 
-    public void setRegisteredDateForUnregisteredIdenifiers(String type,
-                                                           Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider) {
+    public void setRegisteredDateForUnregisteredIdenifiers(
+            String type,
+            Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider) {
         getUnregisteredIdenifiers(type)
                 .forEach(mcrPi -> dateProvider.apply(mcrPi)
                                               .ifPresent(mcrPi::setRegistered));
@@ -297,8 +315,10 @@ public class MCRPersistentIdentifierManager {
         return getParserInstance(typeParserMap.get(type));
     }
 
-    public void registerParser(String type,
-                               Class<? extends MCRPersistentIdentifierParser<? extends MCRPersistentIdentifier>> parserClass) {
+    public void registerParser(
+            String type,
+            Class<? extends MCRPersistentIdentifierParser<? extends MCRPersistentIdentifier>> parserClass) {
+
         this.parserList.add(parserClass);
         this.typeParserMap.put(type, parserClass);
     }

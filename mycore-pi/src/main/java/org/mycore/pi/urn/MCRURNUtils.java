@@ -15,9 +15,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 
-
 public class MCRURNUtils {
-
 
     public static Optional<Date> getDNBRegisterDate(MCRPIRegistrationInfo dnburn) {
         try {
@@ -36,9 +34,11 @@ public class MCRURNUtils {
     }
 
     public static Date getDNBRegisterDate(String identifier) throws MCRIdentifierUnresolvableException,
-            ParseException {Document document = MCRDNBPIDefProvider.get(identifier);
-        XPathExpression<Element> xp = XPathFactory.instance().compile(".//pidef:created[contains(../pidef:identifier, '" + identifier
-                                                                              + "')]", Filters.element(), null, MCRConstants.PIDEF_NAMESPACE);
+            ParseException {
+        Document document = MCRDNBPIDefProvider.get(identifier);
+        XPathExpression<Element> xp = XPathFactory.instance().compile(
+                ".//pidef:created[contains(../pidef:identifier, '" + identifier
+                        + "')]", Filters.element(), null, MCRConstants.PIDEF_NAMESPACE);
         Element element = xp.evaluateFirst(document);
         if (element == null) {
             return null;

@@ -6,15 +6,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPersistentIdentifierManager;
-import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRURNUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Optional;
 import java.util.TimerTask;
@@ -23,6 +23,7 @@ import java.util.function.Function;
 /**
  * Created by chi on 26.01.17.
  * porting from org.mycore.urn.rest.URNRegistrationService
+ *
  * @author shermann
  * @author Huu Chi Vu
  */
@@ -50,26 +51,31 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
         int headStatus = response.getStatusLine().getStatusCode();
         Optional<MCRPIRegistrationInfo> urn = Optional.empty();
 
+        String identifier = urnInfo.getIdentifier();
         switch (headStatus) {
         // urnInfo already registered
         case HttpStatus.SC_NO_CONTENT:
-            LOGGER.info("URN " + urnInfo.getIdentifier() + " is already registered, performing update of url");
+            LOGGER.info("URN {} is already registered, performing update of url", identifier);
             urn = dnburnClient.post(urnInfo, this::handlePostResponse);
             break;
         // urnInfo not registered
         case HttpStatus.SC_NOT_FOUND:
-            LOGGER.info("URN " + urnInfo.getIdentifier() + " is NOT registered");
+            LOGGER.info("URN {} is NOT registered", identifier);
             urn = dnburnClient.put(urnInfo, this::handlePutResponse);
             break;
         default:
-            LOGGER.warn("Could not handle request for urnInfo " + urnInfo + " Status code " + headStatus);
+            LOGGER.warn("Could not handle request for urnInfo {} Status code {}.", identifier, headStatus);
             break;
         }
 
         return urn;
     }
 
-    private Optional<Date> getDNBRegisterDate(Optional<MCRPIRegistrationInfo> urnInfo){
+    private void loggerInfo(String msg, MCRPIRegistrationInfo urnInfo) {
+        LOGGER.info(MessageFormat.format(msg, urnInfo.getIdentifier()));
+    }
+
+    private Optional<Date> getDNBRegisterDate(Optional<MCRPIRegistrationInfo> urnInfo) {
         Optional<Date> dnbRegisterDate = urnInfo.flatMap(MCRURNUtils::getDNBRegisterDate);
         dnbRegisterDate.map(Date::toString)
                        .flatMap(date -> urnInfo.map(urn -> "URN " + urn.getIdentifier() + " registered on " + date))
@@ -82,13 +88,14 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
         MCRPIRegistrationInfo urn = null;
         int postStatus = response.getStatusLine().getStatusCode();
 
+        String identifier = elp.getUrn().getIdentifier();
         switch (postStatus) {
         case HttpStatus.SC_NO_CONTENT:
             urn = elp.getUrn();
-            LOGGER.info("URN " + urn.getIdentifier() + " updated to " + elp.getUrl());
+            LOGGER.info("URN {} updated to {}.", identifier, elp.getUrl());
             break;
         default:
-            LOGGER.warn("URN " + elp.getUrn().getIdentifier() + " could not be updated. Status " + postStatus);
+            LOGGER.warn("URN {} could not be updated. Status {}.", identifier, postStatus);
             break;
         }
 
@@ -99,30 +106,34 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
         MCRPIRegistrationInfo urn = null;
         int putStatus = response.getStatusLine().getStatusCode();
 
+        String identifier = elp.getUrn().getIdentifier();
+        URL url = elp.getUrl();
         switch (putStatus) {
         case HttpStatus.SC_CREATED:
             urn = elp.getUrn();
-            LOGGER.info("URN " + urn.getIdentifier() + " registered to " + elp.getUrl());
+            LOGGER.info("URN " + identifier + " registered to " + url);
             break;
         case HttpStatus.SC_SEE_OTHER:
-            LOGGER.warn("URN " + elp.getUrn().getIdentifier() + " could NOT registered to " + elp.getUrl() + "\n"
+            LOGGER.warn("URN " + identifier + " could NOT registered to " + url + "\n"
                                 + "At least one of the given URLs is already registered under another URN");
             break;
         case HttpStatus.SC_CONFLICT:
-            LOGGER.warn("URN " + elp.getUrn().getIdentifier() + " could NOT registered to " + elp.getUrl() + "\n"
+            LOGGER.warn("URN " + identifier + " could NOT registered to " + url + "\n"
                                 + "Conflict: URN-Record already exists and can not be created again");
             break;
         default:
-            LOGGER.warn(
-                    "Could not handle urnInfo request: status=" + putStatus + ", urnInfo=" + elp.getUrn().getIdentifier()
-                            + ", url=" + elp
-                            .getUrl()
-                            + "\nEpicur Lite:\n\n" + new XMLOutputter(
-                            Format.getPrettyFormat()).outputString(elp.toXML()));
+            LOGGER.warn("Could not handle urnInfo request: status={}, urn={}, url={}.", putStatus, identifier, url);
+            LOGGER.warn("Epicur Lite:");
+            LOGGER.warn(epicurLiteToString(elp));
             break;
         }
 
         return urn;
+    }
+
+    private String epicurLiteToString(MCREpicurLite elp) {
+        return new XMLOutputter(
+                Format.getPrettyFormat()).outputString(elp.toXML());
     }
 
     @Override

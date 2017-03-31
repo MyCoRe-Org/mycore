@@ -5,7 +5,11 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.*;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIRegistrationService;
 import org.mycore.pi.MCRPersistentIdentifierManager;
@@ -18,24 +22,31 @@ import javax.persistence.EntityTransaction;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Service for assigning granular URNs to Derivate.
- * You can call it with a Derivate-ID and it will assign a Base-URN for the Derivate and granular URNs for every file in the Derivate (except IgnoreFileNames).
- * If you then add a file to Derivate you can call with Derivate-ID and additional path of the file. E.g. mir_derivate_00000060 and /image1.jpg
+ * Service for assigning granular URNs to Derivate. You can call it with a Derivate-ID and it will assign a Base-URN for
+ * the Derivate and granular URNs for every file in the Derivate (except IgnoreFileNames). If you then add a file to
+ * Derivate you can call with Derivate-ID and additional path of the file. E.g. mir_derivate_00000060 and /image1.jpg
  * <p>
  * <b>Inscriber is ignored with this {@link MCRPIRegistrationService}</b>
  * </p>
- * Configuration Parameter(s):
- * <dl>
+ * Configuration Parameter(s): <dl>
  * <dt>IgnoreFileNames</dt>
- * <dd>Comma seperated list of regex file which should not have a urn assigned. Default: mets\\.xml</dd>
- * </dl>
+ * <dd>Comma seperated list of regex file which should not have a urn assigned. Default: mets\\.xml</dd> </dl>
  */
 public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationService<MCRDNBURN> {
 
@@ -49,9 +60,9 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     }
 
     public MCRURNGranularRESTRegistrationService(String registrationServiceID,
-                                                 Function<MCRDerivate, Stream<MCRPath>> derivateFileStream) {
+                                                 Function<MCRDerivate, Stream<MCRPath>> derivateFileStreamFunc) {
         super(registrationServiceID, MCRDNBURN.TYPE);
-        this.derivateFileStream = derivateFileStream;
+        this.derivateFileStream = derivateFileStreamFunc;
     }
 
     private static Stream<MCRPath> defaultDerivateFileStream(MCRDerivate derivate) {
@@ -156,12 +167,6 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
         }
     }
 
-    public class MCRPICreationException extends RuntimeException {
-        public MCRPICreationException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
-
     private BiConsumer<Supplier<String>, MCRPath> createFileMetadata(MCRDerivate deriv) {
         return (urnSup, path) -> deriv.getDerivate().getOrCreateFileMetadata(path, urnSup.get());
     }
@@ -204,54 +209,11 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
                 .test(path.getOwnerRelativePath());
     }
 
-    private static class GranularURNGenerator {
-        private final MCRDNBURN derivURN;
-
-        private final String setID;
-
-        private int counter;
-
-        private String leadingZeros;
-
-        public GranularURNGenerator(int seed, MCRDNBURN derivURN, String setID) {
-            this.counter = seed;
-            this.derivURN = derivURN;
-            this.setID = setID;
-        }
-
-        public BiFunction<MCRDNBURN, String, String> getURNFunction() {
-            int currentCount = counter++;
-            return (urn, setID) -> urn.toGranular(setID, getIndex(currentCount)).asString();
-        }
-
-        public Supplier<String> getURNSupplier() {
-            int currentCount = counter++;
-            return () -> derivURN.toGranular(setID, getIndex(currentCount)).asString();
-        }
-
-        public String getIndex(int currentCount) {
-            return String.format(Locale.getDefault(), leadingZeros(counter), currentCount);
-        }
-
-        private String leadingZeros(int i) {
-            if (leadingZeros == null) {
-                leadingZeros = "%0" + numDigits(i) + "d";
-            }
-
-            return leadingZeros;
-        }
-
-        private long numDigits(long n) {
-            if (n < 10)
-                return 1;
-            return 1 + numDigits(n / 10);
-        }
-    }
-
     @Override
-    protected void validateAlreadyInscribed(MCRBase obj, String additional, String type, MCRObjectID id)
+    protected void validateAlreadyInscribed(MCRBase obj, String additional, String identType, MCRObjectID id)
             throws MCRPersistentIdentifierException {
-        // do nothing
+        //TODO: improve API, don't override method to do nothing
+        LOGGER.info("No incriber in this implementation");
     }
 
     private List<String> getIgnoreFileList() {
@@ -267,6 +229,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
 
     @Override
     protected MCRDNBURN registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+        //TODO: improve API, don't override method to do nothing
         // not used in this impl
         return null;
     }
@@ -280,5 +243,56 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     @Override
     protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
             throws MCRPersistentIdentifierException {
+    }
+
+    private static class GranularURNGenerator {
+        private final MCRDNBURN urn;
+
+        private final String setID;
+
+        private int counter;
+
+        private String leadingZeros;
+
+        public GranularURNGenerator(int seed, MCRDNBURN derivURN, String setID) {
+            this.counter = seed;
+            this.urn = derivURN;
+            this.setID = setID;
+        }
+
+        public BiFunction<MCRDNBURN, String, String> getURNFunction() {
+            int currentCount = counter++;
+            return (urn, setID) -> urn.toGranular(setID, getIndex(currentCount)).asString();
+        }
+
+        public Supplier<String> getURNSupplier() {
+            int currentCount = counter++;
+            return () -> urn.toGranular(setID, getIndex(currentCount)).asString();
+        }
+
+        public String getIndex(int currentCount) {
+            return String.format(Locale.getDefault(), leadingZeros(counter), currentCount);
+        }
+
+        private String leadingZeros(int i) {
+            if (leadingZeros == null) {
+                leadingZeros = "%0" + numDigits(i) + "d";
+            }
+
+            return leadingZeros;
+        }
+
+        private long numDigits(long n) {
+            if (n < 10) {
+                return 1;
+            }
+            return 1 + numDigits(n / 10);
+        }
+    }
+
+    public class MCRPICreationException extends RuntimeException {
+        public MCRPICreationException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }

@@ -11,21 +11,21 @@ import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
 import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.backend.MCRPI;
-import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.pi.urn.MCRUUIDURNGenerator;
 
-import javax.persistence.EntityManager;
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TimerTask;
+import java.util.UUID;
 
-import static org.mycore.pi.MCRPIUtils.*;
+import static org.mycore.pi.MCRPIUtils.generateMCRPI;
+import static org.mycore.pi.MCRPIUtils.randomFilename;
 
 /**
  * Created by chi on 23.02.17.
+ *
  * @author Huu Chi Vu
  */
 public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
