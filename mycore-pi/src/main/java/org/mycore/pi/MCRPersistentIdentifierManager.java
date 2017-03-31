@@ -9,6 +9,7 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -18,7 +19,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MCRPersistentIdentifierManager {
@@ -248,11 +248,12 @@ public class MCRPersistentIdentifierManager {
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
-        if (!em.getTransaction().isActive()) {
-            em.getTransaction().begin();
+        EntityTransaction transaction = em.getTransaction();
+        if (!transaction.isActive()) {
+            transaction.begin();
         }
 
-        em.getTransaction().commit();
+        transaction.commit();
     }
 
     public List<MCRPI> getUnregisteredIdenifiers(String type) {

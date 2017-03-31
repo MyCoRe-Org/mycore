@@ -43,6 +43,7 @@ public class MCRURNUtils {
         if (element == null) {
             return null;
         }
+
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.GERMAN).parse(element.getText());
     }
 

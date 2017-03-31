@@ -1,24 +1,25 @@
 package org.mycore.pi.urn.rest;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.BiConsumer;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.urn.MCRHttpUtils;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created by chi on 25.01.17.
@@ -51,22 +52,11 @@ public class MCRDNBURNClient {
      *
      * @return the status code of the request
      */
-    public int head(MCRPIRegistrationInfo urnInfo, Consumer<HttpResponse> callback) {
+    public <T> Optional<T> head(MCRPIRegistrationInfo urnInfo,
+                                BiFunction<HttpResponse, MCRPIRegistrationInfo, T> handler) {
         HttpHead httpHead = new HttpHead(getServiceURL() + urnInfo.getIdentifier());
-        try (CloseableHttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-            return httpClient.execute(httpHead).getStatusLine().getStatusCode();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public <T> T head(MCRPIRegistrationInfo urnInfo, BiFunction<HttpResponse, MCRPIRegistrationInfo,  T> handler) {
-        HttpHead httpHead = new HttpHead(getServiceURL() + urnInfo.getIdentifier());
-        try (CloseableHttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-            return handler.apply(httpClient.execute(httpHead), urnInfo);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return httpClientExec(httpHead)
+                .map(response -> handler.apply(response, urnInfo));
     }
 
     /**
@@ -78,31 +68,19 @@ public class MCRDNBURNClient {
      *
      * @return the status code of the request
      */
-    public <T> T put(MCRPIRegistrationInfo urnInfo, BiFunction<HttpResponse, MCREpicurLite, T> handler) {
-        try (CloseableHttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-            MCREpicurLite elp = epicurProvider.apply(urnInfo);
+    public <T> Optional<T> put(MCRPIRegistrationInfo urnInfo, BiFunction<HttpResponse, MCREpicurLite, T> handler) {
+        MCREpicurLite elp = epicurProvider.apply(urnInfo);
 
-            String content = new XMLOutputter(Format.getPrettyFormat()).outputString(elp.toXML());
-            LOGGER.debug("EpicurLite \"put\" for urn " + urnInfo.getIdentifier() + "\n" + content);
+        String content = epicureToString(elp);
+        LOGGER.debug("EpicurLite \"put\" for urn " + elp.getUrn().getIdentifier() + "\n" + content);
 
-            HttpPut httpPut = new HttpPut(getServiceURL() + urnInfo.getIdentifier());
-            httpPut.addHeader("content-type", "application/xml");
-            httpPut.setEntity(new StringEntity(content, "UTF-8"));
-            httpPut.setConfig(noRedirect());
+        String putURL = getServiceURL() + elp.getUrn().getIdentifier();
 
-            return handler.apply(httpClient.execute(httpPut), elp);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        return setupRequest(HttpPut::new, putURL, content)
+                .flatMap(this::httpClientExec)
+                .map(response -> handler.apply(response, elp));
     }
 
-    private RequestConfig noRedirect() {
-        return RequestConfig
-                .copy(RequestConfig.DEFAULT)
-                .setRedirectsEnabled(false)
-                .build();
-    }
 
     /**
      * Updates all URLS to a given URN.
@@ -113,21 +91,57 @@ public class MCRDNBURNClient {
      *
      * @return the status code of the request
      */
-    public <T> T post(MCRPIRegistrationInfo urnInfo, BiFunction<HttpResponse, MCREpicurLite, T> handler) {
+    public <T> Optional<T> post(MCRPIRegistrationInfo urnInfo, BiFunction<HttpResponse, MCREpicurLite, T> handler) {
+        MCREpicurLite elp = epicurProvider.apply(urnInfo);
+        String content = epicureToString(elp);
+        LOGGER.debug("EpicurLite \"posted\" for urn " + elp.getUrn().getIdentifier() + "\n" + content);
+
+        String postURL = getServiceURL() + elp.getUrn().getIdentifier() + "/links";
+
+        return setupRequest(HttpPost::new, postURL, content)
+                .flatMap(this::httpClientExec)
+                .map(response -> handler.apply(response, elp));
+    }
+
+    private Optional<CloseableHttpResponse> httpClientExec(HttpUriRequest request) {
         try (CloseableHttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-            MCREpicurLite elp = epicurProvider.apply(urnInfo);
-
-            String content = new XMLOutputter(Format.getPrettyFormat()).outputString(elp.toXML());
-            LOGGER.debug("EpicurLite \"posted\" for urn " + urnInfo.getIdentifier() + "\n" + content);
-
-            HttpPost httpPost = new HttpPost(getServiceURL() + urnInfo.getIdentifier() + "/links");
-            httpPost.setHeader("content-type", "application/xml");
-            httpPost.setEntity(new StringEntity(content, "UTF-8"));
-            httpPost.setConfig(noRedirect());
-
-            return handler.apply(httpClient.execute(httpPost), elp);
+            return Optional.of(httpClient.execute(request));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (e instanceof ClientProtocolException) {
+                LOGGER.error("There is an http protocol error.");
+            } else {
+                LOGGER.error("There is a problem or the connection was aborted.");
+            }
+            e.printStackTrace();
         }
+
+        return Optional.empty();
+    }
+
+    private RequestConfig noRedirect() {
+        return RequestConfig
+                .copy(RequestConfig.DEFAULT)
+                .setRedirectsEnabled(false)
+                .build();
+    }
+
+    private <R extends HttpEntityEnclosingRequestBase> Optional<R> setupRequest(Supplier<R> requestSupp, String url,
+                                                                                String content) {
+        R request = requestSupp.get();
+        try {
+            request.setURI(new URI(url));
+            request.setHeader("content-type", "application/xml");
+            request.setConfig(noRedirect());
+            request.setEntity(new StringEntity(content, "UTF-8"));
+            return Optional.of(request);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();
+    }
+
+    private String epicureToString(MCREpicurLite elp) {
+        return new XMLOutputter(Format.getPrettyFormat()).outputString(elp.toXML());
     }
 }

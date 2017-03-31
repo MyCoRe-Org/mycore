@@ -6,8 +6,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRURNUtils;
 
@@ -67,61 +69,60 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
         return urn;
     }
 
-    private Optional<Date> getDNBRegisterDate(MCRPIRegistrationInfo urnInfo){
-        Optional<Date> dnbRegisterDate = MCRURNUtils.getDNBRegisterDate(urnInfo);
+    private Optional<Date> getDNBRegisterDate(Optional<MCRPIRegistrationInfo> urnInfo){
+        Optional<Date> dnbRegisterDate = urnInfo.flatMap(MCRURNUtils::getDNBRegisterDate);
         dnbRegisterDate.map(Date::toString)
-                       .map(date -> "URN " + urnInfo.getIdentifier() + " registered on " + date)
+                       .flatMap(date -> urnInfo.map(urn -> "URN " + urn.getIdentifier() + " registered on " + date))
                        .ifPresent(LOGGER::info);
 
         return dnbRegisterDate;
     }
 
-    private Optional<MCRPIRegistrationInfo> handlePostResponse(HttpResponse response, MCREpicurLite elp) {
-        MCRPIRegistrationInfo urn = elp.getUrn();
+    private MCRPIRegistrationInfo handlePostResponse(HttpResponse response, MCREpicurLite elp) {
+        MCRPIRegistrationInfo urn = null;
         int postStatus = response.getStatusLine().getStatusCode();
-        Optional<MCRPIRegistrationInfo> urnInfo = Optional.empty();
 
         switch (postStatus) {
         case HttpStatus.SC_NO_CONTENT:
-            LOGGER.info("URN " + urn + " updated to " + elp.getUrl());
-            urnInfo = Optional.of(urn);
+            urn = elp.getUrn();
+            LOGGER.info("URN " + urn.getIdentifier() + " updated to " + elp.getUrl());
             break;
         default:
-            LOGGER.warn("URN " + urnInfo + " could not be updated. Status " + postStatus);
+            LOGGER.warn("URN " + elp.getUrn().getIdentifier() + " could not be updated. Status " + postStatus);
             break;
         }
 
-        return urnInfo;
+        return urn;
     }
 
-    private Optional<MCRPIRegistrationInfo> handlePutResponse(HttpResponse response, MCREpicurLite elp) {
-        MCRPIRegistrationInfo urn = elp.getUrn();
+    private MCRPIRegistrationInfo handlePutResponse(HttpResponse response, MCREpicurLite elp) {
+        MCRPIRegistrationInfo urn = null;
         int putStatus = response.getStatusLine().getStatusCode();
-        Optional<MCRPIRegistrationInfo> urnInfo = Optional.empty();
 
         switch (putStatus) {
         case HttpStatus.SC_CREATED:
+            urn = elp.getUrn();
             LOGGER.info("URN " + urn.getIdentifier() + " registered to " + elp.getUrl());
-            urnInfo = Optional.of(urn);
             break;
         case HttpStatus.SC_SEE_OTHER:
-            LOGGER.warn("URN " + urn.getIdentifier() + " could NOT registered to " + elp.getUrl() + "\n"
+            LOGGER.warn("URN " + elp.getUrn().getIdentifier() + " could NOT registered to " + elp.getUrl() + "\n"
                                 + "At least one of the given URLs is already registered under another URN");
             break;
         case HttpStatus.SC_CONFLICT:
-            LOGGER.warn("URN " + urn.getIdentifier() + " could NOT registered to " + elp.getUrl() + "\n"
+            LOGGER.warn("URN " + elp.getUrn().getIdentifier() + " could NOT registered to " + elp.getUrl() + "\n"
                                 + "Conflict: URN-Record already exists and can not be created again");
             break;
         default:
             LOGGER.warn(
-                    "Could not handle urnInfo request: status=" + putStatus + ", urnInfo=" + urn.getIdentifier()
+                    "Could not handle urnInfo request: status=" + putStatus + ", urnInfo=" + elp.getUrn().getIdentifier()
                             + ", url=" + elp
                             .getUrl()
                             + "\nEpicur Lite:\n\n" + new XMLOutputter(
                             Format.getPrettyFormat()).outputString(elp.toXML()));
+            break;
         }
 
-        return urnInfo;
+        return urn;
     }
 
     @Override

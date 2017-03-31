@@ -4,7 +4,6 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.urn.MCRDNBURN;
 
 import java.net.URL;
 

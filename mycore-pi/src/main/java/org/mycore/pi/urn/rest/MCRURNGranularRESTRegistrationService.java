@@ -62,8 +62,12 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
             return Files.walk(path)
                         .map(MCRPath::toMCRPath);
         } catch (IOException e) {
-            throw new RuntimeException("Could not walk file tree of derivate " + derivateId.toString() + "!", e);
+            LOGGER.error("I/O error while access the starting file of derivate " + derivateId.toString() + "!", e);
+        } catch (SecurityException s) {
+            LOGGER.error("No access to starting file of derivate " + derivateId.toString() + "!", s);
         }
+
+        return Stream.empty();
     }
 
     @Override
@@ -84,12 +88,6 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     private MCRDNBURN registerURN(MCRDerivate deriv, String filePath) {
         MCRObjectID derivID = deriv.getId();
 
-        MCRDNBURN derivURN = Optional
-                .ofNullable(deriv.getDerivate())
-                .map(MCRObjectDerivate::getURN)
-                .flatMap(new MCRDNBURNParser()::parse)
-                .orElseGet(() -> createNewURN(deriv));
-
         Function<String, Integer> countCreatedPI = s -> MCRPersistentIdentifierManager
                 .getInstance()
                 .getCreatedIdentifiers(derivID, getType(), getRegistrationServiceID())
@@ -100,6 +98,12 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
                            .map(countCreatedPI)
                            .map(count -> count + 1)
                            .orElse(1);
+
+        MCRDNBURN derivURN = Optional
+                .ofNullable(deriv.getDerivate())
+                .map(MCRObjectDerivate::getURN)
+                .flatMap(new MCRDNBURNParser()::parse)
+                .orElseGet(() -> createNewURN(deriv));
 
         String setID = derivID.getNumberAsString();
         GranularURNGenerator granularURNGen = new GranularURNGenerator(seed, derivURN, setID);
@@ -148,8 +152,13 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
 
             return derivURN;
         } catch (MCRPersistentIdentifierException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Could not create new URN for " + derivID.toString());
+            throw new MCRPICreationException("Could not create new URN for " + derivID.toString(), e);
+        }
+    }
+
+    public class MCRPICreationException extends RuntimeException {
+        public MCRPICreationException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 
@@ -200,9 +209,9 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
 
         private final String setID;
 
-        int counter;
+        private int counter;
 
-        String leadingZeros;
+        private String leadingZeros;
 
         public GranularURNGenerator(int seed, MCRDNBURN derivURN, String setID) {
             this.counter = seed;
@@ -221,7 +230,8 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
         }
 
         public String getIndex(int currentCount) {
-            return String.format(Locale.getDefault(), leadingZeros(counter), currentCount);}
+            return String.format(Locale.getDefault(), leadingZeros(counter), currentCount);
+        }
 
         private String leadingZeros(int i) {
             if (leadingZeros == null) {
@@ -241,6 +251,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     @Override
     protected void validateAlreadyInscribed(MCRBase obj, String additional, String type, MCRObjectID id)
             throws MCRPersistentIdentifierException {
+        // do nothing
     }
 
     private List<String> getIgnoreFileList() {

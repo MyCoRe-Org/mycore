@@ -1,25 +1,21 @@
 package org.mycore.pi.urn.rest;
 
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.common.events.MCRStartupHandler;
+import org.mycore.pi.MCRPIRegistrationInfo;
+
+import javax.servlet.ServletContext;
 import java.util.Optional;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.servlet.ServletContext;
-
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.BiConsumer;
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.common.events.MCRStartupHandler;
-import org.mycore.pi.MCRPIRegistrationInfo;
 
 /**
  * @author shermann

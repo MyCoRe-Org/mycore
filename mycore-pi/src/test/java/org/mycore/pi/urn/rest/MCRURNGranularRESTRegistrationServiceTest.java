@@ -2,16 +2,20 @@ package org.mycore.pi.urn.rest;
 
 import mockit.Mock;
 import mockit.MockUp;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.datamodel.metadata.*;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
 import org.mycore.pi.MockMetadataManager;
+import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRUUIDURNGenerator;
 
 import java.io.IOException;
@@ -29,6 +33,8 @@ import java.util.stream.Stream;
  * @author Huu Chi Vu
  */
 public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase {
+    int numOfDerivFiles = 15;
+
     @Test
     public void fullRegister() throws Exception {
         new MockContentTypes();
@@ -45,29 +51,40 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
 
         mockMetadataManager.put(mcrObjectID, derivate);
 
-        Function<MCRDerivate, Stream<MCRPath>> foo = deriv -> IntStream
-                .iterate(0, i -> i + 1)
-                .mapToObj(i -> {
-                    return "/foo/" + UUID.randomUUID().toString() + "_" + String.format(Locale.getDefault(), "%02d", i);
-                })
-                .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
-                .limit(15);
-        MCRURNGranularRESTRegistrationService testService = new MCRURNGranularRESTRegistrationService("TestService",
+        Function<MCRDerivate, Stream<MCRPath>> foo = deriv -> {
+            return IntStream
+                    .iterate(0, i -> i + 1)
+                    .mapToObj(i -> {
+                        return "/foo/" + UUID.randomUUID().toString() + "_" + String
+                                .format(Locale.getDefault(), "%02d", i);
+                    })
+                    .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
+                    .limit(numOfDerivFiles);
+        };
+        String serviceID = "TestService";
+        MCRURNGranularRESTRegistrationService testService = new MCRURNGranularRESTRegistrationService(serviceID,
                                                                                                       foo);
         testService.fullRegister(derivate, "");
         timerTask();
-    }
 
-    private static final String countRegistered = "select count(u) from MCRPI u "
-            + "where u.type = :type "
-            + "and u.registered is not null";
+        List<MCRPIRegistrationInfo> registeredURNs = MCREntityManagerProvider
+                .getEntityManagerFactory()
+                .createEntityManager()
+                .createNamedQuery("Get.PI.Created", MCRPIRegistrationInfo.class)
+                .setParameter("mcrId", mcrObjectID.toString())
+                .setParameter("type", MCRDNBURN.TYPE)
+                .setParameter("service", serviceID)
+                .getResultList();
+
+        Assert.assertEquals("Wrong number of registered URNs: ", numOfDerivFiles, registeredURNs.size());
+    }
 
     public void timerTask() throws Exception {
         System.out.println("Start: " + new Date());
 
         MCRURNGranularRESTRegistrationStarter starter = new MCRURNGranularRESTRegistrationStarter(2, TimeUnit.SECONDS);
         starter.startUp(null);
-        Thread.sleep(6000);
+        Thread.sleep(12000);
 
         System.out.println("End: " + new Date());
 
