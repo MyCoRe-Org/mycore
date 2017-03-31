@@ -64,7 +64,7 @@ public class MCRJobQueueTest extends MCRJPATestCase {
             job = queue.getJob(params);
             endTransaction();
             startNewTransaction();
-            if(abortAfter-- == 0) {
+            if (abortAfter-- == 0) {
                 fail("Couldn't finish MCRJobQueueTest in one minute.");
             }
         }

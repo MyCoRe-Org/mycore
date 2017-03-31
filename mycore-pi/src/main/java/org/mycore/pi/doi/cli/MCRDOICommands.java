@@ -84,7 +84,10 @@ public class MCRDOICommands {
             MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
             List<MCRDigitalObjectIdentifier> doiList = dataciteClient.getDOIList();
 
-            doiList.stream().filter(doi -> !doi.getPrefix().equals(MCRDigitalObjectIdentifier.TEST_DOI_PREFIX)).forEach(doi -> {
+            doiList.stream().filter(doi -> {
+                boolean isTestDOI = doi.getPrefix().equals(MCRDigitalObjectIdentifier.TEST_DOI_PREFIX);
+                return !isTestDOI || registrationService.usesTestPrefix();
+            }).forEach(doi -> {
                 try {
                     URI uri = dataciteClient.resolveDOI(doi);
 
@@ -134,7 +137,10 @@ public class MCRDOICommands {
             List<MCRDigitalObjectIdentifier> doiList = dataciteClient.getDOIList();
 
             return doiList.stream()
-                    .filter(doi -> !doi.getPrefix().equals(MCRDigitalObjectIdentifier.TEST_DOI_PREFIX))
+                .filter(doi -> {
+                    boolean isTestDOI = doi.getPrefix().equals(MCRDigitalObjectIdentifier.TEST_DOI_PREFIX);
+                    return !isTestDOI || registrationService.usesTestPrefix();
+                })
                     .map(MCRDigitalObjectIdentifier::asString)
                     .map(doiStr -> MessageFormat.format(REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, doiStr, serviceID))
                     .collect(Collectors.toList());

@@ -389,7 +389,10 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * This method put debug data to the logger (for the debug mode).
      */
     public void debug() {
-        debugDefault();
+        if(LOGGER.isDebugEnabled()) {
+            debugDefault();
+            LOGGER.debug(" ");
+        }
     }
 
     /**
@@ -402,7 +405,6 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             LOGGER.debug("Type               = " + type);
             LOGGER.debug("DataPart           = " + datapart);
             LOGGER.debug("Inhreited          = " + String.valueOf(inherited));
-            LOGGER.debug(" ");
         }
     }
 

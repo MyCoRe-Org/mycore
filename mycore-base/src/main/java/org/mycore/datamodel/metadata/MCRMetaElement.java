@@ -482,9 +482,9 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
             LOGGER.debug("Elements           = " + String.valueOf(list.size()));
             LOGGER.debug(" ");
-        }
-        for (MCRMetaInterface aList : list) {
-            aList.debug();
+            for (MCRMetaInterface aList : list) {
+                aList.debug();
+            }
         }
     }
 

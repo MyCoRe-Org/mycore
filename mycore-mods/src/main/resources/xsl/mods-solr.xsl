@@ -202,6 +202,12 @@
         </xsl:choose>
       </field>
     </xsl:for-each>
+    <xsl:for-each select="mods:note">
+      <xsl:variable name="type" select="@type" />
+      <field name="mods.note.{$type}">
+        <xsl:value-of select="text()" />
+      </field>
+    </xsl:for-each>
   </xsl:template>
   <xsl:template match="mods:name" mode="childdoc">
     <xsl:variable name="topField" select="not(ancestor::mods:relatedItem)" />

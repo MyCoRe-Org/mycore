@@ -26,8 +26,10 @@ package org.mycore.datamodel.metadata;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.lang.ref.WeakReference;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
@@ -57,12 +59,16 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
         Duration maxGCTime = Duration.ofSeconds(30);
         runGarbageCollection(new LinkedList<>(Arrays.asList(false, false, true))::poll, maxGCTime);
         long before = MCRObjectIDPool.getSize();
-        String id = "MyCoRe_test_11111111";
-        @SuppressWarnings("unused")
+        int intPart = Year.now().getValue();
+        String id = MCRObjectID.formatID("MyCoRe_test", intPart);
         MCRObjectID mcrId = MCRObjectIDPool.getMCRObjectID(id);
+        WeakReference<String> idRef = new WeakReference<>(id);
+        WeakReference<MCRObjectID> objRef = new WeakReference<>(mcrId);
         assertEquals("ObjectIDPool size is different", before + 1, MCRObjectIDPool.getSize());
         mcrId = null;
-        runGarbageCollection(() -> MCRObjectIDPool.getIfPresent(id) == null, maxGCTime);
+        id = null;
+        runGarbageCollection(() -> idRef.get() == null && objRef.get() == null, maxGCTime);
+        id = MCRObjectID.formatID("MyCoRe_test", intPart);
         assertNull("ObjectIDPool should not contain ID anymore.", MCRObjectIDPool.getIfPresent(id));
         assertEquals("ObjectIDPool size is different", before, MCRObjectIDPool.getSize());
     }
@@ -70,7 +76,7 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
     private void runGarbageCollection(Supplier<Boolean> test, Duration maxTime) {
         LocalDateTime start = LocalDateTime.now();
         int runs = 0;
-        boolean succeed=test.get();
+        boolean succeed = test.get();
         while (!maxTime.minus(Duration.between(start, LocalDateTime.now())).isNegative()) {
             if (succeed) {
                 break;

@@ -7,12 +7,11 @@ import org.mycore.pi.MCRPersistentIdentifierParser;
 
 public class MCRDOIParser implements MCRPersistentIdentifierParser<MCRDigitalObjectIdentifier> {
 
-    // The Prefix of every doi Prefix
-    public static final String PREFIX_PREFIX = "10.";
+    public static final String DIRECTORY_INDICATOR = "10.";
 
     @Override
     public Optional<MCRDigitalObjectIdentifier> parse(String doi) {
-        if (!doi.startsWith(PREFIX_PREFIX)) {
+        if (!doi.startsWith(DIRECTORY_INDICATOR)) {
             return Optional.empty();
         }
 
@@ -24,15 +23,6 @@ public class MCRDOIParser implements MCRPersistentIdentifierParser<MCRDigitalObj
 
         String prefix = doiParts[0];
         String suffix = doiParts[1];
-
-        // the part after 10.
-        String prefixSuffix = prefix.substring(PREFIX_PREFIX.length());
-
-        try {
-            Integer.parseInt(prefixSuffix, 10);
-        } catch (NumberFormatException nfe) {
-            return Optional.empty();
-        }
 
         if (suffix.length() == 0) {
             return Optional.empty();
