@@ -243,6 +243,8 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     @Override
     protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
             throws MCRPersistentIdentifierException {
+        //TODO: improve API, don't override method to do nothing
+        LOGGER.info("No update in this implementation");
     }
 
     private static class GranularURNGenerator {

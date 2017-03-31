@@ -151,6 +151,8 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
     @Override
     protected void validateAlreadyInscribed(MCRBase obj, String additional, String identType, MCRObjectID id)
             throws MCRPersistentIdentifierException {
+        //TODO: improve API, don't override method to do nothing
+        LOGGER.info("No incriber in this implementation");
     }
 
     private List<String> getIgnoreFileList() {
@@ -179,5 +181,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
     @Override
     protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
             throws MCRPersistentIdentifierException {
+        //TODO: improve API, don't override method to do nothing
+        LOGGER.info("No update in this implementation");
     }
 }
