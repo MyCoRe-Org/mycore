@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bibo="http://purl.org/ontology/bibo/"
-  xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:dcterms="http://purl.org/dc/terms/" xmlns:zdb="http://ld.zdb-services.de/resource/" xmlns:dnb_intern="http://dnb.de/"
-  xmlns:isbd="http://iflastandards.info/ns/isbd/elements/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" exclude-result-prefixes="rdf bibo foaf owl dc dcterms zdb dnb_intern isbd rdfs">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:bibo="http://purl.org/ontology/bibo/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:zdb="http://ld.zdb-services.de/resource/"
+  xmlns:dnb_intern="http://dnb.de/"
+  xmlns:ppxml="http://www.oclcpica.org/xmlns/ppxml-1.0"
+  xmlns:isbd="http://iflastandards.info/ns/isbd/elements/"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  exclude-result-prefixes="rdf bibo foaf owl dc dcterms zdb dnb_intern isbd rdfs ppxml">
   <xsl:include href="xslInclude:RDF-mods-journal"/>
   <xsl:template match="/rdf:RDF">
     <mycoreobject>
@@ -17,6 +27,7 @@
     </mycoreobject>
   </xsl:template>
   <xsl:template match="rdf:Description">
+    <xsl:variable name="zdbId" select="substring-after(@rdf:about, 'http://ld.zdb-services.de/resource/')" />
     <mods:mods>
       <!-- process input in deterministic order as editor forms depend on it -->
       <xsl:apply-templates select="@rdf:type" />
@@ -31,12 +42,18 @@
       </xsl:if>
       <xsl:apply-templates select="bibo:issn" />
       <mods:identifier type="zdbid">
-        <xsl:value-of select="substring-after(@rdf:about, 'http://ld.zdb-services.de/resource/')" />
+        <xsl:value-of select="$zdbId" />
       </mods:identifier>
+      <xsl:variable name="picaPlus" select="document(concat('http://services.dnb.de/sru/zdb?version=1.1&amp;operation=searchRetrieve&amp;query=zdbid%3D',$zdbId,'&amp;recordSchema=PicaPlus-xml'))//ppxml:tag[@id='045U']" />
+      <xsl:for-each select="$picaPlus/ppxml:subf">
+        <mods:classification authority="sdnb" displayLabel="sdnb">
+          <xsl:value-of select="." />
+        </mods:classification>
+      </xsl:for-each>
     </mods:mods>
   </xsl:template>
   <xsl:template match="dc:title">
-    <mods:titleInfo altRepGroup="1" xlink:type="simple">
+    <mods:titleInfo>
       <mods:title>
         <xsl:value-of select="." />
       </mods:title>
@@ -50,7 +67,7 @@
     </mods:titleInfo>
   </xsl:template>
   <xsl:template match="bibo:shortTitle">
-    <mods:titleInfo displayLabel="Short form of the title" type="abbreviated">
+    <mods:titleInfo type="abbreviated">
       <mods:title>
         <xsl:value-of select="." />
       </mods:title>
