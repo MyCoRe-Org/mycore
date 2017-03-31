@@ -30,17 +30,12 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
- * Service for assigning granular URNs to Derivate.
- * You can call it with a Derivate-ID and it will assign a Base-URN for the Derivate and granular URNs for every file in the Derivate (except IgnoreFileNames).
- * If you then add a file to Derivate you can call with Derivate-ID and additional path of the file. E.g. mir_derivate_00000060 and /image1.jpg
- * <p>
- * <b>Inscriber is ignored with this {@link MCRPIRegistrationService}</b>
- * </p>
- * Configuration Parameter(s):
- * <dl>
- * <dt>IgnoreFileNames</dt>
- * <dd>Comma seperated list of regex file which should not have a urn assigned. Default: mets\\.xml</dd>
- * </dl>
+ * Service for assigning granular URNs to Derivate. You can call it with a Derivate-ID and it will assign a Base-URN for
+ * the Derivate and granular URNs for every file in the Derivate (except IgnoreFileNames). If you then add a file to
+ * Derivate you can call with Derivate-ID and additional path of the file. E.g. mir_derivate_00000060 and /image1.jpg
+ * <p> <b>Inscriber is ignored with this {@link MCRPIRegistrationService}</b> </p> Configuration Parameter(s): <dl>
+ * <dt>IgnoreFileNames</dt> <dd>Comma seperated list of regex file which should not have a urn assigned. Default:
+ * mets\\.xml</dd> </dl>
  */
 public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationService<MCRDNBURN> {
 
@@ -123,14 +118,16 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
                 .map(Pattern::asPredicate)
                 .collect(Collectors.toList());
 
-        List<MCRPath> pathList = collectingFileVisitor.getPaths()
-                                                      .stream()
-                                                      .filter(file -> !predicateList.stream().filter(p -> p
-                                                              .test(file.toString().split(":")[1])).findAny()
-                                                                                    .isPresent())
-                                                      .map(p -> (MCRPath) p)
-                                                      .sorted()
-                                                      .collect(Collectors.toList());
+        List<MCRPath> pathList = collectingFileVisitor
+                .getPaths()
+                .stream()
+                .filter(file -> !predicateList.stream()
+                                              .filter(p -> p.test(file.toString().split(":")[1]))
+                                              .findAny()
+                                              .isPresent())
+                .map(p -> (MCRPath) p)
+                .sorted()
+                .collect(Collectors.toList());
 
         MCRDNBURN newURN = getNewIdentifier(obj.getId(), additional);
         String setID = obj.getId().getNumberAsString();
