@@ -59,6 +59,8 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
 
     private Transaction tx;
 
+    private int numFiles;
+
     /** Creates a new upload handler and registers it at the handler manager * */
     protected MCRUploadHandler() {
         if (MCRWebsiteWriteProtection.isActive()) {
@@ -83,10 +85,43 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
     /**
      * Starts the upload session.
      * 
-     * @param numFiles
-     *            the number of files that the applet will upload
+     * @param numberOfFiles
+     *            the number of files that will be uploaded
      */
-    public abstract void startUpload(int numFiles) throws Exception;
+    public void startUpload(int numberOfFiles) {
+        this.numFiles = numberOfFiles;
+    }
+
+    /**
+     * Increments the uploaded number of files. Use this method with care!
+     * In general a fixed number of files to upload should be set with
+     * {@link #startUpload(int)}.
+     * 
+     * @return the new number of files to upload
+     */
+    public int incrementNumFiles() {
+        return ++this.numFiles;
+    }
+
+    /**
+     * Decrements the uploaded number of files. Use this method with care!
+     * In general a fixed number of files to upload should be set with
+     * {@link #startUpload(int)}.
+     * 
+     * @return the new number of files to upload
+     */
+    public int decrementNumFiles() {
+        return --this.numFiles;
+    }
+
+    /**
+     * Returns the number of files which will be uploaded
+     * 
+     * @return number of files to upload
+     */
+    public int getNumFiles() {
+        return this.numFiles;
+    }
 
     /**
      * Before the applet sends each file, this method is called to ask if this
