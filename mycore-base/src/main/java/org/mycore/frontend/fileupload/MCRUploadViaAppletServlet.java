@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -64,7 +63,7 @@ public final class MCRUploadViaAppletServlet extends MCRServlet {
 
     private static MCRUploadViaAppletServer uploadServer;
 
-    private void initServer() throws ServletException {
+    private void initServer() {
         synchronized (MCRUploadViaAppletServlet.class) {
             if (uploadServer == null)
                 uploadServer = new MCRUploadViaAppletServer(MCRFrontendUtil.getBaseURL());

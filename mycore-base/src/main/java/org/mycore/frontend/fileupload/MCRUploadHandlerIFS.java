@@ -90,8 +90,6 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     protected MCRPath rootDir;
 
-    private int numFiles;
-
     private int filesUploaded;
 
     public MCRUploadHandlerIFS(String documentID, String derivateID) {
@@ -144,7 +142,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     @Override
     public void startUpload(int numFiles) {
-        this.numFiles = numFiles;
+        super.startUpload(numFiles);
         this.filesUploaded = 0;
         this.setStatus(MCRProcessableStatus.processing);
         this.setProgress(0);
@@ -155,7 +153,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         if (this.derivate != null) {
             return;
         }
-        LOGGER.debug("upload starting, expecting " + numFiles + " files");
+        LOGGER.debug("upload starting, expecting " + getNumFiles() + " files");
 
         MCRObjectID derivateID = getOrCreateDerivateID();
 
@@ -291,7 +289,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 }
             });
             this.filesUploaded++;
-            int progress = (int)(((float)this.filesUploaded / (float)this.numFiles) * 100f);
+            int progress = (int)(((float)this.filesUploaded / (float)getNumFiles()) * 100f);
             this.setProgress(progress);
         }
     }
