@@ -2,17 +2,44 @@ package org.mycore.pi.backend;
 
 import java.util.Date;
 
+import org.mycore.common.MCRCoreVersion;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.mycore.common.MCRCoreVersion;
-
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "Count.PI.Created",
+                query = "select count(u) from MCRPI u "
+                        + "where u.mycoreID = :mcrId "
+                        + "and u.type = :type "
+                        + "and u.additional = :additional "
+                        + "and u.service = :service"
+        ),
+        @NamedQuery(name = "Count.PI.Registered",
+                query = "select count(u) from MCRPI u "
+                        + "where u.mycoreID = :mcrId "
+                        + "and u.type = :type "
+                        + "and u.additional = :additional "
+                        + "and u.service = :service "
+                        + "and u.registered is not null"
+        ),
+        @NamedQuery(name = "Get.PI.Created",
+                query = "select u from MCRPI u "
+                        + "where u.mycoreID = :mcrId "
+                        + "and u.type = :type "
+                        + "and u.additional != '' "
+                        + "and u.service = :service"
+        )
+
+})
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "identifier", "type" }) })
 public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
 
@@ -67,7 +94,7 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
         this.service = service;
         this.registered = registered;
         //TODO: disabled by MCR-1393
-//        this.mcrRevision = MCRCoreVersion.getRevision();
+        //        this.mcrRevision = MCRCoreVersion.getRevision();
         this.mcrVersion = MCRCoreVersion.getVersion();
         this.created = new Date();
     }
@@ -147,5 +174,9 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
 
     public void setService(String service) {
         this.service = service;
+    }
+
+    public int getId() {
+        return id;
     }
 }

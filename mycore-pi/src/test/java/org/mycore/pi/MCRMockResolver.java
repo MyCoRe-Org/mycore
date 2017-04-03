@@ -12,7 +12,7 @@ public class MCRMockResolver extends MCRPersistentIdentifierResolver<MCRMockIden
     }
 
     @Override
-    public Stream<String> resolve(MCRPersistentIdentifier identifier) {
+    public Stream<String> resolve(MCRMockIdentifier identifier) {
         return Stream.of(identifier.asString());
     }
 }

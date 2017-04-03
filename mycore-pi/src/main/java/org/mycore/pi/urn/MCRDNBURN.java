@@ -12,9 +12,13 @@ public class MCRDNBURN extends MCRUniformResourceName {
     public static final String TYPE = "dnbUrn";
     public static final String URN_NID = "nbn:de:";
 
+    @Override
+    public String getPREFIX() {
+        return super.getPREFIX() + URN_NID;
+    }
 
     public MCRDNBURN(String subNamespace, String namespaceSpecificString) {
-        super(URN_NID + subNamespace, namespaceSpecificString);
+        super(subNamespace, namespaceSpecificString);
     }
 
     /**
@@ -167,8 +171,20 @@ public class MCRDNBURN extends MCRUniformResourceName {
         return valueS;
     }
 
-    public MCRDNBURN toGranular(int i, int max) {
-        return new MCRDNBURN(subNamespace.substring(URN_NID.length(),subNamespace.length()-1), this.namespaceSpecificString + addLeadingZeroes(max, i));
+    public MCRDNBURN toGranular(String setID, String index) {
+        return new MCRDNBURN(getSubNamespace(), getGranularNamespaceSpecificString(setID, index));
+    }
+
+    public MCRDNBURN withSuffix(String suffix) {
+        return new MCRDNBURN(getSubNamespace(), getNamespaceSpecificString() + suffix);
+    }
+
+    public MCRDNBURN toGranular(String setID, int i, int max) {
+        return toGranular(setID, addLeadingZeroes(max, i));
+    }
+
+    private String getGranularNamespaceSpecificString(String setID, String index) {
+        return getNamespaceSpecificString()+ "-" + setID + "-" + index;
     }
 
     @Override
@@ -186,7 +202,7 @@ public class MCRDNBURN extends MCRUniformResourceName {
      * >http://www.persistent-identifier.de/?link=316</a>
      */
     public int calculateChecksum() {
-        String urnbase = PREFIX + subNamespace + this.namespaceSpecificString;
+        String urnbase = getPREFIX() + subNamespace + this.namespaceSpecificString;
         char[] urn = urnbase.toCharArray();
 
         /* Convert the String into an integer representation */
