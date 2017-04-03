@@ -94,7 +94,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
                  .collect(Collectors.toList());
     }
 
-    private void guardWebsiteCurrentlyReadOnly() throws IOException {
+    private void guardWebsiteCurrentlyReadOnly() {
         if (MCRWebsiteWriteProtection.isActive())
             throw new RuntimeException("System is currently in read-only mode");
     }
@@ -146,15 +146,16 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     private void handleZipFile(MCRUploadHandler handler, InputStream in) throws IOException, Exception {
         ZipInputStream zis = new ZipInputStream(in);
         MCRNotClosingInputStream nis = new MCRNotClosingInputStream(zis);
-
         for (ZipEntry entry; (entry = zis.getNextEntry()) != null;) {
             String path = convertAbsolutePathToRelativePath(entry.getName());
-
             if (entry.isDirectory())
                 LOGGER.debug("UploadServlet skipping ZIP entry " + path + ", is a directory");
-            else
+            else {
+                handler.incrementNumFiles();
                 handleUploadedFile(handler, entry.getSize(), path, nis);
+            }
         }
+        handler.decrementNumFiles(); //ZIP file does not count
         nis.reallyClose();
     }
 

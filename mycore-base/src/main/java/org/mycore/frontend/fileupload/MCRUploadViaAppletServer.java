@@ -33,8 +33,6 @@ import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.servlet.ServletException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Transaction;
@@ -68,7 +66,7 @@ public final class MCRUploadViaAppletServer implements Runnable {
 
     private boolean doRun = true;
 
-    MCRUploadViaAppletServer(String baseURL) throws ServletException {
+    MCRUploadViaAppletServer(String baseURL) {
         try {
             // query property directly (not via getBaseURL()), saves a stalled
             // MCRSession
