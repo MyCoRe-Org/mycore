@@ -61,7 +61,13 @@ class MCRObjectIDPool {
 
     static long getSize() {
         objectIDCache.cleanUp();
-        return objectIDCache.size();
+        //objectIDCache.size() may return more as actually present;
+        return objectIDCache.asMap()
+            .entrySet()
+            .stream()
+            .filter(e -> e.getKey() != null)
+            .filter(e -> e.getValue() != null)
+            .count();
     }
     
     static MCRObjectID getIfPresent(String id){
