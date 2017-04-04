@@ -261,7 +261,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             Path currentTempFile = tempFileSupplier.get();
             Files.copy(in, currentTempFile, StandardCopyOption.REPLACE_EXISTING);
             long myLength = Files.size(currentTempFile);
-            if (length != 0 && length != myLength) {
+            if (length >= 0 && length != myLength) {
                 throw new IOException("Length of transmitted data does not match promised length: " + myLength + "!="
                     + length);
             }
