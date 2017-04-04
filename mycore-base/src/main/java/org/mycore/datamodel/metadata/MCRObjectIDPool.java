@@ -38,7 +38,6 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 class MCRObjectIDPool {
     private static LoadingCache<String, MCRObjectID> objectIDCache = CacheBuilder
         .newBuilder()
-        .weakKeys()
         .weakValues()
         .build(new CacheLoader<String, MCRObjectID>() {
             @Override
