@@ -62,12 +62,10 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
         int intPart = Year.now().getValue();
         String id = MCRObjectID.formatID("MyCoRe_test", intPart);
         MCRObjectID mcrId = MCRObjectIDPool.getMCRObjectID(id);
-        WeakReference<String> idRef = new WeakReference<>(id);
         WeakReference<MCRObjectID> objRef = new WeakReference<>(mcrId);
         assertEquals("ObjectIDPool size is different", before + 1, MCRObjectIDPool.getSize());
         mcrId = null;
-        id = null;
-        runGarbageCollection(() -> idRef.get() == null && objRef.get() == null, maxGCTime);
+        runGarbageCollection(() -> objRef.get() == null, maxGCTime);
         id = MCRObjectID.formatID("MyCoRe_test", intPart);
         assertNull("ObjectIDPool should not contain ID anymore.", MCRObjectIDPool.getIfPresent(id));
         assertEquals("ObjectIDPool size is different", before, MCRObjectIDPool.getSize());
