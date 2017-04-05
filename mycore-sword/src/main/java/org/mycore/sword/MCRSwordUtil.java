@@ -33,11 +33,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import java.util.zip.Deflater;
 
 import org.apache.abdera.Abdera;
@@ -490,13 +488,19 @@ public class MCRSwordUtil {
         private static Stream<IRI> getEditMediaFileIRIStream(final String collection, final String derivateId) {
             MCRPath derivateRootPath = MCRPath.getPath(derivateId, "/");
             try {
-                final Spliterator<Path> spliterator = Files.newDirectoryStream(derivateRootPath).spliterator();
-                final Stream<Path> stream = StreamSupport.stream(spliterator, false);
-                return stream.map((path) -> {
-                    String relativePath = derivateRootPath.relativize(path).toString();
-                    final String URI = MessageFormat.format("{0}{1}{2}/{3}/{4}", MCRFrontendUtil.getBaseURL(), MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, collection, derivateId, encodeURLPart(relativePath));
-                    return new IRI(URI);
+                List<IRI> iris = new ArrayList<IRI>();
+                Files.walkFileTree(derivateRootPath, new SimpleFileVisitor<Path>() {
+                    @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                        throws IOException {
+                        String relativePath = derivateRootPath.relativize(file).toString();
+                        final String URI = MessageFormat.format("{0}{1}{2}/{3}/{4}", MCRFrontendUtil.getBaseURL(),
+                            MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, collection, derivateId,
+                            encodeURLPart(relativePath));
+                        iris.add(new IRI(URI));
+                        return FileVisitResult.CONTINUE;
+                    }
                 });
+                return iris.stream();
             } catch (IOException e) {
                 LOGGER.error("Error while processing directory stream of " + derivateId, e);
                 throw new MCRException(e);
