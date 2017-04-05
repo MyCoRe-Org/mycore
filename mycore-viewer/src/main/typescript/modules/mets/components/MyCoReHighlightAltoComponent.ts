@@ -53,24 +53,68 @@ module mycore.viewer.components {
                         blockList.push(entry);
                     });
 
-                    fileIdsBlockListMap.keys.forEach(fileId=> {
-                        this.trigger(new RequestAltoModelEvent(this, fileId, (imageHref, altoHref, altoFile:widgets.alto.AltoFile)=> {
-                            var list = fileIdsBlockListMap.get(fileId);
-                            var blocks = altoFile.allElements;
-                            var ids = blocks.map(block=>block.getId());
-                            list.map(blockFromTo=> [ ids.indexOf(blockFromTo.fromId), ids.indexOf(blockFromTo.toId) ])
-                                .forEach(([fromIndex,toIndex])=> {
-                                        for (var i = fromIndex; i <= toIndex; i++) {
-                                            let blockToHighlight = blocks[ i ];
-                                            if(blockToHighlight == null) {
-                                                continue;
-                                            }
-                                            this.marker.markArea(new AreaInPage(imageHref, blockToHighlight.getBlockHPos(), blockToHighlight.getBlockVPos(), blockToHighlight.getWidth(), blockToHighlight.getHeight(), CanvasMarkerType.AREA));
+                    fileIdsBlockListMap.keys.forEach( fileId => {
+                        this.trigger( new RequestAltoModelEvent( this, fileId, ( imageHref, altoHref, altoFile: widgets.alto.AltoFile ) => {
+                            var list = fileIdsBlockListMap.get( fileId );
+                            var allBlocks = altoFile.allElements;
+                            var ids = allBlocks.map( block => block.getId() );
+                            // add all blocks which are required to highlight
+                            var blocks = [];
+                            list.map( blockFromTo => [ids.indexOf( blockFromTo.fromId ), ids.indexOf( blockFromTo.toId )] )
+                                .forEach(( [fromIndex, toIndex] ) => {
+                                    for ( var i = fromIndex; i <= toIndex; i++ ) {
+                                        let blockToHighlight = allBlocks[i];
+                                        if ( blockToHighlight == null ) {
+                                            continue;
                                         }
+                                        blocks.push(blockToHighlight);
                                     }
+                                }
                                 );
+                            // bundle blocks in areas for better highlight quality
+                            var areas:Array<any> = [];
+                            var area:AreaInPage = null;
+                            var maxBottom:number = null;
+                            var maxRight:number = null;
+                            blocks.forEach(block => {
+                                var blockX:number = block.getBlockHPos();
+                                var blockY:number = block.getBlockVPos();
+                                var blockW:number = block.getWidth();
+                                var blockH:number = block.getHeight();
+                                // new area
+                                if(area == null) {
+                                    newArea()
+                                    return;
+                                }
+                                // check if next block should be assigned to the current area
+                                if(isAssignable()) {
+                                    area.maximize(blockX, blockY, blockW, blockH);
+                                    return;
+                                }
+                                // mark area
+                                this.marker.markArea( jQuery.extend(false, {}, area) );
+                                // new area with block
+                                newArea();
 
-                        }));
+                                function newArea() {
+                                    area = new AreaInPage(imageHref, blockX, blockY, blockW, blockH, CanvasMarkerType.AREA);
+                                    maxRight = area.x + area.width;
+                                    maxBottom = area.y + area.height;
+                                }
+
+                                function isAssignable() {
+                                    // sometimes the blocks are not perfectly placed, use this
+                                    // to be a bit more generous (TODO should be 0.5% - 1% of
+                                    // of the height of the image)
+                                    var blockFaultiness = 15; // pixel
+                                    return (blockY >= maxBottom - blockFaultiness) && (blockX <= maxRight);
+                                }
+
+                            });
+                            if(area != null) {
+                                this.marker.markArea( jQuery.extend(false, {}, area) );
+                            }
+                        }) );
                     });
 
 

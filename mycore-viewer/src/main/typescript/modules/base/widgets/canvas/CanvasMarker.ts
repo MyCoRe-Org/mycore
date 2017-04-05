@@ -125,6 +125,21 @@ module mycore.viewer.widgets.canvas {
                     public height: number,
                     public markerType?: CanvasMarkerType) {
         }
+
+        /**
+         * Tries to maximize the bounds of this area.
+         */
+        public maximize(x:number, y:number, width:number, height:number) {
+            var right1:number = this.x + this.width;
+            var right2:number = x + width;
+            var bottom1:number = this.y + this.height;
+            var bottom2:number = y + height;
+            this.x = x < this.x ? x : this.x;
+            this.y = y < this.y ? y : this.y;
+            this.width = Math.max(right1, right2) - this.x;
+            this.height = Math.max(bottom1, bottom2) - this.y;
+        }
+
     }
 
     export enum CanvasMarkerType {
