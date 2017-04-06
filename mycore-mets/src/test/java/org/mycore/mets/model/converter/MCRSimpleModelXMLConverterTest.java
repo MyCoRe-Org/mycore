@@ -23,7 +23,8 @@ public class MCRSimpleModelXMLConverterTest {
             "count(//mets:fileGrp[@USE='MASTER']/mets:file)=3;" +
             "count(//mets:fileGrp[@USE='ALTO']/mets:file)=3;" +
             "count(//mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[@TYPE='page'])=3;" +
-            "count(//mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[@TYPE='page']/mets:fptr)=6";
+            "count(//mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[@TYPE='page']/mets:fptr)=6;"+
+            "count(//mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[@TYPE='page' and contains(@CONTENTIDS, 'URN:special-urn')])=3;";
 
     private MCRMetsSimpleModel metsSimpleModel;
 
