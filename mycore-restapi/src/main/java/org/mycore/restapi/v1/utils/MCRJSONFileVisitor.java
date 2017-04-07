@@ -11,17 +11,17 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.MessageFormat;
 
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.filter.MCRSecureTokenV2FilterConfig;
 
 import com.google.gson.stream.JsonWriter;
+import org.mycore.frontend.jersey.MCRJerseyUtil;
+
+import javax.ws.rs.core.UriInfo;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -37,13 +37,10 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
     
     private String derId;
 
-    public MCRJSONFileVisitor(JsonWriter jw, MCRObjectID objId, MCRObjectID derId) {
+    public MCRJSONFileVisitor(JsonWriter jw, MCRObjectID objId, MCRObjectID derId, UriInfo info) {
         super();
         this.jw = jw;
-        baseURL = MessageFormat.format("{0}{1}", MCRFrontendUtil.getBaseURL(),
-            MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path"))
-            .replace("${mcrid}", objId.toString())
-            .replace("${derid}", derId.toString());
+        this.baseURL = MCRJerseyUtil.getBaseURL(info);
         this.objId = objId.toString();
         this.derId = derId.toString();
     }
@@ -96,7 +93,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         jw.beginObject();
         writePathInfo(file, attrs);
         jw.name("extension").value(getFileExtension(file.getFileName().toString()));
-        jw.name("href").value(MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(MCRObjectID.getInstance(derId), relativePath.toString()));
+        jw.name("href").value(MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(MCRObjectID.getInstance(derId), relativePath.toString(), this.baseURL));
         jw.endObject();
         return super.visitFile(file, attrs);
     }
