@@ -4,10 +4,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.jdom2.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -17,6 +19,8 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
+
+import java.util.List;
 
 /**
  * Contains some jersey utility methods.
@@ -144,6 +148,25 @@ public abstract class MCRJerseyUtil {
     public static String fromStatusCode(int statusCode) {
         Status status = Response.Status.fromStatusCode(statusCode);
         return status != null ? status.getReasonPhrase() : "Unknown Error";
+    }
+
+    /**
+     * Returns the base URL of the mycore system.
+     *
+     * @param info the UriInfo
+     *
+     * @return base URL of the mycore system as string
+     */
+    public static String getBaseURL(UriInfo info) {
+        String baseURL = info.getBaseUri().toString();
+        List<String> applicationPaths = MCRConfiguration.instance()
+                .getStrings("MCR.Jersey.Resource.ApplicationPaths");
+        for(String path : applicationPaths){
+            if (baseURL.endsWith("/" + path + "/")){
+                return baseURL.substring(0, baseURL.indexOf(path));
+            }
+        }
+        return baseURL;
     }
 
 }

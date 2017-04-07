@@ -70,7 +70,11 @@ public class MCRSecureTokenV2FilterConfig {
     }
 
     public static String getFileNodeServletSecured(MCRObjectID derivate, String path) {
-        String fileNodeBaseURL = MCRFrontendUtil.getBaseURL() + "servlets/MCRFileNodeServlet/";
+        return getFileNodeServletSecured(derivate, path, MCRFrontendUtil.getBaseURL());
+    }
+
+    public static String getFileNodeServletSecured(MCRObjectID derivate, String path, String baseURL) {
+        String fileNodeBaseURL = baseURL + "servlets/MCRFileNodeServlet/";
         if (requireHash(path)) {
             MCRSecureTokenV2 token = new MCRSecureTokenV2(derivate + "/" + path,
                 MCRSessionMgr.getCurrentSession().getCurrentIP(), sharedSecret);
