@@ -100,6 +100,7 @@ module mycore.viewer.widgets.layout {
             cssDescription.top = "0px";
             cssDescription.bottom = "0px";
             cssDescription.left = "0px";
+            cssDescription.display = description.size != 0 ? "block" : "none";
 
             switch (description.direction) {
                 case IviewBorderLayout.DIRECTION_EAST:

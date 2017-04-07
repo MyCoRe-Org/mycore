@@ -25,7 +25,7 @@ module mycore.viewer.widgets.canvas {
 
         private _container:JQuery = jQuery("<div></div>");
         private _drawCanvas:HTMLCanvasElement = PageView.createCanvas(1);
-        private _markCanvas:HTMLCanvasElement = PageView.createCanvas(2);
+        private _markCanvas:HTMLCanvasElement = PageView.createCanvas(4);
 
         private _ctx:CanvasRenderingContext2D;
 
