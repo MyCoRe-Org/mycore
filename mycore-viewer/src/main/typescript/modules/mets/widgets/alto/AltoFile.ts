@@ -18,14 +18,33 @@ module mycore.viewer.widgets.alto {
         private _allComposedBlock:Array<AltoElement> = new Array<AltoElement>();
         private _allGraphicalElements:Array<AltoElement> = new Array<AltoElement>();
 
-        constructor(styles:Element, printSpace:Element) {
-            var styleList:NodeList = styles.getElementsByTagName("TextStyle");
+        private _pageWidth:number = -1;
+        private _pageHeight:number = -1;
+
+        constructor(styles:Element, layout:Element) {
+            // set style
+            var styleList:NodeListOf<Element> = styles.getElementsByTagName("TextStyle");
             for(var index = 0; index < styleList.length; index++) {
-                var style:Element = <Element>styleList.item(index);
+                var style:Element = styleList.item(index);
                 var altoStyle:AltoStyle = this.createAltoStyle(style);
                 this._allStyles[altoStyle.getId()] = altoStyle;
             }
 
+            // set width/height
+            var pages:NodeListOf<Element> = layout.getElementsByTagName("Page");
+            var page:Element = pages.item(0);
+            if(page == null) {
+                return;
+            }
+            this._pageWidth = parseInt(page.getAttribute("WIDTH"));
+            this._pageHeight = parseInt(page.getAttribute("HEIGHT"));
+
+            // extract content
+            var printSpaces:NodeListOf<Element> = page.getElementsByTagName("PrintSpace");
+            var printSpace:Element = printSpaces.item(0);
+            if(printSpace == null) {
+                return;
+            }
             this._rootChilds = this.extractElements(printSpace);
             this._allElements = this._allTextBlocks.concat(this._allIllustrations).concat(this._allComposedBlock).concat(this._allLines).concat(this._allGraphicalElements);
         }
@@ -153,6 +172,14 @@ module mycore.viewer.widgets.alto {
 
         public getLines():Array<AltoElement> {
             return this._allLines;
+        }
+
+        public get pageWidth():number {
+            return this._pageWidth;
+        }
+
+        public get pageHeight():number {
+            return this._pageHeight;
         }
 
         private detectElementType(currentElement:Element):AltoElementType {
