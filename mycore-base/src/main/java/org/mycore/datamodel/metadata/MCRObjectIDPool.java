@@ -38,7 +38,6 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 class MCRObjectIDPool {
     private static LoadingCache<String, MCRObjectID> objectIDCache = CacheBuilder
         .newBuilder()
-        .weakKeys()
         .weakValues()
         .build(new CacheLoader<String, MCRObjectID>() {
             @Override
@@ -61,7 +60,13 @@ class MCRObjectIDPool {
 
     static long getSize() {
         objectIDCache.cleanUp();
-        return objectIDCache.size();
+        //objectIDCache.size() may return more as actually present;
+        return objectIDCache.asMap()
+            .entrySet()
+            .stream()
+            .filter(e -> e.getKey() != null)
+            .filter(e -> e.getValue() != null)
+            .count();
     }
     
     static MCRObjectID getIfPresent(String id){

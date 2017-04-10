@@ -38,9 +38,11 @@
   </xsl:template>
 
   <xsl:template match="mods:originInfo[not(@eventType)]">
-    <mods:originInfo eventType="publication">
-      <xsl:apply-templates select="node()|@*" />
-    </mods:originInfo>
+    <xsl:if test="not(//mods:mods/mods:originInfo/@eventType='publication')">
+      <mods:originInfo eventType="publication">
+        <xsl:apply-templates select="node()|@*" />
+      </mods:originInfo>
+    </xsl:if>
   </xsl:template>
 
   <!-- add encoding to a mods:dateIssued without encoding -->
