@@ -165,3 +165,4 @@ $RECYCLE.BIN/
 node_modules/
 bower_components/
 typings/
+.tscache/
