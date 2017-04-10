@@ -82,6 +82,11 @@ public class MCRSimpleModelXMLConverter {
             if(orderLabel != null){
                 physicalSubDiv.setOrderLabel(orderLabel);
             }
+            String contentIds = page.getContentIds();
+            if (contentIds!=null){
+                physicalSubDiv.setContentids(contentIds);
+            }
+
             structMap.getDivContainer().add(physicalSubDiv);
             pageIdMap.put(page, id);
 
