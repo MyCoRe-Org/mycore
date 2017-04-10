@@ -1,0 +1,70 @@
+<td ng-click="pageListCtrl.pageClicked(pageObj, $event)">
+    {{$index+1}}
+</td>
+
+<td ng-click="pageListCtrl.pageClicked(pageObj, $event)"
+    class="{{(pageCtrl.editable && pageCtrl.edit.label != null) ? ((pageCtrl.isValidLabel(pageCtrl.edit.label) ? 'has-success ':'has-error ')):''}}">
+
+    <!-- weired bug here (need to check !pageCtrl.thumbnail or they will be displayed) -->
+    <div ng-if="!pageCtrl.thumbnail && pageCtrl.edit.label == null">
+        <span ng-if="pageCtrl.hasLabel()">{{pageCtrl.page.orderLabel}}</span>
+    </div>
+
+    <input type="text"
+           class="form-control edit"
+           ng-if="!pageCtrl.thumbnail && pageCtrl.editable && pageCtrl.edit.label != null"
+           ng-model="pageCtrl.edit.label"
+           ng-keyup="pageCtrl.editLabelKeyUp($event)"
+           ng-click="pageCtrl.editInputClicked($event)"
+           ng-cancel-drag
+           select-immediately/>
+</td>
+
+
+<td ng-click="pageListCtrl.pageClicked(pageObj, $event)">
+    <div class="btn-group btn-group-xs" role="group">
+        <button ng-if="!pageCtrl.thumbnail && pageCtrl.editable && pageCtrl.edit.label == null"
+                type="button"
+                class="btn btn-default btn-xs"
+                ng-click="pageCtrl.editLabel($event)"
+                title="{{pageCtrl.messages['editPagination'] || '???editPagination???'}}"
+                ng-cancel-drag>
+            <span class="glyphicon glyphicon-edit"></span>
+        </button>
+        <button ng-if="!pageCtrl.thumbnail && pageCtrl.editable && pageCtrl.edit.label == null && pageCtrl.hasLabel()"
+                type="button"
+                class="btn btn-default btn-xs"
+                ng-click="pageCtrl.removePagination($event)"
+                title="{{pageCtrl.messages['removePagination'] || '???removePagination???'}}"
+                ng-cancel-drag>
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+    </div>
+    <div class="btn-group btn-group-xs" role="group">
+        <button ng-if="!pageCtrl.thumbnail && pageCtrl.editable && pageCtrl.edit.label !== null"
+                type="button"
+                class="btn btn-success btn-xs"
+                ng-click="pageCtrl.applyEdit($event)"
+                title="{{pageCtrl.messages['paginationChange'] || '???paginationChange???'}}"
+                ng-cancel-drag>
+            <span class="glyphicon glyphicon glyphicon-ok"></span>
+        </button>
+
+        <button ng-if="!pageCtrl.thumbnail && pageCtrl.editable && pageCtrl.edit.label !== null"
+                ng-click="pageCtrl.throwEdit($event)"
+                type="button"
+                class="btn btn-danger btn-xs"
+                title="{{pageCtrl.messages['paginationAbort'] || '???paginationAbort???'}}"
+                ng-cancel-drag>
+            <span class="glyphicon glyphicon glyphicon-remove"></span>
+        </button>
+    </div>
+</td>
+
+<td ng-click="pageListCtrl.pageClicked(pageObj, $event)">
+    <ul ng-if="!pageCtrl.thumbnail" class="hrefList">
+        <li ng-repeat="file in pageCtrl.getFiles()">
+            {{file.href}}
+        </li>
+    </ul>
+</td>

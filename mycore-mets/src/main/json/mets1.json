@@ -1,0 +1,237 @@
+{
+  "rootSection": {
+    "metsSectionList": [
+      {
+        "metsSectionList": [],
+        "id": "54d95a2e-3e71-499b-808b-7b8e532b38f5",
+        "type": "- cover_front",
+        "label": "intro"
+      },
+      {
+        "metsSectionList": [],
+        "id": "2839df47-99ea-4f4e-a76d-544e03912d85",
+        "type": "contained_work",
+        "label": "begin"
+      },
+      {
+        "metsSectionList": [
+          {
+            "metsSectionList": [],
+            "id": "d0b2434a-46f4-423d-b0f4-85011ab9f366",
+            "type": "map",
+            "label": "middlemap"
+          }
+        ],
+        "id": "19054de2-53aa-4e7e-9323-83dde0e3adc6",
+        "type": "chapter",
+        "label": "middle"
+      },
+      {
+        "metsSectionList": [
+          {
+            "metsSectionList": [],
+            "id": "1dfa9020-1d51-44b8-91fc-296bebe0c9a4",
+            "type": "map",
+            "label": "endmap"
+          }
+        ],
+        "id": "ab8d15cd-537b-48b5-8696-e44c9495bf4f",
+        "type": "chapter",
+        "label": "end"
+      },
+      {
+        "metsSectionList": [],
+        "id": "891dd95e-227b-4584-b4d3-30d892694679",
+        "type": "chapter",
+        "label": "end2"
+      }
+    ],
+    "id": "ddcac0f8-538b-408d-91dc-cf6a38219b59",
+    "type": "monograph",
+    "label": "ArchNachl_derivate_00000011"
+  },
+  "metsPageList": [
+    {
+      "id": "0e32471d-d807-41de-9276-327685cb4415",
+      "fileList": [
+        {
+          "id": "dcc6d72c-b38f-43b1-883b-c5aef83f4b20",
+          "href": "file1.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "cdf74530-c0cc-4489-9881-500033db15de",
+      "fileList": [
+        {
+          "id": "b5128aa9-913b-437a-b919-97ecfa357c04",
+          "href": "file2.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "effe2f51-3d8b-495d-a6f3-34781d370313",
+      "fileList": [
+        {
+          "id": "8036bd33-abab-4ec9-b211-daff5b5d30f2",
+          "href": "file3.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "e203d65a-5c97-4e92-abe8-ed7613fd1a7b",
+      "fileList": [
+        {
+          "id": "3f9c484d-afcb-4141-b449-1965c588faf8",
+          "href": "file4.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "675f9db7-e7ad-40c4-bc10-1502139d9e32",
+      "fileList": [
+        {
+          "id": "577632d6-5198-48fe-978e-ab3fdda05816",
+          "href": "file5.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "072915e2-fde9-4e2a-895f-5b1a24b471c9",
+      "fileList": [
+        {
+          "id": "b0c0414c-22b2-483c-8764-c9fec6d9b8c1",
+          "href": "file6.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "77314709-a500-4337-aded-5549ff97779e",
+      "fileList": [
+        {
+          "id": "c14170f8-5883-4e45-93f9-f48d81cec870",
+          "href": "file7.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "b346487c-32a1-418f-a8eb-7f8dd5297d10",
+      "fileList": [
+        {
+          "id": "78ec71d2-768f-490c-8543-6572daff2025",
+          "href": "file8.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "98161c9d-e267-433f-83ae-3067e56e6012",
+      "fileList": [
+        {
+          "id": "ad8d7949-7887-429d-b55c-5bdd60605a0f",
+          "href": "file9.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "54ff8906-9316-4049-b6a6-f38b683559ae",
+      "fileList": [
+        {
+          "id": "724c208b-6305-43e9-9d4b-1e4ec3074d8f",
+          "href": "file10.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "fb41021e-5a41-478b-9802-e52a97ba0b04",
+      "fileList": [
+        {
+          "id": "731be1c8-e176-4bc3-9cfc-c5043b28de26",
+          "href": "file11.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    },
+    {
+      "id": "750c97c8-907e-4de9-b7be-79df15125d2c",
+      "fileList": [
+        {
+          "id": "2fb3e38f-62ac-4f32-b970-3f9a6b8ee89a",
+          "href": "file12.jpg",
+          "mimeType": "image/jpeg",
+          "use": "MASTER"
+        }
+      ]
+    }
+  ],
+  "sectionPageLinkList": [
+    {
+      "from": "54d95a2e-3e71-499b-808b-7b8e532b38f5",
+      "to": "0e32471d-d807-41de-9276-327685cb4415"
+    },
+    {
+      "from": "54d95a2e-3e71-499b-808b-7b8e532b38f5",
+      "to": "cdf74530-c0cc-4489-9881-500033db15de"
+    },
+    {
+      "from": "2839df47-99ea-4f4e-a76d-544e03912d85",
+      "to": "effe2f51-3d8b-495d-a6f3-34781d370313"
+    },
+    {
+      "from": "2839df47-99ea-4f4e-a76d-544e03912d85",
+      "to": "e203d65a-5c97-4e92-abe8-ed7613fd1a7b"
+    },
+    {
+      "from": "19054de2-53aa-4e7e-9323-83dde0e3adc6",
+      "to": "675f9db7-e7ad-40c4-bc10-1502139d9e32"
+    },
+    {
+      "from": "d0b2434a-46f4-423d-b0f4-85011ab9f366",
+      "to": "072915e2-fde9-4e2a-895f-5b1a24b471c9"
+    },
+    {
+      "from": "ab8d15cd-537b-48b5-8696-e44c9495bf4f",
+      "to": "77314709-a500-4337-aded-5549ff97779e"
+    },
+    {
+      "from": "ab8d15cd-537b-48b5-8696-e44c9495bf4f",
+      "to": "b346487c-32a1-418f-a8eb-7f8dd5297d10"
+    },
+    {
+      "from": "1dfa9020-1d51-44b8-91fc-296bebe0c9a4",
+      "to": "98161c9d-e267-433f-83ae-3067e56e6012"
+    },
+    {
+      "from": "ab8d15cd-537b-48b5-8696-e44c9495bf4f",
+      "to": "54ff8906-9316-4049-b6a6-f38b683559ae"
+    },
+    {
+      "from": "891dd95e-227b-4584-b4d3-30d892694679",
+      "to": "fb41021e-5a41-478b-9802-e52a97ba0b04"
+    },
+    {
+      "from": "891dd95e-227b-4584-b4d3-30d892694679",
+      "to": "750c97c8-907e-4de9-b7be-79df15125d2c"
+    }
+  ]
+}

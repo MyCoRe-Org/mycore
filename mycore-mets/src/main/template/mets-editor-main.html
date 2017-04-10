@@ -1,0 +1,65 @@
+<div ng-if="metsEditorCtrl.model!=null" fa-pane>
+
+    <nav fa-pane pane-size="52px" pane-anchor="north" class="navbar navbar-default">
+        <div ng-include="'toolbar/toolbar.html'"></div>
+    </nav>
+
+
+    <div fa-pane pane-size="40%" pane-anchor="west">
+        <div ng-include="'image/pagePresenter.html'"
+             ng-controller="DefaultPagePresenter as pagePresenter"
+             ng-init="pagePresenter.init(metsEditorCtrl.model)"
+             class="presenter-parent">
+        </div>
+    </div>
+
+    <div ng-switch on="metsEditorCtrl.model.mode">
+        <div ng-switch-when="structuring">
+            <div fa-pane>
+                <div fa-pane pane-size="60%" pane-anchor="east">
+                    <div ng-if="metsEditorCtrl.model.dataLoaded && metsEditorCtrl.model.locked">
+                        <div class="notLinked" ng-controller="NotLinkedController as notLinkedController"
+                             ng-init="notLinkedController.init(metsEditorCtrl.model)">
+                            <div class="badge" ng-repeat="page in notLinkedController.getNotLinkedPages()">
+                                {{ notLinkedController.getPageLabel(page) }}
+                            </div>
+                        </div>
+                        <div class="tree"
+                             ng-controller="MetsEditorTreeController as treeCtrl"
+                             ng-include="'tree/tree.html'"
+                             ng-init="treeCtrl.init(metsEditorCtrl.model.metsModel.rootSection, 'metsSectionList', 'parent', metsEditorCtrl.model)">
+                        </div>
+                    </div>
+                </div>
+
+                <div fa-pane pane-anchor="center" class="tree-pane">
+                    <div ng-if="metsEditorCtrl.model.dataLoaded && metsEditorCtrl.model.locked"
+                         ng-controller="MetsEditorPageListController as pageListCtrl">
+                        <div class="pageListController"
+                             ng-init="pageListCtrl.init(metsEditorCtrl.model, false, true)"
+                             ng-include="'pageList/pageList.html'"
+                             afkl-image-container >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div ng-switch-when="pagination">
+            <div fa-pane>
+                <div fa-pane pane-anchor="center" class="tree-pane">
+                    <div ng-if="metsEditorCtrl.model.dataLoaded && metsEditorCtrl.model.locked"
+                         ng-controller="MetsEditorPageListController as pageListCtrl">
+                        <div class="pageListController"
+                             relative-list
+                             ng-init="pageListCtrl.init(metsEditorCtrl.model, true)"
+                             ng-include="'pageList/pageList.html'"
+                             afkl-image-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

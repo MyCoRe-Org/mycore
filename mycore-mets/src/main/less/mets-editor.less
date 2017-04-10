@@ -1,0 +1,111 @@
+@import "mixins";
+@import "drag-drop";
+@import "modal";
+@import "page-list";
+@import "tree";
+@import "changeList";
+@import "navbar";
+@import "presenter";
+
+div.tree-pane[pane-anchor="center"] {
+  border-right: 1px solid #e7e7e7;
+  border-left: 1px solid #e7e7e7;
+
+  .navbar {
+    padding-left: 10px;
+    padding-right: 10px;
+    border-left: none;
+    border-right: none;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    position: fixed;
+    left: 40%;
+    right: 0px;
+    z-index: 30;
+    opacity: 0.95;
+  }
+
+  .pageList {
+    top: 51px;
+    position: relative;
+  }
+
+  .pageListController {
+    overflow-y: scroll;
+    position: absolute;
+    right: 0px;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+  }
+
+}
+
+.combined {
+  .navbar {
+    padding-left: 10px;
+    padding-right: 10px;
+    border-left: none;
+    border-radius: 0px;
+  }
+
+  .sectionHeader {
+    min-height: 32px;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #e7e7e7;
+    border-top: 1px solid #e7e7e7;
+    padding: 7px;
+    z-index: 20;
+  }
+
+  [scroll-box] {
+    overflow-y: scroll;
+    position: absolute;
+    right: 0px;
+    left: 0px;
+    top: 52px;
+    bottom: 0px;
+
+
+    .glyphicon-link:hover {
+      color: green;
+      cursor: pointer;
+    }
+
+    .glyphicon-remove:hover {
+      color: darkred;
+      cursor: pointer;
+    }
+
+    .thumbnail {
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 5px;
+      -webkit-animation: initial;
+      animation: initial;
+      -moz-animation: initial;
+    }
+
+
+    [scroll-content] .thList,.list {
+      .form-control {
+        max-width: 60%;
+        display: inline;
+      }
+      padding: 7px;
+      //border-bottom: 1px solid #e7e7e7;
+    }
+  }
+}
+
+div.tree-pane{
+  .editable {
+    cursor: text;
+  }
+
+  .list {
+    cursor: pointer;
+  }
+}

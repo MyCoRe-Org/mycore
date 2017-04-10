@@ -1,0 +1,8 @@
+<form class="navbar-form navbar-right" role="save">
+    <button type="button" class="btn btn-primary {{saveCtrl.canSave() ? '':'disabled'}}"
+            ng-click="saveCtrl.saveClicked()"
+            title="{{metsEditorCtrl.i18nModel.messages['save'] || '???save???'}}">
+        <span class="glyphicon glyphicon-floppy-disk"/>
+        {{metsEditorCtrl.i18nModel.messages['save'] || '???save???'}}
+    </button>
+</form>

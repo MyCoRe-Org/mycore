@@ -1,0 +1,26 @@
+.drop-marker {
+  height: 6px;
+  list-style: none;
+}
+
+.tree .drop-marker {
+  display: block;
+}
+
+.drag-enter {
+  text-shadow: 0 -1px 0 #286090;
+  background-image: -webkit-linear-gradient(top, #337ab7 0, #2b669a 100%);
+  background-image: -o-linear-gradient(top, #337ab7 0, #2b669a 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#337ab7), to(#2b669a));
+  background-image: linear-gradient(to bottom, #337ab7 0, #2b669a 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff337ab7', endColorstr='#ff2b669a', GradientType=0);
+  background-repeat: repeat-x;
+  border-color: #2b669a;
+}
+
+.dragging {
+  opacity: 0.7;
+  position: absolute;
+  width: 100%;
+  .filter(grayscale(50%) blur(0.5px))
+}
