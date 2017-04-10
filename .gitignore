@@ -166,3 +166,5 @@ $RECYCLE.BIN/
 
 # dependency for compiling or frontend
 node_modules/
+bower_components/
+typings/
