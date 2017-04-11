@@ -135,6 +135,9 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
             //we cannot handle it ourself
             throw ex;
         }
+        if (job.getResponse().isCommitted()) {
+            return;
+        }
         MCRObjectID id = (MCRObjectID) job.getRequest().getAttribute(KEY_OBJECT_ID);
         String path = (String) job.getRequest().getAttribute(KEY_PATH);
         try (ServletOutputStream sout = job.getResponse().getOutputStream()) {
