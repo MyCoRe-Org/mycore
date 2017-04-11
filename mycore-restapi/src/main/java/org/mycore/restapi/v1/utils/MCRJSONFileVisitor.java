@@ -82,7 +82,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         jw.name("accessed").value(attrs.lastAccessTime().toString());
         jw.endObject();
         if (attrs.isRegularFile()) {
-            jw.name("contentTime").value(MCRContentTypes.probeContentType(path));
+            jw.name("contentType").value(MCRContentTypes.probeContentType(path));
             if (attrs instanceof MCRFileAttributes) {
                 jw.name("md5").value(((MCRFileAttributes<?>) attrs).md5sum());
             }
