@@ -1,0 +1,30 @@
+{
+  "name": "mycore-mets-editor",
+  "version": "0.0.2",
+  "description": "The browser part of the mets-editor as a angular-js application.",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sebastian Hofmann <hofmann.s@uni-jena.de>",
+  "license": "GPLv3",
+  "devDependencies": {
+    "connect": "^3.3.5",
+    "grunt": "^0.4.5",
+    "grunt-bower-task": "^0.4.0",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-contrib-copy": "^0.8.0",
+    "grunt-contrib-jasmine": "^1.0.3",
+    "grunt-contrib-less": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-html2js": "^0.3.0",
+    "grunt-ts": "^6.0.0-beta.9",
+    "grunt-tsd": "^0.1.0",
+    "grunt-tslint": "^4.0.0",
+    "grunt-typedoc": "^0.2.2",
+    "serve-static": "^1.9.2",
+    "tslint": "^4.3.1"
+  }
+}

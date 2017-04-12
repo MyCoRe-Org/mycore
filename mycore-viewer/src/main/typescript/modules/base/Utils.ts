@@ -398,8 +398,8 @@ class MyCoReMap<K, V> {
         return keys;
     }
 
-    public get values() {
-        var values = new Array();
+    public get values():Array<V> {
+        var values:Array<V> = new Array();
         for (var i in this.arr) {
             values.push(this.arr[i]);
         }
@@ -452,6 +452,11 @@ class MyCoReMap<K, V> {
             });
         }
     }
+
+    public isEmpty():boolean {
+        return Object.keys(this.arr).length <= 0;
+    }
+
 }
 
 class ViewerError {

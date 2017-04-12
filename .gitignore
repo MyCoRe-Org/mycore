@@ -160,6 +160,9 @@ $RECYCLE.BIN/
 # https://github.com/grunt-ts/grunt-ts/issues/77
 .baseDir.ts
 
-# dependency for compiling or frontend
+
+# dependencys for compiling or frontend
 node_modules/
 bower_components/
+typings/
+.tscache/

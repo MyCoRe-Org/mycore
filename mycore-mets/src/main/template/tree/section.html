@@ -1,0 +1,94 @@
+<div ng-controller="SectionController as sectionCtrl"
+     ng-init="sectionCtrl.init(element, treeCtrl.editorModel)">
+
+    <!-- Display orderLabel -->
+    <span ng-if="sectionCtrl.edit.label==null" class="tree-folder-label"
+          ng-drag-handle
+          title="{{sectionCtrl.section.label}}">{{sectionCtrl.section.label}}</span>
+
+    <!-- Display Editable orderLabel -->
+    <input class="form-control edit"
+           ng-cancel-drag
+           type="text"
+           ng-if="sectionCtrl.edit.label!=null"
+           ng-model="sectionCtrl.edit.label"
+           ng-init="(sectionCtrl.edit.label=sectionCtrl.section.label||'')"
+           ng-keyup="sectionCtrl.editLabelKeyUp($event)"
+           ng-click="sectionCtrl.inputClicked($event)"
+           select-immediately/>
+
+    <div ng-show="sectionCtrl.edit.label==null"
+          class="edit-menu pull-right">
+
+          <!-- Edit Type -->
+          <select class="badge typeBadge"
+                  ng-cancel-drag
+                  title="{{sectionCtrl.i18nModel.messages['treeChangeType']||'???treeChangeType???'}}"
+                  ng-click="sectionCtrl.inputClicked($event)"
+                  ng-change="sectionCtrl.editTypeChange()"
+                  ng-options="structureElement.id as sectionCtrl.i18nModel.messages[structureElement.id.replace('- ', '')] for (index, structureElement) in sectionCtrl.structureSet"
+                  ng-model="sectionCtrl.edit.type"
+                  ng-init="sectionCtrl.edit.type=sectionCtrl.section.type"
+                  ng-blur="sectionCtrl.blurEditBadge(sectionCtrl.section)"
+                  ng-cancel-drag>
+          </select>
+
+
+          <div class="btn-group btn-group-xs" role="group">
+              <!-- add button -->
+              <button type="button" class="btn btn-default"
+                      ng-cancel-drag
+                      ng-click="sectionCtrl.clickAddSection($event)"
+                      title="{{sectionCtrl.i18nModel.messages['treeAddSection']||'???treeAddSection???'}}">
+                  <span class="glyphicon glyphicon-plus-sign"></span>
+              </button>
+
+
+              <button type="button" class="btn btn-default"
+                      ng-cancel-drag
+                      ng-click="sectionCtrl.clickEditTreeLabel($event)"
+                      title="{{sectionCtrl.i18nModel.messages['treeEditLabel']||'???treeEditLabel???'}}">
+                  <span class="glyphicon glyphicon-edit"></span>
+              </button>
+
+              <button ng-cancel-drag type="button"
+                      class="btn btn-primary"
+                      title="{{sectionCtrl.i18nModel.messages['treeLinkPage']||'???treeLinkPage???'}}"
+                      ng-if="sectionCtrl.canLink(section, $event)"
+                      ng-click="sectionCtrl.link(section, $event)">
+                  <span class="glyphicon glyphicon-link"></span>
+              </button>
+
+              <!-- delete button-->
+              <button type="button" class="btn btn-danger"
+                      ng-cancel-drag
+                      ng-if="sectionCtrl.isDeletable(section)"
+                      ng-click="sectionCtrl.clickDeleteSection($event)"
+                      title="{{sectionCtrl.i18nModel.messages['treeDeleteSection']||'???treeDeleteSection???'}}">
+                  <span class="glyphicon glyphicon-remove"></span>
+              </button>
+
+
+          </div>
+    </div>
+
+    <div ng-if="treeCtrl.treeModel.getElementOpen(element)">
+        <div class="children-list">
+            <div class="child"
+                 ng-repeat="element in treeCtrl.getChildren(element)"
+                 ng-include="'tree/treeElement.html'">
+            </div>
+        </div>
+    </div>
+
+
+    <section  class="linkedPageBox" ng-if="sectionCtrl.hasPageChildren()">
+            <span class="badge" ng-repeat="linkedPage in sectionCtrl.getPageChildren()">
+                {{linkedPage.orderLabel || "[" + sectionCtrl.getAlternateOrderlabel(linkedPage)+ "]"}}
+                <span ng-if="sectionCtrl.canUnlink()"
+                      ng-cancel-drag ng-click="sectionCtrl.removeLink(element, linkedPage, $event)"
+                      title="{{sectionCtrl.i18nModel.messages['treeDeleteLink']||'???treeDeleteLink???'}}"
+                      class="glyphicon glyphicon-remove remove"></span>
+            </span>
+    </section>
+</div>

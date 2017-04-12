@@ -1,0 +1,47 @@
+<div class="list thListElement thumbnail {{(pageCtrl.editable && pageCtrl.edit.label != null) ?
+ ((pageCtrl.isValidLabel(pageCtrl.edit.label) ? 'has-success ':'has-error ')):''}}">
+    <div class="thumb afkl-img-ratio-1-1" afkl-lazy-image="{{pageCtrl.imageLocation}}"></div>
+
+    <div ng-if="pageCtrl.edit.label == null">
+        <span class="thumbnail-label"
+              ng-if="pageCtrl.hasLabel()">{{pageCtrl.page.orderLabel}}</span>
+
+        <span class="thumbnail-label"
+              ng-if="!pageCtrl.hasLabel()">{{'[' + ($index+1) + ']'}}</span>
+    </div>
+
+    <div ng-if="pageCtrl.editable">
+        <input type="text"
+               class="form-control edit"
+               ng-click="pageCtrl.editInputClicked($event)"
+               ng-if="pageCtrl.edit.label != null"
+               ng-model="pageCtrl.edit.label"
+               ng-keyup="pageCtrl.editLabelKeyUp($event)"
+               ng-cancel-drag
+               select-immediately>
+
+        <button ng-if="pageCtrl.edit.label == null"
+                type="button"
+                class="btn btn-default btn-xs"
+                ng-click="pageCtrl.editLabel($event)"
+                ng-cancel-drag>
+            <span class="glyphicon glyphicon-edit"></span>
+        </button>
+
+        <div ng-if="pageCtrl.edit.label !== null" class="btn-group btn-group-xs" role="group">
+            <button type="button"
+                    class="btn btn-success btn-xs"
+                    ng-click="pageCtrl.applyEdit($event)"
+                    ng-cancel-drag>
+                <span class="glyphicon glyphicon glyphicon-ok"></span>
+            </button>
+
+            <button ng-click="pageCtrl.throwEdit($event)"
+                    type="button"
+                    class="btn btn-danger btn-xs"
+                    ng-cancel-drag>
+                <span class="glyphicon glyphicon glyphicon-remove"></span>
+            </button>
+        </div>
+    </div>
+</div>

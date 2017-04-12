@@ -1,0 +1,89 @@
+<div class="navbar navbar-default" ng-if="pageListCtrl.editable">
+    <div class="row">
+        <div class="col-md-3" ng-include="'toolbar/pageListControls.html'"
+             ng-controller="MetsEditorPaginationController as paginationCtrl"
+             ng-init="paginationCtrl.init(metsEditorCtrl.model)">
+        </div>
+        <div class="col-md-3 pull-right">
+            <form class="navbar-form" role="mode">
+                <div class="btn-group pull-right" role="group">
+                    <button type="button" class="btn btn-default {{!pageListCtrl.thumbnails? ' active':''}}"
+                            ng-click="pageListCtrl.thumbnails=false"
+                            title="{{metsEditorCtrl.i18nModel.messages['list'] || '???list???'}}">
+                        <span class="glyphicon glyphicon-list-alt"/>
+                    </button>
+                    <button type="button" class="btn btn-default {{pageListCtrl.thumbnails? ' active':''}}"
+                            ng-click="pageListCtrl.thumbnails=true"
+                            title="{{metsEditorCtrl.i18nModel.messages['thumbnails'] || '???thumbnails???'}}">
+                        <span class="glyphicon glyphicon-th-large"/>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="pageList">
+    <table ng-if="!pageListCtrl.thumbnails">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>{{pageListCtrl.messages["pagination"] || "???pagination???" }}</th>
+            <th>{{pageListCtrl.messages["edit"] || "???edit???"}}</th>
+            <th>{{pageListCtrl.messages["fileName"] || "???fileName???"}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat-start="pageObj in pageListCtrl.getPageList() track by pageObj.id">
+            <td ng-if="pageListCtrl.editable && $index==0"
+                class="drop-marker"
+                ng-drop="true"
+                ng-drop-success="pageListCtrl.dropSuccess(pageObj, 'before', $data, $event)"
+                colspan="4"></td>
+        </tr>
+
+        <tr class="listEntry {{pageListCtrl.isPageSelected(pageObj)? 'selected': ''}}"
+            jump-to-element="{{pageListCtrl.isPageAloneSelected(pageObj)}}"
+            ng-drag="pageListCtrl.editable && pageListCtrl.isPageSelected(pageObj)"
+            ng-drag-success="pageListCtrl.onDragComplete($data,$event)"
+            ng-drag-data="getSelectedPages()"
+            ng-controller="MetsEditorPageController as pageCtrl"
+            ng-init="pageCtrl.init(pageObj, pageListCtrl.model.stateEngine, pageListCtrl.model, pageListCtrl.editable);"
+            ng-include="'pageList/page.html'">
+        </tr>
+
+        <tr ng-repeat-end="pageObj in pageListCtrl.getPageList()">
+            <td ng-if="pageListCtrl.editable"
+                class="drop-marker"
+                ng-drop="true"
+                ng-drop-success="pageListCtrl.dropSuccess(pageObj, 'after', $data, $event)"
+                colspan="4"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div ng-if="pageListCtrl.thumbnails">
+        <div ng-if="pageListCtrl.editable && $index==0"
+             ng-repeat-start="pageObj in pageListCtrl.getPageList() track by pageObj.id"
+             class="drop-marker"
+             ng-drop="true"
+             ng-drop-success="pageListCtrl.dropSuccess(pageObj, 'before', $data, $event)"></div>
+
+        <div class="listEntry {{pageListCtrl.isPageSelected(pageObj)? 'selected': ''}}"
+             ng-drag="pageListCtrl.editable && pageListCtrl.isPageSelected(pageObj)"
+             ng-drag-success="pageListCtrl.onDragComplete($data,$event)"
+             ng-drag-data="getSelectedPages()"
+             jump-to-element="{{pageListCtrl.isPageAloneSelected(pageObj)}}">
+            <div ng-click="pageListCtrl.pageClicked(pageObj, $event)"
+                 ng-controller="MetsEditorPageController as pageCtrl"
+                 ng-init="pageCtrl.init(pageObj, pageListCtrl.model.stateEngine, pageListCtrl.model, pageListCtrl.editable)">
+                <div ng-include="'pageList/page_thumbnail.html'"></div>
+            </div>
+        </div>
+
+        <div ng-if="pageListCtrl.editable"
+             ng-repeat-end="pageObj in pageListCtrl.getPageList()"
+             class="drop-marker"
+             ng-drop="true"
+             ng-drop-success="pageListCtrl.dropSuccess(pageObj, 'after', $data, $event)"></div>
+    </div>
+</div>

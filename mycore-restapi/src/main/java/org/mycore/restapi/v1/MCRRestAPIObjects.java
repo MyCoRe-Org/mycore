@@ -125,8 +125,9 @@ public class MCRRestAPIObjects {
     @GET
     @Produces(MediaType.TEXT_XML)
     @Path("/{value}")
-    public Response returnMCRObject(@PathParam("value") String id, @QueryParam("style") String style) {
-        return MCRRestAPIObjectsHelper.showMCRObject(id, style);
+    public Response returnMCRObject(@Context UriInfo info, @PathParam("value") String id,
+        @QueryParam("style") String style) {
+        return MCRRestAPIObjectsHelper.showMCRObject(id, style, info);
 
     }
 
@@ -143,10 +144,11 @@ public class MCRRestAPIObjects {
     @GET
     @Produces(MediaType.TEXT_XML)
     @Path("/{mcrid}/derivates/{derid}")
-    public Response returnDerivate(@PathParam("mcrid") String mcrid, @PathParam("derid") String derid,
+    public Response returnDerivate(@Context UriInfo info, @PathParam("mcrid") String mcrid,
+        @PathParam("derid") String derid,
         @QueryParam("style") String style) {
         try {
-            return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid);
+            return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info);
         } catch (IOException e) {
             return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
                 "Unable to display derivate content", e.getMessage()).createHttpResponse();
@@ -171,7 +173,7 @@ public class MCRRestAPIObjects {
         @QueryParam("format") @DefaultValue("xml") String format,
         @QueryParam("depth") @DefaultValue("-1") int depth){
         try {
-            return MCRRestAPIObjectsHelper.listContents(request, mcrID, derID, format, path, depth);
+            return MCRRestAPIObjectsHelper.listContents(request, mcrID, derID, format, path, depth, info);
         } catch (IOException e) {
             return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
         }
@@ -187,7 +189,7 @@ public class MCRRestAPIObjects {
     public Response listContents(@Context UriInfo info, @Context Request request, 
         @PathParam("mcrid") String mcrID, @PathParam("derid") String derID){
         try {
-            String url = MCRRestAPIObjectsHelper.retrieveMaindocURL(mcrID,  derID);
+            String url = MCRRestAPIObjectsHelper.retrieveMaindocURL(mcrID,  derID, info);
             if(url!=null){
                 return Response.seeOther(new URI(url)).build();
             }

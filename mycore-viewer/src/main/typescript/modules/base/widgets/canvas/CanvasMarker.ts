@@ -44,7 +44,29 @@ module mycore.viewer.widgets.canvas {
         }
 
         public draw(id:string, ctx:CanvasRenderingContext2D, pageSize:Size2D) {
-            this.areasToMark.hasThen(id, marks=> {
+            var isAreaMarked:boolean = this.areasToMark.values.some(marks => {
+                return marks.filter(isArea).length > 0;
+            });
+            if(isAreaMarked) {
+                var areas:Array<AreaInPage> = this.areasToMark.get(id);
+                var filteredAreas:Array<AreaInPage> = areas == null ? [] : areas.filter(isArea);
+                var areaRGBA = "rgba(0,0,0,0.4)";
+                ctx.save();
+                {
+                    ctx.strokeStyle = areaRGBA;
+                    ctx.fillStyle = areaRGBA;
+                    ctx.beginPath();
+                    ctx.rect(0, 0, pageSize.width, pageSize.height );
+                    ctx.closePath();
+                    ctx.fill();
+                    filteredAreas.forEach(area => {
+                        ctx.clearRect(area.x, area.y, area.width, area.height);
+                    });
+                }
+                ctx.restore();
+            }            
+
+            this.areasToMark.hasThen(id, marks => {
                 ctx.save();
                 {
                     let words = marks.filter((area)=> {
@@ -63,10 +85,9 @@ module mycore.viewer.widgets.canvas {
                 }
                 ctx.restore();
 
-
                 ctx.save();
                 {
-                    let wordsStrong = marks.filter((area)=> {
+                    let wordsStrong = marks.filter((area) => {
                         return "markerType" in area && area.markerType == CanvasMarkerType.WORD_STRONG;
                     });
                     if (wordsStrong.length > 0) {
@@ -75,7 +96,7 @@ module mycore.viewer.widgets.canvas {
                         ctx.lineWidth = lineWidth;
                         ctx.beginPath();
 
-                        wordsStrong.forEach(strongWord=> {
+                        wordsStrong.forEach(strongWord => {
                             ctx.rect(strongWord.x - lineWidth / 2, strongWord.y - lineWidth / 2, strongWord.width + lineWidth, strongWord.height + lineWidth);
                         });
                         ctx.closePath();
@@ -83,37 +104,11 @@ module mycore.viewer.widgets.canvas {
                     }
                 }
                 ctx.restore();
-
-
-                ctx.save();
-                {
-                    let areas = marks.filter((area)=> {
-                        return !("markerType" in area) || ("markerType" in area && area.markerType == CanvasMarkerType.AREA);
-                    });
-
-                    if (areas.length > 0) {
-                        var tolerancePixel = 3;
-                        ctx.strokeStyle = "rgba(0,0,0,0.5)";
-                        ctx.fillStyle = "rgba(0,0,0,0.5)";
-                        ctx.beginPath();
-                        areas.forEach(area=> {
-
-                            ctx.rect(
-                                area.x - (tolerancePixel * window.devicePixelRatio),
-                                area.y - (tolerancePixel * window.devicePixelRatio),
-                                area.width + (2 * tolerancePixel * window.devicePixelRatio),
-                                area.height + (2 * tolerancePixel * window.devicePixelRatio));
-                        });
-                        ctx.rect(pageSize.width, 0, -pageSize.width, pageSize.height);
-                        ctx.closePath();
-                        ctx.fill();
-
-                    }
-                }
-                ctx.restore();
-
-
             });
+
+            function isArea(marker:AreaInPage):boolean {
+                return "markerType" in marker && marker.markerType == CanvasMarkerType.AREA;
+            }
         }
     }
 
@@ -129,7 +124,7 @@ module mycore.viewer.widgets.canvas {
         /**
          * Tries to maximize the bounds of this area.
          */
-        public maximize(x:number, y:number, width:number, height:number) {
+        public maximize(x:number, y:number, width:number, height:number):void {
             var right1:number = this.x + this.width;
             var right2:number = x + width;
             var bottom1:number = this.y + this.height;
@@ -138,6 +133,25 @@ module mycore.viewer.widgets.canvas {
             this.y = y < this.y ? y : this.y;
             this.width = Math.max(right1, right2) - this.x;
             this.height = Math.max(bottom1, bottom2) - this.y;
+            this.correctBounds();
+        }
+
+        /**
+         * Increase this area with the given number of pixel's on all sides.
+         * This is like adding a padding.
+         */
+        public increase(pixel:number):void {
+            this.x -= pixel;
+            this.y -= pixel;
+            this.width += 2 * pixel;
+            this.height += 2 * pixel;
+            this.correctBounds();
+        }
+
+        public correctBounds() {
+            this.x = this.x < 0 ? 0 : this.x;
+            this.y = this.y < 0 ? 0 : this.y;
+            // TODO handle width/height somehow
         }
 
     }

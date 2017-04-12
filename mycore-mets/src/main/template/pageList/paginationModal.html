@@ -1,0 +1,61 @@
+<div class="modalPagination">
+    <div class="modal-header">
+        <h3 class="modal-title">{{ctrl.model.messages["paginationText"] || "???paginationValue???" }}</h3>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-4">
+                <label>{{ctrl.model.messages["paginationValue"] || "???paginationValue???"}}</label>
+            </div>
+            <div class="col-md-8">
+                <input type="text" ng-model="ctrl.model.value" select-immediately>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label>{{ctrl.model.messages["paginationReverse"] || "???paginationReverse???"}}</label>
+            </div>
+            <div class="col-md-8">
+                <input type="checkbox" ng-model="ctrl.model.reverse">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label>{{ctrl.model.messages["paginationMethod"] || "???paginationMethod???"}}</label>
+            </div>
+            <div class="col-md-8">
+                <select ng-model="ctrl.model.method"
+                        ng-options="(ctrl.model.messages[paginationMethod.name] || '???'+paginationMethod.name + '???') for paginationMethod in ctrl.model.methods">
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 previewHeading">
+                <h4>{{ctrl.model.messages["paginationPreview"]||"???paginationPreview???"}}</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 modalPageList">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>{{ctrl.model.messages["paginationChangeBefore"] || "???paginationChangeBefore???"}}</th>
+                        <th>{{ctrl.model.messages["paginationChangeAfter"] || "???paginationChangeAfter???"}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="change in ctrl.changes" class="{{ ($index==ctrl.model.begin) ? 'active' : ''}}">
+                        <td ng-click="ctrl.changeClicked(change.page, $index)">{{change.oldLabel}}</td>
+                        <td ng-click="ctrl.changeClicked(change.page, $index)">{{change.newLabel}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ctrl.change()">{{ctrl.model.messages["paginationChange"] || "???paginationChange???"}}</button>
+    <button class="btn btn-warning" ng-click="ctrl.abort()">{{ctrl.model.messages["paginationAbort"] || "???paginationAbort???"}}</button>
+</div>
+</div>

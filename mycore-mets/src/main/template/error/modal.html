@@ -1,0 +1,20 @@
+<div>
+    <div class="modal-header">
+        <h3 class="modal-title text-danger">{{ctrl.errorModel.title}}</h3>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div ng-if="ctrl.errorModel.imageHref!=null" class="col-md-6">
+                <div class="thumbnail">
+                    <img ng-src="{{ctrl.errorModel.imageHref}}"/>
+                </div>
+            </div>
+            <div class="{{ctrl.errorModel.imageHref==null?'col-md-12':'col-md-6'}}">
+                <p><b>{{ctrl.errorModel.message}}</b></p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" ng-click="ctrl.okayClicked()">{{ ctrl.i18nModel.messages['errorOkay'] || '???errorOkay???' }}</button>
+    </div>
+</div>

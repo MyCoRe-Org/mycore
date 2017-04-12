@@ -1,0 +1,125 @@
+@import "mixins";
+
+.notLinked {
+  background-color: #e7e7e7;
+  padding: 10px;
+  border: 1px solid lightgray;
+  border-left: none;
+}
+
+.tree {
+
+  .tree-root{
+    &.children-list {
+      margin-left: 5px;
+    }
+
+    padding: 5px;
+  }
+
+  .element-content {
+    width: 90%;
+    display: inline-block;
+  }
+
+  input.form-control {
+    width: 200px;
+    display: inline;
+  }
+
+  .edit-menu {
+  }
+
+  .move {
+    cursor: move;
+  }
+
+  .typeBadge {
+    cursor: context-menu;
+    max-width: 100px;
+  }
+
+  .icon-placeholder {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+  }
+
+
+  .panel-body {
+  }
+
+  .tree-element {
+    &.active {
+      text-shadow: 0 -1px 0 #286090;
+      .gradient(#337ab7, #2b669a, #337ab7);
+      border-color: #2b669a;
+      color: white;
+    }
+
+    display: block;
+    cursor: pointer;
+    background-color: rgb(231, 231, 231);
+    padding: 3px;
+    border-radius: 6px;
+    border: 1px solid lightgray;
+  }
+
+  .tree-folder-label {
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+  }
+
+  .tree-folder {
+    cursor: pointer;
+    display: block;
+    padding: 3px;
+    padding-right: 10px;
+    float: left;
+  }
+
+  .file {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .children-list {
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -o-box-shadow: none;
+    -webkit-box-shadow: none;
+    margin-left: 20px;
+    margin-bottom: 0px;
+    margin-top: 2px;
+  }
+
+  .child {
+    border-radius: 0;
+    border-top: 0;
+    border-bottom: 0;
+    border-left: 0;
+    list-style: none;
+    border-right: 0px;
+
+  }
+
+  .linkedPageBox {
+    margin-top: 8px;
+    border: 1px solid lightgray;
+    border-radius: 3px;
+    padding: 5px;
+    margin-bottom: 8px;
+
+    .remove:hover {
+      color: red;
+    }
+
+    .badge {
+      margin: 2px;
+    }
+  }
+
+}

@@ -66,18 +66,15 @@ module mycore.viewer.widgets.canvas {
             var vpSizeInOverview = this.vp.asRectInArea().size.scale(this.overviewViewport.scale);
             ctx.save();
             {
-                //ctx.scale(this.overviewViewport.scale, this.overviewViewport.scale);
                 ctx.lineWidth = lineWidth;
                 ctx.strokeStyle = "rgba(0,0,0,0.5)";
                 ctx.translate(-lineWidth / 2, -lineWidth / 2);
-                //ctx.translate((vpArea.size.width / 2), 0);//+originalViewport.size.height/2);
                 ctx.strokeRect(
                     pos.x,
                     pos.y,
-                        vpSizeInOverview.width + (lineWidth ),
-                        vpSizeInOverview.height + (lineWidth)
-                );
-
+                    vpSizeInOverview.width + (lineWidth ),
+                    vpSizeInOverview.height + (lineWidth)
+                )
             }
             ctx.restore();
         }

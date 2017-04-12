@@ -54,6 +54,11 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
             setProperty("canvas.startup.fitWidth", true);
         }
 
+        String leftShowOnStart = MCRConfiguration.instance().getString("MCR.Viewer.leftShowOnStart", null);
+        if(leftShowOnStart!=null){
+            setProperty("leftShowOnStart", leftShowOnStart);
+        }
+
         // script & css
         boolean developerMode = isDebugParameterSet(request);
         addLocalScript("iview-client-base.js", developerMode);

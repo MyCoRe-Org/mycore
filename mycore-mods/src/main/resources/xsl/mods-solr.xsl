@@ -140,6 +140,9 @@
           <field name="mods.dateIssued.{$type}">
             <xsl:value-of select="." />
           </field>
+          <field name="mods.yearIssued.{$type}">
+            <xsl:value-of select="substring(.,1,4)" />
+          </field>
         </xsl:if>
       </xsl:for-each>
       <xsl:for-each select=".//*[@xlink:title|text()]">

@@ -1,0 +1,45 @@
+<div class="row">
+
+    <!--metsEditorCtrl-->
+    <div id="mets-editor-toolbar" class="col-md-12">
+        <form class="navbar-form navbar-left" role="mode">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-default {{metsEditorCtrl.model.mode=='pagination'? ' active':''}}"
+                        ng-click="metsEditorCtrl.model.mode='pagination'"
+                        title="{{metsEditorCtrl.i18nModel.messages['pagination'] || '???pagination???'}}">
+                    <span class="glyphicon glyphicon-pencil"/>
+                    {{metsEditorCtrl.i18nModel.messages['pagination'] || '???pagination???'}}
+                </button>
+                <button type="button" class="btn btn-default {{metsEditorCtrl.model.mode=='structuring'? ' active':''}}"
+                        ng-click="metsEditorCtrl.model.mode='structuring'"
+                        title="{{metsEditorCtrl.i18nModel.messages['structuring'] || '???structuring???'}}">
+                    <span class="glyphicon glyphicon-tree-conifer"/>
+                    {{metsEditorCtrl.i18nModel.messages['structuring'] || '???structuring???'}}
+                </button>
+            </div>
+        </form>
+
+
+        <div ng-include="'toolbar/stateControls.html'"
+             ng-controller="MetsEditorStateController as stateCtrl"
+             ng-init="stateCtrl.init(metsEditorCtrl.model.stateEngine)">
+        </div>
+
+        <div>
+            <form class="navbar-form navbar-right">
+                <button type="button" class="btn btn-danger" ng-click="metsEditorCtrl.close()"
+                        title="{{metsEditorCtrl.i18nModel.messages['close'] || '???close???'}}">
+                    <span class="glyphicon glyphicon-off"/>
+                </button>
+            </form>
+        </div>
+
+        <div ng-include="'toolbar/saveControls.html'"
+             ng-controller="SaveController as saveCtrl"
+             ng-init="saveCtrl.init(metsEditorCtrl.model)">
+        </div>
+
+
+    </div>
+
+</div>

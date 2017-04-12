@@ -76,6 +76,12 @@ module mycore.viewer.components {
                             var area:AreaInPage = null;
                             var maxBottom:number = null;
                             var maxRight:number = null;
+                            // added at the end to create nicer wider areas
+                            var padding:number = Math.ceil(altoFile.pageHeight * 0.004);
+                            // sometimes the blocks are not perfectly placed, use this
+                            // to be a bit more generous
+                            var blockFaultiness:number = Math.ceil(altoFile.pageHeight * 0.005);
+
                             blocks.forEach(block => {
                                 var blockX:number = block.getBlockHPos();
                                 var blockY:number = block.getBlockVPos();
@@ -92,6 +98,7 @@ module mycore.viewer.components {
                                     return;
                                 }
                                 // mark area
+                                area.increase(padding); // add a small padding
                                 this.marker.markArea( jQuery.extend(false, {}, area) );
                                 // new area with block
                                 newArea();
@@ -103,15 +110,12 @@ module mycore.viewer.components {
                                 }
 
                                 function isAssignable() {
-                                    // sometimes the blocks are not perfectly placed, use this
-                                    // to be a bit more generous (TODO should be 0.5% - 1% of
-                                    // of the height of the image)
-                                    var blockFaultiness = 15; // pixel
                                     return (blockY >= maxBottom - blockFaultiness) && (blockX <= maxRight);
                                 }
 
                             });
                             if(area != null) {
+                                area.increase(padding); // add a small padding
                                 this.marker.markArea( jQuery.extend(false, {}, area) );
                             }
                         }) );
