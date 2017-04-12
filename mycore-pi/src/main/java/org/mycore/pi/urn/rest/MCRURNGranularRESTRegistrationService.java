@@ -67,11 +67,12 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
 
     private static Stream<MCRPath> defaultDerivateFileStream(MCRDerivate derivate) {
         MCRObjectID derivateId = derivate.getId();
-        Path path = MCRPath.getPath(derivateId.toString(), "/");
+        Path derivRoot = MCRPath.getPath(derivateId.toString(), "/");
 
         try {
-            return Files.walk(path)
-                        .map(MCRPath::toMCRPath);
+            return Files.walk(derivRoot)
+                        .map(MCRPath::toMCRPath)
+                        .filter(p -> !p.equals(derivRoot));
         } catch (IOException e) {
             LOGGER.error("I/O error while access the starting file of derivate " + derivateId.toString() + "!", e);
         } catch (SecurityException s) {
