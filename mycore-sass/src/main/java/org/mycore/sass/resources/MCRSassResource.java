@@ -71,7 +71,9 @@ import org.mycore.sass.MCRServletContextResourceImporter;
 @MCRStaticContent
 public class MCRSassResource {
 
-    @javax.ws.rs.core.Context
+    private static final int SECONDS_OF_ONE_DAY = 60 * 60 * 24;
+
+    @Context
     ServletContext context;
 
     @GET
@@ -85,13 +87,13 @@ public class MCRSassResource {
 
             if (cssFile.isPresent()) {
                 CacheControl cc = new CacheControl();
-                cc.setMaxAge(60 * 60 * 24);
+                cc.setMaxAge(SECONDS_OF_ONE_DAY);
 
                 String etagString = MCRSassCompilerManager.getInstance().getLastMD5(name).get();
                 EntityTag etag = new EntityTag(etagString);
 
-                Response.ResponseBuilder builder;
-                if ((builder = request.evaluatePreconditions(etag)) != null) {
+                Response.ResponseBuilder builder = request.evaluatePreconditions(etag);
+                if (builder != null) {
                     return builder.cacheControl(cc).tag(etag).build();
                 }
 

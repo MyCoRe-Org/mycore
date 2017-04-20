@@ -42,19 +42,21 @@
 
 package org.mycore.sass;
 
-
 import io.bit3.jsass.importer.Import;
 import io.bit3.jsass.importer.Importer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,6 +72,7 @@ import org.apache.logging.log4j.core.util.IOUtils;
 public class MCRServletContextResourceImporter implements Importer {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
     private final ServletContext context;
 
     public MCRServletContextResourceImporter(ServletContext context) {
@@ -84,17 +87,26 @@ public class MCRServletContextResourceImporter implements Importer {
                 absolute = previous.getAbsoluteUri().resolve(absolute).toString();
             }
 
-            URL resource = null;
             List<String> possibleNameForms = getPossibleNameForms(absolute);
-            int i = 0;
-            while (i < possibleNameForms.size() && (resource = context.getResource(normalize(possibleNameForms.get(i)))) == null) {
-                i++;
-            }
-            if (resource == null) {
+
+            Optional<URL> firstPossibleName = possibleNameForms.stream()
+                .map(form -> {
+                    try {
+                        return context.getResource(normalize(form));
+                    } catch (MalformedURLException e) {
+                        // ignore exception because it seems to be a not valid name form
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .findFirst();
+
+            if (!firstPossibleName.isPresent()) {
                 return null;
             }
+            URL resource = firstPossibleName.get();
 
-            String contents = getStringContent(possibleNameForms.get(i));
+            String contents = getStringContent(resource);
             URI absoluteUri = resource.toURI();
 
             LOGGER.debug("Resolved " + url + " to " + absoluteUri.toString());
@@ -121,8 +133,8 @@ public class MCRServletContextResourceImporter implements Importer {
         return nameFormArray;
     }
 
-    private String getStringContent(String resource) throws IOException {
-        try (InputStream resourceAsStream = context.getResourceAsStream(normalize(resource))) {
+    private String getStringContent(URL resource) throws IOException {
+        try (InputStream resourceAsStream = resource.openStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream, "UTF-8");
             return IOUtils.toString(inputStreamReader);
         }
