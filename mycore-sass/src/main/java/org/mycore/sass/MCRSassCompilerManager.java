@@ -95,7 +95,7 @@ public class MCRSassCompilerManager {
     private Map<String, String> fileMD5Map = new ConcurrentHashMap<>();
 
     public static MCRSassCompilerManager getInstance() {
-        return MIR_SASS_COMPILER_MANAGER_HOLDER.instance;
+        return MCRSASSCompilerManagerHolder.INSTANCE;
     }
 
     /**
@@ -201,8 +201,8 @@ public class MCRSassCompilerManager {
         return MCR_CONFIGURATION.getBoolean(DEVELOPER_MODE_CONFIG_KEY, false);
     }
 
-    private static final class MIR_SASS_COMPILER_MANAGER_HOLDER {
-        public static final MCRSassCompilerManager instance = new MCRSassCompilerManager();
+    private static final class MCRSASSCompilerManagerHolder {
+        public static final MCRSassCompilerManager INSTANCE = new MCRSassCompilerManager();
     }
 
 }

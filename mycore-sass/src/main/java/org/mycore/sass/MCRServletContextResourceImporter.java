@@ -122,9 +122,9 @@ public class MCRServletContextResourceImporter implements Importer {
 
         int lastSlashPos = relative.lastIndexOf('/');
         if (lastSlashPos != -1) {
-            String _Form = relative.substring(0, lastSlashPos) + "/_" + relative.substring(lastSlashPos + 1);
-            nameFormArray.add(_Form);
-            nameFormArray.add(_Form + ".scss");
+            String form = relative.substring(0, lastSlashPos) + "/_" + relative.substring(lastSlashPos + 1);
+            nameFormArray.add(form);
+            nameFormArray.add(form + ".scss");
         }
 
         nameFormArray.add(relative);
