@@ -2047,5 +2047,6 @@
     <module>mycore-xeditor</module>
     <module>mycore-complete</module>
     <module>mycore-coma</module>
+    <module>mycore-autodeploy</module>
   </modules>
 </project>
