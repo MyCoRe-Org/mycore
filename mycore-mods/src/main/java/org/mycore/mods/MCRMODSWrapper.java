@@ -332,6 +332,6 @@ public class MCRMODSWrapper {
     }
 
     private List<Element> getCategoryNodes() {
-        return getElements("mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])]");
+        return getElements("mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem)]");
     }
 }
