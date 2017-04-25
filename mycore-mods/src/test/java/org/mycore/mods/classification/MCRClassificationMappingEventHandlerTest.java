@@ -9,6 +9,8 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.junit.Assert;
@@ -24,10 +26,10 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.xml.sax.SAXParseException;
 
-
 public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
     public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
+
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationMappingEventHandlerTest.class);
 
     public MCRCategoryDAO getDAO() {
@@ -54,14 +56,29 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mapper.handleObjectUpdated(null, mcro);
 
         String expression = "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
-        XPathExpression<Element> expressionObject = XPathFactory.instance().compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
-        Assert.assertNotNull("The mapped classification should be in the MyCoReObject now!", expressionObject.evaluateFirst(mcro.createXML()));
+        XPathExpression<Element> expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+        Document xml = mcro.createXML();
+        Assert.assertNotNull("The mapped classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        expression = "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'masterThesis')]";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNull("The mapped classification of the child should not be contained in the MyCoReObject now!",
+            expressionObject.evaluateFirst(xml));
+
+
+        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 
     private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
-        MCRCategory category = MCRXMLTransformer.getCategory(saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + categoryFileName)));
+        MCRCategory category = MCRXMLTransformer
+            .getCategory(saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + categoryFileName)));
         getDAO().addCategory(null, category);
     }
 
