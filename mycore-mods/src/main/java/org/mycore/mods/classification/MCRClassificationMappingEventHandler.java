@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -98,9 +97,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 .forEach(mapping -> {
                     String taskMessage = String.format(Locale.ROOT, "add mapping from '%s' to '%s'", mapping.getKey().toString(), mapping.getValue().toString());
                     LOGGER.info(taskMessage);
-                    Optional<Element> createdClassificationElement = mcrmodsWrapper.setElement("classification", "generator", getGenerator(mapping.getKey(), mapping.getValue()), null);
-                    Element element = createdClassificationElement.orElseThrow(() -> new MCRException("Could not: " + taskMessage));
-                    MCRClassMapper.assignCategory(element, mapping.getValue());
+                    Element mappedClassification = mcrmodsWrapper.addElement("classification");
+                    String generator = getGenerator(mapping.getKey(), mapping.getValue());
+                    mappedClassification.setAttribute("generator", generator);
+                    MCRClassMapper.assignCategory(mappedClassification, mapping.getValue());
                 });
         LOGGER.debug("mapping complete.");
     }

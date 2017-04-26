@@ -10,4 +10,8 @@
   </mods:language>
   <mods:classification authority="sdnb" displayLabel="sdnb">000</mods:classification>
   <mods:accessCondition type="use and reproduction" xlink:type="simple">cc_by-nc</mods:accessCondition>
+  <mods:relatedItem type="series" xlink:href="host">
+    <mods:classification authority="sdnb" displayLabel="sdnb">000</mods:classification>
+    <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#master_thesis"/>
+  </mods:relatedItem>
 </mods:mods>
