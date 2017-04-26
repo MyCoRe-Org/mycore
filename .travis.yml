@@ -4,7 +4,7 @@ dist: trusty
 group: beta
 install: true
 addons:
-  firefox: "latest"
+  firefox: "52.0.2"
 cache:
   directories:
     - $HOME/.m2/repository
