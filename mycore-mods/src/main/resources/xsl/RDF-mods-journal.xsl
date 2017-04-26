@@ -13,6 +13,7 @@
   xmlns:ppxml="http://www.oclcpica.org/xmlns/ppxml-1.0"
   xmlns:isbd="http://iflastandards.info/ns/isbd/elements/"
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:rdau="http://rdaregistry.info/Elements/u/"
   exclude-result-prefixes="rdf bibo foaf owl dc dcterms zdb dnb_intern isbd rdfs ppxml">
   <xsl:include href="xslInclude:RDF-mods-journal"/>
   <xsl:template match="/rdf:RDF">
@@ -34,10 +35,10 @@
       <xsl:apply-templates select="dc:title" />
       <xsl:apply-templates select="isbd:p1005|isbd:P1005" />
       <xsl:apply-templates select="bibo:shortTitle" />
-      <xsl:if test="dc:publisher | isbd:p1016 | isbd:P1016 | dcterms:issued">
+      <xsl:if test="dc:publisher | rdau:P60163 | dcterms:issued">
         <mods:originInfo eventType="publication">
           <xsl:apply-templates select="dc:publisher" />
-          <xsl:apply-templates select="isbd:p1016|isbd:P1016" />
+          <xsl:apply-templates select="rdau:P60163" />
           <xsl:apply-templates select="dcterms:issued" />
         </mods:originInfo>
       </xsl:if>
@@ -79,7 +80,7 @@
       <xsl:value-of select="." />
     </mods:publisher>
   </xsl:template>
-  <xsl:template match="isbd:p1016|isbd:P1016">
+  <xsl:template match="rdau:P60163">
     <mods:place>
       <mods:placeTerm type="text">
         <xsl:value-of select="." />
