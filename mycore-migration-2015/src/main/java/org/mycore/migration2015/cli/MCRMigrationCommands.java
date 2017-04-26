@@ -4,11 +4,18 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -16,21 +23,28 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.backend.jpa.links.MCRLINKHREF;
+import org.mycore.backend.jpa.links.MCRLINKHREFPK_;
+import org.mycore.backend.jpa.links.MCRLINKHREF_;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -42,7 +56,7 @@ import org.xml.sax.SAXException;
 @MCRCommandGroup(name = "MyCoRe migration 2015.0x")
 public class MCRMigrationCommands {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRMigrationCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(syntax = "migrate author servflags", help = "Create missing servflags for createdby and modifiedby. (MCR-786)", order = 20)
     public static List<String> addServFlags() {
@@ -173,6 +187,49 @@ public class MCRMigrationCommands {
         return false;
     }
 
-    // fix invalid derivate links /mycoreobject/metadata/derivateLinks/derivateLink for jportal_jparticle_00000008
+    @MCRCommand(syntax = "add missing children to {0}",
+        help = "Adds missing children to structure of parent {0}. (MCR-1480)",
+        order = 15)
+    public static void fixMissingChildren(String id) throws IOException, JDOMException, SAXException {
+        MCRObjectID parentId = MCRObjectID.getInstance(id);
+        Collection<String> children = MCRLinkTableManager.instance().getSourceOf(parentId,
+            MCRLinkTableManager.ENTRY_TYPE_PARENT);
+        if (children.isEmpty()) {
+            return;
+        }
+        MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentId);
+        MCRObjectStructure parentStructure = parent.getStructure();
+        int sizeBefore = parentStructure.getChildren().size();
+        children.stream().map(MCRObjectID::getInstance)
+            .filter(cid -> !parentStructure.getChildren().stream()
+                .anyMatch(candidate -> candidate.getXLinkHrefID().equals(cid)))
+            .sorted().map(MCRMigrationCommands::toLinkId).sequential()
+            .peek(lid -> LOGGER.info("Adding " + lid + " to " + parentId)).forEach(parentStructure::addChild);
+        if (parentStructure.getChildren().size() != sizeBefore) {
+            MCRMetadataManager.fireUpdateEvent(parent);
+        }
+    }
 
+    private static MCRMetaLinkID toLinkId(MCRObjectID mcrObjectID) {
+        String objectLabel = MCRMetadataManager.retrieve(mcrObjectID).getLabel();
+        return new MCRMetaLinkID("child", mcrObjectID, null, objectLabel);
+    }
+
+    @MCRCommand(syntax = "add missing children",
+        help = "Adds missing children to structure of parent objects using MCRLinkTableManager. (MCR-1480)",
+        order = 20)
+    public static List<String> fixMissingChildren() throws IOException, JDOMException, SAXException {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Root<MCRLINKHREF> ac = query.from(MCRLINKHREF.class);
+        return em
+            .createQuery(query
+                .select(cb.concat(cb.literal("add missing children to "),
+                    ac.get(MCRLINKHREF_.key).get(MCRLINKHREFPK_.mcrto)))
+                .where(cb.equal(ac.get(MCRLINKHREF_.key).get(MCRLINKHREFPK_.mcrtype),
+                    MCRLinkTableManager.ENTRY_TYPE_PARENT))
+                .distinct(true).orderBy(cb.asc(cb.literal(1))))
+            .getResultList();
+    }
 }
