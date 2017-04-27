@@ -36,6 +36,7 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
@@ -50,7 +51,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-public final class MCRObjectID {
+public final class MCRObjectID implements Comparable<MCRObjectID> {
     /**
      * public constant value for the MCRObjectID length
      */
@@ -389,6 +390,13 @@ public final class MCRObjectID {
             return equals((MCRObjectID) in);
         }
         return false;
+    }
+
+    @Override public int compareTo(MCRObjectID o) {
+        return MCRUtils.compareParts(this, o,
+            MCRObjectID::getProjectId,
+            MCRObjectID::getTypeId,
+            MCRObjectID::getNumberAsInteger);
     }
 
     /**
