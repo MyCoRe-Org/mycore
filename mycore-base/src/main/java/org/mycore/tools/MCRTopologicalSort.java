@@ -27,6 +27,7 @@ package org.mycore.tools;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +92,7 @@ public class MCRTopologicalSort {
         edgeSources.clear();
 
         String file = null;
-        Map<Integer, String> parentNames = new HashMap<Integer, String>();
+        Map<Integer, List<String>> parentNames = new HashMap<Integer, List<String>>();
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         for (int i = 0; i < files.length; i++) {
             file = files[i];
@@ -104,8 +105,25 @@ public class MCRTopologicalSort {
                             if (xmlStreamReader.getLocalName().equals("mycoreobject")) {
                                 nodes.forcePut(i, xmlStreamReader.getAttributeValue(null, "ID"));
                             } else if (xmlStreamReader.getLocalName().equals("parent")) {
-                                parentNames.put(i,
+                                List<String> dependecyList;
+                                if(parentNames.containsKey(i)){
+                                    dependecyList = parentNames.get(i);
+                                } else {
+                                     dependecyList= new ArrayList<>();
+                                     parentNames.put(i, dependecyList);
+                                }
+                               dependecyList.add(
                                     xmlStreamReader.getAttributeValue("http://www.w3.org/1999/xlink", "href"));
+                            } else if (xmlStreamReader.getLocalName().equals("relatedItem")){
+                                List<String> dependecyList;
+                                if(parentNames.containsKey(i)){
+                                    dependecyList = parentNames.get(i);
+                                } else {
+                                    dependecyList= new ArrayList<>();
+                                    parentNames.put(i, dependecyList);
+                                }
+                                dependecyList.add(
+                                    xmlStreamReader.getAttributeValue("http://www.w3.org/1999/xlink", "href" ));
                             } else if (xmlStreamReader.getLocalName().equals("metadata")) {
                                 break;
                             }
@@ -113,6 +131,8 @@ public class MCRTopologicalSort {
 
                         case XMLStreamConstants.END_ELEMENT:
                             if (xmlStreamReader.getLocalName().equals("parents")) {
+                                break;
+                            } else if (xmlStreamReader.getLocalName().equals("relatedItem")){
                                 break;
                             }
                             break;
@@ -127,10 +147,14 @@ public class MCRTopologicalSort {
 
         //build edges
         for (int source : parentNames.keySet()) {
-            Integer target = nodes.inverse().get(parentNames.get(source));
-            if (target != null) {
-                addEdge(source, target);
+            List<String> dependencies = parentNames.get(source);
+            for(String element: dependencies){
+                Integer target = nodes.inverse().get(element);
+                if (target != null) {
+                    addEdge(source, target);
+                }
             }
+
         }
 
         dirty = false;
