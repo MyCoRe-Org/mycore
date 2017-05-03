@@ -4,7 +4,7 @@
 /// <reference path="../Utils.ts" />
 /// <reference path="events/WaitForEvent.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class ViewerComponent extends mycore.viewer.widgets.events.ViewerEventManager {
 

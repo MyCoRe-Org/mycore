@@ -1,5 +1,5 @@
 /// <reference path="../../../desktop/components/model/MyCoReDesktopToolbarModel.ts" />
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     export class MyCoReFrameToolbarModel extends model.MyCoReDesktopToolbarModel {
         constructor() {
             super("MyCoReFrameToolbar");

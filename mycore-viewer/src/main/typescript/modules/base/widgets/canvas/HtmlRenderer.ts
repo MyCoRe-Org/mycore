@@ -1,5 +1,5 @@
 /// <reference path="../../components/model/TextContent.ts" />
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class HtmlRenderer {
         constructor(private _vp:Viewport, private _area:PageArea, private _view:PageView) {
             this.htmlContainer = document.createElement("div");

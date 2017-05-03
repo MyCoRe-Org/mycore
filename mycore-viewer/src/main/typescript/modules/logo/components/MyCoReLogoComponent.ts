@@ -1,5 +1,5 @@
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export interface LogoSettings extends MyCoReViewerSettings{
         logoURL: string

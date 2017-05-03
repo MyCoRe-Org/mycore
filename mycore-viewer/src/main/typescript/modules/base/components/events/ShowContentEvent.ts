@@ -2,7 +2,7 @@
 /// <reference path="MyCoReImageViewerEvent.ts" />
 /// <reference path="../ViewerComponent.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     export class ShowContentEvent extends MyCoReImageViewerEvent {
 
         constructor(component:ViewerComponent, public content:JQuery, public containerDirection:number, public size = 300, public text:JQuery = null) {

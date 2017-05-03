@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.thumbnail {
+namespace mycore.viewer.widgets.thumbnail {
     export interface ThumbnailOverviewThumbnail {
         id: string;
         label: string;

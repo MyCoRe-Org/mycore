@@ -1,4 +1,4 @@
-module mycore.viewer.components {
+namespace mycore.viewer.components {
     export class MyCoReImageInformationComponent extends ViewerComponent {
 
         constructor(private _settings:MyCoReViewerSettings) {

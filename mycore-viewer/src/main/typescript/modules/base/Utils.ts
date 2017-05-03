@@ -122,6 +122,15 @@ class Position2D {
         return new Position2D(x, y);
     }
 
+    public rotateAround(center:Position2D, rotation:number):Position2D {
+        rotation = rotation * -1; // invert for clockwise rotation
+        var diffX = (this.x - center.x);
+        var diffY = (this.y - center.y);
+        var x = center.x + diffX * Math.cos(rotation) - diffY * Math.sin(rotation);
+        var y = center.y + diffX * Math.sin(rotation) + diffY * Math.cos(rotation);
+        return new Position2D(x,y);
+    }
+
     public toPosition3D(z:number):Position3D {
         return new Position3D(this.x, this.y, z);
     }
@@ -205,6 +214,7 @@ class Size2D {
 }
 
 class Rect {
+
     constructor(public pos:Position2D, public size:Size2D) {
     }
 
@@ -217,6 +227,22 @@ class Rect {
         };
     }
 
+    public getX():number {
+        return this.pos.x;
+    }
+
+    public getY():number {
+        return this.pos.y;
+    }
+
+    public getWidth():number {
+        return this.size.width;
+    }
+
+    public getHeight():number {
+        return this.size.height;
+    }
+    
     public scale(scale:number):Rect {
         return new Rect(this.pos.scale(scale), this.size.scale(scale));
     }
@@ -247,8 +273,28 @@ class Rect {
         return new Rect(this.pos.rotate(deg), this.size.getRotated(deg));
     }
 
-    public static fromULLR(upperLeft:Position2D, lowerRight:Position2D):Rect {
-        return new Rect(new Position2D(upperLeft.x, upperLeft.y), new Size2D(lowerRight.x - upperLeft.x, lowerRight.y - upperLeft.y));
+
+    public flipX():Rect {
+        var x = this.pos.x + this.size.width;
+        var width = -this.size.width;
+        return new Rect(new Position2D(x, this.pos.y), new Size2D(width, this.size.height));
+    }
+
+    public flipY():Rect {
+        var y = this.pos.y + this.size.height;
+        var height = -this.size.height;
+        return new Rect(new Position2D(this.pos.x, y), new Size2D(this.size.width, height));
+    }
+
+    public flip(deg:number):Rect {
+        if(deg == 90) {
+            return this.flipX();
+        } else if(deg == 180) {
+            return this.flipX().flipY();
+        } else if(deg == 270) {
+            return this.flipY();
+        }
+        return this.copy();
     }
 
     public equals(obj) {
@@ -266,6 +312,52 @@ class Rect {
         return this.pos.toString() + " - " + this.size.toString();
     }
 
+    public getRotated(deg:number):Rect {
+        var midPos = this.getMiddlePoint();
+        var rotatedSize = this.size.getRotated(deg);
+        var newUpperLeft = new Position2D(midPos.x - (rotatedSize.width / 2), midPos.y - (rotatedSize.height / 2));
+        return new Rect(newUpperLeft, rotatedSize);
+    }
+
+    /**
+     * Tries to maximize the bounds.
+     */
+    public maximize(x:number, y:number, width:number, height:number):Rect {
+        var right1:number = this.pos.x + this.size.width;
+        var right2:number = x + width;
+        var bottom1:number = this.pos.y + this.size.height;
+        var bottom2:number = y + height;
+        var newX:number = x < this.pos.x ? x : this.pos.x;
+        var newY:number = y < this.pos.y ? y : this.pos.y;
+        var newWidth:number = Math.max(right1, right2) - this.pos.x;
+        var newHeight:number = Math.max(bottom1, bottom2) - this.pos.y;
+        return Rect.fromXYWH(newX, newY, newWidth, newHeight);
+    }
+
+    /**
+     * Increase the rect with the given number of pixel's on all sides.
+     * This is like adding a padding.
+     */
+    public increase(pixel:number):Rect {
+        var x = this.pos.x - pixel;
+        var y = this.pos.y - pixel;
+        var width = this.size.width + (2 * pixel);
+        var height = this.size.height + (2 * pixel);
+        return Rect.fromXYWH(x, y, width, height);
+    }
+
+    public copy():Rect {
+        return new Rect(this.pos.copy(), this.size.copy());
+    }
+
+    public static fromXYWH(x:number, y:number, width:number, height:number) {
+        return new Rect(new Position2D(x, y), new Size2D(width, height));
+    }
+
+    public static fromULLR(upperLeft:Position2D, lowerRight:Position2D):Rect {
+        return new Rect(new Position2D(upperLeft.x, upperLeft.y), new Size2D(lowerRight.x - upperLeft.x, lowerRight.y - upperLeft.y));
+    }
+
     public static getBounding(...n:Rect[]):Rect {
         var max = Math.pow(2, 31);
         var top = max, left = max, bottom = -max, right = -max;
@@ -278,13 +370,6 @@ class Rect {
         });
 
         return Rect.fromULLR(new Position2D(left, top), new Position2D(right, bottom));
-    }
-
-    public getRotated(deg:number):Rect {
-        var midPos = this.getMiddlePoint();
-        var rotatedSize = this.size.getRotated(deg);
-        var newUpperLeft = new Position2D(midPos.x - (rotatedSize.width / 2), midPos.y - (rotatedSize.height / 2));
-        return new Rect(newUpperLeft, rotatedSize);
     }
 
 }
@@ -364,24 +449,34 @@ class Utils {
 
 class MyCoReMap<K, V> {
 
+    private static BASE_KEY_TO_HASH_FUNCTION = (key) => {
+        return key.toString();
+    };
+    private static KEY_PREFIX:string = "MyCoReMap.";
+
     constructor(arr?:any) {
         if (typeof arr != "undefined") {
             for (var key in arr) {
-                this.arr[MyCoReMap.keyPrefix + key.toString()] = arr[key];
+                this.set(<any>key, arr[key]);
             }
         }
     }
 
     private arr = {};
-    private static keyPrefix = "MyCoReMap.";
+    private keyArray:Array<K> = [];
+    private keyToHashFunction:(key:K) => void = MyCoReMap.BASE_KEY_TO_HASH_FUNCTION;
 
     public set(key:K, value:V) {
-
-        this.arr[MyCoReMap.keyPrefix + key.toString()] = value;
+        this.arr[this.getHash(key)] = value;
+        this.keyArray.push(key);
     }
 
     public get(key:K):V {
-        return this.arr[MyCoReMap.keyPrefix + key.toString()];
+        return this.arr[this.getHash(key)];
+    }
+
+    public setKeyToHashFunction(keyToHashFunction:(key:K) => void) {
+        this.keyToHashFunction = keyToHashFunction;
     }
 
     public hasThen(key:K, consumer:(value:V)=>void):void {
@@ -390,12 +485,8 @@ class MyCoReMap<K, V> {
         }
     }
 
-    public get keys() {
-        var keys = new Array();
-        for (var i in this.arr) {
-            keys.push(i.substring(MyCoReMap.keyPrefix.length));
-        }
-        return keys;
+    public get keys():Array<K> {
+        return this.keyArray.slice();
     }
 
     public get values():Array<V> {
@@ -410,34 +501,46 @@ class MyCoReMap<K, V> {
         if (typeof key == "undefined" || key == null) {
             return false;
         }
-        var elem = this.arr[MyCoReMap.keyPrefix + key.toString()];
+        var elem = this.arr[this.getHash(key)];
         return typeof elem != "undefined" && elem != null;
     }
 
-    public forEach(call:(key:string, value:V) => void) {
-        for (var key in this.arr) {
-            call(key.substring(MyCoReMap.keyPrefix.length), this.arr[key]);
+    public forEach(call:(key:K, value:V) => void) {
+        for (var key of this.keyArray) {
+            call(key, this.get(key));
         }
+    }
+
+    public filter(call:(key:K, value:V) => boolean):MyCoReMap<K, V> {
+        var newMap:MyCoReMap<K, V> = new MyCoReMap<K, V>();
+        for (var key of this.keyArray) {
+            var value:V = this.get(key);
+            if(call(key, value)) {
+                newMap.set(key, value);
+            }
+        }
+        return newMap;
     }
 
     public copy():MyCoReMap<K, V> {
         var copy = new MyCoReMap<K, V>();
-
-        for (var arrI in this.arr) {
-            copy.arr[arrI] = this.arr[arrI];
+        for (var key of this.keyArray) {
+            copy.set(key, this.get(key));
         }
-
         return copy;
     }
 
     public remove(key:K) {
-        delete this.arr[MyCoReMap.keyPrefix + key.toString()];
+        delete this.arr[this.getHash(key)];
+        var index = this.keyArray.indexOf(key);
+        if(index >= 0) {
+            this.keyArray.splice(index, 1);
+        }
     }
 
     public clear() {
-        var keys = this.keys;
-        for (var i in keys) {
-            var key = keys[i];
+        var keys = this.keyArray.slice();
+        for (var key of keys) {
             this.remove(key);
         }
     }
@@ -446,7 +549,6 @@ class MyCoReMap<K, V> {
         var that = this;
         for (var mapIndex in maps) {
             var currentMap = maps[mapIndex];
-
             currentMap.forEach((k, v) => {
                 that.set(<any>k, v);
             });
@@ -457,11 +559,15 @@ class MyCoReMap<K, V> {
         return Object.keys(this.arr).length <= 0;
     }
 
+    private getHash(key:K):string {
+        return MyCoReMap.KEY_PREFIX + this.keyToHashFunction(key);
+    }
+
 }
 
 class ViewerError {
     constructor(message:string, error:any = null) {
-        this.informations = new MyCoReMap();
+        this.informations = new MyCoReMap<string, any>();
 
         this.informations.set("message", message);
         this.informations.set("error", error);
@@ -605,7 +711,7 @@ class ViewerUserSettingStore {
         this._browserStorageSupport = typeof Storage !== "undefined";
 
         if (!this.browserStorageSupport) {
-            this._sessionMap = new MyCoReMap<String, String>();
+            this._sessionMap = new MyCoReMap<string, string>();
         }
     }
 
@@ -649,7 +755,7 @@ class ViewerUserSettingStore {
     }
 
     private _browserStorageSupport:boolean;
-    private _sessionMap:MyCoReMap<String, String>;
+    private _sessionMap:MyCoReMap<string, string>;
 
     /**
      * Does the Browser support localStorage
@@ -784,7 +890,7 @@ class ViewerParameterMap extends MyCoReMap<string, string> {
     }
 
     public toParameterString() {
-        var stringBuilder = new Array<String>()
+        var stringBuilder = new Array<string>()
         this.forEach((key, value) => {
             stringBuilder.push(key + "=" + value);
         });

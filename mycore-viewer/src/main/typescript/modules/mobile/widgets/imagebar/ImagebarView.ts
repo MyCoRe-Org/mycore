@@ -1,8 +1,8 @@
-module mycore.viewer.widgets.imagebar {
+namespace mycore.viewer.widgets.imagebar {
 
     export class ImagebarView {
         constructor(__container:JQuery, private _imageSelectedCallback:(position:number, hover:boolean)=>void) {
-            this._idElementMap = new MyCoReMap<String, JQuery>();
+            this._idElementMap = new MyCoReMap<string, JQuery>();
             this._lastSelectedId = "";
             this._container = jQuery("<div></div>");
             this._container.addClass("imagebar");

@@ -3,7 +3,7 @@
 /// <reference path="../ViewerComponent.ts" />
 /// <reference path="../model/LanguageModel.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     export class LanguageModelLoadedEvent extends MyCoReImageViewerEvent {
         constructor(component: ViewerComponent,private _languageModel:model.LanguageModel) {
             super(component, LanguageModelLoadedEvent.TYPE);

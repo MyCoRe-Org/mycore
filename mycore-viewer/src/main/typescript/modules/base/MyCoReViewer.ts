@@ -16,12 +16,12 @@
 
 var IVIEW_COMPONENTS:Array<any> = VIEWER_COMPONENTS || [];
 
-module mycore.viewer {
+namespace mycore.viewer {
 
     export class MyCoReViewer {
 
         constructor(private _container:JQuery, private _settings:MyCoReViewerSettings) {
-            this._eventHandlerMap = new MyCoReMap<String, Array<mycore.viewer.components.ViewerComponent>>();
+            this._eventHandlerMap = new MyCoReMap<string, Array<mycore.viewer.components.ViewerComponent>>();
             this._components = new Array<mycore.viewer.components.ViewerComponent>();
             this._initializingEvents = new Array<mycore.viewer.widgets.events.ViewerEvent>();
 

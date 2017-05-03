@@ -1,7 +1,7 @@
 /// <reference path="../../../Utils.ts" />
 /// <reference path="ToolbarComponent.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export class ToolbarButton extends ToolbarComponent {
         constructor(id: string, label: string, tooltip: string = label, icon: string= null, buttonClass: string = "default", disabled: boolean = false, active: boolean = false) {

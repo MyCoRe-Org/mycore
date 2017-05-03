@@ -2,7 +2,7 @@
 /// <reference path="AltoElement.ts" />
 /// <reference path="AltoFile.ts" />
 
-module mycore.viewer.widgets.alto {
+namespace mycore.viewer.widgets.alto {
     export class AltoHTMLGenerator {
 
         constructor() {

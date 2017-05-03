@@ -2,7 +2,7 @@
 /// <reference path="../widgets/imagebar/ImagebarModel.ts" />
 
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
     export class MyCoReImagebarComponent extends ViewerComponent {
 
         constructor(private _settings:MyCoReViewerSettings, private _container:JQuery) {

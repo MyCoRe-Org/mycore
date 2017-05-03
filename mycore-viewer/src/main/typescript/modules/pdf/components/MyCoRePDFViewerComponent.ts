@@ -3,7 +3,7 @@
 /// <reference path="../widgets/PDFPage.ts" />
 /// <reference path="../widgets/PDFStructureBuilder.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoRePDFViewerComponent extends ViewerComponent {
         constructor(private _settings:PDFSettings, private container:JQuery) {

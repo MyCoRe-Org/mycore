@@ -2,7 +2,7 @@
 /// <reference path="../../widgets/canvas/PageLayout.ts" />
 /// <reference path="../ViewerComponent.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     /**
      * Used to provide a PageLayout wich can be used by the MyCoReImageScrollComponent.
      */

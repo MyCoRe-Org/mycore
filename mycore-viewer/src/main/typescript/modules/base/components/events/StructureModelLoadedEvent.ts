@@ -3,7 +3,7 @@
 /// <reference path="../ViewerComponent.ts" />
 /// <reference path="../model/StructureModel.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     export class StructureModelLoadedEvent extends MyCoReImageViewerEvent {
         constructor(component:ViewerComponent, private _structureModel:model.StructureModel) {
             super(component, StructureModelLoadedEvent.TYPE);

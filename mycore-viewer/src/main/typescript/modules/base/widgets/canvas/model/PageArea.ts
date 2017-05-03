@@ -2,7 +2,7 @@
 /// <reference path="../../../components/model/AbstractPage.ts" />
 /// <reference path="../viewport/Viewport.ts" />
 
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
 
     export class PageArea implements ViewerPropertyObserver<any> {
 
@@ -50,7 +50,7 @@ module mycore.viewer.widgets.canvas {
             return this._pages;
         }
 
-        public getPagesInViewport(viewPort:Viewport) {
+        public getPagesInViewport(viewPort:Viewport):Array<model.AbstractPage> {
             var pages = this._pages;
             var pagesInViewport = new Array<model.AbstractPage>();
             pages.forEach((page) => {

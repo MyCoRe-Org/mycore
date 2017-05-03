@@ -1,14 +1,14 @@
 /// <reference path="viewport/Viewport.ts" />
 /// <reference path="../../definitions/jquery.d.ts" />
 
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class Overview extends PageView {
 
         constructor(private vp:Viewport, private  _maxOverviewSize:Size2D = new Size2D(250, 250)) {
             super(true, false);
             this.container.addClass("overview");
             this.container.attr("style", "");
-            this.container.css("z-index", "4");
+            this.container.css("z-index", "6");
             jQuery(this.markCanvas).detach();
             //this.updateOverviewSize(_maxOverviewSize);
         }

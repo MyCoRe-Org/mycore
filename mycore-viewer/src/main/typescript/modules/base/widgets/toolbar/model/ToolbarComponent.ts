@@ -1,6 +1,6 @@
 /// <reference path="../../../Utils.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export class ToolbarComponent {
         constructor(id: string) {

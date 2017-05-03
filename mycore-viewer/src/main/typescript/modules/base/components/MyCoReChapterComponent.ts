@@ -18,7 +18,7 @@
 /// <reference path="events/ShowContentEvent.ts" />
 /// <reference path="events/RequestStateEvent.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     import StructureImage = mycore.viewer.model.StructureImage;
     /**
@@ -45,7 +45,7 @@ module mycore.viewer.components {
         private _sidebarLabel = jQuery("<span>strukturübersicht</span>");
         private _chapterToActivate:string = null;
         private _autoPagination = true;
-        private _idImageMap: MyCoReMap<String, StructureImage> = new MyCoReMap<String, StructureImage>();
+        private _idImageMap: MyCoReMap<string, StructureImage> = new MyCoReMap<string, StructureImage>();
 
         public init() {
             if (this._enabled) {
@@ -92,6 +92,7 @@ module mycore.viewer.components {
                 handles.push(events.LanguageModelLoadedEvent.TYPE);
                 handles.push(events.RequestStateEvent.TYPE);
                 handles.push(events.RestoreStateEvent.TYPE);
+                handles.push(events.ChapterChangedEvent.TYPE);
             } else {
                 handles.push(events.ProvideToolbarModelEvent.TYPE);
             }
@@ -144,7 +145,7 @@ module mycore.viewer.components {
 
 
             if (e.type == events.ImageChangedEvent.TYPE) {
-                if (typeof this._structureModel == "undefined" || this._structureModel._imageToChapterMap.keys.length == 0) {
+                if (typeof this._structureModel === "undefined" || this._structureModel._imageToChapterMap.isEmpty()) {
                     return;
                 }
                 var imageChangedEvent = <events.ImageChangedEvent> e;
@@ -186,6 +187,14 @@ module mycore.viewer.components {
 
             }
 
+            if(e.type === events.ChapterChangedEvent.TYPE) {
+                let cce = <events.ChapterChangedEvent>e;
+                if (cce == null || cce.chapter == null) {
+                    return;
+                }
+                this.setChapter(cce.chapter.id, false);
+            }
+
         }
 
         private persistChapterToString(chapter:model.StructureChapter):string{
@@ -205,11 +214,14 @@ module mycore.viewer.components {
 
         registerNode(node: JQuery, id: string): void {
             node.click(() => {
-                this.setChapter(id , node);
+                this.setChapter(id, true, node);
             });
         }
 
-        private setChapter(id: string, node?: JQuery) {
+        private setChapter(id: string, jumpToFirstImageOfChapter:boolean = true, node?: JQuery) {
+            if(this._currentChapter != null && this._currentChapter.id == id) {
+                return;
+            }
             let newSelectedChapter = this._chapterWidget.getChapterById(id);
             if(newSelectedChapter == null) {
                 return;
@@ -223,7 +235,9 @@ module mycore.viewer.components {
                     this._chapterWidget.jumpToChapter(<model.StructureChapter>newSelectedChapter);
 
                     this.trigger(new events.ChapterChangedEvent(this, <model.StructureChapter>newSelectedChapter));
-                    this.trigger(new events.ImageSelectedEvent(this, firstImageOfChapter));
+                    if(jumpToFirstImageOfChapter) {
+                        this.trigger(new events.ImageSelectedEvent(this, firstImageOfChapter));
+                    }
                 }
             };
 

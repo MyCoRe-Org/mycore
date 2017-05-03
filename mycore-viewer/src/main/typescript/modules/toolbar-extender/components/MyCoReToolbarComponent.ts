@@ -1,4 +1,4 @@
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     import ToolbarButton = mycore.viewer.widgets.toolbar.ToolbarButton;
     import ToolbarGroup = mycore.viewer.widgets.toolbar.ToolbarGroup;

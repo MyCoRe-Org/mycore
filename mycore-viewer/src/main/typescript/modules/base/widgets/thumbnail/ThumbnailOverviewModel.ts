@@ -1,7 +1,7 @@
 /// <reference path="ThumbnailOverviewThumbnail.ts" />
 /// <reference path="../../Utils.ts" />
 
-module mycore.viewer.widgets.thumbnail {
+namespace mycore.viewer.widgets.thumbnail {
     export class ThumbnailOverviewModel {
         constructor(public thumbnails:Array<ThumbnailOverviewThumbnail> = new Array<ThumbnailOverviewThumbnail>()) {
             this._idThumbnailMap = new MyCoReMap<string, ThumbnailOverviewThumbnail>();

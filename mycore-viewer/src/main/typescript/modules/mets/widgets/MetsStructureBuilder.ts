@@ -1,7 +1,7 @@
 /// <reference path="MetsStructureModel.ts" />
 
 
-module mycore.viewer.widgets.mets {
+namespace mycore.viewer.widgets.mets {
 
 
     export class MetsStructureBuilder {
@@ -69,12 +69,18 @@ module mycore.viewer.widgets.mets {
             this._imageChapterMap = new MyCoReMap<string, model.StructureChapter>();
             this._improvisationMap = new MyCoReMap<string, boolean>(); // see makeLink
             this._metsChapter = this.processChapter(null, this.getFirstElementChild(<Element>this.getStructMap("LOGICAL")), 1);
+            this._imageHrefImageMap = new MyCoReMap<string, model.StructureImage>();
             this._imageList = new Array<model.StructureImage>();
 
             this._idImageMap = new MyCoReMap<string, model.StructureImage>();
             this.processImages();
 
-            this._structureModel = new mycore.viewer.widgets.mets.MetsStructureModel(this._metsChapter, this._imageList, this._chapterImageMap, this._imageChapterMap, altoFiles != null && altoFiles.length > 0);
+            this._structureModel = new widgets.mets.MetsStructureModel( this._metsChapter,
+                    this._imageList,
+                    this._chapterImageMap,
+                    this._imageChapterMap,
+                    this._imageHrefImageMap,
+                    altoFiles != null && altoFiles.length > 0 );
 
             return this._structureModel;
         }
@@ -126,6 +132,7 @@ module mycore.viewer.widgets.mets {
         private _structureModel: MetsStructureModel;
         private _idImageMap: MyCoReMap<string, model.StructureImage>;
         private _improvisationMap:MyCoReMap<string, boolean>;
+        private _imageHrefImageMap:MyCoReMap<string, model.StructureImage>;
 
         private processChapter(parent: model.StructureChapter, chapter: Element, defaultOrder:number): model.StructureChapter {
             if(chapter.nodeName.toString() == "mets:mptr"){
@@ -251,8 +258,12 @@ module mycore.viewer.widgets.mets {
             this.makeLinks();
 
             this._imageList = this._imageList.filter((el => this._imageChapterMap.has(el.id)));
-            this._imageList.forEach((o, i)=> o.order = i + 1);
-
+            this._imageList.forEach((image, i)=> {
+                // fix order
+                image.order = i + 1
+                // build href map
+                this._imageHrefImageMap.set(image.href, image);
+            });
         }
 
         private makeLinks() {

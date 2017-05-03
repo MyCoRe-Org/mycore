@@ -4,7 +4,7 @@
 /// <reference path="model/LanguageModel.ts" />
 /// <reference path="../widgets/i18n/XMLI18NProvider.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
 
     /**

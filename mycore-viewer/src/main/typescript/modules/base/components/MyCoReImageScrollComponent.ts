@@ -15,6 +15,10 @@
 /// <reference path="events/LanguageModelLoadedEvent.ts" />
 /// <reference path="events/RequestPageEvent.ts" />
 /// <reference path="events/PageLayoutChangedEvent.ts" />
+/// <reference path="events/RequestDesktopInputEvent.ts" />
+/// <reference path="events/RequestTouchInputEvent.ts" />
+/// <reference path="events/AddCanvasPageLayerEvent.ts" />
+/// <reference path="events/RedrawEvent.ts" />
 /// <reference path="../MyCoReViewerSettings.ts" />
 /// <reference path="../widgets/events/ViewerEvent.ts" />
 /// <reference path="model/StructureImage.ts" />
@@ -26,27 +30,25 @@
 /// <reference path="../widgets/canvas/viewport/VelocityScrollAnimation.ts" />‚
 /// <reference path="../widgets/canvas/viewport/ViewportTools.ts" />
 /// <reference path="model/AbstractPage.ts" />
-/// <reference path="../widgets/canvas/input/TouchEventHandler.ts" />
+/// <reference path="../widgets/canvas/input/DesktopInputDelegator.ts" />
+/// <reference path="../widgets/canvas/input/DesktopInputListener.ts" />
+/// <reference path="../widgets/canvas/input/TouchInputDelegator.ts" />
+/// <reference path="../widgets/canvas/input/TouchInputListener.ts" />
 /// <reference path="../widgets/canvas/input/TouchSession.ts" />
-/// <reference path="../widgets/canvas/input/DesktopInputEventDelegator.ts" />
-/// <reference path="../widgets/canvas/input/DesktopInputEventHandler.ts" />
-/// <reference path="../widgets/canvas/input/MouseSession.ts" />
 /// <reference path="../components/events/ViewportInitializedEvent.ts" />
-/// <reference path="../components/events/MarkerInitializedEvent.ts" />
 
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     import RequestTextContentEvent = mycore.viewer.components.events.RequestTextContentEvent;
     /**
      * canvas.overview.enabled:boolean      if true the overview will be shown in the lower right corner
      */
-    export class MyCoReImageScrollComponent extends ViewerComponent implements widgets.canvas.TouchEventHandler, widgets.canvas.DesktopInputEventHandler {
+    export class MyCoReImageScrollComponent extends ViewerComponent {
 
         constructor(private _settings:MyCoReViewerSettings, private _container:JQuery) {
             super();
         }
-
 
         public init() {
             this.changeImage(this._settings.filePath, false);
@@ -55,11 +57,9 @@ module mycore.viewer.components {
             this.trigger(new events.WaitForEvent(this, events.ShowContentEvent.TYPE));
             this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
             this.trigger(new events.ViewportInitializedEvent(this, this._pageController.viewport));
-            this.trigger(new events.MarkerInitializedEvent(this, this._pageController.getMarker()));
             var componentContent = this._componentContent;
             componentContent.css({position : "absolute", top : "0px", left : "0px", right : "15px", bottom : "15px"});
             this.initMainView();
-
 
             var overviewEnabled = Utils.getVar(this._settings, "canvas.overview.enabled", true);
             if (!this._settings.mobile) {
@@ -128,10 +128,8 @@ module mycore.viewer.components {
         }
 
         private initMainView() {
-            this._touchDelegators.push(new widgets.canvas.TouchInputDelegator(jQuery(this._imageView.container), this._pageController.viewport, this));
-            this._mouseDelegators.push(new widgets.canvas.DesktopInputEventDelegator(jQuery(this._imageView.container), this._pageController.viewport, this));
-            this._touchDelegators.push(new widgets.canvas.TouchInputDelegator(jQuery(this._altoView.container), this._pageController.viewport, this));
-            this._mouseDelegators.push(new widgets.canvas.DesktopInputEventDelegator(jQuery(this._altoView.container), this._pageController.viewport, this));
+            this.registerDesktopInputHandler(new DesktopInputHandler(this));
+            this.registerTouchInputHandler(new TouchInputHandler(this));
 
             if (!this._settings.mobile) {
 
@@ -232,15 +230,14 @@ module mycore.viewer.components {
         private _hrefPageLoadingMap = new MyCoReMap<string, boolean>();
         private _structureImages:Array<model.StructureImage> = null;
         private _currentImage:string;
-        private _touchAdditionalScaleMove:MoveVector = null;
         private _horizontalScrollbar:widgets.canvas.Scrollbar;
         private _verticalScrollbar:widgets.canvas.Scrollbar;
         private _languageModel:model.LanguageModel = null;
         private _rotateButton:widgets.toolbar.ToolbarButton;
         private _layoutToolbarButton:widgets.toolbar.ToolbarDropdownButton;
 
+        private _desktopDelegators:Array<widgets.canvas.DesktopInputDelegator> = new Array<widgets.canvas.DesktopInputDelegator>();
         private _touchDelegators:Array<widgets.canvas.TouchInputDelegator> = new Array<widgets.canvas.TouchInputDelegator>();
-        private _mouseDelegators:Array<widgets.canvas.DesktopInputEventDelegator> = new Array<widgets.canvas.DesktopInputEventDelegator>();
 
         private _permalinkState:MyCoReMap<string, string> = null;
         private _toggleButton:JQuery;
@@ -254,9 +251,8 @@ module mycore.viewer.components {
 
         private _layouts = new Array<widgets.canvas.PageLayout>();
         private _rotation:number = 0;
-        private _sessionStartRotation:number = 0;
 
-        private _layoutModel = {children : this._orderPageMap, pageCount : 1};
+        private _layoutModel = {children : this._orderPageMap, hrefImageMap: this._hrefImageMap, pageCount : 1};
 
         private _pageLoader = (order:number) => {
             if (this._orderImageMap.has(order)) {
@@ -311,18 +307,38 @@ module mycore.viewer.components {
             handleEvents.push(events.LanguageModelLoadedEvent.TYPE);
             handleEvents.push(events.ProvideToolbarModelEvent.TYPE);
             handleEvents.push(events.ProvidePageLayoutEvent.TYPE);
+            handleEvents.push(events.RequestDesktopInputEvent.TYPE);
+            handleEvents.push(events.RequestTouchInputEvent.TYPE);
+            handleEvents.push(events.AddCanvasPageLayerEvent.TYPE);
+            handleEvents.push(events.RedrawEvent.TYPE);
 
             return handleEvents;
         }
 
-        private previousImage() {
+        public previousImage() {
             this._pageLayout.previous();
             this.update();
         }
 
-        private nextImage() {
+        public nextImage() {
             this._pageLayout.next();
             this.update();
+        }
+
+        public getPageController() {
+            return this._pageController;
+        }
+        
+        public getPageLayout() {
+            return this._pageLayout;
+        }
+
+        public getRotation() {
+            return this._rotation;
+        }
+
+        public setRotation(rotation:number) {
+            this._rotation = rotation;
         }
 
         private changePageLayout(pageLayout:widgets.canvas.PageLayout) {
@@ -500,7 +516,6 @@ module mycore.viewer.components {
             if (e.type == mycore.viewer.components.events.ImageSelectedEvent.TYPE) {
                 var imageSelectedEvent = <mycore.viewer.components.events.ImageSelectedEvent>e;
                 this.changeImage(imageSelectedEvent.image.href, true);
-
             }
 
             if (e.type == events.StructureModelLoadedEvent.TYPE) {
@@ -534,9 +549,28 @@ module mycore.viewer.components {
                 state.set("derivate", this._settings.derivate);
             }
 
+            if(e.type == events.RequestDesktopInputEvent.TYPE) {
+                let requestInputEvent = e as events.RequestDesktopInputEvent;
+                this.registerDesktopInputHandler(requestInputEvent.listener);
+            }
+
+            if(e.type == events.RequestTouchInputEvent.TYPE) {
+                let requestInputEvent = e as events.RequestTouchInputEvent;
+                this.registerTouchInputHandler(requestInputEvent.listener);
+            }
+
             if (e.type == events.RestoreStateEvent.TYPE) {
                 var rste = <events.RestoreStateEvent>e;
                 this._permalinkState = rste.restoredState;
+            }
+
+            if (e.type == events.AddCanvasPageLayerEvent.TYPE) {
+                var acple = <events.AddCanvasPageLayerEvent>e;
+                this._pageController.addCanvasPageLayer(acple.zIndex, acple.canvasPageLayer);
+            }
+
+            if (e.type == events.RedrawEvent.TYPE) {
+                this._pageController.update();
             }
 
         }
@@ -642,7 +676,7 @@ module mycore.viewer.components {
             var position = this._pageLayout.getCurrentPositionInPage();
             var scale = this._pageController.viewport.scale;
             this._pageController.viewport.stopAnimation();
-            this._mouseDelegators.forEach(delegator=>delegator.clearRunning());
+            this._desktopDelegators.forEach(delegator=>delegator.clearRunning());
             this._touchDelegators.forEach(delegator=>delegator.clearRunning());
 
             if (!this._settings.mobile) {
@@ -693,25 +727,46 @@ module mycore.viewer.components {
             return this._hrefImageMap.get(href);
         }
 
+        private registerDesktopInputHandler(listener:widgets.canvas.DesktopInputListener) {
+            this._desktopDelegators.push(new widgets.canvas.DesktopInputDelegator(jQuery(this._imageView.container), this._pageController.viewport, listener));
+            this._desktopDelegators.push(new widgets.canvas.DesktopInputDelegator(jQuery(this._altoView.container), this._pageController.viewport, listener));
+        }
+
+        private registerTouchInputHandler(listener:widgets.canvas.TouchInputListener) {
+            this._touchDelegators.push(new widgets.canvas.TouchInputDelegator(jQuery(this._imageView.container), this._pageController.viewport, listener));
+            this._touchDelegators.push(new widgets.canvas.TouchInputDelegator(jQuery(this._altoView.container), this._pageController.viewport, listener));
+        }
+
+
+    }
+
+    class TouchInputHandler extends widgets.canvas.TouchInputAdapter {
+
+        private _touchAdditionalScaleMove:MoveVector = null;
+        private _sessionStartRotation:number = 0;
+    
+        constructor(public component:MyCoReImageScrollComponent) {
+            super();
+        }
+
         public touchStart(session:widgets.canvas.TouchSession):void {
             this._touchAdditionalScaleMove = new MoveVector(0, 0);
-            this._pageController.viewport.stopAnimation();
+            this.component.getPageController().viewport.stopAnimation();
         }
 
         public touchMove(session:widgets.canvas.TouchSession):void {
-            var viewPort = this._pageController.viewport;
+            var viewPort = this.component.getPageController().viewport;
             if (!session.touchLeft) {
                 if (session.touches == 2 && session.startDistance > 150 && session.currentMove.distance > 150) {
                     var diff = session.currentMove.angle - session.startAngle;
                     var fullNewAngle = (360 * 2 + (this._sessionStartRotation + diff)) % 360;
                     var result = Math.round(fullNewAngle / 90) * 90;
                     result = (result == 360) ? 0 : result;
-                    if (this._rotation != result) {
-                        this._pageLayout.rotate(result);
-                        this._rotation = result;
+                    if (this.component.getRotation() != result) {
+                        this.component.getPageLayout().rotate(result);
+                        this.component.setRotation(result);
                     }
                 }
-
 
                 if (session.startDistance != 0 && session.currentMove.distance != 0 && session.touches > 1) {
                     var lastDistance = 0;
@@ -738,12 +793,12 @@ module mycore.viewer.components {
         }
 
         public touchEnd(session:widgets.canvas.TouchSession):void {
-            var viewPort = this._pageController.viewport;
+            var viewPort = this.component.getPageController().viewport;
 
             if (session.currentMove != null) {
                 if (session.currentMove.velocity.x != 0 || session.currentMove.velocity.y != 0) {
-                    var anim = new widgets.canvas.VelocityScrollAnimation(this._pageController.viewport, session.currentMove.velocity);
-                    this._pageController.viewport.startAnimation(anim);
+                    var anim = new widgets.canvas.VelocityScrollAnimation(this.component.getPageController().viewport, session.currentMove.velocity);
+                    this.component.getPageController().viewport.startAnimation(anim);
                 }
             }
 
@@ -753,44 +808,40 @@ module mycore.viewer.components {
                     var newPosition = viewPort.getAbsolutePosition(currentMiddle);
                     viewPort.startAnimation(new widgets.canvas.ZoomAnimation(viewPort, 2, newPosition, 500));
                 } else {
-                    if (session.canvasStartPosition.equals(this._pageController.viewport.position)) {
+                    if (session.canvasStartPosition.equals(this.component.getPageController().viewport.position)) {
                     }
                 }
             }
-            this._sessionStartRotation = this._rotation;
+            this._sessionStartRotation = this.component.getRotation();
+        }
+    }
+    
+    class DesktopInputHandler extends widgets.canvas.DesktopInputAdapter {
+
+        constructor(public component:MyCoReImageScrollComponent) {
+            super();
         }
 
-        public mouseDown(session:widgets.canvas.MouseSession):void {
+        public mouseDoubleClick(mousePosition:Position2D):void {
+            var vp = this.component.getPageController().viewport;
+            var position:Position2D = vp.getAbsolutePosition(mousePosition);
+            vp.startAnimation(new widgets.canvas.ZoomAnimation(vp, 2, position));
         }
 
-        public mouseMove(session:widgets.canvas.MouseSession):void {
-            var xMove = session.currentPositionInputElement.x - session.startPositionInputElement.x;
-            var yMove = session.currentPositionInputElement.y - session.startPositionInputElement.y;
-            var move = new MoveVector(-xMove, -yMove).rotate(this._pageController.viewport.rotation);
-
-            this._pageController.viewport.position = session.startPositionViewport
-                .scale(this._pageController.viewport.scale)
+        public mouseDrag(currentPosition:Position2D, startPosition:Position2D, startViewport:Position2D):void {
+            var xMove = currentPosition.x - startPosition.x;
+            var yMove = currentPosition.y - startPosition.y;
+            var move = new MoveVector(-xMove, -yMove).rotate(this.component.getPageController().viewport.rotation);
+            this.component.getPageController().viewport.position = startViewport
+                .scale(this.component.getPageController().viewport.scale)
                 .move(move)
-                .scale(1 / this._pageController.viewport.scale);
-
-        }
-
-        public mouseUp(session:widgets.canvas.MouseSession):void {
-            if (typeof session.lastMouseSession != "undefined" && session.lastMouseSession != null && session.downDate - session.lastMouseSession.downDate < 500) {
-                if (Math.abs(session.lastMouseSession.startPositionInputElement.x - session.startPositionInputElement.x) < 10 &&
-                    Math.abs(session.lastMouseSession.startPositionInputElement.y - session.startPositionInputElement.y) < 10) {
-                    var vp = this._pageController.viewport;
-                    var position = vp.getAbsolutePosition(session.currentPositionInputElement);
-                    vp.startAnimation(new widgets.canvas.ZoomAnimation(vp, 2, position));
-                }
-
-            }
+                .scale(1 / this.component.getPageController().viewport.scale);
         }
 
         public scroll(e:{ deltaX: number; deltaY: number; orig: any; pos: Position2D; altKey?: boolean, ctrlKey?:boolean }) {
             var zoomParameter = (ViewerParameterMap.fromCurrentUrl().get("iview2.scroll") == "zoom");
             var zoom = (zoomParameter) ? !e.altKey||e.ctrlKey : e.altKey||e.ctrlKey;
-            var vp = this._pageController.viewport;
+            var vp = this.component.getPageController().viewport;
 
             if (zoom) {
                 var relative = Math.pow(0.95, (e.deltaY / 10));
@@ -814,20 +865,13 @@ module mycore.viewer.components {
         public keydown(e:JQueryKeyEventObject):void {
             switch (e.keyCode) {
                 case 33:
-                    this.previousImage();
+                    this.component.previousImage();
                     break;
                 case 34:
-                    this.nextImage();
+                    this.component.nextImage();
                     break;
                 default :
             }
-        }
-
-        public keypress(e:JQueryKeyEventObject):void {
-
-        }
-
-        public keyup(e:JQueryKeyEventObject):void {
         }
 
     }

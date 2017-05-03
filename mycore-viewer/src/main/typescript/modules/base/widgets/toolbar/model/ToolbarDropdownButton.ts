@@ -1,7 +1,7 @@
 /// <reference path="../../../Utils.ts" />
 /// <reference path="ToolbarButton.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
     export class ToolbarDropdownButton extends ToolbarButton {
 
         constructor(id:string, label:string, children:Array<ToolbarDropdownButtonChild>, icon:string = null, largeContent:boolean = false, buttonClass:string = "default", disabled:boolean = false, active:boolean = false) {

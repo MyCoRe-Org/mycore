@@ -1,7 +1,7 @@
 /// <reference path="../../Utils.ts" />
 /// <reference path="../../definitions/jquery.d.ts" />
 
-module mycore.viewer.widgets.layout {
+namespace mycore.viewer.widgets.layout {
     export class IviewPageLayout {
 
         constructor(_currentPage:JQuery) {

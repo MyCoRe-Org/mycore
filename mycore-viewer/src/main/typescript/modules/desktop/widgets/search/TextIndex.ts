@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.index {
+namespace mycore.viewer.widgets.index {
     export class TextIndex<T> {
 
         constructor(private _fullTextProvider:(T) => string) {

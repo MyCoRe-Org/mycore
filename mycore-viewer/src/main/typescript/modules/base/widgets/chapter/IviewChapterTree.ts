@@ -4,7 +4,7 @@
 /// <reference path="ChapterTreeInputHandler.ts" />
 /// <reference path="ChapterTreeChapter.ts" />
 
-module mycore.viewer.widgets.chaptertree {
+namespace mycore.viewer.widgets.chaptertree {
 
     export class IviewChapterTree {
 

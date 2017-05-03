@@ -5,7 +5,7 @@
 /// <reference path="ThumbnailOverviewView.ts" />
 /// <reference path="ThumbnailOverviewSettings.ts" />
 
-module mycore.viewer.widgets.thumbnail {
+namespace mycore.viewer.widgets.thumbnail {
     export class IviewThumbnailOverview implements ThumbnailOverviewScrollHandler, ThumbnailOverviewResizeHandler {
 
         constructor(private _settings: ThumbnailOverviewSettings) {

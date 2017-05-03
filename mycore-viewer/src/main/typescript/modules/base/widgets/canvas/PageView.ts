@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class PageView {
 
         constructor(private _drawImage:boolean = true, private _drawHTML:boolean = true) {

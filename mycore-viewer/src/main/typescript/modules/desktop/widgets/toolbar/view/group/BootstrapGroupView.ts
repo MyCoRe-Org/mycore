@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export class BootstrapGroupView {
 

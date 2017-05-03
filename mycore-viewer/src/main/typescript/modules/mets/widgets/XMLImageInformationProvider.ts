@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.image {
+namespace mycore.viewer.widgets.image {
 
     export class XMLImageInformationProvider {
         public static getInformation(basePath:string, href: string, callback: (XMLImageInformation) => void, errorCallback: (err) => void = (err) => {

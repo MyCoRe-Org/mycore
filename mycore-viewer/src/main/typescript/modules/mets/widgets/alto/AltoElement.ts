@@ -2,7 +2,7 @@
 
 enum AltoElementType {ComposedBlock, Illustration, GraphicalElement,TextBlock, TextLine, String, SP, HYP}
 
-module mycore.viewer.widgets.alto {
+namespace mycore.viewer.widgets.alto {
     export class AltoElement {
         //diese Klasse stellt ein Grundelement von ALTO dar mit den Minimalanforderungen
 

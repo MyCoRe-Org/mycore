@@ -1,7 +1,7 @@
 /// <reference path="../../../Utils.ts" />
 /// <reference path="TouchMove.ts" />
 
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class TouchSession {
         constructor(public startTime: number,
             public startMiddle: Position2D,

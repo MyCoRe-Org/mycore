@@ -1,19 +1,19 @@
 /// <reference path="viewport/Viewport.ts" />
 /// <reference path="viewport/ViewportTools.ts" />
-/// <reference path="viewport/Animation.ts" />
-/// <reference path="input/DesktopInputEventDelegator.ts" />
-/// <reference path="input/TouchEventDelegator.ts" />
+/// <reference path="Animation.ts" />
+/// <reference path="StatefulAnimation.ts" />
+/// <reference path="InterpolationAnimation.ts" />
 /// <reference path="model/PageArea.ts" />
 /// <reference path="../../components/model/AbstractPage.ts" />
 /// <reference path="../../components/model/TextContent.ts" />
 /// <reference path="HtmlRenderer.ts" />
 /// <reference path="TextRenderer.ts" />
-/// <reference path="CanvasMarker.ts" />
+/// <reference path="CanvasPageLayer.ts" />
 /// <reference path="PageView.ts" />
 /// <reference path="Scrollbar.ts" />
 /// <reference path="Overview.ts" />
 
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class PageController {
 
         constructor(private miniOverview:boolean = false) {
@@ -33,10 +33,10 @@ module mycore.viewer.widgets.canvas {
         private _views:Array<PageView> = new Array<PageView>();
         private _viewHTMLRendererMap = new MyCoReMap<PageView, HtmlRenderer>();
         private _textRenderer:TextRenderer = null;
-        private _marker:CanvasMarker = new CanvasMarker(()=>{
-            this.update();
-        });
-        
+        private _canvasPageLayers = new MyCoReMap<number, CanvasPageLayer>();
+        private _lastAnimationTime:number = null;
+        private _animations = new Array<Animation>();
+
         public _overview:Overview = null;
 
         public _updateSizeIfChanged() {
@@ -92,7 +92,7 @@ module mycore.viewer.widgets.canvas {
                     viewerRequestAnimationFrame(() => {
                         this._nextRequested = false;
                         this._updateSizeIfChanged();
-                        this._viewport.updateAnimation();
+                        this.updateAnimations();
                         this._views.forEach(view=> {
                             if (view.drawHTML) {
                                 var htmlRenderer:HtmlRenderer;
@@ -214,7 +214,10 @@ module mycore.viewer.widgets.canvas {
                 ctx2.translate(-realAreaToDraw.pos.x * scale * info.scale, -realAreaToDraw.pos.y * scale * info.scale);
                 if(!preview){
                     ctx2.scale(scale * info.scale, scale * info.scale);
-                    this.getMarker().draw(page.id, ctx2, page.size);
+                    var layers:Array<CanvasPageLayer> = this.getCanvasPageLayersOrdered();
+                    layers.forEach(layer => {
+                        layer.draw(ctx2, page.id, page.size, view.drawHTML);
+                    });
                     ctx2.scale(1 / scale * info.scale, 1 / scale * info.scale);
                 }
             }
@@ -222,6 +225,44 @@ module mycore.viewer.widgets.canvas {
             ctx2.restore();
         }
 
+        private updateAnimations() {
+            this._viewport.updateAnimation();
+            if(this._animations.length == 0) {
+                this._lastAnimationTime = null;
+                return;
+            }
+            if(this._lastAnimationTime == null) {
+                this._lastAnimationTime = new Date().valueOf();
+            }
+            var elapsedTime:number = new Date().valueOf() - this._lastAnimationTime;
+            var finishedAnimations:Array<Animation> = [];
+            for(var animation of this._animations) {
+                if(animation.updateAnimation(elapsedTime)) {
+                    finishedAnimations.push(animation);
+                }
+            }
+            finishedAnimations.forEach(animation => {
+                this.removeAnimation(animation);
+            });
+            if(this._animations.length == 0) {
+                this._lastAnimationTime = null;
+                return;
+            }
+            setTimeout(() => {
+                this.update();
+            }, 0);   
+        }
+
+        public addAnimation(animation:Animation) {
+            this._animations.push(animation);
+        }
+
+        public removeAnimation(animation:Animation) {
+            var index = this._animations.indexOf(animation);
+            if (index >= 0) {
+                this._animations.splice( index, 1 );
+            }
+        }
 
         public get viewport():mycore.viewer.widgets.canvas.Viewport {
             return this._viewport;
@@ -259,8 +300,23 @@ module mycore.viewer.widgets.canvas {
             return this._pageArea.getPageInformation(page);
         }
 
-        public getMarker():mycore.viewer.widgets.canvas.CanvasMarker {
-            return this._marker;
+        public addCanvasPageLayer(zIndex:number, canvas:CanvasPageLayer) {
+            this._canvasPageLayers.set(zIndex, canvas);
+        }
+
+        public getCanvasPageLayers():MyCoReMap<number, CanvasPageLayer> {
+            return this._canvasPageLayers;
+        }
+
+        public getCanvasPageLayersOrdered():Array<CanvasPageLayer> {
+            if(this._canvasPageLayers == null || this._canvasPageLayers.isEmpty()) {
+                return [];
+            }
+            var sortedArray:Array<CanvasPageLayer> = [];
+            this._canvasPageLayers.keys.sort().forEach(k => {
+                sortedArray.push(this._canvasPageLayers.get(k));
+            });
+            return sortedArray;
         }
 
         public getPageArea():widgets.canvas.PageArea {

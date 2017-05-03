@@ -1,7 +1,7 @@
 /// <reference path="../../components/model/Layer.ts" />
 /// <reference path="../../definitions/jquery.d.ts" />
 
-module mycore.viewer.widgets.layer {
+namespace mycore.viewer.widgets.layer {
 
     export class LayerDisplayModel {
 

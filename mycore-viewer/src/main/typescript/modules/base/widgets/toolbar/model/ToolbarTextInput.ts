@@ -1,7 +1,7 @@
 /// <reference path="../../../Utils.ts" />
 /// <reference path="ToolbarComponent.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export class ToolbarTextInput extends ToolbarComponent {
         constructor(id: string, value:string, placeHolder: string) {

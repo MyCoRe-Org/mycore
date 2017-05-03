@@ -6,7 +6,7 @@
 /// <reference path="../view/dropdown/DropdownView.ts" />
 /// <reference path="../view/ToolbarViewFactory.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
     export class DropdownButtonController extends ButtonController {
 
         constructor(_groupMap:MyCoReMap<string, GroupView>, private _dropdownButtonViewMap:MyCoReMap<string, DropdownView>, private __mobile = false) {

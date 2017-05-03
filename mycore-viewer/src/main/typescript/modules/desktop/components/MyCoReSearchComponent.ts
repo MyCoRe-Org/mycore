@@ -1,10 +1,10 @@
 /// <reference path="../definitions/bootstrap.d.ts" />
 /// <reference path="model/MyCoReViewerSearcher.ts" />
 /// <reference path="events/ProvideViewerSearcherEvent.ts" />
+/// <reference path="../widgets/canvas/SearchResultCanvasPageLayer.ts" />
 
-module mycore.viewer.components {
-    import AreaInPage = mycore.viewer.widgets.canvas.AreaInPage;
-    import CanvasMarkerType = mycore.viewer.widgets.canvas.CanvasMarkerType;
+namespace mycore.viewer.components {
+
     export class MyCoReSearchComponent extends ViewerComponent {
 
         constructor(private _settings:MyCoReViewerSettings) {
@@ -24,6 +24,8 @@ module mycore.viewer.components {
 
         private _searcher:model.MyCoReViewerSearcher = null;
         private _imageHrefImageMap:MyCoReMap<string, model.StructureImage> = new MyCoReMap<string, model.StructureImage>();
+
+        private _searchResultCanvasPageLayer:widgets.canvas.SearchResultCanvasPageLayer = new widgets.canvas.SearchResultCanvasPageLayer();
 
         private _containerVisibleModelLoadedSync = Utils.synchronize<MyCoReSearchComponent>([
                 (_self) => _self._model != null,
@@ -100,7 +102,6 @@ module mycore.viewer.components {
                     var link = jQuery("<a></a>").append(e.context.clone());
                     result.append(link);
 
-
                     this._searchContainer.append(result);
                     if (this._imageHrefImageMap.has(e.obj.pageHref)) {
                         var image = this._imageHrefImageMap.get(e.obj.pageHref);
@@ -110,9 +111,10 @@ module mycore.viewer.components {
                             }
                             lastClicked = result;
                             result.addClass("active");
-                            this._marker.clearAll(CanvasMarkerType.WORD_STRONG);
-                            this._marker.markArea(new AreaInPage(e.obj.pageHref, e.obj.pos.x, e.obj.pos.y, e.obj.size.width, e.obj.size.height, CanvasMarkerType.WORD_STRONG));
+                            var areaRect:Rect = Rect.fromXYWH(e.obj.pos.x, e.obj.pos.y, e.obj.size.width, e.obj.size.height);
+                            this._searchResultCanvasPageLayer.select(e.obj.pageHref, areaRect);
                             this.trigger(new events.ImageSelectedEvent(this, image));
+                            this.trigger(new events.RedrawEvent(this));
                         });
                         var page = jQuery("<span class='childLabel'>" + (image.orderLabel || image.order) + "</span>");
                         result.append(page);
@@ -122,14 +124,14 @@ module mycore.viewer.components {
 
                 });
             }, ()=> {
-                this._marker.clearAll(CanvasMarkerType.WORD);
-                this._marker.clearAll(CanvasMarkerType.WORD_STRONG);
-                textContents.forEach(tc=> {
-                    this._marker.markArea(new AreaInPage(tc.pageHref, tc.pos.x, tc.pos.y, tc.size.width, tc.size.height, CanvasMarkerType.WORD));
+                this._searchResultCanvasPageLayer.clear();
+                textContents.forEach(tc => {
+                    var areaRect:Rect = Rect.fromXYWH(tc.pos.x, tc.pos.y, tc.size.width, tc.size.height);
+                    this._searchResultCanvasPageLayer.add(tc.pageHref, areaRect);
                 });
+                this.trigger(new events.RedrawEvent(this));
             });
         }
-
 
         public init() {
             this._container = jQuery("<div></div>");
@@ -168,8 +170,8 @@ module mycore.viewer.components {
             this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
             this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
             this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
-            this.trigger(new events.WaitForEvent(this, events.MarkerInitializedEvent.TYPE));
             this.trigger(new events.WaitForEvent(this, events.RestoreStateEvent.TYPE));
+            this.trigger(new events.AddCanvasPageLayerEvent(this, 1, this._searchResultCanvasPageLayer));
         }
 
         private updateContainerSize() {
@@ -184,13 +186,10 @@ module mycore.viewer.components {
             handleEvents.push(events.LanguageModelLoadedEvent.TYPE);
             handleEvents.push(events.ShowContentEvent.TYPE);
             handleEvents.push(events.ProvideViewerSearcherEvent.TYPE);
-            handleEvents.push(events.MarkerInitializedEvent.TYPE);
             handleEvents.push(events.RequestStateEvent.TYPE);
             handleEvents.push(events.RestoreStateEvent.TYPE);
             return handleEvents;
         }
-
-        private _marker:mycore.viewer.widgets.canvas.CanvasMarker;
 
         public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
             if (e.type == events.StructureModelLoadedEvent.TYPE) {
@@ -225,8 +224,8 @@ module mycore.viewer.components {
                 var sce = <events.ShowContentEvent> e;
                 if (sce.containerDirection == events.ShowContentEvent.DIRECTION_EAST && sce.content == this._container) {
                     if (sce.size == 0) {
-                        this._marker.clearAll(CanvasMarkerType.WORD);
-                        this._marker.clearAll(CanvasMarkerType.WORD_STRONG);
+                        this._searchResultCanvasPageLayer.clear();
+                        this.trigger(new events.RedrawEvent(this));
                     } else if (this._searchAreaReady && this._toolbarTextInput.value.length > 0) {
                         this._search(this._toolbarTextInput.value);
                     }
@@ -238,11 +237,6 @@ module mycore.viewer.components {
                 var pvse = <events.ProvideViewerSearcherEvent>e;
                 this._searcher = pvse.searcher;
                 this._containerVisibleModelLoadedSync(this);
-            }
-
-            if (e.type == events.MarkerInitializedEvent.TYPE) {
-                let mie = <events.MarkerInitializedEvent>e;
-                this._marker = mie.marker;
             }
 
             if (e.type == events.RequestStateEvent.TYPE) {

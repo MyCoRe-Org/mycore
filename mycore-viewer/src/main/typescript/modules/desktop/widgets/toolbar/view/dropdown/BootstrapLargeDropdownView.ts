@@ -1,11 +1,11 @@
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export class BootstrapLargeDropdownView implements DropdownView {
 
         constructor(private _id:string) {
             this._buttonElement = jQuery("<select></select>");
             this._buttonElement.addClass("btn btn-default navbar-btn dropdown");
-            this._childMap = new MyCoReMap<String, JQuery>();
+            this._childMap = new MyCoReMap<string, JQuery>();
         }
 
         private _buttonElement: JQuery;

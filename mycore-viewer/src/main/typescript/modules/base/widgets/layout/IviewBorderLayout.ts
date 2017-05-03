@@ -1,7 +1,7 @@
 /// <reference path="../../Utils.ts" />
 /// <reference path="../../definitions/jquery.d.ts" />
 
-module mycore.viewer.widgets.layout {
+namespace mycore.viewer.widgets.layout {
     /**
      * Border Layout designed for Desktop.
      * Every container can be resizable.
@@ -22,8 +22,8 @@ module mycore.viewer.widgets.layout {
          */
             constructor(private _parent:JQuery, private  _horizontalStronger, descriptions:ContainerDescription[]) {
 
-            this._containerMap = new MyCoReMap<Number, JQuery>();
-            this._descriptionMap = new MyCoReMap<Number, ContainerDescription>();
+            this._containerMap = new MyCoReMap<number, JQuery>();
+            this._descriptionMap = new MyCoReMap<number, ContainerDescription>();
 
             for (var i in descriptions) {
                 var description:ContainerDescription = descriptions[i];
@@ -100,7 +100,7 @@ module mycore.viewer.widgets.layout {
             cssDescription.top = "0px";
             cssDescription.bottom = "0px";
             cssDescription.left = "0px";
-            cssDescription.display = description.size != 0 ? "block" : "none";
+            cssDescription.display = description.size !== 0 ? "block" : "none";
 
             switch (description.direction) {
                 case IviewBorderLayout.DIRECTION_EAST:

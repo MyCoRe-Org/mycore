@@ -11,7 +11,7 @@
 /// <reference path="events/ImageSelectedEvent.ts" />
 /// <reference path="events/ShowContentEvent.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
     export class MyCoReViewerContainerComponent extends ViewerComponent {
 
         constructor(private _settings: MyCoReViewerSettings, private _container: JQuery, private _contentContainer = jQuery("<div></div>")) {

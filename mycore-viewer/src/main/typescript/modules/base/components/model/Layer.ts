@@ -2,7 +2,7 @@
 /// <reference path="StructureImage.ts" />
 /// <reference path="../../definitions/jquery.d.ts" />
 
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     export interface Layer {
         getLabel():string;
         getId():string;

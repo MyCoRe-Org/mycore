@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.solr {
+namespace mycore.viewer.widgets.solr {
 
     export class SolrResponseParser {
         constructor() {

@@ -4,7 +4,7 @@
 /// <reference path="../widgets/alto/AltoHTMLGenerator.ts" />
 /// <reference path="MetsSettings.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     import RequestAltoModelEvent = mycore.viewer.components.events.RequestAltoModelEvent;
     import AltoHTMLGenerator = mycore.viewer.widgets.alto.AltoHTMLGenerator;

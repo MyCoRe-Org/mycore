@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.chaptertree {
+namespace mycore.viewer.widgets.chaptertree {
 
     export interface ChapterTreeView {
         addNode(parentId: string, id: string, label: string, childLabel: string, expandable: boolean);

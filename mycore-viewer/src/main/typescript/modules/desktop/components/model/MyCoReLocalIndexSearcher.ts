@@ -1,6 +1,6 @@
 /// <reference path="../../widgets/search/TextIndex.ts" />
 
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     export class MyCoReLocalIndexSearcher extends MyCoReViewerSearcher {
 
         constructor() {

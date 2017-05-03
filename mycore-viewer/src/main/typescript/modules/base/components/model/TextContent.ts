@@ -1,6 +1,6 @@
 /// <reference path="../../Utils.ts" />
 
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     export interface TextContentModel {
         content : Array<TextElement>;
     }

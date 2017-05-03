@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export class MobileDropdownView implements DropdownView {
 
@@ -23,7 +23,7 @@ module mycore.viewer.widgets.toolbar {
              this._buttonElement.attr("data-iconpos","left");
              this._buttonElement.attr("data-icon", "th-list");     */
             //this._buttonElement.selectmenu();
-            this._childMap = new MyCoReMap<String, JQuery>();
+            this._childMap = new MyCoReMap<string, JQuery>();
         }
 
         private _buttonElement:JQuery;

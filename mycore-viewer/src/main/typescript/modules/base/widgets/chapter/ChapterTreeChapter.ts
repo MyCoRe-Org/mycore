@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.chaptertree {
+namespace mycore.viewer.widgets.chaptertree {
 
     export interface ChapterTreeChapter {
         parent: ChapterTreeChapter;

@@ -2,7 +2,7 @@
 /// <reference path="../../widgets/canvas/PageLayout.ts" />
 /// <reference path="../ViewerComponent.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     /**
      * Fired when a PageLayoutChanges
      */

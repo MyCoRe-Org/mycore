@@ -6,7 +6,7 @@
 /// <reference path="input/TextInputView.ts" />
 /// <reference path="ToolbarView.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
     export interface ToolbarViewFactory {
         createToolbarView():ToolbarView;
         createTextView(id:string):TextView;

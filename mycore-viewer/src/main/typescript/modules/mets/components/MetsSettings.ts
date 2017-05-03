@@ -1,4 +1,4 @@
-module mycore.viewer.components {
+namespace mycore.viewer.components {
     export interface MetsSettings extends MyCoReViewerSettings {
         metsURL: string;
         imageXmlPath: string;

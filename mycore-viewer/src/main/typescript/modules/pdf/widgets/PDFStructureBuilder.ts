@@ -2,7 +2,7 @@
 /// <reference path="PDFStructureModel.ts" />
 
 
-module mycore.viewer.widgets.pdf {
+namespace mycore.viewer.widgets.pdf {
     import StructureChapter = mycore.viewer.model.StructureChapter;
     export class PDFStructureBuilder {
 
@@ -11,11 +11,11 @@ module mycore.viewer.widgets.pdf {
         }
 
         private _structureModel: PDFStructureModel = null;
-        private _chapterPageMap:MyCoReMap<string, model.StructureImage> = new MyCoReMap<String, mycore.viewer.model.StructureImage>();
+        private _chapterPageMap:MyCoReMap<string, model.StructureImage> = new MyCoReMap<string, mycore.viewer.model.StructureImage>();
         private _pages:Array<model.StructureImage> = new Array<model.StructureImage>();
         private _pageCount:number = 0;
-        private _refPageMap:MyCoReMap<string, PDFPageProxy> = new MyCoReMap<String, PDFPageProxy>();
-        private _idPageMap:MyCoReMap<number, model.StructureImage> = new MyCoReMap<Number, mycore.viewer.model.StructureImage>();
+        private _refPageMap:MyCoReMap<string, PDFPageProxy> = new MyCoReMap<string, PDFPageProxy>();
+        private _idPageMap:MyCoReMap<number, model.StructureImage> = new MyCoReMap<number, mycore.viewer.model.StructureImage>();
         private _loadedPageCount:number;
         private _outline:Array<PDFTreeNode>;
         private _rootChapter:model.StructureChapter;
@@ -148,7 +148,12 @@ module mycore.viewer.widgets.pdf {
                 var that = this;
                 this._rootChapter = new model.StructureChapter(null, "pdf", "0", this._name, null, null, () => 1);
                 this._rootChapter.chapter = this.getChapterFromOutline(this._rootChapter, this._outline,1);
-                this._structureModel = new PDFStructureModel(this._rootChapter, this._pages, this._chapterPageMap, new MyCoReMap<string, mycore.viewer.model.StructureChapter>(), this._refPageMap);
+                this._structureModel = new PDFStructureModel(this._rootChapter,
+                        this._pages,
+                        this._chapterPageMap,
+                        new MyCoReMap<string, model.StructureChapter>(),
+                        new MyCoReMap<string, model.StructureImage>(),
+                        this._refPageMap);
                 this.checkResolvable();
             }
         }

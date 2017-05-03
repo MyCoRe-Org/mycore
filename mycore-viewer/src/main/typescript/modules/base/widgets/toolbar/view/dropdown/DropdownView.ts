@@ -1,7 +1,7 @@
 /// <reference path="../../../../definitions/jquery.d.ts" />
 /// <reference path="../button/ButtonView.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export interface DropdownView extends ButtonView {
         updateChilds(childs:Array<{id:string;label:string;icon:string

@@ -1,6 +1,6 @@
 /// <reference path="model/MyCoReFrameToolbarModel.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoReFrameToolbarProviderComponent extends ViewerComponent {
 
