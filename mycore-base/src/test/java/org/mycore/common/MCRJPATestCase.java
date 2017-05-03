@@ -52,7 +52,7 @@ public class MCRJPATestCase extends MCRTestCase {
                 schemaProperties.put("javax.persistence.schema-generation.scripts.action", action);
                 schemaProperties.put("javax.persistence.schema-generation.scripts." + action + "-target", output);
             }
-            Persistence.generateSchema(MCRJPABootstrapper.PERSISTENCE_UNIT_NAME, schemaProperties);
+            Persistence.generateSchema(getCurrentComponentName(), schemaProperties);
             LogManager.getLogger().debug(() -> "invoked '" + action + "' sql script:\n" + output.toString());
         }
     }
@@ -63,7 +63,7 @@ public class MCRJPATestCase extends MCRTestCase {
         // Configure logging etc.
         super.setUp();
         LogManager.getLogger().debug("Setup JPA");
-        MCRJPABootstrapper.initializeJPA();
+        MCRJPABootstrapper.initializeJPA(Optional.of(getCurrentComponentName()));
         exportSchema();
         MCRHibernateConfigHelper
             .checkEntityManagerFactoryConfiguration(MCREntityManagerProvider.getEntityManagerFactory());
