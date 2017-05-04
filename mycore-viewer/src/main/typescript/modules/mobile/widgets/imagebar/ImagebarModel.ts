@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.imagebar {
+namespace mycore.viewer.widgets.imagebar {
 
     export interface ImagebarImage {
         type:string;

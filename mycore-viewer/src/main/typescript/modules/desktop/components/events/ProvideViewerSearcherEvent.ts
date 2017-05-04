@@ -1,6 +1,6 @@
 /// <reference path="../model/MyCoReViewerSearcher.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     export class ProvideViewerSearcherEvent extends MyCoReImageViewerEvent {
         constructor(component:ViewerComponent, private _searcher:model.MyCoReViewerSearcher) {
             super(component, ProvideViewerSearcherEvent.TYPE);

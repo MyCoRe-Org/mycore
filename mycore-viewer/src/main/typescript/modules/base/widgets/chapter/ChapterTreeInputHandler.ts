@@ -1,7 +1,7 @@
 /// <reference path="../../definitions/jquery.d.ts" />
 /// <reference path="IviewChapterTree.ts" />
 
-module mycore.viewer.widgets.chaptertree {
+namespace mycore.viewer.widgets.chaptertree {
 
     export interface ChapterTreeInputHandler {
         // called from ctrl

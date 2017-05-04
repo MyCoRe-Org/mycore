@@ -5,7 +5,7 @@
 /// <reference path="MobileChapterTreeView.ts" />
 /// <reference path="ChapterTreeInputHandler.ts" />
 
-module mycore.viewer.widgets.chaptertree {
+namespace mycore.viewer.widgets.chaptertree {
 
     export interface ChapterTreeSettings {
         /**

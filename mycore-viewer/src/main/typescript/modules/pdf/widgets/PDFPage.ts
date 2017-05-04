@@ -1,5 +1,5 @@
 /// <reference path="../definitions/pdf.d.ts" />
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class PDFPage implements model.AbstractPage {
 
         constructor(public id, private _pdfPage:PDFPageProxy) {

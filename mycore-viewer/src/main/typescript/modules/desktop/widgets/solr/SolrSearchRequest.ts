@@ -1,5 +1,5 @@
 /// <reference path="SolrResponseParser.ts" />
-module mycore.viewer.widgets.solr {
+namespace mycore.viewer.widgets.solr {
     export class SolrSearchRequest {
 
         constructor(public query:string,

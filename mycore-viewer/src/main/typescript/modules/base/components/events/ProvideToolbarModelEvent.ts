@@ -2,7 +2,7 @@
 /// <reference path="../model/MyCoReBasicToolbarModel.ts" />
 /// <reference path="../ViewerComponent.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     export class ProvideToolbarModelEvent extends MyCoReImageViewerEvent {
 
         constructor(component:ViewerComponent, public model:model.MyCoReBasicToolbarModel) {

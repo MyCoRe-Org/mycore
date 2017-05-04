@@ -2,7 +2,7 @@
 /// <reference path="../../definitions/jquery.d.ts" />
 /// <reference path="LayerDisplayModel.ts" />
 
-module mycore.viewer.widgets.layer {
+namespace mycore.viewer.widgets.layer {
 
     export class LayerDisplayController {
         constructor(private _container:JQuery, private languageResolver:(id:string)=>string) {

@@ -1,8 +1,8 @@
 /// <reference path="../../../Utils.ts" />
 /// <reference path="Viewport.ts" />
-/// <reference path="Animation.ts" />
+/// <reference path="../Animation.ts" />
 
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class VelocityScrollAnimation implements Animation {
 
         constructor(private _viewport: mycore.viewer.widgets.canvas.Viewport, private _startVelocity: MoveVector) {

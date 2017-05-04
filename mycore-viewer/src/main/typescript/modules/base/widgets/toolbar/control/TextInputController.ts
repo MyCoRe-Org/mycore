@@ -6,7 +6,7 @@
 /// <reference path="../view/group/GroupView.ts" />
 /// <reference path="../view/ToolbarViewFactory.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
     export class TextInputController implements ContainerObserver<ToolbarGroup, ToolbarComponent>, ViewerPropertyObserver<any> {
 
         constructor(private _groupMap: MyCoReMap<string, GroupView>, private _textInputViewMap: MyCoReMap<string, TextInputView>) {

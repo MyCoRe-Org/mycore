@@ -1,7 +1,7 @@
 /// <reference path="../widgets/XMLImageInformationProvider.ts" />
 /// <reference path="../widgets/tei/TEILayer.ts" />
 /// <reference path="MetsSettings.ts" />
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoReTEILayerProvider extends ViewerComponent {
 
@@ -57,7 +57,7 @@ module mycore.viewer.components {
 
                 });
 
-                if (transcriptions.keys.length != 0) {
+                if (!transcriptions.isEmpty()) {
                     this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer("transcription", "transcription", transcriptions, this.contentLocation, this._settings.teiStylesheet || "html")));
                 }
 

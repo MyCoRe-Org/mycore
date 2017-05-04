@@ -1,4 +1,4 @@
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
 
     export class RequestAltoModelEvent extends MyCoReImageViewerEvent {
 

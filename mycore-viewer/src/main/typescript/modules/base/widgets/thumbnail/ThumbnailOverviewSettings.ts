@@ -4,7 +4,7 @@
 /// <reference path="ThumbnailOverviewThumbnail.ts" />
 /// <reference path="ThumbnailOverviewInputHandler.ts" />
 
-module mycore.viewer.widgets.thumbnail {
+namespace mycore.viewer.widgets.thumbnail {
 
     export interface ThumbnailOverviewSettings {
         /**

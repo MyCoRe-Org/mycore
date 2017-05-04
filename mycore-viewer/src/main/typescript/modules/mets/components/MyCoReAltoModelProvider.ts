@@ -4,7 +4,7 @@
 /// <reference path="../widgets/alto/AltoFile.ts" />
 /// <reference path="events/RequestAltoModelEvent.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoReAltoModelProvider extends ViewerComponent {
 

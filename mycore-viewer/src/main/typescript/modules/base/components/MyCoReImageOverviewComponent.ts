@@ -16,7 +16,7 @@
 /// <reference path="../widgets/thumbnail/ThumbnailOverviewInputHandler.ts" />
 /// <reference path="../widgets/toolbar/events/DropdownButtonPressedEvent.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     /**
      * imageOverview.enabled: boolean   should the image overview be enabled in toolbar dropwdown menu
@@ -40,7 +40,7 @@ module mycore.viewer.components {
         public init() {
             if (this._enabled) {
                 this._container = jQuery("<div></div>");
-                this._idMetsImageMap = new MyCoReMap<String, model.StructureImage>();
+                this._idMetsImageMap = new MyCoReMap<string, model.StructureImage>();
                 this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
                 this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
 

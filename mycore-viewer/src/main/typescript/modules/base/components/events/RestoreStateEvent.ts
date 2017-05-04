@@ -2,7 +2,7 @@
 /// <reference path="../ViewerComponent.ts" />
 /// <reference path="../../Utils.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     export class RestoreStateEvent extends MyCoReImageViewerEvent {
         constructor(component: ViewerComponent,public restoredState:MyCoReMap<string,string>) {
             super(component, RestoreStateEvent.TYPE);

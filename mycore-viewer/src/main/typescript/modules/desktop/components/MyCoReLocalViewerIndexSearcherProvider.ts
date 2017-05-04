@@ -1,7 +1,7 @@
 /// <reference path="model/MyCoReLocalIndexSearcher.ts" />
 /// <reference path="events/ProvideViewerSearcherEvent.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoReLocalViewerIndexSearcherProvider extends ViewerComponent {
 

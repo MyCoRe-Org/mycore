@@ -2,13 +2,14 @@
 /// <reference path="StructureChapter.ts" />
 /// <reference path="StructureImage.ts" />
 
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     export class StructureModel {
 
-        constructor(public _rootChapter:mycore.viewer.model.StructureChapter,
-                    public _imageList: Array<mycore.viewer.model.StructureImage>,
-                    public _chapterToImageMap:MyCoReMap<string,mycore.viewer.model.StructureImage>,
-                    public _imageToChapterMap:MyCoReMap<string,mycore.viewer.model.StructureChapter>,
+        constructor(public _rootChapter:model.StructureChapter,
+                    public _imageList: Array<model.StructureImage>,
+                    public _chapterToImageMap:MyCoReMap<string, model.StructureImage>,
+                    public _imageToChapterMap:MyCoReMap<string, model.StructureChapter>,
+                    public _imageHrefImageMap:MyCoReMap<string, model.StructureImage>,
                     public _textContentPresent:boolean){
         }
 
@@ -33,24 +34,32 @@ module mycore.viewer.model {
             return this._imageToChapterMap;
         }
 
+        public get imageHrefImageMap() {
+            return this._imageHrefImageMap;
+        }
+
         public get isTextContentPresent():boolean {
                 return this._textContentPresent;
         }
 
-        public set rootChapter(rootChapter:mycore.viewer.model.StructureChapter) {
+        public set rootChapter(rootChapter:model.StructureChapter) {
             this._rootChapter = rootChapter;
         }
 
-        public set imageList(imageList:Array<mycore.viewer.model.StructureImage>) {
+        public set imageList(imageList:Array<model.StructureImage>) {
             this._imageList = imageList;
         }
 
-        public set chapterToImageMap(chapterToImageMap:MyCoReMap<string,mycore.viewer.model.StructureImage>) {
+        public set chapterToImageMap(chapterToImageMap:MyCoReMap<string,model.StructureImage>) {
             this._chapterToImageMap = chapterToImageMap;
         }
 
-        public set imageToChapterMap(imageToChapterMap:MyCoReMap<string,mycore.viewer.model.StructureChapter>) {
+        public set imageToChapterMap(imageToChapterMap:MyCoReMap<string,model.StructureChapter>) {
             this._imageToChapterMap = imageToChapterMap;
+        }
+
+        public set imageHrefImageMap(imageHrefImageMap:MyCoReMap<string,model.StructureImage>) {
+            this._imageHrefImageMap = imageHrefImageMap;
         }
 
         public set isTextContentPresent(textContentPresent:boolean){

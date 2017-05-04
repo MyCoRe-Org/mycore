@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.events {
+namespace mycore.viewer.widgets.events {
 
     export interface ViewerEvent {
         type:string;

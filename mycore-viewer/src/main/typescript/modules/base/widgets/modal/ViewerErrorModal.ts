@@ -1,5 +1,5 @@
 ///<reference path="ViewerModalWindow.ts"/>
-module mycore.viewer.widgets.modal {
+namespace mycore.viewer.widgets.modal {
 
     export class ViewerErrorModal extends IviewModalWindow {
 

@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.tei {
+namespace mycore.viewer.widgets.tei {
     export class TEILayer implements model.Layer {
 
         constructor(private _id: string, private _label: string, private mapping: MyCoReMap<string,string>, private contentLocation: string, private teiStylesheet: string) {

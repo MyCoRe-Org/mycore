@@ -1,4 +1,4 @@
-module mycore.viewer {
+namespace mycore.viewer {
 
     export class MyCoReViewerSettings {
         mobile: boolean;

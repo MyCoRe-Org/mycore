@@ -1,5 +1,5 @@
 /// <reference path="../../components/model/TextContent.ts" />
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class TextRenderer {
         constructor(private _vp:Viewport, private _area:PageArea, private _view:PageView, private _textContentProvider:(page:model.AbstractPage, contentProvider:(textContent:model.TextContentModel)=>void)=>void) {
             this.textContainer = document.createElement("div");
@@ -17,7 +17,7 @@ module mycore.viewer.widgets.canvas {
         private _callbackRunning:MyCoReMap<model.AbstractPage, boolean> = new MyCoReMap<model.AbstractPage, boolean>();
         private _addedPages:Array<model.AbstractPage> = new Array<model.AbstractPage>();
         public textContainer:HTMLElement;
-        private _elementCache:MyCoReMap<String, HTMLElement> = new MyCoReMap<String, HTMLElement>();
+        private _elementCache:MyCoReMap<string, HTMLElement> = new MyCoReMap<string, HTMLElement>();
         private _pageElementCache:MyCoReMap<model.AbstractPage, HTMLElement> = new MyCoReMap<model.AbstractPage, HTMLElement>();
         private _lineElementMap:MyCoReMap<model.TextElement, HTMLElement> = new MyCoReMap<model.TextElement, HTMLElement>()
         private _highlightedLines:MyCoReMap<string, model.TextElement> = null;

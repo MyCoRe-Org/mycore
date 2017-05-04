@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class DoublePageLayout extends PageLayout {
 
         public get relocated():boolean {
@@ -315,17 +315,6 @@ module mycore.viewer.widgets.canvas {
             return -1;
         }
 
-
-        public getCurrentPositionInPage():Position2D {
-            var vpRect = this._pageController.viewport.asRectInArea();
-
-            var page = this.getCurrentPage();
-            var middle = this.getImageMiddle(page);
-            var pageSize = this._pageDimension;
-
-            return new Position2D(vpRect.pos.x - (middle.x - (pageSize.width / 2)), vpRect.pos.y - (middle.y - (pageSize.height / 2)));
-        }
-
         public setCurrentPositionInPage(pos:Position2D):void {
             var vpRect = this._pageController.viewport.asRectInArea();
             var page = this.getCurrentPage();
@@ -334,6 +323,7 @@ module mycore.viewer.widgets.canvas {
             var pagePos = new Position2D(middle.x - (pageSize.width / 2), middle.y - (pageSize.height / 2));
             this._pageController.viewport.position = new Position2D(pagePos.x + pos.x + (vpRect.size.width / 2), pagePos.y + pos.y + (vpRect.size.height / 2));
         }
+
     }
 
 }

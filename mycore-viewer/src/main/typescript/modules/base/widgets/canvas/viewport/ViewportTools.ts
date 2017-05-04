@@ -3,7 +3,7 @@
 /// <reference path="../model/PageArea.ts" />
 /// <reference path="../../../components/model/AbstractPage.ts" />
 
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class ViewportTools {
 
         public static centerViewportOnPage(vp: Viewport, pageAreaInformation: PageAreaInformation) {

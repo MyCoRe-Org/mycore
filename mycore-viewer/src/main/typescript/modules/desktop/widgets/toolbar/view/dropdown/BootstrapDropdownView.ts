@@ -1,6 +1,6 @@
 /// <reference path="../button/BootstrapButtonView.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export class BootstrapDropdownView extends BootstrapButtonView implements DropdownView {
 

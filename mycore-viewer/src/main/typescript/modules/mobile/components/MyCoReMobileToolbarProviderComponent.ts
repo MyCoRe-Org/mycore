@@ -1,6 +1,6 @@
 /// <reference path="model/MyCoReMobileToolbarModel.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoReMobileToolbarProviderComponent extends ViewerComponent {
 

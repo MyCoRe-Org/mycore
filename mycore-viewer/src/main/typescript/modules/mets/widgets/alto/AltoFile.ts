@@ -2,7 +2,7 @@
 /// <reference path="AltoElement.ts" />
 
 
-module mycore.viewer.widgets.alto {
+namespace mycore.viewer.widgets.alto {
     export class AltoFile {
         get allElements():Array<mycore.viewer.widgets.alto.AltoElement> {
             return this._allElements;

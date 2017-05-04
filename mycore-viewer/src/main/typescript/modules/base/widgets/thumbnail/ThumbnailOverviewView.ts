@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.thumbnail {
+namespace mycore.viewer.widgets.thumbnail {
     export class ThumbnailOverviewView {
         constructor(private _container:JQuery, private _scrollHandler:ThumbnailOverviewScrollHandler, private _resizeHandler:ThumbnailOverviewResizeHandler, private _inputHandler:ThumbnailOverviewInputHandler) {
             this._gap = 0;

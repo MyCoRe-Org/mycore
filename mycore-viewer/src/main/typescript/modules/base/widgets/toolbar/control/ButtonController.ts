@@ -8,7 +8,7 @@
 /// <reference path="../view/ToolbarViewFactory.ts" />
 /// <reference path="../view/group/GroupView.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
     export class ButtonController implements ContainerObserver<ToolbarGroup, ToolbarComponent>, ViewerPropertyObserver<any> {
 
         constructor(private _groupMap: MyCoReMap<string, GroupView>, private _buttonViewMap: MyCoReMap<string, ButtonView>, private _mobile:boolean) {

@@ -1,6 +1,6 @@
 /// <reference path="../../widgets/events/ViewerEventManager.ts" />
 
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     export class StructureImage {
 
         /**

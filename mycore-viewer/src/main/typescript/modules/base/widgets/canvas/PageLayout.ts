@@ -1,6 +1,6 @@
 /// <reference path="../../components/model/AbstractPage.ts" />
 
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class PageLayout {
 
         public init(model:OrderedListModel, pageController:PageController, pageDimension:Size2D, horizontalScrollbar:Scrollbar, verticalScrollbar:Scrollbar, pageLoader:(number) => void) {
@@ -22,6 +22,10 @@ module mycore.viewer.widgets.canvas {
         public _pageLoader:(number) => void;
 
         public _insertedPages:Array<number> = new Array();
+
+        public getPageController():widgets.canvas.PageController {
+            return this._pageController;
+        }
 
         /**
          * Default implementation to update a page.
@@ -181,16 +185,79 @@ module mycore.viewer.widgets.canvas {
         }
 
         public getCurrentPositionInPage():Position2D {
-            throw "should be implemented";
+            let positionInArea = this._pageController.viewport.asRectInArea().pos;
+            let page = this.getCurrentPage();
+            let pageSize = this._pageDimension;
+            let middle = this.getImageMiddle( page );
+            let x = positionInArea.x - ( middle.x - ( pageSize.width / 2 ) );
+            let y= positionInArea.y - ( middle.y - ( pageSize.height / 2 ) );
+            return new Position2D(x, y);
         }
 
         public setCurrentPositionInPage(pos:Position2D):void {
             throw "should be implemented";
         }
+
+        /**
+         * Converts the given position to the area position.
+         */
+        public getPositionInArea(windowPosition:Position2D):Position2D {
+            let viewport = this._pageController.viewport;
+            let viewRect = viewport.asRectInArea();
+            let areaX = viewRect.pos.x + (viewRect.size.width * (windowPosition.x / viewport.size.width));
+            let areaY = viewRect.pos.y + (viewRect.size.height * (windowPosition.y / viewport.size.height));
+            return new Position2D(areaX, areaY);
+        }
+
+        public getPageHitInfo(windowPosition:Position2D):PageHitInfo {
+            let viewport = this._pageController.viewport;
+            let pageArea = this._pageController.getPageArea();
+            let positionInArea = this.getPositionInArea(windowPosition);
+
+            for(let page of pageArea.getPagesInViewport(viewport)) {
+                var structureImage = this._model.hrefImageMap.get(page.id);
+                if(structureImage == null) {
+                    continue;
+                }
+                var info:PageAreaInformation = pageArea.getPageInformation(page);
+                var realPageDimension = page.size.getRotated(info.rotation).scale(info.scale);
+                var pageRect = new Rect(new Position2D(
+                            info.position.x - (realPageDimension.width / 2),
+                            info.position.y - (realPageDimension.height / 2)),
+                    realPageDimension);
+                if(pageRect.intersects(positionInArea)) {
+                    var r = pageRect.flip(info.rotation);
+                    var p1 = r.pos.rotate(info.rotation);
+                    var p2 = positionInArea.rotate(info.rotation);
+                    var hit = new Position2D(Math.abs(p2.x - p1.x), Math.abs(p2.y - p1.y));
+                    return {
+                        id: page.id,
+                        order: structureImage.order,
+                        pageAreaInformation: info,
+                        hit: hit
+                    }
+                }
+            }
+            return {
+                id: null,
+                order: null,
+                pageAreaInformation: null,
+                hit: null
+            };
+        }
     }
 
     export interface OrderedListModel {
         children: MyCoReMap<number, model.AbstractPage>;
+        hrefImageMap: MyCoReMap<string, model.StructureImage>;
         pageCount: number;
     }
+
+    export interface PageHitInfo {
+        id: string,
+        order: number,
+        pageAreaInformation:PageAreaInformation,
+        hit: Position2D
+    }
+
 }

@@ -14,7 +14,7 @@
 /// <reference path="events/ProvideLayerEvent.ts" />
 /// <reference path="../widgets/layer/LayerDisplayController.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoReLayerComponent extends ViewerComponent {
         constructor(private _settings:MyCoReViewerSettings) {
@@ -156,8 +156,7 @@ module mycore.viewer.components {
 
 
             if (e.type == events.ImageChangedEvent.TYPE) {
-                var imageChangedEvent = (<events.ImageChangedEvent> e);
-
+                let imageChangedEvent = (<events.ImageChangedEvent> e);
                 if (typeof this.structureModel !== "undefined" && typeof imageChangedEvent.image != "undefined" && imageChangedEvent != null) {
                     this.currentHref = imageChangedEvent.image.href;
                     this.layerDisplay.pageChanged(this.currentHref);
@@ -167,7 +166,6 @@ module mycore.viewer.components {
             if (e.type == events.LanguageModelLoadedEvent.TYPE) {
                 this.languageModel = (<events.LanguageModelLoadedEvent>e).languageModel;
                 this.toolbarButtonSync(this);
-
             }
 
             if (e.type == events.ProvideToolbarModelEvent.TYPE) {

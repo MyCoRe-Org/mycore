@@ -1,4 +1,4 @@
-module mycore.viewer.components {
+namespace mycore.viewer.components {
     export class MyCoReButtonChangeComponent extends ViewerComponent {
 
         constructor(private _settings:MyCoReViewerSettings) {

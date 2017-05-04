@@ -1,5 +1,5 @@
 
-module mycore.viewer.widgets.modal {
+namespace mycore.viewer.widgets.modal {
     export class IviewPrintModalWindow extends IviewModalWindow {
 
         constructor(_mobile: boolean) {

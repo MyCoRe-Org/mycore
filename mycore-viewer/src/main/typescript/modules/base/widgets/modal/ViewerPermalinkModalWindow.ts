@@ -2,7 +2,7 @@
 /// <reference path="../../definitions/jquery.d.ts" />
 /// <reference path="ViewerModalWindow.ts" />
 
-module mycore.viewer.widgets.modal {
+namespace mycore.viewer.widgets.modal {
     export class ViewerPermalinkModalWindow extends IviewModalWindow{
         constructor(_mobile:boolean) {
             super(_mobile, "Permalink");

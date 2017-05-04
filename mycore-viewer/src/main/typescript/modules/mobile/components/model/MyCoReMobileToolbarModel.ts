@@ -1,4 +1,4 @@
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     export class MyCoReMobileToolbarModel extends MyCoReBasicToolbarModel {
         constructor() {
             super("MyCoReMobileToolbar");

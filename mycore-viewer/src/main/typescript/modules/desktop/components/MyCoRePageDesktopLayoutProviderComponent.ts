@@ -1,7 +1,7 @@
 /// <reference path="../widgets/canvas/DoublePageLayout.ts" />
 /// <reference path="../widgets/canvas/DoublePageRelocatedLayout.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoRePageDesktopLayoutProviderComponent extends ViewerComponent {
 

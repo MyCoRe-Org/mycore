@@ -1,7 +1,7 @@
 /// <reference path="MyCoReImageViewerEvent.ts" />
 /// <reference path="../ViewerComponent.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     export class RequestStateEvent extends MyCoReImageViewerEvent {
         /**
          * ImageViewer States Versions:

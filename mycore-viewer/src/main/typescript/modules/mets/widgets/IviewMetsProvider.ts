@@ -1,28 +1,25 @@
 /// <reference path="MetsStructureModel.ts" />
 /// <reference path="MetsStructureBuilder.ts" />
 
-module mycore.viewer.widgets.mets {
+namespace mycore.viewer.widgets.mets {
     export class IviewMetsProvider {
 
-        public static loadModel(metsDocumentLocation:string, tilePathBuilder:(href:string)=>string):GivenViewerPromise<{model:model.StructureModel; metsObject:any}, any> {
-            var promise = new ViewerPromise<{model:model.StructureModel; metsObject:any}, any>();
-            var settings = {
+        public static loadModel(metsDocumentLocation:string, tilePathBuilder:(href:string)=>string):GivenViewerPromise<{model:model.StructureModel; document:Document}, any> {
+            let promise = new ViewerPromise<{model:model.StructureModel; document:Document}, any>();
+            let settings = {
                 url: metsDocumentLocation,
                 success: function (response) {
-                    var builder = new MetsStructureBuilder(response, tilePathBuilder);
-                    promise.resolve({model : builder.processMets(), metsObject : response});
+                    let builder = new MetsStructureBuilder(response, tilePathBuilder);
+                    promise.resolve({model : builder.processMets(), document : response});
                 },
                 error: function (request, status, exception) {
                     promise.reject(exception);
                 }
             };
-
             jQuery.ajax(settings);
             return promise;
         }
 
-
     }
-
 
 }

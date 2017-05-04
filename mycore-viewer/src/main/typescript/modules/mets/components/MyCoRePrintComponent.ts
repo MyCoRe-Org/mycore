@@ -1,7 +1,7 @@
 /// <reference path="MetsSettings.ts" />
 /// <reference path="../widgets/modal/IviewPrintModalWindow.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
     export class MyCoRePrintComponent extends ViewerComponent {
 
         constructor(private _settings: MetsSettings) {

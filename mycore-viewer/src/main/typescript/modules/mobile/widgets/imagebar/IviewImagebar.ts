@@ -1,7 +1,7 @@
 /// <reference path="ImagebarModel.ts" />
 /// <reference path="ImagebarView.ts" />
 
-module mycore.viewer.widgets.imagebar {
+namespace mycore.viewer.widgets.imagebar {
 
     export class IviewImagebar {
         constructor(private _container:JQuery, images:Array<ImagebarImage >, startImage:ImagebarImage, imageSelected:(img:ImagebarImage)=>void, private _urlPrefix:string) {

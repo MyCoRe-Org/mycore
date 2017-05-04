@@ -2,7 +2,7 @@
 /// <reference path="../../definitions/jquery.d.ts" />
 /// <reference path="../../components/model/LanguageModel.ts" />
 
-module mycore.viewer.widgets.i18n {
+namespace mycore.viewer.widgets.i18n {
 
     export class XMLI18NProvider implements I18NProvider {
 

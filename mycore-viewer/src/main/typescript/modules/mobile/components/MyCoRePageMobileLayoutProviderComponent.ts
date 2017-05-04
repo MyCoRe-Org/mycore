@@ -1,5 +1,5 @@
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoRePageMobileLayoutProviderComponent extends ViewerComponent {
 

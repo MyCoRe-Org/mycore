@@ -4,7 +4,7 @@
 /// <reference path="../../widgets/toolbar/model/ToolbarDropdownButton.ts" />
 /// <reference path="LanguageModel.ts" />
 
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     import ToolbarButton = mycore.viewer.widgets.toolbar.ToolbarButton;
     import ToolbarDropdownButton = mycore.viewer.widgets.toolbar.ToolbarDropdownButton;
 

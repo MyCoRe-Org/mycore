@@ -1,5 +1,5 @@
 
-module mycore.viewer.widgets.alto {
+namespace mycore.viewer.widgets.alto {
 
     export class AltoStyle {
         // style of alto

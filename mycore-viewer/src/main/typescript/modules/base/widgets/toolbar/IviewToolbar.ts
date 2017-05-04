@@ -23,7 +23,7 @@
 /// <reference path="control/TextInputController.ts" />
 
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export class IviewToolbar implements ContainerObserver<ToolbarGroup, ToolbarComponent>, ContainerObserver<ToolbarModel, ToolbarGroup> {
 

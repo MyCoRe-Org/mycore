@@ -1,26 +1,23 @@
 /// <reference path="../../../Utils.ts" />
 /// <reference path="../viewport/Viewport.ts" />
-/// <reference path="TouchEventHandler.ts" />
+/// <reference path="TouchInputListener.ts" />
 /// <reference path="VelocityCalculationQueue.ts" />
 /// <reference path="TouchSession.ts" />
 /// <reference path="TouchMove.ts" />
 /// <reference path="TouchPolyfill.ts" />
 
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
 
 
     export class TouchInputDelegator {
 
-        constructor(private _inputElement: JQuery, private _viewport: Viewport, private _handler: TouchEventHandler) {
+        constructor(private _inputElement: JQuery, private _viewport: Viewport, private _handler: TouchInputListener) {
             this.initTouch();
         }
 
-        //that._viewport.position, that._viewport.scale, that._viewport.rotation
         public createTouchSession(startMiddle: Position2D, startAngle: number, startDistance: number, lastSession: TouchSession, canvasStartPosition: Position2D = this._viewport.position, canvasStartScale: number = this._viewport.scale, canvasStartRotation: number = this._viewport.rotation): TouchSession {
-            var newSession = new TouchSession(new Date().valueOf(), startMiddle, startAngle, startDistance, canvasStartPosition, canvasStartScale, canvasStartRotation, null, null, lastSession, 0, false, 0);
-            return newSession;
+            return new TouchSession(new Date().valueOf(), startMiddle, startAngle, startDistance, canvasStartPosition, canvasStartScale, canvasStartRotation, null, null, lastSession, 0, false, 0);
         }
-
 
         private msGestureTarget = null;
         private session:TouchSession = null;
@@ -30,18 +27,16 @@ module mycore.viewer.widgets.canvas {
         }>();
 
         public initTouch(): void {
-            var surface = this._inputElement[0];
-            var that = this;
+            let surface = this._inputElement[0];
+            let that = this;
+            let velocityCalculator = new VelocityCalculationQueue();
+            let touchPoly = new TouchPolyfill(surface);
 
-            var velocityCalculator = new VelocityCalculationQueue();
-
-            var touchPoly = new TouchPolyfill(surface);
-
-            var touchStartListener = function(e: any) {
+            let touchStartListener = function(e: any) {
                 e.preventDefault();
                 if (this.session == null) {
-                    var angle = 0;
-                    var touches = 0;
+                    let angle = 0;
+                    let touches = 0;
                     velocityCalculator = new VelocityCalculationQueue();
 
                     this.session = that.createTouchSession(that.getMiddle(e.targetTouches), angle, that.getDistance(e.targetTouches), this.lastSession);
@@ -63,11 +58,11 @@ module mycore.viewer.widgets.canvas {
                 that._handler.touchStart( this.session);
             };
 
-            var touchEndListener = function(e: any) {
+            let touchEndListener = function(e: any) {
                 this.session.touches--;
                 this.session.touchLeft = true;
 
-                if ( this.session.touches == 0) {
+                if ( this.session.touches === 0) {
                     that._handler.touchEnd( this.session);
                     this.session.lastSession = null;
                     this.lastSession =  this.session;
@@ -75,20 +70,19 @@ module mycore.viewer.widgets.canvas {
                 }
                 e.preventDefault();
             };
-            
-            var touchMoveListener = function(e: any) {
-                e.preventDefault();
 
-                var currentMiddle = that.getMiddle(e.targetTouches);
-                var positions = that.getPositions(e.targetTouches);
-                var currentDistance = that.getDistance(e.targetTouches);
-                var angle = 0;
-                if ( this.session.touches == 2) {
+            let touchMoveListener = function(e: any) {
+                e.preventDefault();
+                let currentMiddle = that.getMiddle(e.targetTouches);
+                let positions = that.getPositions(e.targetTouches);
+                let currentDistance = that.getDistance(e.targetTouches);
+                let angle = 0;
+                if ( this.session.touches === 2) {
                     angle = that.getAngle(e.targetTouches[0], e.targetTouches[1]);
                 }
 
-                var velocity: MoveVector = null;
-                var delta: MoveVector = null;
+                let velocity: MoveVector = null;
+                let delta: MoveVector = null;
                 if ( this.session.currentMove != null) {
                     velocityCalculator.add( this.session.currentMove);
                     velocity = velocityCalculator.getVelocity();
@@ -103,18 +97,17 @@ module mycore.viewer.widgets.canvas {
                     delta = new MoveVector(0, 0);
                 }
 
-
-                var move = new TouchMove(positions, currentMiddle, angle, currentDistance, new Date().valueOf(), velocity, delta);
+                let move = new TouchMove(positions, currentMiddle, angle, currentDistance, new Date().valueOf(), velocity, delta);
 
                 this.session.lastMove =  this.session.currentMove;
                 this.session.currentMove = move;
                 that._handler.touchMove( this.session);
             };
 
-            this.addListener(surface, 'touchstart', touchStartListener);
-            this.addListener(surface, 'touchend', touchEndListener);
-            this.addListener(surface, 'touchmove', touchMoveListener);
-            
+            this.addListener(surface, "touchstart", touchStartListener);
+            this.addListener(surface, "touchend", touchEndListener);
+            this.addListener(surface, "touchmove", touchMoveListener);
+
             touchPoly.touchstart = <any>touchStartListener;
             touchPoly.touchmove = <any>touchMoveListener;
             touchPoly.touchend = <any>touchEndListener;
@@ -122,7 +115,7 @@ module mycore.viewer.widgets.canvas {
         }
 
         public clearRunning() {
-            if(this.session != null){
+            if(this.session != null) {
                 this._handler.touchEnd( this.session);
                 this.session.lastSession = null;
                 this.lastSession =  this.session;
@@ -136,51 +129,41 @@ module mycore.viewer.widgets.canvas {
         }
 
         private getPositions(touches): Array<Position2D> {
-            var positions: Array<Position2D> = new Array();
-
-            for (var touchIndex = 0; touchIndex < touches.length; touchIndex++) {
-                var current = touches[touchIndex];
+            let positions: Array<Position2D> = new Array();
+            for (let touchIndex = 0; touchIndex < touches.length; touchIndex++) {
+                let current = touches[touchIndex];
                 positions.push(new Position2D(current.clientX * window.devicePixelRatio, current.clientY * window.devicePixelRatio));
             }
-
             return positions;
         }
 
-
         private getAngle(touch1, touch2): number {
-            var y = touch2.pageY * window.devicePixelRatio - touch1.pageY * window.devicePixelRatio,
+            let y = touch2.pageY * window.devicePixelRatio - touch1.pageY * window.devicePixelRatio,
                 x = touch2.pageX * window.devicePixelRatio - touch1.pageX * window.devicePixelRatio;
             return Math.atan2(y, x) * 180 / Math.PI;
-
         }
 
         private getMiddle(touches): Position2D {
-            var xCollect = 0;
-            var yCollect = 0;
-
-            for (var touchIndex = 0; touchIndex < touches.length; touchIndex++) {
-                var current = touches[touchIndex];
+            let xCollect = 0;
+            let yCollect = 0;
+            for (let touchIndex = 0; touchIndex < touches.length; touchIndex++) {
+                let current = touches[touchIndex];
                 xCollect += current.clientX * window.devicePixelRatio;
                 yCollect += current.clientY * window.devicePixelRatio;
             }
-
-            var pos = new Position2D(xCollect / touches.length, yCollect / touches.length);
-            return pos;
+            return new Position2D(xCollect / touches.length, yCollect / touches.length);
         }
 
         private getDistance(touches): number {
-            var distCollect = 0;
-
-            for (var touchIndex = 0; touchIndex < touches.length; touchIndex++) {
-                var current = touches[touchIndex];
-
-                var lastElem = touches[touchIndex - 1];
-                if (typeof lastElem != "undefined" && lastElem != null) {
-                    var distance = Math.sqrt(Math.pow(current.clientX - lastElem.clientX, 2) + Math.pow(current.clientY - lastElem.clientY, 2));
+            let distCollect = 0;
+            for (let touchIndex = 0; touchIndex < touches.length; touchIndex++) {
+                let current = touches[touchIndex];
+                let lastElem = touches[touchIndex - 1];
+                if (typeof lastElem !== "undefined" && lastElem != null) {
+                    let distance = Math.sqrt(Math.pow(current.clientX - lastElem.clientX, 2) + Math.pow(current.clientY - lastElem.clientY, 2));
                     distCollect += distance;
                 }
             }
-
             return distCollect;
         }
 

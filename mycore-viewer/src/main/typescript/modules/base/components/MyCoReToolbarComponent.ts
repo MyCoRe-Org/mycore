@@ -19,7 +19,7 @@
 /// <reference path="events/LanguageModelLoadedEvent.ts" />
 /// <reference path="events/ProvideToolbarModelEvent.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
     export class MyCoReToolbarComponent extends ViewerComponent {
 
         constructor(private _settings:MyCoReViewerSettings, private _container:JQuery) {
@@ -63,7 +63,7 @@ module mycore.viewer.components {
                         var imgList = smlEvent.structureModel._imageList;
                         var pageSelect:widgets.toolbar.ToolbarDropdownButton = <widgets.toolbar.ToolbarDropdownButton> this._toolbarModel.getGroup("ImageChangeControllGroup").getComponentById("PageSelect");
 
-                        this._imageIdMap = new MyCoReMap<String, model.StructureImage>();
+                        this._imageIdMap = new MyCoReMap<string, model.StructureImage>();
                         var childs = new Array<widgets.toolbar.ToolbarDropdownButtonChild>();
                         for (var imgIndex in imgList) {
                             var imgElement = imgList[imgIndex];

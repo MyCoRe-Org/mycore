@@ -3,7 +3,7 @@
 
 /// <reference path="MetsSettings.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     import ShowContentEvent = mycore.viewer.components.events.ShowContentEvent;
     export class MyCoReMetsComponent extends ViewerComponent {
@@ -30,12 +30,12 @@ module mycore.viewer.components {
             (context:MyCoReMetsComponent)=> context.lm != null
         ], (context:MyCoReMetsComponent)=> {
             this.metsLoaded(this.mm.model);
-            this.trigger(new events.MetsLoadedEvent(this, this.mm.metsObject));
+            this.trigger(new events.MetsLoadedEvent(this, this.mm));
         });
 
         private error = false;
         private lm:mycore.viewer.model.LanguageModel = null;
-        private mm:{ model:model.StructureModel; metsObject:any } = null;
+        private mm:{ model:model.StructureModel; document:Document } = null;
 
         public init() {
             var settings = this._settings;
@@ -56,7 +56,7 @@ module mycore.viewer.components {
                 };
 
                 var metsPromise = mycore.viewer.widgets.mets.IviewMetsProvider.loadModel(this._settings.metsURL, tilePathBuilder);
-                metsPromise.then((resolved:{ model: model.StructureModel; metsObject: any }) => {
+                metsPromise.then((resolved:{ model: model.StructureModel; document: Document }) => {
                     var model = resolved.model;
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
 

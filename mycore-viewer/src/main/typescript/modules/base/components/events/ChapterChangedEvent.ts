@@ -3,7 +3,7 @@
 /// <reference path="../../widgets/events/ViewerEvent.ts" />
 /// <reference path="../model/StructureImage.ts" />
 
-module mycore.viewer.components.events {
+namespace mycore.viewer.components.events {
     export class ChapterChangedEvent extends MyCoReImageViewerEvent{
         constructor(component: ViewerComponent,private _chapter:model.StructureChapter) {
             super(component, ChapterChangedEvent.TYPE);

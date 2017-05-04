@@ -1,6 +1,6 @@
 /// <reference path="../../widgets/solr/SolrSearchRequest.ts" />
 
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     export class MyCoReSolrSearcher extends MyCoReViewerSearcher {
 
         constructor(private solrHandlerURL:string, private solrFieldName:string, private derivateId:string) {

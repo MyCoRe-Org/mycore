@@ -1,6 +1,6 @@
 /// <reference path="../../Utils.ts" />
 
-module mycore.viewer.model {
+namespace mycore.viewer.model {
     export class LanguageModel {
 
         constructor(private _keyTranslationMap: MyCoReMap<string, string>) {

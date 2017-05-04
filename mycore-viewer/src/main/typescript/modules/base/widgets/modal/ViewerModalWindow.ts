@@ -1,7 +1,7 @@
 /// <reference path="../../Utils.ts" />
 /// <reference path="../../definitions/jquery.d.ts" />
 
-module mycore.viewer.widgets.modal {
+namespace mycore.viewer.widgets.modal {
     export class IviewModalWindow {
         constructor(private _mobile:boolean, _title:string, parent:HTMLElement = document.body) {
             var that = this;

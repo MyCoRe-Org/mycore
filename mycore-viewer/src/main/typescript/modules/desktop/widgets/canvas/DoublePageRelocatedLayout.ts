@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class DoublePageRelocatedLayout extends DoublePageLayout {
 
         public get relocated() : boolean {

@@ -1,7 +1,7 @@
 /// <reference path="../../Utils.ts"/>
 /// <reference path="ViewerEvent.ts" />
 
-module mycore.viewer.widgets.events {
+namespace mycore.viewer.widgets.events {
     export class ViewerEventManager {
 
         constructor() {

@@ -1,7 +1,7 @@
 declare var Piwik;
 declare var window: Window;
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export interface MyCoRePiwikComponentSettings extends MyCoReViewerSettings {
         "MCR.Piwik.baseurl": string;

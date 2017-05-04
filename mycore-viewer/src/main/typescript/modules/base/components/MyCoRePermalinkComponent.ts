@@ -16,7 +16,7 @@
 /// <reference path="model/LanguageModel.ts" />
 
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
     /**
      * permalink.updateHistory: boolean         if true the url will update on image change (default: true)
      * permalink.viewerLocationPattern :string  a patter wich will be used to build the location to the viewer. (default: {baseURL}rsc/viewer/{derivate}/{file})
@@ -41,7 +41,7 @@ module mycore.viewer.components {
                 this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
                 var that = this;
                 var parameter = ViewerParameterMap.fromCurrentUrl();
-                if (parameter.keys.length > 0) {
+                if (!parameter.isEmpty()) {
                     that.trigger(new events.RestoreStateEvent(that, parameter));
                 }
             } else {

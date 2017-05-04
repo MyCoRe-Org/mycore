@@ -7,7 +7,7 @@
 /// <reference path="input/BootstrapTextInputView.ts" />
 /// <reference path="BootstrapToolbarView.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
     export class BootstrapToolbarViewFactory implements ToolbarViewFactory {
 
         createToolbarView():ToolbarView {

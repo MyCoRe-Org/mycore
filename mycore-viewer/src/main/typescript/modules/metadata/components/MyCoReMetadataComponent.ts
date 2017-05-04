@@ -1,4 +1,4 @@
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export interface MetadataSettings extends MyCoReViewerSettings {
         objId: string;

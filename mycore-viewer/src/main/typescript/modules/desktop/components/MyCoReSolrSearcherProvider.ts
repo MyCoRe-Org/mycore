@@ -1,7 +1,7 @@
 /// <reference path="model/MyCoReSolrSearcher.ts" />
 /// <reference path="events/ProvideViewerSearcherEvent.ts" />
 
-module mycore.viewer.components {
+namespace mycore.viewer.components {
 
     export class MyCoReSolrSearcherProvider extends ViewerComponent {
 

@@ -3,7 +3,7 @@
 /// <reference path="button/MobileButtonView.ts" />
 /// <reference path="MobileToolbarView.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
     export class MobileToolbarViewFactory implements ToolbarViewFactory {
 
         createTextInputView(id: string): mycore.viewer.widgets.toolbar.TextInputView {

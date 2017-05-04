@@ -3,7 +3,7 @@
 /// <reference path="ChapterTreeView.ts" />
 /// <reference path="ChapterTreeInputHandler.ts" />
 
-module mycore.viewer.widgets.chaptertree {
+namespace mycore.viewer.widgets.chaptertree {
 
     export class MobileChapterTreeView implements ChapterTreeView {
 

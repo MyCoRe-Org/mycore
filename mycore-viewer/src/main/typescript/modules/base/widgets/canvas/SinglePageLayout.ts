@@ -1,4 +1,4 @@
-module mycore.viewer.widgets.canvas {
+namespace mycore.viewer.widgets.canvas {
     export class SinglePageLayout extends PageLayout {
         private _paiCache = new MyCoReMap<number, PageAreaInformation>();
         private _rotation:number = 0;
@@ -112,7 +112,7 @@ module mycore.viewer.widgets.canvas {
         }
 
         private getPageHeightWithSpace() {
-            return this._pageDimension.height + ((this._pageDimension.height / 100) * 10);
+            return this._pageDimension.height + (this._pageDimension.height / 10);
         }
 
         public getImageMiddle(order:number) {
@@ -131,40 +131,40 @@ module mycore.viewer.widgets.canvas {
         }
 
         private correctViewport():void {
-            var vp = this._pageController.viewport;
+            let vp = this._pageController.viewport;
+            let pageScaling = this.getCurrentPageScaling();
 
-            var pageScaling = this.getCurrentPageScaling();
             if (pageScaling != -1) {
-                var minWidthScale = this._pageController.viewport.size.width / this._pageDimension.width;
-                var minScale = Math.min(this._pageController.viewport.size.height / (this._pageDimension.height * 2), minWidthScale);
+                let minWidthScale = this._pageController.viewport.size.width / this._pageDimension.width;
+                let minScale = Math.min(this._pageController.viewport.size.height / (this._pageDimension.height * 2), minWidthScale);
 
                 if (vp.scale < minScale) {
                     vp.stopAnimation();
                     vp.scale = minScale;
                 }
 
-                var completeScale = vp.scale * pageScaling;
+                let completeScale = vp.scale * pageScaling;
                 if (completeScale > 4) {
                     vp.stopAnimation();
                     vp.scale = 4 / pageScaling;
                 }
             }
 
-            var scaledViewport = vp.size.scale(1 / vp.scale);
-            var minY = Math.ceil(vp.asRectInArea().size.height / 2);
-            var maxY = Math.ceil(this._model.pageCount * this.getPageHeightWithSpace() - Math.floor(vp.asRectInArea().size.height / 2));
-            var correctedY = Math.min(Math.max(vp.position.y, minY), maxY);
+            let scaledViewport = vp.size.scale(1 / vp.scale);
+            let minY = Math.ceil(vp.asRectInArea().size.height / 2);
+            let maxY = Math.ceil(this._model.pageCount * this.getPageHeightWithSpace() - Math.floor(vp.asRectInArea().size.height / 2));
+            let correctedY = Math.min(Math.max(vp.position.y, minY), maxY);
 
             if (scaledViewport.width > (this._pageDimension.width)) {
-                var corrected = new Position2D(0, correctedY);
+                let corrected = new Position2D(0, correctedY);
                 if (!vp.position.equals(corrected)) {
                     vp.position = corrected;
                 }
             } else {
-                var minimalX = (-this._pageDimension.width / 2) + scaledViewport.width / 2;
-                var maximalX = (this._pageDimension.width / 2) - scaledViewport.width / 2;
-                var correctedX = Math.max(minimalX, Math.min(maximalX, vp.position.x));
-                var corrected = new Position2D(correctedX, correctedY);
+                let minimalX = (-this._pageDimension.width / 2) + scaledViewport.width / 2;
+                let maximalX = (this._pageDimension.width / 2) - scaledViewport.width / 2;
+                let correctedX = Math.max(minimalX, Math.min(maximalX, vp.position.x));
+                let corrected = new Position2D(correctedX, correctedY);
                 if (!vp.position.equals(corrected)) {
                     vp.position = corrected;
                 }
@@ -252,16 +252,6 @@ module mycore.viewer.widgets.canvas {
                 }
             }
             return -1;
-        }
-
-        public getCurrentPositionInPage():Position2D {
-            var vpRect = this._pageController.viewport.asRectInArea();
-
-            var page = this.getCurrentPage();
-            var middle = this.getImageMiddle(page);
-            var pageSize = this._pageDimension;
-
-            return new Position2D(vpRect.pos.x - (middle.x - (pageSize.width / 2)), vpRect.pos.y - (middle.y - (pageSize.height / 2)));
         }
 
         public setCurrentPositionInPage(pos:Position2D):void {

@@ -2,7 +2,7 @@
 /// <reference path="ToolbarComponent.ts" />
 /// <reference path="ToolbarGroup.ts" />
 
-module mycore.viewer.widgets.toolbar {
+namespace mycore.viewer.widgets.toolbar {
 
     export class ToolbarModel extends widgets.toolbar.ToolbarGroup implements ContainerObserver<ToolbarGroup, ToolbarComponent> {
 
