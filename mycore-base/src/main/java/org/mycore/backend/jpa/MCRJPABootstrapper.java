@@ -68,16 +68,16 @@ public class MCRJPABootstrapper implements AutoExecutable {
     }
 
     public static void initializeJPA() {
-        initializeJPA(Optional.empty(), null);
+        initializeJPA(null, null);
     }
 
-    public static void initializeJPA(Optional<String> persistenceUnitName) {
+    public static void initializeJPA(String persistenceUnitName) {
         initializeJPA(persistenceUnitName, null);
     }
 
-    public static void initializeJPA(Optional<String> persistenceUnitName, Map<?, ?> properties) {
+    public static void initializeJPA(String persistenceUnitName, Map<?, ?> properties) {
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
-            persistenceUnitName.orElse(PERSISTENCE_UNIT_NAME),
+            Optional.ofNullable(persistenceUnitName).orElse(PERSISTENCE_UNIT_NAME),
             properties);
         checkFactory(entityManagerFactory);
         MCREntityManagerProvider.init(entityManagerFactory);
