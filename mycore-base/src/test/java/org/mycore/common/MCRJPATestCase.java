@@ -63,7 +63,7 @@ public class MCRJPATestCase extends MCRTestCase {
         // Configure logging etc.
         super.setUp();
         LogManager.getLogger().debug("Setup JPA");
-        MCRJPABootstrapper.initializeJPA(Optional.of(getCurrentComponentName()));
+        MCRJPABootstrapper.initializeJPA(getCurrentComponentName());
         exportSchema();
         MCRHibernateConfigHelper
             .checkEntityManagerFactoryConfiguration(MCREntityManagerProvider.getEntityManagerFactory());
