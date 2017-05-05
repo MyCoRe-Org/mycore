@@ -19,6 +19,7 @@ package org.mycore.frontend.cli;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -111,14 +112,19 @@ public class MCRCommandManager {
                          .sorted(Comparator.comparingInt(m -> m.getAnnotation(mcrCommandAnnotation).order()))
                          .map(MCRCommand::new)
                          .collect(Collectors.toCollection(ArrayList::new));
-        knownCommands.put(groupName, commands);
+        addCommandGroup(groupName, commands);
+    }
+
+    //fixes MCR-1594 deep in the code
+    private List<MCRCommand> addCommandGroup(String groupName, ArrayList<MCRCommand> commands) {
+        return knownCommands.put(groupName, Collections.unmodifiableList(commands));
     }
 
     protected void addDefaultCLIClass(String className) {
         Object obj = buildInstanceOfClass(className);
         MCRExternalCommandInterface commandInterface = (MCRExternalCommandInterface) obj;
         ArrayList<MCRCommand> commandsToAdd = commandInterface.getPossibleCommands();
-        knownCommands.put(commandInterface.getDisplayName(), commandsToAdd);
+        addCommandGroup(commandInterface.getDisplayName(), commandsToAdd);
     }
 
     private Object buildInstanceOfClass(String className) {

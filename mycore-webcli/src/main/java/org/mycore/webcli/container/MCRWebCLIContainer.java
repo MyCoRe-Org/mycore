@@ -20,8 +20,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -138,22 +136,15 @@ public class MCRWebCLIContainer {
         JsonArray jsonArray = new JsonArray();
         commandsJSON.add("commands", jsonArray);
         for (Map.Entry<String, List<MCRCommand>> entry : knownCommands.entrySet()) {
-            //sort commands
-            List<MCRCommand> commandList = entry.getValue();
-            Collections.sort(commandList, new Comparator<MCRCommand>() {
-                @Override
-                public int compare(MCRCommand commandA, MCRCommand commandB) {
-                    return commandA.getSyntax().compareToIgnoreCase(commandB.getSyntax());
-                }
-            });
-            //commands sorted
-            JsonArray commands = new JsonArray();
-            for (MCRCommand cmd : commandList) {
-                JsonObject command = new JsonObject();
-                command.add("command", new JsonPrimitive(cmd.getSyntax()));
-                command.add("help", new JsonPrimitive(cmd.getHelpText()));
-                commands.add(command);
-            }
+            //sort commands for display only (fix for MCR-1594)
+            JsonArray commands = entry.getValue().stream()
+                .sorted((commandA, commandB) -> commandA.getSyntax().compareToIgnoreCase(commandB.getSyntax()))
+                .map(cmd -> {
+                    JsonObject command = new JsonObject();
+                    command.add("command", new JsonPrimitive(cmd.getSyntax()));
+                    command.add("help", new JsonPrimitive(cmd.getHelpText()));
+                    return command;
+                }).collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
             JsonObject item = new JsonObject();
             item.addProperty("name", entry.getKey());
             item.add("commands", commands);

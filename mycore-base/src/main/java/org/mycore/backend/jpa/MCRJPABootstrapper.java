@@ -6,6 +6,7 @@ package org.mycore.backend.jpa;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,11 +68,16 @@ public class MCRJPABootstrapper implements AutoExecutable {
     }
 
     public static void initializeJPA() {
-        initializeJPA(null);
+        initializeJPA(null, null);
     }
 
-    public static void initializeJPA(Map<?, ?> properties) {
-        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME,
+    public static void initializeJPA(String persistenceUnitName) {
+        initializeJPA(persistenceUnitName, null);
+    }
+
+    public static void initializeJPA(String persistenceUnitName, Map<?, ?> properties) {
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
+            Optional.ofNullable(persistenceUnitName).orElse(PERSISTENCE_UNIT_NAME),
             properties);
         checkFactory(entityManagerFactory);
         MCREntityManagerProvider.init(entityManagerFactory);

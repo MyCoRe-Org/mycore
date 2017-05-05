@@ -57,6 +57,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -875,4 +876,29 @@ public class MCRUtils {
         return sizeText + " " + sizeUnit;
     }
 
+    /**
+     * Helps to implement {@link Comparable#compareTo(Object)}
+     *
+     * For every <code>part</code> a check is performed in the specified order.
+     * The first check that does not return <code>0</code> the result is returned
+     * by this method. So when this method returns <code>0</code> <code>first</code>
+     * and <code>other</code> should be the same.
+     *
+     * @param first first Object that should be compared
+     * @param other Object that first should be compared against, e.g. <code>first.compareTo(other)</code>
+     * @param part different <code>compareTo()</code> steps
+     * @param <T> object that wants to implement compareTo()
+     * @return  a negative integer, zero, or a positive integer as this object
+     *          is less than, equal to, or greater than the specified object.
+     *
+     * @throws NullPointerException if either <code>first</code> or <code>other</code> is null
+     */
+    @SafeVarargs
+    public static <T> int compareParts(T first, T other, Function<T, Comparable>...part){
+        return Stream.of(part)
+              .mapToInt(f -> f.apply(first).compareTo(f.apply(other)))
+              .filter(i -> i != 0)
+              .findFirst()
+              .orElse(0);
+    }
 }

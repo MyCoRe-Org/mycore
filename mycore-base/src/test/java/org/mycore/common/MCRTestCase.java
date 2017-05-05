@@ -64,7 +64,7 @@ public class MCRTestCase {
         System.setProperty("MCRRuntimeComponentDetector.underTesting", currentComponent);
     }
 
-    private static String getCurrentComponentName() {
+    protected static String getCurrentComponentName() {
         String userDir = System.getProperty("user.dir");
         String currentComponent = Paths.get(userDir).getFileName().toString();
         return currentComponent;
