@@ -146,7 +146,7 @@ module.exports = function (grunt) {
         },
         tslint: { // Checks Typescript code for common mistakes
             options: {
-                configuration: grunt.file.readJSON("tslint.json")
+                configuration: grunt.file.readJSON("../tslint.json")
             },
             MetsEditorClient: {
                 src: ['src/main/ts/**/*.ts']
