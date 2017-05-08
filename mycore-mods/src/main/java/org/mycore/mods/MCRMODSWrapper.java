@@ -29,6 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -38,6 +40,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaXML;
@@ -69,6 +72,9 @@ public class MCRMODSWrapper {
     private static final String MODS_DATAMODEL = "datamodel-mods.xsd";
 
     private static List<String> topLevelElementOrder = new ArrayList<String>();
+
+    private static Set<String> SUPPORTED_TYPES = MCRConfiguration.instance().getStrings("MCR.MODS.Types").stream()
+        .collect(Collectors.toSet());
 
     static {
         topLevelElementOrder.add("typeOfResource");
@@ -104,7 +110,7 @@ public class MCRMODSWrapper {
      * @return true, if mods is supported
      */
     public static boolean isSupported(MCRObject obj) {
-        if (MODS_OBJECT_TYPE.equals(obj.getId().getTypeId())) {
+        if (isSupported(obj.getId())) {
             return true;
         }
         if (obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
@@ -112,6 +118,15 @@ public class MCRMODSWrapper {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns true of the given {@link MCRObjectID} has a mods type. Does not look at the object.
+     * @param id - the {@link MCRObjectID}
+     * @return true if has a mods type
+     */
+    public static boolean isSupported(MCRObjectID id) {
+        return SUPPORTED_TYPES.contains(id.getTypeId());
     }
 
     private MCRObject object;
