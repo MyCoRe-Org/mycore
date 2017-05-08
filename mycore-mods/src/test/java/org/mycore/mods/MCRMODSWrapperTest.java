@@ -37,12 +37,15 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -89,6 +92,16 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         assertNull(wrapper.getServiceFlag("name"));
         wrapper.setServiceFlag("name", "value");
         assertEquals("value", wrapper.getServiceFlag("name"));
+    }
+
+    @Test
+    public void testIsSupported() {
+        MCRConfiguration.instance().set("MCR.Metadata.Type.sthelse", true);
+        MCRObjectID mycore_mods = MCRObjectID.getInstance("mycore_mods_00000011");
+        MCRObjectID mycore_sthelse = MCRObjectID.getInstance("mycore_sthelse_00000011");
+
+        Assert.assertTrue("Mods type should be supported.", MCRMODSWrapper.isSupported(mycore_mods));
+        Assert.assertFalse("sthesle type should not be supported.", MCRMODSWrapper.isSupported(mycore_sthelse));
     }
 
     @Override
