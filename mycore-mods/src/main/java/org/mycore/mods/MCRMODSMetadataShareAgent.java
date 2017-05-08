@@ -78,15 +78,18 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         if (!children.isEmpty()) {
             LOGGER.info("Update inherited metadata");
             for (MCRMetaLinkID childIdRef : children) {
-                LOGGER.info("Update: " + childIdRef);
-                MCRObject child = MCRMetadataManager.retrieveMCRObject(childIdRef.getXLinkHrefID());
-                MCRMODSWrapper childWrapper = new MCRMODSWrapper(child);
-                inheritToChild(holderWrapper, childWrapper);
-                LOGGER.info("Saving: " + childIdRef);
-                try {
-                    MCRMetadataManager.update(child);
-                } catch (MCRActiveLinkException e) {
-                    throw new MCRPersistenceException("Error while updating inherited metadata", e);
+                MCRObjectID childId = childIdRef.getXLinkHrefID();
+                if (MCRMODSWrapper.isSupported(childId)) {
+                    LOGGER.info("Update: " + childIdRef);
+                    MCRObject child = MCRMetadataManager.retrieveMCRObject(childId);
+                    MCRMODSWrapper childWrapper = new MCRMODSWrapper(child);
+                    inheritToChild(holderWrapper, childWrapper);
+                    LOGGER.info("Saving: " + childIdRef);
+                    try {
+                        MCRMetadataManager.update(child);
+                    } catch (MCRActiveLinkException e) {
+                        throw new MCRPersistenceException("Error while updating inherited metadata", e);
+                    }
                 }
             }
         }
@@ -95,21 +98,23 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         for (String rId : recipientIds) {
             LOGGER.info("distribute metadata to " + rId);
             MCRObjectID recipientId = MCRObjectID.getInstance(rId);
-            MCRObject recipient = MCRMetadataManager.retrieveMCRObject(recipientId);
-            MCRMODSWrapper recipientWrapper = new MCRMODSWrapper(recipient);
-            for (Element relatedItem : recipientWrapper.getLinkedRelatedItems()) {
-                String holderId = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-                if (holder.getId().toString().equals(holderId)) {
-                    @SuppressWarnings("unchecked")
-                    Filter<Content> sharedMetadata = (Filter<Content>) Filters.element("part",
-                        MCRConstants.MODS_NAMESPACE).negate();
-                    relatedItem.removeContent(sharedMetadata);
-                    relatedItem.addContent(holderWrapper.getMODS().cloneContent());
-                    LOGGER.info("Saving: " + recipientId);
-                    try {
-                        MCRMetadataManager.update(recipient);
-                    } catch (MCRActiveLinkException e) {
-                        throw new MCRPersistenceException("Error while updating shared metadata", e);
+            if (MCRMODSWrapper.isSupported(recipientId)) {
+                MCRObject recipient = MCRMetadataManager.retrieveMCRObject(recipientId);
+                MCRMODSWrapper recipientWrapper = new MCRMODSWrapper(recipient);
+                for (Element relatedItem : recipientWrapper.getLinkedRelatedItems()) {
+                    String holderId = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                    if (holder.getId().toString().equals(holderId)) {
+                        @SuppressWarnings("unchecked")
+                        Filter<Content> sharedMetadata = (Filter<Content>) Filters.element("part",
+                            MCRConstants.MODS_NAMESPACE).negate();
+                        relatedItem.removeContent(sharedMetadata);
+                        relatedItem.addContent(holderWrapper.getMODS().cloneContent());
+                        LOGGER.info("Saving: " + recipientId);
+                        try {
+                            MCRMetadataManager.update(recipient);
+                        } catch (MCRActiveLinkException e) {
+                            throw new MCRPersistenceException("Error while updating shared metadata", e);
+                        }
                     }
                 }
             }
@@ -125,7 +130,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         MCRObjectID parentID = child.getStructure().getParentID();
         LOGGER.debug("Removing old inherited Metadata.");
         childWrapper.removeInheritedMetadata();
-        if (parentID != null) {
+        if (parentID != null && MCRMODSWrapper.isSupported(parentID)) {
             MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);
             MCRMODSWrapper parentWrapper = new MCRMODSWrapper(parent);
             inheritToChild(parentWrapper, childWrapper);
@@ -139,9 +144,12 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                 //already received metadata from parent;
                 continue;
             }
-            MCRObject targetObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(holderId));
-            MCRMODSWrapper targetWrapper = new MCRMODSWrapper(targetObject);
-            relatedItem.addContent(targetWrapper.getMODS().cloneContent());
+            MCRObjectID holderObjectID = MCRObjectID.getInstance(holderId);
+            if(MCRMODSWrapper.isSupported(holderObjectID)){
+                MCRObject targetObject = MCRMetadataManager.retrieveMCRObject(holderObjectID);
+                MCRMODSWrapper targetWrapper = new MCRMODSWrapper(targetObject);
+                relatedItem.addContent(targetWrapper.getMODS().cloneContent());
+            }
         }
     }
 
