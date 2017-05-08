@@ -38,6 +38,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
@@ -102,6 +103,22 @@ public class MCRMODSWrapperTest extends MCRTestCase {
 
         assertTrue("Mods type should be supported.", MCRMODSWrapper.isSupported(mycoreMods));
         assertFalse("sthesle type should not be supported.", MCRMODSWrapper.isSupported(mycoreSthelse));
+    }
+
+    public void testGetLinkedRelatedItems() throws SAXParseException, IOException {
+        Element mods = loadMODSDocument().detachRootElement();
+        MCRMODSWrapper wrapper = new MCRMODSWrapper();
+
+
+        Element relatedItem = new Element("relatedItem", MCRConstants.MODS_NAMESPACE);
+        relatedItem.setAttribute("href", "mir_test_00000001", MCRConstants.XLINK_NAMESPACE);
+        relatedItem.setAttribute("type", "series");
+        mods.addContent(relatedItem);
+
+        wrapper.setID("JUnit", 4711);
+        wrapper.setMODS(mods);
+
+        Assert.assertEquals("There should be one related item!",wrapper.getLinkedRelatedItems().size(),1);
     }
 
     @Override
