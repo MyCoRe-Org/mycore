@@ -1,4 +1,4 @@
-package org.mycore.migration2015.cli;
+package org.mycore.migration.cli;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
