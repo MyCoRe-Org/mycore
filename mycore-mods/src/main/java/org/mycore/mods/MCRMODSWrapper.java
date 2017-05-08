@@ -58,8 +58,9 @@ public class MCRMODSWrapper {
 
     //ancestor::mycoreobject required for MCR-927
     private static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host' and ancestor::mycoreobject/structure/parents/parent or"
-        + " contains(@xlink:href,'_mods_') and"
-        + " number(substring-after(@xlink:href,'_mods_')) > 0 and"
+        + " string-length(substring-after(@xlink:href,'_')) > 0 and"
+        + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
+        + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and"
         + " contains('"
         + MCRMODSRelationshipType.xPathList() + "', @type)]";
 
