@@ -230,8 +230,8 @@
                 <packages>org.mycore.importer*</packages>
               </group>
               <group>
-                <title>MyCoRe Component: Migration 2.1 -&gt; 2013.06</title>
-                <packages>org.mycore.migration21_22*</packages>
+                <title>MyCoRe Component: Migration</title>
+                <packages>org.mycore.migration*</packages>
               </group>
               <group>
                 <title>MyCoRe Component: Media</title>
@@ -739,8 +739,8 @@
                   <packages>org.mycore.impex*</packages>
                 </group>
                 <group>
-                  <title>MyCoRe Component: Migration 2.1 -&gt; 2013.06</title>
-                  <packages>org.mycore.migration21_22*</packages>
+                  <title>MyCoRe Component: Migration</title>
+                  <packages>org.mycore.migration*</packages>
                 </group>
                 <group>
                   <title>MyCoRe Component: Media</title>
@@ -1282,7 +1282,7 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-migration-2015</artifactId>
+        <artifactId>mycore-migration</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2045,7 +2045,7 @@
     <module>mycore-media</module>
     <module>mycore-meta</module>
     <module>mycore-mets</module>
-    <module>mycore-migration-2015</module>
+    <module>mycore-migration</module>
     <module>mycore-mods</module>
     <module>mycore-oai</module>
     <module>mycore-pi</module>

@@ -7,8 +7,8 @@
     <version>2017.01-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>mycore-migration-2015</artifactId>
-  <name>MyCoRe migration 2014.06 --&gt; 2015.0x tools</name>
+  <artifactId>mycore-migration</artifactId>
+  <name>MyCoRe migration tools</name>
   <properties>
     <manifest.priority>31</manifest.priority>
   </properties>

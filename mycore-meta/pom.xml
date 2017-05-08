@@ -76,7 +76,7 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-migration-2015</artifactId>
+      <artifactId>mycore-migration</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
