@@ -5,7 +5,6 @@ import java.util.List;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class MCRXPathTestRule extends MCRValidationRule {
@@ -14,8 +13,7 @@ public class MCRXPathTestRule extends MCRValidationRule {
 
     public MCRXPathTestRule(String baseXPath, Node ruleElement) {
         super(baseXPath, ruleElement);
-        NamedNodeMap attributes = ruleElement.getAttributes();
-        this.xPathExpression = attributes.getNamedItem("test").getNodeValue();
+        this.xPathExpression = getAttributeValue("test");
     }
 
     @Override

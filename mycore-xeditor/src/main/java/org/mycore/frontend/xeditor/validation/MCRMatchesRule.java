@@ -1,6 +1,5 @@
 package org.mycore.frontend.xeditor.validation;
 
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class MCRMatchesRule extends MCRValidationRule {
@@ -9,8 +8,7 @@ public class MCRMatchesRule extends MCRValidationRule {
 
     public MCRMatchesRule(String baseXPath, Node ruleElement) {
         super(baseXPath, ruleElement);
-        NamedNodeMap attributes = ruleElement.getAttributes();
-        this.pattern = attributes.getNamedItem("matches").getNodeValue();
+        this.pattern = getAttributeValue("matches");
     }
 
     @Override

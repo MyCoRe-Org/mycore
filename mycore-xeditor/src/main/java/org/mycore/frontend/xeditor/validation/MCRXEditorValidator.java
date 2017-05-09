@@ -67,14 +67,22 @@ public class MCRXEditorValidator {
         if (attributes.getNamedItem("test") != null)
             validationRules.add(new MCRXPathTestRule(baseXPath, ruleElement));
 
+        if (attributes.getNamedItem("minLength") != null)
+            validationRules.add(new MCRMinLengthRule(baseXPath, ruleElement));
+
+        if (attributes.getNamedItem("maxLength") != null)
+            validationRules.add(new MCRMaxLengthRule(baseXPath, ruleElement));
+
+        if (attributes.getNamedItem("dateTimeFormat") != null)
+            validationRules.add(new MCRDateTimeFormatRule(baseXPath, ruleElement));
+
         if (hasLegacyAttributes(attributes))
             validationRules.add(new MCRLegacyRule(baseXPath, ruleElement));
     }
 
     private boolean hasLegacyAttributes(NamedNodeMap attributes) {
         return IntStream.range(0, attributes.getLength())
-                        .anyMatch(i -> "maxLength minLenght min max type class method format".contains(
-                            attributes.item(i).getNodeName()));
+            .anyMatch(i -> "min max type class method".contains(attributes.item(i).getNodeName()));
     }
 
     public void clearRules() {

@@ -4,6 +4,7 @@ import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public abstract class MCRValidationRule {
@@ -20,6 +21,12 @@ public abstract class MCRValidationRule {
 
     public Node getRuleElement() {
         return ruleElement;
+    }
+
+    public String getAttributeValue(String name) {
+        NamedNodeMap attributes = ruleElement.getAttributes();
+        Node attribute = attributes.getNamedItem(name);
+        return attribute == null ? null : attribute.getNodeValue();
     }
 
     public boolean validate(MCRValidationResults results, MCRBinding root) throws JaxenException, JDOMException {
