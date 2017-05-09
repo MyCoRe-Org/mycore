@@ -26,13 +26,11 @@ package org.mycore.frontend.xeditor.validation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
@@ -55,34 +53,19 @@ public class MCRXEditorValidator {
     }
 
     public void addRule(String baseXPath, Node ruleElement) {
-        NamedNodeMap attributes = ruleElement.getAttributes();
-
-        Node requiredAttribute = attributes.getNamedItem("required");
-        if ((requiredAttribute != null) && "true".equals(requiredAttribute.getNodeValue()))
-            validationRules.add(new MCRRequiredRule(baseXPath, ruleElement));
-
-        if (attributes.getNamedItem("matches") != null)
-            validationRules.add(new MCRMatchesRule(baseXPath, ruleElement));
-
-        if (attributes.getNamedItem("test") != null)
-            validationRules.add(new MCRXPathTestRule(baseXPath, ruleElement));
-
-        if (attributes.getNamedItem("minLength") != null)
-            validationRules.add(new MCRMinLengthRule(baseXPath, ruleElement));
-
-        if (attributes.getNamedItem("maxLength") != null)
-            validationRules.add(new MCRMaxLengthRule(baseXPath, ruleElement));
-
-        if (attributes.getNamedItem("dateTimeFormat") != null)
-            validationRules.add(new MCRDateTimeFormatRule(baseXPath, ruleElement));
-
-        if (hasLegacyAttributes(attributes))
-            validationRules.add(new MCRLegacyRule(baseXPath, ruleElement));
+        addIfConfigured(new MCRRequiredRule(), baseXPath, ruleElement);
+        addIfConfigured(new MCRMinLengthRule(), baseXPath, ruleElement);
+        addIfConfigured(new MCRMaxLengthRule(), baseXPath, ruleElement);
+        addIfConfigured(new MCRMatchesRule(), baseXPath, ruleElement);
+        addIfConfigured(new MCRXPathTestRule(), baseXPath, ruleElement);
+        addIfConfigured(new MCRDateTimeFormatRule(), baseXPath, ruleElement);
+        addIfConfigured(new MCRLegacyRule(), baseXPath, ruleElement);
     }
 
-    private boolean hasLegacyAttributes(NamedNodeMap attributes) {
-        return IntStream.range(0, attributes.getLength())
-            .anyMatch(i -> "min max type class method".contains(attributes.item(i).getNodeName()));
+    private void addIfConfigured(MCRValidationRule rule, String baseXPath, Node ruleElement) {
+        rule.init(baseXPath, ruleElement);
+        if (rule.hasRequiredAttributes())
+            validationRules.add(rule);
     }
 
     public void clearRules() {

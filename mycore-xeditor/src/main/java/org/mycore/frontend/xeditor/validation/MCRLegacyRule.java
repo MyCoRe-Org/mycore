@@ -1,5 +1,7 @@
 package org.mycore.frontend.xeditor.validation;
 
+import java.util.stream.IntStream;
+
 import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.w3c.dom.NamedNodeMap;
@@ -9,10 +11,16 @@ public class MCRLegacyRule extends MCRValidationRule {
 
     private MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedValidator();
 
-    public MCRLegacyRule(String baseXPath, Node ruleElement) {
-        super(baseXPath, ruleElement);
+    @Override
+    public boolean hasRequiredAttributes() {
+        NamedNodeMap attributes = getRuleElement().getAttributes();
+        return IntStream.range(0, attributes.getLength())
+            .anyMatch(i -> "min max type class method".contains(attributes.item(i).getNodeName()));
+    }
 
-        NamedNodeMap attributes = ruleElement.getAttributes();
+    @Override
+    public void configure() {
+        NamedNodeMap attributes = getRuleElement().getAttributes();
         for (int i = 0; i < attributes.getLength(); i++) {
             Node attribute = attributes.item(i);
             validator.setProperty(attribute.getNodeName(), attribute.getNodeValue());

@@ -1,13 +1,16 @@
 package org.mycore.frontend.xeditor.validation;
 
-import org.w3c.dom.Node;
-
 public class MCRMatchesRule extends MCRValidationRule {
 
     private String pattern;
 
-    public MCRMatchesRule(String baseXPath, Node ruleElement) {
-        super(baseXPath, ruleElement);
+    @Override
+    public boolean hasRequiredAttributes() {
+        return getAttributeValue("matches") != null;
+    }
+
+    @Override
+    public void configure() {
         this.pattern = getAttributeValue("matches");
     }
 

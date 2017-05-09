@@ -13,10 +13,18 @@ public abstract class MCRValidationRule {
 
     protected String xPath;
 
-    public MCRValidationRule(String baseXPath, Node ruleElement) {
+    public void init(String baseXPath, Node ruleElement) {
         Node relativeXPath = ruleElement.getAttributes().getNamedItem("xpath");
         this.xPath = relativeXPath != null ? relativeXPath.getNodeValue() : baseXPath;
         this.ruleElement = ruleElement;
+
+        if (hasRequiredAttributes())
+            configure();
+    }
+
+    public abstract boolean hasRequiredAttributes();
+
+    public void configure() {
     }
 
     public Node getRuleElement() {
