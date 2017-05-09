@@ -9,13 +9,13 @@ import java.util.Locale;
 
 import org.mycore.common.MCRException;
 
-public class MCRDateTimeConverter {
+public class MCRDateConverter {
 
     private static final Date CHECK_DATE = new Date(0l);
 
     private List<SimpleDateFormat> formats = new ArrayList<SimpleDateFormat>();
 
-    public MCRDateTimeConverter(String patterns) {
+    public MCRDateConverter(String patterns) {
         for (String pattern : patterns.split(";")) {
             formats.add(getDateFormat(pattern.trim()));
         }
