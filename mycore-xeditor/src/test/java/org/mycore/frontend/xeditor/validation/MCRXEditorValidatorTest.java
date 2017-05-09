@@ -111,6 +111,49 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     }
 
     @Test
+    public void testDateTimeFormatRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[date]");
+        addRule(session, "/document", "xpath", "//date", "dateTimeFormat", "yyyy-MM-dd");
+        assertTrue(session.getValidator().isValid());
+        assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/date", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession("document[date='2017-04-28']");
+        addRule(session, "/document", "xpath", "//date", "dateTimeFormat", "yyyy-MM-dd");
+        assertTrue(session.getValidator().isValid());
+        assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/date", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[date='28.04.2017']");
+        addRule(session, "/document", "xpath", "//date", "dateTimeFormat", "yyyy-MM-dd");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/date", MCRValidationResults.MARKER_ERROR);
+
+        session = buildSession("document[date='28.04.2017'][date[2]='2017-04-28']");
+        addRule(session, "/document", "xpath", "//date", "dateTimeFormat", "yyyy-MM-dd;dd.MM.yyyy");
+        assertTrue(session.getValidator().isValid());
+        assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/date[1]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/date[2]", MCRValidationResults.MARKER_SUCCESS);
+    }
+
+    @Test
+    public void testLengthRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[text='12345']");
+        addRule(session, "/document", "xpath", "//text", "minLength", "3", "maxLength", "5");
+        assertTrue(session.getValidator().isValid());
+        assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/text", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[text='12345']");
+        addRule(session, "/document", "xpath", "//text", "maxLength", "4");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/text", MCRValidationResults.MARKER_ERROR);
+    }
+
+        @Test
     public void testInvalidation() throws JaxenException, JDOMException {
         MCREditorSession session = buildSession("document[year='1899']");
         addRule(session, "/document/year", "min", "2000", "type", "integer");
