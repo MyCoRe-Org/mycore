@@ -242,7 +242,7 @@ namespace mycore.viewer.components {
         private _permalinkState:MyCoReMap<string, string> = null;
         private _toggleButton:JQuery;
         private _imageView:widgets.canvas.PageView = new widgets.canvas.PageView(true, false);
-        private _altoView:widgets.canvas.PageView = new widgets.canvas.PageView(false, true);
+        private _altoView:widgets.canvas.PageView = new widgets.canvas.PageView(true, true);
         private _componentContent:JQuery = jQuery("<div></div>");
         private _enableViewSelectButton;
         private _viewSelectButton:widgets.toolbar.ToolbarDropdownButton;

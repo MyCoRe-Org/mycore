@@ -20,7 +20,6 @@ namespace mycore.viewer.widgets.canvas {
         private _elementCache:MyCoReMap<string, HTMLElement> = new MyCoReMap<string, HTMLElement>();
         private _pageElementCache:MyCoReMap<model.AbstractPage, HTMLElement> = new MyCoReMap<model.AbstractPage, HTMLElement>();
         private _lineElementMap:MyCoReMap<model.TextElement, HTMLElement> = new MyCoReMap<model.TextElement, HTMLElement>()
-        private _highlightedLines:MyCoReMap<string, model.TextElement> = null;
         private _highlightWordMap:MyCoReMap<model.TextElement, Array<string>> = null;
         private _idPageMap = new MyCoReMap<string, model.AbstractPage>();
         private _mesureCanvas = <CanvasRenderingContext2D>document.createElement("canvas").getContext("2d");
@@ -51,49 +50,6 @@ namespace mycore.viewer.widgets.canvas {
                     this.removePage(p);
                 }
             });
-        }
-
-        public highlightText(text:Array<model.TextElement>, wordMap:MyCoReMap<model.TextElement, Array<string>>) {
-
-            var it = new MyCoReMap<model.TextElement, boolean>();
-            var filteredText = text.filter((item, pos)=> {
-                if (it.has(item)) {
-                    return false;
-                } else {
-                    it.set(item, true);
-                }
-                return true;
-            });
-
-            var highlightedLines = this._highlightedLines;
-            this._highlightedLines = new MyCoReMap<string, model.TextElement>();
-            if (highlightedLines != null) {
-                highlightedLines.forEach((k, v) => {
-                    if (this._lineElementMap.has(v)) {
-                        var parent = this._lineElementMap.get(v).parentElement;
-                        this.removeContentPart(v);
-                        var newContentPart = this.createContentPart(this._idPageMap.get(v.pageHref), v);
-                        parent.appendChild(newContentPart);
-                    }
-                });
-            }
-
-            this._highlightWordMap = wordMap;
-
-            this._highlightedLines = new MyCoReMap<string, model.TextElement>();
-            filteredText.forEach((textLine) => {
-                this._highlightedLines.set(textLine.toString(), textLine);
-                var hasParentPage = this._idPageMap.get(textLine.pageHref);
-                if (hasParentPage) {
-                    if (this._pageElementCache.has(this._idPageMap.get(textLine.pageHref)) && this._lineElementMap.has(textLine)) {
-                        var elem = this._lineElementMap.get(textLine);
-                        elem.setAttribute("class", "line highlighted");
-                        this.highlightWords(textLine, elem);
-                    }
-                }
-            });
-
-
         }
 
         private updatePage(page:model.AbstractPage) {
@@ -203,8 +159,6 @@ namespace mycore.viewer.widgets.canvas {
                 }
             });
 
-
-
             var size = page.size;
             var cacheKey = cp.pos.toString() + cp.text;
 
@@ -219,12 +173,6 @@ namespace mycore.viewer.widgets.canvas {
             var xScaling = cp.size.width / drawnWidth;
             this._lineElementMap.set(cp, htmlElement);
 
-            if (this._highlightedLines != null && this._highlightedLines.has(cp.toString())) {
-                htmlElement.setAttribute("class", "line highlighted");
-                this.highlightWords(cp, htmlElement);
-            }
-
-
             var topPosition = ("fromBottomLeft" in cp && !cp.fromBottomLeft) ? cp.pos.y : size.height - cp.pos.y;
 
             htmlElement.style.cssText = "left : " + cp.pos.x + "px;" +
@@ -236,19 +184,6 @@ namespace mycore.viewer.widgets.canvas {
 
             return htmlElement;
         }
-
-        private highlightWords(cp, elem) {
-            if (this._highlightWordMap.has(cp)) {
-                var words = this._highlightWordMap.get(cp);
-
-                words.forEach((w)=> {
-                    var elemHtml = elem.innerHTML;
-                    elemHtml = elemHtml.replace(new RegExp(w, "gim"), "<span class='highlighted'>$&</span>")
-                    elem.innerHTML = elemHtml;
-                });
-            }
-        }
-
 
     }
 }

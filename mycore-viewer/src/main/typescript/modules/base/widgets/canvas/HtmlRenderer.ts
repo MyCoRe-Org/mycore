@@ -72,7 +72,7 @@ namespace mycore.viewer.widgets.canvas {
             childrenElement.style.cssText = "transform : rotate(" + pai.rotation + "deg);" +
                 "width: " + realSize.width + "px;" +
                 "height: " + realSize.height + "px;"+
-                "background-color : white;";
+                "background-color : transparent;";
 
 
         }
