@@ -7,7 +7,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public abstract class MCRValidationRule {
+public abstract class MCRValidator {
 
     private Node ruleElement;
 

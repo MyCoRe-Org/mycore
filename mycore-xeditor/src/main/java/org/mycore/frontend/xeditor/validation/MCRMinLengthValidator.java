@@ -1,6 +1,6 @@
 package org.mycore.frontend.xeditor.validation;
 
-public class MCRMinLengthRule extends MCRValidationRule {
+public class MCRMinLengthValidator extends MCRValidator {
 
     private int minLength;
 

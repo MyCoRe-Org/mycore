@@ -56,7 +56,7 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.target.MCRInsertTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
-import org.mycore.frontend.xeditor.validation.MCRValidationRule;
+import org.mycore.frontend.xeditor.validation.MCRValidator;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -284,7 +284,7 @@ public class MCRXEditorTransformer {
 
     public NodeSet getFailedValidationRules() {
         NodeSet nodeSet = new NodeSet();
-        for (MCRValidationRule failedRule : editorSession.getValidator().getFailedRules())
+        for (MCRValidator failedRule : editorSession.getValidator().getFailedRules())
             nodeSet.addNode(failedRule.getRuleElement());
         return nodeSet;
     }

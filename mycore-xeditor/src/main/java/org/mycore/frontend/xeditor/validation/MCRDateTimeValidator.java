@@ -2,7 +2,7 @@ package org.mycore.frontend.xeditor.validation;
 
 import org.mycore.frontend.xeditor.validation.MCRDateTimeConverter;
 
-public class MCRDateTimeFormatRule extends MCRValidationRule {
+public class MCRDateTimeValidator extends MCRValidator {
 
     private MCRDateTimeConverter dateTimeConverter;
 
