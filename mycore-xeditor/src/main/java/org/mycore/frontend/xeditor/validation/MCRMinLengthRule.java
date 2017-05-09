@@ -1,13 +1,16 @@
 package org.mycore.frontend.xeditor.validation;
 
-import org.w3c.dom.Node;
-
 public class MCRMinLengthRule extends MCRValidationRule {
 
     private int minLength;
 
-    public MCRMinLengthRule(String baseXPath, Node ruleElement) {
-        super(baseXPath, ruleElement);
+    @Override
+    public boolean hasRequiredAttributes() {
+        return getAttributeValue("minLength") != null;
+    }
+
+    @Override
+    public void configure() {
         minLength = Integer.parseInt(getAttributeValue("minLength"));
     }
 

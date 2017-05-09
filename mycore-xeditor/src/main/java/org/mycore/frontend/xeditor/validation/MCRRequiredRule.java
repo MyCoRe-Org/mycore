@@ -1,12 +1,16 @@
 package org.mycore.frontend.xeditor.validation;
 
 import org.mycore.frontend.xeditor.MCRBinding;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class MCRRequiredRule extends MCRValidationRule {
 
-    public MCRRequiredRule(String baseXPath, Node ruleElement) {
-        super(baseXPath, ruleElement);
+    @Override
+    public boolean hasRequiredAttributes() {
+        NamedNodeMap attributes = getRuleElement().getAttributes();
+        Node requiredAttribute = attributes.getNamedItem("required");
+        return ((requiredAttribute != null) && "true".equals(requiredAttribute.getNodeValue()));
     }
 
     @Override

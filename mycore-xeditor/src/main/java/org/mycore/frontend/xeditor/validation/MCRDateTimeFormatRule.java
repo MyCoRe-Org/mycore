@@ -1,17 +1,20 @@
 package org.mycore.frontend.xeditor.validation;
 
 import org.mycore.frontend.xeditor.validation.MCRDateTimeConverter;
-import org.w3c.dom.Node;
 
 public class MCRDateTimeFormatRule extends MCRValidationRule {
 
     private MCRDateTimeConverter dateTimeConverter;
 
-    public MCRDateTimeFormatRule(String baseXPath, Node ruleElement) {
-        super(baseXPath, ruleElement);
+    @Override
+    public boolean hasRequiredAttributes() {
+        return getAttributeValue("dateTimeFormat") != null;
+    }
+
+    @Override
+    public void configure() {
         String pattern = getAttributeValue("dateTimeFormat");
         dateTimeConverter = new MCRDateTimeConverter(pattern);
-
     }
 
     @Override

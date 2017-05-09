@@ -1,13 +1,16 @@
 package org.mycore.frontend.xeditor.validation;
 
-import org.w3c.dom.Node;
-
 public class MCRMaxLengthRule extends MCRValidationRule {
 
     private int maxLength;
 
-    public MCRMaxLengthRule(String baseXPath, Node ruleElement) {
-        super(baseXPath, ruleElement);
+    @Override
+    public boolean hasRequiredAttributes() {
+        return getAttributeValue("maxLength") != null;
+    }
+
+    @Override
+    public void configure() {
         maxLength = Integer.parseInt(getAttributeValue("maxLength"));
     }
 

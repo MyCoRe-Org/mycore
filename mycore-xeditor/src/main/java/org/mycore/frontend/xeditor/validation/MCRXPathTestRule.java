@@ -5,14 +5,18 @@ import java.util.List;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
-import org.w3c.dom.Node;
 
 public class MCRXPathTestRule extends MCRValidationRule {
 
     private String xPathExpression;
 
-    public MCRXPathTestRule(String baseXPath, Node ruleElement) {
-        super(baseXPath, ruleElement);
+    @Override
+    public boolean hasRequiredAttributes() {
+        return getAttributeValue("test") != null;
+    }
+
+    @Override
+    public void configure() {
         this.xPathExpression = getAttributeValue("test");
     }
 
