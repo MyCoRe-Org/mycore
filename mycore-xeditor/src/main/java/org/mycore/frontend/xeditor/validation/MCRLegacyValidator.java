@@ -2,14 +2,13 @@ package org.mycore.frontend.xeditor.validation;
 
 import java.util.stream.IntStream;
 
-import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public class MCRLegacyRule extends MCRValidationRule {
+public class MCRLegacyValidator extends MCRValidator {
 
-    private MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedValidator();
+    private org.mycore.frontend.editor.validation.MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedValidator();
 
     @Override
     public boolean hasRequiredAttributes() {

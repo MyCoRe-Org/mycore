@@ -1,6 +1,6 @@
 package org.mycore.frontend.xeditor.validation;
 
-public class MCRMaxLengthRule extends MCRValidationRule {
+public class MCRMaxLengthValidator extends MCRValidator {
 
     private int maxLength;
 

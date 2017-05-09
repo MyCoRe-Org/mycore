@@ -6,7 +6,7 @@ import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
 
-public class MCRXPathTestRule extends MCRValidationRule {
+public class MCRXPathTestValidator extends MCRValidator {
 
     private String xPathExpression;
 

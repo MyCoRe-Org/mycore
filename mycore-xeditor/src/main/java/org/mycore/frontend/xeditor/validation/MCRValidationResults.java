@@ -24,7 +24,7 @@ public class MCRValidationResults {
 
     private Map<String, String> xPath2Marker = new HashMap<String, String>();
 
-    private LinkedHashMap<String, MCRValidationRule> xPath2FailedRule = new LinkedHashMap<String, MCRValidationRule>();
+    private LinkedHashMap<String, MCRValidator> xPath2FailedRule = new LinkedHashMap<String, MCRValidator>();
 
     private boolean isValid = true;
 
@@ -32,7 +32,7 @@ public class MCRValidationResults {
         return MARKER_ERROR.equals(xPath2Marker.get(xPath));
     }
 
-    public void mark(String xPath, boolean isValid, MCRValidationRule failedRule) {
+    public void mark(String xPath, boolean isValid, MCRValidator failedRule) {
         if (hasError(xPath))
             return;
 
@@ -49,11 +49,11 @@ public class MCRValidationResults {
         return xPath2Marker.containsKey(xPath) ? xPath2Marker.get(xPath) : MARKER_DEFAULT;
     }
 
-    public MCRValidationRule getFailedRule(String xPath) {
+    public MCRValidator getFailedRule(String xPath) {
         return xPath2FailedRule.get(xPath);
     }
 
-    public Collection<MCRValidationRule> getFailedRules() {
+    public Collection<MCRValidator> getFailedRules() {
         return xPath2FailedRule.values();
     }
 

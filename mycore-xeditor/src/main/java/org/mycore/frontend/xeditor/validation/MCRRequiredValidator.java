@@ -4,7 +4,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public class MCRRequiredRule extends MCRValidationRule {
+public class MCRRequiredValidator extends MCRValidator {
 
     @Override
     public boolean hasRequiredAttributes() {

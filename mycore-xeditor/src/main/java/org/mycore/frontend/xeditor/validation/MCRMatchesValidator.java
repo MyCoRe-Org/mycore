@@ -1,6 +1,6 @@
 package org.mycore.frontend.xeditor.validation;
 
-public class MCRMatchesRule extends MCRValidationRule {
+public class MCRMatchesValidator extends MCRValidator {
 
     private String pattern;
 
