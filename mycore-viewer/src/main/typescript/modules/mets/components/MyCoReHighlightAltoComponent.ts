@@ -53,11 +53,14 @@ namespace mycore.viewer.components {
             return this._chapterAreaContainer;
         }
 
-        public setChapter(chapterId:string, triggerChapterChangeEvent:boolean = false) {
-            if(this.selectedChapter === chapterId) {
+        public setChapter(chapterId:string, triggerChapterChangeEvent:boolean = false, forceChange:boolean = false) {
+            if(!forceChange && this.selectedChapter === chapterId) {
                 return;
             }
             this.selectedChapter = chapterId;
+            if(this._chapterAreaContainer === null) {
+                return;
+            }
             let chapterArea:ChapterArea = chapterId != null ? this._chapterAreaContainer.chapters.get(chapterId) : null;
             this.highlightLayer.selectedChapter = chapterArea;
             this.handleDarkenPageAnimation();
@@ -69,7 +72,7 @@ namespace mycore.viewer.components {
         }
 
         public setHighlightChapter(chapterId:string) {
-            if(this.highlightedChapter === chapterId) {
+            if(this._chapterAreaContainer === null || this.highlightedChapter === chapterId) {
                 return;
             }
             let chapterArea:ChapterArea = chapterId != null ? this._chapterAreaContainer.chapters.get(chapterId) : null;
@@ -109,6 +112,9 @@ namespace mycore.viewer.components {
                 let mle = <events.MetsLoadedEvent> e;
                 this._model = mle.mets.model;
                 this._chapterAreaContainer = new ChapterAreaContainer(this._model);
+                if(this.selectedChapter != null) {
+                    this.setChapter(this.selectedChapter, false, true);
+                }
             }
             if (e.type == events.RequestPageEvent.TYPE) {
                 let rpe = <events.RequestPageEvent> e;
@@ -153,14 +159,16 @@ namespace mycore.viewer.components {
                 return null;
             }
             let chapterAreaContainer:ChapterAreaContainer = this.component.getChapterAreaContainer();
+            if(chapterAreaContainer === null) {
+                return null;
+            }
             let chapters:MyCoReMap<string, ChapterArea> = chapterAreaContainer.chapters;
             let pageChapterMap:MyCoReMap<string, Array<string>> = chapterAreaContainer.pageChapterMap;
     
             let chapterIdsOnPage:Array<string> = pageChapterMap.get(pageHitInfo.id);
             if(chapterIdsOnPage == null || chapterIdsOnPage.length <= 0) {
-                return;
+                return null;
             }
-
             for(let chapterId of chapterIdsOnPage) {
                 let chapterArea:ChapterArea = chapters.get(chapterId);
                 let rectsOfChapter:Array<Rect> = chapterArea.pages.get(pageHitInfo.id);
