@@ -6,7 +6,7 @@ public class MCRMatchesValidator extends MCRValidator {
 
     @Override
     public boolean hasRequiredAttributes() {
-        return getAttributeValue("matches") != null;
+        return hasAttributeValue("matches");
     }
 
     @Override

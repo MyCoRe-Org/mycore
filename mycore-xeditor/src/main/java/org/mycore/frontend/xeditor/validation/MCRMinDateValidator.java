@@ -8,7 +8,7 @@ public class MCRMinDateValidator extends MCRDateValidator {
 
     @Override
     public boolean hasRequiredAttributes() {
-        return super.hasRequiredAttributes() && getAttributeValue("min") != null;
+        return super.hasRequiredAttributes() && hasAttributeValue("min");
     }
 
     @Override

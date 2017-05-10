@@ -6,7 +6,7 @@ public class MCRMinLengthValidator extends MCRValidator {
 
     @Override
     public boolean hasRequiredAttributes() {
-        return getAttributeValue("minLength") != null;
+        return hasAttributeValue("minLength");
     }
 
     @Override

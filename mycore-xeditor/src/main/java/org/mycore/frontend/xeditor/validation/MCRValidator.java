@@ -37,6 +37,10 @@ public abstract class MCRValidator {
         return attribute == null ? null : attribute.getNodeValue();
     }
 
+    public boolean hasAttributeValue(String name) {
+        return (getAttributeValue(name) != null);
+    }
+
     public boolean validate(MCRValidationResults results, MCRBinding root) throws JaxenException, JDOMException {
         MCRBinding binding = new MCRBinding(xPath, false, root);
         boolean isValid = validateBinding(results, binding);

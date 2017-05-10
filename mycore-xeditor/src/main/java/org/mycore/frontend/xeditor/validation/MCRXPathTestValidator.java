@@ -12,7 +12,7 @@ public class MCRXPathTestValidator extends MCRValidator {
 
     @Override
     public boolean hasRequiredAttributes() {
-        return getAttributeValue("test") != null;
+        return hasAttributeValue("test");
     }
 
     @Override

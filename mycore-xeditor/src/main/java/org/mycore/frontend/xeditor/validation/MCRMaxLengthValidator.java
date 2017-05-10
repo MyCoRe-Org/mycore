@@ -6,7 +6,7 @@ public class MCRMaxLengthValidator extends MCRValidator {
 
     @Override
     public boolean hasRequiredAttributes() {
-        return getAttributeValue("maxLength") != null;
+        return hasAttributeValue("maxLength");
     }
 
     @Override
