@@ -8,7 +8,7 @@ public class MCRMaxDateValidator extends MCRDateValidator {
 
     @Override
     public boolean hasRequiredAttributes() {
-        return super.hasRequiredAttributes() && getAttributeValue("max") != null;
+        return super.hasRequiredAttributes() && hasAttributeValue("max");
     }
 
     @Override

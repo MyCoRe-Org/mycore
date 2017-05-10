@@ -8,7 +8,7 @@ public class MCRDateValidator extends MCRValidator {
 
     @Override
     public boolean hasRequiredAttributes() {
-        return "date".equals(getAttributeValue("type")) && (getAttributeValue("format") != null);
+        return "date".equals(getAttributeValue("type")) && hasAttributeValue("format");
     }
 
     @Override
