@@ -61,9 +61,12 @@ public class MCRXEditorValidator {
         addIfConfigured(new MCRIntegerValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMinIntegerValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMaxIntegerValidator(), baseXPath, ruleElement);
+        addIfConfigured(new MCRDecimalValidator(), baseXPath, ruleElement);
+        addIfConfigured(new MCRMinDecimalValidator(), baseXPath, ruleElement);
+        addIfConfigured(new MCRMaxDecimalValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMinStringValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMaxStringValidator(), baseXPath, ruleElement);
-        addIfConfigured(new MCRLegacyValidator(), baseXPath, ruleElement);
+        addIfConfigured(new MCRExternalValidator(), baseXPath, ruleElement);
     }
 
     private void addIfConfigured(MCRValidator validator, String baseXPath, Node ruleElement) {

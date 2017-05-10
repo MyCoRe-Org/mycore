@@ -59,7 +59,8 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         session.getValidator().addRule(baseXPath, ruleAsDOMElement);
     }
 
-    private void checkResult(MCREditorSession session, String xPath, String marker) throws JaxenException, JDOMException {
+    private void checkResult(MCREditorSession session, String xPath, String marker)
+        throws JaxenException, JDOMException {
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         session.getValidator().setValidationMarker(binding);
         assertEquals(marker, session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_MARKER));
@@ -98,7 +99,7 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     }
 
     @Test
-    public void testLegacyRule() throws JaxenException, JDOMException {
+    public void testMinIntegerRule() throws JaxenException, JDOMException {
         MCREditorSession session = buildSession("document[year='1899'][year='2013'][year[3]]");
         addRule(session, "/document/year", "min", "2000", "type", "integer");
 
@@ -107,6 +108,32 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
 
         checkResult(session, "/document/year", MCRValidationResults.MARKER_ERROR);
         checkResult(session, "/document/year[2]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/year[3]", MCRValidationResults.MARKER_DEFAULT);
+    }
+
+    @Test
+    public void testMaxDecimalRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[price='10.99'][price='20.00'][price[3]]");
+        addRule(session, "/document/price", "max", "15.0", "type", "decimal", "locale", "en");
+
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+
+        checkResult(session, "/document/price", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/price[2]", MCRValidationResults.MARKER_ERROR);
+        checkResult(session, "/document/price[3]", MCRValidationResults.MARKER_DEFAULT);
+    }
+
+    @Test
+    public void testMaxDateRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[year='2017'][year='2117'][year[3]]");
+        addRule(session, "/document/year", "max", "2017", "type", "date", "format", "yyyy");
+
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/year[2]", MCRValidationResults.MARKER_ERROR);
         checkResult(session, "/document/year[3]", MCRValidationResults.MARKER_DEFAULT);
     }
 
@@ -153,7 +180,7 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         checkResult(session, "/document/text", MCRValidationResults.MARKER_ERROR);
     }
 
-        @Test
+    @Test
     public void testInvalidation() throws JaxenException, JDOMException {
         MCREditorSession session = buildSession("document[year='1899']");
         addRule(session, "/document/year", "min", "2000", "type", "integer");
@@ -233,5 +260,38 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         addRule(session, "/document/service", "test", "contains($allowedServices,.)");
         assertTrue(session.getValidator().isValid());
         checkResult(session, "/document/service", MCRValidationResults.MARKER_SUCCESS);
+    }
+
+    @Test
+    public void testExternalMethodRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[author='Jim'][author[2]='Charles'][author[3]]");
+        addRule(session, "/document/author", "class", getClass().getName(), "method", "nameStartsWithJ");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+
+        checkResult(session, "/document/author[1]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/author[2]", MCRValidationResults.MARKER_ERROR);
+        checkResult(session, "/document/author[3]", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession(
+            "document[author[1][first='John'][last='Doe']][author[2][first='James'][last='Watt']][author[3]]");
+        addRule(session, "/document/author", "class", getClass().getName(), "method", "authorIsJohnDoe");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+
+        checkResult(session, "/document/author[1]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/author[2]", MCRValidationResults.MARKER_ERROR);
+        checkResult(session, "/document/author[3]", MCRValidationResults.MARKER_SUCCESS);
+    }
+
+    public static boolean nameStartsWithJ(String name) {
+        return name.startsWith("J");
+    }
+
+    public static boolean authorIsJohnDoe(Element author) {
+        if (author.getChildren().isEmpty())
+            return true;
+        else
+            return "John".equals(author.getChildText("first")) && "Doe".equals(author.getChildText("last"));
     }
 }
