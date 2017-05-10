@@ -47,15 +47,18 @@ public class MCRRequiredValidator extends MCRValidator {
         }
 
         String absPath = binding.getAbsoluteXPath();
-        if (results.hasError(absPath)) // do not validate already invalid nodes
+        if (results.hasError(absPath)) {
             return true;
+        }
 
         boolean isValid = false;
 
         // at least one value must exist
-        for (Object node : binding.getBoundNodes())
-            if (!MCRBinding.getValue(node).isEmpty())
+        for (Object node : binding.getBoundNodes()) {
+            if (!MCRBinding.getValue(node).isEmpty()) {
                 isValid = true;
+            }
+        }
 
         results.mark(absPath, isValid, this);
         return isValid;

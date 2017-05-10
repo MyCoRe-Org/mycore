@@ -50,9 +50,10 @@ public class MCRMaxDateValidator extends MCRDateValidator {
     @Override
     protected boolean isValid(String value) {
         Date date = converter.string2date(value);
-        if (date == null)
+        if (date == null) {
             return false;
-        else
+        } else {
             return maxDate.after(date) || maxDate.equals(date);
+        }
     }
 }

@@ -57,8 +57,9 @@ public class MCRXPathTestValidator extends MCRValidator {
             Object node = boundNodes.get(i);
 
             String absPath = MCRXPathBuilder.buildXPath(node);
-            if (results.hasError(absPath)) // do not validate already invalid nodes
+            if (results.hasError(absPath)) {
                 continue;
+            }
 
             MCRBinding nodeBinding = new MCRBinding(i + 1, binding);
             MCRXPathEvaluator evaluator = nodeBinding.getXPathEvaluator();

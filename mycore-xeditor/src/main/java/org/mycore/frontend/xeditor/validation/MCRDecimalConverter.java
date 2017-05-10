@@ -46,12 +46,14 @@ public class MCRDecimalConverter {
      * @return null, if the text contains illegal chars or can not be parsed
      */
     public Double string2double(String value) {
-        if (hasIllegalCharacters(value))
+        if (hasIllegalCharacters(value)) {
             return null;
+        }
 
         NumberFormat nf = NumberFormat.getNumberInstance(locale);
-        if ((nf instanceof DecimalFormat) && hasMultipleDecimalSeparators(value, (DecimalFormat) nf))
+        if ((nf instanceof DecimalFormat) && hasMultipleDecimalSeparators(value, (DecimalFormat) nf)) {
             return null;
+        }
 
         try {
             return new Double(nf.parse(value).doubleValue());

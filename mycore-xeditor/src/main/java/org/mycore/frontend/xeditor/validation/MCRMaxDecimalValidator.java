@@ -47,9 +47,10 @@ public class MCRMaxDecimalValidator extends MCRDecimalValidator {
     @Override
     protected boolean isValid(String value) {
         Double d = converter.string2double(value);
-        if (d == null)
+        if (d == null) {
             return false;
-        else
+        } else {
             return d.doubleValue() <= max;
+        }
     }
 }
