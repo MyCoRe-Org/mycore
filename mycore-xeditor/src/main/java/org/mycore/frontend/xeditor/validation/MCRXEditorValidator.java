@@ -71,8 +71,9 @@ public class MCRXEditorValidator {
 
     private void addIfConfigured(MCRValidator validator, String baseXPath, Node ruleElement) {
         validator.init(baseXPath, ruleElement);
-        if (validator.hasRequiredAttributes())
+        if (validator.hasRequiredAttributes()) {
             validationRules.add(validator);
+        }
     }
 
     public void clearRules() {
@@ -81,8 +82,9 @@ public class MCRXEditorValidator {
 
     public boolean isValid() throws JDOMException, JaxenException {
         MCRBinding root = session.getRootBinding();
-        for (MCRValidator rule : validationRules)
+        for (MCRValidator rule : validationRules) {
             rule.validate(results, root);
+        }
 
         session.getVariables().put(XED_VALIDATION_FAILED, String.valueOf(!results.isValid()));
         return results.isValid();

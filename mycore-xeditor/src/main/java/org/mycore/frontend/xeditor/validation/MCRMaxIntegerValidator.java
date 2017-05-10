@@ -29,7 +29,7 @@ package org.mycore.frontend.xeditor.validation;
 public class MCRMaxIntegerValidator extends MCRIntegerValidator {
 
     private static final String ATTR_MAX = "max";
-    
+
     private int max;
 
     @Override
@@ -44,9 +44,10 @@ public class MCRMaxIntegerValidator extends MCRIntegerValidator {
 
     @Override
     protected boolean isValid(String value) {
-        if (!super.isValid(value))
+        if (!super.isValid(value)) {
             return false;
-        else
+        } else {
             return Integer.parseInt(value) <= max;
+        }
     }
 }

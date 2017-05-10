@@ -33,12 +33,13 @@ public class MCRValidationResults {
     }
 
     public void mark(String xPath, boolean isValid, MCRValidator failedRule) {
-        if (hasError(xPath))
+        if (hasError(xPath)) {
             return;
+        }
 
-        if (isValid)
+        if (isValid) {
             xPath2Marker.put(xPath, MARKER_SUCCESS);
-        else {
+        } else {
             xPath2Marker.put(xPath, MARKER_ERROR);
             xPath2FailedRule.put(xPath, failedRule);
             this.isValid = false;

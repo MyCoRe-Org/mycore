@@ -64,12 +64,14 @@ public class MCRExternalValidator extends MCRValidator {
         boolean isValid = true; // all nodes must validate
         for (Object node : binding.getBoundNodes()) {
             String absPath = MCRXPathBuilder.buildXPath(node);
-            if (results.hasError(absPath)) // do not validate already invalid nodes
+            if (results.hasError(absPath)) {
                 continue;
+            }
 
             Boolean result = isValid(node);
-            if (result == null)
+            if (result == null) {
                 continue;
+            }
 
             results.mark(absPath, result, this);
             isValid = isValid && result;
@@ -79,16 +81,17 @@ public class MCRExternalValidator extends MCRValidator {
 
     protected Boolean isValid(Object node) {
         Method method = findMethod(node.getClass());
-        if (method != null)
+        if (method != null) {
             return invokeMethod(method, node);
-        else {
+        } else {
             method = findMethod(String.class);
             if (method != null) {
                 String value = MCRBinding.getValue(node);
                 return value.isEmpty() ? null : invokeMethod(method, value);
-            } else
+            } else {
                 throw new MCRConfigurationException(
                     "Method configured for external validation not found: " + className + "#" + methodName);
+            }
         }
     }
 

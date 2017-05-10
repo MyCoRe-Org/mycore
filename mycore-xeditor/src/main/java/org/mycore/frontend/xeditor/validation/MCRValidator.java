@@ -18,8 +18,9 @@ public abstract class MCRValidator {
         this.xPath = relativeXPath != null ? relativeXPath.getNodeValue() : baseXPath;
         this.ruleElement = ruleElement;
 
-        if (hasRequiredAttributes())
+        if (hasRequiredAttributes()) {
             configure();
+        }
     }
 
     public abstract boolean hasRequiredAttributes();
@@ -52,12 +53,14 @@ public abstract class MCRValidator {
         boolean isValid = true; // all nodes must validate
         for (Object node : binding.getBoundNodes()) {
             String absPath = MCRXPathBuilder.buildXPath(node);
-            if (results.hasError(absPath)) // do not validate already invalid nodes
+            if (results.hasError(absPath)) {
                 continue;
+            }
 
             String value = MCRBinding.getValue(node);
-            if (value.isEmpty()) // do not validate empty values
+            if (value.isEmpty()) {
                 continue;
+            }
 
             boolean result = isValid(value);
             results.mark(absPath, result, this);

@@ -44,9 +44,10 @@ public class MCRMinIntegerValidator extends MCRIntegerValidator {
 
     @Override
     protected boolean isValid(String value) {
-        if (!super.isValid(value))
+        if (!super.isValid(value)) {
             return false;
-        else
+        } else {
             return min <= Integer.parseInt(value);
+        }
     }
 }
