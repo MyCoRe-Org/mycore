@@ -8,8 +8,8 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRUUIDURNGenerator;
+import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
 import org.mycore.pi.urn.rest.MCREpicurLite;
-import org.mycore.pi.urn.rest.MCRDNBURNClient;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,8 +56,8 @@ public class MCRPIUtils {
         return null;
     }
 
-    public static MCRDNBURNClient getMCRURNClient() {
-        return new MCRDNBURNClient(MCRPIUtils::getEpicure);
+    public static MCRDNBURNRestClient getMCRURNClient() {
+        return new MCRDNBURNRestClient(MCRPIUtils::getEpicure);
     }
 
     private static MCREpicurLite getEpicure(MCRPIRegistrationInfo urnInfo) {

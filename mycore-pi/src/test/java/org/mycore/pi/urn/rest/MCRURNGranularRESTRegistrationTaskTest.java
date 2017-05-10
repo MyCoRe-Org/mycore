@@ -1,25 +1,20 @@
 package org.mycore.pi.urn.rest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
 import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.backend.MCRPI;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TimerTask;
-import java.util.UUID;
 
+import static org.mycore.common.MCRConstants.EPICURLITE_NAMESPACE;
 import static org.mycore.pi.MCRPIUtils.generateMCRPI;
 import static org.mycore.pi.MCRPIUtils.randomFilename;
 
@@ -29,6 +24,8 @@ import static org.mycore.pi.MCRPIUtils.randomFilename;
  * @author Huu Chi Vu
  */
 public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
+    private Element newEpicureElement(String epicurlite) {return new Element(epicurlite, EPICURLITE_NAMESPACE);}
+
     private static final String countRegistered = "select count(u) from MCRPI u "
             + "where u.type = :type "
             + "and u.registered is not null";
@@ -82,22 +79,5 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
         testProperties.put("MCR.PI.Generator.testGenerator.Namespace", "frontend-");
         return testProperties;
-    }
-
-    private static class FooTask extends TimerTask implements Closeable {
-        private static Logger LOGGER = LogManager.getLogger();
-
-        @Override
-        public void run() {
-            UUID uuid = UUID.randomUUID();
-            LOGGER.info("Start task " + uuid);
-            LOGGER.info("Session: " + MCRSessionMgr.getCurrentSession().toString());
-            LOGGER.info("end run " + uuid);
-        }
-
-        @Override
-        public void close() throws IOException {
-            LOGGER.info("End task");
-        }
     }
 }

@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 public class MCRPersistentIdentifierManager {
@@ -260,18 +261,29 @@ public class MCRPersistentIdentifierManager {
     public void setRegisteredDateForUnregisteredIdenifiers(
             String type,
             Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider) {
+
+        Function<MCRPI, Optional<MCRPI>> setDate = identifier -> dateProvider
+                .apply(identifier)
+                .map(date -> {
+                    identifier.setRegistered(date);
+                    return identifier;
+                });
+
         getUnregisteredIdenifiers(type)
-                .forEach(mcrPi -> dateProvider.apply(mcrPi)
-                                              .ifPresent(mcrPi::setRegistered));
+                .parallelStream()
+                .map(setDate)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(MCREntityManagerProvider.getCurrentEntityManager()::persist);
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-
-        EntityTransaction transaction = em.getTransaction();
-        if (!transaction.isActive()) {
-            transaction.begin();
-        }
-
-        transaction.commit();
+//
+//        EntityTransaction transaction = em.getTransaction();
+//        if (!transaction.isActive()) {
+//            transaction.begin();
+//        }
+//
+//        transaction.commit();
     }
 
     public List<MCRPI> getUnregisteredIdenifiers(String type) {
@@ -279,6 +291,7 @@ public class MCRPersistentIdentifierManager {
                 .getCurrentEntityManager()
                 .createQuery("select pi from MCRPI pi where pi.type = :type and pi.registered is null", MCRPI.class)
                 .setParameter("type", type)
+                .setMaxResults(1000)
                 .getResultList();
     }
 

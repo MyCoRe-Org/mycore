@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epicurlite:epicurlite xmlns:epicurlite="http://nbn-resolving.org/epicurlite" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nbn-resolving.org/epicurlite http://nbn-resolving.org/schemas/epicurlite/1.0/epicurlite.xsd">
+  <epicurlite:login/>
+  <epicurlite:password/>
+  <epicurlite:identifier>
+    <epicurlite:value/>
+  </epicurlite:identifier>
+  <epicurlite:resource>
+    <epicurlite:url/>
+    <epicurlite:primary>true</epicurlite:primary>
+    <epicurlite:frontpage>false</epicurlite:frontpage>
+  </epicurlite:resource>
+</epicurlite:epicurlite>

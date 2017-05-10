@@ -3,6 +3,8 @@ package org.mycore.pi.urn.rest;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.pi.MCRPIRegistrationInfo;
 
 import java.net.URL;
@@ -80,6 +82,11 @@ public final class MCREpicurLite {
         epicurLite.addContent(resource);
 
         return epicurLiteDoc;
+    }
+
+    public String asXMLString(){
+        return new XMLOutputter(
+                Format.getPrettyFormat()).outputString(toXML());
     }
 
     private Element newEpicureElement(String epicurlite) {return new Element(epicurlite, EPICURLITE_NAMESPACE);}
