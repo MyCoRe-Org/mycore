@@ -2,11 +2,14 @@ package org.mycore.pi.urn.rest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.urn.MCRDNBURN;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Date;
+import java.util.Optional;
 import java.util.TimerTask;
 
 /**

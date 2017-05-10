@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -262,22 +261,28 @@ public class MCRPersistentIdentifierManager {
             String type,
             Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider) {
 
-        EntityTransaction tx = MCREntityManagerProvider.getCurrentEntityManager()
-                                                       .getTransaction();
-
-        if(!tx.isActive()){
-            tx.begin();
-        }
-
-        Consumer<MCRPI> setDate = identifier -> dateProvider
+        Function<MCRPI, Optional<MCRPI>> setDate = identifier -> dateProvider
                 .apply(identifier)
-                .ifPresent(date -> identifier.setRegistered(date));
+                .map(date -> {
+                    identifier.setRegistered(date);
+                    return identifier;
+                });
 
         getUnregisteredIdenifiers(type)
                 .parallelStream()
-                .forEach(setDate);
+                .map(setDate)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(MCREntityManagerProvider.getCurrentEntityManager()::persist);
 
-        tx.commit();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+//
+//        EntityTransaction transaction = em.getTransaction();
+//        if (!transaction.isActive()) {
+//            transaction.begin();
+//        }
+//
+//        transaction.commit();
     }
 
     public List<MCRPI> getUnregisteredIdenifiers(String type) {
