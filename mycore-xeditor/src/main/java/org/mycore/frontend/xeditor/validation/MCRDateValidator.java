@@ -20,8 +20,6 @@
 
 package org.mycore.frontend.xeditor.validation;
 
-import org.mycore.frontend.xeditor.validation.MCRDateConverter;
-
 /**
  * Validates date values specified by one or more SimpleDateFormat patterns separated by ";".
  * Example: &lt;xed:validate type="date" format="yyyy-MM-dd;dd.MM.yyyy" ... /&gt;

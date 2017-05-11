@@ -25,6 +25,7 @@ public abstract class MCRValidator {
 
     public abstract boolean hasRequiredAttributes();
 
+    /** If validator uses properties to configure its behavior, override this */
     public void configure() {
     }
 
