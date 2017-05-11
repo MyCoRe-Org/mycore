@@ -1,6 +1,5 @@
 package org.mycore.pi.urn.rest;
 
-import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -14,7 +13,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.mycore.common.MCRConstants.EPICURLITE_NAMESPACE;
 import static org.mycore.pi.MCRPIUtils.generateMCRPI;
 import static org.mycore.pi.MCRPIUtils.randomFilename;
 
@@ -24,8 +22,6 @@ import static org.mycore.pi.MCRPIUtils.randomFilename;
  * @author Huu Chi Vu
  */
 public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
-    private Element newEpicureElement(String epicurlite) {return new Element(epicurlite, EPICURLITE_NAMESPACE);}
-
     private static final String countRegistered = "select count(u) from MCRPI u "
             + "where u.type = :type "
             + "and u.registered is not null";
@@ -44,9 +40,6 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
                                       .map(MCRPIRegistrationInfo::getIdentifier)
                                       .map("URN: "::concat)
                                       .forEach(System.out::println);
-        //        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
-        //        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
-        //        MCRHIBConnection.instance().getSession().save(generateMCRPI(randomFilename()));
 
         MCRURNGranularRESTRegistrationTask registrationTask = new MCRURNGranularRESTRegistrationTask(
                 MCRPIUtils.getMCRURNClient());
