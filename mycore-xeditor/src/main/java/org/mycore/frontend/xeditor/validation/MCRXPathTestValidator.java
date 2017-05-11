@@ -29,7 +29,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 /**
  * Validates using an XPath test expression.
  *   
- * Example: &lt:xed:validate xpath="//max" test="(string-length(.) = 0) or (number(.) &gt;= number(../min))" ... /&gt;
+ * Example: &lt;xed:validate xpath="//max" test="(string-length(.) = 0) or (number(.) &gt;= number(../min))" ... /&gt;
  *
  * @author Frank L\u00FCtzenkirchen 
  */
