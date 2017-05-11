@@ -25,16 +25,16 @@ package org.mycore.frontend.fileupload;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
-import org.apache.commons.fileupload.FileItem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Transaction;
@@ -43,8 +43,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
-import org.mycore.frontend.editor.MCREditorSubmission;
-import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -59,6 +57,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @see org.mycore.frontend.fileupload.MCRUploadHandler
  */
 
+@MultipartConfig
 public final class MCRUploadViaFormServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
@@ -69,43 +68,33 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws Exception {
         guardWebsiteCurrentlyReadOnly();
 
-        MCREditorSubmission sub = (MCREditorSubmission) job.getRequest().getAttribute("MCREditorSubmission");
-        MCRRequestParameters rp = sub == null ? new MCRRequestParameters(job.getRequest()) : sub.getParameters();
-        Optional<MCRUploadHandler> uh = getUploadHandler(rp);
+        Optional<MCRUploadHandler> uh = getUploadHandler(job);
         if (!uh.isPresent()) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter 'uploadId' is missing!");
             return;
         }
+
         MCRUploadHandler handler = uh.get();
         LOGGER.info("UploadHandler form based file upload for ID " + handler.getID());
 
-        List<FileItem> files = getUploadedFiles(rp);
-        handleUploadedFiles(handler, files);
+        handleUploadedFiles(handler, job.getRequest().getParts());
 
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(handler.getRedirectURL()));
         handler.finishUpload();
         handler.unregister();
     }
 
-    private List<FileItem> getUploadedFiles(MCRRequestParameters rp) {
-        return rp.getFileList()
-                 .stream()
-                 .filter(file -> file.getSize() > 0)
-                 .collect(Collectors.toList());
-    }
-
     private void guardWebsiteCurrentlyReadOnly() {
-        if (MCRWebsiteWriteProtection.isActive())
+        if (MCRWebsiteWriteProtection.isActive()) {
             throw new RuntimeException("System is currently in read-only mode");
+        }
     }
 
-    private Optional<MCRUploadHandler> getUploadHandler(MCRRequestParameters rp) {
-        return Optional
-            .ofNullable(rp.getParameter("uploadId"))
-            .map(MCRUploadHandlerManager::getHandler);
+    private Optional<MCRUploadHandler> getUploadHandler(MCRServletJob job) {
+        return Optional.ofNullable(job.getRequest().getParameter("uploadId")).map(MCRUploadHandlerManager::getHandler);
     }
 
-    private void handleUploadedFiles(MCRUploadHandler handler, List<FileItem> files) throws Exception, IOException {
+    private void handleUploadedFiles(MCRUploadHandler handler, Collection<Part> files) throws Exception, IOException {
         int numFiles = files.size();
         LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
         handler.startUpload(numFiles);
@@ -113,21 +102,28 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.commitTransaction();
 
-        for (FileItem file : files)
+        for (Part file : files) {
             handleUploadedFile(handler, file);
+        }
 
         session.beginTransaction();
     }
 
-    private void handleUploadedFile(MCRUploadHandler handler, FileItem file) throws IOException, Exception {
+    private void handleUploadedFile(MCRUploadHandler handler, Part file) throws IOException, Exception {
         InputStream in = file.getInputStream();
-        String path = MCRUploadHelper.getFileName(file.getName());
+        String submitted = file.getSubmittedFileName();
+        if (submitted == null) {
+            return;
+        }
+
+        String path = MCRUploadHelper.getFileName(submitted);
 
         MCRConfiguration config = MCRConfiguration.instance();
-        if (config.getBoolean("MCR.FileUpload.DecompressZip", true) && path.toLowerCase(Locale.ROOT).endsWith(".zip"))
+        if (config.getBoolean("MCR.FileUpload.DecompressZip", true) && path.toLowerCase(Locale.ROOT).endsWith(".zip")) {
             handleZipFile(handler, in);
-        else
+        } else {
             handleUploadedFile(handler, file.getSize(), path, in);
+        }
     }
 
     private void handleUploadedFile(MCRUploadHandler handler, long size, String path, InputStream in) throws Exception {
@@ -148,9 +144,9 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         MCRNotClosingInputStream nis = new MCRNotClosingInputStream(zis);
         for (ZipEntry entry; (entry = zis.getNextEntry()) != null;) {
             String path = convertAbsolutePathToRelativePath(entry.getName());
-            if (entry.isDirectory())
+            if (entry.isDirectory()) {
                 LOGGER.debug("UploadServlet skipping ZIP entry " + path + ", is a directory");
-            else {
+            } else {
                 handler.incrementNumFiles();
                 handleUploadedFile(handler, entry.getSize(), path, nis);
             }
