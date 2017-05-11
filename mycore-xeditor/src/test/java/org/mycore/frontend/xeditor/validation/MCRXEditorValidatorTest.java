@@ -52,8 +52,9 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
 
     private void addRule(MCREditorSession session, String baseXPath, String... attributes) throws JDOMException {
         Element rule = new Element("validation-rule");
-        for (int i = 0; i < attributes.length;)
+        for (int i = 0; i < attributes.length;) {
             rule.setAttribute(attributes[i++], attributes[i++]);
+        }
         new Document(rule);
         org.w3c.dom.Element ruleAsDOMElement = new DOMOutputter().output(rule);
         session.getValidator().addRule(baseXPath, ruleAsDOMElement);
@@ -289,9 +290,10 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     }
 
     public static boolean authorIsJohnDoe(Element author) {
-        if (author.getChildren().isEmpty())
+        if (author.getChildren().isEmpty()) {
             return true;
-        else
+        } else {
             return "John".equals(author.getChildText("first")) && "Doe".equals(author.getChildText("last"));
+        }
     }
 }
