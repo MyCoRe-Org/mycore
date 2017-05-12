@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
@@ -103,27 +102,36 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         session.commitTransaction();
 
         for (Part file : files) {
-            handleUploadedFile(handler, file);
+            try {
+                handleUploadedFile(handler, file);
+            } finally {
+                file.delete();
+            }
         }
 
         session.beginTransaction();
     }
 
     private void handleUploadedFile(MCRUploadHandler handler, Part file) throws IOException, Exception {
-        InputStream in = file.getInputStream();
         String submitted = file.getSubmittedFileName();
         if (submitted == null) {
             return;
         }
+        try (InputStream in = file.getInputStream()) {
 
-        String path = MCRUploadHelper.getFileName(submitted);
+            String path = MCRUploadHelper.getFileName(submitted);
 
-        MCRConfiguration config = MCRConfiguration.instance();
-        if (config.getBoolean("MCR.FileUpload.DecompressZip", true) && path.toLowerCase(Locale.ROOT).endsWith(".zip")) {
-            handleZipFile(handler, in);
-        } else {
-            handleUploadedFile(handler, file.getSize(), path, in);
+            if (requireDecompressZip(path)) {
+                handleZipFile(handler, in);
+            } else {
+                handleUploadedFile(handler, file.getSize(), path, in);
+            }
         }
+    }
+
+    private boolean requireDecompressZip(String path) {
+        return MCRConfiguration.instance().getBoolean("MCR.FileUpload.DecompressZip", true)
+            && path.toLowerCase(Locale.ROOT).endsWith(".zip");
     }
 
     private void handleUploadedFile(MCRUploadHandler handler, long size, String path, InputStream in) throws Exception {
