@@ -54,10 +54,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
  *
  * @version $Revision: 34120 $ $Date: 2015-12-02 23:16:17 +0100 (Mi, 02 Dez 2015) $
  *
- * @see org.mycore.frontend.fileupload.MCRUploadHandler
+ * @see MCRUploadHandler
+ * @see MCRUploadServletDeployer
  */
 
-@MultipartConfig
 public final class MCRUploadViaFormServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;

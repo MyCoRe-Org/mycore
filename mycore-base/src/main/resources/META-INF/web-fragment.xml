@@ -120,10 +120,6 @@
     <servlet-name>MCRUploadViaAppletServlet</servlet-name>
     <servlet-class>org.mycore.frontend.fileupload.MCRUploadViaAppletServlet</servlet-class>
   </servlet>
-  <servlet id="UploadViaForm">
-    <servlet-name>MCRUploadViaFormServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.fileupload.MCRUploadViaFormServlet</servlet-class>
-  </servlet>
   <servlet id="Zip">
     <servlet-name>MCRZipServlet</servlet-name>
     <servlet-class>org.mycore.services.zipper.MCRZipServlet</servlet-class>
@@ -232,10 +228,6 @@
   <servlet-mapping>
     <servlet-name>XMLEditor</servlet-name>
     <url-pattern>/servlets/XMLEditor</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRUploadViaFormServlet</servlet-name>
-    <url-pattern>/servlets/MCRUploadViaFormServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRUploadViaAppletServlet</servlet-name>
