@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -94,7 +95,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     }
 
     private void handleUploadedFiles(MCRUploadHandler handler, Collection<Part> files) throws Exception, IOException {
-        int numFiles = files.size();
+        int numFiles = (int) files.stream().map(Part::getSubmittedFileName).filter(Objects::nonNull).count();
         LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
         handler.startUpload(numFiles);
 
