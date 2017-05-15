@@ -111,8 +111,16 @@
               <value>${jetty.port}</value>
             </systemProperty>
             <systemProperty>
-              <name>MCR.Persistence.Database.Enable</name>
-              <value>false</value>
+              <name>MCR.Home</name>
+              <value>${project.build.testOutputDirectory}/mycore-home</value>
+            </systemProperty>
+            <systemProperty>
+              <name>MCR.AppName</name>
+              <value>${project.artifactId}</value>
+            </systemProperty>
+            <systemProperty>
+              <name>MCRRuntimeComponentDetector.underTesting</name>
+              <value>${project.artifactId}</value>
             </systemProperty>
           </systemProperties>
         </configuration>
