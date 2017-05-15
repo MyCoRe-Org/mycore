@@ -22,8 +22,8 @@
 
 package org.mycore.mods;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -38,7 +38,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
@@ -118,7 +117,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         wrapper.setID("JUnit", 4711);
         wrapper.setMODS(mods);
 
-        Assert.assertEquals("There should be one related item!",wrapper.getLinkedRelatedItems().size(),1);
+        assertEquals("There should be one related item!",wrapper.getLinkedRelatedItems().size(),1);
     }
 
     @Override

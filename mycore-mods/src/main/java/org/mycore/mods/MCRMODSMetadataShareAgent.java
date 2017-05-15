@@ -96,9 +96,9 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         Collection<String> recipientIds = MCRLinkTableManager.instance().getSourceOf(holder.getId(),
             MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
         for (String rId : recipientIds) {
-            LOGGER.info("distribute metadata to " + rId);
             MCRObjectID recipientId = MCRObjectID.getInstance(rId);
             if (MCRMODSWrapper.isSupported(recipientId)) {
+                LOGGER.info("distribute metadata to " + rId);
                 MCRObject recipient = MCRMetadataManager.retrieveMCRObject(recipientId);
                 MCRMODSWrapper recipientWrapper = new MCRMODSWrapper(recipient);
                 for (Element relatedItem : recipientWrapper.getLinkedRelatedItems()) {
