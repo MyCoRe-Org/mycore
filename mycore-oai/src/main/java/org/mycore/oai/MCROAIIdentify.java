@@ -41,8 +41,9 @@ import org.mycore.oai.pmh.OAIIdentifierDescription;
 import org.mycore.oai.pmh.SimpleIdentify;
 
 /**
- * Simple MyCoRe implementation of a OAI-PMH {@link Identify} class. Uses the {@link MCRConfiguration} to retrieve all important settings. Earliest date stamp
- * is calculated with the 'restriction' query and sort by 'created'. Also adds custom description elements from URIs configured by MCR.OAIDataProvider.OAI.DescriptionURI
+ * Simple MyCoRe implementation of a OAI-PMH {@link Identify} class. Uses the {@link MCRConfiguration} to retrieve
+ * all important settings. Earliest date stamp is calculated with the 'restriction' query and sort by 'created'.
+ * Also adds custom description elements from URIs configured by MCR.OAIDataProvider.OAI.DescriptionURI
  *
  * @author Matthias Eichner
  * @author Frank L\u00fctzenkirchen
@@ -133,7 +134,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         Date datestamp = DateUtils.parseUTC(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
         try {
             // existing items
-            datestamp = MCROAISearchManager.getSearcher(this.configPrefix, null, null, 1, null).getEarliestTimestamp();
+            datestamp = Date.from(MCROAISearchManager.getSearcher(this, null, 1, null).getEarliestTimestamp());
             // deleted items
             if (DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
                 Date earliestDeletedDate = MCRDeletedItemManager.getFirstDate()

@@ -21,6 +21,8 @@
  */
 package org.mycore.oai;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,8 +56,10 @@ public class MCROAIAdapter implements OAIAdapter {
 
     protected final static Logger LOGGER = LogManager.getLogger(MCROAIAdapter.class);
 
-    public final static String PREFIX = "MCR.OAIDataProvider.";
+    protected final static ZoneId UTC_ZONE = ZoneId.of("UTC");
 
+    public final static String PREFIX = "MCR.OAIDataProvider.";
+    
     public static int DEFAULT_PARTITION_SIZE;
 
     protected String baseURL;
@@ -105,8 +109,7 @@ public class MCROAIAdapter implements OAIAdapter {
     public MCROAIObjectManager getObjectManager() {
         if (this.objectManager == null) {
             this.objectManager = new MCROAIObjectManager();
-            String reposId = getIdentify().getIdentifierDescription().getRepositoryIdentifier();
-            this.objectManager.init(getConfigPrefix(), reposId);
+            this.objectManager.init(getIdentify());
         }
         return this.objectManager;
     }
@@ -116,8 +119,7 @@ public class MCROAIAdapter implements OAIAdapter {
             this.searchManager = new MCROAISearchManager();
             int partitionSize = MCRConfiguration.instance().getInt(getConfigPrefix() + "ResumptionTokens.PartitionSize",
                 DEFAULT_PARTITION_SIZE);
-            this.searchManager.init(getConfigPrefix(), getIdentify().getDeletedRecordPolicy(), getObjectManager(),
-                getSetManager(), partitionSize);
+            this.searchManager.init(getIdentify(), getObjectManager(), getSetManager(), partitionSize);
         }
         return this.searchManager;
     }
@@ -277,7 +279,9 @@ public class MCROAIAdapter implements OAIAdapter {
     @Override
     public OAIDataList<Record> getRecords(MetadataFormat format, Set set, Date from, Date until)
         throws CannotDisseminateFormatException, NoSetHierarchyException, NoRecordsMatchException {
-        OAIDataList<Record> recordList = getSearchManager().searchRecord(format, set, from, until);
+        ZonedDateTime fromDateTime = from != null ? from.toInstant().atZone(UTC_ZONE) : null;
+        ZonedDateTime untilDateTime = until != null ? until.toInstant().atZone(UTC_ZONE) : null;
+        OAIDataList<Record> recordList = getSearchManager().searchRecord(format, set, fromDateTime, untilDateTime);
         if (recordList.isEmpty()) {
             throw new NoRecordsMatchException();
         }
@@ -296,7 +300,9 @@ public class MCROAIAdapter implements OAIAdapter {
     @Override
     public OAIDataList<Header> getHeaders(MetadataFormat format, Set set, Date from, Date until)
         throws CannotDisseminateFormatException, NoSetHierarchyException, NoRecordsMatchException {
-        OAIDataList<Header> headerList = getSearchManager().searchHeader(format, set, from, until);
+        ZonedDateTime fromDateTime = from != null ? from.toInstant().atZone(UTC_ZONE) : null;
+        ZonedDateTime untilDateTime = until != null ? until.toInstant().atZone(UTC_ZONE) : null;
+        OAIDataList<Header> headerList = getSearchManager().searchHeader(format, set, fromDateTime, untilDateTime);
         if (headerList.isEmpty()) {
             throw new NoRecordsMatchException();
         }
