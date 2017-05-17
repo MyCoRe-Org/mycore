@@ -26,6 +26,7 @@
       </metadata>
     </mycoreobject>
   </xsl:template>
+  <xsl:key name="kIssn" match="bibo:issn" use="text()"/>
   <xsl:template match="rdf:Description">
     <xsl:variable name="zdbId" select="substring-after(@rdf:about, 'http://ld.zdb-services.de/resource/')" />
     <mods:mods>
@@ -40,7 +41,7 @@
           <xsl:apply-templates select="isbd:p1016|isbd:P1016" />
         </mods:originInfo>
       </xsl:if>
-      <xsl:apply-templates select="bibo:issn" />
+      <xsl:apply-templates select="bibo:issn[generate-id() = generate-id(key('kIssn', text())[1])]" />
       <mods:identifier type="zdbid">
         <xsl:value-of select="$zdbId" />
       </mods:identifier>
