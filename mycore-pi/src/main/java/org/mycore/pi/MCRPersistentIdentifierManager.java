@@ -9,7 +9,6 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -258,35 +256,35 @@ public class MCRPersistentIdentifierManager {
                 .getResultList();
     }
 
-    public void setRegisteredDateForUnregisteredIdenifiers(
+    public Integer setRegisteredDateForUnregisteredIdenifiers(
             String type,
-            Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider) {
+            Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider, Integer batchSize) {
 
-        EntityTransaction tx = MCREntityManagerProvider.getCurrentEntityManager()
-                                                       .getTransaction();
+        List<MCRPI> unregisteredIdentifiers = getUnregisteredIdentifiers(type, batchSize);
+        unregisteredIdentifiers
+                .forEach(ident -> dateProvider
+                        .apply(ident)
+                        .ifPresent(ident::setRegistered)
+                );
 
-        if(!tx.isActive()){
-            tx.begin();
-        }
-
-        Consumer<MCRPI> setDate = identifier -> dateProvider
-                .apply(identifier)
-                .ifPresent(date -> identifier.setRegistered(date));
-
-        getUnregisteredIdenifiers(type)
-                .parallelStream()
-                .forEach(setDate);
-
-        tx.commit();
+        return unregisteredIdentifiers.size();
     }
 
-    public List<MCRPI> getUnregisteredIdenifiers(String type) {
-        return MCREntityManagerProvider
+    public List<MCRPI> getUnregisteredIdentifiers(String type, int maxSize) {
+        TypedQuery<MCRPI> getUnregisteredQuery = MCREntityManagerProvider
                 .getCurrentEntityManager()
-                .createQuery("select pi from MCRPI pi where pi.type = :type and pi.registered is null", MCRPI.class)
-                .setParameter("type", type)
-                .setMaxResults(1000)
-                .getResultList();
+                .createNamedQuery("Get.PI.Unregistered", MCRPI.class)
+                .setParameter("type", type);
+
+        if (maxSize >= 0) {
+            getUnregisteredQuery.setMaxResults(maxSize);
+        }
+
+        return getUnregisteredQuery.getResultList();
+    }
+
+    public List<MCRPI> getUnregisteredIdentifiers(String type) {
+        return getUnregisteredIdentifiers(type, -1);
     }
 
     public List<MCRPIRegistrationInfo> getRegistered(MCRObject object) {

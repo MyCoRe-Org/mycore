@@ -1,6 +1,7 @@
 package org.mycore.pi.urn.rest;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
@@ -8,6 +9,7 @@ import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
 import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.urn.MCRDNBURN;
 
 import java.util.Date;
 import java.util.Map;
@@ -25,7 +27,9 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
     private static final String countRegistered = "select count(u) from MCRPI u "
             + "where u.type = :type "
             + "and u.registered is not null";
+    public static final int BATCH_SIZE = 20;
 
+    @Ignore
     @Test
     public void run() throws Exception {
         MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered);
@@ -35,16 +39,18 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         Assert.assertNull("Registered date should be null.", urn1.getRegistered());
 
         MCRPersistentIdentifierManager.getInstance()
-                                      .getUnregisteredIdenifiers(urn1.getType())
+                                      .getUnregisteredIdentifiers(urn1.getType())
                                       .stream()
                                       .map(MCRPIRegistrationInfo::getIdentifier)
                                       .map("URN: "::concat)
                                       .forEach(System.out::println);
 
-        MCRURNGranularRESTRegistrationTask registrationTask = new MCRURNGranularRESTRegistrationTask(
-                MCRPIUtils.getMCRURNClient());
+        while (MCRPersistentIdentifierManager
+                .getInstance()
+                .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, MCRPIUtils.getMCRURNClient()::register, BATCH_SIZE)
+                > 0) {
 
-        registrationTask.run();
+        }
 
         boolean registered = MCRPersistentIdentifierManager.getInstance().isRegistered(urn1);
         System.out.println("Registered: " + registered);
@@ -57,7 +63,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
                 .map("URN registered: "::concat)
                 .ifPresent(System.out::println);
 
-        MCRPersistentIdentifierManager.getInstance().getUnregisteredIdenifiers(urn1.getType())
+        MCRPersistentIdentifierManager.getInstance().getUnregisteredIdentifiers(urn1.getType())
                                       .stream()
                                       .map(MCRPIRegistrationInfo::getIdentifier)
                                       .map("URN update: "::concat)

@@ -1,7 +1,5 @@
 package org.mycore.pi.backend;
 
-import java.util.Date;
-
 import org.mycore.common.MCRCoreVersion;
 
 import javax.persistence.Column;
@@ -13,6 +11,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.util.Date;
 
 @Entity
 @NamedQueries({
@@ -37,7 +36,18 @@ import javax.persistence.UniqueConstraint;
                         + "and u.type = :type "
                         + "and u.additional != '' "
                         + "and u.service = :service"
+        ),
+        @NamedQuery(name = "Get.PI.Unregistered",
+                query = "select u from MCRPI u "
+                        + "where u.type = :type "
+                        + "and u.registered is null"
+        ),
+        @NamedQuery(name = "Update.PI.Registered.Date",
+                query = "update from MCRPI u "
+                        + "set u.registered = :date "
+                        + "where u.id = :id"
         )
+
 
 })
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "identifier", "type" }) })
@@ -82,7 +92,7 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     }
 
     public MCRPI(String identifier, String type, String mycoreID, String additional) {
-        this(identifier, type, mycoreID.toString(), additional, null, null);
+        this(identifier, type, mycoreID, additional, null, null);
     }
 
     public MCRPI(String identifier, String type, String mycoreID, String additional, String service, Date registered) {

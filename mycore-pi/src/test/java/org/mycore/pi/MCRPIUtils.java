@@ -60,7 +60,7 @@ public class MCRPIUtils {
         return new MCRDNBURNRestClient(MCRPIUtils::getEpicure);
     }
 
-    private static MCREpicurLite getEpicure(MCRPIRegistrationInfo urnInfo) {
+    public static MCREpicurLite getEpicure(MCRPIRegistrationInfo urnInfo) {
         return MCREpicurLite.instance(urnInfo, MCRPIUtils.getUrl(urnInfo))
                             .setCredentials(new UsernamePasswordCredentials("test", "test"));
     }

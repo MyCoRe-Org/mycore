@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -38,6 +39,7 @@ public class MCRHttpsClient {
     public static CloseableHttpClient getHttpsClient() {
         return HttpClientBuilder
                 .create()
+                .setConnectionTimeToLive(1, TimeUnit.MINUTES)
                 .setSSLContext(SSLContexts.createSystemDefault())
                 .build();
     }
@@ -47,7 +49,7 @@ public class MCRHttpsClient {
         try (CloseableHttpClient httpClient = getHttpsClient()) {
             return httpClient.execute(httpHead);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("There is a problem or the connection was aborted for URL: " + url, e);
         }
 
         return null;

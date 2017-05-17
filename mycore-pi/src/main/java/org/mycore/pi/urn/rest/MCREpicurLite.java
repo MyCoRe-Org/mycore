@@ -96,10 +96,6 @@ public final class MCREpicurLite {
         return this;
     }
 
-    public MCRPIRegistrationInfo getUrn() {
-        return urn;
-    }
-
     public URL getUrl() {
         return url;
     }
@@ -122,6 +118,6 @@ public final class MCREpicurLite {
 
     @Override
     public String toString() {
-        return urn + "|" + url.toString();
+        return urn.getIdentifier() + "|" + url.toString();
     }
 }

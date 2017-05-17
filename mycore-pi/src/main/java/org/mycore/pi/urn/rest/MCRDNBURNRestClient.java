@@ -2,6 +2,7 @@ package org.mycore.pi.urn.rest;
 
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,8 +55,17 @@ public class MCRDNBURNRestClient {
      * @return the status code of the request
      */
     public Optional<Date> register(MCRPIRegistrationInfo urn) {
-        CloseableHttpResponse response = MCRHttpsClient.head(getBaseServiceURL(urn));
-        int headStatus = response.getStatusLine().getStatusCode();
+        String url = getBaseServiceURL(urn);
+        CloseableHttpResponse response = MCRHttpsClient.head(url);
+
+        StatusLine statusLine = response.getStatusLine();
+
+        if(statusLine == null){
+            LOGGER.warn("HEAD request for {} returns no status line.", url);
+            return Optional.empty();
+        }
+
+        int headStatus = statusLine.getStatusCode();
 
         String identifier = urn.getIdentifier();
         switch (headStatus) {
@@ -96,7 +106,15 @@ public class MCRDNBURNRestClient {
         String elpXML = elp.asXMLString();
         String baseServiceURL = getBaseServiceURL(urn);
         CloseableHttpResponse response = MCRHttpsClient.put(baseServiceURL, APPLICATION_XML.toString(), elpXML);
-        int putStatus = response.getStatusLine().getStatusCode();
+
+        StatusLine statusLine = response.getStatusLine();
+
+        if(statusLine == null){
+            LOGGER.warn("PUT request for {} returns no status line.", baseServiceURL);
+            return Optional.empty();
+        }
+
+        int putStatus = statusLine.getStatusCode();
 
         String identifier = urn.getIdentifier();
         URL url = elp.getUrl();
@@ -142,9 +160,16 @@ public class MCRDNBURNRestClient {
         String elpXML = elp.asXMLString();
         String updateURL = getUpdateURL(urn);
         CloseableHttpResponse response = MCRHttpsClient.post(updateURL, APPLICATION_XML.toString(), elpXML);
-        int postStatus = response.getStatusLine().getStatusCode();
+        StatusLine statusLine = response.getStatusLine();
 
-        String identifier = elp.getUrn().getIdentifier();
+        if(statusLine == null){
+            LOGGER.warn("POST request for {} returns no status line.", updateURL);
+            return Optional.empty();
+        }
+
+        int postStatus = statusLine.getStatusCode();
+
+        String identifier = urn.getIdentifier();
         switch (postStatus) {
         case HttpStatus.SC_NO_CONTENT:
             LOGGER.info("URN {} updated to {}.", identifier, elp.getUrl());
