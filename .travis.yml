@@ -5,6 +5,9 @@ group: beta
 install: true
 addons:
   firefox: "52.0.2"
+  apt:
+    packages:
+    - google-chrome-stable
 cache:
   directories:
     - $HOME/.m2/repository
@@ -31,6 +34,9 @@ before_install:
         geckodriver --version
 
 before_script:
+  - wget http://chromedriver.storage.googleapis.com/2.29/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip -d chromedriver
+  - export PATH=$PATH:$PWD/chromedriver
   - export DISPLAY=:99.0
   - sleep 3
   - |
@@ -38,6 +44,6 @@ before_script:
 script:
   - mkdir ${HOME}/tmp
   - export TMPDIR="${HOME}/tmp"
-  - mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dwebdriver.firefox.bin=${FIREFOX_BIN} && mvn -P!standard-with-extra-repos -B javadoc:javadoc && mvn -P!standard-with-extra-repos com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
+  - mvn -B -Plocal-testing,!standard-with-extra-repos clean install -DDriverProvider=org.mycore.common.selenium.drivers.MCRChromeDriverFactory && mvn -P!standard-with-extra-repos -B javadoc:javadoc && mvn -P!standard-with-extra-repos com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
 after_failure:
   - sh travis/autodeploy.sh "$TRAVIS_BUILD_NUMBER-$TRAVIS_EVENT_TYPE-$TRAVIS_PULL_REQUEST" "https://MyCoRe-Travis:$GITHUB_TOKEN@github.com/MyCoRe-Travis/test_artifacts.git"
