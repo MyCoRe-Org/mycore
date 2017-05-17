@@ -63,7 +63,7 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
- * handles uploads via the UploadApplet and store files directly into the IFS.
+ * handles uploads and store files directly into the IFS.
  *
  * @author Thomas Scheffler (yagee)
  * @author Frank L\u00FCtzenkirchen
@@ -257,29 +257,15 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             }
         };
 
-        try {
-            Path currentTempFile = tempFileSupplier.get();
-            Files.copy(in, currentTempFile, StandardCopyOption.REPLACE_EXISTING);
-            long myLength = Files.size(currentTempFile);
-            if (length >= 0 && length != myLength) {
-                throw new IOException("Length of transmitted data does not match promised length: " + myLength + "!="
-                    + length);
-            }
-
-            for (MCRPostUploadFileProcessor pufp : FILE_PROCESSORS) {
-                if (pufp.isProcessable(path)) {
-                    currentTempFile = pufp.processFile(path, currentTempFile, tempFileSupplier);
-                }
-            }
-
+        try (InputStream fIn = preprocessInputStream(path, in, length, tempFileSupplier)) {
             if (rootDir == null) {
                 //MCR-1376: Create derivate only if at least one file was successfully uploaded
                 prepareUpload();
             }
             MCRPath file = getFile(path);
-            LOGGER.info("Moving " + currentTempFile + " to " + file + ".");
-            Files.copy(currentTempFile, file, StandardCopyOption.REPLACE_EXISTING);
-            return myLength;
+            LOGGER.info("Creating file " + file + ".");
+            Files.copy(fIn, file, StandardCopyOption.REPLACE_EXISTING);
+            return tempFiles.isEmpty() ? length : Files.size(tempFiles.stream().reduce((a, b) -> b).get());
         } finally {
             tempFiles.stream().filter(Files::exists).forEach((tempFilePath) -> {
                 try {
@@ -292,6 +278,28 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             int progress = (int)(((float)this.filesUploaded / (float)getNumFiles()) * 100f);
             this.setProgress(progress);
         }
+    }
+
+    private InputStream preprocessInputStream(String path, InputStream in, long length, Supplier<Path> tempFileSupplier)
+        throws IOException {
+        List<MCRPostUploadFileProcessor> activeProcessors = FILE_PROCESSORS.stream().filter(p -> p.isProcessable(path))
+            .collect(Collectors.toList());
+        if (activeProcessors.isEmpty()) {
+            return in;
+        }
+        Path currentTempFile = tempFileSupplier.get();
+        try (InputStream initialIS = in) {
+            Files.copy(initialIS, currentTempFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+        long myLength = Files.size(currentTempFile);
+        if (length >= 0 && length != myLength) {
+            throw new IOException("Length of transmitted data does not match promised length: " + myLength + "!="
+                + length);
+        }
+        for (MCRPostUploadFileProcessor pufp : activeProcessors) {
+            currentTempFile = pufp.processFile(path, currentTempFile, tempFileSupplier);
+        }
+        return Files.newInputStream(currentTempFile);
     }
 
     private MCRPath getFile(String path) throws IOException {

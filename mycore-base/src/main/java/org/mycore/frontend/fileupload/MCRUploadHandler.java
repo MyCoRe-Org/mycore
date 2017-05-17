@@ -24,11 +24,6 @@ package org.mycore.frontend.fileupload;
 
 import java.io.InputStream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.hibernate.Transaction;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.processing.MCRAbstractProcessable;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
@@ -48,16 +43,12 @@ import org.mycore.frontend.MCRWebsiteWriteProtection;
  * @see MCRUploadHandlerManager
  */
 public abstract class MCRUploadHandler extends MCRAbstractProcessable {
-    /** The LOGGER * */
-    private static Logger LOGGER = LogManager.getLogger(MCRUploadHandler.class);
 
     /** The unique ID of this upload session * */
     protected String uploadID;
 
     /** The url where to go after upload is finished. * */
     protected String url;
-
-    private Transaction tx;
 
     private int numFiles;
 
@@ -124,18 +115,17 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
     }
 
     /**
-     * Before the applet sends each file, this method is called to ask if this
+     * This method is called to ask if this
      * file should be uploaded and will be accepted by the server. The default
      * implementation always returns true (always upload file), but subclasses
      * should overwrite this method to decide whether the file's content must be
-     * uploaded. Decision can be based on the MD5 checksum that the applet
-     * calculated on the client side, so unchanged files do not have to be
+     * uploaded. Decision can be based on the MD5 checksum, so unchanged files do not have to be
      * uploaded again.
      * 
      * @param path
      *            the path and filename of the file
      * @param checksum
-     *            the MD5 checksum computed at the client applet side
+     *            the MD5 checksum computed at the client side
      * @param length 
      *            the length of the file in bytes (file size)
      * @return true, if the file should be uploaded, false if the file should be
@@ -146,7 +136,7 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
     }
 
     /**
-     * When the applet uploads a file, this method is called so that the
+     * This method is called so that the
      * UploadHandler subclass can store the file on the server side.
      * When the UploadHandler could read less than length bytes from the
      * InputStream at the time the InputStream has no data any more, the user
@@ -165,7 +155,7 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
      *            the total file size as number of bytes. This may be 0,
      *            meaning that the file is empty or the file size is not known.
      * @param md5
-     *            the md5 checksum calculated at the client applet side. This
+     *            the md5 checksum calculated at the client side. This
      *            may be null, meaning that the md5 checksum is not known.
      * @return 
      *            the number of bytes that have been stored.
@@ -173,7 +163,7 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
     public abstract long receiveFile(String path, InputStream in, long length, String md5) throws Exception;
 
     /**
-     * When the applet finished uploading all files, this method is called so
+     * After finishing uploading all files, this method is called so
      * that the UploadHandler subclass can finish work and commit all saved
      * files.
      * 
@@ -181,8 +171,7 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
     public abstract void finishUpload() throws Exception;
 
     /**
-     * After the remote user canceled the upload process in the applet, 
-     * this method is called so that the UploadHandler subclass can finish 
+     * This method is called so that the UploadHandler subclass can finish 
      * or cancel work. The implementation is optional, by default finishUpload()
      * is called 
      * 
@@ -192,52 +181,11 @@ public abstract class MCRUploadHandler extends MCRAbstractProcessable {
     }
 
     /**
-     * When the applet is closed after uploading all files, the servlet calls
-     * this method automatically to unregister this upload handler from the
+     * Automatically unregister this upload handler from the
      * UploadHandlerManager.
      */
     public void unregister() {
         MCRUploadHandlerManager.unregister(uploadID);
     }
 
-    /**
-     * @deprecated caller should handle transaction
-     */
-    @Deprecated
-    protected void startTransaction() {
-        LOGGER.debug("Starting transaction");
-        if (tx == null || !tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
-            tx = MCRHIBConnection.instance().getSession().beginTransaction();
-        } else {
-            throw new MCRException("Transaction already started");
-        }
-    }
-
-    /**
-     * @deprecated caller should handle transaction
-     */
-    @Deprecated
-    protected void commitTransaction() {
-        LOGGER.debug("Committing transaction");
-        if (tx != null) {
-            tx.commit();
-            tx = null;
-        } else {
-            throw new NullPointerException("Cannot commit transaction");
-        }
-    }
-
-    /**
-     * @deprecated caller should handle transaction
-     */
-    @Deprecated
-    protected void rollbackTransaction() {
-        LOGGER.debug("Rolling back transaction");
-        if (tx != null) {
-            tx.rollback();
-            tx = null;
-        } else {
-            throw new NullPointerException("Cannot rollback transaction");
-        }
-    }
 }
