@@ -84,7 +84,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             return;
         }
         // vorher alle mit generator *-mycore löschen
-        mcrmodsWrapper.getElements("//classification[contains(@generator, '" + GENERATOR_SUFFIX + "')]")
+        mcrmodsWrapper.getElements("mods:classification[contains(@generator, '" + GENERATOR_SUFFIX + "')]")
                 .stream().forEach(Element::detach);
 
         LOGGER.info("check mappings " + obj.getId().toString());
