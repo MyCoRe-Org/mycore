@@ -135,7 +135,11 @@
 
   <xsl:template name="creators">
     <creators>
-      <xsl:apply-templates select="mods:name[mods:role/mods:roleTerm='aut' or mods:role/mods:roleTerm='cre']" />
+      <xsl:choose>
+        <xsl:when test="mods:name[mods:role/mods:roleTerm='aut']"><xsl:apply-templates select="mods:name[mods:role/mods:roleTerm='aut']" /></xsl:when>
+        <xsl:when test="mods:name[mods:role/mods:roleTerm='cre']"><xsl:apply-templates select="mods:name[mods:role/mods:roleTerm='cre']" /></xsl:when>
+        <xsl:when test="mods:name[mods:role/mods:roleTerm='edt']"><xsl:apply-templates select="mods:name[mods:role/mods:roleTerm='edt']" /></xsl:when>
+      </xsl:choose>
     </creators>
   </xsl:template>
 
