@@ -121,9 +121,21 @@
         <field name="mods.dateIssued">
           <xsl:value-of select="." />
         </field>
-        <field name="mods.yearIssued">
-          <xsl:value-of select="substring(.,1,4)" />
-        </field>
+        <xsl:variable name="yearIssued">
+          <xsl:choose>
+            <xsl:when test="contains(.,'-')">
+              <xsl:value-of select="substring-before(.,'-')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="."/>
+            </xsl:otherwise>
+          </xsl:choose> 
+        </xsl:variable>
+        <xsl:if test="not (string(number($yearIssued)) = 'NaN')">
+          <field name="mods.yearIssued">
+            <xsl:value-of select="$yearIssued" />
+          </field>
+        </xsl:if>
       </xsl:if>
     </xsl:for-each>
     <!-- add allMeta from parent -->
