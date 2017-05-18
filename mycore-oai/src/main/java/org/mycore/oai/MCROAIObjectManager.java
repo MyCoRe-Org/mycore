@@ -54,29 +54,30 @@ public class MCROAIObjectManager {
 
     protected final static Logger LOGGER = LogManager.getLogger(MCROAIObjectManager.class);
 
-    protected String configPrefix;
-
-    protected String repositoryIdentifier;
+    protected MCROAIIdentify identify;
 
     protected String recordUriPattern;
 
     protected String headerUriPattern;
 
     /**
-     * Initialize the object mananger. Its important to call this method before you
+     * Initialize the object manager. Its important to call this method before you
      * can retrieve records or headers!
      * 
-     * @param repositoryIdentifier identifier of the repository, use the {@link MCROAIIdentify} to retrieve it
+     * @param identify oai repository identifier
      */
-    public void init(String configPrefix, String repositoryIdentifier) {
-        this.configPrefix = configPrefix;
-        this.repositoryIdentifier = repositoryIdentifier;
+    public void init(MCROAIIdentify identify) {
+        this.identify = identify;
+        String configPrefix = this.identify.getConfigPrefix();
         this.recordUriPattern = MCRConfiguration.instance().getString(configPrefix + "Adapter.RecordURIPattern");
         this.headerUriPattern = MCRConfiguration.instance().getString(configPrefix + "Adapter.HeaderURIPattern");
     }
 
     /**
      * Converts a oai identifier to a mycore id.
+     * 
+     * @param oaiId the oai identifier
+     * @return the mycore identifier
      */
     public String getMyCoReId(String oaiId) {
         return oaiId.substring(oaiId.lastIndexOf(':') + 1);
@@ -84,9 +85,11 @@ public class MCROAIObjectManager {
 
     /**
      * Converts a mycore id to a oai id.
+     * 
+     * @param mcrId mycore identifier
      */
     public String getOAIId(String mcrId) {
-        return "oai:" + this.repositoryIdentifier + ":" + mcrId;
+        return getOAIIDPrefix() + mcrId;
     }
 
     public Record getRecord(String mcrID, MetadataFormat format) {
@@ -129,10 +132,11 @@ public class MCROAIObjectManager {
         try {
             // building the query
             return MCRDeletedItemManager.getLastDeletedDate(mcrId)
-                .map(ZonedDateTime::toInstant)
-                .map(Date::from)
-                .map(deletedDate -> new Record(new Header(getOAIId(mcrId), deletedDate, Status.deleted)))
-                .orElse(null);
+                                        .map(ZonedDateTime::toInstant)
+                                        .map(Date::from)
+                                        .map(deletedDate -> new Record(
+                                            new Header(getOAIId(mcrId), deletedDate, Status.deleted)))
+                                        .orElse(null);
         } catch (Exception ex) {
             LOGGER.warn("Error while retrieving deleted record " + mcrId, ex);
         }
@@ -170,12 +174,7 @@ public class MCROAIObjectManager {
     }
 
     protected String formatURI(String uri, String id, String metadataPrefix) {
-        MCRObjectID mcrID = null;
-        try {
-            mcrID = MCRObjectID.getInstance(id);
-        } catch (Exception exc) {
-            // just check if its a valid mcr id
-        }
+        MCRObjectID mcrID = MCRObjectID.isValid(id) ? MCRObjectID.getInstance(id) : null;
         boolean exists;
         String objectType;
         if (mcrID != null) {
@@ -186,8 +185,8 @@ public class MCROAIObjectManager {
             exists = node != null;
             objectType = "data_file";
         }
-        return uri.replace("{id}", id).replace("{format}", metadataPrefix).replace("{objectType}", objectType)
-            .replace(":{flag}", !exists ? ":deletedMcrObject" : "");
+        return uri.replace("{id}", id).replace("{format}", metadataPrefix).replace("{objectType}", objectType).replace(
+            ":{flag}", !exists ? ":deletedMcrObject" : "");
     }
 
     Header headerToHeader(Element headerElement) {
@@ -219,14 +218,17 @@ public class MCROAIObjectManager {
      * @return true if exists, otherwise false
      */
     protected boolean exists(String oaiId) {
-        String prefix = "oai:" + this.repositoryIdentifier + ":";
-        String mcrId = oaiId.substring(prefix.length());
+        String mcrId = oaiId.substring(getOAIIDPrefix().length());
         try {
             MCRObjectID mcrObjId = MCRObjectID.getInstance(mcrId);
             return MCRXMLMetadataManager.instance().exists(mcrObjId);
         } catch (Exception ex) {
             return false;
         }
+    }
+
+    private String getOAIIDPrefix() {
+        return "oai:" + this.identify.getIdentifierDescription().getRepositoryIdentifier() + ":";
     }
 
 }

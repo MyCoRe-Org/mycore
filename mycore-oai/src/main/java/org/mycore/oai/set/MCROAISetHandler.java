@@ -7,7 +7,7 @@ import org.mycore.oai.pmh.Set;
  *
  * @author Matthias Eichner
  *
- * @param <T>
+ * @param <T> set type
  */
 public interface MCROAISetHandler<T> {
 

@@ -1,50 +1,44 @@
 package org.mycore.oai;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 
+/**
+ * Solr implementation of a MCROAIResult.
+ * 
+ * @author Matthias Eichner
+ */
 public class MCROAISolrResult implements MCROAIResult {
 
     protected QueryResponse response;
 
-    protected List<String> deletedRecords;
-
-    public MCROAISolrResult(QueryResponse response, List<String> deletedRecords) {
+    public MCROAISolrResult(QueryResponse response) {
         this.response = response;
-        this.deletedRecords = deletedRecords;
     }
 
     @Override
     public int getNumHits() {
-        return (int) getResponse().getResults().getNumFound() + getDeletedRecords().size();
+        return (int) getResponse().getResults().getNumFound();
     }
 
     @Override
-    public String getID(int cursor) {
+    public List<String> list() {
         SolrDocumentList list = getResponse().getResults();
-        long start = list.getStart();
-        int pos = (int) (cursor - start);
-        if (cursor >= getNumHits() || pos < 0) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (pos >= list.size()) {
-            pos = cursor - (int) getResponse().getResults().getNumFound();
-            if (pos >= getDeletedRecords().size() || pos < 0) {
-                throw new IndexOutOfBoundsException();
-            }
-            return getDeletedRecords().get(pos);
-        }
-        return (String) list.get(pos).getFieldValue("id");
+        return list.stream().map(doc -> {
+            return (String) doc.getFieldValue("id");
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public String nextCursor() {
+        return this.response.getNextCursorMark();
     }
 
     public QueryResponse getResponse() {
         return response;
-    }
-
-    public List<String> getDeletedRecords() {
-        return deletedRecords;
     }
 
 }

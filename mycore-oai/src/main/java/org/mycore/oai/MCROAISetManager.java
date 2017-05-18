@@ -152,6 +152,8 @@ public class MCROAISetManager {
 
     /**
      * Returns a list of OAI-PMH sets defined by MyCoRe.
+     * 
+     * @return list of oai sets
      */
     @SuppressWarnings("unchecked")
     public OAIDataList<Set> get() {
@@ -181,6 +183,7 @@ public class MCROAISetManager {
     /**
      * Returns the {@link MCROAISetConfiguration} for the given set id.
      * 
+     * @param <T> value of the configuration
      * @param setId the set identifier
      * @return the configuration for this set
      */

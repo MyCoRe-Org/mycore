@@ -1,8 +1,9 @@
 package org.mycore.oai;
 
-import java.util.ArrayList;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,55 +12,68 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.datamodel.common.MCRISO8601FormatChooser;
 import org.mycore.oai.pmh.Set;
 import org.mycore.oai.set.MCROAISetConfiguration;
 import org.mycore.solr.MCRSolrClientFactory;
 
+/**
+ * Solr searcher implementation. Uses cursors.
+ * 
+ * @author Matthias Eichner
+ */
 public class MCROAISolrSearcher extends MCROAISearcher {
 
     protected final static Logger LOGGER = LogManager.getLogger(MCROAISolrSearcher.class);
 
     private Set set;
 
-    private Date from;
+    private ZonedDateTime from;
 
-    private Date until;
+    private ZonedDateTime until;
 
-    private List<String> deletedRecords;
+    /**
+     * Solr always returns a nextCursorMark even when the end of the list is reached.
+     * Due to that behavior we query the next result in advance and check if the
+     * marks are equal (which tells us the end is reached). To avoid double querying
+     * we store the result in {@link #nextResult}. For simple forwarding harvesting
+     * this should be efficient.
+     */
+    private String lastCursor;
 
-    public MCROAISolrSearcher() {
-        super();
-        this.deletedRecords = new ArrayList<>();
+    private MCROAISolrResult nextResult;
+
+    @Override
+    public MCROAIResult query(String cursor) {
+        this.updateRunningExpirationTimer();
+        return handleResult(cursor.equals(this.lastCursor) ? this.nextResult : solrQuery(cursor));
     }
 
     @Override
-    public MCROAIResult query(int cursor) {
-        return solrQuery(cursor);
-    }
-
-    @Override
-    public MCROAIResult query(Set set, Date from, Date until) {
+    public MCROAIResult query(Set set, ZonedDateTime from, ZonedDateTime until) {
         this.set = set;
         this.from = from;
         this.until = until;
-        this.deletedRecords = searchDeleted(from, until);
-        return solrQuery(0);
+        return handleResult(solrQuery("*"));
     }
 
-    protected MCROAIResult solrQuery(int start) {
+    private MCROAIResult handleResult(MCROAISolrResult result) {
+        this.nextResult = solrQuery(result.nextCursor());
+        this.lastCursor = result.nextCursor();
+        if (result.nextCursor().equals(this.nextResult.nextCursor())) {
+            return MCROAISimpleResult.from(result).setNextCursor(null);
+        }
+        return result;
+    }
+
+    protected MCROAISolrResult solrQuery(String cursor) {
+        String configPrefix = this.identify.getConfigPrefix();
+
         SolrQuery query = new SolrQuery();
         // query
-        String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
+        String restriction = getConfig().getString(configPrefix + "Search.Restriction", null);
         if (restriction != null) {
             query.set("q", restriction);
-        }
-
-        // sort
-        String sortBy = getConfig().getString(getConfigPrefix() + "Search.SortBy", null);
-        if (sortBy != null) {
-            sortBy = sortBy.replace("ascending", "asc").replace("descending", "desc");
-            query.set("sort", sortBy);
         }
 
         // set support
@@ -79,45 +93,43 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             query.add("fq", dateFilter.toString());
         }
 
-        // start & rows
-        query.add("start", String.valueOf(start));
-        query.add("rows", String.valueOf(getPartitionSize()));
+        // cursor
+        query.set("cursorMark", cursor);
+        query.set("rows", String.valueOf(getPartitionSize()));
+        query.set("sort", "id asc");
         // request handler
-        query.setRequestHandler(getConfig().getString(getConfigPrefix() + "Search.RequestHandler", "/select"));
+        query.setRequestHandler(getConfig().getString(configPrefix + "Search.RequestHandler", "/select"));
 
         // do the query
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         try {
             QueryResponse response = solrClient.query(query);
-            return new MCROAISolrResult(response, this.deletedRecords);
+            return new MCROAISolrResult(response);
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
         }
         return null;
     }
 
-    private String buildFromUntilCondition(Date from, Date until) {
+    private String buildFromUntilCondition(ZonedDateTime from, ZonedDateTime until) {
         String fieldFromUntil = getConfig().getString(getConfigPrefix() + "Search.FromUntil", "modified");
         StringBuilder query = new StringBuilder(" +").append(fieldFromUntil).append(":[");
+        DateTimeFormatter format = MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT;
         if (from == null) {
             query.append("* TO ");
         } else {
-            MCRISO8601Date mcrDate = new MCRISO8601Date();
-            mcrDate.setDate(from);
-            query.append(mcrDate.getISOString()).append(" TO ");
+            query.append(format.format(from)).append(" TO ");
         }
         if (until == null) {
             query.append("*]");
         } else {
-            MCRISO8601Date mcrDate = new MCRISO8601Date();
-            mcrDate.setDate(until);
-            query.append(mcrDate.getISOString()).append("]");
+            query.append(format.format(until)).append(']');
         }
         return query.toString();
     }
 
     @Override
-    public Date getEarliestTimestamp() {
+    public Instant getEarliestTimestamp() {
         String sortBy = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.SortBy", "modified asc");
         String fieldName = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.FieldName", "modified");
         String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
@@ -132,7 +144,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             QueryResponse response = solrClient.query(params);
             SolrDocumentList list = response.getResults();
             if (list.size() >= 1) {
-                return (Date) list.get(0).getFieldValue(fieldName);
+                Date date = (Date) list.get(0).getFieldValue(fieldName);
+                return date.toInstant();
             }
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
