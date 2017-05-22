@@ -914,9 +914,6 @@
           <xsl:when test="mods:part/mods:date">
             <xsl:apply-templates select="mods:part/mods:date" mode="formatDate"/>
           </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="''" />
-          </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       <!-- Volume -->
@@ -932,10 +929,10 @@
         <xsl:value-of
           select="concat('H. ',mods:part/mods:detail[@type='issue']/mods:number)" />
       </xsl:if>
-      <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number and not($dateIssued='')">
+      <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number and string-length($dateIssued) > 0">
         <xsl:text> </xsl:text>
       </xsl:if>
-      <xsl:if test="not($dateIssued='')">
+      <xsl:if test="string-length($dateIssued) > 0">
         <xsl:text>(</xsl:text>
         <xsl:value-of select="$dateIssued" />
         <xsl:text>)</xsl:text>
