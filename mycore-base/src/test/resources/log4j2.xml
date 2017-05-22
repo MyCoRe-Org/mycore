@@ -11,6 +11,5 @@
       <AppenderRef ref="Console"/>
     </Root>
     <Logger name="org.hibernate" level="error" additivity="false" />
-    <Logger name="org.mycore.frontend.editor.validation" level="info" additivity="false" />
   </Loggers>
 </Configuration>

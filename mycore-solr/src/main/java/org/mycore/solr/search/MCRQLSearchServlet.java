@@ -17,11 +17,9 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.jdom2.Document;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.fieldquery.MCRQuery;
-//import org.mycore.services.fieldquery.MCRSearchServlet;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 import org.xml.sax.SAXException;
 
@@ -46,31 +44,25 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
     public void doGetPost(MCRServletJob job) throws IOException, ServletException, TransformerException, SAXException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
-        MCREditorSubmission sub = (MCREditorSubmission) request.getAttribute("MCREditorSubmission");
         String searchString = getReqParameter(request, "search", null);
         String queryString = getReqParameter(request, "query", null);
 
         Document input = (Document) request.getAttribute("MCRXEditorSubmission");
         MCRQuery query;
 
-        if (sub != null) {
-            input = (Document) sub.getXML().clone();
-            query = MCRQLSearchUtils.buildFormQuery(sub.getXML().getRootElement());
+        if (input != null) {
+            //xeditor input
+            query = MCRQLSearchUtils.buildFormQuery(input.getRootElement());
         } else {
-            if (input != null) {
-                //xeditor input
-                query = MCRQLSearchUtils.buildFormQuery(input.getRootElement());
+            if (queryString != null) {
+                query = MCRQLSearchUtils.buildComplexQuery(queryString);
+            } else if (searchString != null) {
+                query = MCRQLSearchUtils.buildDefaultQuery(searchString, defaultSearchField);
             } else {
-                if (queryString != null) {
-                    query = MCRQLSearchUtils.buildComplexQuery(queryString);
-                } else if (searchString != null) {
-                    query = MCRQLSearchUtils.buildDefaultQuery(searchString, defaultSearchField);
-                } else {
-                    query = MCRQLSearchUtils.buildNameValueQuery(request);
-                }
-
-                input = MCRQLSearchUtils.setQueryOptions(query, request);
+                query = MCRQLSearchUtils.buildNameValueQuery(request);
             }
+
+            input = MCRQLSearchUtils.setQueryOptions(query, request);
         }
 
         // Show incoming query document

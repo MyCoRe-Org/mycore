@@ -25,7 +25,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.xml.sax.SAXParseException;
 
@@ -76,10 +75,7 @@ class MCRPersistenceHelper {
     static Document getEditorSubmission(HttpServletRequest request, boolean failOnMissing) throws ServletException {
         Document inDoc = (Document) request.getAttribute("MCRXEditorSubmission");
         if (inDoc == null) {
-            MCREditorSubmission sub = (MCREditorSubmission) request.getAttribute("MCREditorSubmission");
-            if (sub != null)
-                inDoc = sub.getXML();
-            else if (failOnMissing)
+            if (failOnMissing)
                 throw new ServletException("No MCREditorSubmission");
             else
                 return null;

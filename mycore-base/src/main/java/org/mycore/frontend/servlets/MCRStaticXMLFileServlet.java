@@ -27,29 +27,19 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.jdom2.output.Format;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.MCRLayoutUtilities;
-import org.mycore.frontend.editor.MCREditorServlet;
 import org.xml.sax.SAXException;
 
 /**
@@ -66,22 +56,12 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     protected final static Logger LOGGER = LogManager.getLogger(MCRStaticXMLFileServlet.class);
 
-    /** XML document types that may contain editor forms */
-    protected Set<String> docTypesIncludingEditors = new HashSet<String>();
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        List<String> docTypes = MCRConfiguration.instance().getStrings("MCR.EditorFramework.DocTypes", Arrays.asList("MyCoReWebPage"));
-        docTypesIncludingEditors.addAll(docTypes);
-    }
-
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
-        URISyntaxException, TransformerException {
+            URISyntaxException, TransformerException {
         String ruleID = MCRLayoutUtilities.getWebpageACLID(job.getRequest().getServletPath());
         if (MCRAccessManager.hasRule(ruleID, READ_WEBPAGE_PERMISSION)
-            && !MCRAccessManager.checkPermission(ruleID, READ_WEBPAGE_PERMISSION)) {
+                && !MCRAccessManager.checkPermission(ruleID, READ_WEBPAGE_PERMISSION)) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -90,13 +70,13 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
             HttpServletRequest request = job.getRequest();
             HttpServletResponse response = job.getResponse();
             setXSLParameters(resource, request);
-            MCRContent content = expandEditorElements(request, response, resource);
+            MCRContent content = getResourceContent(request, response, resource);
             getLayoutService().doLayout(request, response, content);
         }
     }
 
-    private void setXSLParameters(URL resource, HttpServletRequest request) throws MalformedURLException,
-        URISyntaxException {
+    private void setXSLParameters(URL resource, HttpServletRequest request)
+            throws MalformedURLException, URISyntaxException {
         String path = resource.getProtocol().equals("file") ? resource.getPath() : resource.toExternalForm();
         int lastPathElement = path.lastIndexOf('/') + 1;
         String fileName = path.substring(lastPathElement);
@@ -124,22 +104,8 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         return null;
     }
 
-    /** For defined document types like static webpages, replace editor elements with complete editor definition */
-    protected MCRContent expandEditorElements(HttpServletRequest request, HttpServletResponse response, URL resource)
-        throws IOException,
-        JDOMException, SAXException, MalformedURLException {
-        MCRContent content = new MCRURLContent(resource);
-        if (mayContainEditorForm(content)) {
-            Document xml = content.asXML();
-            MCREditorServlet.replaceEditorElements(request, resource.toString(), xml);
-            MCRJDOMContent jdomContent = new MCRJDOMContent(xml);
-            jdomContent.setFormat(Format.getRawFormat());
-            return jdomContent;
-        }
-        return content;
-    }
-
-    protected boolean mayContainEditorForm(MCRContent content) throws IOException {
-        return docTypesIncludingEditors.contains(content.getDocType());
+    protected MCRContent getResourceContent(HttpServletRequest request, HttpServletResponse response, URL resource)
+            throws IOException, JDOMException, SAXException, MalformedURLException {
+        return new MCRURLContent(resource);
     }
 }

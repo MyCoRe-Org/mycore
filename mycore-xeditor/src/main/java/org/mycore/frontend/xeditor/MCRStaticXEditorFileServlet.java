@@ -26,13 +26,19 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.servlets.MCRStaticXMLFileServlet;
@@ -47,20 +53,37 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
     protected final static Logger LOGGER = LogManager.getLogger(MCRStaticXEditorFileServlet.class);
 
+    /** XML document types that may contain editor forms */
+    protected Set<String> docTypesIncludingEditors = new HashSet<String>();
+
     @Override
-    protected MCRContent expandEditorElements(HttpServletRequest request, HttpServletResponse response, URL resource)
-        throws IOException, JDOMException, SAXException, MalformedURLException {
-        MCRContent content = super.expandEditorElements(request, response, resource);
+    public void init() throws ServletException {
+        super.init();
+        List<String> defaults = Arrays.asList("MyCoReWebPage");
+        List<String> docTypes = MCRConfiguration.instance().getStrings("MCR.XEditor.DocTypes", defaults);
+        docTypesIncludingEditors.addAll(docTypes);
+    }
+
+    protected boolean mayContainEditorForm(MCRContent content) throws IOException {
+        return docTypesIncludingEditors.contains(content.getDocType());
+    }
+
+    /** For defined document types like static webpages, replace editor elements with complete editor definition */
+    @Override
+    protected MCRContent getResourceContent(HttpServletRequest request, HttpServletResponse response, URL resource)
+            throws IOException, JDOMException, SAXException, MalformedURLException {
+        MCRContent content = super.getResourceContent(request, response, resource);
         if (mayContainEditorForm(content)) {
             content = doExpandEditorElements(content, request, response,
-                request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM), request.getRequestURL().toString());
+                    request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM),
+                    request.getRequestURL().toString());
         }
         return content;
     }
 
     public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request,
-        HttpServletResponse response, String sessionID, String pageURL) throws IOException, JDOMException,
-        SAXException, MalformedURLException {
+            HttpServletResponse response, String sessionID, String pageURL)
+            throws IOException, JDOMException, SAXException, MalformedURLException {
         MCRParameterCollector pc = new MCRParameterCollector(request, false);
         MCREditorSession session = null;
 

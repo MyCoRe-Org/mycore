@@ -74,7 +74,6 @@ import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.xml.sax.SAXParseException;
@@ -107,9 +106,7 @@ public class MCRMailer extends MCRServlet {
         String goTo = job.getRequest().getParameter("goto");
         String xsl = job.getRequest().getParameter("xsl");
 
-        MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        Document input = sub != null ? sub.getXML()
-                : (Document) (job.getRequest().getAttribute("MCRXEditorSubmission"));
+        Document input = (Document) (job.getRequest().getAttribute("MCRXEditorSubmission"));
         MCRMailer.sendMail(input, xsl);
 
         job.getResponse().sendRedirect(goTo);
