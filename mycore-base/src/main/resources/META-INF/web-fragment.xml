@@ -111,11 +111,6 @@
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRStaticXMLFileServlet</servlet-class>
   </servlet>
-  <servlet id="XMLEditor">
-    <servlet-name>XMLEditor</servlet-name>
-    <servlet-class>org.mycore.frontend.editor.MCREditorServlet</servlet-class>
-    <load-on-startup>100</load-on-startup>
-  </servlet>
   <servlet id="Zip">
     <servlet-name>MCRZipServlet</servlet-name>
     <servlet-class>org.mycore.services.zipper.MCRZipServlet</servlet-class>
@@ -220,10 +215,6 @@
   <servlet-mapping>
     <servlet-name>MCRFileNodeServlet</servlet-name>
     <url-pattern>/servlets/MCRFileNodeServlet/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>XMLEditor</servlet-name>
-    <url-pattern>/servlets/XMLEditor</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRZipServlet</servlet-name>

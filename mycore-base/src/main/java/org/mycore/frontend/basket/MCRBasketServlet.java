@@ -34,7 +34,6 @@ import org.jdom2.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -125,8 +124,8 @@ public class MCRBasketServlet extends MCRServlet {
             type = basket.getType();
             MCRBasketManager.setBasketInSession(basket);
         } else if ("comment".equals(action)) {
-            MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
-            String comment = sub.getXML().getRootElement().getChildTextTrim("comment");
+            Document sub = (Document) (job.getRequest().getAttribute("MCRXEditorSubmission"));
+            String comment = sub.getRootElement().getChildTextTrim("comment");
             for (String id : ids) {
                 basket.get(id).setComment(comment);
             }
