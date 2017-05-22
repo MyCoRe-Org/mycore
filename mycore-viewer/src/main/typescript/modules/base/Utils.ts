@@ -14,6 +14,16 @@ function addViewerComponent(component:any) {
     VIEWER_COMPONENTS.push(component);
 }
 
+function viewerClearTextSelection(){
+    if (window.getSelection) {
+        if (window.getSelection().empty) {  // Chrome
+            window.getSelection().empty();
+        } else if (window.getSelection().removeAllRanges) {  // Firefox
+            window.getSelection().removeAllRanges();
+        }
+    }
+}
+
 function addIviewComponent(component:any) {
     console.warn("addIviewComponent shouldnt be used anymore!");
     VIEWER_COMPONENTS.push(component);

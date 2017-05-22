@@ -8,9 +8,11 @@ namespace mycore.viewer.widgets.alto {
         constructor() {
         }
 
-        public generateHtml(alto:widgets.alto.AltoFile):HTMLElement {
+
+        public generateHtml(alto:widgets.alto.AltoFile, pageID:string):HTMLElement {
             let fontFamily = "sans-serif";
             let element = document.createElement("div");
+
             element.style.position = "absolute";
             element.style.whiteSpace = "nowrap";
             element.style.fontFamily = "sans-serif";
@@ -28,31 +30,32 @@ namespace mycore.viewer.widgets.alto {
                 let blockFontSize:number = this.getFontSize(ctx, block, fontFamily);
                 blockFontSize *= 0.9;
 
+
                 let blockDiv:string = "<div";
                 blockDiv += " class='altoBlock'";
-                blockDiv += " style='top: " + block.getVPos() + "px;";
-                blockDiv += " left: " + block.getHPos() + "px;";
-                blockDiv += " width: " + block.getWidth() + "px;";
-                blockDiv += " height: " + block.getHeight() + "px;";
-                blockDiv += " font-size: " + blockFontSize + "px;";
+                blockDiv += " style='";
+                blockDiv += ` transform: translate(${Math.round(block.getHPos())}px,${Math.round(block.getVPos())}px );`;
+                blockDiv += ` width: ${block.getWidth()}px;`;
+                blockDiv += ` height: ${block.getHeight()}px;`;
+                blockDiv += ` font-size: ${blockFontSize}px;`;
                 if(drawOutline) {
-                    blockDiv += " outline: " + outline + "px solid white;";
+                    blockDiv += ` outline: ${outline}px solid white;`;
                 }
                 blockDiv += "'>";
 
                 block.getChildren().map((line) => {
-                    endecoderElem.innerHTML = this.getLineAsString(line);
+
 
                     // build line
                     let lineDiv:string = "<p";
                     lineDiv += " class='altoLine'";
-                    lineDiv += " style='height: " + line.getHeight() + "px;";
-                    lineDiv += " width: " + line.getWidth() + "px;";
-                    lineDiv += " left: " + line.getHPos() + "px;";
-                    lineDiv += " top: " + line.getVPos() + "px;";
+                    lineDiv += ` style='height: ${line.getHeight()}px;`;
+                    lineDiv += ` width: ${line.getWidth()}px;`;
+                    lineDiv += ` transform: translate(${Math.round(line.getHPos()-block.getHPos())}px, ${Math.round(line.getVPos()-block.getVPos())}px);`;
 
                     // build style
                     let lineStyle:AltoStyle = line.getStyle();
+
                     if(lineStyle != null) {
                         let lineFontStyle = lineStyle.getFontStyle();
                         if(lineFontStyle != null) {
@@ -63,7 +66,8 @@ namespace mycore.viewer.widgets.alto {
                             }
                         }
                     }
-                    lineDiv += "'>" + endecoderElem.innerHTML + "</p>";
+
+                    lineDiv += "'>" + this.getLineAsElement(line) + "</p>";
                     blockDiv += lineDiv;
                 });
                 blockDiv += "</div>";
@@ -74,18 +78,17 @@ namespace mycore.viewer.widgets.alto {
             return element;
         }
 
-        private getWordsArray(line:AltoElement):Array<string> {
-            let tmpElement = document.createElement("span");
+        private getWordsArray(line:AltoElement):Array<AltoElement> {
             return line.getChildren()
-                       .filter(elementInLine => elementInLine.getType() === AltoElementType.String)
-                       .map((word, wordCount, allWords) => {
-                tmpElement.innerText = word.getContent();
-                return tmpElement.innerHTML;
-            });
+                       .filter(elementInLine => elementInLine.getType() === AltoElementType.String);
         }
 
         private getLineAsString(line:AltoElement):string {
-            return this.getWordsArray(line).join(" ");
+            let span = document.createElement("span");
+            return this.getWordsArray(line).map((line:AltoElement)=>{
+                span.innerText = line.getContent();
+                return span.innerHTML;
+            }).join(" ");
         }
 
         private getFontSize(ctx:CanvasRenderingContext2D, block:AltoElement, fontFamily:string) {
@@ -114,5 +117,12 @@ namespace mycore.viewer.widgets.alto {
             return maxSize;
         }
 
+        private getLineAsElement(line: mycore.viewer.widgets.alto.AltoElement) {
+            let span = document.createElement("word");
+            return this.getWordsArray(line).map(word=>{
+                span.innerText = word.getContent();
+                return `<span data-vpos="${word.getVPos()}" data-hpos="${word.getHPos()}" data-word="${word.getContent()}">${span.innerHTML}</span>`
+            }).join(" ")
+        }
     }
 }

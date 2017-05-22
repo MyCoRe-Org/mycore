@@ -10,6 +10,8 @@ namespace mycore.viewer.model {
         public viewSelectChilds:Array<widgets.toolbar.ToolbarDropdownButtonChild>;
         public viewSelect:widgets.toolbar.ToolbarDropdownButton;
 
+        public selectionSwitchButton:widgets.toolbar.ToolbarButton;
+
         public addComponents():void {
             this._viewSelectGroup=new widgets.toolbar.ToolbarGroup("viewSelectGroup");
 
@@ -46,6 +48,11 @@ namespace mycore.viewer.model {
             this._viewSelectGroup.addComponent(this.viewSelect);
         }
 
+        public addSelectionSwitchButton():void{
+            this.selectionSwitchButton = new widgets.toolbar.ToolbarButton("selectionSwitchButton", "", "");
+            this.selectionSwitchButton.icon = "text-width";
+            //this._actionControllGroup.addComponent(this.selectionSwitchButton);
+        }
 
     }
 }

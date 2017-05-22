@@ -198,16 +198,19 @@ namespace mycore.viewer.components {
             if (mode == 'imageView') {
                 this._imageView.container.css({"left" : "0px", "right" : "0px"});
                 remove(this._altoView);
-                add(this._imageView)
+                add(this._imageView);
+                this.setSelectableButtonEnabled(false);
             } else if (mode == 'mixedView') {
                 this._imageView.container.css({"left" : "0px", "right" : "50%"});
                 this._altoView.container.css({"left" : "50%", "right" : "0px"});
                 add(this._altoView);
-                add(this._imageView)
+                add(this._imageView);
+                this.setSelectableButtonEnabled(true);
             } else if (mode == 'textView') {
                 this._altoView.container.css({"left" : "0px", "right" : "0px"});
                 remove(this._imageView);
                 add(this._altoView);
+                this.setSelectableButtonEnabled(true);
             } else {
                 console.warn("unknown view mode: " + mode);
             }
@@ -244,11 +247,12 @@ namespace mycore.viewer.components {
         private _imageView:widgets.canvas.PageView = new widgets.canvas.PageView(true, false);
         private _altoView:widgets.canvas.PageView = new widgets.canvas.PageView(true, true);
         private _componentContent:JQuery = jQuery("<div></div>");
-        private _enableViewSelectButton;
+        private _enableAltoSpecificButtons;
+        private _selectionSwitchButton: mycore.viewer.widgets.toolbar.ToolbarButton;
         private _viewSelectButton:widgets.toolbar.ToolbarDropdownButton;
         private _viewMode:string = "imageView";
 
-
+        private _toolbarModel: mycore.viewer.model.MyCoReBasicToolbarModel;
         private _layouts = new Array<widgets.canvas.PageLayout>();
         private _rotation:number = 0;
 
@@ -431,11 +435,19 @@ namespace mycore.viewer.components {
                 var ptme = <events.ProvideToolbarModelEvent>e;
                 this._rotateButton = ptme.model._rotateButton;
                 this._layoutToolbarButton = ptme.model._layoutDropdownButton;
+                this._toolbarModel = ptme.model;
                 if (!this._settings.mobile) {
-                    if ("addViewSelectButton" in ptme.model) {
-                        this._enableViewSelectButton = ()=> {
-                            (<any>ptme.model).addViewSelectButton();
-                            this._viewSelectButton = (<any>ptme.model).viewSelect;
+                    if ("addViewSelectButton" in ptme.model || "addSelectionSwitchButton" in ptme.model) {
+                        this._enableAltoSpecificButtons = () => {
+                            if ("addViewSelectButton" in ptme.model) {
+                                (<any>ptme.model).addViewSelectButton();
+                                this._viewSelectButton = (<any>ptme.model).viewSelect;
+                            }
+                            if ("addSelectionSwitchButton" in ptme.model) {
+                                (<any>ptme.model).addSelectionSwitchButton();
+                                this._selectionSwitchButton = (<any>ptme.model).selectionSwitchButton;
+                            }
+
                             this.updateToolbarLabel();
                         };
                     }
@@ -488,6 +500,14 @@ namespace mycore.viewer.components {
                     }
                 }
 
+                if (buttonPressedEvent.button.id == "selectionSwitchButton") {
+                    if (!buttonPressedEvent.button.active) {
+                        this.setAltoSelectable(true);
+                    } else {
+                        this.setAltoSelectable(false);
+                    }
+                }
+
             }
 
             if (e.type == events.ProvidePageLayoutEvent.TYPE) {
@@ -514,7 +534,7 @@ namespace mycore.viewer.components {
 
 
             if (e.type == mycore.viewer.components.events.ImageSelectedEvent.TYPE) {
-                var imageSelectedEvent = <mycore.viewer.components.events.ImageSelectedEvent>e;
+                let imageSelectedEvent = <mycore.viewer.components.events.ImageSelectedEvent>e;
                 this.changeImage(imageSelectedEvent.image.href, true);
             }
 
@@ -573,6 +593,31 @@ namespace mycore.viewer.components {
                 this._pageController.update();
             }
 
+        }
+
+        private setAltoSelectable(selectable: boolean) {
+            this._selectionSwitchButton.active = selectable;
+            jQuery("[data-id='selectionSwitchButton']").blur();
+
+            if (selectable) {
+                this._altoView.container.addClass("altoSelectable");
+            } else {
+                this._altoView.container.removeClass("altoSelectable");
+            }
+
+            viewerClearTextSelection();
+        }
+
+        private setSelectableButtonEnabled(enabled: boolean) {
+            if (enabled) {
+                if (this._toolbarModel._actionControllGroup.getComponents().indexOf(this._selectionSwitchButton) == -1) {
+                    this._toolbarModel._actionControllGroup.addComponent(this._selectionSwitchButton);
+                }
+            } else {
+                if (this._toolbarModel._actionControllGroup.getComponents().indexOf(this._selectionSwitchButton) != -1) {
+                    this._toolbarModel._actionControllGroup.removeComponent(this._selectionSwitchButton);
+                }
+            }
         }
 
         private addLayout(layout:widgets.canvas.PageLayout) {
@@ -667,7 +712,7 @@ namespace mycore.viewer.components {
 
             if (altoPresent && !this._settings.mobile) {
                 // enable button
-                this._enableViewSelectButton();
+                this._enableAltoSpecificButtons();
             }
         }
 

@@ -24,13 +24,24 @@ namespace mycore.viewer.components {
         private _imageInformationMap:MyCoReMap<string, widgets.image.XMLImageInformation> = new MyCoReMap<string, widgets.image.XMLImageInformation>();
         private _imagePageMap:MyCoReMap<string, widgets.canvas.TileImagePage> = new MyCoReMap<string, widgets.canvas.TileImagePage>();
         private _altoHTMLGenerator = new AltoHTMLGenerator();
+        private _imageHTMLMap:MyCoReMap<string,HTMLElement> = new MyCoReMap<string, HTMLElement>();
 
         private getPage(image:string, resolve:(page:widgets.canvas.TileImagePage) => void) {
             if (this._imagePageMap.has(image)) {
-                resolve(this.createPageFromMetadata(image, this._imageInformationMap.get(image)));
+                resolve(this._imagePageMap.get(image));
             } else {
                 this.getPageMetadata(image, (metadata) => {
-                    resolve(this.createPageFromMetadata(image, metadata));
+                    let imagePage = this.createPageFromMetadata(image, metadata);
+                    if(!this._imageHTMLMap.has(image)){
+                        this.trigger(new RequestAltoModelEvent(this, image, (page, altoHref,altoModel)=>{
+                            if(!this._imageHTMLMap.has(image)){
+                                let htmlElement = this._altoHTMLGenerator.generateHtml(altoModel, image);
+                                imagePage.setHTMLContent(htmlElement);
+                                this._imageHTMLMap.set(image, htmlElement);
+                            }
+                        } ));
+                    }
+                    resolve(imagePage);
                 });
             }
         }
@@ -74,34 +85,11 @@ namespace mycore.viewer.components {
 
         public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
             if (e.type == events.RequestPageEvent.TYPE) {
-                var rpe = <events.RequestPageEvent> e;
-
-                var pageAltoSynchronize = Utils.synchronize<{
-                    page:widgets.canvas.TileImagePage; 
-                    altoModel:widgets.alto.AltoFile;
-                }>(
-                    [
-                        (synchronizeObj)=>synchronizeObj.page != null,
-                        (synchronizeObj)=>synchronizeObj.altoModel != null,
-                    ],
-                    (synchronizeObj)=> {
-                        var htmlElement = this._altoHTMLGenerator.generateHtml(synchronizeObj.altoModel);
-                        synchronizeObj.page.setAltoContent(htmlElement);
-                    }
-                );
-
-                var synchronizeObj = {page : null, altoModel : null};
-
+                let rpe = <events.RequestPageEvent> e;
                 this.getPage(rpe._pageId, (page:widgets.canvas.TileImagePage) => {
-                    synchronizeObj.page = page;
-                    pageAltoSynchronize(synchronizeObj);
                     rpe._onResolve(rpe._pageId, page);
                 });
 
-                this.trigger(new RequestAltoModelEvent(this, rpe._pageId, (page, altoHref,altoModel)=>{
-                    synchronizeObj.altoModel = altoModel;
-                    pageAltoSynchronize(synchronizeObj);
-                } ));
 
             }
 

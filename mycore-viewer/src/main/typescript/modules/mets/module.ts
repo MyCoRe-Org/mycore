@@ -4,5 +4,6 @@
 /// <reference path="components/MyCoReTEILayerProvider.ts" />
 /// <reference path="components/MyCoRePrintComponent.ts" />
 /// <reference path="components/MyCoReHighlightAltoComponent.ts" />
+/// <reference path="components/MyCoReAltoEditorComponent.ts" />
 
 console.log("METS MODULE"); 
