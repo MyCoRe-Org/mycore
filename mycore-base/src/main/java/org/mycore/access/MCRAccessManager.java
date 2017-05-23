@@ -23,7 +23,12 @@
 package org.mycore.access;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,9 +36,12 @@ import org.jdom2.Element;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.access.strategies.MCRDerivateIDStrategy;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 /**
  * @author Thomas Scheffler
@@ -50,7 +58,14 @@ public class MCRAccessManager {
     public static final String PERMISSION_WRITE = "writedb";
 
     public static final String PERMISSION_DELETE = "deletedb";
-
+    
+    private static final ExecutorService EXECUTOR_SERVICE;
+    
+    static {
+        EXECUTOR_SERVICE = Executors.newWorkStealingPool();
+        MCRShutdownHandler.getInstance().addCloseable(EXECUTOR_SERVICE::shutdownNow);
+    }
+    
     public static MCRAccessInterface getAccessImpl() {
         return MCRConfiguration.instance().<MCRAccessInterface> getSingleInstanceOf("MCR.Access.Class",
                 MCRAccessBaseImpl.class.getName());
@@ -339,6 +354,27 @@ public class MCRAccessManager {
      */
     public static boolean hasRule(String id, String permission) {
         return getAccessImpl().hasRule(id, permission);
+    }
+    
+    public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier){
+        return checkPermission(user, checkSuplier, EXECUTOR_SERVICE);
+    }
+    
+    public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier, ExecutorService es){
+        return CompletableFuture.supplyAsync(getWrappedFixedUserCallable(user, checkSuplier), es);
+    }
+    
+    private static Supplier<Boolean> getWrappedFixedUserCallable(MCRUserInformation user,
+        Supplier<Boolean> checkSuplier) {
+        MCRFixedUserCallable<Boolean> mcrFixedUserCallable = new MCRFixedUserCallable<>(checkSuplier::get, user);
+        return () -> {
+            try {
+                return mcrFixedUserCallable.call();
+            } catch (Exception e) {
+                LOGGER.error("Exception while running ACL check for user: " + user.getUserID(), e);
+                return false;
+            }
+        };
     }
 
 }

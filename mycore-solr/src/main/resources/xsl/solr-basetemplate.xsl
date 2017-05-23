@@ -23,6 +23,12 @@
         <xsl:value-of select="@xlink:href" />
       </field>
     </xsl:for-each>
+    <field name="worldReadable">
+      <xsl:value-of select="mcrxsl:isWorldReadable(@ID)" />
+    </field>
+    <field name="worldReadableComplete">
+      <xsl:value-of select="mcrxsl:isWorldReadableComplete(@ID)" />
+    </field>
     <xsl:for-each select="./descendant::*[@classid and @categid]">
       <xsl:variable name="classid" select="@classid" />
       <xsl:variable name="uri" select="concat('classification:metadata:0:parents:',@classid,':',@categid)" />

@@ -45,11 +45,16 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.xml.parsers.DocumentBuilder;
@@ -63,6 +68,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRCalendar;
@@ -454,6 +460,63 @@ public class MCRXMLFunctions {
         Boolean returnValue = Boolean.valueOf(display);
         DISPLAY_DERIVATE_CACHE.put(derivateId, returnValue);
         return returnValue;
+    }
+    
+    /**
+     * Checks if the given object has derivates that are all accessible to guest user.
+     * 
+     * Normally this implies that all derivates are readable by everyone. Only non-hidden
+     * derivates are taken into account. So if an object only contains hidden
+     * @param objId MCRObjectID as String
+     * @see #isWorldReadable(String)
+     */
+    public static boolean isWorldReadableComplete(String objId) {
+        LOGGER.info("World completely readable: " + objId);
+        if (objId == null || !MCRObjectID.isValid(objId)) {
+            return false;
+        }
+        MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
+        CompletableFuture<Boolean> permission = MCRAccessManager.checkPermission(
+            MCRSystemUserInformation.getGuestInstance(),
+            () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ)
+                ? checkReadPermissionOfDerivates(mcrObjectID) : false);
+        try {
+            return permission.join();
+        } catch (CancellationException | CompletionException e) {
+            LOGGER.error("Error while retriving ACL information for Object " + objId, e);
+            return false;
+        }
+    }
+
+    private static boolean checkReadPermissionOfDerivates(MCRObjectID mcrObjectID) {
+        Set<String> displayableDerivates = MCRMetadataManager
+            .getDerivateIds(mcrObjectID, 0, TimeUnit.SECONDS) //need actual data
+            .stream()
+            .map(MCRObjectID::toString)
+            .filter(MCRXMLFunctions::isDisplayedEnabledDerivate)
+            .collect(Collectors.toSet());
+        return !displayableDerivates.isEmpty() && displayableDerivates.stream()
+            .allMatch(derId -> MCRAccessManager.checkPermission(derId, MCRAccessManager.PERMISSION_READ));
+    }
+    
+    /**
+     * Checks if the given object is readable to guest user.
+     * @param objId MCRObjectID as String
+     */
+    public static boolean isWorldReadable(String objId) {
+        if (objId == null || !MCRObjectID.isValid(objId)) {
+            return false;
+        }
+        MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
+        CompletableFuture<Boolean> permission = MCRAccessManager.checkPermission(
+            MCRSystemUserInformation.getGuestInstance(),
+            () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ));
+        try {
+            return permission.join();
+        } catch (CancellationException | CompletionException e) {
+            LOGGER.error("Error while retriving ACL information for Object " + objId, e);
+            return false;
+        }
     }
 
     /**
