@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -41,7 +42,7 @@ import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 import org.mycore.solr.search.MCRSolrSearchUtils;
-import org.mycore.util.concurrent.MCRSystemCallable;
+import org.mycore.util.concurrent.MCRFixedUserCallable;
 import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 import org.mycore.util.concurrent.processing.MCRProcessableSupplier;
@@ -368,8 +369,8 @@ public class MCRSolrIndexer {
      *            index handler to submit
      */
     public static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
-        MCRSystemCallable<List<MCRSolrIndexHandler>> indexTask = new MCRSystemCallable<>(
-            new MCRSolrIndexTask(indexHandler));
+        MCRFixedUserCallable<List<MCRSolrIndexHandler>> indexTask = new MCRFixedUserCallable<>(
+            new MCRSolrIndexTask(indexHandler), MCRSystemUserInformation.getSystemUserInstance());
         MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = SOLR_EXECUTOR.submit(indexTask);
         supplier.getFuture().whenCompleteAsync(afterIndex(), SOLR_EXECUTOR.getExecutor());
     }
