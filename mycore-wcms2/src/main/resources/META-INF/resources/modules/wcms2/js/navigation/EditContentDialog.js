@@ -85,8 +85,7 @@ wcms.navigation.EditContentDialog = function() {
         	splitter: true,
         	gutters: false
         });
-        var canNotEditLabel = "<p>" + I18nManager.getInstance().getI18nTextAsString("component.wcms.navigation.itemEditor.canNotEdit") + "</p>";
-        this.canNotEdit = new dijit.layout.ContentPane({region:"center",style: "border:none;padding:0px; display:none", content: canNotEditLabel});
+        this.canNotEdit = new dijit.layout.ContentPane({region:"center",style: "border:none;padding:0px; display:none", content: ""});
         
         leftBC.addChild(this.sectionSelect);
         leftBC.addChild(this.sectionToolbar);
@@ -182,6 +181,9 @@ wcms.navigation.EditContentDialog = function() {
 		dojo.removeClass(this.canNotEdit.id, "visible");
 		if(this.selectedSection == null || this.selectedSection.hidden == "true") {
 			dojo.addClass(this.editorDiv.id, "hidden");
+      var invalidText = I18nManager.getInstance().getI18nTextAsString("component.wcms.navigation.itemEditor.canNotEdit");
+      var canNotEditLabel = "<p>" + invalidText + " '" + this.selectedSection.invalidElement + "'</p>";
+      this.canNotEdit.set("content", canNotEditLabel);
 			dojo.addClass(this.canNotEdit.id, "visible");
 		}
 	}

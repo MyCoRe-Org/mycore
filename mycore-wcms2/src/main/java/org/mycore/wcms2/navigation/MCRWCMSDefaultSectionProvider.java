@@ -34,14 +34,14 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
 
     private static final List<String> HTML_TAG_LIST = Arrays.asList("html", "head", "title", "base", "link", "meta",
         "style", "script", "noscript", "body", "body", "section", "nav", "article", "aside", "h1", "h2", "h3", "h4",
-        "h5", "h6", "header", "footer", "address", "main", "p", "hr", "pre", "blockquote", "ol", "ul", "li", "dl",
-        "dt", "dd", "figure", "figcaption", "div", "a", "em", "strong", "small", "s", "cite", "q", "dfn", "abbr",
-        "data", "time", "code", "var", "samp", "kbd", "sub", "sup", "i", "b", "u", "mark", "ruby", "rt", "rp", "bdi",
-        "bdo", "span", "br", "wbr", "ins", "del", "img", "iframe", "embed", "object", "param", "video", "audio",
-        "source", "track", "canvas", "map", "area", "svg", "math", "table", "caption", "colgroup", "col", "tbody",
-        "thead", "tfoot", "tr", "td", "th", "form", "fieldset", "legend", "label", "input", "button", "select",
-        "datalist", "optgroup", "option", "textarea", "keygen", "output", "progress", "meter", "details", "summary",
-        "menuitem", "menu");
+        "h5", "h6", "header", "footer", "address", "main", "p", "hr", "pre", "blockquote", "ol", "ul", "li", "dl", "dt",
+        "dd", "figure", "figcaption", "div", "a", "em", "strong", "small", "s", "cite", "q", "dfn", "abbr", "data",
+        "time", "code", "var", "samp", "kbd", "sub", "sup", "i", "b", "u", "mark", "ruby", "rt", "rp", "bdi", "bdo",
+        "span", "br", "wbr", "ins", "del", "img", "iframe", "embed", "object", "param", "video", "audio", "source",
+        "track", "canvas", "map", "area", "svg", "math", "table", "caption", "colgroup", "col", "tbody", "thead",
+        "tfoot", "tr", "td", "th", "form", "fieldset", "legend", "label", "input", "button", "select", "datalist",
+        "optgroup", "option", "textarea", "keygen", "output", "progress", "meter", "details", "summary", "menuitem",
+        "menu", "font");
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
@@ -83,8 +83,10 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
             if (lang != null && !lang.equals("")) {
                 jsonObject.addProperty(JSON_LANG, lang);
             }
-            if (!isHTMLElment(section)) {
+            String invalidElementName = validateElement(section);
+            if (invalidElementName != null) {
                 jsonObject.addProperty("hidden", "true");
+                jsonObject.addProperty("invalidElement", invalidElementName);
             }
             jsonObject.addProperty(JSON_DATA, data);
             // add to array
@@ -94,27 +96,31 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
     }
 
     /**
-     * Returns true if an element and all childs are HTML or Mycore Tags
+     * Returns null if an element and all children using HTML or Mycore Tags.
+     * 
+     * @param element the element to validate
+     * @return the invalid element name or null if everything is fine
      */
-    private boolean isHTMLElment(Element element) {
-        if (HTML_TAG_LIST.contains(element.getName().toLowerCase(Locale.ROOT))
-            || MYCORE_TAG_LIST.contains(element.getName().toLowerCase(Locale.ROOT))) {
-            boolean valid = true;
-            for (Element el : element.getChildren()) {
-                valid = valid & isHTMLElment(el);
-                if (valid == false) {
-                    break;
-                }
-            }
-            return valid;
-        } else {
-            return false;
+    private String validateElement(Element element) {
+        String elementName = element.getName().toLowerCase(Locale.ROOT);
+        if (!(HTML_TAG_LIST.contains(elementName) || MYCORE_TAG_LIST.contains(elementName))) {
+            return elementName;
         }
+        for (Element el : element.getChildren()) {
+            String childElementName = validateElement(el);
+            if (childElementName != null) {
+                return childElementName;
+            }
+        }
+        return null;
     }
 
     /**
      * Returns the content of an element as string. The element itself
      * is ignored.
+     * 
+     * @param e the element to get the content from
+     * @return the content as string
      */
     protected String getContent(Element e) throws IOException {
         XMLOutputter out = new XMLOutputter();
