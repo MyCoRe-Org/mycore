@@ -5,7 +5,6 @@ import java.io.OutputStream;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -58,8 +57,7 @@ public class MCRWCMSNavigationManager {
     /**
      * Returns the navigation as json.
      */
-    public synchronized static JsonObject getNavigationAsJSON() throws IOException, ParserConfigurationException,
-        SAXException, JAXBException {
+    public synchronized static JsonObject getNavigationAsJSON() throws IOException, SAXException, JAXBException {
         return NAVIGATION_PROVIDER.toJSON(getNavigation());
     }
 
@@ -73,8 +71,7 @@ public class MCRWCMSNavigationManager {
     /**
      * Returns the navigation as pojo.
      */
-    public static MCRNavigation getNavigation() throws IOException, ParserConfigurationException, SAXException,
-        JAXBException {
+    public static MCRNavigation getNavigation() throws IOException, SAXException, JAXBException {
         DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
         try {
             org.w3c.dom.Document doc = documentBuilder.parse(MCRLayoutUtilities.getNavigationURL().toString());
