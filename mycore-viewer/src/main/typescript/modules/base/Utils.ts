@@ -329,8 +329,8 @@ class Rect {
         var bottom2:number = y + height;
         var newX:number = x < this.pos.x ? x : this.pos.x;
         var newY:number = y < this.pos.y ? y : this.pos.y;
-        var newWidth:number = Math.max(right1, right2) - this.pos.x;
-        var newHeight:number = Math.max(bottom1, bottom2) - this.pos.y;
+        var newWidth:number = Math.max(right1, right2) - newX;
+        var newHeight:number = Math.max(bottom1, bottom2) - newY;
         return Rect.fromXYWH(newX, newY, newWidth, newHeight);
     }
 
