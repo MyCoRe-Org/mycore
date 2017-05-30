@@ -188,7 +188,7 @@
     </xsl:for-each>
     <xsl:for-each select="mods:accessCondition[@type='use and reproduction']">
       <field name="mods.rights">
-        <xsl:variable name="trimmed" select="normalize-space(.)" />
+        <xsl:variable name="trimmed" select="substring-after(@xlink:href, '#')" />
         <xsl:choose>
           <xsl:when test="contains($trimmed, 'cc_by')">
             <xsl:apply-templates select="." mode="cc-text" />
