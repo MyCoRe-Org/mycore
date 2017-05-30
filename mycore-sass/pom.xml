@@ -27,6 +27,8 @@
     <version>2017.01-SNAPSHOT</version>
   </parent>
   <artifactId>mycore-sass</artifactId>
+  <name>MyCoRe SASS</name>
+  <description>SASS on-the-fly compiler resource</description>
   <dependencies>
     <dependency>
       <groupId>com.yahoo.platform.yui</groupId>
