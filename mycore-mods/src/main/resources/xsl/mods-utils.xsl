@@ -6,6 +6,7 @@
 
   <xsl:param name="CurrentUser" />
   <xsl:param name="CurrentLang" />
+  <xsl:param name="DefaultLang" />
   <xsl:param name="ServletsBaseURL" />
 
   <xsl:template mode="mods.type" match="mods:mods">
@@ -299,7 +300,21 @@
   <xsl:template match="mods:accessCondition" mode="cc-text">
     <xsl:variable name="trimmed" select="substring-after(normalize-space(@xlink:href),'#')" />
     <xsl:variable name="licenseURI" select="concat('classification:metadata:0:children:mir_licenses:',$trimmed)" />
-    <xsl:value-of select="document($licenseURI)//category/label[@xml:lang=$CurrentLang]/@text" />
+    <xsl:variable name="licenseXML" select="document($licenseURI)" />
+    <xsl:choose>
+      <xsl:when test="$licenseXML//category/label[@xml:lang=$CurrentLang]/@text">
+        <xsl:value-of select="$licenseXML//category/label[@xml:lang=$CurrentLang]/@text" />
+      </xsl:when>
+      <xsl:when test="$licenseXML//category/label[@xml:lang=$DefaultLang]/@text">
+        <xsl:value-of select="$licenseXML//category/label[@xml:lang=$DefaultLang]/@text" />
+      </xsl:when>
+      <xsl:when test="$licenseXML//category/label/@text">
+        <xsl:value-of select="$licenseXML//category/label/@text" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$trimmed" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="mods:accessCondition" mode="rights_reserved">
