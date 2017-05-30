@@ -51,7 +51,7 @@
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <node.version>v6.9.1</node.version>
-    <pmd.version>5.5.5</pmd.version>
+    <pmd.version>5.7.0</pmd.version>
     <selenium.version>3.4.0</selenium.version>
     <site.suffix />
     <sortpom.sortDeps>scope,groupId,artifactId</sortpom.sortDeps>
@@ -495,7 +495,6 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.7.7.201606060606</version>
         <executions>
           <execution>
             <goals>
