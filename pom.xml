@@ -4,10 +4,10 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>31-SNAPSHOT</version>
+    <version>31</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2017.01-SNAPSHOT</version>
+  <version>2017.05</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -30,7 +30,7 @@
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>HEAD</tag>
+    <tag>v2017.05</tag>
   </scm>
   <properties>
     <changelog.since>2016-12-21</changelog.since>
@@ -1373,7 +1373,7 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.11</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.iview2</groupId>
@@ -1639,7 +1639,7 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>selenium-utils</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
