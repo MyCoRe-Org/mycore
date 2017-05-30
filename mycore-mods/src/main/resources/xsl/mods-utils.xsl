@@ -308,13 +308,14 @@
       <xsl:when test="$licenseXML//category/label[@xml:lang=$DefaultLang]/@text">
         <xsl:value-of select="$licenseXML//category/label[@xml:lang=$DefaultLang]/@text" />
       </xsl:when>
-      <xsl:when test="$licenseXML//category/label/@text">
-        <xsl:value-of select="$licenseXML//category/label/@text" />
+      <xsl:when test="$licenseXML//category/label[1]/@text">
+        <xsl:value-of select="$licenseXML//category/label[1]/@text" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$trimmed" />
       </xsl:otherwise>
     </xsl:choose>
+
   </xsl:template>
 
   <xsl:template match="mods:accessCondition" mode="rights_reserved">
