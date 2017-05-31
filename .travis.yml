@@ -42,7 +42,7 @@ before_script:
   - |
    echo "BUILD START: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 script:
-  - mkdir ${HOME}/tmp
+  - mkdir ${HOME}/tmp 
   - export TMPDIR="${HOME}/tmp"
   - mvn -B -Plocal-testing,!standard-with-extra-repos clean install -DDriverProvider=org.mycore.common.selenium.drivers.MCRChromeDriverFactory && mvn -P!standard-with-extra-repos -B javadoc:javadoc && mvn -P!standard-with-extra-repos com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
 after_failure:

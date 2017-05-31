@@ -29,23 +29,27 @@ import java.nio.file.NotDirectoryException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
-import org.mycore.datamodel.ifs2.MCRStoredMetadata;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
+import org.mycore.solr.MCRSolrClientFactory;
 
 /**
  * This class implements all common methods to create the sitemap data.
@@ -62,19 +66,16 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * <li>MCR.GoogleSitemap.ObjectPath - the path to get the MCRObject in the sitemap URL, 'receive/' is default</li>
  * <li>MCR.GoogleSitemap.NumberOfURLs - the number of URLs in one sitemap file, 10000 is default</li>
  * </ul>
- * 
+ *
  * see http://www.sitemaps.org/de/protocol.html
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
- * 
+ *
  */
 public final class MCRGoogleSitemapCommon {
-
-    /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
 
     /** Zone information **/
     private static final Locale SITEMAP_LOCALE = Locale.ROOT;
@@ -91,12 +92,6 @@ public final class MCRGoogleSitemapCommon {
     private final static String SITEINDEX_SCHEMA = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd";
 
     private final static String SITEMAP_SCHEMA = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
-
-    /** The base URL */
-    private String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
-
-    /** The webapps directory path from configuration */
-    private final File webappBaseDir;
 
     /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
     private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");
@@ -115,11 +110,14 @@ public final class MCRGoogleSitemapCommon {
     private static final String objectPath = MCRConfiguration.instance().getString("MCR.GoogleSitemap.ObjectPath",
         "receive/");
 
-    /** Number of URLs in one sitemap */
-    private static int numberOfURLs = MCRConfiguration.instance().getInt("MCR.GoogleSitemap.NumberOfURLs", 10000);
-
     /** The XML table API */
     private static final MCRXMLMetadataManager tm = MCRXMLMetadataManager.instance();
+
+    /** The logger */
+    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
+
+    /** Number of URLs in one sitemap */
+    private static int numberOfURLs = MCRConfiguration.instance().getInt("MCR.GoogleSitemap.NumberOfURLs", 10000);
 
     /** number format for parts */
     private static NumberFormat number_format = getNumberFormat();
@@ -127,8 +125,16 @@ public final class MCRGoogleSitemapCommon {
     /** date formatter */
     private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", SITEMAP_LOCALE);
 
+    /** The webapps directory path from configuration */
+    private final File webappBaseDir;
+
+    /** The base URL */
+    private String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
+
     /** local data */
     private List<MCRObjectIDDate> objidlist = null;
+
+    private static final String SOLR_QUERY = MCRConfiguration.instance().getString("MCR.GoogleSitemap.SolrQuery");
 
     /** The constructor 
      * @throws NotDirectoryException */
@@ -149,15 +155,15 @@ public final class MCRGoogleSitemapCommon {
         }
     }
 
+    public MCRGoogleSitemapCommon(String baseURL, File baseDir) throws NotDirectoryException {
+        this(baseDir);
+        this.baseurl = baseURL;
+    }
+
     private static NumberFormat getNumberFormat() {
         NumberFormat nf = NumberFormat.getIntegerInstance(SITEMAP_LOCALE);
         nf.setMinimumFractionDigits(5);
         return nf;
-    }
-
-    public MCRGoogleSitemapCommon(String baseURL, File baseDir) throws NotDirectoryException {
-        this(baseDir);
-        this.baseurl = baseURL;
     }
 
     /**
@@ -165,19 +171,30 @@ public final class MCRGoogleSitemapCommon {
      * <em>numberOfURLs</em> URLs and only one MyCoRe type the sitemap_google.xml
      * contained all URLs. Otherwise it split the sitemap in an sitemap_google.xml
      * index file and a lot of sitemap_google_xxxx.xml URL files.
-     * 
+     *
      * @return the number of files, one for a single sitemap_google.xml file, more than
      *         one for the index and all parts.
+     *
      */
     protected final int checkSitemapFile() throws IOException {
         int number = 0;
-        for (String type : types) {
-            List<String> ids = tm.listIDsOfType(type);
-            for (String id : ids) {
-                MCRObjectID mcrid = MCRObjectID.getInstance(id);
-                MCRStoredMetadata sm = tm.getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
-                objidlist.add(new MCRObjectIDFileSystemDate(sm, id));
-            }
+        QueryResponse response;
+        SolrQuery query = new SolrQuery();
+        query.setQuery(SOLR_QUERY);
+        query.setRows(Integer.MAX_VALUE);
+        query.setParam("fl", "id,modified");
+
+        try {
+            response = MCRSolrClientFactory.getSolrClient().query(query);
+            objidlist = response.getResults().stream().map((document) -> {
+                String id = (String) document.getFieldValue("id");
+                Date modified = (Date) document.getFieldValue("modified");
+
+                return new MCRObjectIDDateImpl(modified, id);
+            }).collect(Collectors.toList());
+
+        } catch (SolrServerException e) {
+            LOGGER.error(e);
         }
         number = objidlist.size() / numberOfURLs;
         if (objidlist.size() % numberOfURLs != 0)
@@ -187,7 +204,7 @@ public final class MCRGoogleSitemapCommon {
 
     /**
      * The method return the path to the sitemap_google.xml file.
-     * 
+     *
      * @param number
      *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
      * @param withpath
@@ -210,7 +227,7 @@ public final class MCRGoogleSitemapCommon {
 
     /**
      * The method build the sitemap_google.xml JDOM document over all items.
-     * 
+     *
      * @return The sitemap_google.xml as JDOM document
      */
     protected final Document buildSingleSitemap() throws Exception {
@@ -229,7 +246,7 @@ public final class MCRGoogleSitemapCommon {
 
     /**
      * The method call the database and build the sitemap_google.xml JDOM document.
-     * 
+     *
      * @param number
      *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
      * @return The sitemap.xml as JDOM document
@@ -275,7 +292,7 @@ public final class MCRGoogleSitemapCommon {
 
     /**
      * The method build the index sitemap_google.xml JDOM document.
-     * 
+     *
      * @param number
      *            number of indexed files (must greater than 1
      * @return The index sitemap_google.xml as JDOM document
