@@ -12,7 +12,7 @@ namespace mycore.viewer.widgets.canvas {
         public htmlContainer:HTMLElement;
         private _pageElementCache:MyCoReMap<model.AbstractPage, HTMLElement> = new MyCoReMap<model.AbstractPage, HTMLElement>();
         private _idPageMap = new MyCoReMap<string, model.AbstractPage>();
-        private _addedContentMap = new MyCoReMap<model.AbstractPage, HTMLElement>();
+        private _addedContentMap = new MyCoReMap<model.AbstractPage, ViewerProperty<HTMLElement>>();
 
         public update() {
             var pagesInViewport = this._area.getPagesInViewport(this._vp);
@@ -27,12 +27,20 @@ namespace mycore.viewer.widgets.canvas {
 
                 if(!this._addedContentMap.has(page)){
                     if("getHTMLContent" in page){
-                        let content = (<any>page).getHTMLContent()
-                        if(content != null){
-                            this._addedContentMap.set(page, content);
-                            let htmlElement = this._pageElementCache.get(page);
-                            htmlElement.querySelector("div div").appendChild(content);
-                        }
+                        let content = (<any>page).getHTMLContent();
+                        this._addedContentMap.set(page, content);
+                        let observer = {
+                            propertyChanged : (_old: ViewerProperty<HTMLElement>, _new: ViewerProperty<HTMLElement>) => {
+                                if (_new.value != null) {
+                                    let htmlElement = this._pageElementCache.get(page);
+                                    let root = htmlElement.querySelector("div div");
+                                    root.innerHTML = "";
+                                    root.appendChild(_new.value);
+                                }
+                            }
+                        };
+                        content.addObserver(observer);
+                        observer.propertyChanged(null, content);
                     }
                 }
 
@@ -77,8 +85,6 @@ namespace mycore.viewer.widgets.canvas {
                 "width: " + realSize.width + "px;" +
                 "height: " + realSize.height + "px;"+
                 "background-color : transparent;";
-
-
 
         }
 

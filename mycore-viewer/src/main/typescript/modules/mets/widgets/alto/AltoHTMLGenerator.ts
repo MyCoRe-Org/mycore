@@ -8,7 +8,6 @@ namespace mycore.viewer.widgets.alto {
         constructor() {
         }
 
-
         public generateHtml(alto:widgets.alto.AltoFile, pageID:string):HTMLElement {
             let fontFamily = "sans-serif";
             let element = document.createElement("div");
@@ -16,7 +15,7 @@ namespace mycore.viewer.widgets.alto {
             element.style.position = "absolute";
             element.style.whiteSpace = "nowrap";
             element.style.fontFamily = "sans-serif";
-
+            element.setAttribute("data-id", pageID);
             let endecoderElem = document.createElement("span");
             let mesureCanvas = document.createElement("canvas");
             let ctx:CanvasRenderingContext2D = <CanvasRenderingContext2D>mesureCanvas.getContext("2d");
@@ -121,7 +120,12 @@ namespace mycore.viewer.widgets.alto {
             let span = document.createElement("word");
             return this.getWordsArray(line).map(word=>{
                 span.innerText = word.getContent();
-                return `<span data-vpos="${word.getVPos()}" data-hpos="${word.getHPos()}" data-word="${word.getContent()}">${span.innerHTML}</span>`
+                return `<span data-vpos="${word.getVPos()}"
+ data-hpos="${word.getHPos()}"
+ data-word="${word.getContent()}"
+ data-width="${word.getWidth()}"
+ data-height="${word.getHeight()}"
+ >${span.innerHTML}</span>`
             }).join(" ")
         }
     }

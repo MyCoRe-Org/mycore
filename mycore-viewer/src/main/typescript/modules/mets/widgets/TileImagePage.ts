@@ -27,7 +27,7 @@ namespace mycore.viewer.widgets.canvas {
         private _imgPreviewLoaded: boolean = false;
         private _imgNotPreviewLoaded: boolean = false;
 
-        private htmlContent: HTMLElement = null;
+        private htmlContent: ViewerProperty<HTMLElement> = new ViewerProperty<HTMLElement>(this, "htmlContent");
 
 
         public get size(): Size2D {
@@ -71,13 +71,6 @@ namespace mycore.viewer.widgets.canvas {
 
         }
 
-
-        public setHTMLContent(value:HTMLElement) {
-            if (value != this.htmlContent) {
-                this.htmlContent = value;
-                this.updateHTML();
-            }
-        }
 
         public getHTMLContent(){
             return this.htmlContent;

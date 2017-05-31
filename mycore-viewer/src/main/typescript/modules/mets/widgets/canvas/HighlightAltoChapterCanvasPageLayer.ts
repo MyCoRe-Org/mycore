@@ -2,43 +2,54 @@
 
 namespace mycore.viewer.widgets.canvas {
 
-    export class HighlightAltoCanvasPageLayer implements widgets.canvas.CanvasPageLayer {
+    export class HighlightAltoChapterCanvasPageLayer implements widgets.canvas.CanvasPageLayer {
 
         public selectedChapter: components.ChapterArea = null;
         public highlightedChapter: components.ChapterArea = null;
         public fadeAnimation:widgets.canvas.InterpolationAnimation = null;
 
         private chaptersToClear: MyCoReMap<string, components.ChapterArea> = new MyCoReMap<string, components.ChapterArea>();
+        private enabled: boolean = true;
+
+        public isEnabled(){
+            return this.enabled;
+        }
+
+        public setEnabled(enabled:boolean){
+            this.enabled = enabled;
+        }
 
         public draw( ctx: CanvasRenderingContext2D, id: string, pageSize: Size2D, drawOnHtml: boolean = false ) {
-            let selected:boolean = this.isChapterSelected();
-            let highlighted:boolean = this.isHighlighted();
-            let animated:boolean = this.fadeAnimation != null && this.fadeAnimation.isRunning;
+            if(this.isEnabled()){
+                let selected:boolean = this.isChapterSelected();
+                let highlighted:boolean = this.isHighlighted();
+                let animated:boolean = this.fadeAnimation != null && this.fadeAnimation.isRunning;
 
-            if(!animated && !selected && !highlighted) {
-                this.chaptersToClear.clear();
-            }
-
-            if(selected) {
-                this.chaptersToClear.set("selected", this.selectedChapter);
-            }
-            if(highlighted) {
-                this.chaptersToClear.set("highlighted", this.highlightedChapter);
-            } else if(selected) {
-                this.chaptersToClear.remove("highlighted");
-            }
-
-            if(animated || selected || highlighted) {
-                let rgba = selected ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.15)";
-                if(this.fadeAnimation != null) {
-                    rgba = "rgba(0,0,0," + this.fadeAnimation.value + ")";
+                if(!animated && !selected && !highlighted) {
+                    this.chaptersToClear.clear();
                 }
-                this.darkenPage(ctx, pageSize, rgba);
-                this.clearRects(ctx, id);
-            }
 
-            if(highlighted && selected) {
-                this.drawRects(ctx, id, this.highlightedChapter.pages, "rgba(0,0,0,0.2)");
+                if(selected) {
+                    this.chaptersToClear.set("selected", this.selectedChapter);
+                }
+                if(highlighted) {
+                    this.chaptersToClear.set("highlighted", this.highlightedChapter);
+                } else if(selected) {
+                    this.chaptersToClear.remove("highlighted");
+                }
+
+                if(animated || selected || highlighted) {
+                    let rgba = selected ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.15)";
+                    if(this.fadeAnimation != null) {
+                        rgba = "rgba(0,0,0," + this.fadeAnimation.value + ")";
+                    }
+                    this.darkenPage(ctx, pageSize, rgba);
+                    this.clearRects(ctx, id);
+                }
+
+                if(highlighted && selected) {
+                    this.drawRects(ctx, id, this.highlightedChapter.pages, "rgba(0,0,0,0.2)");
+                }
             }
         }
 

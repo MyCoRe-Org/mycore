@@ -18,6 +18,7 @@
 /// <reference path="events/RequestDesktopInputEvent.ts" />
 /// <reference path="events/RequestTouchInputEvent.ts" />
 /// <reference path="events/AddCanvasPageLayerEvent.ts" />
+/// <reference path="events/TextEditEvent.ts" />
 /// <reference path="events/RedrawEvent.ts" />
 /// <reference path="../MyCoReViewerSettings.ts" />
 /// <reference path="../widgets/events/ViewerEvent.ts" />
@@ -46,7 +47,7 @@ namespace mycore.viewer.components {
      */
     export class MyCoReImageScrollComponent extends ViewerComponent {
 
-        constructor(private _settings:MyCoReViewerSettings, private _container:JQuery) {
+        constructor(private _settings: MyCoReViewerSettings, private _container: JQuery) {
             super();
         }
 
@@ -81,14 +82,14 @@ namespace mycore.viewer.components {
             });
 
             this._pageController.viewport.positionProperty.addObserver({
-                propertyChanged : (old:ViewerProperty<Position2D>, newPosition:ViewerProperty<Position2D>) => {
+                propertyChanged : (old: ViewerProperty<Position2D>, newPosition: ViewerProperty<Position2D>) => {
                     this.update();
                 }
             });
 
 
             this._pageController.viewport.scaleProperty.addObserver({
-                propertyChanged : (old:ViewerProperty<number>, newScale:ViewerProperty<number>) => {
+                propertyChanged : (old: ViewerProperty<number>, newScale: ViewerProperty<number>) => {
                 }
             });
 
@@ -96,10 +97,10 @@ namespace mycore.viewer.components {
             this.trigger(new events.ShowContentEvent(this, componentContent, events.ShowContentEvent.DIRECTION_CENTER));
         }
 
-        private initOverview(overviewEnabled:any|any|any|boolean) {
+        private initOverview(overviewEnabled: any | any | any | boolean) {
             if (overviewEnabled) {
                 var overviewContainer = this._pageController._overview.container;
-                var minVisibleSize = parseInt(Utils.getVar(this._settings, "canvas.overview.minVisibleSize", MyCoReImageScrollComponent.DEFAULT_CANVAS_OVERVIEW_MIN_VISIBLE_SIZE, (value)=> {
+                var minVisibleSize = parseInt(Utils.getVar(this._settings, "canvas.overview.minVisibleSize", MyCoReImageScrollComponent.DEFAULT_CANVAS_OVERVIEW_MIN_VISIBLE_SIZE, (value) => {
                     return !isNaN((<any>value) * 1) && parseInt(value, 10) > 1;
                 }), 10);
 
@@ -111,7 +112,7 @@ namespace mycore.viewer.components {
                     iconChild.addClass(MyCoReImageScrollComponent.OVERVIEW_INVISIBLE_ICON);
                 }
 
-                this._toggleButton.click(()=> {
+                this._toggleButton.click(() => {
                     if (jQuery(overviewContainer).is(":visible")) {
                         jQuery(overviewContainer).hide();
                         iconChild.addClass(MyCoReImageScrollComponent.OVERVIEW_VISIBLE_ICON);
@@ -144,7 +145,7 @@ namespace mycore.viewer.components {
                     }
                 });
 
-                this._horizontalScrollbar.scrollHandler = this._verticalScrollbar.scrollHandler = ()=> {
+                this._horizontalScrollbar.scrollHandler = this._verticalScrollbar.scrollHandler = () => {
                     this._pageLayout.scrollhandler();
                 };
 
@@ -154,6 +155,7 @@ namespace mycore.viewer.components {
             this._componentContent.append(this._imageView.container);
             this._imageView.container.addClass("mainView");
             this._imageView.container.css({left : "0px", right : "0px"});
+            this._componentContent.addClass("grabbable");
 
             //this._componentContent.append(this._altoView.container);
             this._altoView.container.addClass("secondView");
@@ -164,10 +166,10 @@ namespace mycore.viewer.components {
 
             this._pageController.views.push(this._imageView);
             //this._pageController.views.push(this._altoView);
-            
-            if(this._settings.doctype == 'pdf'){
-                let textRenderer = new widgets.canvas.TextRenderer(this._pageController.viewport, this._pageController.getPageArea(), this._imageView, (page:model.AbstractPage, contentProvider:(textContent:model.TextContentModel)=>void)=>{
-                    this.trigger(new RequestTextContentEvent(this,page.id,(id,model)=>{
+
+            if (this._settings.doctype == 'pdf') {
+                let textRenderer = new widgets.canvas.TextRenderer(this._pageController.viewport, this._pageController.getPageArea(), this._imageView, (page: model.AbstractPage, contentProvider: (textContent: model.TextContentModel) => void) => {
+                    this.trigger(new RequestTextContentEvent(this, page.id, (id, model) => {
                         contentProvider(model);
                     }))
                 });
@@ -175,8 +177,8 @@ namespace mycore.viewer.components {
             }
         }
 
-        private setViewMode(mode:string):void {
-            var remove = (view:widgets.canvas.PageView)=> {
+        private setViewMode(mode: string): void {
+            var remove = (view: widgets.canvas.PageView) => {
                 let index = this._pageController.views.indexOf(view);
                 if (index != -1) {
                     this._pageController.views.splice(index, 1);
@@ -185,7 +187,7 @@ namespace mycore.viewer.components {
             };
 
 
-            var add = (view:widgets.canvas.PageView)=> {
+            var add = (view: widgets.canvas.PageView) => {
                 if (this._pageController.views.indexOf(view) == -1) {
                     this._pageController.views.push(view);
                 }
@@ -220,45 +222,45 @@ namespace mycore.viewer.components {
 
         }
 
-        private _pageLayout:widgets.canvas.PageLayout = null;
-        private _pageController:widgets.canvas.PageController = new mycore.viewer.widgets.canvas.PageController(true);
-    
+        private _pageLayout: widgets.canvas.PageLayout = null;
+        private _pageController: widgets.canvas.PageController = new mycore.viewer.widgets.canvas.PageController(true);
+
 
         private static ALTO_TEXT_HREF = "AltoHref";
         private static PDF_TEXT_HREF = "pdfText";
-        private _hrefImageMap:MyCoReMap<string, model.StructureImage> = new MyCoReMap<string, model.StructureImage>();
+        private _hrefImageMap: MyCoReMap<string, model.StructureImage> = new MyCoReMap<string, model.StructureImage>();
         private _hrefPageMap = new MyCoReMap<string, model.AbstractPage>();
         private _orderImageMap = new MyCoReMap<number, model.StructureImage>();
         private _orderPageMap = new MyCoReMap<number, model.AbstractPage>();
         private _hrefPageLoadingMap = new MyCoReMap<string, boolean>();
-        private _structureImages:Array<model.StructureImage> = null;
-        private _currentImage:string;
-        private _horizontalScrollbar:widgets.canvas.Scrollbar;
-        private _verticalScrollbar:widgets.canvas.Scrollbar;
-        private _languageModel:model.LanguageModel = null;
-        private _rotateButton:widgets.toolbar.ToolbarButton;
-        private _layoutToolbarButton:widgets.toolbar.ToolbarDropdownButton;
+        private _structureImages: Array<model.StructureImage> = null;
+        private _currentImage: string;
+        private _horizontalScrollbar: widgets.canvas.Scrollbar;
+        private _verticalScrollbar: widgets.canvas.Scrollbar;
+        private _languageModel: model.LanguageModel = null;
+        private _rotateButton: widgets.toolbar.ToolbarButton;
+        private _layoutToolbarButton: widgets.toolbar.ToolbarDropdownButton;
 
-        private _desktopDelegators:Array<widgets.canvas.DesktopInputDelegator> = new Array<widgets.canvas.DesktopInputDelegator>();
-        private _touchDelegators:Array<widgets.canvas.TouchInputDelegator> = new Array<widgets.canvas.TouchInputDelegator>();
+        private _desktopDelegators: Array<widgets.canvas.DesktopInputDelegator> = new Array<widgets.canvas.DesktopInputDelegator>();
+        private _touchDelegators: Array<widgets.canvas.TouchInputDelegator> = new Array<widgets.canvas.TouchInputDelegator>();
 
-        private _permalinkState:MyCoReMap<string, string> = null;
-        private _toggleButton:JQuery;
-        private _imageView:widgets.canvas.PageView = new widgets.canvas.PageView(true, false);
-        private _altoView:widgets.canvas.PageView = new widgets.canvas.PageView(true, true);
-        private _componentContent:JQuery = jQuery("<div></div>");
+        private _permalinkState: MyCoReMap<string, string> = null;
+        private _toggleButton: JQuery;
+        public _imageView: widgets.canvas.PageView = new widgets.canvas.PageView(true, false);
+        private _altoView: widgets.canvas.PageView = new widgets.canvas.PageView(true, true);
+        public _componentContent: JQuery = jQuery("<div></div>");
         private _enableAltoSpecificButtons;
         private _selectionSwitchButton: mycore.viewer.widgets.toolbar.ToolbarButton;
-        private _viewSelectButton:widgets.toolbar.ToolbarDropdownButton;
-        private _viewMode:string = "imageView";
+        private _viewSelectButton: widgets.toolbar.ToolbarDropdownButton;
+        private _viewMode: string = "imageView";
 
         private _toolbarModel: mycore.viewer.model.MyCoReBasicToolbarModel;
         private _layouts = new Array<widgets.canvas.PageLayout>();
-        private _rotation:number = 0;
+        private _rotation: number = 0;
 
-        private _layoutModel = {children : this._orderPageMap, hrefImageMap: this._hrefImageMap, pageCount : 1};
+        private _layoutModel = {children : this._orderPageMap, hrefImageMap : this._hrefImageMap, pageCount : 1};
 
-        private _pageLoader = (order:number) => {
+        private _pageLoader = (order: number) => {
             if (this._orderImageMap.has(order)) {
                 this.loadPageIfNotPresent(this._orderImageMap.get(order).href, order);
             } else {
@@ -273,7 +275,7 @@ namespace mycore.viewer.components {
         private static OVERVIEW_VISIBLE_ICON = `glyphicon-triangle-top`;
         private static OVERVIEW_INVISIBLE_ICON = `glyphicon-triangle-bottom`;
 
-        private changeImage(image:string, extern:boolean) {
+        private changeImage(image: string, extern: boolean) {
             if (this._currentImage != image) {
                 this._currentImage = image;
                 let imageObj = this._hrefImageMap.get(image);
@@ -298,7 +300,7 @@ namespace mycore.viewer.components {
             this._pageLayout.fitToWidth();
         }
 
-        public get handlesEvents():string[] {
+        public get handlesEvents(): string[] {
             var handleEvents = [];
 
             handleEvents.push(mycore.viewer.widgets.toolbar.events.ButtonPressedEvent.TYPE);
@@ -315,6 +317,7 @@ namespace mycore.viewer.components {
             handleEvents.push(events.RequestTouchInputEvent.TYPE);
             handleEvents.push(events.AddCanvasPageLayerEvent.TYPE);
             handleEvents.push(events.RedrawEvent.TYPE);
+            handleEvents.push(events.TextEditEvent.TYPE);
 
             return handleEvents;
         }
@@ -332,7 +335,7 @@ namespace mycore.viewer.components {
         public getPageController() {
             return this._pageController;
         }
-        
+
         public getPageLayout() {
             return this._pageLayout;
         }
@@ -341,11 +344,11 @@ namespace mycore.viewer.components {
             return this._rotation;
         }
 
-        public setRotation(rotation:number) {
+        public setRotation(rotation: number) {
             this._rotation = rotation;
         }
 
-        private changePageLayout(pageLayout:widgets.canvas.PageLayout) {
+        private changePageLayout(pageLayout: widgets.canvas.PageLayout) {
             if (this._pageLayout != null) {
                 this._pageLayout.clear();
                 var page = this._pageLayout.getCurrentPage();
@@ -363,12 +366,12 @@ namespace mycore.viewer.components {
             this.trigger(new events.PageLayoutChangedEvent(this, this._pageLayout));
         }
 
-        private loadPageIfNotPresent(imageHref:string, order:number) {
+        private loadPageIfNotPresent(imageHref: string, order: number) {
             if (!this._hrefPageMap.has(imageHref) &&
                 (!this._hrefPageLoadingMap.has(imageHref) || !this._hrefPageLoadingMap.get(imageHref))) {
                 this._hrefPageLoadingMap.set(imageHref, true);
 
-                var textHref:string = null;
+                var textHref: string = null;
                 if (this._hrefImageMap.has(imageHref)) {
                     var additionalHrefs = this._imageByHref(imageHref).additionalHrefs;
                     if (additionalHrefs.has(MyCoReImageScrollComponent.ALTO_TEXT_HREF)) {
@@ -396,13 +399,13 @@ namespace mycore.viewer.components {
         private restorePermalink() {
             var state = this._permalinkState;
 
-            if(state.has("layout")){
+            if (state.has("layout")) {
                 var layout = state.get("layout");
-                var layoutObjects = this._layouts.filter(l=>l.getLabelKey() == layout);
-                if(layoutObjects.length!=1){
+                var layoutObjects = this._layouts.filter(l => l.getLabelKey() == layout);
+                if (layoutObjects.length != 1) {
                     console.log("no matching layout found!");
                 } else {
-                    this.changePageLayout(layoutObjects[0])
+                    this.changePageLayout(layoutObjects[ 0 ])
 
                 }
             }
@@ -430,7 +433,7 @@ namespace mycore.viewer.components {
         }
 
 
-        public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
             if (e.type == events.ProvideToolbarModelEvent.TYPE) {
                 var ptme = <events.ProvideToolbarModelEvent>e;
                 this._rotateButton = ptme.model._rotateButton;
@@ -522,7 +525,7 @@ namespace mycore.viewer.components {
                 var dbpe = <widgets.toolbar.events.DropdownButtonPressedEvent> e;
 
                 if (dbpe.button.id == 'LayoutDropdownButton') {
-                    this._layouts.filter((e)=>e.getLabelKey() == dbpe.childId).forEach((layout)=> {
+                    this._layouts.filter((e) => e.getLabelKey() == dbpe.childId).forEach((layout) => {
                         this.changePageLayout(layout);
                         this.updateToolbarLabel();
                     });
@@ -569,12 +572,12 @@ namespace mycore.viewer.components {
                 state.set("derivate", this._settings.derivate);
             }
 
-            if(e.type == events.RequestDesktopInputEvent.TYPE) {
+            if (e.type == events.RequestDesktopInputEvent.TYPE) {
                 let requestInputEvent = e as events.RequestDesktopInputEvent;
                 this.registerDesktopInputHandler(requestInputEvent.listener);
             }
 
-            if(e.type == events.RequestTouchInputEvent.TYPE) {
+            if (e.type == events.RequestTouchInputEvent.TYPE) {
                 let requestInputEvent = e as events.RequestTouchInputEvent;
                 this.registerTouchInputHandler(requestInputEvent.listener);
             }
@@ -593,11 +596,34 @@ namespace mycore.viewer.components {
                 this._pageController.update();
             }
 
+            if (e.type === events.TextEditEvent.TYPE) {
+                let tee = <events.TextEditEvent> e;
+                if (tee.component !== this) {
+                    //this.setAltoSelectable(tee.edit);
+                    this.setAltoOnTop(tee.edit);
+                    if (tee.edit && this._viewMode == 'imageView') {
+                        this.setViewMode("mixedView")
+                    }
+                }
+            }
+
+        }
+
+        private setAltoOnTop(onTop: boolean) {
+            this.setAltoSelectable(false);
+            if (onTop) {
+                this._altoView.container.addClass("altoTop");
+                this._selectionSwitchButton.disabled = true;
+            } else {
+                this._altoView.container.removeClass("altoTop");
+                this._selectionSwitchButton.disabled = false;
+            }
         }
 
         private setAltoSelectable(selectable: boolean) {
             this._selectionSwitchButton.active = selectable;
             jQuery("[data-id='selectionSwitchButton']").blur();
+            this._altoView.container.removeClass("altoTop");
 
             if (selectable) {
                 this._altoView.container.addClass("altoSelectable");
@@ -620,7 +646,7 @@ namespace mycore.viewer.components {
             }
         }
 
-        private addLayout(layout:widgets.canvas.PageLayout) {
+        private addLayout(layout: widgets.canvas.PageLayout) {
             this._layouts.push(layout);
             layout.init(this._layoutModel, this._pageController, new Size2D(this.pageWidth, this.pageHeight), this._horizontalScrollbar, this._verticalScrollbar, this._pageLoader);
             this.synchronizeLayoutToolbarButton();
@@ -628,9 +654,9 @@ namespace mycore.viewer.components {
 
         private synchronizeLayoutToolbarButton() {
             var changed = false;
-            this._layouts.forEach((layout)=> {
+            this._layouts.forEach((layout) => {
                 var id = layout.getLabelKey();
-                var childrenWithId = this._layoutToolbarButton.children.filter((c) =>  c.id == id);
+                var childrenWithId = this._layoutToolbarButton.children.filter((c) => c.id == id);
 
                 if (childrenWithId.length == 0) {
                     this._layoutToolbarButton.children.push({
@@ -650,7 +676,7 @@ namespace mycore.viewer.components {
         private updateToolbarLabel() {
             if (this._languageModel != null) {
                 if (this._layoutToolbarButton != null) { // dont need to translate the layoutbuttons if  there is only one layout
-                    this._layoutToolbarButton.children.forEach((e)=> {
+                    this._layoutToolbarButton.children.forEach((e) => {
                         e.label = this._languageModel.getTranslation("layout." + e.id);
                     });
 
@@ -663,7 +689,7 @@ namespace mycore.viewer.components {
                 if (this._viewSelectButton != null) {
                     this._viewSelectButton.label = this._languageModel.getTranslation("view." + this._viewMode);
 
-                    this._viewSelectButton.children.forEach((child)=> {
+                    this._viewSelectButton.children.forEach((child) => {
                         child.label = this._languageModel.getTranslation("view." + child.id);
                     });
                     this._viewSelectButton.children = this._viewSelectButton.children;
@@ -721,8 +747,8 @@ namespace mycore.viewer.components {
             var position = this._pageLayout.getCurrentPositionInPage();
             var scale = this._pageController.viewport.scale;
             this._pageController.viewport.stopAnimation();
-            this._desktopDelegators.forEach(delegator=>delegator.clearRunning());
-            this._touchDelegators.forEach(delegator=>delegator.clearRunning());
+            this._desktopDelegators.forEach(delegator => delegator.clearRunning());
+            this._touchDelegators.forEach(delegator => delegator.clearRunning());
 
             if (!this._settings.mobile) {
                 this._horizontalScrollbar.clearRunning();
@@ -768,16 +794,16 @@ namespace mycore.viewer.components {
         }
 
 
-        private _imageByHref(href:string) {
+        private _imageByHref(href: string) {
             return this._hrefImageMap.get(href);
         }
 
-        private registerDesktopInputHandler(listener:widgets.canvas.DesktopInputListener) {
+        private registerDesktopInputHandler(listener: widgets.canvas.DesktopInputListener) {
             this._desktopDelegators.push(new widgets.canvas.DesktopInputDelegator(jQuery(this._imageView.container), this._pageController.viewport, listener));
             this._desktopDelegators.push(new widgets.canvas.DesktopInputDelegator(jQuery(this._altoView.container), this._pageController.viewport, listener));
         }
 
-        private registerTouchInputHandler(listener:widgets.canvas.TouchInputListener) {
+        private registerTouchInputHandler(listener: widgets.canvas.TouchInputListener) {
             this._touchDelegators.push(new widgets.canvas.TouchInputDelegator(jQuery(this._imageView.container), this._pageController.viewport, listener));
             this._touchDelegators.push(new widgets.canvas.TouchInputDelegator(jQuery(this._altoView.container), this._pageController.viewport, listener));
         }
@@ -787,19 +813,19 @@ namespace mycore.viewer.components {
 
     class TouchInputHandler extends widgets.canvas.TouchInputAdapter {
 
-        private _touchAdditionalScaleMove:MoveVector = null;
-        private _sessionStartRotation:number = 0;
-    
-        constructor(public component:MyCoReImageScrollComponent) {
+        private _touchAdditionalScaleMove: MoveVector = null;
+        private _sessionStartRotation: number = 0;
+
+        constructor(public component: MyCoReImageScrollComponent) {
             super();
         }
 
-        public touchStart(session:widgets.canvas.TouchSession):void {
+        public touchStart(session: widgets.canvas.TouchSession): void {
             this._touchAdditionalScaleMove = new MoveVector(0, 0);
             this.component.getPageController().viewport.stopAnimation();
         }
 
-        public touchMove(session:widgets.canvas.TouchSession):void {
+        public touchMove(session: widgets.canvas.TouchSession): void {
             var viewPort = this.component.getPageController().viewport;
             if (!session.touchLeft) {
                 if (session.touches == 2 && session.startDistance > 150 && session.currentMove.distance > 150) {
@@ -837,7 +863,7 @@ namespace mycore.viewer.components {
             }
         }
 
-        public touchEnd(session:widgets.canvas.TouchSession):void {
+        public touchEnd(session: widgets.canvas.TouchSession): void {
             var viewPort = this.component.getPageController().viewport;
 
             if (session.currentMove != null) {
@@ -860,20 +886,33 @@ namespace mycore.viewer.components {
             this._sessionStartRotation = this.component.getRotation();
         }
     }
-    
+
     class DesktopInputHandler extends widgets.canvas.DesktopInputAdapter {
 
-        constructor(public component:MyCoReImageScrollComponent) {
+        constructor(public component: MyCoReImageScrollComponent) {
             super();
         }
 
-        public mouseDoubleClick(mousePosition:Position2D):void {
+        public mouseDown(mousePosition, e): void {
+
+            let container = this.component._componentContent;
+            container.addClass("grab");
+            container.removeClass("grabbable");
+        }
+
+        public mouseUp(mousePosition, e): void {
+            let container = this.component._componentContent;
+            container.addClass("grabbable");
+            container.removeClass("grab");
+        }
+
+        public mouseDoubleClick(mousePosition: Position2D): void {
             var vp = this.component.getPageController().viewport;
-            var position:Position2D = vp.getAbsolutePosition(mousePosition);
+            var position: Position2D = vp.getAbsolutePosition(mousePosition);
             vp.startAnimation(new widgets.canvas.ZoomAnimation(vp, 2, position));
         }
 
-        public mouseDrag(currentPosition:Position2D, startPosition:Position2D, startViewport:Position2D):void {
+        public mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D): void {
             var xMove = currentPosition.x - startPosition.x;
             var yMove = currentPosition.y - startPosition.y;
             var move = new MoveVector(-xMove, -yMove).rotate(this.component.getPageController().viewport.rotation);
@@ -883,9 +922,9 @@ namespace mycore.viewer.components {
                 .scale(1 / this.component.getPageController().viewport.scale);
         }
 
-        public scroll(e:{ deltaX: number; deltaY: number; orig: any; pos: Position2D; altKey?: boolean, ctrlKey?:boolean }) {
+        public scroll(e: { deltaX: number; deltaY: number; orig: any; pos: Position2D; altKey?: boolean, ctrlKey?: boolean }) {
             var zoomParameter = (ViewerParameterMap.fromCurrentUrl().get("iview2.scroll") == "zoom");
-            var zoom = (zoomParameter) ? !e.altKey||e.ctrlKey : e.altKey||e.ctrlKey;
+            var zoom = (zoomParameter) ? !e.altKey || e.ctrlKey : e.altKey || e.ctrlKey;
             var vp = this.component.getPageController().viewport;
 
             if (zoom) {
@@ -907,7 +946,7 @@ namespace mycore.viewer.components {
 
         }
 
-        public keydown(e:JQueryKeyEventObject):void {
+        public keydown(e: JQueryKeyEventObject): void {
             switch (e.keyCode) {
                 case 33:
                     this.component.previousImage();
