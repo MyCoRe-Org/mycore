@@ -1,10 +1,13 @@
 package org.mycore.oai;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.mycore.oai.pmh.Header;
 
 /**
  * Solr implementation of a MCROAIResult.
@@ -15,8 +18,11 @@ public class MCROAISolrResult implements MCROAIResult {
 
     protected QueryResponse response;
 
-    public MCROAISolrResult(QueryResponse response) {
+    private Function<SolrDocument, Header> toHeader;
+
+    public MCROAISolrResult(QueryResponse response, Function<SolrDocument, Header> toHeader) {
         this.response = response;
+        this.toHeader = toHeader;
     }
 
     @Override
@@ -25,11 +31,9 @@ public class MCROAISolrResult implements MCROAIResult {
     }
 
     @Override
-    public List<String> list() {
+    public List<Header> list() {
         SolrDocumentList list = getResponse().getResults();
-        return list.stream().map(doc -> {
-            return (String) doc.getFieldValue("id");
-        }).collect(Collectors.toList());
+        return list.stream().map(toHeader).collect(Collectors.toList());
     }
 
     @Override

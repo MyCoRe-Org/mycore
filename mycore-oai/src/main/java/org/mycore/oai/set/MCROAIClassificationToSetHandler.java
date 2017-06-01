@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.MCROAIUtils;
@@ -34,7 +35,7 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
                 setFilter = field + ":" + classid + "*";
             }
         }
-        query.add("fq", setFilter);
+        query.add(CommonParams.FQ, setFilter);
     }
 
     @Override
@@ -45,13 +46,13 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         ModifiableSolrParams p = new ModifiableSolrParams();
         String value = MCROAIUtils.getSetSpecValue(set);
-        p.set("q", MCROAIUtils.getDefaultSetQuery(value, getConfigPrefix()));
+        p.set(CommonParams.Q, MCROAIUtils.getDefaultSetQuery(value, getConfigPrefix()));
         String restriction = MCROAIUtils.getDefaultRestriction(getConfigPrefix());
         if (restriction != null) {
-            p.set("fq", restriction);
+            p.set(CommonParams.FQ, restriction);
         }
-        p.set("rows", 1);
-        p.set("fl", "id");
+        p.set(CommonParams.ROWS, 1);
+        p.set(CommonParams.FL, "id");
         try {
             QueryResponse response = solrClient.query(p);
             return response.getResults().isEmpty();

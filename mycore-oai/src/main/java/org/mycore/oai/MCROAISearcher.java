@@ -2,11 +2,13 @@ package org.mycore.oai;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.oai.pmh.Set;
 
@@ -42,20 +44,25 @@ public abstract class MCROAISearcher {
 
     protected MCROAISetManager setManager;
 
+    private MCROAIObjectManager objectManager;
+
     public MCROAISearcher() {
         Random random = new Random(System.currentTimeMillis());
         this.id = Long.toString(random.nextLong(), 36) + Long.toString(System.currentTimeMillis(), 36);
     }
 
     public void init(MCROAIIdentify identify, MetadataFormat format, long expire, int partitionSize,
-        MCROAISetManager setManager) {
+        MCROAISetManager setManager, MCROAIObjectManager objectManager) {
         this.identify = identify;
         this.metadataFormat = format;
         this.expire = expire;
         this.partitionSize = partitionSize;
         this.setManager = setManager;
+        this.objectManager = objectManager;
         updateRunningExpirationTimer();
     }
+    
+    public abstract Optional<Header> getHeader(String mcrId);
 
     public abstract MCROAIResult query(String cursor);
 
@@ -81,6 +88,10 @@ public abstract class MCROAISearcher {
 
     public MCROAISetManager getSetManager() {
         return setManager;
+    }
+    
+    public MCROAIObjectManager getObjectManager() {
+        return objectManager;
     }
 
     protected String getConfigPrefix() {

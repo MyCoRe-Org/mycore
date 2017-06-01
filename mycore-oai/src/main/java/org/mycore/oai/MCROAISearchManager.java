@@ -3,6 +3,7 @@ package org.mycore.oai;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,6 +80,11 @@ public class MCROAISearchManager {
         this.setManager = setManager;
         this.partitionSize = partitionSize;
     }
+    
+    public Optional<Header> getHeader(String oaiId) {
+        MCROAISearcher searcher = getSearcher(this.identify, null, 1, setManager, objManager);
+        return searcher.getHeader(objManager.getMyCoReId(oaiId));
+    }
 
     public OAIDataList<Header> searchHeader(String resumptionToken) throws BadResumptionTokenException {
         String searchId = getSearchId(resumptionToken);
@@ -103,14 +109,14 @@ public class MCROAISearchManager {
     }
 
     public OAIDataList<Header> searchHeader(MetadataFormat format, Set set, ZonedDateTime from, ZonedDateTime until) {
-        MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager);
+        MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager, objManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);
         return getHeaderList(searcher, result);
     }
 
     public OAIDataList<Record> searchRecord(MetadataFormat format, Set set, ZonedDateTime from, ZonedDateTime until) {
-        MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager);
+        MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager, objManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);
         return getRecordList(searcher, result);
@@ -118,8 +124,8 @@ public class MCROAISearchManager {
 
     protected OAIDataList<Record> getRecordList(MCROAISearcher searcher, MCROAIResult result) {
         OAIDataList<Record> recordList = new OAIDataList<Record>();
-        result.list().forEach(id -> {
-            Record record = this.objManager.getRecord(id, searcher.getMetadataFormat());
+        result.list().forEach(header -> {
+            Record record = this.objManager.getRecord(header, searcher.getMetadataFormat());
             if (record != null) {
                 recordList.add(record);
             }
@@ -130,12 +136,7 @@ public class MCROAISearchManager {
 
     protected OAIDataList<Header> getHeaderList(MCROAISearcher searcher, MCROAIResult result) {
         OAIDataList<Header> headerList = new OAIDataList<Header>();
-        result.list().forEach(id -> {
-            Header header = this.objManager.getHeader(id, searcher.getMetadataFormat());
-            if (header != null) {
-                headerList.add(header);
-            }
-        });
+        headerList.addAll(result.list());
         this.setResumptionToken(headerList, searcher, result);
         return headerList;
     }
@@ -177,11 +178,11 @@ public class MCROAISearchManager {
     }
 
     public static MCROAISearcher getSearcher(MCROAIIdentify identify, MetadataFormat format, int partitionSize,
-        MCROAISetManager setManager) {
+        MCROAISetManager setManager, MCROAIObjectManager objectManager) {
         String className = identify.getConfigPrefix() + "Searcher";
         String defaultClass = MCROAICombinedSearcher.class.getName();
         MCROAISearcher searcher = getConfig().<MCROAISearcher> getInstanceOf(className, defaultClass);
-        searcher.init(identify, format, MAX_AGE, partitionSize, setManager);
+        searcher.init(identify, format, MAX_AGE, partitionSize, setManager, objectManager);
         return searcher;
     }
 

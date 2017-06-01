@@ -134,7 +134,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         Date datestamp = DateUtils.parseUTC(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
         try {
             // existing items
-            datestamp = Date.from(MCROAISearchManager.getSearcher(this, null, 1, null).getEarliestTimestamp());
+            datestamp = Date.from(MCROAISearchManager.getSearcher(this, null, 1, null, null).getEarliestTimestamp());
             // deleted items
             if (DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
                 Date earliestDeletedDate = MCRDeletedItemManager.getFirstDate()

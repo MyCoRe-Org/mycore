@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
@@ -243,7 +244,12 @@ public class MCROAIAdapter implements OAIAdapter {
     @Override
     public Record getRecord(String identifier, MetadataFormat format)
         throws CannotDisseminateFormatException, IdDoesNotExistException {
-        MCROAIObjectManager objectManager = getObjectManager();
+        Optional<Record> possibleRecord = getSearchManager()
+            .getHeader(identifier)
+            .map(h -> objectManager.getRecord(h, format));
+        if (possibleRecord.isPresent()) {
+            return possibleRecord.get();
+        }
         if (!objectManager.exists(identifier)) {
             DeletedRecordPolicy rP = getIdentify().getDeletedRecordPolicy();
             if (DeletedRecordPolicy.Persistent.equals(rP)) {
@@ -253,14 +259,8 @@ public class MCROAIAdapter implements OAIAdapter {
                     return deletedRecord;
                 }
             }
-            throw new IdDoesNotExistException(identifier);
         }
-        Record record = objectManager.getRecord(objectManager.getMyCoReId(identifier), format);
-        if (record == null) {
-            // oai-pmh does not offer a better exception for internal server errros
-            throw new IdDoesNotExistException(identifier);
-        }
-        return record;
+        throw new IdDoesNotExistException(identifier);
     }
 
     /*

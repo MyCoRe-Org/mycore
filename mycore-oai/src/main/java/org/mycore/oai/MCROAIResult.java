@@ -2,6 +2,8 @@ package org.mycore.oai;
 
 import java.util.List;
 
+import org.mycore.oai.pmh.Header;
+
 /**
  * The result of a searcher query.
  * 
@@ -14,7 +16,7 @@ public interface MCROAIResult {
      * 
      * @return list of mycore object identifiers
      */
-    List<String> list();
+    List<Header> list();
 
     /**
      * Number of all hits
