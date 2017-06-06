@@ -57,8 +57,6 @@ public class MCROAIObjectManager {
 
     protected String recordUriPattern;
 
-    protected String headerUriPattern;
-
     /**
      * Initialize the object manager. Its important to call this method before you
      * can retrieve records or headers!
@@ -69,7 +67,6 @@ public class MCROAIObjectManager {
         this.identify = identify;
         String configPrefix = this.identify.getConfigPrefix();
         this.recordUriPattern = MCRConfiguration.instance().getString(configPrefix + "Adapter.RecordURIPattern");
-        this.headerUriPattern = MCRConfiguration.instance().getString(configPrefix + "Adapter.HeaderURIPattern");
     }
 
     /**
@@ -141,11 +138,6 @@ public class MCROAIObjectManager {
 
     protected Element getJDOMRecord(String mcrId, MetadataFormat format) {
         String uri = formatURI(this.recordUriPattern, mcrId, format.getPrefix());
-        return getURI(uri);
-    }
-
-    protected Element getJDOMHeader(String mcrId, MetadataFormat format) {
-        String uri = formatURI(this.headerUriPattern, mcrId, format.getPrefix());
         return getURI(uri);
     }
 
