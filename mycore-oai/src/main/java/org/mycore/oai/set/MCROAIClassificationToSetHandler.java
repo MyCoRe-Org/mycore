@@ -21,6 +21,7 @@ import org.mycore.oai.MCROAIUtils;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.oai.pmh.Set;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrUtils;
 
 /**
  * Classification set handler.
@@ -40,20 +41,11 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
     }
 
     public void apply(MCRSet set, SolrQuery query) {
-        String origSet = set.getSpec();
-        String setFilter = MCRConfiguration.instance().getString(getConfigPrefix() + "MapSetToQuery." + origSet, null);
-        if (setFilter == null) {
-            String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(),
-                set.getSpec().split("\\:")[1]);
-            if (origSet.contains(":")) {
-                setFilter = classField + ":" + classid + "\\:" + origSet.substring(origSet.indexOf(":") + 1);
-            } else {
-                setFilter = classField + ":" + classid + "*";
-            }
-        } else {
-            //TODO: implement support for MapSetToQuery
-            throw new UnsupportedOperationException("Cannot yet map '" + setFilter + "' back to Set");
-        }
+        String setSpec = set.getSpec();
+        String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(), set.getSetId());
+        //Check: Is it possible for setSpec to NOT contain ":" here?
+        String value = setSpec.contains(":") ? setSpec.substring(setSpec.indexOf(":")) : ":*";
+        String setFilter = classField + ":" + MCRSolrUtils.escapeSearchValue(classid + value);
         query.add(CommonParams.FQ, setFilter);
     }
 
