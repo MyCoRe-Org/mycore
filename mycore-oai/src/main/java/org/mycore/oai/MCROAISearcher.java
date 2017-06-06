@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.MetadataFormat;
-import org.mycore.oai.pmh.Set;
+import org.mycore.oai.set.MCRSet;
 
 /**
  * <p>Base class to query different types of data in the mycore system.
@@ -66,7 +66,7 @@ public abstract class MCROAISearcher {
 
     public abstract MCROAIResult query(String cursor);
 
-    public abstract MCROAIResult query(Set set, ZonedDateTime from, ZonedDateTime until);
+    public abstract MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until);
 
     public abstract Instant getEarliestTimestamp();
 

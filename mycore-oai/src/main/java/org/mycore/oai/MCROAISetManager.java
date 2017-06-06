@@ -24,23 +24,21 @@ package org.mycore.oai;
 import static org.mycore.oai.pmh.OAIConstants.NS_OAI;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Transaction;
 import org.jdom2.Element;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
@@ -48,9 +46,11 @@ import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.OAIDataList;
 import org.mycore.oai.pmh.Set;
-import org.mycore.oai.set.MCROAISolrSetConfiguration;
 import org.mycore.oai.set.MCROAISetConfiguration;
 import org.mycore.oai.set.MCROAISetHandler;
+import org.mycore.oai.set.MCROAISolrSetConfiguration;
+import org.mycore.oai.set.MCRSet;
+import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 /**
  * Manager class to handle OAI-PMH set specific behavior. For a data provider instance, set support is optional and must be configured as described below.
@@ -78,7 +78,7 @@ public class MCROAISetManager {
 
     protected String configPrefix;
 
-    protected Map<String, MCROAISetConfiguration<?>> setConfigurationMap;
+    protected Map<String, MCROAISetConfiguration<?, ?, ?>> setConfigurationMap;
 
     /**
      * Time in milliseconds when the classification changed.
@@ -90,11 +90,11 @@ public class MCROAISetManager {
      */
     protected int cacheMaxAge;
 
-    protected final OAIDataList<Set> cachedSetList;
+    protected final OAIDataList<MCRSet> cachedSetList;
 
     public MCROAISetManager() {
         this.setConfigurationMap = Collections.synchronizedMap(new HashMap<>());
-        this.cachedSetList = new OAIDataList<Set>();
+        this.cachedSetList = new OAIDataList<MCRSet>();
         this.classLastModified = Long.MIN_VALUE;
     }
 
@@ -103,51 +103,51 @@ public class MCROAISetManager {
         this.cacheMaxAge = cacheMaxAge;
         updateURIs();
         if (this.cacheMaxAge != 0) {
-            startTimerTask();
+            ScheduledExecutorService updateSetExecutor = Executors.newScheduledThreadPool(1);
+            try {
+                updateCachedSetList();
+                updateSetExecutor.scheduleWithFixedDelay(getUpdateRunnable(), cacheMaxAge, cacheMaxAge,
+                    TimeUnit.MINUTES);
+            } finally {
+                MCRShutdownHandler.getInstance().addCloseable(updateSetExecutor::shutdown);
+            }
         }
     }
 
-    protected void startTimerTask() {
-        long maxAgeInMilli = this.cacheMaxAge * 60 * 1000;
-        TimerTask tt = new TimerTask() {
-            public void run() {
-                MCRSession session = MCRSessionMgr.getCurrentSession();//create a new session for this thread
-                MCRSessionMgr.setCurrentSession(session);//store session in this thread
-                session.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-                Transaction transaction = MCRHIBConnection.instance().getSession().beginTransaction();
-                try {
-                    LOGGER.info("update oai set list");
-                    synchronized (cachedSetList) {
-                        OAIDataList<Set> setList = createSetList();
-                        cachedSetList.clear();
-                        cachedSetList.addAll(setList);
-                    }
-                } finally {
-                    try {
-                        transaction.commit();
-                    } catch (Exception exc) {
-                        LOGGER.error("Error occured while retrieving oai set list", exc);
-                        transaction.rollback();
-                    }
-                    MCRSessionMgr.releaseCurrentSession();//release so this session is not returned by getCurrentSession
-                    session.close();//no further need for this session
+    private Runnable getUpdateRunnable() {
+        MCRFixedUserCallable<Object> callable = new MCRFixedUserCallable<>(
+            Executors.callable(this::updateCachedSetList), MCRSystemUserInformation.getSystemUserInstance());
+        return () -> {
+            try {
+                callable.call();
+            } catch (Exception e) {
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
                 }
+                throw new MCRException(e);
             }
         };
-        new Timer().schedule(tt, new Date(System.currentTimeMillis() + maxAgeInMilli), maxAgeInMilli);
+    }
+
+    private void updateCachedSetList() {
+        LOGGER.info("update oai set list");
+        synchronized (cachedSetList) {
+            OAIDataList<MCRSet> setList = createSetList();
+            cachedSetList.clear();
+            cachedSetList.addAll(setList);
+        }
     }
 
     protected void updateURIs() {
         this.setConfigurationMap = Collections.synchronizedMap(new HashMap<>());
-        MCRConfiguration config = MCRConfiguration.instance();
-        String setIds = config.getString(this.configPrefix + "Sets", null);
-        if(setIds != null) {
-            for (String setId : setIds.split(",")) {
-                setId = setId.trim();
-                MCROAISetConfiguration<?> setConf = new MCROAISolrSetConfiguration(this.configPrefix, setId);
-                this.setConfigurationMap.put(setId, setConf);
-            }
-        }
+        getDefinedSetIds().stream()
+            .map(String::trim)
+            .map(setId -> new MCROAISolrSetConfiguration(this.configPrefix, setId))
+            .forEach(c -> setConfigurationMap.put(c.getId(), c));
+    }
+
+    public List<String> getDefinedSetIds() {
+        return MCRConfiguration.instance().getStrings(this.configPrefix + "Sets", Collections.emptyList());
     }
 
     /**
@@ -156,8 +156,19 @@ public class MCROAISetManager {
      * @return list of oai sets
      */
     @SuppressWarnings("unchecked")
-    public OAIDataList<Set> get() {
+    public OAIDataList<MCRSet> get() {
         // no cache
+        if (this.cacheMaxAge == 0) {
+            return createSetList();
+        }
+        OAIDataList<MCRSet> oaiDataList = getDirectList();
+        // create a shallow copy of the set list
+        synchronized (oaiDataList) {
+            return (OAIDataList<MCRSet>) oaiDataList.clone();
+        }
+    }
+
+    public OAIDataList<MCRSet> getDirectList() {
         if (this.cacheMaxAge == 0) {
             return createSetList();
         }
@@ -167,17 +178,12 @@ public class MCROAISetManager {
         if (lastModified != this.classLastModified) {
             this.classLastModified = lastModified;
             synchronized (this.cachedSetList) {
-                OAIDataList<Set> setList = createSetList();
+                OAIDataList<MCRSet> setList = createSetList();
                 cachedSetList.clear();
                 cachedSetList.addAll(setList);
             }
         }
-        // create a shallow copy of the set list
-        OAIDataList<Set> clonedList;
-        synchronized (this.cachedSetList) {
-            clonedList = (OAIDataList<Set>) this.cachedSetList.clone();
-        }
-        return clonedList;
+        return cachedSetList;
     }
 
     /**
@@ -188,21 +194,26 @@ public class MCROAISetManager {
      * @return the configuration for this set
      */
     @SuppressWarnings("unchecked")
-    public <T> MCROAISetConfiguration<T> getConfig(String setId) {
-        return (MCROAISetConfiguration<T>) this.setConfigurationMap.get(setId);
+    public <Q, R, K> MCROAISetConfiguration<Q, R, K> getConfig(String setId) {
+        return (MCROAISetConfiguration<Q, R, K>) this.setConfigurationMap.get(setId);
     }
 
-    protected OAIDataList<Set> createSetList() {
-        OAIDataList<Set> setList = new OAIDataList<Set>();
+    protected OAIDataList<MCRSet> createSetList() {
+        OAIDataList<MCRSet> setList = new OAIDataList<MCRSet>();
         synchronized (this.setConfigurationMap) {
-            for (MCROAISetConfiguration<?> conf : this.setConfigurationMap.values()) {
-                MCROAISetHandler<?> handler = conf.getHandler();
-                Element resolved = MCRURIResolver.instance().resolve(conf.getURI());
-                for (Element setElement : (List<Element>) (resolved.getChildren("set", OAIConstants.NS_OAI))) {
-                    Set set = createSet(conf.getId(), setElement);
-                    if (!contains(set.getSpec(), setList)) {
-                        if (!handler.filter(set)) {
-                            setList.add(set);
+            for (MCROAISetConfiguration<?, ?, ?> conf : this.setConfigurationMap.values()) {
+                MCROAISetHandler<?, ?, ?> handler = conf.getHandler();
+                Map<String, MCRSet> setMap = handler.getSetMap();
+                synchronized (setMap) {
+                    setMap.clear();
+                    Element resolved = MCRURIResolver.instance().resolve(conf.getURI());
+                    for (Element setElement : (List<Element>) (resolved.getChildren("set", OAIConstants.NS_OAI))) {
+                        MCRSet set = createSet(conf.getId(), setElement);
+                        setMap.put(set.getSpec(), set);
+                        if (!contains(set.getSpec(), setList)) {
+                            if (!handler.filter(set)) {
+                                setList.add(set);
+                            }
                         }
                     }
                 }
@@ -211,40 +222,40 @@ public class MCROAISetManager {
         return setList;
     }
 
-    private Set createSet(String setId, Element setElement) {
+    private MCRSet createSet(String setId, Element setElement) {
         String setSpec = setElement.getChildText("setSpec", NS_OAI);
         String setName = setElement.getChildText("setName", NS_OAI);
-        Set set = new Set(getSetSpec(setId, setSpec), setName);
+        MCRSet set = new MCRSet(setId, getSetSpec(setSpec), setName);
         set.getDescription()
-           .addAll(setElement.getChildren("setDescription", NS_OAI)
-                             .stream() //all setDescription
-                             .flatMap(e -> e.getChildren().stream().limit(1)) //first childElement of setDescription
-                             .peek(Element::detach)
-                             .map(d -> (Description) new Description() {
-                                 @Override
-                                 public Element toXML() {
-                                     return d;
-                                 }
+            .addAll(setElement.getChildren("setDescription", NS_OAI)
+                .stream() //all setDescription
+                .flatMap(e -> e.getChildren().stream().limit(1)) //first childElement of setDescription
+                .peek(Element::detach)
+                .map(d -> (Description) new Description() {
+                    @Override
+                    public Element toXML() {
+                        return d;
+                    }
 
-                                 @Override
-                                 public void fromXML(Element descriptionElement) {
-                                     throw new UnsupportedOperationException();
-                                 }
-                             })
-                             .collect(Collectors.toList()));
+                    @Override
+                    public void fromXML(Element descriptionElement) {
+                        throw new UnsupportedOperationException();
+                    }
+                })
+                .collect(Collectors.toList()));
         return set;
     }
 
-    private String getSetSpec(String setId, String elementText) {
-        StringBuffer setSpec = new StringBuffer(setId).append(":");
+    private String getSetSpec(String elementText) {
         if (elementText.contains(":")) {
+            StringBuffer setSpec = new StringBuffer();
             String classID = elementText.substring(0, elementText.indexOf(':')).trim();
             classID = MCRClassificationAndSetMapper.mapClassificationToSet(this.configPrefix, classID);
             setSpec.append(classID).append(elementText.substring(elementText.indexOf(':')));
+            return setSpec.toString();
         } else {
-            setSpec.append(elementText);
+            return elementText;
         }
-        return setSpec.toString();
     }
 
     /**
@@ -256,7 +267,7 @@ public class MCROAISetManager {
      *            list of sets
      * @return the set with setSpec
      */
-    public static Set get(String setSpec, OAIDataList<Set> setList) {
+    public static <T extends Set> T get(String setSpec, OAIDataList<T> setList) {
         return setList.stream().filter(s -> s.getSpec().equals(setSpec)).findFirst().orElse(null);
     }
 
@@ -269,7 +280,7 @@ public class MCROAISetManager {
      *            list of sets
      * @return true if the list contains the set
      */
-    public static boolean contains(String setSpec, OAIDataList<Set> setList) {
+    public static boolean contains(String setSpec, OAIDataList<? extends Set> setList) {
         return get(setSpec, setList) != null;
     }
 

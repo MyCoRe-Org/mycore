@@ -1,6 +1,7 @@
 package org.mycore.oai.set;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.common.SolrDocument;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
@@ -9,20 +10,19 @@ import org.mycore.common.config.MCRConfiguration;
  * 
  * @author Matthias Eichner
  */
-public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQuery> {
+public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQuery, SolrDocument, String> {
 
     private String id;
 
     private String uri;
 
-    private MCROAISetHandler<SolrQuery> handler;
+    private MCROAISetHandler<SolrQuery, SolrDocument, String> handler;
 
     public MCROAISolrSetConfiguration(String configPrefix, String setId) {
         MCRConfiguration config = MCRConfiguration.instance();
-        MCROAISetHandler<SolrQuery> handler = config.getInstanceOf(configPrefix + "Sets." + setId + ".handler",
-            "org.mycore.oai.set.MCROAIClassificationToSetHandler");
+        MCROAISetHandler<SolrQuery, SolrDocument, String> handler = config.getInstanceOf(configPrefix + "Sets." + setId + ".Handler",
+            MCROAIClassificationToSetHandler.class.getName());
         handler.init(configPrefix, setId);
-
         this.id = setId;
         this.uri = config.getString(configPrefix + "Sets." + setId).trim();
         this.handler = handler;
@@ -39,7 +39,7 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
     }
 
     @Override
-    public MCROAISetHandler<SolrQuery> getHandler() {
+    public MCROAISetHandler<SolrQuery, SolrDocument, String> getHandler() {
         return this.handler;
     }
 

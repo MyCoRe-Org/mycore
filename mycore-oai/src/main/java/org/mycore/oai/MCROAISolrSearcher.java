@@ -3,8 +3,12 @@ package org.mycore.oai;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,6 +24,10 @@ import org.mycore.datamodel.common.MCRISO8601FormatChooser;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Set;
 import org.mycore.oai.set.MCROAISetConfiguration;
+import org.mycore.oai.set.MCROAISetHandler;
+import org.mycore.oai.set.MCROAISetResolver;
+import org.mycore.oai.set.MCROAISolrSetHandler;
+import org.mycore.oai.set.MCRSet;
 import org.mycore.solr.MCRSolrClientFactory;
 
 /**
@@ -30,8 +38,8 @@ import org.mycore.solr.MCRSolrClientFactory;
 public class MCROAISolrSearcher extends MCROAISearcher {
 
     protected final static Logger LOGGER = LogManager.getLogger(MCROAISolrSearcher.class);
-    
-    private Set set;
+
+    private MCRSet set;
 
     private ZonedDateTime from;
 
@@ -47,9 +55,9 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     private String lastCursor;
 
     private MCROAISolrResult nextResult;
-    
+
     @Override
-    public Optional<Header> getHeader(String mcrId){
+    public Optional<Header> getHeader(String mcrId) {
         SolrQuery query = getBaseQuery(CommonParams.FQ);
         query.set(CommonParams.Q, mcrId);
         query.setRows(1);
@@ -58,8 +66,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         try {
             QueryResponse response = solrClient.query(query);
             SolrDocumentList results = response.getResults();
-            if (!results.isEmpty()){
-                return Optional.of(toHeader(results.get(0)));
+            if (!results.isEmpty()) {
+                return Optional.of(toHeader(results.get(0), getSetResolver(results)));
             }
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
@@ -74,7 +82,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     }
 
     @Override
-    public MCROAIResult query(Set set, ZonedDateTime from, ZonedDateTime until) {
+    public MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until) {
         this.set = set;
         this.from = from;
         this.until = until;
@@ -95,8 +103,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
         // set support
         if (this.set != null) {
-            String setId = MCROAIUtils.getSetId(this.set);
-            MCROAISetConfiguration<SolrQuery> setConfig = getSetManager().getConfig(setId);
+            String setId = this.set.getSetId();
+            MCROAISetConfiguration<SolrQuery, SolrDocument, String> setConfig = getSetManager().getConfig(setId);
             setConfig.getHandler().apply(this.set, query);
         }
         // date range
@@ -118,7 +126,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         try {
             QueryResponse response = solrClient.query(query);
-            return new MCROAISolrResult(response, this::toHeader);
+            return new MCROAISolrResult(response, d -> toHeader(d, getSetResolver(response.getResults())));
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
         }
@@ -133,17 +141,55 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         if (restriction != null) {
             query.set(restrictionField, restriction);
         }
-
-        query.setFields("id", getModifiedField(), getCategoryField());
+        String[] requiredFields = Stream.concat(Stream.of("id", getModifiedField()), getRequiredFieldNames().stream())
+            .toArray(i -> new String[i]);
+        query.setFields(requiredFields);
         // request handler
         query.setRequestHandler(getConfig().getString(configPrefix + "Search.RequestHandler", "/select"));
         return query;
     }
+
+    private Collection<MCROAISetResolver<String, SolrDocument>> getSetResolver(Collection<SolrDocument> result) {
+        return getSetManager().getDefinedSetIds().stream()
+            .map(getSetManager()::getConfig)
+            .map(MCROAISetConfiguration::getHandler)
+            .map(this::cast)
+            .map(h -> h.getSetResolver(result))
+            .collect(Collectors.toList());
+    }
     
-    Header toHeader(SolrDocument doc) {
+    private Collection<String> getRequiredFieldNames(){
+        return getSetManager().getDefinedSetIds().stream()
+            .map(getSetManager()::getConfig)
+            .map(MCROAISetConfiguration::getHandler)
+            .filter(MCROAISolrSetHandler.class::isInstance)
+            .map(MCROAISolrSetHandler.class::cast)
+            .peek(h -> LOGGER.info("Handler: " + h.getHandlerPrefix() + " " + h.getClass().getName()))
+            .flatMap(h -> h.getFieldNames().stream())
+            .peek(s -> LOGGER.info("Field: " + s))
+            .collect(Collectors.toSet());
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private MCROAISetHandler<SolrQuery, SolrDocument, String> cast(MCROAISetHandler handler) {
+        return handler;
+    }
+
+    Header toHeader(SolrDocument doc, Collection<MCROAISetResolver<String, SolrDocument>> setResolver) {
         Date modified = (Date) doc.getFieldValue(getModifiedField());
-        Header header = new Header(getObjectManager().getOAIId(doc.getFieldValue("id").toString()), modified);
+        String docId = doc.getFieldValue("id").toString();
+        Header header = new Header(getObjectManager().getOAIId(docId), modified);
+        setResolver.parallelStream()
+            .map(r -> r.getSets(docId))
+            .flatMap(Collection::stream)
+            .sorted(this::compare)
+            .sequential()
+            .forEachOrdered(header.getSetList()::add);
         return header;
+    }
+
+    private int compare(Set s1, Set s2) {
+        return s1.getSpec().compareTo(s2.getSpec());
     }
 
     private String buildFromUntilCondition(ZonedDateTime from, ZonedDateTime until) {
@@ -165,10 +211,6 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
     private String getModifiedField() {
         return getConfig().getString(getConfigPrefix() + "Search.FromUntil", "modified");
-    }
-
-    private String getCategoryField() {
-        return getConfig().getString(getConfigPrefix() + "Search.Category", "category");
     }
 
     @Override

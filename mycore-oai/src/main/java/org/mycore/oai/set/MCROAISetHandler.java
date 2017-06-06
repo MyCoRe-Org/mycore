@@ -1,15 +1,16 @@
 package org.mycore.oai.set;
 
-import org.mycore.oai.pmh.Set;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Base interface to handle mycore oai sets.
  *
  * @author Matthias Eichner
  *
- * @param <T> set type
+ * @param <Q> set type
  */
-public interface MCROAISetHandler<T> {
+public interface MCROAISetHandler<Q, R, K> {
 
     /**
      * Initializes the set handler with the configPrefix
@@ -22,16 +23,20 @@ public interface MCROAISetHandler<T> {
     public void init(String configPrefix, String setId);
 
     /**
-     * Called before {@link #apply(Set, Object)} to check if the
+     * Called before {@link #apply(MCRSet, Object)} to check if the
      * given set should be added to the ListSets view.
      *
      * @return false if the given set should be added (the
      *           set is not filtered)
      */
-    public default boolean filter(Set set) {
+    public default boolean filter(MCRSet set) {
         return false;
     }
+    
+    public Map<String, MCRSet> getSetMap();
 
-    public void apply(Set set, T t);
+    public void apply(MCRSet set, Q q);
+    
+    public MCROAISetResolver<K, R> getSetResolver(Collection<R> result);
 
 }

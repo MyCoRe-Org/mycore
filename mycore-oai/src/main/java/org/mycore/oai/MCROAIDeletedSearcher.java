@@ -14,7 +14,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Header.Status;
 import org.mycore.oai.pmh.Identify.DeletedRecordPolicy;
-import org.mycore.oai.pmh.Set;
+import org.mycore.oai.set.MCRSet;
 
 /**
  * Searcher for deleted records. The schema for the cursor
@@ -66,7 +66,7 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
     }
 
     @Override
-    public MCROAIResult query(Set set, ZonedDateTime from, ZonedDateTime until) {
+    public MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until) {
         this.deletedRecords = this.searchDeleted(from, until);
         return this.query(null);
     }

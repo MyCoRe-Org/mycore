@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Identify.DeletedRecordPolicy;
 import org.mycore.oai.pmh.MetadataFormat;
-import org.mycore.oai.pmh.Set;
+import org.mycore.oai.set.MCRSet;
 
 /**
  * <p>Combines the solr searcher and the deleted searcher. Ignores the
@@ -58,7 +58,7 @@ public class MCROAICombinedSearcher extends MCROAISearcher {
     }
 
     @Override
-    public MCROAIResult query(Set set, ZonedDateTime from, ZonedDateTime until) {
+    public MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until) {
         MCROAIResult solrResult = this.solrSearcher.query(set, from, until);
         if (!this.deletedSearcher.isPresent()) {
             this.numHits = solrResult.getNumHits();

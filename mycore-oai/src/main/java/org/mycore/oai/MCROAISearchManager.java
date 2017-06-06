@@ -18,6 +18,7 @@ import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.oai.pmh.OAIDataList;
 import org.mycore.oai.pmh.Record;
 import org.mycore.oai.pmh.Set;
+import org.mycore.oai.set.MCRSet;
 
 /**
  * Search manager of the mycore OAI-PMH implementation. Creates a new
@@ -108,14 +109,14 @@ public class MCROAISearchManager {
         return getRecordList(searcher, result);
     }
 
-    public OAIDataList<Header> searchHeader(MetadataFormat format, Set set, ZonedDateTime from, ZonedDateTime until) {
+    public OAIDataList<Header> searchHeader(MetadataFormat format, MCRSet set, ZonedDateTime from, ZonedDateTime until) {
         MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager, objManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);
         return getHeaderList(searcher, result);
     }
 
-    public OAIDataList<Record> searchRecord(MetadataFormat format, Set set, ZonedDateTime from, ZonedDateTime until) {
+    public OAIDataList<Record> searchRecord(MetadataFormat format, MCRSet set, ZonedDateTime from, ZonedDateTime until) {
         MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager, objManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);
