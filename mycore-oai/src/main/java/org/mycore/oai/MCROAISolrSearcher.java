@@ -5,7 +5,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,6 +28,7 @@ import org.mycore.oai.set.MCROAISetResolver;
 import org.mycore.oai.set.MCROAISolrSetHandler;
 import org.mycore.oai.set.MCRSet;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrUtils;
 
 /**
  * Solr searcher implementation. Uses cursors.
@@ -59,7 +59,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     @Override
     public Optional<Header> getHeader(String mcrId) {
         SolrQuery query = getBaseQuery(CommonParams.FQ);
-        query.set(CommonParams.Q, mcrId);
+        query.set(CommonParams.Q, "id:" + MCRSolrUtils.escapeSearchValue(mcrId));
         query.setRows(1);
         // do the query
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
@@ -157,16 +157,14 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             .map(h -> h.getSetResolver(result))
             .collect(Collectors.toList());
     }
-    
-    private Collection<String> getRequiredFieldNames(){
+
+    private Collection<String> getRequiredFieldNames() {
         return getSetManager().getDefinedSetIds().stream()
             .map(getSetManager()::getConfig)
             .map(MCROAISetConfiguration::getHandler)
             .filter(MCROAISolrSetHandler.class::isInstance)
             .map(MCROAISolrSetHandler.class::cast)
-            .peek(h -> LOGGER.info("Handler: " + h.getHandlerPrefix() + " " + h.getClass().getName()))
             .flatMap(h -> h.getFieldNames().stream())
-            .peek(s -> LOGGER.info("Field: " + s))
             .collect(Collectors.toSet());
     }
 

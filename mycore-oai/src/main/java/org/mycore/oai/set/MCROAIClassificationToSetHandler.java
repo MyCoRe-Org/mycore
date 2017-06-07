@@ -76,10 +76,8 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
     @Override
     public Collection<String> getFieldNames() {
         if (classField == null) {
-            LOGGER.info("Returning empty set :" + getHandlerPrefix());
             return super.getFieldNames();
         }
-        LOGGER.info("Returning field :" + classField + " " + getHandlerPrefix());
         return Collections.singleton(classField);
     }
 

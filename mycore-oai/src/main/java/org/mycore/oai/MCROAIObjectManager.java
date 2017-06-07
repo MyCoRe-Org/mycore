@@ -94,7 +94,7 @@ public class MCROAIObjectManager {
             return new Record(header);
         }
         try {
-            recordElement = getJDOMRecord(header.getId(), format);
+            recordElement = getJDOMRecord(getMyCoReId(header.getId()), format);
         } catch (Exception exc) {
             LOGGER.error("unable to get record " + header.getId() + " (" + format.getPrefix() + ")");
             return null;
