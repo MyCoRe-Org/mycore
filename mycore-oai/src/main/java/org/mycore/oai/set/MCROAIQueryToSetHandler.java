@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,6 @@ public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
         super.init(configPrefix, setId);
         configQuery = getSetFilterQuery(setId);
         if (configQuery.contains(SET_SPEC_PARAMETER)) {
-            checkParameterQuery(configQuery);
             this.searchField = getSearchField(configQuery);
         } else {
             this.searchField = null;
@@ -45,7 +45,12 @@ public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
     }
 
     private String getSearchField(String simpleQuery) {
-        return SIMPLE_PARAMETER_QUERY.matcher(simpleQuery).group("field");
+        Matcher fieldMatcher = SIMPLE_PARAMETER_QUERY.matcher(simpleQuery);
+        if (fieldMatcher.matches()) {
+            return fieldMatcher.group("field");
+        }
+        throw new MCRConfigurationException(
+            "Queries containing '" + SET_SPEC_PARAMETER + "' must be in simple form: fielName:{setSpec}");
     }
 
     @Override
@@ -54,13 +59,6 @@ public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
             return super.getFieldNames();
         }
         return Collections.singleton(searchField);
-    }
-
-    private void checkParameterQuery(String simpleQuery) {
-        if (!SIMPLE_PARAMETER_QUERY.matcher(simpleQuery).matches()) {
-            throw new MCRConfigurationException(
-                "Queries containing '" + SET_SPEC_PARAMETER + "' must be in simple form: fielName:{setSpec}");
-        }
     }
 
     @Override
