@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -119,8 +120,9 @@ public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
 
         @Override
         public Collection<Set> getSets(String key) {
-            return resultMap.get(key)
-                .getFieldValues(queryField)
+            return Optional.ofNullable(resultMap.get(key)
+                .getFieldValues(queryField))
+                .orElseGet(() -> Collections.emptySet())
                 .stream()
                 .map(getSetMap()::get)
                 .collect(Collectors.toSet());
