@@ -126,7 +126,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         try {
             QueryResponse response = solrClient.query(query);
-            return new MCROAISolrResult(response, d -> toHeader(d, getSetResolver(response.getResults())));
+            Collection<MCROAISetResolver<String, SolrDocument>> setResolver = getSetResolver(response.getResults());
+            return new MCROAISolrResult(response, d -> toHeader(d, setResolver));
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
         }

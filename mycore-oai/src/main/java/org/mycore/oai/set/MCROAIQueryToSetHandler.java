@@ -167,17 +167,17 @@ public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
             SolrQuery solrQuery = new SolrQuery();
             MCRConfiguration config = MCRConfiguration.instance();
             // query
-            solrQuery.setQuery(query);
-            solrQuery.setFields("id");
-            String filterQuery = getResult().stream()
+            String idQuery = getResult().stream()
                 .map(getIdentifier())
                 .map(MCRSolrUtils::escapeSearchValue)
                 .collect(Collectors.joining(" OR ", "id:(", ")"));
-            solrQuery.set(CommonParams.FQ, filterQuery);
+            solrQuery.setQuery(idQuery);
+            solrQuery.setFilterQueries(query);
+            solrQuery.setFields("id");
+            solrQuery.setRows(getResult().size());
             // request handler
             solrQuery.setRequestHandler(config.getString(getConfigPrefix() + "Search.RequestHandler", "/select"));
             return solrQuery;
-
         }
 
     }
