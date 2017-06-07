@@ -100,16 +100,21 @@ public class MCROAIObjectManager {
             return null;
         }
         Record record = new Record(header);
-        Element metadataElement = recordElement.getChild("metadata", OAIConstants.NS_OAI);
-        if (metadataElement != null && !metadataElement.getChildren().isEmpty()) {
-            Element metadataChild = (Element) metadataElement.getChildren().get(0);
-            record.setMetadata(new SimpleMetadata(metadataChild.detach()));
-        }
-        Element aboutElement = recordElement.getChild("about", OAIConstants.NS_OAI);
-        if (aboutElement != null) {
-            for (Element aboutChild : aboutElement.getChildren()) {
-                record.getAboutList().add(aboutChild.detach());
+        if (recordElement.getNamespace().equals(OAIConstants.NS_OAI)) {
+            Element metadataElement = recordElement.getChild("metadata", OAIConstants.NS_OAI);
+            if (metadataElement != null && !metadataElement.getChildren().isEmpty()) {
+                Element metadataChild = (Element) metadataElement.getChildren().get(0);
+                record.setMetadata(new SimpleMetadata(metadataChild.detach()));
             }
+            Element aboutElement = recordElement.getChild("about", OAIConstants.NS_OAI);
+            if (aboutElement != null) {
+                for (Element aboutChild : aboutElement.getChildren()) {
+                    record.getAboutList().add(aboutChild.detach());
+                }
+            }
+        } else {
+            //handle as metadata
+            record.setMetadata(new SimpleMetadata(recordElement));
         }
         return record;
     }

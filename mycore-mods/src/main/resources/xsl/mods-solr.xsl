@@ -4,7 +4,7 @@
   exclude-result-prefixes="xalan xlink mods mcrxsl">
   <xsl:import href="xslImport:solr-document:mods-solr.xsl" />
   <xsl:include href="mods-utils.xsl" />
-  <xsl:include href="mods2mods.xsl" />
+  <xsl:include href="modsenhancer.xsl" />
   <xsl:include href="xslInclude:mods" />
 
   <xsl:strip-space elements="mods:*" />
