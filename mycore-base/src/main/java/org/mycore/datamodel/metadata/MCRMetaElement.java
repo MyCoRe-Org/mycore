@@ -306,8 +306,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         try {
             String classname = element.getAttributeValue("class");
             if(classname == null) {
-                throw new MCRException("Missing required class attribute in element " + element.getName() + " of object "
-                        + element.getDocument().getRootElement().getAttributeValue("ID"));
+                throw new MCRException("Missing required class attribute in element " + element.getName());
             }
             fullname = META_PACKAGE_NAME + classname;
             forName = (Class<? extends MCRMetaInterface>) Class.forName(fullname);
