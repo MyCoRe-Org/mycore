@@ -61,7 +61,7 @@ public abstract class MCROAISearcher {
         this.objectManager = objectManager;
         updateRunningExpirationTimer();
     }
-    
+
     public abstract Optional<Header> getHeader(String mcrId);
 
     public abstract MCROAIResult query(String cursor);
@@ -89,7 +89,7 @@ public abstract class MCROAISearcher {
     public MCROAISetManager getSetManager() {
         return setManager;
     }
-    
+
     public MCROAIObjectManager getObjectManager() {
         return objectManager;
     }

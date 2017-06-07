@@ -138,9 +138,9 @@ public class MCROAIIdentify extends SimpleIdentify {
             // deleted items
             if (DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
                 Date earliestDeletedDate = MCRDeletedItemManager.getFirstDate()
-                                                                .map(ZonedDateTime::toInstant)
-                                                                .map(Date::from)
-                                                                .orElse(null);
+                    .map(ZonedDateTime::toInstant)
+                    .map(Date::from)
+                    .orElse(null);
                 if (earliestDeletedDate != null && earliestDeletedDate.compareTo(datestamp) < 0) {
                     datestamp = earliestDeletedDate;
                 }

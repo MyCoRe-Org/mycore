@@ -120,10 +120,9 @@ public class MCROAISetManager {
         return () -> {
             try {
                 callable.call();
+            } catch (RuntimeException e) {
+                throw e;
             } catch (Exception e) {
-                if (e instanceof RuntimeException) {
-                    throw (RuntimeException) e;
-                }
                 throw new MCRException(e);
             }
         };

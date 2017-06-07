@@ -20,7 +20,7 @@ public interface MCROAISetHandler<Q, R, K> {
      * @param configPrefix the config prefix
      * @param setId the set id without any prefix
      */
-    public void init(String configPrefix, String setId);
+    void init(String configPrefix, String setId);
 
     /**
      * Called before {@link #apply(MCRSet, Object)} to check if the
@@ -29,14 +29,14 @@ public interface MCROAISetHandler<Q, R, K> {
      * @return false if the given set should be added (the
      *           set is not filtered)
      */
-    public default boolean filter(MCRSet set) {
+    default boolean filter(MCRSet set) {
         return false;
     }
     
-    public Map<String, MCRSet> getSetMap();
+    Map<String, MCRSet> getSetMap();
 
-    public void apply(MCRSet set, Q q);
+    void apply(MCRSet set, Q q);
     
-    public MCROAISetResolver<K, R> getSetResolver(Collection<R> result);
+    MCROAISetResolver<K, R> getSetResolver(Collection<R> result);
 
 }

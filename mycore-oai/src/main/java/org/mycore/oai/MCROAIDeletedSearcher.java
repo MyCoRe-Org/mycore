@@ -113,7 +113,8 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
             return new ArrayList<>();
         }
         LOGGER.info("Getting identifiers of deleted items");
-        List<Entry<String, ZonedDateTime>> deletedItems = MCRDeletedItemManager.getDeletedItems(from, Optional.ofNullable(until));
+        List<Entry<String, ZonedDateTime>> deletedItems = MCRDeletedItemManager.getDeletedItems(from,
+            Optional.ofNullable(until));
         List<String> types = getConfig().getStrings(getConfigPrefix() + "DeletedRecordTypes", null);
         if (types == null || types.isEmpty()) {
             return deletedItems.stream()
@@ -125,8 +126,8 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
             .map(this::toHeader)
             .collect(Collectors.toList());
     }
-    
-    private Header toHeader(Entry<String, ZonedDateTime> p){
+
+    private Header toHeader(Entry<String, ZonedDateTime> p) {
         return new Header(getObjectManager().getOAIId(p.getKey()), Date.from(p.getValue().toInstant()), Status.deleted);
     }
 

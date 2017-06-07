@@ -81,7 +81,7 @@ public class MCROAISearchManager {
         this.setManager = setManager;
         this.partitionSize = partitionSize;
     }
-    
+
     public Optional<Header> getHeader(String oaiId) {
         MCROAISearcher searcher = getSearcher(this.identify, null, 1, setManager, objManager);
         return searcher.getHeader(objManager.getMyCoReId(oaiId));
@@ -109,14 +109,16 @@ public class MCROAISearchManager {
         return getRecordList(searcher, result);
     }
 
-    public OAIDataList<Header> searchHeader(MetadataFormat format, MCRSet set, ZonedDateTime from, ZonedDateTime until) {
+    public OAIDataList<Header> searchHeader(MetadataFormat format, MCRSet set, ZonedDateTime from,
+        ZonedDateTime until) {
         MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager, objManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);
         return getHeaderList(searcher, result);
     }
 
-    public OAIDataList<Record> searchRecord(MetadataFormat format, MCRSet set, ZonedDateTime from, ZonedDateTime until) {
+    public OAIDataList<Record> searchRecord(MetadataFormat format, MCRSet set, ZonedDateTime from,
+        ZonedDateTime until) {
         MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager, objManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);

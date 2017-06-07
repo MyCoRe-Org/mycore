@@ -14,6 +14,8 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQuery, SolrDocument, String> {
 
+    private static final String SETS_PREFIX = "Sets.";
+
     private String id;
 
     private String uri;
@@ -22,7 +24,7 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
 
     public MCROAISolrSetConfiguration(String configPrefix, String setId) {
         MCRConfiguration config = MCRConfiguration.instance();
-        String setConfigPrefix = configPrefix + "Sets." + setId;
+        String setConfigPrefix = configPrefix + SETS_PREFIX + setId;
         MCROAISetHandler<SolrQuery, SolrDocument, String> handler = config.getInstanceOf(
             setConfigPrefix + ".Handler",
             getFallbackHandler(configPrefix, setId));
@@ -49,17 +51,17 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
 
     private String getFallbackHandler(String configPrefix, String setId) {
         MCRConfiguration config = MCRConfiguration.instance();
-        String queryProperty = configPrefix + "Sets." + setId + ".Query";
+        String queryProperty = configPrefix + SETS_PREFIX + setId + ".Query";
         if (config.getString(queryProperty,
             config.getString(configPrefix + "MapSetToQuery." + setId, null)) != null) {
             return MCROAIQueryToSetHandler.class.getName();
         }
-        String classProperty = configPrefix + "Sets." + setId + ".Classification";
+        String classProperty = configPrefix + SETS_PREFIX + setId + ".Classification";
         if (config.getString(classProperty,
             config.getString(configPrefix + "MapSetToClassification." + setId, null)) != null) {
             return MCROAIClassificationToSetHandler.class.getName();
         }
-        if (config.getString(configPrefix + "Sets." + setId + ".Handler", null) == null) {
+        if (config.getString(configPrefix + SETS_PREFIX + setId + ".Handler", null) == null) {
             LogManager.getLogger().error(
                 "Neither '{}' nor '{}' is defined. Please map set '{}' to classification or query.", classProperty,
                 queryProperty, setId);

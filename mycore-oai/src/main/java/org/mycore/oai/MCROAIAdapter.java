@@ -61,7 +61,7 @@ public class MCROAIAdapter implements OAIAdapter {
     protected final static ZoneId UTC_ZONE = ZoneId.of("UTC");
 
     public final static String PREFIX = "MCR.OAIDataProvider.";
-    
+
     public static int DEFAULT_PARTITION_SIZE;
 
     protected String baseURL;
@@ -294,7 +294,8 @@ public class MCROAIAdapter implements OAIAdapter {
         getSetManager().getDirectList();
         ZonedDateTime fromDateTime = from != null ? from.toInstant().atZone(UTC_ZONE) : null;
         ZonedDateTime untilDateTime = until != null ? until.toInstant().atZone(UTC_ZONE) : null;
-        OAIDataList<Record> recordList = getSearchManager().searchRecord(format, toMCRSet(set), fromDateTime, untilDateTime);
+        OAIDataList<Record> recordList = getSearchManager().searchRecord(format, toMCRSet(set), fromDateTime,
+            untilDateTime);
         if (recordList.isEmpty()) {
             throw new NoRecordsMatchException();
         }
@@ -302,7 +303,7 @@ public class MCROAIAdapter implements OAIAdapter {
     }
 
     private MCRSet toMCRSet(Set set) throws NoSetHierarchyException, NoRecordsMatchException {
-        if (set == null){
+        if (set == null) {
             return null;
         }
         return getSet(set.getSpec());
@@ -326,7 +327,8 @@ public class MCROAIAdapter implements OAIAdapter {
         ZonedDateTime untilDateTime = until != null ? until.toInstant().atZone(UTC_ZONE) : null;
         //Update set for response header
         getSetManager().getDirectList();
-        OAIDataList<Header> headerList = getSearchManager().searchHeader(format, toMCRSet(set), fromDateTime, untilDateTime);
+        OAIDataList<Header> headerList = getSearchManager().searchHeader(format, toMCRSet(set), fromDateTime,
+            untilDateTime);
         if (headerList.isEmpty()) {
             throw new NoRecordsMatchException();
         }

@@ -3,6 +3,8 @@ package org.mycore.oai.set;
 import org.mycore.oai.pmh.Set;
 
 public class MCRSet extends Set {
+    private String setId;
+
     public MCRSet(String setId, String spec, String name) {
         super(spec, name);
         this.setId = setId;
@@ -12,7 +14,6 @@ public class MCRSet extends Set {
         this(setId, spec, null);
     }
 
-    private String setId;
 
     public String getSetId() {
         return setId;
