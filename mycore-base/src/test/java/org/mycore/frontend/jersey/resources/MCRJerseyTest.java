@@ -30,7 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.MCRTestCaseHelper;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.jersey.MCRJerseyResourceConfig;
 
 /**
  * Jersey base test class. Overwrite this class and add a 
@@ -47,8 +47,6 @@ public abstract class MCRJerseyTest extends JerseyTest {
 
     public static Set<Class<?>> JERSEY_CLASSES = new HashSet<>();
 
-    protected MCRConfiguration config;
-
     @BeforeClass
     public static void mcrInitBaseDir() throws IOException {
         MCRTestCaseHelper.beforeClass(junitFolder);
@@ -63,7 +61,6 @@ public abstract class MCRJerseyTest extends JerseyTest {
     @Before
     public void mcrSetUp() throws Exception {
         MCRTestCaseHelper.before(getTestProperties());
-        config = MCRConfiguration.instance();
     }
 
     @After
@@ -90,10 +87,16 @@ public abstract class MCRJerseyTest extends JerseyTest {
         return new ExtendedGrizzlyTestContainerFactory();
     }
 
-    protected static class MCRTestResourceConfig extends ResourceConfig {
+    protected static class MCRTestResourceConfig extends MCRJerseyResourceConfig {
 
-        public MCRTestResourceConfig() {
-            super(JERSEY_CLASSES);
+        @Override
+        protected void setupResources() {
+            this.registerClasses(JERSEY_CLASSES);
+        }
+
+        @Override
+        protected void setupFeatures() {
+            // no features
         }
 
     }

@@ -28,26 +28,36 @@ public class MCRJerseyResourceConfig extends ResourceConfig {
     public MCRJerseyResourceConfig() {
         super();
         LOGGER.info("Loading jersey resource config...");
-        // multi part
-        this.register(MultiPartFeature.class);
 
-        // register all packages from MCRConfiguratin
+        // setup resources
+        setupResources();
+
+        // include mcr jersey feature
+        setupFeatures();
+
+        // setup guice bridge
+        setupGuiceBridge();
+    }
+
+    /**
+     * Setup the jersey resources. 
+     */
+    protected void setupResources() {
         String propertyString = MCRConfiguration.instance().getString("MCR.Jersey.resource.packages",
             "org.mycore.frontend.jersey.resources");
         this.packages(propertyString.split(","));
         LOGGER.info("Scanning jersey resource packages " + propertyString);
+    }
 
-        // include mcr jersey feature
+    /**
+     * Setup features. By default the multi part feature and every mycore feature
+     * class in "org.mycore.frontend.jersey.feature".
+     */
+    protected void setupFeatures() {
+        // multi part
+        this.register(MultiPartFeature.class);
+        // mycore features
         this.packages("org.mycore.frontend.jersey.feature");
-
-        // setup guice bridge
-        LOGGER.info("Initialize hk2 - guice bridge...");
-        register(new AbstractContainerLifecycleListener() {
-            @Override
-            public void onStartup(Container container) {
-                setupGuiceBridge(container.getApplicationHandler().getServiceLocator());
-            }
-        });
     }
 
     /**
@@ -57,14 +67,19 @@ public class MCRJerseyResourceConfig extends ResourceConfig {
      * <p>
      * <a href="https://hk2.java.net/guice-bridge/">about the bridge</a>
      * </p>
-     * 
-     * @param serviceLocator the service locator
      */
-    protected void setupGuiceBridge(ServiceLocator serviceLocator) {
-        Injector injector = MCRInjectorConfig.injector();
-        GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
-        GuiceIntoHK2Bridge guiceBridge = serviceLocator.getService(GuiceIntoHK2Bridge.class);
-        guiceBridge.bridgeGuiceInjector(injector);
+    protected void setupGuiceBridge() {
+        LOGGER.info("Initialize hk2 - guice bridge...");
+        register(new AbstractContainerLifecycleListener() {
+            @Override
+            public void onStartup(Container container) {
+                ServiceLocator serviceLocator = container.getApplicationHandler().getServiceLocator();
+                Injector injector = MCRInjectorConfig.injector();
+                GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
+                GuiceIntoHK2Bridge guiceBridge = serviceLocator.getService(GuiceIntoHK2Bridge.class);
+                guiceBridge.bridgeGuiceInjector(injector);
+            }
+        });
     }
 
 }
