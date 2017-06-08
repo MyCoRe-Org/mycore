@@ -1,28 +1,16 @@
 package org.mycore.oai.set;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.params.CommonParams;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.oai.pmh.Set;
-import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.MCRSolrUtils;
 
 public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
 
@@ -98,88 +86,6 @@ public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
         MCROAIParameterQuerySetResolver resolver = new MCROAIParameterQuerySetResolver(searchField);
         resolver.init(getConfigPrefix(), getHandlerPrefix(), getSetMap(), result, MCROAISolrSetHandler::getIdentifier);
         return resolver;
-    }
-
-    private static class MCROAIParameterQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
-
-        private String queryField;
-
-        private Map<String, SolrDocument> resultMap;
-
-        public MCROAIParameterQuerySetResolver(String queryField) {
-            super();
-            this.queryField = queryField;
-        }
-
-        @Override
-        public void init(String configPrefix, String setId, Map<String, MCRSet> setMap, Collection<SolrDocument> result,
-            Function<SolrDocument, String> identifier) {
-            super.init(configPrefix, setId, setMap, result, identifier);
-            resultMap = getResult().stream().collect(Collectors.toMap(getIdentifier(), d -> d));
-        }
-
-        @Override
-        public Collection<Set> getSets(String key) {
-            return Optional.ofNullable(resultMap.get(key)
-                .getFieldValues(queryField))
-                .orElseGet(() -> Collections.emptySet())
-                .stream()
-                .map(getSetMap()::get)
-                .collect(Collectors.toSet());
-        }
-
-    }
-
-    private static class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
-
-        private String query;
-
-        private java.util.Set<String> idsInSet;
-
-        public MCROAIQuerySetResolver(String query) {
-            super();
-            this.query = query;
-        }
-
-        @Override
-        public void init(String configPrefix, String setId, Map<String, MCRSet> setMap, Collection<SolrDocument> result,
-            Function<SolrDocument, String> identifier) {
-            super.init(configPrefix, setId, setMap, result, identifier);
-            SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
-            QueryResponse response;
-            try {
-                response = solrClient.query(getQuery());
-            } catch (SolrServerException | IOException e) {
-                throw new MCRException("Error while getting set membership.", e);
-            }
-            idsInSet = response.getResults().stream().map(getIdentifier()).collect(Collectors.toSet());
-        }
-
-        @Override
-        public Collection<Set> getSets(String key) {
-            if (idsInSet.contains(key)) {
-                return Collections.singleton(getSetMap().get(getSetId()));
-            }
-            return Collections.emptySet();
-        }
-
-        private SolrQuery getQuery() {
-            SolrQuery solrQuery = new SolrQuery();
-            MCRConfiguration config = MCRConfiguration.instance();
-            // query
-            String idQuery = getResult().stream()
-                .map(getIdentifier())
-                .map(MCRSolrUtils::escapeSearchValue)
-                .collect(Collectors.joining(" OR ", "id:(", ")"));
-            solrQuery.setQuery(idQuery);
-            solrQuery.setFilterQueries(query);
-            solrQuery.setFields("id");
-            solrQuery.setRows(getResult().size());
-            // request handler
-            solrQuery.setRequestHandler(config.getString(getConfigPrefix() + "Search.RequestHandler", "/select"));
-            return solrQuery;
-        }
-
     }
 
 }
