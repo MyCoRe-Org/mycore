@@ -1,5 +1,6 @@
 <web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0" metadata-complete="true">
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0" metadata-complete="true"
+>
   <name>mycore</name>
   <!-- **************************************************************** -->
   <!-- Servlets and mapping from MyCoRe kernel -->
@@ -343,11 +344,11 @@
   </servlet-mapping>
 
   <servlet id="MCRExportServlet">
-    <servlet-name> MCRExportServlet </servlet-name>
-    <servlet-class> org.mycore.frontend.export.MCRExportServlet </servlet-class>
+    <servlet-name>MCRExportServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.export.MCRExportServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name> MCRExportServlet </servlet-name>
+    <servlet-name>MCRExportServlet</servlet-name>
     <url-pattern> /servlets/MCRExportServlet/* </url-pattern>
   </servlet-mapping>
 
@@ -395,6 +396,11 @@
     <servlet-name>MyCoRe Jersey Resource</servlet-name>
     <url-pattern>/rsc/*</url-pattern>
   </servlet-mapping>
+  <filter-mapping>
+    <filter-name>MCRUserAgentFilter</filter-name>
+    <servlet-name>MyCoRe Jersey Resource</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
 
   <!-- **************************************************************** -->
   <!-- General configuration -->
