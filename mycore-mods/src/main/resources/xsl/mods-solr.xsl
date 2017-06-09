@@ -146,7 +146,7 @@
           <xsl:value-of select="text()" />
         </field>
       </xsl:for-each>
-      <xsl:for-each select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued">
+      <xsl:for-each select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued[@encoding='w3cdtf']">
         <xsl:sort data-type="number" select="count(ancestor::mods:originInfo[not(@eventType) or @eventType='publication'])" />
         <xsl:if test="position()=1">
           <field name="mods.dateIssued.{$type}">
