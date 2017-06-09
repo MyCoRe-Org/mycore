@@ -26,7 +26,8 @@ import org.jdom2.Element;
 
 /**
  * Merges MODS elements that must occur only once per type.
- * So if they have the same name and the same type attribute value, they are regarded to represent the same information.
+ * So if they have the same name and the same type attribute value, 
+ * they are regarded to represent the same information.
  * 
  * @author Frank L\u00FCtzenkirchen
  */
@@ -43,8 +44,9 @@ public class MCRUniqueTypeMerger extends MCRMerger {
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
         if (!(other instanceof MCRUniqueTypeMerger)) {
-            return false;}
-        else{
-            return this.getType().equals(((MCRUniqueTypeMerger) other).getType());}
+            return false;
+        } else {
+            return this.getType().equals(((MCRUniqueTypeMerger) other).getType());
+        }
     }
 }

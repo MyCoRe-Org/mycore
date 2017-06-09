@@ -46,13 +46,14 @@ public class MCRTitleInfoMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRTitleInfoMerger))
+        if (!(other instanceof MCRTitleInfoMerger)) {
             return false;
+        }
 
         MCRTitleInfoMerger otherTitle = (MCRTitleInfoMerger) other;
-        if (text.equals(otherTitle.text))
+        if (text.equals(otherTitle.text)) {
             return true;
-
+        }
         return text.startsWith(otherTitle.text) || otherTitle.text.startsWith(text);
     }
 

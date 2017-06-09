@@ -29,10 +29,11 @@ import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Compares and merges mods:abstract elements. The abstract text is normalized before comparing.
- * Two abstracts are regarded probably same if their levenshtein distance is less than a configured percentage of the text length.
+ * Two abstracts are regarded probably same 
+ * if their levenshtein distance is less than a configured percentage of the text length.
  * 
- * MCR.MODS.Merger.AbstractMerger.MaxDistancePercent=[The maximum levenshtein distance in percent]
- * MCR.MODS.Merger.AbstractMerger.MaxCompareLength=[The maximum number of characters to compare from the two abstracts]
+ * MCR.MODS.Merger.AbstractMerger.MaxDistancePercent=[Maximum levenshtein distance in percent]
+ * MCR.MODS.Merger.AbstractMerger.MaxCompareLength=[Maximum number of characters to compare from the two abstracts]
  * 
  * @author Frank L\u00FCtzenkirchen
  */
@@ -56,12 +57,14 @@ public class MCRAbstractMerger extends MCRMerger {
     }
 
     /**
-     *  * Two abstracts are regarded probably same if their levenshtein distance is less than a configured percentage of the text length.
+     *  Two abstracts are regarded probably same 
+     *  if their levenshtein distance is less than a configured percentage of the text length.
      */
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRAbstractMerger))
+        if (!(other instanceof MCRAbstractMerger)) {
             return false;
+        }
 
         String textOther = ((MCRAbstractMerger) other).text;
         int length = Math.min(text.length(), textOther.length());

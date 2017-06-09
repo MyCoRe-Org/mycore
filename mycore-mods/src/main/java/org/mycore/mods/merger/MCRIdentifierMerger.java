@@ -44,15 +44,17 @@ public class MCRIdentifierMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRIdentifierMerger))
+        if (!(other instanceof MCRIdentifierMerger)) {
             return false;
-        else
+        } else {
             return this.getType().equals(((MCRIdentifierMerger) other).getType());
+        }
     }
 
     @Override
     public void mergeFrom(MCRMerger other) {
-        if (other.element.getText().contains("-"))
+        if (other.element.getText().contains("-")) {
             this.element.setText(other.element.getText());
+        }
     }
 }

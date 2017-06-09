@@ -37,7 +37,7 @@ public class MCRTextNormalizer {
     public static String normalizeText(String text) {
         text = text.toLowerCase(Locale.getDefault());
         text = new MCRHyphenNormalizer().normalize(text).replace("-", " ");
-        text = Normalizer.normalize(text, Form.NFD).replaceAll("\\p{M}", ""); // canonical decomposition, then remove accents
+        text = Normalizer.normalize(text, Form.NFD).replaceAll("\\p{M}", ""); //canonical decomposition, remove accents
         text = text.replace("ue", "u").replace("oe", "o").replace("ae", "a").replace("ß", "s").replace("ss", "s");
         text = text.replaceAll("[^a-z0-9]\\s]", ""); //remove all non-alphabetic characters
         // text = text.replaceAll("\\b.{1,3}\\b", " ").trim(); // remove all words with fewer than four characters

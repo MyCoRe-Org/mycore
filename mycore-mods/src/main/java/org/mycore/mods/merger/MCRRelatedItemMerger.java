@@ -26,7 +26,8 @@ import org.jdom2.Element;
 
 /**
  * Compares and merges mods:relatedItem elements.
- * Two related items are only probably same if they are of type "host", since there can only be one host per publication.
+ * Two related items are only probably same 
+ * if they are of type "host", since there can only be one host per publication.
  * 
  * @author Frank L\u00FCtzenkirchen
  */
