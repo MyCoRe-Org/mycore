@@ -26,6 +26,8 @@ import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 
 /**
+ * Compares and merges mods:extent elements.
+ * 
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRExtentMerger extends MCRMerger {
@@ -45,9 +47,9 @@ public class MCRExtentMerger extends MCRMerger {
 
     @Override
     public void mergeFrom(MCRMerger other) {
-        if (element.getParentElement().getName().equals("physicalDescription"))
+        if (element.getParentElement().getName().equals("physicalDescription")) {
             super.mergeFrom(other);
-        else { // parent is "mods:part"
+        } else { // parent is "mods:part"
             if ((!this.hasStartPage()) && ((MCRExtentMerger) other).hasStartPage()) {
                 mergeAttributes(other);
                 this.element.setContent(other.element.cloneContent());

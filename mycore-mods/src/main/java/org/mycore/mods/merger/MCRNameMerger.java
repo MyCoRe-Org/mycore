@@ -33,6 +33,8 @@ import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 
 /**
+ * Compares and merges mods:name elements
+ * 
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRNameMerger extends MCRMerger {

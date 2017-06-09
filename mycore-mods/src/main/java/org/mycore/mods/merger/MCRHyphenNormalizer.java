@@ -32,14 +32,15 @@ public class MCRHyphenNormalizer {
     private final static char HYPHEN_NORM = '-';
 
     private char[] HYPHEN_VARIANTS = { '\u002D', '\u2010', '\u2011', '\u2012', '\u2013', '\u2015', '\u2212', '\u2E3B',
-        '\uFE58', '\uFE63' };
+            '\uFE58', '\uFE63', };
 
     /**
      * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.  
      **/
     public String normalize(String input) {
-        for (char hypenVariant : HYPHEN_VARIANTS)
+        for (char hypenVariant : HYPHEN_VARIANTS) {
             input = input.replace(hypenVariant, HYPHEN_NORM);
+        }
         return input;
     }
 }

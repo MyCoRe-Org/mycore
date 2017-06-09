@@ -28,15 +28,23 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
+ * Compares and merges mods:abstract elements. The abstract text is normalized before comparing.
+ * Two abstracts are regarded probably same if their levenshtein distance is less than a configured percentage of the text length.
+ * 
+ * MCR.MODS.Merger.AbstractMerger.MaxDistancePercent=[The maximum levenshtein distance in percent]
+ * MCR.MODS.Merger.AbstractMerger.MaxCompareLength=[The maximum number of characters to compare from the two abstracts]
+ * 
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRAbstractMerger extends MCRMerger {
 
     /** Maximum Levenshtein distance to accept two abstracts as equal, in percent */
-    private static final int MAX_DISTANCE_PERCENT = MCRConfiguration.instance().getInt("MCR.MODS.Merger.AbstractMerger.MaxDistancePercent");
+    private static final int MAX_DISTANCE_PERCENT = MCRConfiguration.instance()
+            .getInt("MCR.MODS.Merger.AbstractMerger.MaxDistancePercent");
 
     /** Maximum number of characters to compare from two abstracts */
-    private static final int MAX_COMPARE_LENGTH = MCRConfiguration.instance().getInt("MCR.MODS.Merger.AbstractMerger.MaxCompareLength");
+    private static final int MAX_COMPARE_LENGTH = MCRConfiguration.instance()
+            .getInt("MCR.MODS.Merger.AbstractMerger.MaxCompareLength");
 
     private String text;
 
@@ -47,6 +55,9 @@ public class MCRAbstractMerger extends MCRMerger {
         text = text.substring(0, Math.min(text.length(), MAX_COMPARE_LENGTH));
     }
 
+    /**
+     *  * Two abstracts are regarded probably same if their levenshtein distance is less than a configured percentage of the text length.
+     */
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
         if (!(other instanceof MCRAbstractMerger))

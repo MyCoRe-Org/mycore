@@ -25,6 +25,9 @@ package org.mycore.mods.merger;
 import org.jdom2.Element;
 
 /**
+ * Merges MODS elements that must occur only once per type.
+ * So if they have the same name and the same type attribute value, they are regarded to represent the same information.
+ * 
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRUniqueTypeMerger extends MCRMerger {

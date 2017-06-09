@@ -26,6 +26,11 @@ import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 
 /**
+ * Compares and merges mods:titleInfo elements.
+ * The normalized combined text of mods:nonSort, mods:title and mods:subTitle is compared.
+ * Two titles are probably same if they are identical or one is prefix of the other.
+ * When merging, the title that has a subtitle or the longer one wins. 
+ * 
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRTitleInfoMerger extends MCRMerger {
