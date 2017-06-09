@@ -162,14 +162,15 @@ public class MCROAISearchManager {
     }
 
     protected void setResumptionToken(OAIDataList<?> dataList, MCROAISearcher searcher, MCROAIResult result) {
-        if (result.nextCursor() == null) {
-            return;
-        }
-        DefaultResumptionToken rsToken = new DefaultResumptionToken();
-        rsToken.setToken(searcher.getID() + TOKEN_DELIMITER + String.valueOf(result.nextCursor()));
-        rsToken.setCompleteListSize(result.getNumHits());
-        rsToken.setExpirationDate(Date.from(searcher.getExpirationTime()));
-        dataList.setResumptionToken(rsToken);
+        result.nextCursor()
+            .map(cursor -> {
+                DefaultResumptionToken rsToken = new DefaultResumptionToken();
+                rsToken.setToken(searcher.getID() + TOKEN_DELIMITER + cursor);
+                rsToken.setCompleteListSize(result.getNumHits());
+                rsToken.setExpirationDate(searcher.getExpirationTime());
+                return rsToken;
+            })
+            .ifPresent(dataList::setResumptionToken);
     }
 
     public int getPartitionSize() {

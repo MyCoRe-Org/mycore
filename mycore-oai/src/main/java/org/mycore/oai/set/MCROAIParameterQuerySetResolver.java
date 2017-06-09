@@ -11,7 +11,7 @@ import org.apache.solr.common.SolrDocument;
 import org.mycore.oai.pmh.Set;
 
 /**
- * If query is in form <code>{searchField}':{setSpec}', uses {searchField}
+ * If <code>{OAIPrefix}.Sets.{SetID}.Query</code> is in form <code>{searchField}':{setSpec}', uses {searchField}
  * to map from SOLR result document to OAI set.
  * @author Thomas Scheffler (yagee)
  */

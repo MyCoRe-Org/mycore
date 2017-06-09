@@ -1,6 +1,7 @@
 package org.mycore.oai;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.mycore.oai.pmh.Header;
 
@@ -26,10 +27,8 @@ public interface MCROAIResult {
     int getNumHits();
 
     /**
-     * Next cursor or null
-     * 
      * @return the next cursor
      */
-    String nextCursor();
+    Optional<String> nextCursor();
 
 }

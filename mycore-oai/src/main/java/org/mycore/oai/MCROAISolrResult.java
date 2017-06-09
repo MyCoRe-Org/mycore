@@ -1,6 +1,7 @@
 package org.mycore.oai;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -37,8 +38,8 @@ public class MCROAISolrResult implements MCROAIResult {
     }
 
     @Override
-    public String nextCursor() {
-        return this.response.getNextCursorMark();
+    public Optional<String> nextCursor() {
+        return Optional.ofNullable(this.response.getNextCursorMark());
     }
 
     public QueryResponse getResponse() {

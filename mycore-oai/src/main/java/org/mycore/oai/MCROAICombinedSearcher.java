@@ -86,8 +86,8 @@ public class MCROAICombinedSearcher extends MCROAISearcher {
         MCROAISimpleResult result = new MCROAISimpleResult();
         result.setNumHits(this.numHits);
         // solr query - not at the end
-        if (solrResult.nextCursor() != null) {
-            result.setNextCursor(solrResult.nextCursor());
+        if (solrResult.nextCursor().isPresent()) {
+            result.setNextCursor(solrResult.nextCursor().get());
             result.setHeaderList(solrResult.list());
             return result;
         }
@@ -99,7 +99,7 @@ public class MCROAICombinedSearcher extends MCROAISearcher {
             String deletedCursor = delSearcher.buildCursor(0, delta);
             MCROAIResult deletedResult = delSearcher.query(deletedCursor);
             result.list().addAll(deletedResult.list());
-            result.setNextCursor(deletedResult.nextCursor());
+            deletedResult.nextCursor().ifPresent(result::setNextCursor);
         } else if (delSearcher.getDeletedRecords().size() > 0) {
             result.setNextCursor(delSearcher.buildCursor(0, this.getPartitionSize()));
         }

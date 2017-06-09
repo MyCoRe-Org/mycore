@@ -52,7 +52,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
      * we store the result in {@link #nextResult}. For simple forwarding harvesting
      * this should be efficient.
      */
-    private String lastCursor;
+    private Optional<String> lastCursor;
 
     private MCROAISolrResult nextResult;
 
@@ -78,7 +78,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     @Override
     public MCROAIResult query(String cursor) {
         this.updateRunningExpirationTimer();
-        return handleResult(cursor.equals(this.lastCursor) ? this.nextResult : solrQuery(cursor));
+        Optional<String> currentCursor = Optional.of(cursor);
+        return handleResult(currentCursor.equals(this.lastCursor) ? this.nextResult : solrQuery(currentCursor));
     }
 
     @Override
@@ -86,7 +87,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         this.set = set;
         this.from = from;
         this.until = until;
-        return handleResult(solrQuery(CursorMarkParams.CURSOR_MARK_START));
+        return handleResult(solrQuery(Optional.empty()));
     }
 
     private MCROAIResult handleResult(MCROAISolrResult result) {
@@ -98,7 +99,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         return result;
     }
 
-    protected MCROAISolrResult solrQuery(String cursor) {
+    protected MCROAISolrResult solrQuery(Optional<String> cursor) {
         SolrQuery query = getBaseQuery(CommonParams.Q);
 
         // set support
@@ -107,18 +108,14 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             MCROAISetConfiguration<SolrQuery, SolrDocument, String> setConfig = getSetManager().getConfig(setId);
             setConfig.getHandler().apply(this.set, query);
         }
-        // date range
-        StringBuilder dateFilter = new StringBuilder();
         // from & until
         if (this.from != null || this.until != null) {
-            dateFilter.append(buildFromUntilCondition(this.from, this.until));
-        }
-        if (dateFilter.length() > 0) {
-            query.add(CommonParams.FQ, dateFilter.toString());
+            String fromUntilCondition = buildFromUntilCondition(this.from, this.until);
+            query.add(CommonParams.FQ, fromUntilCondition);
         }
 
         // cursor
-        query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
+        query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor.orElse(CursorMarkParams.CURSOR_MARK_START));
         query.set(CommonParams.ROWS, String.valueOf(getPartitionSize()));
         query.set(CommonParams.SORT, "id asc");
 
@@ -177,7 +174,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     Header toHeader(SolrDocument doc, Collection<MCROAISetResolver<String, SolrDocument>> setResolver) {
         Date modified = (Date) doc.getFieldValue(getModifiedField());
         String docId = doc.getFieldValue("id").toString();
-        Header header = new Header(getObjectManager().getOAIId(docId), modified);
+        Header header = new Header(getObjectManager().getOAIId(docId), modified.toInstant());
         setResolver.parallelStream()
             .map(r -> r.getSets(docId))
             .flatMap(Collection::stream)

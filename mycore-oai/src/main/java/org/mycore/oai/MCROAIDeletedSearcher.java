@@ -1,6 +1,5 @@
 package org.mycore.oai;
 
-import java.sql.Date;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
     public Optional<Header> getHeader(String mcrId) {
         return MCRDeletedItemManager.getLastDeletedDate(mcrId)
             .map(ZonedDateTime::toInstant)
-            .map(Date::from)
             .map(deletedDate -> new Header(getObjectManager().getOAIId(mcrId), deletedDate, Status.deleted));
     }
 
@@ -128,7 +126,7 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
     }
 
     private Header toHeader(Entry<String, ZonedDateTime> p) {
-        return new Header(getObjectManager().getOAIId(p.getKey()), Date.from(p.getValue().toInstant()), Status.deleted);
+        return new Header(getObjectManager().getOAIId(p.getKey()), p.getValue().toInstant(), Status.deleted);
     }
 
 }

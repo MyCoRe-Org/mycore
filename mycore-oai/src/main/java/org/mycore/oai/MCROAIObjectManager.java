@@ -22,7 +22,6 @@
 package org.mycore.oai;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -131,7 +130,6 @@ public class MCROAIObjectManager {
             // building the query
             return MCRDeletedItemManager.getLastDeletedDate(mcrId)
                 .map(ZonedDateTime::toInstant)
-                .map(Date::from)
                 .map(deletedDate -> new Record(
                     new Header(getOAIId(mcrId), deletedDate, Status.deleted)))
                 .orElse(null);

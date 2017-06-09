@@ -21,10 +21,10 @@
  */
 package org.mycore.oai;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -288,12 +288,12 @@ public class MCROAIAdapter implements OAIAdapter {
     }
 
     @Override
-    public OAIDataList<Record> getRecords(MetadataFormat format, Set set, Date from, Date until)
+    public OAIDataList<Record> getRecords(MetadataFormat format, Set set, Instant from, Instant until)
         throws CannotDisseminateFormatException, NoSetHierarchyException, NoRecordsMatchException {
         //Update set for response header
         getSetManager().getDirectList();
-        ZonedDateTime fromDateTime = from != null ? from.toInstant().atZone(UTC_ZONE) : null;
-        ZonedDateTime untilDateTime = until != null ? until.toInstant().atZone(UTC_ZONE) : null;
+        ZonedDateTime fromDateTime = from != null ? from.atZone(UTC_ZONE) : null;
+        ZonedDateTime untilDateTime = until != null ? until.atZone(UTC_ZONE) : null;
         OAIDataList<Record> recordList = getSearchManager().searchRecord(format, toMCRSet(set), fromDateTime,
             untilDateTime);
         if (recordList.isEmpty()) {
@@ -321,10 +321,10 @@ public class MCROAIAdapter implements OAIAdapter {
     }
 
     @Override
-    public OAIDataList<Header> getHeaders(MetadataFormat format, Set set, Date from, Date until)
+    public OAIDataList<Header> getHeaders(MetadataFormat format, Set set, Instant from, Instant until)
         throws CannotDisseminateFormatException, NoSetHierarchyException, NoRecordsMatchException {
-        ZonedDateTime fromDateTime = from != null ? from.toInstant().atZone(UTC_ZONE) : null;
-        ZonedDateTime untilDateTime = until != null ? until.toInstant().atZone(UTC_ZONE) : null;
+        ZonedDateTime fromDateTime = from != null ? from.atZone(UTC_ZONE) : null;
+        ZonedDateTime untilDateTime = until != null ? until.atZone(UTC_ZONE) : null;
         //Update set for response header
         getSetManager().getDirectList();
         OAIDataList<Header> headerList = getSearchManager().searchHeader(format, toMCRSet(set), fromDateTime,

@@ -2,6 +2,7 @@ package org.mycore.oai;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.mycore.oai.pmh.Header;
 
@@ -36,8 +37,8 @@ public class MCROAISimpleResult implements MCROAIResult {
     }
 
     @Override
-    public String nextCursor() {
-        return this.nextCursor;
+    public Optional<String> nextCursor() {
+        return Optional.ofNullable(this.nextCursor);
     }
 
     public MCROAISimpleResult setNextCursor(String nextCursor) {
@@ -58,7 +59,7 @@ public class MCROAISimpleResult implements MCROAIResult {
     public static MCROAISimpleResult from(MCROAIResult result) {
         MCROAISimpleResult newResult = new MCROAISimpleResult();
         newResult.setHeaderList(result.list());
-        newResult.setNextCursor(result.nextCursor());
+        result.nextCursor().ifPresent(newResult::setNextCursor);
         newResult.setNumHits(result.getNumHits());
         return newResult;
     }
