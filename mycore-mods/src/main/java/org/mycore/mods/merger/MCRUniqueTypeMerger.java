@@ -42,9 +42,9 @@ public class MCRUniqueTypeMerger extends MCRMerger {
 
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
-        if (!(other instanceof MCRUniqueTypeMerger))
-            return false;
-        else
-            return this.getType().equals(((MCRUniqueTypeMerger) other).getType());
+        if (!(other instanceof MCRUniqueTypeMerger)) {
+            return false;}
+        else{
+            return this.getType().equals(((MCRUniqueTypeMerger) other).getType());}
     }
 }
