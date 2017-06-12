@@ -1,5 +1,5 @@
 /*
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -71,8 +71,10 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * Transforms XML content using a static XSL stylesheet. The stylesheet is configured via
  * <code>MCR.ContentTransformer.{ID}.Stylesheet</code>. You may choose your own instance of {@link SAXTransformerFactory} via
- * <code>MCR.ContentTransformer.{ID}.TransformerFactoryClass</code>
- * 
+ * <code>MCR.ContentTransformer.{ID}.TransformerFactoryClass</code>.
+ * The default transformer factory implementation {@link org.apache.xalan.processor.TransformerFactoryImpl} is configured with
+ * <code>MCR.LayoutService.TransformerFactoryClass</code>.
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRXSLTransformer extends MCRParameterizedTransformer {
@@ -89,7 +91,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static boolean TRACE_LISTENER_ENABLED = LogManager.getLogger(MCRTraceListener.class).isDebugEnabled();
 
-    private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSLTransformer>(100,
+    private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<>(100,
         "MCRXSLTransformer instance cache");
 
     private static long CHECK_PERIOD = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod",
@@ -120,10 +122,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     public synchronized void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
-        TransformerFactory transformerFactory = Optional
-            .ofNullable(factoryClass)
-            .map(c -> TransformerFactory.newInstance(c, null))
-            .orElseGet(TransformerFactory::newInstance);
+        TransformerFactory transformerFactory = Optional.ofNullable(factoryClass)
+            .map(c -> TransformerFactory.newInstance(c, null)).orElseGet(TransformerFactory::newInstance);
         LOGGER.info("Transformerfactory: " + transformerFactory.getClass().getName());
         transformerFactory.setURIResolver(URI_RESOLVER);
         transformerFactory.setErrorListener(MCRErrorListener.getInstance());
@@ -151,7 +151,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         String property = "MCR.ContentTransformer." + id + ".Stylesheet";
         String[] stylesheets = MCRConfiguration.instance().getString(property).split(",");
         setStylesheets(stylesheets);
-        property = "MCR.ContentTransformer." + id + ".TransformerFactory";
+        property = "MCR.ContentTransformer." + id + ".TransformerFactoryClass";
         String transformerFactory = MCRConfiguration.instance().getString(property, DEFAULT_FACTORY_CLASS);
         if (transformerFactory != null && !transformerFactory.equals(DEFAULT_FACTORY_CLASS)) {
             setTransformerFactory(transformerFactory);
@@ -183,8 +183,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                     SAXSource source = templateSources[i].getSource();
                     templates[i] = tFactory.newTemplates(source);
                     if (templates[i] == null) {
-                        throw new TransformerConfigurationException("XSLT Stylesheet could not be compiled: "
-                            + templateSources[i].getURL());
+                        throw new TransformerConfigurationException(
+                            "XSLT Stylesheet could not be compiled: " + templateSources[i].getURL());
                     }
                     modified[i] = lastModified;
                 }
@@ -294,7 +294,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     protected LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
         throws TransformerConfigurationException, SAXException {
         checkTemplateUptodate();
-        LinkedList<TransformerHandler> xslSteps = new LinkedList<TransformerHandler>();
+        LinkedList<TransformerHandler> xslSteps = new LinkedList<>();
         //every transformhandler shares the same ErrorListener instance
         MCRErrorListener errorListener = MCRErrorListener.getInstance();
         for (Templates template : templates) {
@@ -326,8 +326,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return reader;
     }
 
-    private String getOutputProperty(String propertyName, String defaultValue) throws TransformerException,
-        SAXException {
+    private String getOutputProperty(String propertyName, String defaultValue)
+        throws TransformerException, SAXException {
         checkTemplateUptodate();
         Templates lastTemplate = templates[templates.length - 1];
         Properties outputProperties = lastTemplate.getOutputProperties();
@@ -381,8 +381,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             this.transformerHandler = transformerHandler;
             LOGGER.info("Transformer lastModified: " + transformerLastModified);
             LOGGER.info("Source lastModified     : " + source.lastModified());
-            this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0) ? Math.max(
-                transformerLastModified, source.lastModified()) : -1;
+            this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0)
+                ? Math.max(transformerLastModified, source.lastModified()) : -1;
             this.eTag = generateETag(source, lastModified, parameter.hashCode());
             this.name = fileName;
             this.mimeType = mimeType;
@@ -402,7 +402,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
         private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode)
             throws IOException {
-            //parameterHashCode is stable for this session and current request URL 
+            //parameterHashCode is stable for this session and current request URL
             long systemLastModified = MCRConfiguration.instance().getSystemLastModified();
             StringBuilder b = new StringBuilder('"');
             byte[] unencodedETag = ByteBuffer.allocate(Long.SIZE / 4).putLong(lastModified ^ parameterHashCode)
