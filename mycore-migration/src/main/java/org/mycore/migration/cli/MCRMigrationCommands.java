@@ -3,13 +3,18 @@ package org.mycore.migration.cli;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -48,6 +53,10 @@ import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.urn.MCRDNBURN;
+import org.mycore.pi.urn.MCRDNBURNParser;
+import org.mycore.urn.hibernate.MCRURN;
 import org.xml.sax.SAXException;
 
 /**
@@ -231,5 +240,54 @@ public class MCRMigrationCommands {
                     MCRLinkTableManager.ENTRY_TYPE_PARENT))
                 .distinct(true).orderBy(cb.asc(cb.literal(1))))
             .getResultList();
+    }
+
+    @MCRCommand(help = "migrate urn with serveID {service ID}", syntax = "migrate urn with serveID {0}")
+    public static void migrateURN(String serviceID) {
+        EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+
+        entityManager.createQuery("select u from MCRURN u", MCRURN.class)
+                     .getResultList()
+                     .stream()
+                     .flatMap(mcrurn -> toMCRPI(mcrurn, serviceID))
+                     .peek(MCRMigrationCommands::logInfo)
+                     .forEach(entityManager::persist);
+
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.commit();
+    }
+
+    private static Stream<MCRPI> toMCRPI(MCRURN mcrurn, String serviceID) {
+        String derivID = mcrurn.getId();
+        String additional = Optional
+                .ofNullable(mcrurn.getPath())
+                .flatMap(path -> Optional.ofNullable(mcrurn.getFilename())
+                                         .map(filename -> Paths.get(path, filename)))
+                .map(Path::toString)
+                .orElse("");
+
+        MCRPI mcrpi = new MCRPI(mcrurn.getURN(), MCRDNBURN.TYPE, derivID, additional, serviceID, null);
+        String suffix = "-dfg";
+
+        return Optional.of(mcrurn)
+                       .filter(u -> u.isDfg())
+                       .flatMap(MCRMigrationCommands::parse)
+                       .map(dnbURN -> dnbURN.withSuffix(suffix))
+                       .map(MCRDNBURN::asString)
+                       .map(dfgURN -> new MCRPI(dfgURN, MCRDNBURN.TYPE + suffix, derivID, additional,
+                               serviceID + suffix, null))
+                       .map(dfgMcrPi -> Stream.of(mcrpi, dfgMcrPi))
+                       .orElse(Stream.of(mcrpi));
+    }
+
+    private static Optional<MCRDNBURN> parse(MCRURN urn) {
+        return new MCRDNBURNParser().parse(urn.getURN());
+    }
+
+    private static void logInfo(MCRPI urn){
+        String urnStr = urn.getIdentifier();
+        String mycoreID = urn.getMycoreID();
+        String path = urn.getAdditional();
+        LOGGER.info("Migrating: {} - {}:{}", urnStr, mycoreID, path);
     }
 }
