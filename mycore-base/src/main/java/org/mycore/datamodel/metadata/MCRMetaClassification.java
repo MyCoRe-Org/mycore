@@ -244,12 +244,9 @@ public class MCRMetaClassification extends MCRMetaDefault {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (!super.equals(obj)) {
             return false;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        }
         final MCRMetaClassification other = (MCRMetaClassification) obj;
         return Objects.equals(this.category, other.category);
     }

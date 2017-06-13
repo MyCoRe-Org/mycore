@@ -204,4 +204,14 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
             LOGGER.debug(" ");
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MCRMetaBoolean other = (MCRMetaBoolean) obj;
+        return this.value == other.value;
+    }
+
 }

@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -76,8 +78,8 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaInstitutionName(String set_subtag, String default_lang, String set_type, int set_inherted, String set_fullname, String set_nickname,
-        String set_property) throws MCRException {
+    public MCRMetaInstitutionName(String set_subtag, String default_lang, String set_type, int set_inherted,
+        String set_fullname, String set_nickname, String set_property) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         fullname = "";
         nickname = "";
@@ -201,10 +203,10 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
     public JsonObject createJSON() {
         JsonObject obj = super.createJSON();
         obj.addProperty("fullname", fullname);
-        if(nickname != null) {
+        if (nickname != null) {
             obj.addProperty("nickname", nickname);
         }
-        if(property != null) {
+        if (property != null) {
             obj.addProperty("property", property);
         }
         return obj;
@@ -235,4 +237,15 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
     public final MCRMetaInstitutionName clone() {
         return new MCRMetaInstitutionName(subtag, lang, type, inherited, fullname, nickname, property);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MCRMetaInstitutionName other = (MCRMetaInstitutionName) obj;
+        return Objects.equals(fullname, other.fullname) && Objects.equals(nickname, other.nickname)
+            && Objects.equals(property, other.property);
+    }
+
 }

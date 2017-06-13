@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -231,4 +233,15 @@ final public class MCRMetaIFS extends MCRMetaDefault {
         ifs.setType(getType());
         return ifs;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MCRMetaIFS other = (MCRMetaIFS) obj;
+        return Objects.equals(sourcepath, other.sourcepath) && Objects.equals(maindoc, other.maindoc)
+            && Objects.equals(ifsid, other.ifsid);
+    }
+
 }

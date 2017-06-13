@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,7 +88,9 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private int FRACTION_DIGITS;
+
     private int DIMENSION_LENGTH;
+
     private int MEASUREMENT_LENGTH;
 
     private void loadProperties() {
@@ -127,7 +130,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *   the number string is not in a number format
      */
     public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, String number)
-            throws MCRException {
+        throws MCRException {
         super(subtag, null, null, inherted);
         loadProperties();
         setDimension(dimension);
@@ -153,7 +156,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *   the number string is not in a number format
      */
     public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, BigDecimal number)
-            throws MCRException {
+        throws MCRException {
         super(subtag, null, null, inherted);
         loadProperties();
         setDimension(dimension);
@@ -180,7 +183,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     @Deprecated
     public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, double number)
-            throws MCRException {
+        throws MCRException {
         super(subtag, null, null, inherted);
         loadProperties();
         setDimension(dimension);
@@ -374,7 +377,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Measurement        = " + measurement);
             LOGGER.debug("Dimension          = " + dimension);
@@ -382,4 +385,15 @@ final public class MCRMetaNumber extends MCRMetaDefault {
             LOGGER.debug("");
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MCRMetaNumber other = (MCRMetaNumber) obj;
+        return Objects.equals(measurement, other.measurement) && Objects.equals(dimension, other.dimension)
+            && Objects.equals(number, other.number);
+    }
+
 }

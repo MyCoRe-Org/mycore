@@ -275,12 +275,9 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (!super.equals(obj)) {
             return false;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        }
         final MCRMetaLangText other = (MCRMetaLangText) obj;
         return Objects.equals(this.text, other.text) && Objects.equals(this.form, other.form);
     }
