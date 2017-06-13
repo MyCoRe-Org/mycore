@@ -1,7 +1,7 @@
 ///<reference path="simple/MCRMetsSimpleModel.ts"/>
 ///<reference path="simple/MCRMetsPage.ts"/>
 ///<reference path="simple/MCRMetsSection.ts"/>
-///<reference path="../../../../typings/angularjs/angular.d.ts"/>
+
 
 namespace org.mycore.mets.model {
 

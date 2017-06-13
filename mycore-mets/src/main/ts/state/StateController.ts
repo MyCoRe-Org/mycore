@@ -1,5 +1,5 @@
 ///<reference path="StateEngine.ts"/>
-///<reference path="../../../../typings/angularjs/angular.d.ts"/>
+
 namespace org.mycore.mets.model.state {
     export class MetsEditorStateController {
         constructor(private $modal, public i18nModel, hotkeys) {

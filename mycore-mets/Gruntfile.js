@@ -4,7 +4,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-bower-task');
-    grunt.loadNpmTasks('grunt-tsd');
     grunt.loadNpmTasks('grunt-html2js');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
@@ -89,34 +88,15 @@ module.exports = function (grunt) {
                 }
             }
         },
-        tsd: { // Downloads .d.ts files which are needed for libs like angularjs or jquery
-            refresh: {
-                options: {
-                    command: 'reinstall',
-                    latest: false,
-                    config: 'tsd.json',
-                    opts: (function () {
-                        if (typeof process.env.GITHUB_TOKEN != "undefined") {
-                            console.log("Found GITHUB_TOKEN in env!");
-                            return {"token": process.env.GITHUB_TOKEN}
-                        } else {
-                            console.log("Could not find GITHUB_TOKEN. " +
-                                "TSD will try to use 'TSD_GITHUB_TOKEN' or uses the default Github api authentication..");
-                            return {};
-                        }
-                    })()
-                }
-            }
-        },
         clean: {
-            dependecies: ["bower_components/", "typings/"],
+            dependecies: ["bower_components/"],
             compiled: ["<%= properties.outputPath %>/js", "target/css"],
             copied: ["<%= properties.outputPath %>/example", "target/json"],
-            all: ["<%= properties.outputPath %>/", "typings/", "bower_components/"]
+            all: ["<%= properties.outputPath %>/", "bower_components/"]
         },
         ts: { // Compiles Typescript files
             MetsEditorClient: {
-                src: "src/main/ts/MetsEditor.ts",
+                src: ["node_modules/@types/**/*.d.ts", "src/main/ts/MetsEditor.ts"],
                 out: "<%= properties.outputPath %>/js/MetsEditor.js",
                 options: {
                     target: 'es5',
@@ -125,12 +105,12 @@ module.exports = function (grunt) {
                     ignoreError: false,
                     sourceMap: false,
                     references: [
-                        "typings/**/*.d.ts"
+                        "node_modules/@types/**/*.d.ts"
                     ]
                 }
             },
             MetsEditorClientTests: {
-                src: ["<%= properties.outputPath %>/js/MetsEditor.d.ts", "src/test/ts/**/*.ts"],
+                src: ["node_modules/@types/**/*.d.ts", "<%= properties.outputPath %>/js/MetsEditor.d.ts", "src/test/ts/**/*.ts"],
                 out: "<%= properties.outputPath %>/js/MetsEditor-tests.js",
                 options: {
                     target: 'es5',
@@ -138,9 +118,6 @@ module.exports = function (grunt) {
                     comments: true,
                     ignoreError: false,
                     sourceMap: false,
-                    references: [
-                        "typings/**/*.d.ts"
-                    ]
                 }
             }
         },
@@ -245,7 +222,7 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.task.registerTask("dependencies", ["bower:install", "tsd:refresh"]);
+    grunt.task.registerTask("dependencies", ["bower:install"]);
     grunt.task.registerTask("compile", ["ts:MetsEditorClient", "less:MetsEditorClient", "html2js:templates", "uglify"]);
     grunt.task.registerTask("compileTests", ["ts:MetsEditorClientTests"]);
     grunt.task.registerTask("default", ["dependencies", "compile", "compileTests", "tslint",

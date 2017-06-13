@@ -1,4 +1,3 @@
-///<reference path="../../../typings/jasmine/jasmine.d.ts"/>
 namespace org.mycore.mets.tests {
     describe("Pagination", () => {
 
