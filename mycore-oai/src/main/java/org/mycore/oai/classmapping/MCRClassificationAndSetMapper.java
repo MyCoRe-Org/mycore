@@ -68,7 +68,8 @@ public class MCRClassificationAndSetMapper {
                     .stream()
                     .filter(entry -> entry.getValue().equals(classid))
                     .peek(e -> LogManager.getLogger()
-                        .warn("Please rename deprecated property '{}' and use '{}' suffix.", e.getKey(), PROP_CLASS_SUFFIX))
+                        .warn("Please rename deprecated property '{}' and use '{}' suffix.", e.getKey(),
+                            PROP_CLASS_SUFFIX))
                     .findFirst()
                     .map(entry -> entry.getKey().substring(entry.getKey().lastIndexOf(".") + 1))
                     .orElse(classid);

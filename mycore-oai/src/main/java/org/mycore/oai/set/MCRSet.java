@@ -14,7 +14,6 @@ public class MCRSet extends Set {
         this(setId, spec, null);
     }
 
-
     public String getSetId() {
         return setId;
     }

@@ -30,8 +30,8 @@ public abstract class MCROAISolrSetHandler implements MCROAISetHandler<SolrQuery
     public String getHandlerPrefix() {
         return handlerPrefix;
     }
-    
-    public Collection<String> getFieldNames(){
+
+    public Collection<String> getFieldNames() {
         return Collections.emptySet();
     }
 

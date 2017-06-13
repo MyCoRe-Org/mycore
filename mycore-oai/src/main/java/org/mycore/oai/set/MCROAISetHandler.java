@@ -32,11 +32,11 @@ public interface MCROAISetHandler<Q, R, K> {
     default boolean filter(MCRSet set) {
         return false;
     }
-    
+
     Map<String, MCRSet> getSetMap();
 
     void apply(MCRSet set, Q q);
-    
+
     MCROAISetResolver<K, R> getSetResolver(Collection<R> result);
 
 }
