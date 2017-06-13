@@ -2,6 +2,7 @@ package org.mycore.pi.cli;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,8 +19,12 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.pi.MCRPIRegistrationService;
+import org.mycore.pi.MCRPIRegistrationServiceManager;
+import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
 
 @MCRCommandGroup(name = "PI Commands")
@@ -72,5 +77,41 @@ public class MCRPICommands {
         });
     }
 
+    @MCRCommand(syntax = "try to control {0} with service {1} with additional {2}", help = "")
+    public static void migrateURNGranularToServiceID(String objectIDString, String serviceID, String additional)
+        throws MCRAccessException, MCRActiveLinkException, IOException {
+        additional=additional.trim();
+        MCRPIRegistrationService<MCRPersistentIdentifier> service = MCRPIRegistrationServiceManager
+            .getInstance().getRegistrationService(serviceID);
+
+        MCRPersistentIdentifierMetadataManager<MCRPersistentIdentifier> metadataManager = service.getMetadataManager();
+
+        MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
+        MCRBase mcrBase = MCRMetadataManager.retrieve(objectID);
+        Optional<MCRPersistentIdentifier> identifier;
+
+        try {
+            identifier = metadataManager.getIdentifier(mcrBase, additional);
+        } catch (MCRPersistentIdentifierException e) {
+            LOGGER.info("Could not detect any identifier with service " + serviceID, e);
+            return;
+        }
+
+        if (!identifier.isPresent()) {
+            LOGGER.info("Could not detect any identifier with service " + serviceID);
+            return;
+        }
+
+        MCRPersistentIdentifier persistentIdentifier = identifier.get();
+        if (service.isRegistered(objectID, additional)) {
+            LOGGER.info("Already present in Database: " + serviceID);
+            return;
+        }
+        MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, additional, persistentIdentifier);
+        MCRPIRegistrationService.addFlagToObject(mcrBase, mcrpi);
+        MCRMetadataManager.update(mcrBase);
+        LOGGER.info("{}:{} is now under control of {}", objectID, additional, serviceID);
+
+    }
 
 }

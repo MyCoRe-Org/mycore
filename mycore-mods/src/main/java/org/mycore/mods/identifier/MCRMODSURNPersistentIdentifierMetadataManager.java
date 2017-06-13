@@ -1,18 +1,25 @@
 package org.mycore.mods.identifier;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.pi.MCRPersistentIdentifierInscriber;
+import org.mycore.pi.MCRPersistentIdentifier;
+import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.urn.MCRDNBURNParser;
 import org.mycore.pi.urn.MCRUniformResourceName;
 
+public class MCRMODSURNPersistentIdentifierMetadataManager
+    extends MCRPersistentIdentifierMetadataManager<MCRUniformResourceName> {
 
-public class MCRMODSURNPersistentIdentifierInscriber extends MCRPersistentIdentifierInscriber<MCRUniformResourceName> {
+    private static final String MODS_IDENTIFIER_TYPE_URN = "mods:identifier[@type='urn']";
 
-    public MCRMODSURNPersistentIdentifierInscriber(String inscriberID) {
+    public MCRMODSURNPersistentIdentifierMetadataManager(String inscriberID) {
         super(inscriberID);
     }
 
@@ -28,12 +35,21 @@ public class MCRMODSURNPersistentIdentifierInscriber extends MCRPersistentIdenti
 
     }
 
-    @Override
-    public boolean hasIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    @Override public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(obj);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        Element element = wrapper.getElement("mods:identifier[@type='urn']");
-        return element != null;
+        Element element = wrapper.getElement(MODS_IDENTIFIER_TYPE_URN);
+
+        if (element == null) {
+            return Optional.empty();
+        }
+
+        String urnText = element.getTextNormalize();
+        return new MCRDNBURNParser()
+            .parse(urnText)
+            .filter(Objects::nonNull)
+            .map(MCRPersistentIdentifier.class::cast);
     }
 
     private MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {

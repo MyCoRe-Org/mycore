@@ -71,7 +71,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
         MCRPIRegistrationServiceManager serviceManager = MCRPIRegistrationServiceManager.getInstance();
 
         List<MCRPIRegistrationInfo> registered = MCRPersistentIdentifierManager.getInstance().getRegistered(obj);
-        List<String> serviceList = serviceManager.getServiceList();
+        List<String> serviceList = serviceManager.getServiceIDList();
 
         for (MCRPIRegistrationInfo pi : registered) {
             String serviceName = pi.getService();

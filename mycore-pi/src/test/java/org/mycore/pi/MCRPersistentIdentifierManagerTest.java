@@ -1,5 +1,13 @@
 package org.mycore.pi;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,14 +22,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
@@ -163,9 +163,9 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         configuration.put("MCR.PI.Registration." + MOCK_SERVICE + ".Generator", MOCK_PID_GENERATOR);
         configuration.put("MCR.PI.Registration." + MOCK_SERVICE + ".Inscriber", MOCK_INSCRIBER);
 
-        configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER, MCRMockInscriber.class.getName());
-        configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER + "." + MCRMockInscriber.TEST_PROPERTY,
-                          MCRMockInscriber.TEST_PROPERTY_VALUE);
+        configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER, MCRMockMetadataManager.class.getName());
+        configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER + "." + MCRMockMetadataManager.TEST_PROPERTY,
+                          MCRMockMetadataManager.TEST_PROPERTY_VALUE);
 
         configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR, MCRMockIdentifierGenerator.class.getName());
         configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR + "." + MCRMockIdentifierGenerator.TEST_PROPERTY,

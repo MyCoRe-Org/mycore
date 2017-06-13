@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -22,8 +21,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPersistentIdentifierInscriber;
+import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.MCRDOIParser;
 import org.mycore.pi.doi.MCRDOIRegistrationService;
@@ -61,14 +59,14 @@ public class MCRDOICommands {
         }
 
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
-        MCRPersistentIdentifierInscriber<MCRDigitalObjectIdentifier> synchronizer = registrationService.getInscriber();
+        MCRPersistentIdentifierMetadataManager<MCRDigitalObjectIdentifier> synchronizer = registrationService.getMetadataManager();
 
         if (!registrationService.isRegistered(objectID, doiString)) {
             LOGGER.info(objectID.toString() + " is not found in PI-Database. Insert it..");
             registrationService.insertIdentifierToDatabase(mcrObject, "", doi);
         }
 
-        if (!synchronizer.hasIdentifier(mcrObject, "")) {
+        if (!synchronizer.getIdentifier(mcrObject, "").isPresent()) {
             LOGGER.info("Object doesn't have Identifier inscribed! Insert it..");
             synchronizer.insertIdentifier(doi, mcrObject, "");
             MCRMetadataManager.update(mcrObject);

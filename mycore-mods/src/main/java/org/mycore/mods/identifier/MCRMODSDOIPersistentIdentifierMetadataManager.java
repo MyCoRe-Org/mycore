@@ -1,19 +1,24 @@
 package org.mycore.mods.identifier;
 
+import java.util.Objects;
+import java.util.Optional;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.pi.MCRPersistentIdentifierInscriber;
+import org.mycore.pi.MCRPersistentIdentifier;
+import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
+import org.mycore.pi.doi.MCRDOIParser;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRMODSDOIPersistentIdentifierInscriber extends MCRPersistentIdentifierInscriber<MCRDigitalObjectIdentifier> {
+public class MCRMODSDOIPersistentIdentifierMetadataManager
+    extends MCRPersistentIdentifierMetadataManager<MCRDigitalObjectIdentifier> {
 
 
-    public MCRMODSDOIPersistentIdentifierInscriber(String inscriberID) {
+    public MCRMODSDOIPersistentIdentifierMetadataManager(String inscriberID) {
         super(inscriberID);
     }
 
@@ -24,13 +29,6 @@ public class MCRMODSDOIPersistentIdentifierInscriber extends MCRPersistentIdenti
         wrapper.setElement("identifier", "type", "doi", identifier.asString()).orElseThrow(() -> new MCRException("Could not insert doi into mods document!"));
     }
 
-    @Override
-    public boolean hasIdentifier(MCRBase base, String additional) throws MCRPersistentIdentifierException {
-        MCRObject object = checkObject(base);
-        MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        Element element = wrapper.getElement("mods:identifier[@type='doi']");
-        return element != null;
-    }
 
     private MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {
         if(!(base instanceof MCRObject)){
@@ -42,5 +40,23 @@ public class MCRMODSDOIPersistentIdentifierInscriber extends MCRPersistentIdenti
     @Override
     public void removeIdentifier(MCRDigitalObjectIdentifier identifier, MCRBase obj, String additional) {
 
+    }
+
+    @Override public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase base, String additional)
+        throws MCRPersistentIdentifierException {
+        MCRObject object = checkObject(base);
+        MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
+        Element element = wrapper.getElement("mods:identifier[@type='doi']");
+        if(element==null){
+            return Optional.empty();
+        }
+
+        String doiText = element.getTextNormalize();
+
+
+        return new MCRDOIParser()
+            .parse(doiText)
+            .filter(Objects::nonNull)
+            .map(MCRPersistentIdentifier.class::cast);
     }
 }
