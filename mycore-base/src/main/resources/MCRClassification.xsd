@@ -66,7 +66,7 @@
 
   <xsd:complexType name="MCRClassCatgories">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" type="MCRClassCategory" name="category" />
+      <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRClassCategory" name="category" />
     </xsd:sequence>
   </xsd:complexType>
 
