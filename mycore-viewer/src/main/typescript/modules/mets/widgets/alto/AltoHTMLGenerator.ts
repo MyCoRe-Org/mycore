@@ -8,14 +8,14 @@ namespace mycore.viewer.widgets.alto {
         constructor() {
         }
 
-        public generateHtml(alto:widgets.alto.AltoFile, pageID:string):HTMLElement {
+        public generateHtml(alto:widgets.alto.AltoFile, altoID:string):HTMLElement {
             let fontFamily = "sans-serif";
             let element = document.createElement("div");
 
             element.style.position = "absolute";
             element.style.whiteSpace = "nowrap";
             element.style.fontFamily = "sans-serif";
-            element.setAttribute("data-id", pageID);
+            element.setAttribute("data-id", altoID);
             let endecoderElem = document.createElement("span");
             let mesureCanvas = document.createElement("canvas");
             let ctx:CanvasRenderingContext2D = <CanvasRenderingContext2D>mesureCanvas.getContext("2d");

@@ -110,6 +110,9 @@ public final class MCRConstants {
 
     private final static HashMap<String, Namespace> namespacesByPrefix;
 
+    public static final Namespace ALTO_NAMESPACE = Namespace
+        .getNamespace("alto", "http://www.loc.gov/standards/alto/ns-v2#");
+
     static {
         namespacesByPrefix = new HashMap<String, Namespace>();
 

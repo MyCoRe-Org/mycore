@@ -10,6 +10,8 @@ namespace mycore.viewer.widgets.alto {
         public changeWordButton: JQuery;
 
         private idChangeMap = new MyCoReMap<string, AltoChange>();
+        private fileChangeMap = new MyCoReMap<string, Array<AltoChange>>();
+
         private idViewMap = new MyCoReMap<string, JQuery>();
         private pageHeading: JQuery;
 
@@ -18,13 +20,25 @@ namespace mycore.viewer.widgets.alto {
         private infoHeading: JQuery;
 
         private changeClickHandler: Array<(change: AltoChange) => void> = new Array<(change: AltoChange) => void>();
+        private changeRemoveClickHandler: Array<(change: AltoChange) => void> = new Array<(change: AltoChange) => void>();
+        private submitClickHandler: Array<() => void> = new Array<() => void>();
+        private applyClickHandler: Array<() => void> = new Array<() => void>();
+        private deleteClickHandler: Array<() => void> = new Array<() => void>();
+
+        private submitButton: JQuery;
+        private applyButton: JQuery;
+        private deleteButton: JQuery;
 
         constructor(container: JQuery, private i18n: model.LanguageModel) {
             this.widgetElement = jQuery(this.createHTML());
             this.widgetElement.appendTo(container);
+
             this.tableContainer = this.widgetElement.find("tbody.table-line-container");
             this.buttonContainer = this.widgetElement.find("div.button-group-container");
             this.changeWordButton = this.widgetElement.find("button.changeWord");
+            this.submitButton = this.widgetElement.find(".submit-button");
+            this.applyButton = this.widgetElement.find(".apply-button");
+            this.deleteButton = this.widgetElement.find(".delete-button");
 
             this.pageHeading = this.widgetElement.find("[data-sort=pageHeading]");
             this.actionHeading = this.widgetElement.find("[data-sort=actionHeading]");
@@ -34,15 +48,55 @@ namespace mycore.viewer.widgets.alto {
             this.actionHeading.click(this.getSortClickEventHandler('actionHeading'));
             this.infoHeading.click(this.getSortClickEventHandler('infoHeading'));
 
+            this.submitButton.click(() => {
+                this.submitClickHandler.forEach((e) => {
+                    e();
+                });
+            });
+
+            this.applyButton.click(() => {
+                this.applyClickHandler.forEach((e) => {
+                    e();
+                });
+            });
+
+            this.deleteButton.click(() => {
+                this.deleteClickHandler.forEach((e) => {
+                    e();
+                });
+            });
+        }
+
+        public enableApplyButton(enabled:boolean = true){
+            if (enabled) {
+                this.applyButton.show();
+            } else {
+                this.applyButton.hide();
+            }
         }
 
         public addChangeClickedEventHandler(handler: (change: AltoChange) => void) {
             this.changeClickHandler.push(handler);
         }
 
+        public addSubmitClickHandler(handler: () => void) {
+            this.submitClickHandler.push(handler);
+        }
+
+        public addApplyClickHandler(handler: () => void) {
+            this.applyClickHandler.push(handler);
+        }
+
+        public addDeleteClickHandler(handler: () => void) {
+            this.deleteClickHandler.push(handler);
+        }
+
+        public addChangeRemoveClickHandler(handler: (change: AltoChange) => void){
+            this.changeRemoveClickHandler.push(handler);
+        }
+
         private getSortClickEventHandler(byClicked: string) {
             return (ev) => {
-                console.log(this.getCurrentSortMethod());
                 let currentSort = this.getCurrentSortMethod();
                 if (currentSort == null || currentSort.sortBy !== byClicked) {
                     this.sortBy(byClicked, true)
@@ -88,16 +142,16 @@ namespace mycore.viewer.widgets.alto {
         }
 
         private getSortFn(by: string, down: boolean): (x, y) => number {
-            let headerIndex = [ "pageHeading", "actionHeading", "infoHeading" ];
+            let headerIndex = [ "action", "pageHeading", "actionHeading", "infoHeading" ];
             switch (by) {
-                case headerIndex[ 0 ]:
+                case headerIndex[ 1 ]:
                     return (x: JQuery, y: JQuery) => {
-                        let order1 = this.idChangeMap.get(x.attr("data-id")).getPageOrder();
-                        let order2 = this.idChangeMap.get(y.attr("data-id")).getPageOrder();
+                        let order1 = this.idChangeMap.get(x.attr("data-id")).pageOrder;
+                        let order2 = this.idChangeMap.get(y.attr("data-id")).pageOrder;
                         return (down ? 1 : -1) * (order1 - order2);
                     };
-                case headerIndex[ 1 ]:
                 case headerIndex[ 2 ]:
+                case headerIndex[ 3 ]:
                     return (x: JQuery, y: JQuery) => {
                         let text1 = jQuery(x.children("td").get(headerIndex.indexOf(by))).text();
                         let text2 = jQuery(y.children("td").get(headerIndex.indexOf(by))).text();
@@ -123,7 +177,7 @@ namespace mycore.viewer.widgets.alto {
             return `
 <div class="alto-editor-widget container-fluid">
     <h3 class="small-heading">${this.getLabel("altoWidget.heading")}</h3>     
-    <div class="btn-toolbar">
+    <div class="btn-toolbar edit">
         <div class="btn-group btn-group-xs button-group-container">
             <button type="button" class="btn btn-default changeWord">${this.getLabel("altoWidget.changeWord")}</button>
         </div>
@@ -133,6 +187,7 @@ namespace mycore.viewer.widgets.alto {
         <table class="table table-condensed">
             <thead>
                 <tr>
+                    <th></th>
                     <th data-sort="pageHeading">${this.getLabel("altoWidget.table.page")}</th>
                     <th data-sort="actionHeading">${this.getLabel("altoWidget.table.action")}</th>
                     <th data-sort="infoHeading">${this.getLabel("altoWidget.table.info")}</th>
@@ -143,6 +198,13 @@ namespace mycore.viewer.widgets.alto {
             </tbody>
         </table>
     </div>
+    <div class="btn-toolbar action">
+        <div class="btn-group btn-group-xs button-group-container">
+            <button type="button" class="btn btn-primary apply-button">${this.getLabel("altoWidget.apply")}</button>
+            <button type="button" class="btn btn-success submit-button">${this.getLabel("altoWidget.submit")}</button>
+            <button type="button" class="btn btn-danger delete-button">${this.getLabel("altoWidget.delete")}</button>
+        </div>
+    </div>
 </div>
 `;
         }
@@ -151,15 +213,36 @@ namespace mycore.viewer.widgets.alto {
             return this.i18n.getTranslation(id);
         }
 
-        public addChange(change: AltoChange) {
+        public hasChange(key: string) {
+            return this.idChangeMap.has(key);
+        }
+
+        public getChange(key: string) {
+            return this.idChangeMap.get(key);
+        }
+
+        public getChanges() {
+            return this.idChangeMap;
+        }
+
+        public getChangesInFile(file: string) {
+            return this.fileChangeMap.get(file) || [];
+        }
+
+        public addChange(key: string, change: AltoChange) {
             if (this.idChangeMap.values.indexOf(change) != -1) {
                 return;
             }
 
-            let id = Math.random().toString(16);
-            this.idChangeMap.set(id, change);
+            this.idChangeMap.set(key, change);
+            let changes = this.fileChangeMap.get(change.file);
+            if (!this.fileChangeMap.has(change.file)) {
+                changes = [];
+                this.fileChangeMap.set(change.file, changes);
+            }
+            changes.push(change);
 
-            this.addRow(id, change);
+            this.addRow(key, change);
         }
 
         private addRow(id: string, change: AltoChange) {
@@ -187,30 +270,36 @@ namespace mycore.viewer.widgets.alto {
                 this.tableContainer.append(view);
             }
 
-            view.click(()=>{
-                this.changeClickHandler.forEach((handler)=>{
-                   handler(change);
-                });
+            view.click((e) => {
+                if(jQuery(e.target).hasClass("remove")){
+                    this.changeRemoveClickHandler.forEach((handler) => {
+                        handler(change);
+                    });
+                } else {
+                    this.changeClickHandler.forEach((handler) => {
+                        handler(change);
+                    });
+                }
+
             });
 
             this.idViewMap.set(id, view);
         }
 
         private getChangeText(change: mycore.viewer.widgets.alto.AltoChange) {
-            if (change.getType() == AltoWordChange.TYPE) {
+            if (change.type == AltoWordChange.TYPE) {
                 let wc = <AltoWordChange>change;
                 return `${wc.from} => ${wc.to}`;
             }
         }
 
-        updateChange(change: mycore.viewer.widgets.alto.AltoChange) {
+        public updateChange(change: mycore.viewer.widgets.alto.AltoChange) {
             let changeID = this.getChangeID(change);
 
             this.idViewMap.get(changeID).html(this.getChangeHTMLContent(change));
-
         }
 
-        getChangeID(change: mycore.viewer.widgets.alto.AltoChange) {
+        public getChangeID(change: mycore.viewer.widgets.alto.AltoChange) {
             let changeID = null;
             this.idChangeMap.forEach((k, v) => {
                 if (v == change) {
@@ -222,8 +311,9 @@ namespace mycore.viewer.widgets.alto {
 
         private getChangeHTMLContent(change: mycore.viewer.widgets.alto.AltoChange) {
             return `
-<td>${change.getPageOrder()}</td>
-<td>${change.getType()}</td>
+<td><span class="glyphicon glyphicon-remove remove"></span></td>
+<td>${change.pageOrder}</td>
+<td>${this.i18n.getTranslation("altoWidget.change." + change.type)}</td>
 <td>${this.getChangeText(change)}</td>
 `
         }
@@ -233,6 +323,14 @@ namespace mycore.viewer.widgets.alto {
             this.idViewMap.get(changeID).remove();
             this.idViewMap.remove(changeID);
             this.idChangeMap.remove(changeID);
+
+            if (this.fileChangeMap.has(wordChange.file)) {
+                let changes = this.fileChangeMap.get(wordChange.file);
+                let index = 0;
+                while ((index = changes.indexOf(wordChange, index)) != -1) {
+                    changes.splice(index, 1);
+                }
+            }
         }
     }
 

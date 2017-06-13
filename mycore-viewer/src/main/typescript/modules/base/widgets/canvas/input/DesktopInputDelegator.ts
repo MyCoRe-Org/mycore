@@ -45,7 +45,6 @@ namespace mycore.viewer.widgets.canvas {
                 this._handler.mouseDrag(mousePosition,
                     this._currentMouseSession.startPosition,
                     this._currentMouseSession.startViewport, e);
-                console.log(this._handler);
             };
 
             this._mouseDownHandler = (e: JQueryMouseEventObject) => {

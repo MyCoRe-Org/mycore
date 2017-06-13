@@ -620,6 +620,10 @@ namespace mycore.viewer.components {
             }
         }
 
+        public isAltoSelectable() {
+            return this._selectionSwitchButton.active;
+        }
+
         private setAltoSelectable(selectable: boolean) {
             this._selectionSwitchButton.active = selectable;
             jQuery("[data-id='selectionSwitchButton']").blur();
@@ -913,13 +917,15 @@ namespace mycore.viewer.components {
         }
 
         public mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D): void {
-            var xMove = currentPosition.x - startPosition.x;
-            var yMove = currentPosition.y - startPosition.y;
-            var move = new MoveVector(-xMove, -yMove).rotate(this.component.getPageController().viewport.rotation);
-            this.component.getPageController().viewport.position = startViewport
-                .scale(this.component.getPageController().viewport.scale)
-                .move(move)
-                .scale(1 / this.component.getPageController().viewport.scale);
+            if (!this.component.isAltoSelectable()) {
+                var xMove = currentPosition.x - startPosition.x;
+                var yMove = currentPosition.y - startPosition.y;
+                var move = new MoveVector(-xMove, -yMove).rotate(this.component.getPageController().viewport.rotation);
+                this.component.getPageController().viewport.position = startViewport
+                    .scale(this.component.getPageController().viewport.scale)
+                    .move(move)
+                    .scale(1 / this.component.getPageController().viewport.scale);
+            }
         }
 
         public scroll(e: { deltaX: number; deltaY: number; orig: any; pos: Position2D; altKey?: boolean, ctrlKey?: boolean }) {

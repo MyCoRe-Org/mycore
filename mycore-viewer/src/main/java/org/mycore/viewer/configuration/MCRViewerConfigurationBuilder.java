@@ -81,7 +81,9 @@ public class MCRViewerConfigurationBuilder {
      */
     public static MCRViewerConfigurationBuilder mets(HttpServletRequest request) {
         MCRViewerMetsConfiguration metsConfig = new MCRViewerMetsConfiguration();
-        return MCRViewerConfigurationBuilder.build(request).mixin(metsConfig);
+        return MCRViewerConfigurationBuilder.build(request)
+            .mixin(metsConfig)
+            .mixin(new MCRViewerAltoEditorConfiguration().setup(request));
     }
 
     /**

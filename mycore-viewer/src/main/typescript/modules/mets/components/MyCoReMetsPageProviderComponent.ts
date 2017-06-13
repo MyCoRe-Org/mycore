@@ -8,6 +8,7 @@ namespace mycore.viewer.components {
 
     import RequestAltoModelEvent = mycore.viewer.components.events.RequestAltoModelEvent;
     import AltoHTMLGenerator = mycore.viewer.widgets.alto.AltoHTMLGenerator;
+    import PageLoadedEvent = mycore.viewer.components.events.PageLoadedEvent;
 
     export class MyCoReMetsPageProviderComponent extends ViewerComponent {
 
@@ -42,7 +43,7 @@ namespace mycore.viewer.components {
                         if (!this._imageHTMLMap.has(image)) {
                             this.trigger(new RequestAltoModelEvent(this, image, (page, altoHref, altoModel) => {
                                 if (!this._imageHTMLMap.has(image)) {
-                                    let htmlElement = this._altoHTMLGenerator.generateHtml(altoModel, image);
+                                    let htmlElement = this._altoHTMLGenerator.generateHtml(altoModel, altoHref);
                                     imagePage.getHTMLContent().value = htmlElement;
                                     this._imageHTMLMap.set(image, htmlElement);
                                 }
@@ -54,6 +55,7 @@ namespace mycore.viewer.components {
                             pop(imagePage);
                         }
                         this._imagePageMap.set(image, imagePage);
+                        this.trigger(new PageLoadedEvent(this,image,imagePage));
                     });
                 }
             }

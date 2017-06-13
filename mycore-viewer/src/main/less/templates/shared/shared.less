@@ -267,6 +267,8 @@
       z-index: 3;
     }
 
+    text-align: left;
+
     .altoLine span {
       cursor: text;
     }
@@ -276,7 +278,7 @@
       border: 3px darkgreen solid;
     }
 
-    .edited{
+    .edited {
       background-color: lightblue;
     }
 
@@ -311,6 +313,15 @@
 
   .alto-editor-widget {
     th[data-sort] {
+      cursor: pointer;
+    }
+
+    .btn-toolbar.action {
+      padding-top: 20px;
+    }
+
+    .glyphicon-remove {
+      color: red;
       cursor: pointer;
     }
   }

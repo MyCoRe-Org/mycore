@@ -28,6 +28,9 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRXMLContent;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -134,7 +137,14 @@ public class MCRViewerConfiguration {
      */
     public static String getFilePath(HttpServletRequest request) {
         try {
-            return getFromPath(request.getPathInfo(), 2);
+            String fromPath = getFromPath(request.getPathInfo(), 2);
+            if(fromPath == null || fromPath.isEmpty() || fromPath.equals("/")){
+                String derivate = getDerivate(request);
+                MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
+                String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();
+                return "/" + nameOfMainFile;
+            }
+            return fromPath;
         } catch (Exception exc) {
             LOGGER.warn("Unable to get the file path of request " + request.getRequestURI());
             return null;

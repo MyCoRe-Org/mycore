@@ -17,92 +17,146 @@
     <!-- <link rel="stylesheet" href="../META-INF/resources/components/iview/templates/mobile/jquery.mobile-1.3.2.min.css" />     -->
     <script>
 
-          window.onload = function() {
+        window.onload = function () {
             var json = {
-              resources: {
-                script: [ "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-base.js",
-                    "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-desktop.js",
-                    "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-mets.js",
-                    "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-metadata.js",
-                    "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-piwik.js" ],
-                css: [ "http://zs.thulb.uni-jena.de/modules/iview2/css/default.css", "http://zs.thulb.uni-jena.de/css/jp-iview.css" ]
-              },
-              properties: {
-                derivateURL: "http://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00242075/",
-                metsURL: "http://zs.thulb.uni-jena.de/servlets/MCRMETSServlet/jportal_derivate_00242075",
-                canvas: {
-                  overview: {
-                    enabled: true,
-                  }
-                },
-                i18nURL: "http://zs.thulb.uni-jena.de/rsc/locale/translate/{lang}/component.mets.*,component.viewer.*",
-                derivate: "jportal_derivate_00242075",
-                filePath: "/THULB_168283743_1811_LLZ_001_18110102_007.tif",
-                mobile: false,
-                adminMail: "mcradmin@mycore.de",
-                tileProviderPath: "http://zs.thulb.uni-jena.de/servlets/MCRTileServlet/",
-                imageXmlPath: "http://zs.thulb.uni-jena.de/servlets/MCRTileServlet/",
-                pdfCreatorURI: "http://wrackdm17.thulb.uni-jena.de/mets-printer/pdf",
-                text: {
-                  enabled: false
-                },
-                doctype: "mets",
-                webApplicationBaseURL: "http://zs.thulb.uni-jena.de/",
-                metadataURL: "http://zs.thulb.uni-jena.de/receive/jportal_jpvolume_00220753?XSL.Transformer\u003dmycoreobject-viewer",
-                pdfCreatorStyle: "pdf",
-                objId: "jportal_jpvolume_00220753",
-                lang: "de",
-                permalink: {
-                  enabled: false,
-                  updateHistory: false,
-                  viewerLocationPattern: "/classes/example/MyCoReImageViewer.html"
+                    resources: {
+                        script: ["http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-base.js",
+                            "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-desktop.js",
+                            "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-mets.js",
+                            "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-metadata.js",
+                            "http://zs.thulb.uni-jena.de/modules/iview2/js/iview-client-piwik.js"],
+                        css: ["http://zs.thulb.uni-jena.de/modules/iview2/css/default.css", "http://zs.thulb.uni-jena.de/css/jp-iview.css"]
+                    },
+                    properties: {
+                        derivateURL: "http://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00242075/",
+                        metsURL: "http://zs.thulb.uni-jena.de/servlets/MCRMETSServlet/jportal_derivate_00242075",
+                        canvas: {
+                            overview: {
+                                enabled: true,
+                            }
+                        },
+                        i18nURL: "http://zs.thulb.uni-jena.de/rsc/locale/translate/{lang}/component.mets.*,component.viewer.*",
+                        derivate: "jportal_derivate_00242075",
+                        filePath: "/THULB_168283743_1811_LLZ_001_18110102_007.tif",
+                        mobile: false,
+                        adminMail: "mcradmin@mycore.de",
+                        tileProviderPath: "http://zs.thulb.uni-jena.de/servlets/MCRTileServlet/",
+                        imageXmlPath: "http://zs.thulb.uni-jena.de/servlets/MCRTileServlet/",
+                        pdfCreatorURI: "http://wrackdm17.thulb.uni-jena.de/mets-printer/pdf",
+                        text: {
+                            enabled: false
+                        },
+                        doctype: "mets",
+                        webApplicationBaseURL: "http://zs.thulb.uni-jena.de/",
+                        metadataURL: "http://zs.thulb.uni-jena.de/receive/jportal_jpvolume_00220753?XSL.Transformer\u003dmycoreobject-viewer",
+                        pdfCreatorStyle: "pdf",
+                        objId: "jportal_jpvolume_00220753",
+                        lang: "de",
+                        permalink: {
+                            enabled: false,
+                            updateHistory: false,
+                            viewerLocationPattern: "/classes/example/MyCoReImageViewer.html"
+                        },
+                        altoChanges: {
+                            "wordChanges": [{
+                                "file": "THULB_168283743_1811_LLZ_001_18110102_007.tif",
+                                "type": "AltoWordChange",
+                                "pageOrder": 7,
+                                "hpos": 1327,
+                                "vpos": 283,
+                                "width": 119,
+                                "height": 38,
+                                "from": "Zcit-",
+                                "to": "Zeit-"
+                            }, {
+                                "file": "THULB_168283743_1811_LLZ_001_18110102_007.tif",
+                                "type": "AltoWordChange",
+                                "pageOrder": 7,
+                                "hpos": 939,
+                                "vpos": 337,
+                                "width": 276,
+                                "height": 54,
+                                "from": "ungezähnte",
+                                "to": "ungezähmte"
+                            }, {
+                                "file": "THULB_168283743_1811_LLZ_001_18110102_007.tif",
+                                "type": "AltoWordChange",
+                                "pageOrder": 7,
+                                "hpos": 846,
+                                "vpos": 1413,
+                                "width": 40,
+                                "height": 41,
+                                "from": "\\V",
+                                "to": "W"
+                            }, {
+                                "file": "THULB_168283743_1811_LLZ_001_18110102_007.tif",
+                                "type": "AltoWordChange",
+                                "pageOrder": 7,
+                                "hpos": 906,
+                                "vpos": 1412,
+                                "width": 299,
+                                "height": 52,
+                                "from": "ohlihätigkcil",
+                                "to": "ohlihätigkeit"
+                            }, {
+                                "file": "THULB_168283743_1811_LLZ_001_18110102_007.tif",
+                                "type": "AltoWordChange",
+                                "pageOrder": 7,
+                                "hpos": 438,
+                                "vpos": 620,
+                                "width": 330,
+                                "height": 44,
+                                "from": "dilatorischen",
+                                "to": "dictatorischen"
+                            }]
+                        }
+                    }
                 }
-              }
-            };
+            ;
             new mycore.viewer.MyCoReViewer(jQuery("body"), json.properties);
-          };
-/*
-          window.onload = function() {
-            window["viewer"] = new mycore.viewer.MyCoReViewer(jQuery("body"), {
-              "mobile": false,
-              doctype: "mets",
-              metsURL: "mets/HisBest_derivate_00000376/mets.xml",
-              "imageXmlPath": "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRTileServlet/",
-              "tileProviderPath": "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRTileServlet/",
-              "filePath": "/RN_0004_0002r.tif",
-              derivate: "HisBest_derivate_00000376",
-              i18nURL: "../META-INF/resources/modules/iview2/i18n/{lang}.json",
-              lang: "de",
-              pdfCreatorStyle: "pdf",
-              pdfCreatorURI: "http://wrackdm17.thulb.uni-jena.de/mets-printer/pdf",
-              metadataURL: null,
-              objId: "",
-              webApplicationBaseURL: "/classes/META-INF/resources",
-              imageOverview: {
-                enabled: true
-              },
-              chapter: {
-                enabled: true,
-                showOnStart: true
-              },
-              permalink: {
-                enabled: true,
-                updateHistory: true,
-                viewerLocationPattern: "/classes/example/MyCoReImageViewer.html"
+        };
+        /*
+         window.onload = function() {
+         window["viewer"] = new mycore.viewer.MyCoReViewer(jQuery("body"), {
+         "mobile": false,
+         doctype: "mets",
+         metsURL: "mets/HisBest_derivate_00000376/mets.xml",
+         "imageXmlPath": "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRTileServlet/",
+         "tileProviderPath": "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRTileServlet/",
+         "filePath": "/RN_0004_0002r.tif",
+         derivate: "HisBest_derivate_00000376",
+         i18nURL: "../META-INF/resources/modules/iview2/i18n/{lang}.json",
+         lang: "de",
+         pdfCreatorStyle: "pdf",
+         pdfCreatorURI: "http://wrackdm17.thulb.uni-jena.de/mets-printer/pdf",
+         metadataURL: null,
+         objId: "",
+         webApplicationBaseURL: "/classes/META-INF/resources",
+         imageOverview: {
+         enabled: true
+         },
+         chapter: {
+         enabled: true,
+         showOnStart: true
+         },
+         permalink: {
+         enabled: true,
+         updateHistory: true,
+         viewerLocationPattern: "/classes/example/MyCoReImageViewer.html"
 
-              },
-              canvas: {
-                overview: {
-                  enabled: true
-                }
-              },
-              adminMail: "mcradmin@mycore.de",
-              onClose: function() {
-                console.log("You can define a custom close button behavior.");
-              }
-            });
-          }*/
-        </script>
+         },
+         canvas: {
+         overview: {
+         enabled: true
+         }
+         },
+         adminMail: "mcradmin@mycore.de",
+         onClose: function() {
+         console.log("You can define a custom close button behavior.");
+         }
+         });
+         }*/
+    </script>
 </head>
 <body>
 

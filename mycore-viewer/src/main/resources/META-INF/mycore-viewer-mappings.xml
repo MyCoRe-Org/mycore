@@ -1,0 +1,3 @@
+<entity-mappings>
+  <entity class="org.mycore.viewer.alto.model.MCRDBStoredChangeSet" />
+</entity-mappings>

@@ -11,6 +11,8 @@ namespace mycore.viewer.components {
     import DesktopInputAdapter = mycore.viewer.widgets.canvas.DesktopInputAdapter;
     import AbstractPage = mycore.viewer.model.AbstractPage;
     import StructureImage = mycore.viewer.model.StructureImage;
+    import AltoChange = mycore.viewer.widgets.alto.AltoChange;
+    import PageLoadedEvent = mycore.viewer.components.events.PageLoadedEvent;
 
     export class MyCoReAltoEditorComponent extends ViewerComponent {
         private _structureImages: Array<mycore.viewer.model.StructureImage>;
@@ -22,22 +24,29 @@ namespace mycore.viewer.components {
         private _altoDropdownChildItem: { id: string; label: string };
         private container: JQuery;
         private containerTitle: JQuery;
-        private editorWidget: mycore.viewer.widgets.alto.AltoEditorWidget;
+        public editorWidget: mycore.viewer.widgets.alto.AltoEditorWidget;
         private static DROP_DOWN_CHILD_ID = "altoButtonChild";
         private currentOrder: number;
-        private currentPageID: string;
-        private highlightWordLayer: HighligtAltoWordCanvasPageLayer = new HighligtAltoWordCanvasPageLayer();
-        private contentIDImageMap = new MyCoReMap<string, StructureImage>();
+        private currentAltoID: string;
+        private highlightWordLayer: HighligtAltoWordCanvasPageLayer = new HighligtAltoWordCanvasPageLayer(this);
+        private altoIDImageMap = new MyCoReMap<string, StructureImage>();
+        private imageHrefAltoContentMap = new MyCoReMap<string, HTMLElement>();
+        public altoHrefImageHrefMap = new MyCoReMap<string, string>();
+        public imageHrefAltoHrefMap = new MyCoReMap<string, string>();
 
-        constructor(private _settings: MyCoReViewerSettings, private _container: JQuery) {
+        private initialHtmlApplyList: Array<AltoChange> = new Array<AltoChange>();
+
+
+        constructor(private _settings: MetsSettings, private _container: JQuery) {
             super();
-            console.log(this._container);
         }
 
         private everythingLoadedSynchronize = Utils.synchronize<MyCoReAltoEditorComponent>(
             [
                 (obj) => obj._toolbarModel != null,
                 (obj) => obj._languageModel != null,
+                (obj) => obj._structureModel != null,
+                (obj) => obj._altoPresent
             ],
             (obj) => {
                 obj.completeLoaded();
@@ -45,15 +54,20 @@ namespace mycore.viewer.components {
         );
 
         public init() {
-            this.container = jQuery("<div></div>");
-            this.containerTitle = jQuery("<span>ALTO-Editor</span>");
+            if (this.editorEnabled()) {
+                this.container = jQuery("<div></div>");
+                this.containerTitle = jQuery("<span>ALTO-Editor</span>");
 
-            this.trigger(new WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
+                this.trigger(new WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
 
-            this.container.bind("iviewResize", () => {
-                this.updateContainerSize();
-            });
+                this.container.bind("iviewResize", () => {
+                    this.updateContainerSize();
+                });
+            }
+        }
 
+        private editorEnabled() {
+            return typeof this._settings.altoEditorPostURL !== "undefined" && this._settings.altoEditorPostURL != null;
         }
 
 
@@ -65,7 +79,11 @@ namespace mycore.viewer.components {
                 for (let imageIndex in this._structureImages) {
                     let image = this._structureImages[ imageIndex ];
                     this._altoPresent = this._altoPresent || image.additionalHrefs.has("AltoHref");
+                    if (this._altoPresent) {
+                        this.altoHrefImageHrefMap.set(image.additionalHrefs.get("AltoHref"), image.href);
+                    }
                 }
+                this.everythingLoadedSynchronize(this);
             }
 
             if (e.type == events.LanguageModelLoadedEvent.TYPE) {
@@ -85,34 +103,49 @@ namespace mycore.viewer.components {
                 let dbpe = <widgets.toolbar.events.DropdownButtonPressedEvent> e;
 
                 if (dbpe.childId === MyCoReAltoEditorComponent.DROP_DOWN_CHILD_ID) {
-                    this.trigger(new ShowContentEvent(this, this.container, ShowContentEvent.DIRECTION_WEST, 400, this.containerTitle));
+                    this.openEditor();
+                }
+            }
+
+
+            if (e.type == events.PageLoadedEvent.TYPE) {
+                let ple = < events.PageLoadedEvent>e;
+
+                let altoContent = (<TileImagePage>ple.abstractPage).getHTMLContent();
+                if (altoContent.value != null) {
+                    let structureImage = this._structureModel.imageHrefImageMap.get(ple.abstractPage.id);
+                    let altoHref = structureImage.additionalHrefs.get("AltoHref");
+                    this.altoIDImageMap.set(altoContent.value.getAttribute("data-id"), structureImage);
+                    this.syncChanges(altoContent.value, altoHref);
+                    this.imageHrefAltoContentMap.set(structureImage.href, altoContent.value);
+                    this.imageHrefAltoHrefMap.set(structureImage.href, altoHref);
 
                 } else {
-                    // disable all tools here!
-                }
-
-            }
-
-            if (e.type == events.ImageChangedEvent.TYPE) {
-                let ice = < events.ImageChangedEvent>e;
-
-                if (typeof ice.image != "undefined") {
-                    this.trigger(new events.RequestPageEvent(this, ice.image.href, (pageId: string, abstractPage: model.AbstractPage) => {
-                        let altoContent = (<TileImagePage>abstractPage).getHTMLContent();
-                        if (altoContent.value != null) {
-                            this.contentIDImageMap.set(altoContent.value.getAttribute("data-id"), ice.image);
-                        } else {
-                            altoContent.addObserver({
-                                propertyChanged : (old: ViewerProperty<HTMLElement>, _new: ViewerProperty<HTMLElement>) => {
-                                    this.contentIDImageMap.set(_new.value.getAttribute("data-id"), ice.image);
-                                }
-                            });
+                    altoContent.addObserver({
+                        propertyChanged : (old: ViewerProperty<HTMLElement>, _new: ViewerProperty<HTMLElement>) => {
+                            let structureImage = this._structureModel.imageHrefImageMap.get(ple.abstractPage.id);
+                            let altoHref = structureImage.additionalHrefs.get("AltoHref");
+                            this.altoIDImageMap.set(_new.value.getAttribute("data-id"), structureImage);
+                            this.syncChanges(_new.value, altoHref);
+                            this.imageHrefAltoContentMap.set(structureImage.href, _new.value);
+                            this.imageHrefAltoHrefMap.set(structureImage.href, altoHref);
                         }
-
-                    }));
-
+                    });
                 }
             }
+
+            if (e.type == events.ShowContentEvent.TYPE) {
+                let sce = <events.ShowContentEvent>e;
+                if (sce.containerDirection == events.ShowContentEvent.DIRECTION_WEST) {
+                    if (sce.size == 0) {
+                        this.toggleEditWord(false);
+                    }
+                }
+            }
+        }
+
+        private openEditor() {
+            this.trigger(new ShowContentEvent(this, this.container, ShowContentEvent.DIRECTION_WEST, 400, this.containerTitle));
         }
 
         public mouseClick(position: Position2D, ev: JQueryMouseEventObject) {
@@ -140,8 +173,8 @@ namespace mycore.viewer.components {
         }
 
 
-        private changes: MyCoReMap<string, AltoWordChange> = new MyCoReMap<string, AltoWordChange>();
         private currentEditWord: HTMLElement = null;
+        private beforeEditWord: string = null;
 
         private static ENTER_KEY = 13;
         private static ESC_KEY = 27;
@@ -154,19 +187,20 @@ namespace mycore.viewer.components {
                          height: number) {
 
             if (this.currentEditWord != null) {
-                this.applyEdit(this.currentEditWord, this.currentPageID, this.currentOrder);
+                this.applyEdit(this.currentEditWord, this.currentAltoID, this.currentOrder);
             }
 
-            let findPageID = (el: HTMLElement) => {
-                return el.getAttribute("data-id") == null ? findPageID(el.parentElement) : el.getAttribute("data-id");
+            let findAltoID = (el: HTMLElement) => {
+                return el.getAttribute("data-id") == null ? findAltoID(el.parentElement) : el.getAttribute("data-id");
             };
 
-            let pageId = findPageID(element);
+            let altoID = findAltoID(element);
 
 
-            this.currentPageID = pageId;
-            this.currentOrder = this.contentIDImageMap.get(pageId).order;
+            this.currentAltoID = altoID;
+            this.currentOrder = this.altoIDImageMap.get(altoID).order;
             this.currentEditWord = element;
+            this.beforeEditWord = element.innerText;
             this.currentEditWord.setAttribute("contenteditable", "true");
             /*this.currentEditWord.onblur = () => {
              if (this.currentEditWord != null) {
@@ -179,15 +213,15 @@ namespace mycore.viewer.components {
                 hpos : hpos,
                 width : width,
                 height : height,
-                id : this.currentPageID
+                id : this.currentAltoID
             });
             this.trigger(new events.RedrawEvent(this));
         }
 
-        keyDown(e: JQueryKeyEventObject) {
+        public keyDown(e: JQueryKeyEventObject) {
             if (this.currentEditWord != null) {
                 if (e.keyCode == MyCoReAltoEditorComponent.ENTER_KEY) {
-                    this.applyEdit(this.currentEditWord, this.currentPageID, this.currentOrder);
+                    this.applyEdit(this.currentEditWord, this.currentAltoID, this.currentOrder);
                     return;
                 }
 
@@ -200,47 +234,60 @@ namespace mycore.viewer.components {
         }
 
         private abortEdit(element: HTMLElement) {
-            let word = element.getAttribute("data-word");
-
-            element.innerText = word;
+            element.innerText = this.beforeEditWord;
 
             this.endEdit(element);
         }
 
-        private applyEdit(element: HTMLElement, pageId: string, order: number) {
+        private resetWordEdit(element: HTMLElement) {
+            if (this.currentEditWord == element) {
+                this.abortEdit(element);
+            }
+
+            let word = element.getAttribute("data-word");
+            element.innerText = word;
+
+            if (element.classList.contains("edited")) {
+                element.classList.remove("edited");
+            }
 
 
+        }
+
+        private applyEdit(element: HTMLElement, altoID: string, order: number) {
             let vpos = parseInt(element.getAttribute("data-vpos")),
                 hpos = parseInt(element.getAttribute("data-hpos")),
+                width = parseInt(element.getAttribute("data-width")),
+                height = parseInt(element.getAttribute("data-height")),
                 newWord = element.innerHTML;
 
-            let key = `${pageId}_${vpos}_${hpos}`;
+            let key = this.calculateChangeKey(altoID, vpos, hpos);
 
             let oldWord = element.getAttribute("data-word");
 
-            if (!this.changes.has(key)) {
+            if (!this.editorWidget.hasChange(key)) {
                 if (oldWord !== newWord) {
 
                     let wordChange = new AltoWordChange(
-                        pageId,
+                        altoID,
                         hpos,
                         vpos,
+                        width,
+                        height,
                         oldWord,
                         newWord,
                         order
                     );
-                    this.changes.set(key, wordChange);
-                    this.editorWidget.addChange(wordChange);
+                    this.editorWidget.addChange(key, wordChange);
                     element.classList.add("edited")
                 }
             } else {
-                let wordChange = this.changes.get(key);
+                let wordChange = <AltoWordChange>this.editorWidget.getChange(key);
 
                 if (oldWord !== newWord) {
                     wordChange.to = newWord;
                     this.editorWidget.updateChange(wordChange);
                 } else {
-                    this.changes.remove(key);
                     this.editorWidget.removeChange(wordChange);
                     if (element.classList.contains("edited")) {
                         element.classList.remove("edited");
@@ -251,8 +298,12 @@ namespace mycore.viewer.components {
             this.endEdit(element);
         }
 
+        private calculateChangeKey(altoID: string, vpos: number, hpos: number) {
+            return `${altoID}_${vpos}_${hpos}`;
+        }
+
         private endEdit(element: HTMLElement) {
-            this.currentEditWord = this.currentOrder = this.currentPageID = null;
+            this.currentEditWord = this.currentOrder = this.currentAltoID = this.beforeEditWord = null;
             element.setAttribute("contenteditable", "false");
             this.highlightWordLayer.setHighlightedWord(null);
             viewerClearTextSelection();
@@ -260,13 +311,15 @@ namespace mycore.viewer.components {
         }
 
         public get handlesEvents(): string[] {
-            return [
+            return this.editorEnabled() ? [
                 events.StructureModelLoadedEvent.TYPE,
                 events.LanguageModelLoadedEvent.TYPE,
                 events.ProvideToolbarModelEvent.TYPE,
                 widgets.toolbar.events.DropdownButtonPressedEvent.TYPE,
-                events.ImageChangedEvent.TYPE
-            ];
+                events.ImageChangedEvent.TYPE,
+                events.PageLoadedEvent.TYPE,
+                events.ShowContentEvent.TYPE
+            ] : [];
         }
 
         private toggleEditWord(enable: boolean = !this.editorWidget.changeWordButton.hasClass("active")) {
@@ -283,7 +336,7 @@ namespace mycore.viewer.components {
             this.trigger(new events.RedrawEvent(this));
         }
 
-        private isEditing() {
+        public isEditing() {
             return this.editorWidget.changeWordButton.hasClass("active");
         }
 
@@ -296,22 +349,155 @@ namespace mycore.viewer.components {
             this._sidebarControllDropdownButton.children.push(this._altoDropdownChildItem);
             this._sidebarControllDropdownButton.children = this._sidebarControllDropdownButton.children;
             this.editorWidget = new AltoEditorWidget(this.container, this._languageModel);
-            this.containerTitle.text(`${this._languageModel.getTranslation("containerTitle")}`);
+            this.containerTitle.text(`${this._languageModel.getTranslation("altoEditor")}`);
+
+            if (typeof  this._settings.altoReviewer !== "undefined" && this._settings.altoReviewer != null && this._settings.altoReviewer) {
+                this.editorWidget.enableApplyButton(true);
+            }
+
+            if (typeof this._settings.altoChanges != "undefined" && this._settings.altoChanges != null) {
+                if ("wordChanges" in this._settings.altoChanges && this._settings.altoChanges.wordChanges instanceof Array) {
+                    this._settings.altoChanges.wordChanges.forEach((change) => {
+                        change.pageOrder = this._structureModel.imageHrefImageMap.get(this.altoHrefImageHrefMap.get(change.file)).order;
+                        this.editorWidget.addChange(this.calculateChangeKey(change.file, change.hpos, change.vpos), change);
+                        this.initialHtmlApplyList.push(change);
+                    });
+                }
+            }
 
             this.editorWidget.changeWordButton.click((ev) => {
                 this.toggleEditWord();
             });
 
             this.editorWidget.addChangeClickedEventHandler((change) => {
-                this.trigger(new events.ImageSelectedEvent(this, this._structureModel.imageHrefImageMap.get(change.file)));
+                this.trigger(new events.ImageSelectedEvent(this, this._structureModel.imageHrefImageMap.get(this.altoHrefImageHrefMap.get(change.file))));
 
             });
 
+            let submitSuccess = (result: { pid: string }) => {
+                this._settings.altoChangePID = result.pid;
+            };
+
+            let applySuccess = () => {
+                window.location.reload(true);
+            };
+
+            this.editorWidget.addSubmitClickHandler(() => {
+                this.submitChanges(submitSuccess);
+            });
+
+            this.editorWidget.addApplyClickHandler(() => {
+                this.submitChanges((result: { pid: string }) => {
+                    submitSuccess(result);
+                    this.applyChanges(applySuccess);
+                });
+            });
+
+            this.editorWidget.addDeleteClickHandler(() => {
+                if (this._settings.altoChangePID) {
+                    let requestURL = this._settings.altoEditorPostURL;
+                    requestURL += "/delete/" + this._settings.altoChangePID;
+
+                    jQuery.ajax(requestURL, {
+                        contentType : "application/json",
+                        type : "POST",
+                        success : () => {
+                            this._settings.altoChangePID = null;
+                        }
+                    });
+                }
+                this.editorWidget.getChanges().forEach((file, change) => {
+                    this.removeChange(change);
+                })
+            });
+
+            this.editorWidget.addChangeRemoveClickHandler((change) => {
+                this.removeChange(change);
+            });
+
+
             this.trigger(new events.AddCanvasPageLayerEvent(this, 2, this.highlightWordLayer));
             this.trigger(new events.RequestDesktopInputEvent(this, new EditAltoInputListener(this)));
+            this.trigger(new events.WaitForEvent(this, PageLoadedEvent.TYPE));
 
+            if (this._settings.leftShowOnStart === 'altoEditor') {
+                this.openEditor();
+            }
 
             this.updateContainerSize();
+        }
+
+        private removeChange(change) {
+            this.editorWidget.removeChange(change);
+
+            // revert changes made in html
+            let imageHref = this.altoHrefImageHrefMap.get(change.file);
+            if (this.imageHrefAltoContentMap.has(imageHref)) {
+                let altoContent = this.imageHrefAltoContentMap.get(imageHref);
+                if (change.type === AltoWordChange.TYPE) {
+                    let wordChange = <AltoWordChange>change;
+                    let searchResult = this.findChange(wordChange, altoContent);
+
+                    if (searchResult.length == 0) {
+                        console.log("Could not find change " + wordChange);
+                    } else {
+                        this.resetWordEdit(searchResult.get(0));
+                    }
+
+                }
+            }
+            this.trigger(new events.RedrawEvent(this));
+            // if they are not in the map then they are not changed :D
+        }
+
+        private applyChanges(callback) {
+            let requestURL = this._settings.altoEditorPostURL;
+            requestURL += "/apply/" + this._settings.altoChangePID;
+
+            jQuery.ajax(requestURL, {
+                contentType : "application/json",
+                type : "POST",
+                success : callback
+            });
+        }
+
+        private submitChanges(success: (result: { pid: string }) => any) {
+            let changeSet = {
+                "wordChanges" : this.editorWidget.getChanges().values,
+                "derivateID" : this._settings.derivate
+            };
+            let requestURL = this._settings.altoEditorPostURL;
+            if (typeof this._settings.altoChangePID !== "undefined" && this._settings.altoChangePID != null) {
+                requestURL += "/update/" + this._settings.altoChangePID;
+            } else {
+                requestURL += "/store"
+            }
+
+            jQuery.ajax(requestURL, {
+                data : this.prepareData(changeSet),
+                contentType : "application/json",
+                type : "POST",
+                success : success
+            });
+        }
+
+        private prepareData(changeSet: { wordChanges: Array<mycore.viewer.widgets.alto.AltoChange> }) {
+            let copy = JSON.parse(JSON.stringify(changeSet));
+
+            copy.wordChanges.forEach((val: AltoChange) => {
+                if ("pageOrder" in val) {
+                    delete val.pageOrder;
+                }
+            });
+
+            return JSON.stringify(copy);
+        }
+
+        private findChange(wordChange: mycore.viewer.widgets.alto.AltoWordChange, altoContent: HTMLElement) {
+            let find = `[data-hpos=${wordChange.hpos}][data-vpos=${wordChange.vpos}]` +
+                `[data-width=${wordChange.width}][data-height=${wordChange.height}]`;
+            let searchResult = jQuery(altoContent).find(find);
+            return searchResult;
         }
 
         private updateContainerSize() {
@@ -322,16 +508,33 @@ namespace mycore.viewer.components {
         }
 
 
-        drag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D, e: JQueryMouseEventObject) {
+        public drag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D, e: JQueryMouseEventObject) {
             if (e.target !== this.currentEditWord) {
                 e.preventDefault();
             }
         }
 
-        mouseDown(position: Position2D, e: JQueryMouseEventObject) {
+        public mouseDown(position: Position2D, e: JQueryMouseEventObject) {
             if (e.target !== this.currentEditWord) {
                 e.preventDefault();
             }
+        }
+
+        private syncChanges(altoContent: HTMLElement, href:string) {
+            let changesInFile = this.editorWidget.getChangesInFile(href);
+            changesInFile.forEach(change => {
+                if (change.type == AltoWordChange.TYPE) {
+                    let wordChange = <AltoWordChange> change;
+                    let elementToChange = this.findChange(wordChange, altoContent);
+                    if (elementToChange.length > 0) {
+                        elementToChange[ 0 ].innerText = wordChange.to;
+                        elementToChange.addClass("edited");
+                    } else {
+                        console.log("Could not find Change: " + change);
+                    }
+                }
+
+            });
         }
     }
 
@@ -341,34 +544,39 @@ namespace mycore.viewer.components {
             super();
         }
 
-        mouseDown(position: Position2D, e: JQueryMouseEventObject): void {
-            this.editAltoComponent.mouseDown(position, e);
+        public mouseDown(position: Position2D, e: JQueryMouseEventObject): void {
+            if (this.editAltoComponent.isEditing()) {
+                this.editAltoComponent.mouseDown(position, e);
+            }
         }
 
-        mouseUp(position: Position2D, e: JQueryMouseEventObject) {
+        public mouseUp(position: Position2D, e: JQueryMouseEventObject) {
         }
 
-        mouseMove(position: Position2D, e: JQueryMouseEventObject) {
-
+        public mouseMove(position: Position2D, e: JQueryMouseEventObject) {
 
         }
 
-        mouseClick(position: Position2D, e: JQueryMouseEventObject) {
-            this.editAltoComponent.mouseClick(position, e);
+        public mouseClick(position: Position2D, e: JQueryMouseEventObject) {
+            if (this.editAltoComponent.isEditing()) {
+                this.editAltoComponent.mouseClick(position, e);
+            }
         }
 
-        mouseDoubleClick(position: Position2D, e: JQueryMouseEventObject): void {
+        public mouseDoubleClick(position: Position2D, e: JQueryMouseEventObject): void {
         }
 
-        keydown(e: JQueryKeyEventObject): void {
+        public keydown(e: JQueryKeyEventObject): void {
             this.editAltoComponent.keyDown(e);
         }
 
-        mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
-                  e: JQueryMouseEventObject): void {
+        public mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
+                         e: JQueryMouseEventObject): void {
 
-            this.editAltoComponent.drag(currentPosition, startPosition, startViewport,
-                e);
+            if (this.editAltoComponent.isEditing()) {
+                this.editAltoComponent.drag(currentPosition, startPosition, startViewport,
+                    e);
+            }
         }
     }
 
@@ -382,7 +590,13 @@ namespace mycore.viewer.components {
 
     export class HighligtAltoWordCanvasPageLayer implements widgets.canvas.CanvasPageLayer {
 
+        constructor(private component: MyCoReAltoEditorComponent) {
+
+        }
+
         private static EDIT_HIGHLIGHT_COLOR = "#90EE90";
+        private static EDITED_HIGHLIGHT_COLOR = "#ADD8E6";
+
 
         private highlightedWord: HighlightedWord = null;
 
@@ -394,27 +608,55 @@ namespace mycore.viewer.components {
             this.highlightedWord = word;
         }
 
-        draw(ctx: CanvasRenderingContext2D, id: string, pageSize: Size2D, drawOnHtml: boolean): void {
+        public draw(ctx: CanvasRenderingContext2D, id: string, pageSize: Size2D, drawOnHtml: boolean): void {
             if (drawOnHtml) {
                 return;
             }
 
-            if (this.highlightedWord != null && id == this.highlightedWord.id) {
-                ctx.save();
-                {
-                    let width = 5 * window.devicePixelRatio;
-
-                    let gap = width / 2 + 5 * devicePixelRatio;
-                    ctx.rect(this.highlightedWord.hpos - gap,
-                        this.highlightedWord.vpos - gap,
-                        this.highlightedWord.width + (gap * 2),
-                        this.highlightedWord.height + (gap * 2));
-                    ctx.strokeStyle = HighligtAltoWordCanvasPageLayer.EDIT_HIGHLIGHT_COLOR;
-                    ctx.lineWidth = width;
-                    ctx.stroke();
+            ctx.save();
+            {
+                if (this.highlightedWord != null && id == this.component.altoHrefImageHrefMap.get(this.highlightedWord.id)) {
+                    this.strokeWord(ctx,
+                        this.highlightedWord.hpos,
+                        this.highlightedWord.vpos,
+                        this.highlightedWord.width,
+                        this.highlightedWord.height,
+                        HighligtAltoWordCanvasPageLayer.EDIT_HIGHLIGHT_COLOR);
                 }
-                ctx.restore();
+
+                let file = this.component.imageHrefAltoHrefMap.get(id);
+                if (typeof file !== "undefined") {
+
+                    this.component.editorWidget.getChangesInFile(file)
+                        .forEach((change) => {
+                            if (change.type == AltoWordChange.TYPE) {
+                                let wordChange = <AltoWordChange>change;
+                                this.strokeWord(ctx,
+                                    wordChange.hpos,
+                                    wordChange.vpos,
+                                    wordChange.width,
+                                    wordChange.height,
+                                    HighligtAltoWordCanvasPageLayer.EDITED_HIGHLIGHT_COLOR);
+                            }
+                        });
+                }
             }
+
+            ctx.restore();
+
+        }
+
+        private strokeWord(ctx: CanvasRenderingContext2D, hpos, vpos, wwidth, wheight, color) {
+            let width = 5 * window.devicePixelRatio;
+
+            let gap = width / 2 + 5 * devicePixelRatio;
+            ctx.rect(hpos - gap,
+                vpos - gap,
+                wwidth + (gap * 2),
+                wheight + (gap * 2));
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.stroke();
         }
 
 
