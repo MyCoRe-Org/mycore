@@ -23,8 +23,8 @@ import org.mycore.oai.set.MCRSet;
 /**
  * Search manager of the mycore OAI-PMH implementation. Creates a new
  * {@link MCROAISearcher} instance for each
- * {@link #searchHeader(MetadataFormat, Set, ZonedDateTime, ZonedDateTime)}
- * and {@link #searchRecord(MetadataFormat, Set, ZonedDateTime, ZonedDateTime)} call.
+ * {@link #searchHeader(MetadataFormat, MCRSet, ZonedDateTime, ZonedDateTime)}
+ * and {@link #searchRecord(MetadataFormat, MCRSet, ZonedDateTime, ZonedDateTime)} call.
  * The resumption token created by those methods can be reused for
  * later calls to the same searcher. A searcher is dropped after an
  * expiration time. The time increases for each query call.

@@ -188,7 +188,9 @@ public class MCROAISetManager {
     /**
      * Returns the {@link MCROAISetConfiguration} for the given set id.
      * 
-     * @param <T> value of the configuration
+     * @param <Q> value of the configuration
+     * @param <R> Result collection type
+     * @param <K> Key value type for a single hit
      * @param setId the set identifier
      * @return the configuration for this set
      */

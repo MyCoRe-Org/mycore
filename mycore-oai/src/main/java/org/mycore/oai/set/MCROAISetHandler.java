@@ -9,6 +9,8 @@ import java.util.Map;
  * @author Matthias Eichner
  *
  * @param <Q> set type
+ * @param <R> Result collection type
+ * @param <K> Result collection key type
  */
 public interface MCROAISetHandler<Q, R, K> {
 
