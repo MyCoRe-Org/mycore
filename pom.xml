@@ -1214,11 +1214,6 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-broadcasting</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mycore</groupId>
         <artifactId>mycore-buildtools</artifactId>
         <version>${project.version}</version>
         <exclusions>
@@ -2044,7 +2039,6 @@
   <modules>
     <module>mycore-base</module>
     <module>mycore-acl-editor2</module>
-    <module>mycore-broadcasting</module>
     <module>mycore-buildtools</module>
     <module>mycore-classbrowser</module>
     <module>mycore-classeditor</module>
