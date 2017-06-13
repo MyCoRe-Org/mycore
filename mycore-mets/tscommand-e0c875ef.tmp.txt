@@ -1,0 +1,1 @@
+src/main/ts/MetsEditor.ts --declaration --target ES5 --out ./target/classes/META-INF/resources/module/mets/js/MetsEditor.js
