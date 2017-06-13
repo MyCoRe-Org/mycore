@@ -31,6 +31,8 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class implements all method for handling with the MCRMetaClassification
  * part of a metadata object. The MCRMetaClassification class present a link to
@@ -76,7 +78,8 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * @exception MCRException if the set_subtag value, the set_classid value or
      * the set_categid are null, empty, too long or not a MCRObjectID
      */
-    public MCRMetaClassification(String set_subtag, int set_inherted, String set_type, String set_classid, String set_categid) throws MCRException {
+    public MCRMetaClassification(String set_subtag, int set_inherted, String set_type, String set_classid,
+        String set_categid) throws MCRException {
         super(set_subtag, null, set_type, set_inherted);
         setValue(set_classid, set_categid);
     }
@@ -96,7 +99,8 @@ public class MCRMetaClassification extends MCRMetaDefault {
      *
      * @exception MCRException if the set_subtag value is empty, too long or not a MCRObjectID
      */
-    public MCRMetaClassification(String set_subtag, int set_inherted, String set_type, MCRCategoryID category) throws MCRException {
+    public MCRMetaClassification(String set_subtag, int set_inherted, String set_type, MCRCategoryID category)
+        throws MCRException {
         super(set_subtag, null, set_type, set_inherted);
         if (category == null) {
             throw new MCRException("Category is not set in " + getSubTag());
@@ -181,6 +185,26 @@ public class MCRMetaClassification extends MCRMetaDefault {
     }
 
     /**
+     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * with the following data.
+     * 
+     * <pre>
+     *   {
+     *     classid: "mycore_class_00000001",
+     *     categid: "category1"
+     *   }
+     * </pre>
+     * 
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject obj = super.createJSON();
+        obj.addProperty("classid", category.getRootID());
+        obj.addProperty("categid", category.getID());
+        return obj;
+    }
+
+    /**
      * Validates this MCRMetaClassification. This method throws an exception if:
      * <ul>
      * <li>the subtag is not null or empty</li>
@@ -211,7 +235,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Category            = " + category);
             LOGGER.debug(" ");
