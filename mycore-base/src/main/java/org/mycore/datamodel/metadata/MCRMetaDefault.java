@@ -55,7 +55,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     // common data
     protected static final String NL = System.getProperties().getProperty("line.separator");
 
-    protected static final String DEFAULT_LANGUAGE = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+    protected static final String DEFAULT_LANGUAGE = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
+        MCRConstants.DEFAULT_LANG);
 
     protected static final String DEFAULT_DATAPART = "metadata";
 
@@ -118,7 +119,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaDefault(String set_subtag, String default_lang, String set_type, int set_inherited) throws MCRException {
+    public MCRMetaDefault(String set_subtag, String default_lang, String set_type, int set_inherited)
+        throws MCRException {
         this(default_lang);
         setInherited(set_inherited);
         subtag = set_subtag;
@@ -277,7 +279,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     public Element createXML() throws MCRException {
         try {
             validate();
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             debug();
             throw exc;
         }
@@ -366,30 +368,19 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if (obj == null || getClass() != obj.getClass())
             return false;
         MCRMetaDefault other = (MCRMetaDefault) obj;
-        if (!Objects.equals(datapart, other.datapart)) {
-            return false;
-        } else if (!Objects.equals(inherited, other.inherited)) {
-            return false;
-        } else if (!Objects.equals(lang, other.lang)) {
-            return false;
-        } else if (!Objects.equals(subtag, other.subtag)) {
-            return false;
-        } else if (!Objects.equals(type, other.type)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(datapart, other.datapart) && Objects.equals(inherited, other.inherited)
+            && Objects.equals(lang, other.lang) && Objects.equals(subtag, other.subtag)
+            && Objects.equals(type, other.type);
     }
 
     /**
      * This method put debug data to the logger (for the debug mode).
      */
     public void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             debugDefault();
             LOGGER.debug(" ");
         }
@@ -399,7 +390,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * This method put common debug data to the logger (for the debug mode).
      */
     public final void debugDefault() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("SubTag             = " + subtag);
             LOGGER.debug("Language           = " + lang);
             LOGGER.debug("Type               = " + type);
