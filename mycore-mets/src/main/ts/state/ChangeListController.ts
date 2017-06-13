@@ -1,5 +1,5 @@
 ///<reference path="ModelChange.ts"/>
-///<reference path="../../../../typings/angularjs/angular.d.ts"/>
+
 namespace org.mycore.mets.controller {
 
     export class MetsEditorChangeListController {

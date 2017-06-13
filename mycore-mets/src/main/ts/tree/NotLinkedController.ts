@@ -1,5 +1,3 @@
-///<reference path="../../../../typings/angularjs/angular.d.ts"/>
-///<reference path="../../../../typings/jquery/jquery.d.ts"/>
 ///<reference path="../model/simple/MCRMetsSection.ts"/>
 ///<reference path="../model/simple/MCRMetsSimpleModel.ts"/>
 ///<reference path="../model/MetsEditorModel.ts"/>

@@ -1,4 +1,3 @@
-///<reference path="../../../../typings/jquery/jquery.d.ts"/>
 ///<reference path="ErrorModalModel.ts" />
 
 namespace org.mycore.mets.controller {

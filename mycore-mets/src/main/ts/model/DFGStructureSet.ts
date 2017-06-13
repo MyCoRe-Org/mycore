@@ -1,5 +1,3 @@
-///<reference path="../../../../typings/angularjs/angular.d.ts"/>
-
 namespace org.mycore.mets.model {
     export class StructureSetElement {
 

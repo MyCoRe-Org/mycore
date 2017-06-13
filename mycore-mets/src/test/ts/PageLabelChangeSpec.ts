@@ -1,4 +1,3 @@
-///<reference path="../../../typings/jasmine/jasmine.d.ts"/>
 ///<reference path="TestUtils.ts"/>
 namespace org.mycore.mets.tests {
     describe("PageLabelChange", () => {

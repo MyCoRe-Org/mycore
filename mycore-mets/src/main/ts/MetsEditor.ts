@@ -1,4 +1,3 @@
-///<reference path="../../../typings/angularjs/angular.d.ts"/>
 ///<reference path="model/simple/MCRMetsSimpleModel.ts"/>
 ///<reference path="model/MetsModelLoaderService.ts"/>
 ///<reference path="model/MetsModelSaveService.ts"/>
@@ -96,10 +95,10 @@ angular.module("MetsEditorModelFactory", [ "MetsModelLoaderService", "MetsEditor
                 new org.mycore.mets.model.MetsEditorModelFactory(modelLoader, editorConfiguration) ]
     );
 angular.module("MetsEditorPresenterModule", [])
-    .controller("DefaultPagePresenter", org.mycore.mets.controller.DefaultPagePresenter);
+    .controller("DefaultPagePresenter", <any> org.mycore.mets.controller.DefaultPagePresenter);
 angular.module("MetsEditorApp")
     .controller("MetsEditorTreeController",
-        [ "$scope",
+        <any> [ "$scope",
             "MetsEditorI18NModel",
             "ngDraggable",
             "$modal",
@@ -108,7 +107,7 @@ angular.module("MetsEditorApp")
 
 angular.module("MetsEditorSectionModule", [ "MetsEditorI18NModel", "StructureSetConfiguration" ]);
 angular.module("MetsEditorSectionModule").controller("SectionController",
-    [
+    <any> [
         "$scope",
         "MetsEditorI18NModel",
         "StructureSet",
@@ -129,17 +128,17 @@ angular.module("MetsEditorApp").directive("selectImmediately", [ "$timeout", fun
 } ]);
 
 angular.module("MetsEditorApp").controller("MetsEditorController",
-    [ "$scope", "MetsEditorModelFactory", "MetsEditorI18NModel", "hotkeys", "$timeout", "MetsModelLockService",
+    <any> [ "$scope", "MetsEditorModelFactory", "MetsEditorI18NModel", "hotkeys", "$timeout", "MetsModelLockService",
         "$modal", "$window",
         org.mycore.mets.controller.MetsEditorController ]);
 
 
 angular.module("ErrorModal", [ "ui.bootstrap", "MetsEditorI18NModel" ]).controller("ErrorModalController",
-    [ "$scope", "$modalInstance", "MetsEditorI18NModel", org.mycore.mets.controller.ErrorModalController ]);
+    <any> [ "$scope", "$modalInstance", "MetsEditorI18NModel", org.mycore.mets.controller.ErrorModalController ]);
 
 angular.module("MetsEditorApp");
 angular.module("MetsEditorApp").controller("MetsEditorPageListController",
-    [ "ngDraggable", "$timeout", "$modal", "hotkeys", "MetsEditorI18NModel", org.mycore.mets.controller.PageListController ]);
+    <any> [ "ngDraggable", "$timeout", "$modal", "hotkeys", "MetsEditorI18NModel", org.mycore.mets.controller.PageListController ]);
 
 angular.module("MetsEditorApp").directive("jumpToElement", [ "$timeout", function ($timeout) {
     return {
@@ -192,33 +191,33 @@ angular.module("MetsEditorApp").directive("jumpToElement", [ "$timeout", functio
 } ]);
 
 angular.module("MetsEditorApp").controller("MetsEditorPageController",
-    [ "MetsEditorI18NModel", org.mycore.mets.controller.PageController ]);
+    <any> [ "MetsEditorI18NModel", org.mycore.mets.controller.PageController ]);
 
 angular.module("MetsEditorApp")
     .controller("MetsEditorPaginationController",
-        [ "$modal", "MetsEditorI18NModel", "hotkeys", org.mycore.mets.controller.PaginationController ]);
+        <any> [ "$modal", "MetsEditorI18NModel", "hotkeys", org.mycore.mets.controller.PaginationController ]);
 
 angular.module("MetsEditorApp")
     .controller("PaginationModalController",
-        [ "$scope", "$modalInstance", org.mycore.mets.controller.Pagination.PaginationModalController ]);
+        <any> [ "$scope", "$modalInstance", org.mycore.mets.controller.Pagination.PaginationModalController ]);
 
 {
     const metsEditorStateController = angular.module("MetsEditorApp");
     metsEditorStateController.controller("MetsEditorStateController",
-        [ "$modal", "MetsEditorI18NModel", "hotkeys", org.mycore.mets.model.state.MetsEditorStateController ]);
+        <any> [ "$modal", "MetsEditorI18NModel", "hotkeys", org.mycore.mets.model.state.MetsEditorStateController ]);
 }
 
 angular.module("MetsEditorApp").controller("MetsEditorChangeListController",
-    [ "$scope", "$modalInstance", "MetsEditorI18NModel", org.mycore.mets.controller.MetsEditorChangeListController ]);
+    <any> [ "$scope", "$modalInstance", "MetsEditorI18NModel", org.mycore.mets.controller.MetsEditorChangeListController ]);
 
 {
     let saveController = angular.module("MetsEditorApp");
     saveController.controller("SaveController",
-        [ "MetsEditorI18NModel", "MetsModelSaveService", org.mycore.mets.model.state.SaveController ]);
+        <any> [ "MetsEditorI18NModel", "MetsModelSaveService", org.mycore.mets.model.state.SaveController ]);
 }
 
 angular.module("MetsEditorApp")
-    .controller("NotLinkedController", [ org.mycore.mets.controller.NotLinkedController ]);
+    .controller("NotLinkedController", <any> [ org.mycore.mets.controller.NotLinkedController ]);
 
 angular.module("MetsModelLockService", []).service("MetsModelLockService",
     [ "$http", ($http) => new org.mycore.mets.model.MetsModelLock($http) ]);

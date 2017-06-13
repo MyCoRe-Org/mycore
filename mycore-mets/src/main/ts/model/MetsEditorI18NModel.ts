@@ -1,4 +1,3 @@
-///<reference path="../../../../typings/angularjs/angular.d.ts"/>
 ///<reference path="MetsEditorConfiguration.ts"/>
 
 namespace org.mycore.mets.model {
@@ -7,7 +6,7 @@ namespace org.mycore.mets.model {
                          $log: ng.ILogService, editorConfiguration: MetsEditorConfiguration) {
         let metsEditorMessageModel = {messages : new Array()};
 
-        $http.get(editorConfiguration.i18URL).success((i18nData) => {
+        (<any> $http.get(editorConfiguration.i18URL)).success((i18nData) => {
             for (let index in i18nData) {
                 if (i18nData.hasOwnProperty(index)) {
                     let betterKey = index;
