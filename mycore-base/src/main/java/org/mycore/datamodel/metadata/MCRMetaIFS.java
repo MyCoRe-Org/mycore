@@ -26,6 +26,8 @@ package org.mycore.datamodel.metadata;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class implements all method for handling the IFS metadata. The
  * MCRMetaIFS class present all informations to store and retrieve derivates to
@@ -177,6 +179,30 @@ final public class MCRMetaIFS extends MCRMetaDefault {
         elm.setAttribute("ifsid", ifsid);
 
         return elm;
+    }
+
+    /**
+     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * with the following data.
+     * 
+     * <pre>
+     *   {
+     *     sourcepath: "...",
+     *     maindoc: "image.tif",
+     *     ifsid: "ve3s8a3j00xsfk8z"
+     *   }
+     * </pre>
+     * 
+     */
+    @Override
+    public JsonObject createJSON() {
+        JsonObject obj = super.createJSON();
+        if (sourcepath != null) {
+            obj.addProperty("sourcepath", sourcepath);
+        }
+        obj.addProperty("maindoc", maindoc);
+        obj.addProperty("ifsid", ifsid);
+        return obj;
     }
 
     /**
