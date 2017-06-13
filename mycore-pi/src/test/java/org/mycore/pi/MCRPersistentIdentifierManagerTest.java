@@ -111,7 +111,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
         long numOfUnregisteredPI = MCRPersistentIdentifierManager
                 .getInstance()
-                .getUnregisteredIdenifiers("Unregistered")
+                .getUnregisteredIdentifiers("Unregistered")
                 .stream()
                 .count();
 

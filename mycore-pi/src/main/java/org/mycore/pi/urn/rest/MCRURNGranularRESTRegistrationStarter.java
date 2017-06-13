@@ -55,7 +55,7 @@ public class MCRURNGranularRESTRegistrationStarter
     public void startUp(ServletContext servletContext) {
         getUsernamePassword()
                 .map(this::getEpicureProvider)
-                .map(MCRDNBURNClient::new)
+                .map(MCRDNBURNRestClient::new)
                 .map(MCRURNGranularRESTRegistrationTask::new)
                 .map(this::startTimerTask)
                 .orElseGet(this::couldNotStartTask)

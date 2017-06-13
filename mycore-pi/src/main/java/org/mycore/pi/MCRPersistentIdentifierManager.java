@@ -9,7 +9,6 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -257,29 +256,35 @@ public class MCRPersistentIdentifierManager {
                 .getResultList();
     }
 
-    public void setRegisteredDateForUnregisteredIdenifiers(
+    public Integer setRegisteredDateForUnregisteredIdenifiers(
             String type,
-            Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider) {
-        getUnregisteredIdenifiers(type)
-                .forEach(mcrPi -> dateProvider.apply(mcrPi)
-                                              .ifPresent(mcrPi::setRegistered));
+            Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider, Integer batchSize) {
 
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        List<MCRPI> unregisteredIdentifiers = getUnregisteredIdentifiers(type, batchSize);
+        unregisteredIdentifiers
+                .forEach(ident -> dateProvider
+                        .apply(ident)
+                        .ifPresent(ident::setRegistered)
+                );
 
-        EntityTransaction transaction = em.getTransaction();
-        if (!transaction.isActive()) {
-            transaction.begin();
-        }
-
-        transaction.commit();
+        return unregisteredIdentifiers.size();
     }
 
-    public List<MCRPI> getUnregisteredIdenifiers(String type) {
-        return MCREntityManagerProvider
+    public List<MCRPI> getUnregisteredIdentifiers(String type, int maxSize) {
+        TypedQuery<MCRPI> getUnregisteredQuery = MCREntityManagerProvider
                 .getCurrentEntityManager()
-                .createQuery("select pi from MCRPI pi where pi.type = :type and pi.registered is null", MCRPI.class)
-                .setParameter("type", type)
-                .getResultList();
+                .createNamedQuery("Get.PI.Unregistered", MCRPI.class)
+                .setParameter("type", type);
+
+        if (maxSize >= 0) {
+            getUnregisteredQuery.setMaxResults(maxSize);
+        }
+
+        return getUnregisteredQuery.getResultList();
+    }
+
+    public List<MCRPI> getUnregisteredIdentifiers(String type) {
+        return getUnregisteredIdentifiers(type, -1);
     }
 
     public List<MCRPIRegistrationInfo> getRegistered(MCRObject object) {
