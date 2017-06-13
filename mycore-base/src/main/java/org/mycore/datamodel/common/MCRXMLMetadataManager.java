@@ -677,7 +677,7 @@ public class MCRXMLMetadataManager {
     }
 
     /**
-     * Returns all stored object types of MCRObjects.
+     * Returns all stored object types of MCRObjects/MCRDerivates.
      *
      * @return collection of object types
      * @see MCRObjectID#getTypeId()
@@ -687,8 +687,24 @@ public class MCRXMLMetadataManager {
                      .map(this::getObjectTypeDirectories)
                      .flatMap(Arrays::stream)
                      .map(File::getName)
+                     .filter(MCRObjectID::isValidType)
                      .distinct()
                      .collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns all used base ids of MCRObjects/MCRDerivates.
+     *
+     * @return collection of object types
+     * @see MCRObjectID#getBase()
+     */
+    public Collection<String> getObjectBaseIds() {
+        return Arrays.stream(getProjectDirectories())
+            .map(this::getObjectTypeDirectories)
+            .flatMap(Arrays::stream)
+            .filter(f -> MCRObjectID.isValidType(f.getName()))
+            .map(f -> f.getParentFile().getName() + "_" + f.getName())
+            .collect(Collectors.toSet());
     }
 
     /**
