@@ -70,10 +70,10 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Transforms XML content using a static XSL stylesheet. The stylesheet is configured via
- * <code>MCR.ContentTransformer.{ID}.Stylesheet</code>. You may choose your own instance of {@link SAXTransformerFactory} via
- * <code>MCR.ContentTransformer.{ID}.TransformerFactoryClass</code>.
- * The default transformer factory implementation {@link org.apache.xalan.processor.TransformerFactoryImpl} is configured with
- * <code>MCR.LayoutService.TransformerFactoryClass</code>.
+ * <code>MCR.ContentTransformer.{ID}.Stylesheet</code>. You may choose your own instance of
+ * {@link SAXTransformerFactory} via <code>MCR.ContentTransformer.{ID}.TransformerFactoryClass</code>.
+ * The default transformer factory implementation {@link org.apache.xalan.processor.TransformerFactoryImpl}
+ * is configured with <code>MCR.LayoutService.TransformerFactoryClass</code>.
  *
  * @author Frank L\u00FCtzenkirchen
  */
