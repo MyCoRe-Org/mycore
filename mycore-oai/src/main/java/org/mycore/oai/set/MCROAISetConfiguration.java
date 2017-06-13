@@ -1,11 +1,11 @@
 package org.mycore.oai.set;
 
-public interface MCROAISetConfiguration<T> {
+public interface MCROAISetConfiguration<Q, R, K> {
 
     public String getId();
 
     public String getURI();
 
-    public MCROAISetHandler<T> getHandler();
+    public MCROAISetHandler<Q, R, K> getHandler();
 
 }

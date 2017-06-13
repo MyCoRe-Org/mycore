@@ -21,9 +21,9 @@
  */
 package org.mycore.oai;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -129,19 +129,18 @@ public class MCROAIIdentify extends SimpleIdentify {
      *
      * @return the create date of the oldest document within the repository
      */
-    protected Date calculateEarliestTimestamp() {
+    protected Instant calculateEarliestTimestamp() {
         // default value
-        Date datestamp = DateUtils.parseUTC(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
+        Instant datestamp = DateUtils.parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
         try {
             // existing items
-            datestamp = Date.from(MCROAISearchManager.getSearcher(this, null, 1, null).getEarliestTimestamp());
+            datestamp = MCROAISearchManager.getSearcher(this, null, 1, null, null).getEarliestTimestamp();
             // deleted items
             if (DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
-                Date earliestDeletedDate = MCRDeletedItemManager.getFirstDate()
-                                                                .map(ZonedDateTime::toInstant)
-                                                                .map(Date::from)
-                                                                .orElse(null);
-                if (earliestDeletedDate != null && earliestDeletedDate.compareTo(datestamp) < 0) {
+                Instant earliestDeletedDate = MCRDeletedItemManager.getFirstDate()
+                    .map(ZonedDateTime::toInstant)
+                    .orElse(null);
+                if (earliestDeletedDate != null && earliestDeletedDate.isBefore(datestamp)) {
                     datestamp = earliestDeletedDate;
                 }
             }

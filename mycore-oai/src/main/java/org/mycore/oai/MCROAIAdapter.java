@@ -21,13 +21,14 @@
  */
 package org.mycore.oai;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
@@ -46,6 +47,7 @@ import org.mycore.oai.pmh.OAIDataList;
 import org.mycore.oai.pmh.Record;
 import org.mycore.oai.pmh.Set;
 import org.mycore.oai.pmh.dataprovider.OAIAdapter;
+import org.mycore.oai.set.MCRSet;
 
 /**
  * Default MyCoRe {@link OAIAdapter} implementation.
@@ -59,7 +61,7 @@ public class MCROAIAdapter implements OAIAdapter {
     protected final static ZoneId UTC_ZONE = ZoneId.of("UTC");
 
     public final static String PREFIX = "MCR.OAIDataProvider.";
-    
+
     public static int DEFAULT_PARTITION_SIZE;
 
     protected String baseURL;
@@ -147,11 +149,17 @@ public class MCROAIAdapter implements OAIAdapter {
     @Override
     public OAIDataList<Set> getSets() throws NoSetHierarchyException {
         MCROAISetManager setManager = getSetManager();
-        OAIDataList<Set> setList = setManager.get();
+        OAIDataList<MCRSet> setList2 = setManager.get();
+        OAIDataList<Set> setList = cast(setList2);
         if (setList.isEmpty()) {
             throw new NoSetHierarchyException();
         }
         return setList;
+    }
+
+    @SuppressWarnings("unchecked")
+    private OAIDataList<Set> cast(OAIDataList<? extends Set> setList) {
+        return (OAIDataList<Set>) setList;
     }
 
     /*
@@ -162,7 +170,7 @@ public class MCROAIAdapter implements OAIAdapter {
     public OAIDataList<Set> getSets(String resumptionToken)
         throws NoSetHierarchyException, BadResumptionTokenException {
         MCROAISetManager setManager = getSetManager();
-        OAIDataList<Set> setList = setManager.get();
+        OAIDataList<Set> setList = cast(setManager.get());
         if (setList.isEmpty()) {
             throw new NoSetHierarchyException();
         }
@@ -175,13 +183,13 @@ public class MCROAIAdapter implements OAIAdapter {
      * @see org.mycore.oai.pmh.dataprovider.OAIAdapter#getSet(java.lang.String)
      */
     @Override
-    public Set getSet(String setSpec) throws NoSetHierarchyException, NoRecordsMatchException {
+    public MCRSet getSet(String setSpec) throws NoSetHierarchyException, NoRecordsMatchException {
         MCROAISetManager setManager = getSetManager();
-        OAIDataList<Set> setList = setManager.get();
+        OAIDataList<MCRSet> setList = setManager.get();
         if (setList.isEmpty()) {
             throw new NoSetHierarchyException();
         }
-        Set set = MCROAISetManager.get(setSpec, setList);
+        MCRSet set = MCROAISetManager.get(setSpec, setList);
         if (set == null) {
             throw new NoRecordsMatchException();
         }
@@ -243,7 +251,14 @@ public class MCROAIAdapter implements OAIAdapter {
     @Override
     public Record getRecord(String identifier, MetadataFormat format)
         throws CannotDisseminateFormatException, IdDoesNotExistException {
-        MCROAIObjectManager objectManager = getObjectManager();
+        //Update set for response header
+        getSetManager().getDirectList();
+        Optional<Record> possibleRecord = getSearchManager()
+            .getHeader(identifier)
+            .map(h -> objectManager.getRecord(h, format));
+        if (possibleRecord.isPresent()) {
+            return possibleRecord.get();
+        }
         if (!objectManager.exists(identifier)) {
             DeletedRecordPolicy rP = getIdentify().getDeletedRecordPolicy();
             if (DeletedRecordPolicy.Persistent.equals(rP)) {
@@ -253,14 +268,8 @@ public class MCROAIAdapter implements OAIAdapter {
                     return deletedRecord;
                 }
             }
-            throw new IdDoesNotExistException(identifier);
         }
-        Record record = objectManager.getRecord(objectManager.getMyCoReId(identifier), format);
-        if (record == null) {
-            // oai-pmh does not offer a better exception for internal server errros
-            throw new IdDoesNotExistException(identifier);
-        }
-        return record;
+        throw new IdDoesNotExistException(identifier);
     }
 
     /*
@@ -269,6 +278,8 @@ public class MCROAIAdapter implements OAIAdapter {
      */
     @Override
     public OAIDataList<Record> getRecords(String resumptionToken) throws BadResumptionTokenException {
+        //Update set for response header
+        getSetManager().getDirectList();
         OAIDataList<Record> recordList = getSearchManager().searchRecord(resumptionToken);
         if (recordList.isEmpty()) {
             throw new BadResumptionTokenException(resumptionToken);
@@ -277,19 +288,31 @@ public class MCROAIAdapter implements OAIAdapter {
     }
 
     @Override
-    public OAIDataList<Record> getRecords(MetadataFormat format, Set set, Date from, Date until)
+    public OAIDataList<Record> getRecords(MetadataFormat format, Set set, Instant from, Instant until)
         throws CannotDisseminateFormatException, NoSetHierarchyException, NoRecordsMatchException {
-        ZonedDateTime fromDateTime = from != null ? from.toInstant().atZone(UTC_ZONE) : null;
-        ZonedDateTime untilDateTime = until != null ? until.toInstant().atZone(UTC_ZONE) : null;
-        OAIDataList<Record> recordList = getSearchManager().searchRecord(format, set, fromDateTime, untilDateTime);
+        //Update set for response header
+        getSetManager().getDirectList();
+        ZonedDateTime fromDateTime = from != null ? from.atZone(UTC_ZONE) : null;
+        ZonedDateTime untilDateTime = until != null ? until.atZone(UTC_ZONE) : null;
+        OAIDataList<Record> recordList = getSearchManager().searchRecord(format, toMCRSet(set), fromDateTime,
+            untilDateTime);
         if (recordList.isEmpty()) {
             throw new NoRecordsMatchException();
         }
         return recordList;
     }
 
+    private MCRSet toMCRSet(Set set) throws NoSetHierarchyException, NoRecordsMatchException {
+        if (set == null) {
+            return null;
+        }
+        return getSet(set.getSpec());
+    }
+
     @Override
     public OAIDataList<Header> getHeaders(String resumptionToken) throws BadResumptionTokenException {
+        //Update set for response header
+        getSetManager().getDirectList();
         OAIDataList<Header> headerList = getSearchManager().searchHeader(resumptionToken);
         if (headerList.isEmpty()) {
             throw new BadResumptionTokenException(resumptionToken);
@@ -298,11 +321,14 @@ public class MCROAIAdapter implements OAIAdapter {
     }
 
     @Override
-    public OAIDataList<Header> getHeaders(MetadataFormat format, Set set, Date from, Date until)
+    public OAIDataList<Header> getHeaders(MetadataFormat format, Set set, Instant from, Instant until)
         throws CannotDisseminateFormatException, NoSetHierarchyException, NoRecordsMatchException {
-        ZonedDateTime fromDateTime = from != null ? from.toInstant().atZone(UTC_ZONE) : null;
-        ZonedDateTime untilDateTime = until != null ? until.toInstant().atZone(UTC_ZONE) : null;
-        OAIDataList<Header> headerList = getSearchManager().searchHeader(format, set, fromDateTime, untilDateTime);
+        ZonedDateTime fromDateTime = from != null ? from.atZone(UTC_ZONE) : null;
+        ZonedDateTime untilDateTime = until != null ? until.atZone(UTC_ZONE) : null;
+        //Update set for response header
+        getSetManager().getDirectList();
+        OAIDataList<Header> headerList = getSearchManager().searchHeader(format, toMCRSet(set), fromDateTime,
+            untilDateTime);
         if (headerList.isEmpty()) {
             throw new NoRecordsMatchException();
         }

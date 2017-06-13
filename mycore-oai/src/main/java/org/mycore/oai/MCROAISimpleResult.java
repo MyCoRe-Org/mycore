@@ -2,6 +2,9 @@ package org.mycore.oai;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import org.mycore.oai.pmh.Header;
 
 /**
  * Simple implementation of a {@link MCROAIResult} with setter
@@ -11,21 +14,21 @@ import java.util.List;
  */
 public class MCROAISimpleResult implements MCROAIResult {
 
-    private List<String> idList;
+    private List<Header> headerList;
 
     private int numHits;
 
     private String nextCursor;
 
     public MCROAISimpleResult() {
-        this.idList = new ArrayList<>();
+        this.headerList = new ArrayList<>();
         this.numHits = 0;
         this.nextCursor = null;
     }
 
     @Override
-    public List<String> list() {
-        return this.idList;
+    public List<Header> list() {
+        return this.headerList;
     }
 
     @Override
@@ -34,8 +37,8 @@ public class MCROAISimpleResult implements MCROAIResult {
     }
 
     @Override
-    public String nextCursor() {
-        return this.nextCursor;
+    public Optional<String> nextCursor() {
+        return Optional.ofNullable(this.nextCursor);
     }
 
     public MCROAISimpleResult setNextCursor(String nextCursor) {
@@ -48,15 +51,15 @@ public class MCROAISimpleResult implements MCROAIResult {
         return this;
     }
 
-    public MCROAISimpleResult setIdList(List<String> idList) {
-        this.idList = idList;
+    public MCROAISimpleResult setHeaderList(List<Header> headerList) {
+        this.headerList = headerList;
         return this;
     }
 
     public static MCROAISimpleResult from(MCROAIResult result) {
         MCROAISimpleResult newResult = new MCROAISimpleResult();
-        newResult.setIdList(result.list());
-        newResult.setNextCursor(result.nextCursor());
+        newResult.setHeaderList(result.list());
+        result.nextCursor().ifPresent(newResult::setNextCursor);
         newResult.setNumHits(result.getNumHits());
         return newResult;
     }

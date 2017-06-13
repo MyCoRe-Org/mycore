@@ -23,7 +23,6 @@ package org.mycore.oai;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
-import org.mycore.oai.pmh.Set;
 
 public abstract class MCROAIUtils {
 
@@ -49,30 +48,6 @@ public abstract class MCROAIUtils {
                 return "category:*" + id + "*";
             }
         }
-    }
-
-    /**
-     * The default setSpec format is: <b>SET_ID</b>:<b>SET_VALUE</b>.
-     * This returns the SET_ID of the setSpec.
-     *
-     * @param set the set to get the id from
-     * @return the id
-     */
-    public static String getSetId(Set set) {
-        String spec = set.getSpec();
-        return spec.substring(0, spec.indexOf(":"));
-    }
-
-    /**
-     * The default setSpec format is: <b>SET_ID</b>:<b>SET_VALUE</b>.
-     * This returns the SET_VALUE of the setSpec.
-     *
-     * @param set the set to get the value from
-     * @return the value
-     */
-    public static String getSetSpecValue(Set set) {
-        String spec = set.getSpec();
-        return spec.substring(spec.indexOf(":") + 1);
     }
 
 }

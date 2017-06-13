@@ -1,8 +1,11 @@
 package org.mycore.backend.jpa.deleteditems;
 
 import java.time.ZonedDateTime;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -68,21 +71,24 @@ public class MCRDeletedItemManager {
         }
     }
 
-    public static List<String> getDeletedItems(ZonedDateTime from, Optional<ZonedDateTime> until) {
+    public static List<Entry<String, ZonedDateTime>> getDeletedItems(ZonedDateTime from, Optional<ZonedDateTime> until) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<String> query = cb.createQuery(String.class);
+        CriteriaQuery<MCRDELETEDITEMSPK> query = cb.createQuery(MCRDELETEDITEMSPK.class);
         Root<MCRDELETEDITEMS> deletedItems = query.from(MCRDELETEDITEMS.class);
         Path<MCRDELETEDITEMSPK> key = deletedItems.get(MCRDELETEDITEMS_.key);
         Path<ZonedDateTime> dateDeleted = key.get(MCRDELETEDITEMSPK_.dateDeleted);
         return em.createQuery(
             query
-                .select(key.get(MCRDELETEDITEMSPK_.identifier))
+                .select(key)
                 .where(
                     until
                         .map(u -> cb.between(dateDeleted, from, u))
                         .orElse(cb.greaterThan(dateDeleted, from))))
-            .getResultList();
+            .getResultList()
+            .stream()
+            .map(pk -> new SimpleEntry<>(pk.getIdentifier(), pk.getDateDeleted()))
+            .collect(Collectors.toList());
     }
 
     public static Optional<ZonedDateTime> getLastDeletedDate(String identifier) {

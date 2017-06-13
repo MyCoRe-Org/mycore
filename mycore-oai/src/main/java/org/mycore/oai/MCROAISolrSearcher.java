@@ -3,19 +3,32 @@ package org.mycore.oai;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.datamodel.common.MCRISO8601FormatChooser;
+import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Set;
 import org.mycore.oai.set.MCROAISetConfiguration;
+import org.mycore.oai.set.MCROAISetHandler;
+import org.mycore.oai.set.MCROAISetResolver;
+import org.mycore.oai.set.MCROAISolrSetHandler;
+import org.mycore.oai.set.MCRSet;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrUtils;
 
 /**
  * Solr searcher implementation. Uses cursors.
@@ -26,7 +39,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
     protected final static Logger LOGGER = LogManager.getLogger(MCROAISolrSearcher.class);
 
-    private Set set;
+    private MCRSet set;
 
     private ZonedDateTime from;
 
@@ -39,22 +52,42 @@ public class MCROAISolrSearcher extends MCROAISearcher {
      * we store the result in {@link #nextResult}. For simple forwarding harvesting
      * this should be efficient.
      */
-    private String lastCursor;
+    private Optional<String> lastCursor;
 
     private MCROAISolrResult nextResult;
 
     @Override
-    public MCROAIResult query(String cursor) {
-        this.updateRunningExpirationTimer();
-        return handleResult(cursor.equals(this.lastCursor) ? this.nextResult : solrQuery(cursor));
+    public Optional<Header> getHeader(String mcrId) {
+        SolrQuery query = getBaseQuery(CommonParams.FQ);
+        query.set(CommonParams.Q, "id:" + MCRSolrUtils.escapeSearchValue(mcrId));
+        query.setRows(1);
+        // do the query
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        try {
+            QueryResponse response = solrClient.query(query);
+            SolrDocumentList results = response.getResults();
+            if (!results.isEmpty()) {
+                return Optional.of(toHeader(results.get(0), getSetResolver(results)));
+            }
+        } catch (Exception exc) {
+            LOGGER.error("Unable to handle solr request", exc);
+        }
+        return Optional.empty();
     }
 
     @Override
-    public MCROAIResult query(Set set, ZonedDateTime from, ZonedDateTime until) {
+    public MCROAIResult query(String cursor) {
+        this.updateRunningExpirationTimer();
+        Optional<String> currentCursor = Optional.of(cursor);
+        return handleResult(currentCursor.equals(this.lastCursor) ? this.nextResult : solrQuery(currentCursor));
+    }
+
+    @Override
+    public MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until) {
         this.set = set;
         this.from = from;
         this.until = until;
-        return handleResult(solrQuery("*"));
+        return handleResult(solrQuery(Optional.empty()));
     }
 
     private MCROAIResult handleResult(MCROAISolrResult result) {
@@ -66,53 +99,97 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         return result;
     }
 
-    protected MCROAISolrResult solrQuery(String cursor) {
-        String configPrefix = this.identify.getConfigPrefix();
-
-        SolrQuery query = new SolrQuery();
-        // query
-        String restriction = getConfig().getString(configPrefix + "Search.Restriction", null);
-        if (restriction != null) {
-            query.set("q", restriction);
-        }
+    protected MCROAISolrResult solrQuery(Optional<String> cursor) {
+        SolrQuery query = getBaseQuery(CommonParams.Q);
 
         // set support
         if (this.set != null) {
-            String setId = MCROAIUtils.getSetId(this.set);
-            MCROAISetConfiguration<SolrQuery> setConfig = getSetManager().getConfig(setId);
+            String setId = this.set.getSetId();
+            MCROAISetConfiguration<SolrQuery, SolrDocument, String> setConfig = getSetManager().getConfig(setId);
             setConfig.getHandler().apply(this.set, query);
         }
-
-        // date range
-        StringBuilder dateFilter = new StringBuilder();
         // from & until
         if (this.from != null || this.until != null) {
-            dateFilter.append(buildFromUntilCondition(this.from, this.until));
-        }
-        if (dateFilter.length() > 0) {
-            query.add("fq", dateFilter.toString());
+            String fromUntilCondition = buildFromUntilCondition(this.from, this.until);
+            query.add(CommonParams.FQ, fromUntilCondition);
         }
 
         // cursor
-        query.set("cursorMark", cursor);
-        query.set("rows", String.valueOf(getPartitionSize()));
-        query.set("sort", "id asc");
-        // request handler
-        query.setRequestHandler(getConfig().getString(configPrefix + "Search.RequestHandler", "/select"));
+        query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor.orElse(CursorMarkParams.CURSOR_MARK_START));
+        query.set(CommonParams.ROWS, String.valueOf(getPartitionSize()));
+        query.set(CommonParams.SORT, "id asc");
 
         // do the query
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         try {
             QueryResponse response = solrClient.query(query);
-            return new MCROAISolrResult(response);
+            Collection<MCROAISetResolver<String, SolrDocument>> setResolver = getSetResolver(response.getResults());
+            return new MCROAISolrResult(response, d -> toHeader(d, setResolver));
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
         }
         return null;
     }
 
+    private SolrQuery getBaseQuery(String restrictionField) {
+        String configPrefix = this.identify.getConfigPrefix();
+        SolrQuery query = new SolrQuery();
+        // query
+        String restriction = getConfig().getString(configPrefix + "Search.Restriction", null);
+        if (restriction != null) {
+            query.set(restrictionField, restriction);
+        }
+        String[] requiredFields = Stream.concat(Stream.of("id", getModifiedField()), getRequiredFieldNames().stream())
+            .toArray(i -> new String[i]);
+        query.setFields(requiredFields);
+        // request handler
+        query.setRequestHandler(getConfig().getString(configPrefix + "Search.RequestHandler", "/select"));
+        return query;
+    }
+
+    private Collection<MCROAISetResolver<String, SolrDocument>> getSetResolver(Collection<SolrDocument> result) {
+        return getSetManager().getDefinedSetIds().stream()
+            .map(getSetManager()::getConfig)
+            .map(MCROAISetConfiguration::getHandler)
+            .map(this::cast)
+            .map(h -> h.getSetResolver(result))
+            .collect(Collectors.toList());
+    }
+
+    private Collection<String> getRequiredFieldNames() {
+        return getSetManager().getDefinedSetIds().stream()
+            .map(getSetManager()::getConfig)
+            .map(MCROAISetConfiguration::getHandler)
+            .filter(MCROAISolrSetHandler.class::isInstance)
+            .map(MCROAISolrSetHandler.class::cast)
+            .flatMap(h -> h.getFieldNames().stream())
+            .collect(Collectors.toSet());
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private MCROAISetHandler<SolrQuery, SolrDocument, String> cast(MCROAISetHandler handler) {
+        return handler;
+    }
+
+    Header toHeader(SolrDocument doc, Collection<MCROAISetResolver<String, SolrDocument>> setResolver) {
+        Date modified = (Date) doc.getFieldValue(getModifiedField());
+        String docId = doc.getFieldValue("id").toString();
+        Header header = new Header(getObjectManager().getOAIId(docId), modified.toInstant());
+        setResolver.parallelStream()
+            .map(r -> r.getSets(docId))
+            .flatMap(Collection::stream)
+            .sorted(this::compare)
+            .sequential()
+            .forEachOrdered(header.getSetList()::add);
+        return header;
+    }
+
+    private int compare(Set s1, Set s2) {
+        return s1.getSpec().compareTo(s2.getSpec());
+    }
+
     private String buildFromUntilCondition(ZonedDateTime from, ZonedDateTime until) {
-        String fieldFromUntil = getConfig().getString(getConfigPrefix() + "Search.FromUntil", "modified");
+        String fieldFromUntil = getModifiedField();
         StringBuilder query = new StringBuilder(" +").append(fieldFromUntil).append(":[");
         DateTimeFormatter format = MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT;
         if (from == null) {
@@ -128,17 +205,21 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         return query.toString();
     }
 
+    private String getModifiedField() {
+        return getConfig().getString(getConfigPrefix() + "Search.FromUntil", "modified");
+    }
+
     @Override
     public Instant getEarliestTimestamp() {
         String sortBy = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.SortBy", "modified asc");
         String fieldName = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.FieldName", "modified");
         String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
         ModifiableSolrParams params = new ModifiableSolrParams();
-        params.add("sort", sortBy);
-        params.add("q", restriction);
-        params.add("fq", fieldName + ":*");
-        params.add("fl", fieldName);
-        params.add("rows", "1");
+        params.add(CommonParams.SORT, sortBy);
+        params.add(CommonParams.Q, restriction);
+        params.add(CommonParams.FQ, fieldName + ":*");
+        params.add(CommonParams.FL, fieldName);
+        params.add(CommonParams.ROWS, "1");
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         try {
             QueryResponse response = solrClient.query(params);

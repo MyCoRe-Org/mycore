@@ -4,13 +4,16 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.oai.pmh.Header;
+import org.mycore.oai.pmh.Header.Status;
 import org.mycore.oai.pmh.Identify.DeletedRecordPolicy;
-import org.mycore.oai.pmh.Set;
+import org.mycore.oai.set.MCRSet;
 
 /**
  * Searcher for deleted records. The schema for the cursor
@@ -24,7 +27,14 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
 
     public static final String CURSOR_DELIMETER = "_";
 
-    private List<String> deletedRecords;
+    private List<Header> deletedRecords;
+
+    @Override
+    public Optional<Header> getHeader(String mcrId) {
+        return MCRDeletedItemManager.getLastDeletedDate(mcrId)
+            .map(ZonedDateTime::toInstant)
+            .map(deletedDate -> new Header(getObjectManager().getOAIId(mcrId), deletedDate, Status.deleted));
+    }
 
     @Override
     public MCROAISimpleResult query(String cursor) {
@@ -54,7 +64,7 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
     }
 
     @Override
-    public MCROAIResult query(Set set, ZonedDateTime from, ZonedDateTime until) {
+    public MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until) {
         this.deletedRecords = this.searchDeleted(from, until);
         return this.query(null);
     }
@@ -64,7 +74,7 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
         return MCRDeletedItemManager.getFirstDate().map(ZonedDateTime::toInstant).orElse(null);
     }
 
-    public List<String> getDeletedRecords() {
+    public List<Header> getDeletedRecords() {
         return deletedRecords;
     }
 
@@ -94,25 +104,29 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
      * 
      * @return a list with identifiers of the deleted objects
      */
-    protected List<String> searchDeleted(ZonedDateTime from, ZonedDateTime until) {
+    protected List<Header> searchDeleted(ZonedDateTime from, ZonedDateTime until) {
         DeletedRecordPolicy deletedRecordPolicy = this.identify.getDeletedRecordPolicy();
         if (from == null || DeletedRecordPolicy.No.equals(deletedRecordPolicy)
             || DeletedRecordPolicy.Transient.equals(deletedRecordPolicy)) {
             return new ArrayList<>();
         }
         LOGGER.info("Getting identifiers of deleted items");
-        List<String> deletedItems = MCRDeletedItemManager.getDeletedItems(from, Optional.ofNullable(until));
+        List<Entry<String, ZonedDateTime>> deletedItems = MCRDeletedItemManager.getDeletedItems(from,
+            Optional.ofNullable(until));
         List<String> types = getConfig().getStrings(getConfigPrefix() + "DeletedRecordTypes", null);
         if (types == null || types.isEmpty()) {
-            return deletedItems;
+            return deletedItems.stream()
+                .map(this::toHeader)
+                .collect(Collectors.toList());
         }
         return deletedItems.stream()
-                           .map(MCRObjectID::getInstance)
-                           .filter(id -> {
-                               return types.contains(id.getTypeId());
-                           })
-                           .map(MCRObjectID::toString)
-                           .collect(Collectors.toList());
+            .filter(e -> types.contains(MCRObjectID.getInstance(e.getKey()).getTypeId()))
+            .map(this::toHeader)
+            .collect(Collectors.toList());
+    }
+
+    private Header toHeader(Entry<String, ZonedDateTime> p) {
+        return new Header(getObjectManager().getOAIId(p.getKey()), p.getValue().toInstant(), Status.deleted);
     }
 
 }

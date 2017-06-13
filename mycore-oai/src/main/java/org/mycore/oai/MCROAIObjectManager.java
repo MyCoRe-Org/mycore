@@ -22,7 +22,6 @@
 package org.mycore.oai;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +35,6 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Header.Status;
 import org.mycore.oai.pmh.MetadataFormat;
@@ -58,8 +56,6 @@ public class MCROAIObjectManager {
 
     protected String recordUriPattern;
 
-    protected String headerUriPattern;
-
     /**
      * Initialize the object manager. Its important to call this method before you
      * can retrieve records or headers!
@@ -70,7 +66,6 @@ public class MCROAIObjectManager {
         this.identify = identify;
         String configPrefix = this.identify.getConfigPrefix();
         this.recordUriPattern = MCRConfiguration.instance().getString(configPrefix + "Adapter.RecordURIPattern");
-        this.headerUriPattern = MCRConfiguration.instance().getString(configPrefix + "Adapter.HeaderURIPattern");
     }
 
     /**
@@ -92,31 +87,33 @@ public class MCROAIObjectManager {
         return getOAIIDPrefix() + mcrId;
     }
 
-    public Record getRecord(String mcrID, MetadataFormat format) {
+    public Record getRecord(Header header, MetadataFormat format) {
         Element recordElement;
+        if (header.isDeleted()) {
+            return new Record(header);
+        }
         try {
-            recordElement = getJDOMRecord(mcrID, format);
+            recordElement = getJDOMRecord(getMyCoReId(header.getId()), format);
         } catch (Exception exc) {
-            LOGGER.error("unable to get record " + mcrID + " (" + format.getPrefix() + ")");
+            LOGGER.error("unable to get record " + header.getId() + " (" + format.getPrefix() + ")");
             return null;
         }
-        Element headerElement = recordElement.getChild("header", OAIConstants.NS_OAI);
-        if (headerElement == null) {
-            LOGGER.error("Header element of record " + mcrID + " (" + format.getPrefix() + ") is null!");
-            return null;
-        }
-        Header header = headerToHeader(headerElement);
         Record record = new Record(header);
-        Element metadataElement = recordElement.getChild("metadata", OAIConstants.NS_OAI);
-        if (metadataElement != null && !metadataElement.getChildren().isEmpty()) {
-            Element metadataChild = (Element) metadataElement.getChildren().get(0);
-            record.setMetadata(new SimpleMetadata(metadataChild.detach()));
-        }
-        Element aboutElement = recordElement.getChild("about", OAIConstants.NS_OAI);
-        if (aboutElement != null) {
-            for (Element aboutChild : aboutElement.getChildren()) {
-                record.getAboutList().add(aboutChild.detach());
+        if (recordElement.getNamespace().equals(OAIConstants.NS_OAI)) {
+            Element metadataElement = recordElement.getChild("metadata", OAIConstants.NS_OAI);
+            if (metadataElement != null && !metadataElement.getChildren().isEmpty()) {
+                Element metadataChild = (Element) metadataElement.getChildren().get(0);
+                record.setMetadata(new SimpleMetadata(metadataChild.detach()));
             }
+            Element aboutElement = recordElement.getChild("about", OAIConstants.NS_OAI);
+            if (aboutElement != null) {
+                for (Element aboutChild : aboutElement.getChildren()) {
+                    record.getAboutList().add(aboutChild.detach());
+                }
+            }
+        } else {
+            //handle as metadata
+            record.setMetadata(new SimpleMetadata(recordElement));
         }
         return record;
     }
@@ -132,34 +129,18 @@ public class MCROAIObjectManager {
         try {
             // building the query
             return MCRDeletedItemManager.getLastDeletedDate(mcrId)
-                                        .map(ZonedDateTime::toInstant)
-                                        .map(Date::from)
-                                        .map(deletedDate -> new Record(
-                                            new Header(getOAIId(mcrId), deletedDate, Status.deleted)))
-                                        .orElse(null);
+                .map(ZonedDateTime::toInstant)
+                .map(deletedDate -> new Record(
+                    new Header(getOAIId(mcrId), deletedDate, Status.deleted)))
+                .orElse(null);
         } catch (Exception ex) {
             LOGGER.warn("Error while retrieving deleted record " + mcrId, ex);
         }
         return null;
     }
 
-    public Header getHeader(String mcrId, MetadataFormat format) {
-        try {
-            Element headerElement = getJDOMHeader(mcrId, format);
-            return headerElement != null ? headerToHeader(headerElement) : null;
-        } catch (Exception exc) {
-            LOGGER.error("unable to get header element of record " + mcrId + " (" + format.getPrefix() + ")", exc);
-            return null;
-        }
-    }
-
     protected Element getJDOMRecord(String mcrId, MetadataFormat format) {
         String uri = formatURI(this.recordUriPattern, mcrId, format.getPrefix());
-        return getURI(uri);
-    }
-
-    protected Element getJDOMHeader(String mcrId, MetadataFormat format) {
-        String uri = formatURI(this.headerUriPattern, mcrId, format.getPrefix());
         return getURI(uri);
     }
 
@@ -187,23 +168,6 @@ public class MCROAIObjectManager {
         }
         return uri.replace("{id}", id).replace("{format}", metadataPrefix).replace("{objectType}", objectType).replace(
             ":{flag}", !exists ? ":deletedMcrObject" : "");
-    }
-
-    Header headerToHeader(Element headerElement) {
-        String id = headerElement.getChildText("identifier", OAIConstants.NS_OAI);
-        String datestampString = headerElement.getChildText("datestamp", OAIConstants.NS_OAI);
-        if (id == null || datestampString == null) {
-            return null;
-        }
-        Date datestamp = DateUtils.parseUTC(datestampString);
-        Header header = new Header(id, datestamp);
-        if (!exists(id)) {
-            header.setDeleted(true);
-        }
-        for (Object setSpec : headerElement.getChildren("setSpec", OAIConstants.NS_OAI)) {
-            header.getSetList().add(setToSet((Element) setSpec));
-        }
-        return header;
     }
 
     Set setToSet(Element setElement) {
