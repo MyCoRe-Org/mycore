@@ -23,9 +23,9 @@
 package org.mycore.mods.merger;
 
 /**
- * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.  
- * 
- * @author Frank L\u00FCtzenkirchen 
+ * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.
+ *
+ * @author Frank L\u00FCtzenkirchen
  **/
 public class MCRHyphenNormalizer {
 
@@ -35,7 +35,7 @@ public class MCRHyphenNormalizer {
             '\u2212', '\u2E3B', '\uFE58', '\uFE63', };
 
     /**
-     * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.  
+     * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.
      **/
     public String normalize(String input) {
         for (char hypenVariant : HYPHEN_VARIANTS) {

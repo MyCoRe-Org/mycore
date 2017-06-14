@@ -36,11 +36,11 @@ import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * MCRMerger is the main and default implementation for comparing and merging MODS elements that are semantically the same.
- * Each MODS element is wrapped by an instance of MCRMerger or one of its subclasses. 
+ * Each MODS element is wrapped by an instance of MCRMerger or one of its subclasses.
  * It contains methods to decide whether the two MODS elements are equal, or probably represent the information maybe with different granularity.
  * If so, the text, elements and attributes are merged so that the "better" information/representation wins.
- * This is done recursively for all child elements, too.   
- * 
+ * This is done recursively for all child elements, too.
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRMerger {
@@ -55,7 +55,7 @@ public class MCRMerger {
 
     /**
      * Returns true, if the element wrapped by this merger probably represents the same information as the other.
-     * The default implementation returns false and may be overwritten by subclasses implementing logic for specific MODS elements. 
+     * The default implementation returns false and may be overwritten by subclasses implementing logic for specific MODS elements.
      */
     public boolean isProbablySameAs(MCRMerger other) {
         return false;
@@ -76,7 +76,7 @@ public class MCRMerger {
     /**
      * Merges the contents of the element wrapped by the other merger into the contents of the element wrapped by this merger.
      * Should only be called if this.isProbablySameAs(other).
-     * 
+     *
      * The default implementation copies all attributes from the other into this if they do not exist in this element.
      * Afterwards it recursively builds mergers for all child elements and compares and eventually merges them too.
      */
@@ -90,14 +90,15 @@ public class MCRMerger {
      */
     protected void mergeAttributes(MCRMerger other) {
         for (Attribute attribute : other.element.getAttributes()) {
-            if (this.element.getAttribute(attribute.getName(), attribute.getNamespace()) == null)
+            if (this.element.getAttribute(attribute.getName(), attribute.getNamespace()) == null) {
                 this.element.setAttribute(attribute.clone());
+            }
         }
     }
 
     /**
      * Merges all child elements of this with that from other.
-     * This is done by building MCRMerger instances for each child element and comparing them. 
+     * This is done by building MCRMerger instances for each child element and comparing them.
      */
     protected void mergeElements(MCRMerger other) {
         List<MCRMerger> entries = new ArrayList<MCRMerger>();
@@ -112,8 +113,8 @@ public class MCRMerger {
 
     /**
      * Given a list of MCRMergers which represent the current content, merges a new entry into it.
-     * 
-     * @param entries a list of existing mergers, each wrapping an element 
+     *
+     * @param entries a list of existing mergers, each wrapping an element
      * @param newEntry the merger for the new element that should be merged into the existing entries
      */
     private void mergeIntoExistingEntries(List<MCRMerger> entries, MCRMerger newEntry) {
@@ -138,8 +139,8 @@ public class MCRMerger {
 
     /**
      * Helper method to lookup child elements by XPath.
-     * 
-     * @param xPath XPath expression relative to the element wrapped by this merger. 
+     *
+     * @param xPath XPath expression relative to the element wrapped by this merger.
      * @return a list of elements matching the given XPath
      */
     protected List<Element> getNodes(String xPath) {

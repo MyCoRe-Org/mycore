@@ -27,7 +27,7 @@ import org.mycore.common.MCRConstants;
 
 /**
  * Compares and merges mods:extent elements.
- * 
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRExtentMerger extends MCRMerger {

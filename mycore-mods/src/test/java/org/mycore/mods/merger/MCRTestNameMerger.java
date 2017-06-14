@@ -62,9 +62,8 @@ public class MCRTestNameMerger extends MCRTestCase {
         assertTrue(h.isProbablySameAs(a));
         assertTrue(h.isProbablySameAs(d));
 
-        MCRNameMerger i = buildNameEntry(
-                "[mods:namePart[@type='given']='T.'][mods:namePart[@type='family']='Müller']"
-                        + "[mods:namePart[@type='termsOfAddress']='Jun.']");
+        MCRNameMerger i = buildNameEntry("[mods:namePart[@type='given']='T.'][mods:namePart[@type='family']='Müller']"
+                + "[mods:namePart[@type='termsOfAddress']='Jun.']");
         assertTrue(i.isProbablySameAs(h));
         assertTrue(i.isProbablySameAs(a));
         assertTrue(i.isProbablySameAs(d));

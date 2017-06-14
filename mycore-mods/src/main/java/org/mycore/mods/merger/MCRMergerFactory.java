@@ -26,13 +26,13 @@ import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
- * Builds appropriate MCRMerger instances for a given MODS XML element. 
- * Since MODS elements need to be compared and merged differently, the factory returns 
+ * Builds appropriate MCRMerger instances for a given MODS XML element.
+ * Since MODS elements need to be compared and merged differently, the factory returns
  * different merger implementations for different element types.
- * 
+ *
  * MCR.MODS.Merger.default=[Default class to merge MODS, typically MCRMerger]
- * MCR.MODS.Merger.[elementName]=[Specific implementation by element name] 
- * 
+ * MCR.MODS.Merger.[elementName]=[Specific implementation by element name]
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRMergerFactory {

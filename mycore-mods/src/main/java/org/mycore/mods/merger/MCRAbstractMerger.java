@@ -29,12 +29,12 @@ import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Compares and merges mods:abstract elements. The abstract text is normalized before comparing.
- * Two abstracts are regarded probably same 
+ * Two abstracts are regarded probably same
  * if their levenshtein distance is less than a configured percentage of the text length.
- * 
+ *
  * MCR.MODS.Merger.AbstractMerger.MaxDistancePercent=[Maximum levenshtein distance in percent]
  * MCR.MODS.Merger.AbstractMerger.MaxCompareLength=[Maximum number of characters to compare from the two abstracts]
- * 
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRAbstractMerger extends MCRMerger {
@@ -57,7 +57,7 @@ public class MCRAbstractMerger extends MCRMerger {
     }
 
     /**
-     *  Two abstracts are regarded probably same 
+     *  Two abstracts are regarded probably same
      *  if their levenshtein distance is less than a configured percentage of the text length.
      */
     @Override

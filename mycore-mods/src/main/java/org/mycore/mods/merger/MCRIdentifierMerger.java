@@ -29,7 +29,7 @@ import org.jdom2.Element;
  * This implementation assumes there is only one identifier per type.
  * So if the type is same, the identifiers are regarded to represent the same information.
  * At merge, the identifier containing hyphens wins, because it is regarded prettier ;-)
- * 
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRIdentifierMerger extends MCRMerger {

@@ -28,8 +28,8 @@ import java.util.Locale;
 
 /**
  * Normalizes text to be fault tolerant when matching for duplicates.
- * Accents, umlauts, case are normalized. Punctuation and non-alphabetic/non-digit characters are removed. 
- * 
+ * Accents, umlauts, case are normalized. Punctuation and non-alphabetic/non-digit characters are removed.
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRTextNormalizer {
