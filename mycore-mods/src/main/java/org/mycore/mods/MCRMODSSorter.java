@@ -35,22 +35,23 @@ import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * Provides functionality to sort MODS elements to a predefined order.
- * The MODSSorter can be either used as URIResolver via 
+ * The MODSSorter can be either used as URIResolver via
  * "sort:[...URI returning MODS...]"
- * or by invoking 
+ * or by invoking
  * MCRMODSSorter.sort( [JDOM Element with mods:mods] );
- * 
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRMODSSorter implements URIResolver {
 
-    private final static String[] order = { "genre", "typeofResource", "titleInfo", "nonSort", "subTitle", "title",
+    private final static String[] ORDER = { "genre", "typeofResource", "titleInfo", "nonSort", "subTitle", "title",
             "partNumber", "partName", "name", "namePart", "displayForm", "role", "affiliation", "originInfo", "place",
             "publisher", "dateIssued", "dateCreated", "dateModified", "dateValid", "dateOther", "edition", "issuance",
             "frequency", "relatedItem", "language", "physicalDescription", "abstract", "note", "subject",
-            "classification", "location", "shelfLocator", "url", "accessCondition", "part", "extension", "recordInfo" };
+            "classification", "location", "shelfLocator", "url", "accessCondition", "part", "extension",
+            "recordInfo", };
 
-    private final static List<String> orderList = Arrays.asList(order);
+    private final static List<String> ORDER_LIST = Arrays.asList(ORDER);
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -68,14 +69,15 @@ public class MCRMODSSorter implements URIResolver {
         int pos1 = getPos(e1);
         int pos2 = getPos(e2);
 
-        if (pos1 == pos2)
+        if (pos1 == pos2) {
             return e1.getName().compareTo(e2.getName());
-        else
+        } else {
             return pos1 - pos2;
+        }
     }
 
     private static int getPos(Element e) {
         String name = e.getName();
-        return orderList.contains(name) ? orderList.indexOf(name) : orderList.size();
+        return ORDER_LIST.contains(name) ? ORDER_LIST.indexOf(name) : ORDER_LIST.size();
     }
 }
