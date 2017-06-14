@@ -93,7 +93,7 @@ public class MCRRestAPIUploadHelper {
     public static final String FORMAT_XML = "xml";
 
     private static java.nio.file.Path UPLOAD_DIR = Paths
-        .get(MCRConfiguration.instance().getString("MCR.RestAPI.Upload.Directory"));
+        .get(MCRConfiguration.instance().getString("MCR.RestAPI.v1.Upload.Directory"));
     static {
         if (!Files.exists(UPLOAD_DIR)) {
             try {
@@ -103,6 +103,8 @@ public class MCRRestAPIUploadHelper {
             }
         }
     }
+    
+
 
     /**
      * uploads a mycore mobject    
@@ -117,7 +119,8 @@ public class MCRRestAPIUploadHelper {
     public static Response uploadObject(UriInfo info, HttpServletRequest request, InputStream uploadedInputStream,
         org.glassfish.jersey.media.multipart.FormDataContentDisposition fileDetails) {
 
-        if (checkAccess(request)) {
+        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
+        if (response.getStatus() == Status.OK.getStatusCode()) {
             java.nio.file.Path fXML = null;
             try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
                 SAXBuilder sb = new SAXBuilder();
@@ -144,7 +147,7 @@ public class MCRRestAPIUploadHelper {
                 setDefaultPermission(mcrID, "publication", "api");
                 mcrSession.setUserInformation(currentUser);
 
-                return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
+               response = Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
                     .type("application/xml; charset=UTF-8").build();
 
             } catch (Exception e) {
@@ -159,7 +162,7 @@ public class MCRRestAPIUploadHelper {
                 }
             }
         }
-        return Response.status(Status.FORBIDDEN).build();
+        return response;
 
     }
 
@@ -170,9 +173,8 @@ public class MCRRestAPIUploadHelper {
     public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String formParamlabel) {
 
-        Response response = Response.status(Status.FORBIDDEN).build();
-        if (checkAccess(request)) {
-
+        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
+        if (response.getStatus() == Status.OK.getStatusCode()) {
             //  File fXML = null;
             MCRObjectID mcrObjID = MCRObjectID.getInstance(pathParamMcrObjID);
 
@@ -226,8 +228,8 @@ public class MCRRestAPIUploadHelper {
         String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5,
         Long formParamSize) {
 
-        Response response = Response.status(Status.FORBIDDEN).build();
-        if (checkAccess(request)) {
+        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
+        if (response.getStatus() == Status.OK.getStatusCode()) {
             SortedMap<String, String> parameter = new TreeMap<>();
             parameter.put("mcrObjectID", pathParamMcrObjID);
             parameter.put("mcrDerivateID", pathParamMcrDerID);
@@ -337,9 +339,8 @@ public class MCRRestAPIUploadHelper {
     public static Response deleteAllFiles(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) {
 
-        Response response = Response.status(Status.FORBIDDEN).build();
-        if (checkAccess(request)) {
-
+        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
+        if (response.getStatus() == Status.OK.getStatusCode()) {
             SortedMap<String, String> parameter = new TreeMap<>();
             parameter.put("mcrObjectID", pathParamMcrObjID);
             parameter.put("mcrDerivateID", pathParamMcrDerID);
@@ -394,9 +395,8 @@ public class MCRRestAPIUploadHelper {
     public static Response deleteDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) {
 
-        Response response = Response.status(Status.FORBIDDEN).build();
-        if (checkAccess(request)) {
-
+        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
+        if (response.getStatus() == Status.OK.getStatusCode()) {
             SortedMap<String, String> parameter = new TreeMap<>();
             parameter.put("mcrObjectID", pathParamMcrObjID);
             parameter.put("mcrDerivateID", pathParamMcrDerID);
@@ -437,11 +437,6 @@ public class MCRRestAPIUploadHelper {
             }
         }
         return response;
-
-    }
-
-    private static boolean checkAccess(HttpServletRequest request) {
-        return ",127.0.0.1,::1,".contains("," + request.getRemoteAddr() + ",");
     }
 
     private static void setDefaultPermission(MCRObjectID objID, String workflowProcessType, String userid) {
@@ -513,6 +508,4 @@ public class MCRRestAPIUploadHelper {
 
         return result;
     }
-
-   
 }
