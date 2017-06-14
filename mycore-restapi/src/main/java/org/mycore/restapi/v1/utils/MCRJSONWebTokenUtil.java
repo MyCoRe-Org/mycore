@@ -225,7 +225,7 @@ public class MCRJSONWebTokenUtil {
         return false;
     }
     
-    public static SignedJWT getAuthenticationToken(HttpServletRequest request) {
+    public static SignedJWT retrieveAuthenticationToken(HttpServletRequest request) {
         String auth = request.getHeader("Authorization");
         if (auth != null && auth.startsWith("Bearer ")) {
             String authToken = auth.substring(7).trim();

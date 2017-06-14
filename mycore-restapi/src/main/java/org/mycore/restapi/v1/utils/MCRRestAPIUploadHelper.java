@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Signature;
+import java.util.Base64;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
@@ -51,12 +52,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -67,8 +66,6 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.content.MCRStringContent;
-import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -82,10 +79,10 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.user2.MCRUserManager;
-import org.xml.sax.SAXParseException;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jwt.SignedJWT;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
@@ -121,6 +118,7 @@ public class MCRRestAPIUploadHelper {
 
         Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
         if (response.getStatus() == Status.OK.getStatusCode()) {
+            SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
             java.nio.file.Path fXML = null;
             try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
                 SAXBuilder sb = new SAXBuilder();
@@ -142,9 +140,9 @@ public class MCRRestAPIUploadHelper {
 
                 MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
                 MCRUserInformation currentUser = mcrSession.getUserInformation();
-                mcrSession.setUserInformation(MCRUserManager.getUser("api"));
+                MCRUserInformation apiUser = MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromSessionToken(signedJWT));
+                mcrSession.setUserInformation(apiUser);
                 MCRObjectCommands.updateFromFile(fXML.toString(), false); // handles "create" as well
-                setDefaultPermission(mcrID, "publication", "api");
                 mcrSession.setUserInformation(currentUser);
 
                response = Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
@@ -181,7 +179,8 @@ public class MCRRestAPIUploadHelper {
             try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
                 MCRSession session = MCRServlet.getSession(request);
                 MCRUserInformation currentUser = session.getUserInformation();
-                session.setUserInformation(MCRUserManager.getUser("api"));
+                MCRUserInformation apiUser = MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromSessionToken(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request)));
+                session.setUserInformation(apiUser);
 
                 MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjID);
                 MCRObjectID derID = null;
@@ -207,10 +206,6 @@ public class MCRRestAPIUploadHelper {
                         new MCRMetaLinkID("derobject", derID, null, formParamlabel));
                 }
 
-                //the first transaction shall be committed
-                try (MCRJPATransactionWrapper mtw2 = new MCRJPATransactionWrapper()) {
-                    setDefaultPermission(derID, "publication", "api");
-                }
                 response = Response
                     .created(info.getBaseUriBuilder()
                         .path("v1/objects/" + mcrObjID.toString() + "/derivates/" + derID.toString()).build())
@@ -244,7 +239,7 @@ public class MCRRestAPIUploadHelper {
                 //ToDo error handling
             }
             if (!(MCRJSONWebTokenUtil.validateToken(request) && verifyPropertiesBySignature(parameter, base64Signature,
-                MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader( MCRJSONWebTokenUtil.getAuthenticationToken(request))))) {
+                MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader( MCRJSONWebTokenUtil.retrieveAuthenticationToken(request))))) {
                 //validation failed -> error handling
 
             } else {
@@ -350,7 +345,7 @@ public class MCRRestAPIUploadHelper {
                 //ToDo error handling
             }
             if (!(MCRJSONWebTokenUtil.validateToken(request) && verifyPropertiesBySignature(parameter, base64Signature,
-                MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader( MCRJSONWebTokenUtil.getAuthenticationToken(request))))) {
+                MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader( MCRJSONWebTokenUtil.retrieveAuthenticationToken(request))))) {
 
                 //validation failed -> error handling
 
@@ -405,8 +400,9 @@ public class MCRRestAPIUploadHelper {
             if (base64Signature == null) {
                 //ToDo error handling
             }
+            SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
             if (!(MCRJSONWebTokenUtil.validateToken(request) && verifyPropertiesBySignature(parameter, base64Signature,
-                MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader( MCRJSONWebTokenUtil.getAuthenticationToken(request))))) {
+                MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader( signedJWT)))) {
 
                 //validation failed -> error handling
 
@@ -415,7 +411,7 @@ public class MCRRestAPIUploadHelper {
                     //MCRSession session = MCRServlet.getSession(request);
                     MCRSession session = MCRSessionMgr.getCurrentSession();
                     MCRUserInformation currentUser = session.getUserInformation();
-                    session.setUserInformation(MCRUserManager.getUser("api"));
+                    session.setUserInformation(MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromSessionToken(signedJWT)));
                     MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
                     MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
@@ -439,44 +435,6 @@ public class MCRRestAPIUploadHelper {
         return response;
     }
 
-    private static void setDefaultPermission(MCRObjectID objID, String workflowProcessType, String userid) {
-        MCRConfiguration config = MCRConfiguration.instance();
-        String[] defaultPermissionTypes = config
-            .getString("MCR.WorkflowEngine.DefaultPermissionTypes", "read,commitdb,writedb,deletedb,deletewf")
-            .split(",");
-
-        for (int i = 0; i < defaultPermissionTypes.length; i++) {
-            String propName = new StringBuffer("MCR.WorkflowEngine.defaultACL.").append(objID.getTypeId()).append(".")
-                .append(defaultPermissionTypes[i]).append(".").append(workflowProcessType).toString();
-
-            String strRule = config.getString(propName,
-                "<condition format=\"xml\"><boolean operator=\"false\" /></condition>");
-            strRule = strRule.replaceAll("\\$\\{user\\}", userid);
-            try {
-                Element rule = (Element) MCRXMLParserFactory.getParser(false).parseXML(new MCRStringContent(strRule))
-                    .getRootElement().detach();
-                String permissionType = defaultPermissionTypes[i];
-                //  MCRAccessManager.getAccessImpl().createRule(rule,  "System", "");
-                if (MCRAccessManager.hasRule(objID.toString(), permissionType)) {
-                    MCRAccessManager.updateRule(objID.toString(), permissionType, rule, "");
-                } else {
-                    MCRAccessManager.addRule(objID.toString(), permissionType, rule, "");
-                }
-            } catch (SAXParseException spe) {
-                LOGGER.error("SAXParseException: ", spe);
-            }
-        }
-
-        //set read to true;
-        if (MCRAccessManager.hasRule(objID.toString(), MCRAccessManager.PERMISSION_READ)) {
-            MCRAccessManager.updateRule(objID.toString(), MCRAccessManager.PERMISSION_READ,
-                MCRAccessManager.getTrueRule(), "");
-        } else {
-            MCRAccessManager.addRule(objID.toString(), MCRAccessManager.PERMISSION_READ, MCRAccessManager.getTrueRule(),
-                "");
-        }
-    }
-
     public static boolean verifyPropertiesBySignature(SortedMap<String, String> data, String base64Signature,
         JWK clientPublicJWK) {
         try {
@@ -486,7 +444,7 @@ public class MCRRestAPIUploadHelper {
             signature.initVerify(key.toPublicKey());
             signature.update(message.getBytes(StandardCharsets.UTF_8));
 
-            return signature.verify(Base64.decodeBase64(base64Signature.getBytes(StandardCharsets.UTF_8)));
+            return signature.verify(Base64.getDecoder().decode(base64Signature.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             e.printStackTrace();
         }

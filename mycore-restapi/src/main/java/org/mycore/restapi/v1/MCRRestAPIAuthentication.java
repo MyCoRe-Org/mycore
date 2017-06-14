@@ -37,8 +37,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
+import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserManager;
 
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -161,7 +164,8 @@ public class MCRRestAPIAuthentication {
     }
     
     private String validateUser(String username, String password, JWK clientPubKey) {
-        if (username.equals("mycore") && password.equals("alleswirdgut")) {
+        MCRUser user = MCRUserManager.checkPassword(username, password);
+        if (user!=null) {
             return MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("rest-api"), "http://localhost:8080/",
                 clientPubKey);
         }
@@ -194,7 +198,7 @@ public class MCRRestAPIAuthentication {
                     JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader(signedJWT);
                     if (submittedUser != null && clientPubKey != null) {
                         String jwt = MCRJSONWebTokenUtil.createJWT(submittedUser, Arrays.asList("rest-api"),
-                            "http://localhost:8080/", clientPubKey);
+                            MCRFrontendUtil.getBaseURL(), clientPubKey);
                         if (jwt != null) {
                             StringBuffer msg = new StringBuffer();
                             msg.append("{");
