@@ -196,6 +196,11 @@ public class MCRRSSFeedImporter {
 
     private String getPublicationID(SyndEntry entry) {
         String link = entry.getLink();
+        if (link == null) {
+            LOGGER.warn("no link found in feed entry");
+            return null;
+        }
+        link = link.trim();
         Matcher m = pattern2findID.matcher(link);
         if (m.matches()) {
             return m.group(1);
