@@ -26,11 +26,11 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
 
 /**
  * This class contains some generic utility functions for the REST API
@@ -46,13 +46,13 @@ public class MCRRestAPIUtil {
      * @param request
      * @return
      */
-    public static Response checkWriteAccessForIP(HttpServletRequest request) {
+    public static boolean checkWriteAccessForIP(HttpServletRequest request) throws MCRRestAPIException {
         String clientIP = getClientIpAddress(request);
         if(ALLOWED_WRITE_IP_PATTERN.matcher(clientIP).matches()){
-            return Response.ok().build();
+            return true;
         }
         else{
-           return MCRRestAPIError.create(Status.FORBIDDEN,  MCRRestAPIError.CODE_ACCESS_DENIED, "The client IP "+clientIP+" is not allowed to write to the Rest API", null).createHttpResponse();
+           throw new MCRRestAPIException(MCRRestAPIError.create(Status.FORBIDDEN,  MCRRestAPIError.CODE_ACCESS_DENIED, "The client IP "+clientIP+" is not allowed to write to the Rest API", null));
         }
     }
     

@@ -78,6 +78,8 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.restapi.v1.errors.MCRRestAPIError;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.user2.MCRUserManager;
 
 import com.nimbusds.jose.jwk.JWK;
@@ -114,10 +116,9 @@ public class MCRRestAPIUploadHelper {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public static Response uploadObject(UriInfo info, HttpServletRequest request, InputStream uploadedInputStream,
-        org.glassfish.jersey.media.multipart.FormDataContentDisposition fileDetails) {
-
-        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
-        if (response.getStatus() == Status.OK.getStatusCode()) {
+       FormDataContentDisposition fileDetails) {
+        try{
+        if(MCRRestAPIUtil.checkWriteAccessForIP(request)) {
             SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
             java.nio.file.Path fXML = null;
             try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
@@ -145,11 +146,13 @@ public class MCRRestAPIUploadHelper {
                 MCRObjectCommands.updateFromFile(fXML.toString(), false); // handles "create" as well
                 mcrSession.setUserInformation(currentUser);
 
-               response = Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
+               return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
                     .type("application/xml; charset=UTF-8").build();
 
             } catch (Exception e) {
                 LOGGER.error("Unable to Upload file: " + String.valueOf(fXML), e);
+                throw new MCRRestAPIException(MCRRestAPIError.create(Status.BAD_REQUEST,  MCRRestAPIError.CODE_WRONG_PARAMETER, 
+                    "Unable to Upload file: " + String.valueOf(fXML), e.getMessage()));
             } finally {
                 if (fXML != null) {
                     try {
@@ -160,7 +163,12 @@ public class MCRRestAPIUploadHelper {
                 }
             }
         }
-        return response;
+ 
+        }
+        catch(MCRRestAPIException e){
+            return MCRRestAPIError.createHttpResponseFromErrorList(e.getErrors());
+        }
+        return MCRRestAPIError.create(Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR, "Could not upload the file", null).createHttpResponse();
 
     }
 
@@ -170,9 +178,9 @@ public class MCRRestAPIUploadHelper {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String formParamlabel) {
-
-        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
-        if (response.getStatus() == Status.OK.getStatusCode()) {
+        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        try{
+        if(MCRRestAPIUtil.checkWriteAccessForIP(request)){
             //  File fXML = null;
             MCRObjectID mcrObjID = MCRObjectID.getInstance(pathParamMcrObjID);
 
@@ -215,6 +223,10 @@ public class MCRRestAPIUploadHelper {
                 LOGGER.error("Exeption while uploading derivate", e);
             }
         }
+        }
+        catch(MCRRestAPIException e){
+            response = MCRRestAPIError.createHttpResponseFromErrorList(e.getErrors());
+        }
         return response;
     }
 
@@ -223,8 +235,9 @@ public class MCRRestAPIUploadHelper {
         String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5,
         Long formParamSize) {
 
-        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
-        if (response.getStatus() == Status.OK.getStatusCode()) {
+        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        try{
+        if(MCRRestAPIUtil.checkWriteAccessForIP(request)) {
             SortedMap<String, String> parameter = new TreeMap<>();
             parameter.put("mcrObjectID", pathParamMcrObjID);
             parameter.put("mcrDerivateID", pathParamMcrDerID);
@@ -313,6 +326,7 @@ public class MCRRestAPIUploadHelper {
                                 Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
                             } catch (IOException | MCRAccessException e) {
                                 LOGGER.error(e);
+                                throw new MCRRestAPIException(MCRRestAPIError.create(Status.INTERNAL_SERVER_ERROR,  MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
                             }
                         }
                         session.setUserInformation(currentUser);
@@ -322,6 +336,9 @@ public class MCRRestAPIUploadHelper {
                     }
                 }
             }
+        }}
+        catch(MCRRestAPIException e){
+            response = MCRRestAPIError.createHttpResponseFromErrorList(e.getErrors());
         }
         return response;
 
@@ -334,8 +351,9 @@ public class MCRRestAPIUploadHelper {
     public static Response deleteAllFiles(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) {
 
-        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
-        if (response.getStatus() == Status.OK.getStatusCode()) {
+        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        try{
+            if(MCRRestAPIUtil.checkWriteAccessForIP(request)) {
             SortedMap<String, String> parameter = new TreeMap<>();
             parameter.put("mcrObjectID", pathParamMcrObjID);
             parameter.put("mcrDerivateID", pathParamMcrDerID);
@@ -378,6 +396,10 @@ public class MCRRestAPIUploadHelper {
                 }
             }
         }
+        }
+        catch(MCRRestAPIException e){
+            response = MCRRestAPIError.createHttpResponseFromErrorList(e.getErrors());
+        }
         return response;
     }
 
@@ -390,8 +412,9 @@ public class MCRRestAPIUploadHelper {
     public static Response deleteDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) {
 
-        Response response = MCRRestAPIUtil.checkWriteAccessForIP(request);
-        if (response.getStatus() == Status.OK.getStatusCode()) {
+        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        try{
+        if(MCRRestAPIUtil.checkWriteAccessForIP(request)) {
             SortedMap<String, String> parameter = new TreeMap<>();
             parameter.put("mcrObjectID", pathParamMcrObjID);
             parameter.put("mcrDerivateID", pathParamMcrDerID);
@@ -431,6 +454,10 @@ public class MCRRestAPIUploadHelper {
                         .type("application/xml; charset=UTF-8").build();
                 }
             }
+        }
+        }
+        catch(MCRRestAPIException e){
+            response = MCRRestAPIError.createHttpResponseFromErrorList(e.getErrors());
         }
         return response;
     }

@@ -46,6 +46,7 @@ public class MCRRestAPIError {
     public static final String CODE_NOT_FOUND = "NOT_FOUND";
     public static final String CODE_INTERNAL_ERROR = "INTERNAL_ERROR";
     public static final String CODE_ACCESS_DENIED = "ACCESS_DENIED";
+    public static final String CODE_INVALID_AUTHENCATION = "INVALID_AUTHENTICATION";
     
     Response.Status status = Response.Status.BAD_REQUEST;
     String code = "";
@@ -101,6 +102,10 @@ public class MCRRestAPIError {
         return gson.toJson(errorMsg);
     }
     
+    public Response.Status getStatus() {
+        return status;
+    }
+    
     public static Response createHttpResponseFromErrorList(Response.Status status, List<MCRRestAPIError> errors) {
         if(errors.size()==0){
             return Response.ok().build();
@@ -109,8 +114,20 @@ public class MCRRestAPIError {
             return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE).entity(convertErrorListToJSONString(errors)).build();
         }
     }
-
-    public Response.Status getStatus() {
-        return status;
+    
+    /**
+     * takes the status from the first error object
+     * @param errors
+     * @return
+     */
+    public static Response createHttpResponseFromErrorList(List<MCRRestAPIError> errors) {
+        if(errors.size()==0){
+            return Response.ok().build();
+        }
+        else{
+            return Response.status(errors.get(0).getStatus()).type(MediaType.APPLICATION_JSON_TYPE).entity(convertErrorListToJSONString(errors)).build();
+        }
     }
+
+    
 }
