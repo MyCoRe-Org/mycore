@@ -193,9 +193,9 @@ public class MCRRestAPIAuthentication {
                     && jwsObj.getHeader().getJWK().toJSONString()
                         .equals(JWK.parse(signedJWT.getJWTClaimsSet().getJSONObjectClaim("sub_jwk")).toJSONString())) {
 
-                    String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromSessionToken(signedJWT);
+                    String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT);
 
-                    JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader(signedJWT);
+                    JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT);
                     if (submittedUser != null && clientPubKey != null) {
                         String jwt = MCRJSONWebTokenUtil.createJWT(submittedUser, Arrays.asList("rest-api"),
                             MCRFrontendUtil.getBaseURL(), clientPubKey);
