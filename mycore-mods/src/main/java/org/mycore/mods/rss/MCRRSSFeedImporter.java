@@ -64,47 +64,36 @@ import com.rometools.rome.io.XmlReader;
 
 /**
  * Reads an RSS feed referencing new publications and imports those publications that are not stored yet.
- * 
- * Usage: 
+ *
+ * Usage:
  *   MCRRSSFeedImporter.importFromFeed( [sourceSystemID], [targetProjectID] );
- *   where targetProjectID is the target project ID to import mods objects to, e.g. "mir". 
- *   
+ *   where targetProjectID is the target project ID to import mods objects to, e.g. "mir".
+ *
  * Reads the RSS feed configured via
- * MCR.MODS.RSSFeedImporter.[sourceSystemID].FeedURL=[http(s) URL of remote RSS feed to read]  
- *   
- * For each entry, 
- * 
+ * MCR.MODS.RSSFeedImporter.[sourceSystemID].FeedURL=[http(s) URL of remote RSS feed to read]
+ *
+ * For each entry,
+ *
  * 1. Gets the link given in that entry (assuming it points to the publications) and
- * extracts the publication ID from the link, using a regular expression configured via   
+ * extracts the publication ID from the link, using a regular expression configured via
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].Pattern2FindID=
- * 
+ *
  * 2. Queries the SOLR index to check if this publication isn't already stored. The field to query is
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].Field2QueryID=[SOLR field name]
- * 
+ *
  * 3. Retrieves the publication metadata from the remote system and converts it to &lt;mycoreobject /&gt; XML.
- * MCR.MODS.RSSFeedImporter.[sourceSystemID].PublicationURI=xslStyle:...:http://...{0}... 
+ * MCR.MODS.RSSFeedImporter.[sourceSystemID].PublicationURI=xslStyle:...:http://...{0}...
  * where the remote publication ID will be replaced in Java message format syntax as {0}.
  *
  * 4. Saves the publication in persistent store, with the given projectID and object type "mods".
- * 
+ *
  * When the total number of publications imported is > 0 AND the property
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].XSL2BuildNotificationMail=foo.xsl
  * is set, builds and sends a notification mail via MCRMailer.
- *   
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRRSSFeedImporter {
-
-    private static final String STATUS_FLAG = "imported";
-
-    private static final String PROPERTY_MAIL_ADDRESS = "MCR.Mail.Address";
-
-    private final static Logger LOGGER = LogManager.getLogger(MCRRSSFeedImporter.class);
-
-    public static void importFromFeed(String sourceSystemID, String projectID) throws Exception {
-        MCRRSSFeedImporter importer = new MCRRSSFeedImporter(sourceSystemID);
-        importer.importPublications(projectID);
-    }
 
     private String sourceSystemID;
 
@@ -118,6 +107,17 @@ public class MCRRSSFeedImporter {
 
     private String xsl2BuildNotificationMail;
 
+    private static final String STATUS_FLAG = "imported";
+
+    private static final String PROPERTY_MAIL_ADDRESS = "MCR.Mail.Address";
+
+    private final static Logger LOGGER = LogManager.getLogger(MCRRSSFeedImporter.class);
+
+    public static void importFromFeed(String sourceSystemID, String projectID) throws Exception {
+        MCRRSSFeedImporter importer = new MCRRSSFeedImporter(sourceSystemID);
+        importer.importPublications(projectID);
+    }
+
     public MCRRSSFeedImporter(String sourceSystemID) {
         this.sourceSystemID = sourceSystemID;
 
@@ -129,10 +129,10 @@ public class MCRRSSFeedImporter {
         field2queryID = config.getString(prefix + "Field2QueryID");
         xsl2BuildNotificationMail = config.getString(prefix + "XSL2BuildNotificationMail", null);
 
-        getPattern2FinedID(prefix, config);
+        getPattern2FinedID(prefix);
     }
 
-    private void getPattern2FinedID(String prefix, MCRConfiguration config) {
+    private void getPattern2FinedID(String prefix) {
         String patternProperty = prefix + "Pattern2FindID";
         try {
             String pattern = MCRConfiguration.instance().getString(patternProperty);
@@ -150,14 +150,15 @@ public class MCRRSSFeedImporter {
         List<MCRObject> importedObjects = new ArrayList<MCRObject>();
         for (SyndEntry entry : feed.getEntries()) {
             MCRObject importedObject = handleFeedEntry(entry, projectID);
-            if (importedObject != null)
+            if (importedObject != null) {
                 importedObjects.add(importedObject);
+            }
         }
 
         int numPublicationsImported = importedObjects.size();
         LOGGER.info("imported " + numPublicationsImported + " publications.");
 
-        if ( (numPublicationsImported > 0) && ( xsl2BuildNotificationMail != null ) ) {
+        if ((numPublicationsImported > 0) && (xsl2BuildNotificationMail != null)) {
             sendNotificationMail(importedObjects);
         }
     }
@@ -172,8 +173,9 @@ public class MCRRSSFeedImporter {
     private MCRObject handleFeedEntry(SyndEntry entry, String projectID)
             throws MCRPersistenceException, MCRAccessException {
         String publicationID = getPublicationID(entry);
-        if (publicationID == null)
+        if (publicationID == null) {
             return null;
+        }
 
         if (isAlreadyStored(publicationID)) {
             LOGGER.info("publication with ID " + publicationID + " already existing, will not import.");
@@ -238,8 +240,9 @@ public class MCRRSSFeedImporter {
 
     private void sendNotificationMail(List<MCRObject> importedObjects) throws Exception {
         Element xml = new Element(STATUS_FLAG).setAttribute("source", this.sourceSystemID);
-        for (MCRObject obj : importedObjects)
+        for (MCRObject obj : importedObjects) {
             xml.addContent(obj.createXML().detachRootElement());
+        }
 
         HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put(PROPERTY_MAIL_ADDRESS, MCRConfiguration.instance().getString(PROPERTY_MAIL_ADDRESS));

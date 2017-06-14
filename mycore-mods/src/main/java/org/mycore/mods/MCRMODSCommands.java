@@ -56,14 +56,14 @@ import org.xml.sax.SAXException;
  * @author Thomas Scheffler (yagee)
  *
  */
-@MCRCommandGroup(name="MODS Commands")
+@MCRCommandGroup(name = "MODS Commands")
 public class MCRMODSCommands extends MCRAbstractCommands {
 
     public static final String MODS_V3_XSD_URI = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMODSCommands.class);
 
-    @MCRCommand(syntax="load all mods documents from directory {0} for project {1}", help="Load all MODS documents as MyCoRe Objects for project {1} from directory {0}", order=10)
+    @MCRCommand(syntax = "load all mods documents from directory {0} for project {1}", help = "Load all MODS documents as MyCoRe Objects for project {1} from directory {0}", order = 10)
     public static List<String> loadFromDirectory(String directory, String projectID) {
         File dir = new File(directory);
         if (!dir.isDirectory()) {
@@ -74,16 +74,15 @@ public class MCRMODSCommands extends MCRAbstractCommands {
             LOGGER.warn("No files found in directory " + dir);
             return null;
         }
-        return Arrays.stream(list)
-                     .filter(file -> file.endsWith(".xml"))
-                     .map(file -> MessageFormat.format(
-                         "load mods document from file {0} for project {1}",
-                         new File(dir, file).getAbsolutePath(), projectID))
-                     .collect(Collectors.toList());
+        return Arrays.stream(list).filter(file -> file.endsWith(".xml"))
+                .map(file -> MessageFormat.format("load mods document from file {0} for project {1}",
+                        new File(dir, file).getAbsolutePath(), projectID))
+                .collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax="load mods document from file {0} for project {1}", help="Load MODS document {0} as MyCoRe Object for project {1}", order=20)
-    public static void loadFromFile(String modsFileName, String projectID) throws JDOMException, IOException, MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
+    @MCRCommand(syntax = "load mods document from file {0} for project {1}", help = "Load MODS document {0} as MyCoRe Object for project {1}", order = 20)
+    public static void loadFromFile(String modsFileName, String projectID) throws JDOMException, IOException,
+            MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
             throw new MCRException(MessageFormat.format("File {0} is not a file.", modsFile.getAbsolutePath()));
@@ -94,7 +93,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         MCRXMLHelper.validate(modsDoc, MODS_V3_XSD_URI);
         Element modsRoot = modsDoc.getRootElement();
         if (!modsRoot.getNamespace().equals(MCRConstants.MODS_NAMESPACE)) {
-            throw new MCRException(MessageFormat.format("File {0} is not a MODS document.", modsFile.getAbsolutePath()));
+            throw new MCRException(
+                    MessageFormat.format("File {0} is not a MODS document.", modsFile.getAbsolutePath()));
         }
         if (modsRoot.getName().equals("modsCollection")) {
             List<Element> modsElements = modsRoot.getChildren("mods", MCRConstants.MODS_NAMESPACE);
@@ -106,13 +106,14 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         }
     }
 
-    private static void saveAsMyCoReObject(String projectID, Element modsRoot) throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
+    private static void saveAsMyCoReObject(String projectID, Element modsRoot)
+            throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
         MCRObject mcrObject = MCRMODSWrapper.wrapMODSDocument(modsRoot, projectID);
         mcrObject.setId(MCRObjectID.getNextFreeId(mcrObject.getId().getBase()));
         MCRMetadataManager.create(mcrObject);
     }
 
-    @MCRCommand(syntax="import publications from {0} RSS feed for project {1}", help="Read RSS feed from data source {0}, convert and save new publications as MyCoRe Object for project {1}", order=30)
+    @MCRCommand(syntax = "import publications from {0} RSS feed for project {1}", help = "Read RSS feed from data source {0}, convert and save new publications as MyCoRe Object for project {1}", order = 30)
     public static void importFromRSSFeed(String sourceSystemID, String projectID) throws Exception {
         MCRRSSFeedImporter.importFromFeed(sourceSystemID, projectID);
     }
