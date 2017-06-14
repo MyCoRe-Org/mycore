@@ -22,6 +22,9 @@
 
 package org.mycore.restapi.v1.errors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * exception that can be thrown during rest api requests
  * 
@@ -33,13 +36,17 @@ public class MCRRestAPIException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private MCRRestAPIError error;
+    private List<MCRRestAPIError> errors = new ArrayList<>();
 
     public MCRRestAPIException(MCRRestAPIError error) {
-        this.error = error;
+        errors.add(error);
+    }
+    
+    public MCRRestAPIException(List<MCRRestAPIError> errors) {
+        this.errors.addAll(errors);
     }
 
-    public MCRRestAPIError getError() {
-        return error;
+    public List<MCRRestAPIError> getErrors() {
+        return errors;
     }
 }

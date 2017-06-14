@@ -30,11 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.mycore.common.config.MCRConfiguration;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import org.mycore.restapi.v1.errors.MCRRestAPIError;
 
 /**
  * This class contains some generic utility functions for the REST API
@@ -56,7 +52,7 @@ public class MCRRestAPIUtil {
             return Response.ok().build();
         }
         else{
-           return createErrorResponse(Status.FORBIDDEN,  "ACCESS_DENIED", "The client IP "+clientIP+" is not allowed to write to the Rest API", null);
+           return MCRRestAPIError.create(Status.FORBIDDEN,  MCRRestAPIError.CODE_ACCESS_DENIED, "The client IP "+clientIP+" is not allowed to write to the Rest API", null).createHttpResponse();
         }
     }
     
@@ -75,33 +71,5 @@ public class MCRRestAPIUtil {
             // the header may contain a list of IPs, we only need the client (first IP)
             return new StringTokenizer(xForwardedForHeader, ",").nextToken().trim();
         }
-    }
-    
-    /**
-     * creates an error response
-     * 
-     * the format is specified in: http://jsonapi.org/format/#errors
-     * 
-     * @param status - the HTTP status code
-     * @param code - an application specific error code
-     * @param title - the error title
-     * @param detail - further details - may be null
-     * @return
-     */
-    public static Response createErrorResponse(Status status, String code, String title, String detail){
-        JsonObject error = new JsonObject();
-        error.addProperty("status", String.valueOf(status.getStatusCode()));
-        error.addProperty("code",  code);
-        error.addProperty("title",  title);
-        if(detail!=null){
-            error.addProperty("detail", detail);
-        }
-        JsonArray errors = new JsonArray();
-        errors.add(error);
-        JsonObject errorMsg = new JsonObject();
-        errorMsg.add("errors", errors);
-        
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return Response.status(status).entity(gson.toJson(errorMsg)).build();
     }
 }

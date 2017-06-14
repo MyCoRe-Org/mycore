@@ -199,7 +199,7 @@ public class MCRRestAPIClassifications {
         try {
             MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
             if (cl == null) {
-                return MCRRestAPIError.create(Response.Status.BAD_REQUEST, "Classification not found.",
+                return MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
                     "There is no classification with the given ID.").createHttpResponse();
             }
             Document docClass = MCRCategoryTransformer.getMetaDataDocument(cl, false);
@@ -211,8 +211,8 @@ public class MCRRestAPIClassifications {
                 if (e != null) {
                     eRoot = e;
                 } else {
-                    return MCRRestAPIError.create(Response.Status.BAD_REQUEST, "Category not found.",
-                        "The classfication does not contain a category with the given ID.").createHttpResponse();
+                    return MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_NOT_FOUND,
+                        "Category not found.", "The classfication does not contain a category with the given ID.").createHttpResponse();
                 }
             }
             if (filterNonEmpty) {
