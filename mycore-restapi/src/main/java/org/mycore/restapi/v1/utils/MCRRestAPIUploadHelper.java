@@ -140,7 +140,7 @@ public class MCRRestAPIUploadHelper {
 
                 MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
                 MCRUserInformation currentUser = mcrSession.getUserInformation();
-                MCRUserInformation apiUser = MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromSessionToken(signedJWT));
+                MCRUserInformation apiUser = MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT));
                 mcrSession.setUserInformation(apiUser);
                 MCRObjectCommands.updateFromFile(fXML.toString(), false); // handles "create" as well
                 mcrSession.setUserInformation(currentUser);
@@ -179,7 +179,7 @@ public class MCRRestAPIUploadHelper {
             try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
                 MCRSession session = MCRServlet.getSession(request);
                 MCRUserInformation currentUser = session.getUserInformation();
-                MCRUserInformation apiUser = MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromSessionToken(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request)));
+                MCRUserInformation apiUser = MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request)));
                 session.setUserInformation(apiUser);
 
                 MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjID);
@@ -239,7 +239,7 @@ public class MCRRestAPIUploadHelper {
                 //ToDo error handling
             }
             if (!(MCRJSONWebTokenUtil.validateToken(request) && verifyPropertiesBySignature(parameter, base64Signature,
-                MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader( MCRJSONWebTokenUtil.retrieveAuthenticationToken(request))))) {
+                MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken( MCRJSONWebTokenUtil.retrieveAuthenticationToken(request))))) {
                 //validation failed -> error handling
 
             } else {
@@ -345,7 +345,7 @@ public class MCRRestAPIUploadHelper {
                 //ToDo error handling
             }
             if (!(MCRJSONWebTokenUtil.validateToken(request) && verifyPropertiesBySignature(parameter, base64Signature,
-                MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader( MCRJSONWebTokenUtil.retrieveAuthenticationToken(request))))) {
+                MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request))))) {
 
                 //validation failed -> error handling
 
@@ -402,7 +402,7 @@ public class MCRRestAPIUploadHelper {
             }
             SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
             if (!(MCRJSONWebTokenUtil.validateToken(request) && verifyPropertiesBySignature(parameter, base64Signature,
-                MCRJSONWebTokenUtil.retrievePublicKeyFromSignedTokenHeader( signedJWT)))) {
+                MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT)))) {
 
                 //validation failed -> error handling
 
@@ -411,7 +411,7 @@ public class MCRRestAPIUploadHelper {
                     //MCRSession session = MCRServlet.getSession(request);
                     MCRSession session = MCRSessionMgr.getCurrentSession();
                     MCRUserInformation currentUser = session.getUserInformation();
-                    session.setUserInformation(MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromSessionToken(signedJWT)));
+                    session.setUserInformation(MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT)));
                     MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
                     MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 

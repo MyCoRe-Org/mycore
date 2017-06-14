@@ -123,7 +123,7 @@ public class MCRJSONWebTokenUtil {
         return null;
     }
 
-    public static JWK retrievePublicKeyFromSignedTokenHeader(SignedJWT signedJWT) {
+    public static JWK retrievePublicKeyFromAuthenticationToken(SignedJWT signedJWT) {
         JWK result = null;
         try {
             result = signedJWT.getHeader().getJWK();
@@ -139,7 +139,7 @@ public class MCRJSONWebTokenUtil {
         return null;
     }
 
-    public static String retrieveUsernameFromSessionToken(SignedJWT signedJWT) {
+    public static String retrieveUsernameFromAuthenticationToken(SignedJWT signedJWT) {
         try {
             // Extract payload
 
