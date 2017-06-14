@@ -1,5 +1,13 @@
 package org.mycore.pi;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,14 +22,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
@@ -149,7 +149,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
         configuration.put("MCR.Metadata.Store.BaseDir", baseDir.getRoot().getAbsolutePath());
         try {
-            configuration.put("MCR.Metadata.Store.SVNBase", baseDir.newFolder("versions").getAbsolutePath());
+            configuration.put("MCR.Metadata.Store.SVNBase", baseDir.newFolder("versions").toURI().toString());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
