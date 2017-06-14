@@ -27,30 +27,29 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Base64;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRStaticContent;
+import org.mycore.restapi.v1.errors.MCRRestAPIError;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.SignedJWT;
-import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier;
-import com.nimbusds.jwt.proc.JWTClaimsSetVerifier;
 
 /**
  * Rest Controller that handles authentication.
@@ -160,74 +159,51 @@ public class MCRRestAPIAuthentication {
         String txt = "-----BEGIN PUBLIC KEY-----\n"
             + Base64.getEncoder().encodeToString(MCRJSONWebTokenUtil.RSA_KEYS.getPublic().getEncoded())
             + "\n-----END PUBLIC KEY-----";
-       return Response.ok(txt).type("text/plain; charset=UTF-8").build();
+        return Response.ok(txt).type("text/plain; charset=UTF-8").build();
     }
-    
+
     private String validateUser(String username, String password, JWK clientPubKey) {
         MCRUser user = MCRUserManager.checkPassword(username, password);
-        if (user!=null) {
+        if (user != null) {
             return MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("rest-api"), "http://localhost:8080/",
                 clientPubKey);
         }
         return null;
     }
 
-    //TODO validate Token (Signatur und Zeitliche Gültigkeit)
-    private boolean validateToken(String token) {
-        JWTClaimsSetVerifier claimsVerifier = new DefaultJWTClaimsVerifier<SecurityContext>();
-
-        return true;
-    }
-
     @POST
     @Path("/renew")
-    public Response renew(@DefaultValue("") String data,
-        @DefaultValue("")@HeaderParam("Authorization") String authorization) {
-        if (authorization.startsWith("Bearer ")) {
-            String authToken = authorization.substring(7).trim();
-            try {
-                JWSObject jwsObj = JWSObject.parse(authToken);
-                SignedJWT signedJWT = jwsObj.getPayload().toSignedJWT();
-                // JWK class does equals only by object id
-                if (signedJWT.verify(new RSASSAVerifier((RSAPublicKey) MCRJSONWebTokenUtil.RSA_KEYS.getPublic()))
-                    && jwsObj.getHeader().getJWK().toJSONString()
-                        .equals(JWK.parse(signedJWT.getJWTClaimsSet().getJSONObjectClaim("sub_jwk")).toJSONString())) {
+    public Response renew(@DefaultValue("") String data, @Context HttpServletRequest request) {
+        try {
+            SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
 
-                    String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT);
+            String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT);
+            JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT);
+            if (submittedUser != null && clientPubKey != null) {
+                String jwt = MCRJSONWebTokenUtil.createJWT(submittedUser, Arrays.asList("rest-api"),
+                    MCRFrontendUtil.getBaseURL(), clientPubKey);
+                if (jwt != null) {
+                    StringBuffer msg = new StringBuffer();
+                    msg.append("{");
+                    msg.append("\n    \"executed\":true,");
+                    msg.append("\n    \"access_token\": \"" + jwt + "\",");
+                    msg.append("\n    \"token_type\": \"Bearer\",");
+                    msg.append("\n    \"data\": \"" + data + "\",");
 
-                    JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT);
-                    if (submittedUser != null && clientPubKey != null) {
-                        String jwt = MCRJSONWebTokenUtil.createJWT(submittedUser, Arrays.asList("rest-api"),
-                            MCRFrontendUtil.getBaseURL(), clientPubKey);
-                        if (jwt != null) {
-                            StringBuffer msg = new StringBuffer();
-                            msg.append("{");
-                            msg.append("\n    \"executed\":true,");
-                            msg.append("\n    \"access_token\": \"" + jwt + "\",");
-                            msg.append("\n    \"token_type\": \"Bearer\",");
-                            msg.append("\n    \"data\": \"" + data + "\",");
+                    msg.append("\n}");
 
-                            msg.append("\n}");
-
-                            return Response.ok(msg.toString()).type("application/json; charset=UTF-8").build();
-                        }
-                    }
+                    return Response.ok(msg.toString()).type("application/json; charset=UTF-8").build();
                 }
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
-            return Response.status(Status.FORBIDDEN).entity("Session cannot be renewed!").type("text/plain; charset=UTF-8").build();
+        } catch (MCRRestAPIException rae) {
+            return MCRRestAPIError.createHttpResponseFromErrorList(rae.getErrors());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return MCRRestAPIError.create(Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
+                "Session cannot be renewed!", e.getMessage()).createHttpResponse();
         }
-
-        StringBuffer msg = new StringBuffer();
-        msg.append("{");
-        msg.append("\n    \"executed\":false,");
-        msg.append("\n    \"error\": \"permission_denied\"");
-        msg.append("\n    \"error_description\": \"Please provide a valid JWT Token for the session.\"");
-        msg.append("\n}");
-        
-        return Response.status(Status.FORBIDDEN).entity(msg.toString()).type("application/json; charset=UTF-8").build();
+        return MCRRestAPIError.create(Status.FORBIDDEN, MCRRestAPIError.CODE_INVALID_AUTHENCATION, "Permission denied",
+            "Please provide a valid JWT Token for the session.").createHttpResponse();
     }
-
 }
