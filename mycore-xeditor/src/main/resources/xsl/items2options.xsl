@@ -5,6 +5,7 @@
   <xsl:param name="DefaultLang" />
   <xsl:param name="MaxLengthVisible" />
   <xsl:param name="Mode" />
+  <xsl:param name="allSelectable" select="false" />
 
   <xsl:variable name="editor.list.indent" select="'&#160;&#160;&#160;'" />
   <xsl:template match="items">
@@ -29,7 +30,7 @@
     </xsl:variable>
     
     <xsl:choose>
-	    <xsl:when test="label[lang('x-group')]">
+	    <xsl:when test="label[lang('x-group')] and not($allSelectable='true')">
 		   	<optgroup title="{$toolTip}">
 		   	  <xsl:attribute name="label">
 		   	  	<xsl:value-of select="$indent" disable-output-escaping="yes" />
@@ -43,7 +44,7 @@
 	    </xsl:when>
 	    <xsl:otherwise>
 	        <option title="{$toolTip}">
-	          <xsl:if test="label[lang('x-disable')]">
+	          <xsl:if test="label[lang('x-disable')] and not($allSelectable='true')">
 		   	  	<xsl:attribute name="disabled"/>
 		   	  </xsl:if>
 		      <xsl:copy-of select="@*" />
