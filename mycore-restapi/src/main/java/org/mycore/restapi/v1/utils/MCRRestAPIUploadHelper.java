@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
 import java.util.SortedMap;
@@ -42,12 +43,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -108,11 +103,6 @@ public class MCRRestAPIUploadHelper {
      * based upon:    
      * http://puspendu.wordpress.com/2012/08/23/restful-webservice-file-upload-with-jersey/
      */
-
-    @POST
-    @Path("/objects/")
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public static Response uploadObject(UriInfo info, HttpServletRequest request, InputStream uploadedInputStream,
         FormDataContentDisposition fileDetails) {
         try {
@@ -146,7 +136,9 @@ public class MCRRestAPIUploadHelper {
                     mcrSession.setUserInformation(currentUser);
 
                     return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
-                        .type("application/xml; charset=UTF-8").header("Authorization", "Bearer "+MCRJSONWebTokenUtil.createJWT(signedJWT).serialize()).build();
+                        .type("application/xml; charset=UTF-8")
+                        .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize())
+                        .build();
 
                 } catch (Exception e) {
                     LOGGER.error("Unable to Upload file: " + String.valueOf(fXML), e);
@@ -169,18 +161,14 @@ public class MCRRestAPIUploadHelper {
         }
         return MCRRestAPIError.create(Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
             "Could not upload the file", null).createHttpResponse();
-
     }
 
-    @POST
-    @Path("/objects/id/{mcrObjID}/derivates")
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String formParamlabel) {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         try {
             if (MCRRestAPIUtil.checkWriteAccessForIP(request)) {
+                SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
                 //  File fXML = null;
                 MCRObjectID mcrObjID = MCRObjectID.getInstance(pathParamMcrObjID);
 
@@ -188,8 +176,7 @@ public class MCRRestAPIUploadHelper {
                     MCRSession session = MCRServlet.getSession(request);
                     MCRUserInformation currentUser = session.getUserInformation();
                     MCRUserInformation apiUser = MCRUserManager
-                        .getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(
-                            MCRJSONWebTokenUtil.retrieveAuthenticationToken(request)));
+                        .getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT));
                     session.setUserInformation(apiUser);
 
                     MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjID);
@@ -219,7 +206,9 @@ public class MCRRestAPIUploadHelper {
                     response = Response
                         .created(info.getBaseUriBuilder()
                             .path("v1/objects/" + mcrObjID.toString() + "/derivates/" + derID.toString()).build())
-                        .type("application/xml; charset=UTF-8").build();
+                        .type("application/xml; charset=UTF-8")
+                        .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize())
+                        .build();
                     session.setUserInformation(currentUser);
                 } catch (Exception e) {
                     LOGGER.error("Exeption while uploading derivate", e);
@@ -253,9 +242,8 @@ public class MCRRestAPIUploadHelper {
                 if (base64Signature == null) {
                     //ToDo error handling
                 }
-                if (verifyPropertiesBySignature(parameter,
-                    base64Signature, MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(
-                        signedJWT))) {
+                if (verifyPropertiesBySignature(parameter, base64Signature,
+                    MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT))) {
                     try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
                         //MCRSession session = MCRServlet.getSession(request);
                         MCRSession session = MCRSessionMgr.getCurrentSession();
@@ -331,13 +319,17 @@ public class MCRRestAPIUploadHelper {
                                 }
                             }
                             session.setUserInformation(currentUser);
-                            response = Response.created(info.getBaseUriBuilder()
-                                .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
-                                .build()).type("application/xml; charset=UTF-8").build();
+                            response = Response
+                                .created(info.getBaseUriBuilder()
+                                    .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString()
+                                        + "/contents")
+                                    .build())
+                                .type("application/xml; charset=UTF-8").header("Authorization",
+                                    "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize())
+                                .build();
                         }
                     }
-                }
-                else{
+                } else {
                     //TODO error handling
                 }
             }
@@ -347,10 +339,6 @@ public class MCRRestAPIUploadHelper {
         return response;
     }
 
-    @DELETE
-    @Path("/objects/{mcrObjID}/derivates/{mcrDerID}/contents")
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public static Response deleteAllFiles(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) {
 
@@ -390,9 +378,15 @@ public class MCRRestAPIUploadHelper {
                         }
 
                         session.setUserInformation(currentUser);
-                        response = Response.created(info.getBaseUriBuilder()
-                            .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
-                            .build()).type("application/xml; charset=UTF-8").build();
+                        response = Response
+                            .created(
+                                info.getBaseUriBuilder()
+                                    .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString()
+                                        + "/contents")
+                                    .build())
+                            .type("application/xml; charset=UTF-8")
+                            .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize())
+                            .build();
                     }
                 } else {
                     //TODO Error handling
@@ -404,18 +398,13 @@ public class MCRRestAPIUploadHelper {
         return response;
     }
 
-    /**
-    @DELETE
-    @Path("/objects/{mcrObjID}/derivates/{mcrDerID}")
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    */
     public static Response deleteDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) {
 
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         try {
             if (MCRRestAPIUtil.checkWriteAccessForIP(request)) {
+                SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
                 SortedMap<String, String> parameter = new TreeMap<>();
                 parameter.put("mcrObjectID", pathParamMcrObjID);
                 parameter.put("mcrDerivateID", pathParamMcrDerID);
@@ -424,7 +413,6 @@ public class MCRRestAPIUploadHelper {
                 if (base64Signature == null) {
                     //ToDo error handling
                 }
-                SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
                 try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
                     //MCRSession session = MCRServlet.getSession(request);
                     MCRSession session = MCRSessionMgr.getCurrentSession();
@@ -447,7 +435,9 @@ public class MCRRestAPIUploadHelper {
                     session.setUserInformation(currentUser);
                     response = Response
                         .created(info.getBaseUriBuilder().path("v1/objects/" + objID.toString() + "/derivates").build())
-                        .type("application/xml; charset=UTF-8").build();
+                        .type("application/xml; charset=UTF-8")
+                        .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize())
+                        .build();
                 }
             }
         } catch (MCRRestAPIException e) {
@@ -461,18 +451,20 @@ public class MCRRestAPIUploadHelper {
         try {
             String message = generateJSONMessageFromProperties(data);
             Signature signature = Signature.getInstance("SHA1withRSA");
-            RSAKey key = (RSAKey) clientPublicJWK;
-            signature.initVerify(key.toPublicKey());
+            PublicKey pubkey = ((RSAKey) clientPublicJWK).toPublicKey();
+
+            signature.initVerify(pubkey);
             signature.update(message.getBytes(StandardCharsets.UTF_8));
 
-            return signature.verify(Base64.getDecoder().decode(base64Signature.getBytes(StandardCharsets.UTF_8)));
+            boolean x = signature.verify(Base64.getDecoder().decode(base64Signature.getBytes(StandardCharsets.UTF_8)));
+            return x;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    private static String generateJSONMessageFromProperties(SortedMap<String, String> data) {
+    public static String generateJSONMessageFromProperties(SortedMap<String, String> data) {
         StringWriter sw = new StringWriter();
         sw.append("{");
         for (String key : data.keySet()) {
