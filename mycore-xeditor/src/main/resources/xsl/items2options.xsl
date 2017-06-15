@@ -5,7 +5,7 @@
   <xsl:param name="DefaultLang" />
   <xsl:param name="MaxLengthVisible" />
   <xsl:param name="Mode" />
-  <xsl:param name="allSelectable" select="false" />
+  <xsl:param name="allSelectable" select="'false'" />
 
   <xsl:variable name="editor.list.indent" select="'&#160;&#160;&#160;'" />
   <xsl:template match="items">
