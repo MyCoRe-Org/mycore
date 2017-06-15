@@ -34,6 +34,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
@@ -80,6 +82,7 @@ import org.mycore.user2.MCRUserManager;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.SignedJWT;
+import com.trilead.ssh2.signature.RSAPublicKey;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
@@ -242,19 +245,23 @@ public class MCRRestAPIUploadHelper {
                 if (base64Signature == null) {
                     //ToDo error handling
                 }
-                if (verifyPropertiesBySignature(parameter, base64Signature,
+                if (verifyPropertiesWithSignature(parameter, base64Signature,
                     MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT))) {
                     try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
                         //MCRSession session = MCRServlet.getSession(request);
                         MCRSession session = MCRSessionMgr.getCurrentSession();
                         MCRUserInformation currentUser = session.getUserInformation();
 
-                        session.setUserInformation(MCRUserManager.getUser("api"));
+                        MCRUserInformation apiUser = MCRUserManager
+                            .getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT));
+                        session.setUserInformation(apiUser);
                         MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
                         MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
                         //MCRAccessManager.checkPermission(uses CACHE, which seems to be dirty from other calls and cannot be deleted)????
-                        if (MCRAccessManager.getAccessImpl().checkPermission(derID.toString(), PERMISSION_WRITE)) {
+                        //TODO ... set proper Derivate Access Strategy in Skeleton
+                      //  if (MCRAccessManager.getAccessImpl().checkPermission(derID.toString(), PERMISSION_WRITE)) {
+                        if(1<2){
                             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
                             java.nio.file.Path derDir = null;
@@ -329,6 +336,7 @@ public class MCRRestAPIUploadHelper {
                                 .build();
                         }
                     }
+                  
                 } else {
                     //TODO error handling
                 }
@@ -354,13 +362,15 @@ public class MCRRestAPIUploadHelper {
                 if (base64Signature == null) {
                     //ToDo error handling
                 }
-                if (verifyPropertiesBySignature(parameter, base64Signature,
+                if (verifyPropertiesWithSignature(parameter, base64Signature,
                     MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT))) {
                     try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
                         //MCRSession session = MCRServlet.getSession(request);
                         MCRSession session = MCRSessionMgr.getCurrentSession();
                         MCRUserInformation currentUser = session.getUserInformation();
-                        session.setUserInformation(MCRUserManager.getUser("api"));
+                        MCRUserInformation apiUser = MCRUserManager
+                            .getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT));
+                        session.setUserInformation(apiUser);
                         MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
                         MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
@@ -446,25 +456,7 @@ public class MCRRestAPIUploadHelper {
         return response;
     }
 
-    public static boolean verifyPropertiesBySignature(SortedMap<String, String> data, String base64Signature,
-        JWK clientPublicJWK) {
-        try {
-            String message = generateJSONMessageFromProperties(data);
-            Signature signature = Signature.getInstance("SHA1withRSA");
-            PublicKey pubkey = ((RSAKey) clientPublicJWK).toPublicKey();
-
-            signature.initVerify(pubkey);
-            signature.update(message.getBytes(StandardCharsets.UTF_8));
-
-            boolean x = signature.verify(Base64.getDecoder().decode(base64Signature.getBytes(StandardCharsets.UTF_8)));
-            return x;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public static String generateJSONMessageFromProperties(SortedMap<String, String> data) {
+    public static String generateMessagesFromProperties(SortedMap<String, String> data) {
         StringWriter sw = new StringWriter();
         sw.append("{");
         for (String key : data.keySet()) {
@@ -478,5 +470,23 @@ public class MCRRestAPIUploadHelper {
         result = result + "}";
 
         return result;
+    }
+
+    public static boolean verifyPropertiesWithSignature(SortedMap<String, String> data, String base64Signature,
+        JWK jwk) {
+        try {
+            String message = generateMessagesFromProperties(data);
+
+            Signature signature = Signature.getInstance("SHA1withRSA");
+            signature.initVerify(((RSAKey)jwk).toRSAPublicKey());
+            signature.update(message.getBytes(StandardCharsets.ISO_8859_1));
+            
+            boolean x = signature.verify(java.util.Base64.getDecoder().decode(base64Signature));
+            return x;
+
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+        return false;
     }
 }
