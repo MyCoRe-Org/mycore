@@ -146,7 +146,7 @@ public class MCRRestAPIUploadHelper {
                     mcrSession.setUserInformation(currentUser);
 
                     return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
-                        .type("application/xml; charset=UTF-8").build();
+                        .type("application/xml; charset=UTF-8").header("Authorization", "Bearer "+MCRJSONWebTokenUtil.createJWT(signedJWT).serialize()).build();
 
                 } catch (Exception e) {
                     LOGGER.error("Unable to Upload file: " + String.valueOf(fXML), e);

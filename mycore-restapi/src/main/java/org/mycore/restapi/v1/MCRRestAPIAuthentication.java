@@ -120,7 +120,7 @@ public class MCRRestAPIAuthentication {
         }
         //validate username and password
         if (username != null && password != null && MCRUserManager.checkPassword(username, password) != null) {
-            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("rest-api"), "http://localhost:8080/",
+            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("rest-api"), MCRFrontendUtil.getBaseURL(),
                 clientPubKey);
             if (jwt != null) {
                 StringBuffer msg = new StringBuffer();

@@ -141,8 +141,8 @@ public class MCRJSONWebTokenUtil {
     public static JWK retrievePublicKeyFromAuthenticationToken(SignedJWT signedJWT) {
         JWK result = null;
         try {
-            result = signedJWT.getHeader().getJWK();
-            RSAKey publicKey = RSAKey.parse(result.toJSONObject());
+            result = JWK.parse(signedJWT.getJWTClaimsSet().getJSONObjectClaim("sub_jwk"));
+            RSAKey publicKey = (RSAKey)signedJWT.getHeader().getJWK();
             if (signedJWT.verify(new RSASSAVerifier(publicKey))) {
                 return result;
             }
