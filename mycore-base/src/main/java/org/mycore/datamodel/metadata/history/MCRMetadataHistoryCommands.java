@@ -5,12 +5,18 @@ package org.mycore.datamodel.metadata.history;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -20,6 +26,8 @@ import javax.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.common.MCRCreatorCache;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -33,6 +41,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.util.concurrent.MCRTransactionableCallable;
 import org.xml.sax.SAXException;
 
 /**
@@ -41,7 +50,7 @@ import org.xml.sax.SAXException;
  */
 @MCRCommandGroup(name = "Metadata history")
 public class MCRMetadataHistoryCommands {
-
+    
     @MCRCommand(syntax = "clear metadata history of base {0}", help = "clears metadata history of all objects with base id {0}")
     public static void clearHistory(String baseId) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
@@ -88,23 +97,47 @@ public class MCRMetadataHistoryCommands {
     @MCRCommand(syntax = "build metadata history of base {0}", help = "build metadata history of all objects with base id {0}")
     public static List<String> buildHistory(String baseId) {
         MCRMetadataStore store = MCRXMLMetadataManager.instance().getStore(baseId);
-        return IntStream.rangeClosed(1, store.getHighestStoredID())
+        ExecutorService executorService = Executors.newWorkStealingPool();
+        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+        int maxId = store.getHighestStoredID();
+        AtomicInteger completed = new AtomicInteger(maxId);
+        IntStream.rangeClosed(1, maxId)
+            .parallel()
             .mapToObj(i -> MCRObjectID.formatID(baseId, i))
-            .map(id -> "build metadata history of id " + id)
-            .collect(Collectors.toList());
+            .map(MCRObjectID::getInstance)
+            .map(id -> new MCRTransactionableCallable<Object>(Executors.callable(() -> {
+                EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+                getHistoryItems(id).sequential().forEach(em::persist);
+                completed.decrementAndGet();
+            }), currentSession))
+            .forEach(executorService::submit);
+        executorService.shutdown();
+        boolean waitToFinish = true;
+        while (!executorService.isTerminated() && waitToFinish) {
+            LogManager.getLogger().info("Waiting for history of {} objects/derivates.", completed.get());
+            try {
+                executorService.awaitTermination(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                waitToFinish = false;
+            }
+        }
+        return Collections.emptyList();
     }
 
     @MCRCommand(syntax = "build metadata history of id {0}", help = "build metadata history of object/derivate with id {0}")
     public static void buildSingleHistory(String mcrId) {
         MCRObjectID objId = MCRObjectID.getInstance(mcrId);
-        if (objId.getTypeId().equals("derivate")) {
-            buildDerivateHistory(objId);
-        } else {
-            buildObjectHistory(objId);
-        }
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        getHistoryItems(objId).sequential().forEach(em::persist);
     }
 
-    private static void buildDerivateHistory(MCRObjectID derId) {
+    private static Stream<MCRMetaHistoryItem> getHistoryItems(MCRObjectID objId) {
+        Stream<MCRMetaHistoryItem> items = objId.getTypeId().equals("derivate") ? buildDerivateHistory(objId)
+            : buildObjectHistory(objId);
+        return items;
+    }
+
+    private static Stream<MCRMetaHistoryItem> buildDerivateHistory(MCRObjectID derId) {
         try {
             List<MCRMetadataVersion> versions = Collections.emptyList();
             MCRMetadataStore store = MCRXMLMetadataManager.instance().getStore(derId);
@@ -114,16 +147,17 @@ public class MCRMetadataHistoryCommands {
                 versions = versionedMetadata.listVersions();
             }
             if (versions.isEmpty()) {
-                buildSimpleDerivateHistory(derId);
+                return buildSimpleDerivateHistory(derId);
             } else {
-                buildDerivateHistory(derId, versions);
+                return buildDerivateHistory(derId, versions);
             }
         } catch (IOException e) {
             LogManager.getLogger().error("Error while getting history of " + derId);
+            return Stream.empty();
         }
     }
 
-    private static void buildObjectHistory(MCRObjectID objId) {
+    private static Stream<MCRMetaHistoryItem> buildObjectHistory(MCRObjectID objId) {
         try {
             List<MCRMetadataVersion> versions = Collections.emptyList();
             MCRMetadataStore store = MCRXMLMetadataManager.instance().getStore(objId);
@@ -133,19 +167,19 @@ public class MCRMetadataHistoryCommands {
                 versions = versionedMetadata.listVersions();
             }
             if (versions.isEmpty()) {
-                buildSimpleObjectHistory(objId);
+                return buildSimpleObjectHistory(objId);
             } else {
-                buildObjectHistory(objId, versions);
+                return buildObjectHistory(objId, versions);
             }
         } catch (IOException e) {
             LogManager.getLogger().error("Error while getting history of " + objId);
+            return Stream.empty();
         }
     }
 
-    private static void buildSimpleDerivateHistory(MCRObjectID derId) throws IOException {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+    private static Stream<MCRMetaHistoryItem> buildSimpleDerivateHistory(MCRObjectID derId) throws IOException {
         boolean exist = false;
-        LogManager.getLogger().info("Store of {} has no old revisions. History rebuild is limited", derId);
+        LogManager.getLogger().debug("Store of {} has no old revisions. History rebuild is limited", derId);
         if (MCRMetadataManager.exists(derId)) {
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derId);
             Instant lastModified = Instant
@@ -159,24 +193,23 @@ public class MCRMetadataHistoryCommands {
             }
             String user = Optional.ofNullable(creator)
                 .orElseGet(() -> MCRSystemUserInformation.getSystemUserInstance().getUserID());
-            em.persist(create(derId,
+            MCRMetaHistoryItem create = create(derId,
                 user,
-                lastModified));
+                lastModified);
             exist = true;
             boolean objectIsHidden = !der.getDerivate().isDisplayEnabled();
             if (objectIsHidden && exist) {
-                em.persist(delete(derId, user, lastModified.plusMillis(1)));
-                exist ^= true;
+                return Stream.of(create, delete(derId, user, lastModified.plusMillis(1)));
             }
+            return Stream.of(create);
         } else {
-            em.persist(delete(derId, null, Instant.now()));
+            return Stream.of(delete(derId, null, Instant.now()));
         }
     }
 
-    private static void buildSimpleObjectHistory(MCRObjectID objId) throws IOException {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+    private static Stream<MCRMetaHistoryItem> buildSimpleObjectHistory(MCRObjectID objId) throws IOException {
         boolean exist = false;
-        LogManager.getLogger().info("Store of {} has no old revisions. History rebuild is limited", objId);
+        LogManager.getLogger().debug("Store of {} has no old revisions. History rebuild is limited", objId);
         if (MCRMetadataManager.exists(objId)) {
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(objId);
             Instant lastModified = Instant
@@ -190,37 +223,36 @@ public class MCRMetadataHistoryCommands {
             }
             String user = Optional.ofNullable(creator)
                 .orElseGet(() -> MCRSystemUserInformation.getSystemUserInstance().getUserID());
-            em.persist(create(objId,
-                user,
-                lastModified));
+            MCRMetaHistoryItem create = create(objId, user, lastModified);
             exist = true;
             boolean objectIsHidden = MCRMetadataHistoryManager.objectIsHidden(obj);
             if (objectIsHidden && exist) {
-                em.persist(delete(objId, user, lastModified.plusMillis(1)));
-                exist ^= true;
+                return Stream.of(create, delete(objId, user, lastModified.plusMillis(1)));
             }
+            return Stream.of(create);
         } else {
-            em.persist(delete(objId, null, Instant.now()));
+            return Stream.of(delete(objId, null, Instant.now()));
         }
     }
 
-    private static void buildDerivateHistory(MCRObjectID derId, List<MCRMetadataVersion> versions) throws IOException {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+    private static Stream<MCRMetaHistoryItem> buildDerivateHistory(MCRObjectID derId, List<MCRMetadataVersion> versions)
+        throws IOException {
         boolean exist = false;
-        LogManager.getLogger().info("Complete history rebuild of {} should be possible", derId);
+        LogManager.getLogger().debug("Complete history rebuild of {} should be possible", derId);
+        ArrayList<MCRMetaHistoryItem> items = new ArrayList<>(100);
         for (MCRMetadataVersion version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();
             if (version.getType() == MCRMetadataVersion.DELETED) {
                 if (exist) {
-                    em.persist(delete(derId, user, revDate));
+                    items.add(delete(derId, user, revDate));
                     exist = false;
                 }
             } else {
                 //created or updated
                 int timeOffset = 0;
                 if (version.getType() == MCRMetadataVersion.CREATED && !exist) {
-                    em.persist(create(derId, user, revDate));
+                    items.add(create(derId, user, revDate));
                     timeOffset = 1;
                     exist = true;
                 }
@@ -228,10 +260,10 @@ public class MCRMetadataHistoryCommands {
                     MCRDerivate derivate = new MCRDerivate(version.retrieve().asXML());
                     boolean derivateIsHidden = !derivate.getDerivate().isDisplayEnabled();
                     if (derivateIsHidden && exist) {
-                        em.persist(delete(derId, user, revDate.plusMillis(timeOffset)));
+                        items.add(delete(derId, user, revDate.plusMillis(timeOffset)));
                         exist = false;
                     } else if (!derivateIsHidden && !exist) {
-                        em.persist(create(derId, user,
+                        items.add(create(derId, user,
                             revDate.plusMillis(timeOffset)));
                         exist = true;
                     }
@@ -241,25 +273,27 @@ public class MCRMetadataHistoryCommands {
                 }
             }
         }
+        return items.stream();
     }
 
-    private static void buildObjectHistory(MCRObjectID objId, List<MCRMetadataVersion> versions) throws IOException {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+    private static Stream<MCRMetaHistoryItem> buildObjectHistory(MCRObjectID objId, List<MCRMetadataVersion> versions)
+        throws IOException {
         boolean exist = false;
-        LogManager.getLogger().info("Complete history rebuild of {} should be possible", objId);
+        LogManager.getLogger().debug("Complete history rebuild of {} should be possible", objId);
+        ArrayList<MCRMetaHistoryItem> items = new ArrayList<>(100);
         for (MCRMetadataVersion version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();
             if (version.getType() == MCRMetadataVersion.DELETED) {
                 if (exist) {
-                    em.persist(delete(objId, user, revDate));
+                    items.add(delete(objId, user, revDate));
                     exist = false;
                 }
             } else {
                 //created or updated
                 int timeOffset = 0;
                 if (version.getType() == MCRMetadataVersion.CREATED && !exist) {
-                    em.persist(create(objId, user, revDate));
+                    items.add(create(objId, user, revDate));
                     timeOffset = 1;
                     exist = true;
                 }
@@ -267,10 +301,10 @@ public class MCRMetadataHistoryCommands {
                     MCRObject obj = new MCRObject(version.retrieve().asXML());
                     boolean objectIsHidden = MCRMetadataHistoryManager.objectIsHidden(obj);
                     if (objectIsHidden && exist) {
-                        em.persist(delete(objId, user, revDate.plusMillis(timeOffset)));
+                        items.add(delete(objId, user, revDate.plusMillis(timeOffset)));
                         exist = false;
                     } else if (!objectIsHidden && !exist) {
-                        em.persist(create(objId, user, revDate.plusMillis(timeOffset)));
+                        items.add(create(objId, user, revDate.plusMillis(timeOffset)));
                         exist = true;
                     }
                 } catch (JDOMException | SAXException e) {
@@ -279,6 +313,7 @@ public class MCRMetadataHistoryCommands {
                 }
             }
         }
+        return items.stream();
     }
 
     private static MCRMetaHistoryItem create(MCRObjectID mcrid, String author, Instant instant) {
@@ -296,7 +331,7 @@ public class MCRMetadataHistoryCommands {
         item.setTime(instant);
         item.setUserID(author);
         item.setEventType(eventType);
-        LogManager.getLogger().info(() -> item);
+        LogManager.getLogger().debug(() -> item);
         return item;
     }
 

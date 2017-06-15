@@ -24,10 +24,8 @@ import org.mycore.datamodel.metadata.history.MCRMetadataHistoryEventType;
     @NamedQuery(name="MCRMetaHistory.getLastDeleted", query="SELECT MAX(time) FROM MCRMetaHistoryItem WHERE id=:id and eventType='D'"),
     @NamedQuery(name="MCRMetaHistory.getLastEventByID", 
         query="SELECT a FROM MCRMetaHistoryItem a "
-            + "LEFT OUTER JOIN MCRMetaHistoryItem b "
-            + "ON a.id = b.id AND a.time BETWEEN :from AND :until AND "
-            + "b.time BETWEEN :from AND :until AND a.time < b.time "
-            + "WHERE b.id IS NULL"),
+            + "WHERE a.time in (SELECT max(time) as time FROM MCRMetaHistoryItem b WHERE a.id=b.id AND time BETWEEN :from AND :until group by id) "
+            + "AND a.eventType=:eventType"),
     @NamedQuery(name="MCRMetaHistory.getFirstDate", query="SELECT MIN(time) from MCRMetaHistoryItem")
 })
 public class MCRMetaHistoryItem implements Serializable {

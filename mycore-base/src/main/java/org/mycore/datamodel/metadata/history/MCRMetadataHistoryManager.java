@@ -27,10 +27,14 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRMetadataHistoryManager extends MCREventHandlerBase {
 
-    public Instant getHistoryStart() {
+    public static Optional<Instant> getHistoryStart() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<Instant> query = em.createNamedQuery("MCRMetaHistory.getFirstDate", Instant.class);
-        return query.getSingleResult();
+        try {
+            return Optional.of(query.getSingleResult());
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
     public static Map<MCRObjectID, Instant> getDeletedItems(Instant from, Optional<Instant> until) {
@@ -39,9 +43,9 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
             MCRMetaHistoryItem.class);
         query.setParameter("from", from);
         query.setParameter("until", until.orElseGet(Instant::now));
+        query.setParameter("eventType", MCRMetadataHistoryEventType.Delete);
         return query.getResultList()
             .stream()
-            .filter(hi -> hi.getEventType() == MCRMetadataHistoryEventType.Delete)
             .collect(Collectors.toMap(MCRMetaHistoryItem::getId, MCRMetaHistoryItem::getTime));
     }
 

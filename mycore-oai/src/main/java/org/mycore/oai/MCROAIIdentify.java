@@ -22,16 +22,15 @@
 package org.mycore.oai;
 
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.FriendsDescription;
@@ -137,8 +136,7 @@ public class MCROAIIdentify extends SimpleIdentify {
             datestamp = MCROAISearchManager.getSearcher(this, null, 1, null, null).getEarliestTimestamp();
             // deleted items
             if (DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
-                Instant earliestDeletedDate = MCRDeletedItemManager.getFirstDate()
-                    .map(ZonedDateTime::toInstant)
+                Instant earliestDeletedDate = MCRMetadataHistoryManager.getHistoryStart()
                     .orElse(null);
                 if (earliestDeletedDate != null && earliestDeletedDate.isBefore(datestamp)) {
                     datestamp = earliestDeletedDate;

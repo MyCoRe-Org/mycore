@@ -1,7 +1,6 @@
 package org.mycore.oai;
 
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Random;
 
@@ -66,7 +65,7 @@ public abstract class MCROAISearcher {
 
     public abstract MCROAIResult query(String cursor);
 
-    public abstract MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until);
+    public abstract MCROAIResult query(MCRSet set, Instant from, Instant until);
 
     public abstract Instant getEarliestTimestamp();
 

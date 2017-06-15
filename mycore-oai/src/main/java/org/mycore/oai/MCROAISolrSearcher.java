@@ -1,7 +1,8 @@
 package org.mycore.oai;
 
+import java.io.IOException;
 import java.time.Instant;
-import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Date;
@@ -13,12 +14,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRISO8601FormatChooser;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Set;
@@ -41,9 +44,9 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
     private MCRSet set;
 
-    private ZonedDateTime from;
+    private Instant from;
 
-    private ZonedDateTime until;
+    private Instant until;
 
     /**
      * Solr always returns a nextCursorMark even when the end of the list is reached.
@@ -79,18 +82,26 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     public MCROAIResult query(String cursor) {
         this.updateRunningExpirationTimer();
         Optional<String> currentCursor = Optional.of(cursor);
-        return handleResult(currentCursor.equals(this.lastCursor) ? this.nextResult : solrQuery(currentCursor));
+        try {
+            return handleResult(currentCursor.equals(this.lastCursor) ? this.nextResult : solrQuery(currentCursor));
+        } catch (SolrServerException | IOException e) {
+            throw new MCRException("Error while handling query.", e);
+        }
     }
 
     @Override
-    public MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until) {
+    public MCROAIResult query(MCRSet set, Instant from, Instant until) {
         this.set = set;
         this.from = from;
         this.until = until;
-        return handleResult(solrQuery(Optional.empty()));
+        try {
+            return handleResult(solrQuery(Optional.empty()));
+        } catch (SolrServerException | IOException e) {
+            throw new MCRException("Error while handling query.", e);
+        }
     }
 
-    private MCROAIResult handleResult(MCROAISolrResult result) {
+    private MCROAIResult handleResult(MCROAISolrResult result) throws SolrServerException, IOException {
         this.nextResult = solrQuery(result.nextCursor());
         this.lastCursor = result.nextCursor();
         if (result.nextCursor().equals(this.nextResult.nextCursor())) {
@@ -99,7 +110,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         return result;
     }
 
-    protected MCROAISolrResult solrQuery(Optional<String> cursor) {
+    protected MCROAISolrResult solrQuery(Optional<String> cursor) throws SolrServerException, IOException {
         SolrQuery query = getBaseQuery(CommonParams.Q);
 
         // set support
@@ -121,14 +132,9 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
         // do the query
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
-        try {
-            QueryResponse response = solrClient.query(query);
-            Collection<MCROAISetResolver<String, SolrDocument>> setResolver = getSetResolver(response.getResults());
-            return new MCROAISolrResult(response, d -> toHeader(d, setResolver));
-        } catch (Exception exc) {
-            LOGGER.error("Unable to handle solr request", exc);
-        }
-        return null;
+        QueryResponse response = solrClient.query(query);
+        Collection<MCROAISetResolver<String, SolrDocument>> setResolver = getSetResolver(response.getResults());
+        return new MCROAISolrResult(response, d -> toHeader(d, setResolver));
     }
 
     private SolrQuery getBaseQuery(String restrictionField) {
@@ -188,19 +194,19 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         return s1.getSpec().compareTo(s2.getSpec());
     }
 
-    private String buildFromUntilCondition(ZonedDateTime from, ZonedDateTime until) {
+    private String buildFromUntilCondition(Instant from, Instant until) {
         String fieldFromUntil = getModifiedField();
         StringBuilder query = new StringBuilder(" +").append(fieldFromUntil).append(":[");
         DateTimeFormatter format = MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT;
         if (from == null) {
             query.append("* TO ");
         } else {
-            query.append(format.format(from)).append(" TO ");
+            query.append(format.format(from.atZone(ZoneId.of("UTC")))).append(" TO ");
         }
         if (until == null) {
             query.append("*]");
         } else {
-            query.append(format.format(until)).append(']');
+            query.append(format.format(until.atZone(ZoneId.of("UTC")))).append(']');
         }
         return query.toString();
     }

@@ -1,7 +1,6 @@
 package org.mycore.oai;
 
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.mycore.oai.pmh.Header;
@@ -58,7 +57,7 @@ public class MCROAICombinedSearcher extends MCROAISearcher {
     }
 
     @Override
-    public MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until) {
+    public MCROAIResult query(MCRSet set, Instant from, Instant until) {
         MCROAIResult solrResult = this.solrSearcher.query(set, from, until);
         if (!this.deletedSearcher.isPresent()) {
             this.numHits = solrResult.getNumHits();
