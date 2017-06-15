@@ -258,85 +258,84 @@ public class MCRRestAPIUploadHelper {
                         MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
                         MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
-                        //MCRAccessManager.checkPermission(uses CACHE, which seems to be dirty from other calls and cannot be deleted)????
-                        //TODO ... set proper Derivate Access Strategy in Skeleton
-                      //  if (MCRAccessManager.getAccessImpl().checkPermission(derID.toString(), PERMISSION_WRITE)) {
-                        if(1<2){
-                            MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
+                        //TODO check against derivate ACLs -  Access Strategy in Skeleton does not work
+                        //if (MCRAccessManager.getAccessImpl().checkPermission(derID.toString(), PERMISSION_WRITE)) {
+                        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
-                            java.nio.file.Path derDir = null;
+                        java.nio.file.Path derDir = null;
 
-                            String path = null;
-                            if (der.getOwnerID().equals(objID)) {
-                                try {
-                                    derDir = UPLOAD_DIR.resolve(derID.toString());
-                                    if (Files.exists(derDir)) {
-                                        Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
-                                    }
-                                    path = formParamPath.replace("\\", "/").replace("../", "");
-
-                                    MCRDirectory difs = MCRDirectory.getRootDirectory(derID.toString());
-                                    if (difs == null) {
-                                        difs = new MCRDirectory(derID.toString());
-                                    }
-
-                                    der.getDerivate().getInternals().setIFSID(difs.getID());
-                                    der.getDerivate().getInternals().setSourcePath(derDir.toString());
-
-                                    if (formParamUnzip) {
-                                        String maindoc = null;
-                                        try (ZipInputStream zis = new ZipInputStream(
-                                            new BufferedInputStream(uploadedInputStream))) {
-                                            ZipEntry entry;
-                                            while ((entry = zis.getNextEntry()) != null) {
-                                                LOGGER.debug("Unzipping: " + entry.getName());
-                                                java.nio.file.Path target = derDir.resolve(entry.getName());
-                                                Files.createDirectories(target.getParent());
-                                                Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
-                                                if (maindoc == null && !entry.isDirectory()) {
-                                                    maindoc = entry.getName();
-                                                }
-                                            }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        MCRFileImportExport.importFiles(derDir.toFile(), difs);
-
-                                        if (formParamMaindoc) {
-                                            der.getDerivate().getInternals().setMainDoc(maindoc);
-                                        }
-                                    } else {
-                                        java.nio.file.Path saveFile = derDir.resolve(path);
-                                        Files.createDirectories(saveFile.getParent());
-                                        Files.copy(uploadedInputStream, saveFile, StandardCopyOption.REPLACE_EXISTING);
-                                        //delete old file
-                                        MCRFileImportExport.importFiles(derDir.toFile(), difs);
-                                        if (formParamMaindoc) {
-                                            der.getDerivate().getInternals().setMainDoc(path);
-                                        }
-                                    }
-
-                                    MCRMetadataManager.update(der);
+                        String path = null;
+                        if (der.getOwnerID().equals(objID)) {
+                            try {
+                                derDir = UPLOAD_DIR.resolve(derID.toString());
+                                if (Files.exists(derDir)) {
                                     Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
-                                } catch (IOException | MCRAccessException e) {
-                                    LOGGER.error(e);
-                                    throw new MCRRestAPIException(MCRRestAPIError.create(Status.INTERNAL_SERVER_ERROR,
-                                        MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
                                 }
+                                path = formParamPath.replace("\\", "/").replace("../", "");
+
+                                MCRDirectory difs = MCRDirectory.getRootDirectory(derID.toString());
+                                if (difs == null) {
+                                    difs = new MCRDirectory(derID.toString());
+                                }
+
+                                der.getDerivate().getInternals().setIFSID(difs.getID());
+                                der.getDerivate().getInternals().setSourcePath(derDir.toString());
+
+                                if (formParamUnzip) {
+                                    String maindoc = null;
+                                    try (ZipInputStream zis = new ZipInputStream(
+                                        new BufferedInputStream(uploadedInputStream))) {
+                                        ZipEntry entry;
+                                        while ((entry = zis.getNextEntry()) != null) {
+                                            LOGGER.debug("Unzipping: " + entry.getName());
+                                            java.nio.file.Path target = derDir.resolve(entry.getName());
+                                            Files.createDirectories(target.getParent());
+                                            Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
+                                            if (maindoc == null && !entry.isDirectory()) {
+                                                maindoc = entry.getName();
+                                            }
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    MCRFileImportExport.importFiles(derDir.toFile(), difs);
+
+                                    if (formParamMaindoc) {
+                                        der.getDerivate().getInternals().setMainDoc(maindoc);
+                                    }
+                                } else {
+                                    java.nio.file.Path saveFile = derDir.resolve(path);
+                                    Files.createDirectories(saveFile.getParent());
+                                    Files.copy(uploadedInputStream, saveFile, StandardCopyOption.REPLACE_EXISTING);
+                                    //delete old file
+                                    MCRFileImportExport.importFiles(derDir.toFile(), difs);
+                                    if (formParamMaindoc) {
+                                        der.getDerivate().getInternals().setMainDoc(path);
+                                    }
+                                }
+
+                                MCRMetadataManager.update(der);
+                                Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
+                            } catch (IOException | MCRAccessException e) {
+                                LOGGER.error(e);
+                                throw new MCRRestAPIException(MCRRestAPIError.create(Status.INTERNAL_SERVER_ERROR,
+                                    MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
                             }
-                            session.setUserInformation(currentUser);
-                            response = Response
-                                .created(info.getBaseUriBuilder()
+                        }
+                        session.setUserInformation(currentUser);
+                        response = Response
+                            .created(
+                                info.getBaseUriBuilder()
                                     .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString()
                                         + "/contents")
                                     .build())
-                                .type("application/xml; charset=UTF-8").header("Authorization",
-                                    "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize())
-                                .build();
-                        }
+                            .type("application/xml; charset=UTF-8")
+                            .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize())
+                            .build();
+
                     }
-                  
+
                 } else {
                     //TODO error handling
                 }
@@ -478,9 +477,9 @@ public class MCRRestAPIUploadHelper {
             String message = generateMessagesFromProperties(data);
 
             Signature signature = Signature.getInstance("SHA1withRSA");
-            signature.initVerify(((RSAKey)jwk).toRSAPublicKey());
+            signature.initVerify(((RSAKey) jwk).toRSAPublicKey());
             signature.update(message.getBytes(StandardCharsets.ISO_8859_1));
-            
+
             boolean x = signature.verify(java.util.Base64.getDecoder().decode(base64Signature));
             return x;
 
