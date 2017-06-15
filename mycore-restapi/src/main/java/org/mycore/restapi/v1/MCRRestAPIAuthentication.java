@@ -118,19 +118,20 @@ public class MCRRestAPIAuthentication {
             username = userPwd.substring(0, splitPos);
             password = userPwd.substring(splitPos + 1);
         }
-        if (username != null && password != null) {
-
-            String jwt = validateUser(username, password, clientPubKey);
+        //validate username and password
+        if (username != null && password != null && MCRUserManager.checkPassword(username, password) != null) {
+            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("rest-api"), "http://localhost:8080/",
+                clientPubKey);
             if (jwt != null) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("{");
                 msg.append("\n    \"login_successful\":true,");
-                msg.append("\n    \"access_token\": \"" + jwt + "\",");
+                msg.append("\n    \"access_token\": \"" + jwt.serialize() + "\",");
                 msg.append("\n    \"token_type\": \"Bearer\"");
                 msg.append("\n}");
 
                 return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-                    .header("Authorization", "Bearer " + jwt).build();
+                    .header("Authorization", "Bearer " + jwt.serialize()).build();
             }
         }
 
@@ -162,38 +163,24 @@ public class MCRRestAPIAuthentication {
         return Response.ok(txt).type("text/plain; charset=UTF-8").build();
     }
 
-    private String validateUser(String username, String password, JWK clientPubKey) {
-        MCRUser user = MCRUserManager.checkPassword(username, password);
-        if (user != null) {
-            return MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("rest-api"), "http://localhost:8080/",
-                clientPubKey);
-        }
-        return null;
-    }
-
     @POST
     @Path("/renew")
     public Response renew(@DefaultValue("") String data, @Context HttpServletRequest request) {
         try {
             SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
+            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(signedJWT);
+            if (jwt != null) {
+                StringBuffer msg = new StringBuffer();
+                msg.append("{");
+                msg.append("\n    \"executed\":true,");
+                msg.append("\n    \"access_token\": \"" + jwt.serialize() + "\",");
+                msg.append("\n    \"token_type\": \"Bearer\",");
+                msg.append("\n    \"data\": \"" + data + "\",");
 
-            String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT);
-            JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT);
-            if (submittedUser != null && clientPubKey != null) {
-                String jwt = MCRJSONWebTokenUtil.createJWT(submittedUser, Arrays.asList("rest-api"),
-                    MCRFrontendUtil.getBaseURL(), clientPubKey);
-                if (jwt != null) {
-                    StringBuffer msg = new StringBuffer();
-                    msg.append("{");
-                    msg.append("\n    \"executed\":true,");
-                    msg.append("\n    \"access_token\": \"" + jwt + "\",");
-                    msg.append("\n    \"token_type\": \"Bearer\",");
-                    msg.append("\n    \"data\": \"" + data + "\",");
+                msg.append("\n}");
 
-                    msg.append("\n}");
-
-                    return Response.ok(msg.toString()).type("application/json; charset=UTF-8").build();
-                }
+                return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
+                    .header("Authorization", "Bearer " + jwt.serialize()).build();
             }
         } catch (MCRRestAPIException rae) {
             return MCRRestAPIError.createHttpResponseFromErrorList(rae.getErrors());

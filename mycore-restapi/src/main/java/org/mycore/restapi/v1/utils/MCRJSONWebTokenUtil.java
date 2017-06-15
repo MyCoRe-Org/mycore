@@ -32,6 +32,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -42,6 +43,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 
@@ -194,9 +196,7 @@ public class MCRJSONWebTokenUtil {
 
     }
 
-    public static String createJWT(String user, List<String> roles, String webAppBaseURL, JWK clientPubKey) {
-        String jwt = null;
-
+    public static SignedJWT createJWT(String user, List<String> roles, String webAppBaseURL, JWK clientPubKey) {
         ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
         JWTClaimsSet claims = new JWTClaimsSet.Builder().issuer(webAppBaseURL).jwtID(UUID.randomUUID().toString())
             .expirationTime(Date.from(currentTime.plusMinutes(EXPIRATION_TIME_MINUTES).toInstant()))
@@ -213,16 +213,22 @@ public class MCRJSONWebTokenUtil {
         SignedJWT signedJWT = new SignedJWT(jwsHeader, claims);
         try {
             signedJWT.sign(new RSASSASigner(RSA_KEYS.getPrivate()));
-            jwt = signedJWT.serialize();
         } catch (JOSEException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-
         }
+        System.out.println("JWT: " + signedJWT.serialize());
+        return signedJWT;
+    }
 
-        System.out.println("JWT: " + jwt);
-        return jwt;
-
+    public static SignedJWT createJWT(SignedJWT oldJWT) {
+        String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(oldJWT);
+        JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(oldJWT);
+        if (submittedUser != null && clientPubKey != null) {
+            return MCRJSONWebTokenUtil.createJWT(submittedUser, Arrays.asList("rest-api"), MCRFrontendUtil.getBaseURL(),
+                clientPubKey);
+        }
+        return null;
     }
 
     /**
@@ -253,7 +259,8 @@ public class MCRJSONWebTokenUtil {
 
                         throw new MCRRestAPIException(
                             MCRRestAPIError.create(Status.UNAUTHORIZED, MCRRestAPIError.CODE_INVALID_AUTHENCATION,
-                                "The Authentication Token expired at "+ formatter.format(expires.toInstant()), "Please log-in again."));
+                                "The Authentication Token expired at " + formatter.format(expires.toInstant()),
+                                "Please log-in again."));
                     }
 
                 } else {
