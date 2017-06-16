@@ -9,6 +9,10 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
 import org.mycore.urn.services.MCRURNManager;
 
+/**
+ * Adds URNS to SOLR Index
+ * Changeable in property <code>MCR.Module-solr.Indexer.File.AccumulatorList</code>
+ */
 public class MCRSolrFileIndexURNAccumulator implements MCRSolrFileIndexAccumulator {
     @Override public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)
         throws IOException {

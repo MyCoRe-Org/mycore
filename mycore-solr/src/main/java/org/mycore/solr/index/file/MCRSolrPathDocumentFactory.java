@@ -26,8 +26,6 @@ package org.mycore.solr.index.file;
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
@@ -69,21 +67,17 @@ public class MCRSolrPathDocumentFactory {
             .stream()
             .map((accumulatorClassRef) -> {
                 try {
-                    Class<MCRSolrFileIndexAccumulator> accumulatorClass = (Class<MCRSolrFileIndexAccumulator>) Class
-                        .forName(accumulatorClassRef);
-                    Constructor<MCRSolrFileIndexAccumulator> accumulatorClassConstructor = accumulatorClass
-                        .getConstructor();
-                    MCRSolrFileIndexAccumulator fileIndexAccumulator = accumulatorClassConstructor.newInstance();
-                    return fileIndexAccumulator;
+                    Class<? extends MCRSolrFileIndexAccumulator> accumulatorClass = Class
+                        .forName(accumulatorClassRef)
+                        .asSubclass(MCRSolrFileIndexAccumulator.class);
+
+                    return accumulatorClass.newInstance();
                 } catch (ClassNotFoundException e) {
                     throw new MCRConfigurationException(
                         "AccumulatorClass configurated in " + ACCUMULATOR_LIST_PROPERTY_NAME + " not found : "
                             + accumulatorClassRef, e);
-                } catch (NoSuchMethodException e) {
-                    throw new MCRConfigurationException(
-                        "AccumulatorClass configurated in " + ACCUMULATOR_LIST_PROPERTY_NAME
-                            + " has no default constructor.", e);
-                } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+
+                } catch (IllegalAccessException | InstantiationException e) {
                     throw new MCRConfigurationException(
                         "Construxtor of the AccumulatorClass configurated in " + ACCUMULATOR_LIST_PROPERTY_NAME
                             + " can not be invoked.", e);
@@ -116,7 +110,7 @@ public class MCRSolrPathDocumentFactory {
             }
         };
 
-        ACCUMULATOR_LIST.stream().forEach(accumulate);
+        ACCUMULATOR_LIST.forEach(accumulate);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("MCRFile " + input.toString() + " transformed to:\n" + doc.toString());
