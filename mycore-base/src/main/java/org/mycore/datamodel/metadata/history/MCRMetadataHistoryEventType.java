@@ -16,9 +16,10 @@ public enum MCRMetadataHistoryEventType {
                 return MCRMetadataHistoryEventType.Create;
             case 'd':
                 return MCRMetadataHistoryEventType.Delete;
+            default:
+                throw new IllegalArgumentException(
+                    "No such " + MCRMetadataHistoryEventType.class.getSimpleName() + ": " + abbr);
         }
-        throw new IllegalArgumentException(
-            "No such " + MCRMetadataHistoryEventType.class.getSimpleName() + ": " + abbr);
     }
 
     protected char getAbbr() {

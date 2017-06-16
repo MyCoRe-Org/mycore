@@ -1,15 +1,24 @@
 package org.mycore.datamodel.metadata.history;
 
 import java.io.Serializable;
-import java.lang.String;
 import java.time.Instant;
-import javax.persistence.*;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 import org.mycore.backend.jpa.MCRObjectIDConverter;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.history.MCRMetadataHistoryEventType;
 
 /**
  * Entity implementation class for Entity: MCRMetaHistoryItem
@@ -21,12 +30,13 @@ import org.mycore.datamodel.metadata.history.MCRMetadataHistoryEventType;
     @Index(name = "IDX_TIME", columnList = "time")
 })
 @NamedQueries({
-    @NamedQuery(name="MCRMetaHistory.getLastDeleted", query="SELECT MAX(time) FROM MCRMetaHistoryItem WHERE id=:id and eventType='D'"),
-    @NamedQuery(name="MCRMetaHistory.getLastEventByID", 
-        query="SELECT a FROM MCRMetaHistoryItem a "
-            + "WHERE a.time in (SELECT max(time) as time FROM MCRMetaHistoryItem b WHERE a.id=b.id AND time BETWEEN :from AND :until group by id) "
-            + "AND a.eventType=:eventType"),
-    @NamedQuery(name="MCRMetaHistory.getFirstDate", query="SELECT MIN(time) from MCRMetaHistoryItem")
+    @NamedQuery(name = "MCRMetaHistory.getLastDeleted",
+        query = "SELECT MAX(time) FROM MCRMetaHistoryItem WHERE id=:id and eventType='D'"),
+    @NamedQuery(name = "MCRMetaHistory.getLastEventByID", query = "SELECT a FROM MCRMetaHistoryItem a "
+        + "WHERE a.time in (SELECT max(time) as time FROM MCRMetaHistoryItem b "
+        + "WHERE a.id=b.id AND time BETWEEN :from AND :until group by id) "
+        + "AND a.eventType=:eventType"),
+    @NamedQuery(name = "MCRMetaHistory.getFirstDate", query = "SELECT MIN(time) from MCRMetaHistoryItem")
 })
 public class MCRMetaHistoryItem implements Serializable {
 
@@ -42,7 +52,7 @@ public class MCRMetaHistoryItem implements Serializable {
     private Instant time;
 
     @Convert(converter = MCRMetadataHistoryEventTypeConverter.class)
-    @Column(length=1)
+    @Column(length = 1)
     private MCRMetadataHistoryEventType eventType;
 
     private String userID;
@@ -50,10 +60,6 @@ public class MCRMetaHistoryItem implements Serializable {
     private String userIP;
 
     private static final long serialVersionUID = 1L;
-
-    public MCRMetaHistoryItem() {
-        super();
-    }
 
     static MCRMetaHistoryItem createdNow(MCRObjectID id) {
         return now(id, MCRMetadataHistoryEventType.Create);

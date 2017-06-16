@@ -59,7 +59,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
             return Optional.empty();
         }
     }
-    
+
     private void createNow(MCRObjectID id) {
         store(MCRMetaHistoryItem.createdNow(id));
     }

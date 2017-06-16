@@ -50,8 +50,9 @@ import org.xml.sax.SAXException;
  */
 @MCRCommandGroup(name = "Metadata history")
 public class MCRMetadataHistoryCommands {
-    
-    @MCRCommand(syntax = "clear metadata history of base {0}", help = "clears metadata history of all objects with base id {0}")
+
+    @MCRCommand(syntax = "clear metadata history of base {0}",
+        help = "clears metadata history of all objects with base id {0}")
     public static void clearHistory(String baseId) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -64,7 +65,8 @@ public class MCRMetadataHistoryCommands {
         LogManager.getLogger().info("Deleted {} items in history of {}", rowsDeleted, baseId);
     }
 
-    @MCRCommand(syntax = "clear metadata history of id {0}", help = "clears metadata history of object/derivate with id {0}")
+    @MCRCommand(syntax = "clear metadata history of id {0}",
+        help = "clears metadata history of object/derivate with id {0}")
     public static void clearSingleHistory(String mcrId) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -94,7 +96,8 @@ public class MCRMetadataHistoryCommands {
             .collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "build metadata history of base {0}", help = "build metadata history of all objects with base id {0}")
+    @MCRCommand(syntax = "build metadata history of base {0}",
+        help = "build metadata history of all objects with base id {0}")
     public static List<String> buildHistory(String baseId) {
         MCRMetadataStore store = MCRXMLMetadataManager.instance().getStore(baseId);
         ExecutorService executorService = Executors.newWorkStealingPool();
@@ -124,7 +127,8 @@ public class MCRMetadataHistoryCommands {
         return Collections.emptyList();
     }
 
-    @MCRCommand(syntax = "build metadata history of id {0}", help = "build metadata history of object/derivate with id {0}")
+    @MCRCommand(syntax = "build metadata history of id {0}",
+        help = "build metadata history of object/derivate with id {0}")
     public static void buildSingleHistory(String mcrId) {
         MCRObjectID objId = MCRObjectID.getInstance(mcrId);
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
