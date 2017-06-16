@@ -37,6 +37,11 @@
       <artifactId>log4j-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
     </dependency>
@@ -60,6 +65,10 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-ifs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-solr</artifactId>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
