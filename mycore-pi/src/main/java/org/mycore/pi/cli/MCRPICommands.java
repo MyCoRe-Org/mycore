@@ -78,9 +78,9 @@ public class MCRPICommands {
     }
 
     @MCRCommand(syntax = "try to control {0} with service {1} with additional {2}", help = "")
-    public static void migrateURNGranularToServiceID(String objectIDString, String serviceID, String additional)
+    public static void migrateURNGranularToServiceID(String objectIDString, String serviceID, final String additional)
         throws MCRAccessException, MCRActiveLinkException, IOException {
-        additional=additional.trim();
+        String trimAdditional=additional.trim();
         MCRPIRegistrationService<MCRPersistentIdentifier> service = MCRPIRegistrationServiceManager
             .getInstance().getRegistrationService(serviceID);
 
@@ -91,7 +91,7 @@ public class MCRPICommands {
         Optional<MCRPersistentIdentifier> identifier;
 
         try {
-            identifier = metadataManager.getIdentifier(mcrBase, additional);
+            identifier = metadataManager.getIdentifier(mcrBase, trimAdditional);
         } catch (MCRPersistentIdentifierException e) {
             LOGGER.info("Could not detect any identifier with service " + serviceID, e);
             return;
@@ -103,14 +103,14 @@ public class MCRPICommands {
         }
 
         MCRPersistentIdentifier persistentIdentifier = identifier.get();
-        if (service.isRegistered(objectID, additional)) {
+        if (service.isRegistered(objectID, trimAdditional)) {
             LOGGER.info("Already present in Database: " + serviceID);
             return;
         }
-        MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, additional, persistentIdentifier);
+        MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, trimAdditional, persistentIdentifier);
         MCRPIRegistrationService.addFlagToObject(mcrBase, mcrpi);
         MCRMetadataManager.update(mcrBase);
-        LOGGER.info("{}:{} is now under control of {}", objectID, additional, serviceID);
+        LOGGER.info("{}:{} is now under control of {}", objectID, trimAdditional, serviceID);
 
     }
 

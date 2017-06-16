@@ -69,7 +69,11 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response listServices() {
         return Response
                 .status(Response.Status.OK)
-                .entity(MCRPIRegistrationServiceManager.getInstance().getServiceIDList().stream().collect(Collectors.joining(",")))
+                .entity(MCRPIRegistrationServiceManager
+                .getInstance()
+                .getServiceIDList()
+                .stream()
+                .collect(Collectors.joining(",")))
                 .build();
     }
 

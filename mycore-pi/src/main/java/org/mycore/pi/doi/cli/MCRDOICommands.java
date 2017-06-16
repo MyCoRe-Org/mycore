@@ -59,7 +59,8 @@ public class MCRDOICommands {
         }
 
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
-        MCRPersistentIdentifierMetadataManager<MCRDigitalObjectIdentifier> synchronizer = registrationService.getMetadataManager();
+        MCRPersistentIdentifierMetadataManager<MCRDigitalObjectIdentifier> synchronizer =
+            registrationService.getMetadataManager();
 
         if (!registrationService.isRegistered(objectID, doiString)) {
             LOGGER.info(objectID.toString() + " is not found in PI-Database. Insert it..");

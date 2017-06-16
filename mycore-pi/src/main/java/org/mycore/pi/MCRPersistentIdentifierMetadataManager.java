@@ -14,7 +14,8 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
- * Should be able to insert/remove DOI, URN or other identifiers to metadata and check if they already have a Identifier of type T
+ * Should be able to insert/remove DOI, URN or other identifiers to metadata and check if they already have a
+ * Identifier of type T
  * @param <T>
  */
 public abstract class MCRPersistentIdentifierMetadataManager<T extends MCRPersistentIdentifier> {
@@ -56,7 +57,9 @@ public abstract class MCRPersistentIdentifierMetadataManager<T extends MCRPersis
         return shortened;
     }
 
-    public abstract void insertIdentifier(T identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException;
+    public abstract void insertIdentifier(T identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException;
+
     public abstract void removeIdentifier(T identifier, MCRBase obj, String additional);
 
     public abstract Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)

@@ -23,10 +23,12 @@ public class MCRMODSDOIPersistentIdentifierMetadataManager
     }
 
     @Override
-    public void insertIdentifier(MCRDigitalObjectIdentifier identifier, MCRBase base,String additional) throws MCRPersistentIdentifierException {
+    public void insertIdentifier(MCRDigitalObjectIdentifier identifier, MCRBase base, String additional)
+        throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(base);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        wrapper.setElement("identifier", "type", "doi", identifier.asString()).orElseThrow(() -> new MCRException("Could not insert doi into mods document!"));
+        wrapper.setElement("identifier", "type", "doi", identifier.asString())
+            .orElseThrow(() -> new MCRException("Could not insert doi into mods document!"));
     }
 
 
@@ -39,7 +41,7 @@ public class MCRMODSDOIPersistentIdentifierMetadataManager
 
     @Override
     public void removeIdentifier(MCRDigitalObjectIdentifier identifier, MCRBase obj, String additional) {
-
+        // not supported
     }
 
     @Override public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase base, String additional)

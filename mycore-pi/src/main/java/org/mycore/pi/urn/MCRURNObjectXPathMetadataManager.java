@@ -31,7 +31,8 @@ public class MCRURNObjectXPathMetadataManager extends MCRPersistentIdentifierMet
     }
 
     @Override
-    public void insertIdentifier(MCRDNBURN identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    public void insertIdentifier(MCRDNBURN identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
         MCRNodeBuilder nb = new MCRNodeBuilder();

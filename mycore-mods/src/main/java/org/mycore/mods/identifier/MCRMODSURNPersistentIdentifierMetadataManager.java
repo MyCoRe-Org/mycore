@@ -24,15 +24,17 @@ public class MCRMODSURNPersistentIdentifierMetadataManager
     }
 
     @Override
-    public void insertIdentifier(MCRUniformResourceName identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    public void insertIdentifier(MCRUniformResourceName identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(obj);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        wrapper.setElement("identifier", "type", "urn", identifier.asString()).orElseThrow(() -> new MCRException("Could not insert urn into mods document!"));
+        wrapper.setElement("identifier", "type", "urn", identifier.asString())
+            .orElseThrow(() -> new MCRException("Could not insert urn into mods document!"));
     }
 
     @Override
     public void removeIdentifier(MCRUniformResourceName identifier, MCRBase obj, String additional) {
-
+        // not supported
     }
 
     @Override public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)

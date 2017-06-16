@@ -61,7 +61,8 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     private static Logger LOGGER = LogManager.getLogger();
     /**
-     * This map can will be used to replace the old IdentifierInscriber class names with the new MetadataManager class names
+     * This map can will be used to replace the old IdentifierInscriber class names with the new MetadataManager class
+     * names
      */
     private static final HashMap<String, String> OLD_CLASS_NEW_CLASS_MAPPING = new HashMap<>();
 
@@ -82,15 +83,16 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         return registrationServiceID;
     }
 
-    public static String repairDeprecatedClassNames(String className, String metadataManagerPropertyKey) {
+    public static String repairDeprecatedClassNames(final String className, String metadataManagerPropertyKey) {
+        String newClassName = className;
         for (String key : OLD_CLASS_NEW_CLASS_MAPPING.keySet()) {
             if (className.contains(key)) {
                 String replacement = OLD_CLASS_NEW_CLASS_MAPPING.get(key);
                 LOGGER.warn("You should replace {} with {} in {}", key, replacement, metadataManagerPropertyKey);
-                className = className.replaceAll(key, replacement);
+                newClassName = newClassName.replaceAll(key, replacement);
             }
         }
-        return className;
+        return newClassName;
     }
 
     public MCRPersistentIdentifierMetadataManager<T> getMetadataManager() {
@@ -132,8 +134,8 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         className = repairDeprecatedClassNames(className, metadataManagerPropertyKey);
 
         try {
-            Class<MCRPersistentIdentifierMetadataManager<T>> classObject = (Class<MCRPersistentIdentifierMetadataManager<T>>) Class
-                    .forName(className);
+            Class<MCRPersistentIdentifierMetadataManager<T>> classObject =
+                (Class<MCRPersistentIdentifierMetadataManager<T>>) Class.forName(className);
             Constructor<MCRPersistentIdentifierMetadataManager<T>> constructor = classObject
                 .getConstructor(String.class);
             return constructor.newInstance(metadataManager);
@@ -240,12 +242,14 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
     }
 
     /**
-     * Validates everything, registers a new Identifier, inserts the identifier to object metadata and writes a information to the Database.
+     * Validates everything, registers a new Identifier, inserts the identifier to object metadata and writes a
+     * information to the Database.
      *
      * @param obj the object which has to be identified
      * @return the assigned Identifier
      * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException           the {@link MCRPersistentIdentifierMetadataManager} lets {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
+     * @throws MCRActiveLinkException           the {@link MCRPersistentIdentifierMetadataManager} lets
+     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
     public T fullRegister(MCRBase obj, String additional)
@@ -305,7 +309,8 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * @param identifier the Identifier
      * @param obj the deleted object
      * @param additional
-     * @throws MCRPersistentIdentifierException to abort deletion of the object  or if something went wrong. (E.G. {@link org.mycore.pi.doi.MCRDOIRegistrationService} throws if not superuser tries to delete the object)
+     * @throws MCRPersistentIdentifierException to abort deletion of the object  or if something went wrong.
+     * (E.G. {@link org.mycore.pi.doi.MCRDOIRegistrationService} throws if not superuser tries to delete the object)
      */
     protected abstract void delete(T identifier, MCRBase obj, String additional)
             throws MCRPersistentIdentifierException;

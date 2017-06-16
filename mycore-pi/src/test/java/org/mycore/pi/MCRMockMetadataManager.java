@@ -21,21 +21,22 @@ public class MCRMockMetadataManager extends MCRPersistentIdentifierMetadataManag
     }
 
     @Override
-    public void insertIdentifier(MCRMockIdentifier identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    public void insertIdentifier(MCRMockIdentifier identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         Assert.assertEquals("Test propterties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
-        map.put(obj.toString()+additional.toString(), identifier);
+        map.put(obj.toString() + additional, identifier);
     }
 
     @Override
     public void removeIdentifier(MCRMockIdentifier identifier, MCRBase obj, String additional) {
         Assert.assertEquals("Test properties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
-        map.remove(obj.toString()+additional.toString());
+        map.remove(obj.toString() + additional);
     }
 
     @Override
     public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        return Optional.ofNullable(map.get(obj.toString()+additional.toString()));
+        return Optional.ofNullable(map.get(obj.toString() + additional));
     }
 
 }
