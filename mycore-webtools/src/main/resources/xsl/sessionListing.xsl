@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  exclude-result-prefixes="i18n">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+                exclude-result-prefixes="i18n">
 
   <xsl:template match="sessionListing">
     <div id="sessionListingContainer" style="margin-top: 16px;">
@@ -8,7 +9,7 @@
       <div id="sessionListingLoadingSpinner">
         <h3 class="text-center">
           <i class="fa fa-circle-o-notch fa-spin"></i>
-          <xsl:value-of select="i18n:translate('component.session-listing.loadingPleaseWait')" />
+          <xsl:value-of select="i18n:translate('component.session-listing.loadingPleaseWait')"/>
         </h3>
       </div>
 
@@ -16,26 +17,27 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">
-              <xsl:value-of select="i18n:translate('component.session-listing.options')" />
+              <xsl:value-of select="i18n:translate('component.session-listing.options')"/>
             </h3>
           </div>
           <div class="panel-body">
             <div class="form-horizontal">
               <div class="form-group">
                 <label for="sessionListingFilter" class="col-sm-2 control-label">
-                  <xsl:value-of select="i18n:translate('component.session-listing.filter')" />
+                  <xsl:value-of select="i18n:translate('component.session-listing.filter')"/>
                 </label>
                 <div class="col-sm-10">
                   <input type="text" class="form-control" id="sessionListingFilter" placeholder="Filter"
-                    onchange="mycore.session.listing.onFilterChange()" />
+                         onchange="mycore.session.listing.onFilterChange()"/>
                 </div>
               </div>
               <div class="form-group">
                 <label for="sessionListingFilter" class="col-sm-2 control-label">
-                  <xsl:value-of select="i18n:translate('component.session-listing.resolveHostNames')" />
+                  <xsl:value-of select="i18n:translate('component.session-listing.resolveHostNames')"/>
                 </label>
                 <div class="col-sm-10" style="margin-top: 5px;">
-                  <input id="sessionListingResolveHostname" type="checkbox" onchange="mycore.session.listing.onHostnameResolvingChange()" />
+                  <input id="sessionListingResolveHostname" type="checkbox"
+                         onchange="mycore.session.listing.onHostnameResolvingChange()"/>
                 </div>
               </div>
             </div>
@@ -45,24 +47,32 @@
         <table id="sessionListingTable" class="table">
           <tr>
             <th data-criteria="login" role="button" tabindex="0" onclick="mycore.session.listing.sortByLogin()">
-              <xsl:value-of select="i18n:translate('component.session-listing.login')" />
+              <xsl:value-of select="i18n:translate('component.session-listing.login')"/>
               <i class="fa fa-sort "></i>
             </th>
             <th data-criteria="ip" role="button" tabindex="0" onclick="mycore.session.listing.sortByIP()">
-              <xsl:value-of select="i18n:translate('component.session-listing.ip')" />
+              <xsl:value-of select="i18n:translate('component.session-listing.ip')"/>
               <i class="fa fa-sort "></i>
             </th>
-            <th data-criteria="createTime" role="button" tabindex="0" onclick="mycore.session.listing.sortByFirstAccess()">
-              <xsl:value-of select="i18n:translate('component.session-listing.firstAccess')" />
+            <th data-criteria="createTime" role="button" tabindex="0"
+                onclick="mycore.session.listing.sortByFirstAccess()">
+              <xsl:value-of select="i18n:translate('component.session-listing.firstAccess')"/>
               <i class="fa fa-sort "></i>
             </th>
-            <th data-criteria="lastAccess" role="button" tabindex="0" onclick="mycore.session.listing.sortByLastAccess()">
-              <xsl:value-of select="i18n:translate('component.session-listing.lastAccess')" />
+            <th data-criteria="lastAccess" role="button" tabindex="0"
+                onclick="mycore.session.listing.sortByLastAccess()">
+              <xsl:value-of select="i18n:translate('component.session-listing.lastAccess')"/>
               <i class="fa fa-sort "></i>
             </th>
-            <th data-criteria="stackTrace" role="button" tabindex="0" onclick="mycore.session.listing.sortByStacktrace()">
+            <th data-criteria="stackTrace" role="button" tabindex="0"
+                onclick="mycore.session.listing.sortByStacktrace()">
               Stacktrace
               <i class="fa fa-sort "></i>
+            </th>
+            <th>
+              <span id="i18n-kill-question" style="display: none;">
+                <xsl:value-of select="i18n:translate('component.session-listing.killQuestion')"/>
+              </span>
             </th>
           </tr>
         </table>
@@ -91,7 +101,7 @@
     </xsl:variable>
     <script>
       $(document).ready(function() {
-      <xsl:value-of select="concat('var baseURL = ',$quot,$WebApplicationBaseURL,$quot, ';')" />
+      <xsl:value-of select="concat('var baseURL = ',$quot,$WebApplicationBaseURL,$quot, ';')"/>
       mycore.session.listing.init(baseURL);
       mycore.session.listing.load(false);
       });
