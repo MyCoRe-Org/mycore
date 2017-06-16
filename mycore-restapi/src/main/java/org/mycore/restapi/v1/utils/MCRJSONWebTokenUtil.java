@@ -142,13 +142,12 @@ public class MCRJSONWebTokenUtil {
         JWK result = null;
         try {
             result = JWK.parse(signedJWT.getJWTClaimsSet().getJSONObjectClaim("sub_jwk"));
-            RSAKey publicKey = (RSAKey)signedJWT.getHeader().getJWK();
+            RSAKey publicKey = (RSAKey) signedJWT.getHeader().getJWK();
             if (signedJWT.verify(new RSASSAVerifier(publicKey))) {
                 return result;
             }
         } catch (ParseException | JOSEException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error(e);
         }
 
         return null;
@@ -166,7 +165,7 @@ public class MCRJSONWebTokenUtil {
                 return username;
             }
         } catch (ParseException | JOSEException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
 
         return null;
@@ -186,9 +185,7 @@ public class MCRJSONWebTokenUtil {
             signedJWT.sign(new RSASSASigner(RSA_KEYS.getPrivate()));
             jwt = signedJWT.serialize();
         } catch (JOSEException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-
+            LOGGER.error(e);
         }
 
         System.out.println("JWT: " + jwt);
@@ -215,7 +212,7 @@ public class MCRJSONWebTokenUtil {
             signedJWT.sign(new RSASSASigner(RSA_KEYS.getPrivate()));
         } catch (JOSEException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         System.out.println("JWT: " + signedJWT.serialize());
         return signedJWT;
