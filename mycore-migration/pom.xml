@@ -31,11 +31,11 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-urn</artifactId>
+      <artifactId>mycore-pi</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-pi</artifactId>
+      <artifactId>mycore-urn</artifactId>
     </dependency>
   </dependencies>
 </project>
