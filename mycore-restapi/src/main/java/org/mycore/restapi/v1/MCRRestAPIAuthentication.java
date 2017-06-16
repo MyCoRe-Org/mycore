@@ -39,6 +39,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
@@ -59,7 +61,7 @@ import com.nimbusds.jwt.SignedJWT;
 @Path("/v1/auth")
 @MCRStaticContent
 public class MCRRestAPIAuthentication {
-
+    private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIAuthentication.class);
     /**
      * return the server public key as Java Web Token
      * 
@@ -184,8 +186,7 @@ public class MCRRestAPIAuthentication {
         } catch (MCRRestAPIException rae) {
             return MCRRestAPIError.createHttpResponseFromErrorList(rae.getErrors());
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error(e);
             return MCRRestAPIError.create(Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
                 "Session cannot be renewed!", e.getMessage()).createHttpResponse();
         }
