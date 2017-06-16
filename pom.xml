@@ -391,6 +391,7 @@
         <version>2.4.0</version>
         <executions>
           <execution>
+            <id>sort-pom</id>
             <goals>
               <goal>sort</goal>
             </goals>
@@ -600,6 +601,44 @@
   </distributionManagement>
   <profiles>
     <profile>
+      <id>ci</id>
+      <activation>
+        <property>
+          <name>env.CI</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+      <plugin>
+        <groupId>com.github.ekryd.sortpom</groupId>
+        <artifactId>sortpom-maven-plugin</artifactId>
+        <version>2.4.0</version>
+        <executions>
+          <execution>
+            <id>sort-pom</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <expandEmptyElements>false</expandEmptyElements>
+              <keepBlankLines>true</keepBlankLines>
+              <sortDependencies>${sortpom.sortDeps}</sortDependencies>
+              <sortOrderFile>${sortpom.sortFile}</sortOrderFile>
+              <sortProperties>${sortpom.sortProps}</sortProperties>
+              <verifyFail>stop</verifyFail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>release-profile</id>
       <properties>
         <site.suffix>-${project.version}</site.suffix>
@@ -618,6 +657,10 @@
       <id>deployment</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>env.CI</name>
+          <value>true</value>
+        </property>
       </activation>
       <build>
         <plugins>
