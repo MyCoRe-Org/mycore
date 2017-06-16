@@ -1,5 +1,23 @@
 package org.mycore.webtools.session;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
+import org.mycore.frontend.jersey.MCRJerseyUtil;
+
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import java.awt.Color;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -7,24 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.stream.Collectors;
-
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUserInformation;
-import org.mycore.frontend.jersey.MCRJerseyUtil;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 /**
  * Resource which provides information about mycore sessions. 
@@ -58,6 +58,23 @@ public class MCRSessionResource {
             .map(s -> generateSessionJSON(s, resolveHostname))
             .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
         return Response.status(Status.OK).entity(rootJSON.toString()).build();
+    }
+
+    /**
+     * Kills the session with the specified session identifier.
+     *
+     * @return 200 OK if the session could be killed
+     */
+    @POST
+    @Path("kill/{id}")
+    public Response kill(@PathParam("id") String sessionID) {
+        // check permissions
+        MCRJerseyUtil.checkPermission("manage-sessions");
+
+        // kill
+        MCRSession session = MCRSessionMgr.getSession(sessionID);
+        session.close();
+        return Response.status(Status.OK).build();
     }
 
     /**
