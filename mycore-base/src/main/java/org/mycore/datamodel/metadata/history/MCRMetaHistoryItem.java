@@ -36,7 +36,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
         + "WHERE a.time in (SELECT max(time) as time FROM MCRMetaHistoryItem b "
         + "WHERE a.id=b.id AND time BETWEEN :from AND :until group by id) "
         + "AND a.eventType=:eventType"),
-    @NamedQuery(name = "MCRMetaHistory.getFirstDate", query = "SELECT MIN(time) from MCRMetaHistoryItem")
+    @NamedQuery(name = "MCRMetaHistory.getFirstDate", query = "SELECT MIN(time) from MCRMetaHistoryItem"),
+    @NamedQuery(name = "MCRMetaHistory.getHighestID", query = "SELECT MAX(id) from MCRMetaHistoryItem WHERE ID like :looksLike")
 })
 public class MCRMetaHistoryItem implements Serializable {
 

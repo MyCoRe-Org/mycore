@@ -61,6 +61,7 @@ import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -101,9 +102,9 @@ public class MCRXMLMetadataManager {
 
     /** The singleton */
     private static MCRXMLMetadataManager SINGLETON;
-    
+
     private HashSet<String> createdStores;
-    
+
     /**
      * The default IFS2 Metadata store class to use, set by MCR.Metadata.Store.DefaultClass
      */
@@ -336,9 +337,11 @@ public class MCRXMLMetadataManager {
         createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, impl);
     }
-    
-    private void throwStoreDirException(File dir, String project, String objectType, String configPrefix){
-        throw new MCRException(MessageFormat.format("Could create directory ''{0}'' to set up Store for project ''{1}'' and objectType ''{2}'' and config prefix ''{3}''", dir.getAbsolutePath(), project, objectType, configPrefix));
+
+    private void throwStoreDirException(File dir, String project, String objectType, String configPrefix) {
+        throw new MCRException(MessageFormat.format(
+            "Could create directory ''{0}'' to set up Store for project ''{1}'' and objectType ''{2}'' and config prefix ''{3}''",
+            dir.getAbsolutePath(), project, objectType, configPrefix));
     }
 
     private String getStoryKey(String project, String objectType) {
@@ -607,14 +610,19 @@ public class MCRXMLMetadataManager {
      * @return the highest stored ID number as a String
      */
     public int getHighestStoredID(String project, String type) {
-        return getStore(project, type).getHighestStoredID();
+        int highestStoredID = getStore(project, type).getHighestStoredID();
+        //fixes MCR-1534 (IDs once deleted should never be used again)
+        return Math.max(highestStoredID,
+            MCRMetadataHistoryManager.getHighestStoredID(project, type)
+                .map(MCRObjectID::getNumberAsInteger)
+                .orElse(0));
     }
 
     /**
      * Checks if an object with the given MCRObjectID exists in the store.
      */
     public boolean exists(MCRObjectID mcrid) throws IOException {
-        if(mcrid == null) {
+        if (mcrid == null) {
             return false;
         }
         return getStore(mcrid).exists(mcrid.getNumberAsInteger());
@@ -684,12 +692,12 @@ public class MCRXMLMetadataManager {
      */
     public Collection<String> getObjectTypes() {
         return Arrays.stream(getProjectDirectories())
-                     .map(this::getObjectTypeDirectories)
-                     .flatMap(Arrays::stream)
-                     .map(File::getName)
-                     .filter(MCRObjectID::isValidType)
-                     .distinct()
-                     .collect(Collectors.toSet());
+            .map(this::getObjectTypeDirectories)
+            .flatMap(Arrays::stream)
+            .map(File::getName)
+            .filter(MCRObjectID::isValidType)
+            .distinct()
+            .collect(Collectors.toSet());
     }
 
     /**
@@ -731,7 +739,8 @@ public class MCRXMLMetadataManager {
     private File[] getObjectTypeDirectories(File projectDirectory) {
         File[] objectTypeDirectories = projectDirectory.listFiles();
         if (objectTypeDirectories == null) {
-            throw new MCRException("unable to list files of IFS2 metadata directory " + projectDirectory.getAbsolutePath());
+            throw new MCRException(
+                "unable to list files of IFS2 metadata directory " + projectDirectory.getAbsolutePath());
         }
         return objectTypeDirectories;
     }
