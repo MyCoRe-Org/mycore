@@ -803,6 +803,12 @@ var ACLEditor = function(){
 				}
 			}
         });
+        $("text[i18n]").each(function () {
+        	var key = $(this).attr("i18n");
+            if (key !== undefined && key !== "") {
+                $(this).html(geti18n(key));
+            }
+        });
     }
 }
 
