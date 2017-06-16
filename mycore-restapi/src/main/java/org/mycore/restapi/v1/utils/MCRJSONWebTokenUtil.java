@@ -133,7 +133,7 @@ public class MCRJSONWebTokenUtil {
                 return result;
             }
         } catch (ParseException | JOSEException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         return null;
     }

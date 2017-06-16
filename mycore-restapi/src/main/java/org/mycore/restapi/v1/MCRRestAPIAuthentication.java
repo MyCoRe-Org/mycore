@@ -44,7 +44,6 @@ import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
-import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 import com.nimbusds.jose.jwk.JWK;
