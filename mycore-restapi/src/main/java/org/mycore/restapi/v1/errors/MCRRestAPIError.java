@@ -41,16 +41,25 @@ import com.google.gson.JsonObject;
  */
 public class MCRRestAPIError {
     public static final String CODE_WRONG_PARAMETER = "WRONG_PARAMETER";
+
     public static final String CODE_WRONG_QUERY_PARAMETER = "WRONG_QUERY_PARAMETER";
+
     public static final String CODE_WRONG_ID = "WRONG_ID";
+
     public static final String CODE_NOT_FOUND = "NOT_FOUND";
+
     public static final String CODE_INTERNAL_ERROR = "INTERNAL_ERROR";
+
     public static final String CODE_ACCESS_DENIED = "ACCESS_DENIED";
+
     public static final String CODE_INVALID_AUTHENCATION = "INVALID_AUTHENTICATION";
-    
+
     Response.Status status = Response.Status.BAD_REQUEST;
+
     String code = "";
+
     String title = "";
+
     String detail = null;
 
     public MCRRestAPIError(Response.Status status, String code, String title, String detail) {
@@ -101,33 +110,32 @@ public class MCRRestAPIError {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(errorMsg);
     }
-    
+
     public Response.Status getStatus() {
         return status;
     }
-    
+
     public static Response createHttpResponseFromErrorList(Response.Status status, List<MCRRestAPIError> errors) {
-        if(errors.size()==0){
+        if (errors.size() == 0) {
             return Response.ok().build();
-        }
-        else{
-            return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE).entity(convertErrorListToJSONString(errors)).build();
+        } else {
+            return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE)
+                .entity(convertErrorListToJSONString(errors)).build();
         }
     }
-    
+
     /**
      * takes the status from the first error object
      * @param errors
      * @return
      */
     public static Response createHttpResponseFromErrorList(List<MCRRestAPIError> errors) {
-        if(errors.size()==0){
+        if (errors.size() == 0) {
             return Response.ok().build();
-        }
-        else{
-            return Response.status(errors.get(0).getStatus()).type(MediaType.APPLICATION_JSON_TYPE).entity(convertErrorListToJSONString(errors)).build();
+        } else {
+            return Response.status(errors.get(0).getStatus()).type(MediaType.APPLICATION_JSON_TYPE)
+                .entity(convertErrorListToJSONString(errors)).build();
         }
     }
 
-    
 }

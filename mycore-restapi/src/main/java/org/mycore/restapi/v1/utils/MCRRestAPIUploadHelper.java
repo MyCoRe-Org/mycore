@@ -34,9 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
 import java.util.SortedMap;
@@ -82,7 +79,6 @@ import org.mycore.user2.MCRUserManager;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.SignedJWT;
-import com.trilead.ssh2.signature.RSAPublicKey;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
@@ -296,7 +292,7 @@ public class MCRRestAPIUploadHelper {
                                             }
                                         }
                                     } catch (IOException e) {
-                                        e.printStackTrace();
+                                        LOGGER.error(e);
                                     }
 
                                     MCRFileImportExport.importFiles(derDir.toFile(), difs);
@@ -480,7 +476,7 @@ public class MCRRestAPIUploadHelper {
             signature.initVerify(((RSAKey) jwk).toRSAPublicKey());
             signature.update(message.getBytes(StandardCharsets.ISO_8859_1));
 
-            boolean x = signature.verify(java.util.Base64.getDecoder().decode(base64Signature));
+            boolean x = signature.verify(Base64.getDecoder().decode(base64Signature));
             return x;
 
         } catch (Exception e) {

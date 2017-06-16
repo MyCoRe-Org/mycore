@@ -38,9 +38,10 @@ import org.mycore.restapi.v1.errors.MCRRestAPIException;
  * @author Robert Stephan
  */
 public class MCRRestAPIUtil {
-    
-    private static Pattern ALLOWED_WRITE_IP_PATTERN = Pattern.compile(MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.Write.IPs.Pattern"));
-    
+
+    private static Pattern ALLOWED_WRITE_IP_PATTERN = Pattern
+        .compile(MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.Write.IPs.Pattern"));
+
     /**
      * checks wether the IP of the client is an allowed IP for Upload
      * @param request
@@ -48,14 +49,14 @@ public class MCRRestAPIUtil {
      */
     public static boolean checkWriteAccessForIP(HttpServletRequest request) throws MCRRestAPIException {
         String clientIP = getClientIpAddress(request);
-        if(ALLOWED_WRITE_IP_PATTERN.matcher(clientIP).matches()){
+        if (ALLOWED_WRITE_IP_PATTERN.matcher(clientIP).matches()) {
             return true;
-        }
-        else{
-           throw new MCRRestAPIException(MCRRestAPIError.create(Status.FORBIDDEN,  MCRRestAPIError.CODE_ACCESS_DENIED, "The client IP "+clientIP+" is not allowed to write to the Rest API", null));
+        } else {
+            throw new MCRRestAPIException(MCRRestAPIError.create(Status.FORBIDDEN, MCRRestAPIError.CODE_ACCESS_DENIED,
+                "The client IP " + clientIP + " is not allowed to write to the Rest API", null));
         }
     }
-    
+
     /**
      * returns the client IP-Address from HTTP request
      * 
