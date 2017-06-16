@@ -23,7 +23,7 @@ public class MCRObjectIDConverter implements AttributeConverter<MCRObjectID, Str
 
     @Override
     public MCRObjectID convertToEntityAttribute(String id) {
-        return MCRObjectID.getInstance(id);
+        return id == null ? null : MCRObjectID.getInstance(id);
     }
 
 }
