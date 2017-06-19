@@ -62,8 +62,6 @@ public class MCRSolrInputDocument {
     @XmlID
     @XmlSchemaType(name = "ID")
     protected String id;
-    @XmlAttribute(name = "boost")
-    protected BigDecimal boost;
 
     /**
      * Gets the value of the fieldOrDoc property.
@@ -118,29 +116,5 @@ public class MCRSolrInputDocument {
     public void setId(String value) {
         this.id = value;
     }
-
-    /**
-     * Gets the value of the boost property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigDecimal }
-     *     
-     */
-    public BigDecimal getBoost() {
-        return boost;
-    }
-
-    /**
-     * Sets the value of the boost property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigDecimal }
-     *     
-     */
-    public void setBoost(BigDecimal value) {
-        this.boost = value;
-    }
-
+ 
 }

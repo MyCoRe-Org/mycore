@@ -65,6 +65,7 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
 import com.google.common.hash.Hashing;
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
 @MCRCommandGroup(name = "IFS2 Maintenance Commands")
@@ -384,12 +385,11 @@ public class MCRIFS2Commands {
         // check fctid, size and MD5 of the file
         String fctid = "";
         String md5 = "";
-        try {
-            MCRContentInputStream cis = new MCRContentInputStream(new FileInputStream(node));
+        try (MCRContentInputStream cis = new MCRContentInputStream(new FileInputStream(node))) {
             byte[] header = cis.getHeader();
             fctid = MCRFileContentTypeFactory.detectType(node.getName(), header).getID();
-            cis.close();
-            md5 = Files.hash(node, Hashing.md5()).toString();
+            ByteStreams.copy(cis, ByteStreams.nullOutputStream());
+            md5 = cis.getMD5String();
         } catch (MCRException | IOException e1) {
             e1.printStackTrace();
             return;

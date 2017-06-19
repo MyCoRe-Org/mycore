@@ -42,15 +42,6 @@
 
 package org.mycore.sass;
 
-import io.bit3.jsass.CompilationException;
-import io.bit3.jsass.Options;
-import io.bit3.jsass.Output;
-import io.bit3.jsass.context.FileContext;
-import io.bit3.jsass.context.StringContext;
-import io.bit3.jsass.importer.Import;
-import io.bit3.jsass.importer.Importer;
-import io.bit3.jsass.Compiler;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -69,6 +60,15 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
+
+import io.bit3.jsass.CompilationException;
+import io.bit3.jsass.Compiler;
+import io.bit3.jsass.Options;
+import io.bit3.jsass.Output;
+import io.bit3.jsass.context.FileContext;
+import io.bit3.jsass.context.StringContext;
+import io.bit3.jsass.importer.Import;
+import io.bit3.jsass.importer.Importer;
 
 /**
  * Compiles .scss to .css or .min.css using different sources ({@link Importer}s)
@@ -164,11 +164,6 @@ public class MCRSassCompilerManager {
             firstImport.getAbsoluteUri(), options);
         Compiler compiler = new Compiler();
         Output output = compiler.compile(context);
-
-        if (output.getErrorStatus() != 0) {
-            LOGGER.error(output.getErrorMessage());
-            throw new CompilationException(output.getErrorStatus(), output.getErrorMessage());
-        }
 
         String css = output.getCss();
         boolean compress = name.endsWith(".min.css");

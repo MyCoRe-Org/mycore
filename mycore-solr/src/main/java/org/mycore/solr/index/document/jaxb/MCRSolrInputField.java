@@ -110,31 +110,6 @@ public class MCRSolrInputField {
     }
 
     /**
-     * Gets the value of the boost property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigDecimal }
-     *     
-     */
-    @XmlAttribute(name = "boost")
-    public BigDecimal getBoost() {
-        return boost;
-    }
-
-    /**
-     * Sets the value of the boost property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigDecimal }
-     *     
-     */
-    public void setBoost(BigDecimal value) {
-        this.boost = value;
-    }
-
-    /**
      * Gets the value of the update property.
      * 
      * @return
