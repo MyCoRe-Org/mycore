@@ -62,6 +62,7 @@ import com.nimbusds.jwt.SignedJWT;
 @MCRStaticContent
 public class MCRRestAPIAuthentication {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIAuthentication.class);
+
     /**
      * return the server public key as Java Web Token
      * 
@@ -121,8 +122,8 @@ public class MCRRestAPIAuthentication {
         }
         //validate username and password
         if (username != null && password != null && MCRUserManager.checkPassword(username, password) != null) {
-            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("rest-api"), MCRFrontendUtil.getBaseURL(),
-                clientPubKey);
+            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("rest-api"),
+                MCRFrontendUtil.getBaseURL(), clientPubKey);
             if (jwt != null) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("{");

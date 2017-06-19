@@ -369,7 +369,8 @@ public class MCRRestAPIUploadHelper {
                         MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
                         MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
-                        //MCRAccessManager.checkPermission(uses CACHE, which seems to be dirty from other calls and cannot be deleted)????
+                        //MCRAccessManager.checkPermission
+                        //(uses CACHE, which seems to be dirty from other calls and cannot be deleted)????
                         if (MCRAccessManager.getAccessImpl().checkPermission(derID.toString(), PERMISSION_WRITE)) {
                             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
