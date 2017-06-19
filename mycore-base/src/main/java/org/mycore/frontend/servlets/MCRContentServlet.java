@@ -54,6 +54,7 @@ public abstract class MCRContentServlet extends MCRServlet {
 
     @Override
     public void init() throws ServletException {
+        super.init();
         this.config = MCRServletContentHelper.buildConfig(getServletConfig());
     }
 

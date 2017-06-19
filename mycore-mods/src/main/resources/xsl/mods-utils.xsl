@@ -5,6 +5,8 @@
   exclude-result-prefixes="i18n mcrxml xalan xlink">
 
   <xsl:param name="CurrentUser" />
+  <xsl:param name="CurrentLang" />
+  <xsl:param name="DefaultLang" />
   <xsl:param name="ServletsBaseURL" />
 
   <xsl:template mode="mods.type" match="mods:mods">
@@ -296,9 +298,24 @@
   </xsl:template>
 
   <xsl:template match="mods:accessCondition" mode="cc-text">
-    <!-- like cc_by-nc-sa: remove the 'cc_' -->
-    <xsl:variable name="licenseString" select="substring-before(substring-after(@xlink:href, '#cc_'), '_')" />
-    <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.cc.30.', $licenseString))" />
+    <xsl:variable name="trimmed" select="substring-after(normalize-space(@xlink:href),'#')" />
+    <xsl:variable name="licenseURI" select="concat('classification:metadata:0:children:mir_licenses:',$trimmed)" />
+    <xsl:variable name="licenseXML" select="document($licenseURI)" />
+    <xsl:choose>
+      <xsl:when test="$licenseXML//category/label[@xml:lang=$CurrentLang]/@text">
+        <xsl:value-of select="$licenseXML//category/label[@xml:lang=$CurrentLang]/@text" />
+      </xsl:when>
+      <xsl:when test="$licenseXML//category/label[@xml:lang=$DefaultLang]/@text">
+        <xsl:value-of select="$licenseXML//category/label[@xml:lang=$DefaultLang]/@text" />
+      </xsl:when>
+      <xsl:when test="$licenseXML//category/label[1]/@text">
+        <xsl:value-of select="$licenseXML//category/label[1]/@text" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$trimmed" />
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
   <xsl:template match="mods:accessCondition" mode="rights_reserved">
