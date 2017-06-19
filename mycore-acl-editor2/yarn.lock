@@ -19,6 +19,10 @@ async@0.2.10:
   version "0.2.10"
   resolved "https://registry.yarnpkg.com/async/-/async-0.2.10.tgz#b6bbe0b0674b9d719708ca38de8c237cb526c3d1"
 
+bootstrap-3-typeahead@4.0.0:
+  version v4.0.0
+  resolved "https://registry.yarnpkg.com/bootstrap-3-typeahead/-/bootstrap-3-typeahead-4.0.0.tgz#334871fda1cd74a8f3a0497152712e547e385ff3"
+
 bower@1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/bower/-/bower-1.8.0.tgz#55dbebef0ad9155382d9e9d3e497c1372345b44a"
@@ -175,6 +179,10 @@ inherits@2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
 
+"jquery-stupid-table@https://github.com/eckstueck/Stupid-Table-Plugin.git":
+  version "1.0.1"
+  resolved "https://github.com/eckstueck/Stupid-Table-Plugin.git#8bd410e9431031aef3d383891ee8f1a668fa80f1"
+
 js-yaml@~2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-2.0.5.tgz#a25ae6509999e97df278c6719da11bd0687743a8"
@@ -225,6 +233,10 @@ rimraf@~2.2.8:
 rimraf@2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.2.6.tgz#c59597569b14d956ad29cacc42bdddf5f0ea4f4c"
+
+select2@3.4.3:
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/select2/-/select2-3.4.3.tgz#80b05c510b878562dc4aead0ec2cda88c09c6603"
 
 sigmund@~1.0.0:
   version "1.0.1"

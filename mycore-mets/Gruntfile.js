@@ -3,69 +3,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-html2js');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-tslint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-
-    const COMPONENTS_PATH = "bower_components/";
-
-    /**
-     * Gets the version of a package by package name
-     * @param pkg the name of the package
-     * @return {*} the version of the bower package
-     */
-    var getVersion = function (pkg) {
-        var possiblePaths = [COMPONENTS_PATH + pkg + '/bower.json', COMPONENTS_PATH + pkg + '/.bower.json'];
-        var versionString, existingFiles = possiblePaths.filter(function (path, i, arr) {
-            return grunt.file.exists(path);
-        });
-        if (existingFiles.length === 0) {
-            throw "no bower.json ";
-        }
-        existingFiles.map(function (file) {
-            return grunt.file.readJSON(file);
-        }).filter(function (json) {
-            return "version" in json;
-        }).forEach(function (json) {
-            versionString = json.version;
-        });
-        return versionString;
-    };
-
-    const SHARED_LAYOUT = function (type, pkg, sourceDir) { // this function tells the plugin where to put the files
-        /*
-         Example:
-         sourceDir: bower_components/jquery/dist/jquery.js
-         type: __untyped__ // type resolution of this plugin is crap
-         pkg: jquery
-
-         Every Package has files which are declared as "main" (see bower.json of the packages).
-         We only need these.
-         */
-        var versionString = getVersion(pkg);
-
-        // get relative path in component.
-        var relativePath = sourceDir.substr(COMPONENTS_PATH.length + pkg.length + 1);
-        // +1 because / ist not in package name
-
-        var prefixFolder = "shared/";
-
-        // relativePath ist now dist/jquery.js but we only need dist/
-        var relativePathWithoutFileName = relativePath.split("/").filter(function (e, i, a) {
-            /*
-             we can do some advanced filtering like skip "dist/" or skip "src/"
-             But its better if we keep the original structure
-             */
-            return i !== a.length - 1;
-        }).join("/");
-
-
-        var path = require("path");
-        return path.join(prefixFolder + pkg + "/" + versionString + "/" + relativePathWithoutFileName);
-    };
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -75,24 +17,10 @@ module.exports = function (grunt) {
             outputPath: "./target/classes/META-INF/resources/module/mets" // used for things which should be included in .jar file
         }, /*    webVisiblePath: "../archive/docportal/build/webapps/",
          outputPath: "../archive/docportal/build/webapps/module/mets"*/
-        bower: { // Downloads libs like jquery, angularjs or bootstrap
-            install: {
-                options: {
-                    targetDir: '<%= properties.webVisiblePath %>',
-                    install: true,
-                    verbose: false,
-                    cleanTargetDir: true,
-                    cleanBowerDir: false,
-                    bowerOptions: {},
-                    layout: SHARED_LAYOUT
-                }
-            }
-        },
         clean: {
-            dependecies: ["bower_components/"],
             compiled: ["<%= properties.outputPath %>/js", "target/css"],
             copied: ["<%= properties.outputPath %>/example", "target/json"],
-            all: ["<%= properties.outputPath %>/", "bower_components/"]
+            all: ["<%= properties.outputPath %>/"]
         },
         ts: { // Compiles Typescript files
             MetsEditorClient: {
@@ -144,29 +72,49 @@ module.exports = function (grunt) {
             }
         },
         copy: { // Copys files to the target folder
-            exampleJson: {
-                expand: true,
-                cwd: 'src/main/',
-                src: ["json/**"],
-                dest: '<%= properties.outputPath %>/'
+            sources: {
+                exampleJson: {
+                    expand: true,
+                    cwd: 'src/main/',
+                    src: ["json/**"],
+                    dest: '<%= properties.outputPath %>/'
+                },
+                exampleHtml: {
+                    expand: true,
+                    cwd: 'src/main/',
+                    src: ["example/**"],
+                    dest: '<%= properties.outputPath %>/'
+                },
+                images: {
+                    expand: true,
+                    cwd: 'src/main/',
+                    src: ["img/**"],
+                    dest: '<%= properties.outputPath %>/'
+                },
+                lib: {
+                    expand: true,
+                    cwd: 'src/main/',
+                    src: ["lib/**"],
+                    dest: '<%= properties.outputPath %>/'
+                }
             },
-            exampleHtml: {
+            frontendFiles: {
                 expand: true,
-                cwd: 'src/main/',
-                src: ["example/**"],
-                dest: '<%= properties.outputPath %>/'
-            },
-            images: {
-                expand: true,
-                cwd: 'src/main/',
-                src: ["img/**"],
-                dest: '<%= properties.outputPath %>/'
-            },
-            lib: {
-                expand: true,
-                cwd: 'src/main/',
-                src: ["lib/**"],
-                dest: '<%= properties.outputPath %>/'
+                cwd: './node_modules',
+                src: [
+                    "jquery/dist/jquery.js",
+                    "angular/angular.js",
+                    "angular-resource/angular-resource.js",
+                    "angular-bootstrap/ui-bootstrap-tpls.js",
+                    "bootstrap/dist/**",
+                    "angular-mocks/angular-mocks.js",
+                    "angular-hotkeys/build/hotkeys.min.js",
+                    "angular-hotkeys/build/hotkeys.min.css",
+                    "angular-borderlayout2/dist/borderLayout.js",
+                    "angular-borderlayout2/dist/borderLayout.css",
+                    "angular-lazy-image/release/lazy-image.js"
+                ],
+                dest: '<%= properties.webVisiblePath %>/shared/'
             }
         },
         less: {
@@ -194,8 +142,8 @@ module.exports = function (grunt) {
         },
         jasmine: { // runs javascript unit Tests
             pivotal: {
-                src: ['<%= properties.webVisiblePath %>/shared/angular/1.4.5-build.4179+sha.d881673/angular.js',
-                    '<%= properties.webVisiblePath %>/shared/angular-mocks/1.3.17/angular-mocks.js',
+                src: ['<%= properties.webVisiblePath %>/shared/angular/angular.js',
+                    '<%= properties.webVisiblePath %>/shared/angular-mocks/angular-mocks.js',
                     '<%= properties.outputPath %>/js/MetsEditor.js'],
                 options: {
                     specs: '<%= properties.outputPath %>/js/MetsEditor-tests.js'
@@ -222,11 +170,11 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.task.registerTask("dependencies", ["bower:install"]);
+    grunt.task.registerTask("dependencies", ["copy:frontendFiles"]);
     grunt.task.registerTask("compile", ["ts:MetsEditorClient", "less:MetsEditorClient", "html2js:templates", "uglify"]);
     grunt.task.registerTask("compileTests", ["ts:MetsEditorClientTests"]);
     grunt.task.registerTask("default", ["dependencies", "compile", "compileTests", "tslint",
-        "copy"]);
+        "copy:sources"]);
 
     grunt.task.registerTask("developer", function () {
         var connect = require('connect');

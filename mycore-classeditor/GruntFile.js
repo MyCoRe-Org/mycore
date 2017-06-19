@@ -10,24 +10,24 @@ module.exports = function (grunt) {
                     files: [
                         {
                             expand: true,
-                            cwd: './bower_components/font-awesome',
-                            dest: './target/classes/META-INF/resources/modules/classeditor/bower_components/font-awesome',
+                            cwd: './node_modules/font-awesome',
+                            dest: './target/classes/META-INF/resources/modules/classeditor/node_modules/font-awesome',
                             src: [
                                 '**'
                             ]
                         },
                         {
                             expand: true,
-                            cwd: './bower_components/dojo',
-                            dest: './target/classes/META-INF/resources/modules/classeditor/bower_components/dojo',
+                            cwd: './node_modules/dojo',
+                            dest: './target/classes/META-INF/resources/modules/classeditor/node_modules/dojo',
                             src: [
                                 '**'
                             ]
                         },
                         {
                             expand: true,
-                            cwd: './bower_components/dijit',
-                            dest: './target/classes/META-INF/resources/modules/classeditor/bower_components/dijit',
+                            cwd: './node_modules/dijit',
+                            dest: './target/classes/META-INF/resources/modules/classeditor/node_modules/dijit',
                             src: [
                                 '**'
                             ]

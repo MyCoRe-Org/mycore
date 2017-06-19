@@ -10,24 +10,24 @@ module.exports = function (grunt) {
                     files: [
                         {
                             expand: true,
-                            cwd: './bower_components/ckeditor',
-                            dest: './target/classes/META-INF/resources/modules/wcms2/bower_components/ckeditor',
+                            cwd: './node_modules/ckeditor',
+                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/ckeditor',
                             src: [
                                 '**'
                             ]
                         },
                         {
                             expand: true,
-                            cwd: './bower_components/dojo',
-                            dest: './target/classes/META-INF/resources/modules/wcms2/bower_components/dojo',
+                            cwd: './node_modules/dojo',
+                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/dojo',
                             src: [
                                 '**'
                             ]
                         },
                         {
                             expand: true,
-                            cwd: './bower_components/dijit',
-                            dest: './target/classes/META-INF/resources/modules/wcms2/bower_components/dijit',
+                            cwd: './node_modules/dijit',
+                            dest: './target/classes/META-INF/resources/modules/wcms2/node_modules/dijit',
                             src: [
                                 '**'
                             ]

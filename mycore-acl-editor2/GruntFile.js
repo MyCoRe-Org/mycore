@@ -10,18 +10,18 @@ module.exports = function (grunt) {
                     files: [
                         {
                             expand: true,
-                            cwd: "./bower_components",
-                            dest: "./target/classes/META-INF/resources/modules/acl-editor2/gui/bower_components",
+                            cwd: "./node_modules",
+                            dest: "./target/classes/META-INF/resources/modules/acl-editor2/gui/node_modules",
                             flatten: true,
                             src: [
                                 "./jquery-stupid-table/stupidtable.min.js",
-                                "./bootstrap3-typeahead/bootstrap3-typeahead.min.js"
+                                "./bootstrap-3-typeahead/bootstrap3-typeahead.min.js"
                             ]
                         },
                         {
                             expand: true,
-                            cwd: "./bower_components/select2",
-                            dest: "./target/classes/META-INF/resources/modules/acl-editor2/gui/bower_components/select2",
+                            cwd: "./node_modules/select2",
+                            dest: "./target/classes/META-INF/resources/modules/acl-editor2/gui/node_modules/select2",
                             src: [
                                 '**'
                             ]
