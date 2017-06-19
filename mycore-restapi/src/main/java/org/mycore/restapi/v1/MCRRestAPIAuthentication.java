@@ -141,8 +141,8 @@ public class MCRRestAPIAuthentication {
         msg.append("{");
         msg.append("\n    \"login_successful\":false,");
         msg.append("\n    \"error\": \"login_failed\"");
-        msg.append(
-            "\n    \"error_description\": \"Login failed. Please provider proper user name and password via HTTP Basic Authentication.\"");
+        msg.append("\n    \"error_description\": ");
+        msg.append("\"Login failed. Please provider proper user name and password via HTTP Basic Authentication.\"");
         msg.append("\n}");
 
         return Response.status(Status.FORBIDDEN).header("WWW-Authenticate", "Basic realm=\"MyCoRe REST API\"")
