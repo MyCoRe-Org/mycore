@@ -5,6 +5,7 @@ package org.mycore.datamodel.metadata.history;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,14 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *
  */
 public class MCRMetadataHistoryManager extends MCREventHandlerBase {
+
+    public static Optional<MCRObjectID> getHighestStoredID(String project, String type) {
+        String looksLike = Objects.requireNonNull(project) + "\\_" + Objects.requireNonNull(type) + "%";
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRObjectID> query = em.createNamedQuery("MCRMetaHistory.getHighestID", MCRObjectID.class);
+        query.setParameter("looksLike", looksLike);
+        return Optional.ofNullable(query.getSingleResult());
+    }
 
     public static Optional<Instant> getHistoryStart() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
@@ -51,13 +60,10 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
 
     public static Optional<Instant> getLastDeletedDate(MCRObjectID identifier) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        TypedQuery<Instant> query = em.createNamedQuery("MCRMetaHistory.getLastDeleted", Instant.class);
+        TypedQuery<Instant> query = em.createNamedQuery("MCRMetaHistory.getLastOfType", Instant.class);
         query.setParameter("id", identifier);
-        try {
-            return Optional.of(query.getSingleResult());
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        query.setParameter("type", MCRMetadataHistoryEventType.Delete);
+        return Optional.ofNullable(query.getSingleResult());
     }
 
     private void createNow(MCRObjectID id) {
