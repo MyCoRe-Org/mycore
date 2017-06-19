@@ -52,14 +52,12 @@ public class MCRPersistentIdentifierManager {
         typeParserMap = new ConcurrentHashMap<>();
 
         Map<String, String> parserPropertiesMap = MCRConfiguration.instance().getPropertiesMap(PARSER_CONFIGURATION);
-        System.out.println("ParserMap: " + parserPropertiesMap.size());
         parserPropertiesMap.forEach((k, v) -> {
             String type = k.substring(PARSER_CONFIGURATION.length());
             try {
                 @SuppressWarnings("unchecked")
                 Class<? extends MCRPersistentIdentifierParser<?>> parserClass =
                         (Class<? extends MCRPersistentIdentifierParser<?>>) Class.forName(v);
-                System.out.println("Parser: " + k + " - " + v);
                 registerParser(type, parserClass);
             } catch (ClassNotFoundException e) {
                 throw new MCRConfigurationException("Could not load class " + v + " defined in " + k);
@@ -97,7 +95,6 @@ public class MCRPersistentIdentifierManager {
 
     public static MCRPersistentIdentifierManager getInstance() {
         if (instance == null) {
-            System.out.println("instance is null");
             instance = new MCRPersistentIdentifierManager();
         }
 
@@ -125,12 +122,12 @@ public class MCRPersistentIdentifierManager {
         return em.createQuery(
                 rowCountQuery
                         .select(cb.count(pi))
-                        .where(cb.equal(pi.get(MCRPI_.type), mcrpiRegistrationInfo.getType()))
-                        .where(cb.equal(pi.get(MCRPI_.additional), mcrpiRegistrationInfo.getAdditional()))
-                        .where(cb.equal(pi.get(MCRPI_.identifier), mcrpiRegistrationInfo.getIdentifier()))
-                        .where(cb.equal(pi.get(MCRPI_.service), mcrpiRegistrationInfo.getService()))
-                        .where(cb.equal(pi.get(MCRPI_.mycoreID), mcrpiRegistrationInfo.getMycoreID()))
-        ).getSingleResult().intValue() > 0;
+                    .where(cb.equal(pi.get(MCRPI_.type), mcrpiRegistrationInfo.getType()),
+                        cb.equal(pi.get(MCRPI_.additional), mcrpiRegistrationInfo.getAdditional()),
+                        cb.equal(pi.get(MCRPI_.identifier), mcrpiRegistrationInfo.getIdentifier()),
+                        cb.equal(pi.get(MCRPI_.service), mcrpiRegistrationInfo.getService()),
+                        cb.equal(pi.get(MCRPI_.mycoreID), mcrpiRegistrationInfo.getMycoreID()))).getSingleResult()
+            .intValue() > 0;
     }
 
     public MCRPI get(String service, String mycoreID, String additional) {
@@ -141,9 +138,10 @@ public class MCRPersistentIdentifierManager {
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
         return em.createQuery(
                 getQuery
-                        .where(cb.equal(pi.get(MCRPI_.additional), additional))
-                        .where(cb.equal(pi.get(MCRPI_.mycoreID), mycoreID))
-                        .where(cb.equal(pi.get(MCRPI_.service), service))).getSingleResult();
+                    .where(
+                        cb.equal(pi.get(MCRPI_.additional), additional),
+                        cb.equal(pi.get(MCRPI_.mycoreID), mycoreID),
+                        cb.equal(pi.get(MCRPI_.service), service))).getSingleResult();
 
     }
 
