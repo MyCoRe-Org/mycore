@@ -969,14 +969,14 @@
         <version>59.1</version>
       </dependency>
       <dependency>
-        <groupId>com.rometools</groupId>
-        <artifactId>rome</artifactId>
-        <version>1.7.3</version>
-      </dependency>
-      <dependency>
         <groupId>com.nimbusds</groupId>
         <artifactId>nimbus-jose-jwt</artifactId>
         <version>4.39</version>
+      </dependency>
+      <dependency>
+        <groupId>com.rometools</groupId>
+        <artifactId>rome</artifactId>
+        <version>1.7.3</version>
       </dependency>
       <dependency>
         <groupId>com.yahoo.platform.yui</groupId>
