@@ -79,14 +79,14 @@ public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
         }
     }
 
-    private static void handleCreated(MCRObjectService objService) {
+    protected static void handleCreated(MCRObjectService objService) {
         objService.removeFlags(MCRObjectService.FLAG_TYPE_CREATEDBY);
         objService.addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, MCRSessionMgr.getCurrentSession()
             .getUserInformation().getUserID());
         handleUpdated(objService);
     }
 
-    private static void setDefaultState(MCRObjectService objService) {
+    protected static void setDefaultState(MCRObjectService objService) {
         if (objService.getState() == null) {
             MCRCategoryID defaultState = new MCRCategoryID(
                 MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID"),
@@ -95,18 +95,18 @@ public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
         }
     }
 
-    private static void handleUpdated(MCRObjectService objectService) {
+    protected static void handleUpdated(MCRObjectService objectService) {
         objectService.removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
         objectService.addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY,
             MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
     }
 
-    private static boolean isStateChanged(MCRObject oldVersion, MCRObject obj) {
+    protected static boolean isStateChanged(MCRObject oldVersion, MCRObject obj) {
         MCRCategoryID newState = obj.getService().getState();
         return newState != null && oldVersion != null && !newState.equals(oldVersion.getService().getState());
     }
 
-    private static void updateDerivateState(MCRObject obj) {
+    protected static void updateDerivateState(MCRObject obj) {
         MCRCategoryID state = obj.getService().getState();
         obj
             .getStructure()
@@ -116,7 +116,7 @@ public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
             .forEach(id -> updateDerivateState(id, state));
     }
 
-    private static void updateDerivateState(MCRObjectID derID, MCRCategoryID state) {
+    protected static void updateDerivateState(MCRObjectID derID, MCRCategoryID state) {
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derID);
         MCRCategoryID oldState = derivate.getService().getState();
         if (!state.equals(oldState)) {
