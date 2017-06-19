@@ -1,5 +1,15 @@
 package org.mycore.pi.urn.rest;
 
+import static org.mycore.pi.MCRPIUtils.generateMCRPI;
+import static org.mycore.pi.MCRPIUtils.randomFilename;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -11,13 +21,6 @@ import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.mycore.pi.MCRPIUtils.generateMCRPI;
-import static org.mycore.pi.MCRPIUtils.randomFilename;
-
 /**
  * Created by chi on 23.02.17.
  *
@@ -28,6 +31,8 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
             + "where u.type = :type "
             + "and u.registered is not null";
     public static final int BATCH_SIZE = 20;
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Ignore
     @Test
@@ -43,17 +48,17 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
                                       .stream()
                                       .map(MCRPIRegistrationInfo::getIdentifier)
                                       .map("URN: "::concat)
-                                      .forEach(System.out::println);
+            .forEach(LOGGER::info);
 
-        while (MCRPersistentIdentifierManager
-                .getInstance()
-                .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, MCRPIUtils.getMCRURNClient()::register, BATCH_SIZE)
-                > 0) {
-
-        }
+        Integer progressedIdentifiersFromDatabase;
+        Function<MCRPIRegistrationInfo, Optional<Date>> registerFn = MCRPIUtils.getMCRURNClient()::register;
+        do {
+            progressedIdentifiersFromDatabase = MCRPersistentIdentifierManager.getInstance()
+                .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, registerFn, BATCH_SIZE);
+        } while (progressedIdentifiersFromDatabase > 0);
 
         boolean registered = MCRPersistentIdentifierManager.getInstance().isRegistered(urn1);
-        System.out.println("Registered: " + registered);
+        LOGGER.info("Registered: " + registered);
 
         MCRPI mcrpi = MCREntityManagerProvider.getCurrentEntityManager().find(MCRPI.class, urn1.getId());
         Optional.ofNullable(mcrpi)
@@ -61,15 +66,15 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
                 .map(MCRPI::getRegistered)
                 .map(Date::toString)
                 .map("URN registered: "::concat)
-                .ifPresent(System.out::println);
+            .ifPresent(LOGGER::info);
 
         MCRPersistentIdentifierManager.getInstance().getUnregisteredIdentifiers(urn1.getType())
                                       .stream()
                                       .map(MCRPIRegistrationInfo::getIdentifier)
                                       .map("URN update: "::concat)
-                                      .forEach(System.out::println);
+            .forEach(LOGGER::info);
 
-        System.out.println("end.");
+        LOGGER.info("end.");
     }
 
     @Override

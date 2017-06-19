@@ -163,9 +163,9 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         configuration.put("MCR.PI.Registration." + MOCK_SERVICE + ".Generator", MOCK_PID_GENERATOR);
         configuration.put("MCR.PI.Registration." + MOCK_SERVICE + ".Inscriber", MOCK_INSCRIBER);
 
-        configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER, MCRMockInscriber.class.getName());
-        configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER + "." + MCRMockInscriber.TEST_PROPERTY,
-                          MCRMockInscriber.TEST_PROPERTY_VALUE);
+        configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER, MCRMockMetadataManager.class.getName());
+        configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER + "." + MCRMockMetadataManager.TEST_PROPERTY,
+                          MCRMockMetadataManager.TEST_PROPERTY_VALUE);
 
         configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR, MCRMockIdentifierGenerator.class.getName());
         configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR + "." + MCRMockIdentifierGenerator.TEST_PROPERTY,

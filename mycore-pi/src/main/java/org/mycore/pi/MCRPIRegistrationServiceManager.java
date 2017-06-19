@@ -18,13 +18,20 @@ public class MCRPIRegistrationServiceManager {
         return InstanceHolder.instance;
     }
 
-    public List<String> getServiceList() {
+    public List<String> getServiceIDList() {
         return MCRConfiguration.instance()
                 .getPropertiesMap(REGISTRATION_SERVICE_CONFIG_PREFIX)
                 .keySet()
                 .stream()
                 .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
                 .collect(Collectors.toList());
+    }
+
+    public List<MCRPIRegistrationService> getServiceList() {
+        return getServiceIDList()
+            .stream()
+            .map(this::getRegistrationService)
+            .collect(Collectors.toList());
     }
 
     public <T extends MCRPersistentIdentifier> MCRPIRegistrationService<T> getRegistrationService(String registrationServiceID) {

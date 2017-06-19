@@ -49,7 +49,6 @@ public class MCRDOIRest {
 
     public static void main(String[] args) throws MCRIdentifierUnresolvableException {
         MCRDOIRestResponse mcrdoiRestResponse = get(new MCRDOIParser().parse("10.1000/1").get());
-        System.out.println(mcrdoiRestResponse.toString());
     }
 
 }

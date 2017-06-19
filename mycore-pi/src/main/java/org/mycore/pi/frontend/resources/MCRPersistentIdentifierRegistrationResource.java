@@ -69,7 +69,11 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response listServices() {
         return Response
                 .status(Response.Status.OK)
-                .entity(MCRPIRegistrationServiceManager.getInstance().getServiceList().stream().collect(Collectors.joining(",")))
+                .entity(MCRPIRegistrationServiceManager
+                .getInstance()
+                .getServiceIDList()
+                .stream()
+                .collect(Collectors.joining(",")))
                 .build();
     }
 
@@ -78,7 +82,7 @@ public class MCRPersistentIdentifierRegistrationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response register(@PathParam("serviceName") String serviceName, @PathParam("mycoreId") String mycoreId, @DefaultValue("") @QueryParam("additional") String additional) {
 
-        if (!MCRPIRegistrationServiceManager.getInstance().getServiceList().contains(serviceName)) {
+        if (!MCRPIRegistrationServiceManager.getInstance().getServiceIDList().contains(serviceName)) {
             return Response.status(Response.Status.BAD_REQUEST).entity(buildErrorJSON("No Registration Service found for " + serviceName)).build();
         }
 
