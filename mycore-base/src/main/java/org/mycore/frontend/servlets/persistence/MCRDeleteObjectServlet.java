@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.frontend.servlets.persistence;
 
@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -25,7 +26,7 @@ import org.xml.sax.SAXParseException;
 public class MCRDeleteObjectServlet extends MCRPersistenceServlet {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3148314720092349972L;
 
@@ -37,8 +38,8 @@ public class MCRDeleteObjectServlet extends MCRPersistenceServlet {
 
     @Override
     void displayResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.sendRedirect(
-            response.encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "editor_deleted.xml"));
+        String deletedRedirect = MCRConfiguration.instance().getString("MCR.Persistence.PageDelete").trim();
+        response.sendRedirect(response.encodeRedirectURL(MCRFrontendUtil.getBaseURL() + deletedRedirect));
     }
 
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+  <section i18n="component.base.page.deleted.title" xml:lang="all">
+    <div class="row">
+      <div class="col-xs-8 col-xs-offset-2">
+        <p style="padding: 15px;" class="bg-success text-center">
+          <i18n key="component.base.page.deleted.text"/>
+        </p>
+      </div>
+    </div>
+  </section>
+
+</MyCoReWebPage>
