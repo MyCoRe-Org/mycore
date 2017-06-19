@@ -64,9 +64,6 @@ public class MCRSolrInputDocumentGenerator {
     public static SolrInputDocument getSolrInputDocument(MCRSolrInputDocument jaxbDoc) {
         SolrInputDocument doc = new SolrInputDocument();
         HashSet<MCRSolrInputField> duplicateFilter = new HashSet<>();
-        if (jaxbDoc.getBoost() != null) {
-            doc.setDocumentBoost(jaxbDoc.getBoost().floatValue());
-        }
         for (Object o : jaxbDoc.getFieldOrDoc()) {
             if (o instanceof MCRSolrInputField) {
                 MCRSolrInputField field = (MCRSolrInputField) o;
@@ -77,11 +74,7 @@ public class MCRSolrInputDocumentGenerator {
                     LOGGER.debug("adding " + field.getName() + "=" + field.getValue());
                 }
                 duplicateFilter.add(field);
-                if (field.getBoost() != null) {
-                    doc.addField(field.getName(), field.getValue(), field.getBoost().floatValue());
-                } else {
-                    doc.addField(field.getName(), field.getValue());
-                }
+                doc.addField(field.getName(), field.getValue());
             } else if (o instanceof MCRSolrInputDocument) {
                 MCRSolrInputDocument child = (MCRSolrInputDocument) o;
                 SolrInputDocument solrChild = getSolrInputDocument(child);

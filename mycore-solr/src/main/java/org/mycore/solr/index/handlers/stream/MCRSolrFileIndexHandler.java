@@ -26,8 +26,6 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     final static Logger LOGGER = LogManager.getLogger(MCRSolrFileIndexHandler.class);
 
-    final static float DEFAULT_BOOST = (new SolrInputField(null)).getBoost(); //normally 1.0f
-
     public MCRSolrFileIndexHandler(MCRSolrPathContentStream stream) {
         super(stream);
     }
@@ -75,9 +73,6 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
                 params.set(name, values);
             } else {
                 params.set(name, field.getValue().toString());
-            }
-            if (field.getBoost() != DEFAULT_BOOST) {
-                params.set("boost." + field.getName(), Float.toString(field.getBoost()));
             }
         }
         return params;
