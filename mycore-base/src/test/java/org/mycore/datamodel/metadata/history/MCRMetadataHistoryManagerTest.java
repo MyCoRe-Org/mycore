@@ -1,6 +1,6 @@
 package org.mycore.datamodel.metadata.history;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.time.Instant;
 import java.util.Map;
