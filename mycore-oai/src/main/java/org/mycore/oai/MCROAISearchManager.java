@@ -23,15 +23,15 @@ import org.mycore.oai.set.MCRSet;
 /**
  * Search manager of the mycore OAI-PMH implementation. Creates a new
  * {@link MCROAISearcher} instance for each
- * {@link #searchHeader(MetadataFormat, MCRSet, ZonedDateTime, ZonedDateTime)}
- * and {@link #searchRecord(MetadataFormat, MCRSet, ZonedDateTime, ZonedDateTime)} call.
+ * {@link #searchHeader(MetadataFormat, MCRSet, Instant, Instant)}
+ * and {@link #searchRecord(MetadataFormat, MCRSet, Instant, Instant)} call.
  * The resumption token created by those methods can be reused for
  * later calls to the same searcher. A searcher is dropped after an
  * expiration time. The time increases for each query call.
- * 
+ *
  * <p>Due to token based querying it is not possible to set a current
  * position for the resumption token. Its always set to -1.</p>
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCROAISearchManager {
@@ -58,7 +58,7 @@ public class MCROAISearchManager {
     }
 
     public MCROAISearchManager() {
-        this.resultMap = new ConcurrentHashMap<String, MCROAISearcher>();
+        this.resultMap = new ConcurrentHashMap<>();
         TimerTask tt = new TimerTask() {
             public void run() {
                 for (Map.Entry<String, MCROAISearcher> entry : resultMap.entrySet()) {
@@ -109,16 +109,14 @@ public class MCROAISearchManager {
         return getRecordList(searcher, result);
     }
 
-    public OAIDataList<Header> searchHeader(MetadataFormat format, MCRSet set, Instant from,
-        Instant until) {
+    public OAIDataList<Header> searchHeader(MetadataFormat format, MCRSet set, Instant from, Instant until) {
         MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager, objManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);
         return getHeaderList(searcher, result);
     }
 
-    public OAIDataList<Record> searchRecord(MetadataFormat format, MCRSet set, Instant from,
-        Instant until) {
+    public OAIDataList<Record> searchRecord(MetadataFormat format, MCRSet set, Instant from, Instant until) {
         MCROAISearcher searcher = getSearcher(this.identify, format, getPartitionSize(), setManager, objManager);
         this.resultMap.put(searcher.getID(), searcher);
         MCROAIResult result = searcher.query(set, from, until);
@@ -126,7 +124,7 @@ public class MCROAISearchManager {
     }
 
     protected OAIDataList<Record> getRecordList(MCROAISearcher searcher, MCROAIResult result) {
-        OAIDataList<Record> recordList = new OAIDataList<Record>();
+        OAIDataList<Record> recordList = new OAIDataList<>();
         result.list().forEach(header -> {
             Record record = this.objManager.getRecord(header, searcher.getMetadataFormat());
             if (record != null) {
@@ -138,7 +136,7 @@ public class MCROAISearchManager {
     }
 
     protected OAIDataList<Header> getHeaderList(MCROAISearcher searcher, MCROAIResult result) {
-        OAIDataList<Header> headerList = new OAIDataList<Header>();
+        OAIDataList<Header> headerList = new OAIDataList<>();
         headerList.addAll(result.list());
         this.setResumptionToken(headerList, searcher, result);
         return headerList;
@@ -162,15 +160,13 @@ public class MCROAISearchManager {
     }
 
     protected void setResumptionToken(OAIDataList<?> dataList, MCROAISearcher searcher, MCROAIResult result) {
-        result.nextCursor()
-            .map(cursor -> {
-                DefaultResumptionToken rsToken = new DefaultResumptionToken();
-                rsToken.setToken(searcher.getID() + TOKEN_DELIMITER + cursor);
-                rsToken.setCompleteListSize(result.getNumHits());
-                rsToken.setExpirationDate(searcher.getExpirationTime());
-                return rsToken;
-            })
-            .ifPresent(dataList::setResumptionToken);
+        result.nextCursor().map(cursor -> {
+            DefaultResumptionToken rsToken = new DefaultResumptionToken();
+            rsToken.setToken(searcher.getID() + TOKEN_DELIMITER + cursor);
+            rsToken.setCompleteListSize(result.getNumHits());
+            rsToken.setExpirationDate(searcher.getExpirationTime());
+            return rsToken;
+        }).ifPresent(dataList::setResumptionToken);
     }
 
     public int getPartitionSize() {
