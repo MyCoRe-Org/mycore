@@ -17,16 +17,16 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
 
     private static final Instant HISTORY_START = Instant.parse("2017-06-19T10:28:36.565Z");
 
+    private MCRObjectID testObject;
+
+    private Instant lastDelete;
+
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.Metadata.Type.mods", Boolean.TRUE.toString());
         return testProperties;
     }
-
-    private MCRObjectID testObject;
-
-    private Instant lastDelete;
 
     @Override
     public void setUp() throws Exception {
