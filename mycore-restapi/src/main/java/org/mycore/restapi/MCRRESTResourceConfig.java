@@ -4,7 +4,7 @@
 package org.mycore.restapi;
 
 import org.mycore.common.config.MCRConfiguration;
-
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 /**
@@ -22,6 +22,7 @@ public class MCRRESTResourceConfig extends ResourceConfig {
                                             .stream()
                                             .toArray(String[]::new);
         packages(restPackages);
+        register(MultiPartFeature.class);
     }
 
 }

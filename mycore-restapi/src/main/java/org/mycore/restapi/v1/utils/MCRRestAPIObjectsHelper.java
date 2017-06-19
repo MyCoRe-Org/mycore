@@ -48,6 +48,7 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.logging.log4j.LogManager;
@@ -81,7 +82,6 @@ import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.restapi.v1.MCRRestAPIObjects;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.restapi.v1.errors.MCRRestAPIFieldError;
 import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
 import org.mycore.solr.MCRSolrClientFactory;
 
@@ -106,8 +106,8 @@ public class MCRRestAPIObjectsHelper {
             Element eStructure = doc.getRootElement().getChild("structure");
             if (queryParamStyle != null && !MCRRestAPIObjects.STYLE_DERIVATEDETAILS.equals(queryParamStyle)) {
                 throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.BAD_REQUEST,
-                    "The value of parameter {style} is not allowed.", "Allowed values for {style} parameter are: "
-                        + MCRRestAPIObjects.STYLE_DERIVATEDETAILS));
+                    MCRRestAPIError.CODE_WRONG_PARAMETER, "The value of parameter {style} is not allowed.",
+                    "Allowed values for {style} parameter are: " + MCRRestAPIObjects.STYLE_DERIVATEDETAILS));
             }
 
             if (MCRRestAPIObjects.STYLE_DERIVATEDETAILS.equals(queryParamStyle) && eStructure != null) {
@@ -141,19 +141,19 @@ public class MCRRestAPIObjectsHelper {
                 outputter.output(doc, sw);
             } catch (IOException e) {
                 throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                    "Unable to retrieve MyCoRe object", e.getMessage()));
+                    MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to retrieve MyCoRe object", e.getMessage()));
             }
             return Response.ok(sw.toString()).type("application/xml").build();
         }
 
-        catch (MCRRestAPIException rae) {
-            return rae.getError().createHttpResponse();
+        catch (MCRRestAPIException e) {
+            return MCRRestAPIError.createHttpResponseFromErrorList(e.getErrors().get(0).getStatus(), e.getErrors());
         }
 
     }
 
-    public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID,
-        UriInfo info) throws IOException {
+    public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID, UriInfo info)
+        throws IOException {
         try {
             MCRObject mcrObj = retrieveMCRObject(pathParamMcrID);
             MCRDerivate derObj = retrieveMCRDerivate(mcrObj, pathParamDerID);
@@ -168,15 +168,14 @@ public class MCRRestAPIObjectsHelper {
             return Response.ok(sw.toString()).type("application/xml").build();
 
         } catch (MCRRestAPIException e) {
-            return e.getError().createHttpResponse();
+            return MCRRestAPIError.createHttpResponseFromErrorList(e.getErrors().get(0).getStatus(), e.getErrors());
         }
 
         // return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "Unexepected program flow termination.",
         //       "Please contact a developer!").createHttpResponse();
     }
-    
-    private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj, UriInfo info)
-        throws IOException {
+
+    private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj, UriInfo info) throws IOException {
         return listDerivateContent(mcrObj, derObj, "", info);
     }
 
@@ -185,8 +184,8 @@ public class MCRRestAPIObjectsHelper {
         Element eContents = new Element("contents");
         eContents.setAttribute("mycoreobject", mcrObj.getId().toString());
         eContents.setAttribute("derivate", derObj.getId().toString());
-        if(!deriPath.endsWith("/")){
-            deriPath+="/";
+        if (!deriPath.endsWith("/")) {
+            deriPath += "/";
         }
         MCRPath p = MCRPath.getPath(derObj.getId().toString(), deriPath);
         if (p != null) {
@@ -211,8 +210,8 @@ public class MCRRestAPIObjectsHelper {
         return eContents;
     }
 
-    private static String listDerivateContentAsJson(MCRDerivate derObj, String path, int depth,
-        UriInfo info) throws IOException {
+    private static String listDerivateContentAsJson(MCRDerivate derObj, String path, int depth, UriInfo info)
+        throws IOException {
         StringWriter sw = new StringWriter();
         MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
         root = MCRPath.toMCRPath(root.resolve(path));
@@ -222,7 +221,7 @@ public class MCRRestAPIObjectsHelper {
         if (root != null) {
             JsonWriter writer = new JsonWriter(sw);
             Files.walkFileTree(root, EnumSet.noneOf(FileVisitOption.class), depth,
-                    new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId(), info));
+                new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId(), info));
             writer.close();
         }
         return sw.toString();
@@ -232,17 +231,13 @@ public class MCRRestAPIObjectsHelper {
      * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
      */
     public static Response listObjects(UriInfo info, String format, String filter, String sort) {
+        List<MCRRestAPIError> errors = new ArrayList<>();
         //analyze sort
-        MCRRestAPIError error = MCRRestAPIError.create(Response.Status.BAD_REQUEST,
-            "The syntax of one or more query parameters is wrong.", null);
-
         MCRRestAPISortObject sortObj = null;
         try {
             sortObj = createSortObject(sort);
         } catch (MCRRestAPIException rae) {
-            for (MCRRestAPIFieldError fe : rae.getError().getFieldErrors()) {
-                error.addFieldError(fe);
-            }
+            errors.addAll(rae.getErrors());
         }
 
         //analyze format
@@ -250,8 +245,8 @@ public class MCRRestAPIObjectsHelper {
         if (format.equals(MCRRestAPIObjects.FORMAT_JSON) || format.equals(MCRRestAPIObjects.FORMAT_XML)) {
             //ok
         } else {
-            error
-                .addFieldError(MCRRestAPIFieldError.create("format", "Allowed values for format are 'json' or 'xml'."));
+            errors.add(MCRRestAPIError.create(Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_PARAMETER,
+                "The parameter 'format' is wrong.", "Allowed values for format are 'json' or 'xml'."));
         }
 
         //analyze filter
@@ -271,10 +266,9 @@ public class MCRRestAPIObjectsHelper {
                 }
                 if (s.startsWith("lastModifiedBefore:")) {
                     if (!validateDateInput(s.substring(19))) {
-                        error
-                            .addFieldError(MCRRestAPIFieldError
-                                .create("filter",
-                                    "The value of lastModifiedBefore could not be parsed. Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
+                        errors.add(MCRRestAPIError.create(Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_PARAMETER,
+                            "The parameter 'filter' is wrong.",
+                            "The value of lastModifiedBefore could not be parsed. Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
                         continue;
                     }
                     if (lastModifiedBefore == null) {
@@ -287,10 +281,9 @@ public class MCRRestAPIObjectsHelper {
 
                 if (s.startsWith("lastModifiedAfter:")) {
                     if (!validateDateInput(s.substring(18))) {
-                        error
-                            .addFieldError(MCRRestAPIFieldError
-                                .create("filter",
-                                    "The value of lastModifiedAfter could not be parsed. Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
+                        errors.add(MCRRestAPIError.create(Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_PARAMETER,
+                            "The parameter 'filter' is wrong.",
+                            "The value of lastModifiedAfter could not be parsed. Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
                         continue;
                     }
                     if (lastModifiedAfter == null) {
@@ -301,31 +294,23 @@ public class MCRRestAPIObjectsHelper {
                     continue;
                 }
 
-                error
-                    .addFieldError(MCRRestAPIFieldError
-                        .create(
-                            "filter",
-                            "The syntax of the filter '"
-                                + s
-                                + "'could not be parsed. The syntax should be [filterName]:[value]. Allowed filterNames are 'project', 'type', 'lastModifiedBefore' and 'lastModifiedAfter'."));
+                errors.add(MCRRestAPIError.create(Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_PARAMETER,
+                    "The parameter 'filter' is wrong.", "The syntax of the filter '" + s
+                        + "'could not be parsed. The syntax should be [filterName]:[value]. Allowed filterNames are 'project', 'type', 'lastModifiedBefore' and 'lastModifiedAfter'."));
             }
         }
 
-        if (error.getFieldErrors().size() > 0) {
-            return error.createHttpResponse();
+        if (errors.size() > 0) {
+            return MCRRestAPIError.createHttpResponseFromErrorList(Status.BAD_REQUEST, errors);
         }
-
-        //Parameters are checked - continue tor retrieve data
+        //Parameters are validated - continue to retrieve data
 
         //retrieve MCRIDs by Type and Project ID
         Set<String> mcrIDs = new HashSet<String>();
         if (projectIDs.isEmpty()) {
             if (typeIDs.isEmpty()) {
-                mcrIDs = MCRXMLMetadataManager.instance()
-                                              .listIDs()
-                                              .stream()
-                                              .filter(id -> !id.contains("_derivate_"))
-                                              .collect(Collectors.toSet());
+                mcrIDs = MCRXMLMetadataManager.instance().listIDs().stream().filter(id -> !id.contains("_derivate_"))
+                    .collect(Collectors.toSet());
             } else {
                 for (String t : typeIDs) {
                     mcrIDs.addAll(MCRXMLMetadataManager.instance().listIDsOfType(t));
@@ -386,8 +371,7 @@ public class MCRRestAPIObjectsHelper {
                 Element eMcrObject = new Element("mycoreobject");
                 eMcrObject.setAttribute("ID", oid.getId());
                 eMcrObject.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
-                eMcrObject.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build()
-                    .toString());
+                eMcrObject.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
 
                 eMcrobjects.addContent(eMcrObject);
             }
@@ -398,7 +382,8 @@ public class MCRRestAPIObjectsHelper {
                 return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").build();
             } catch (IOException e) {
                 return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                    "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
+                    MCRRestAPIError.CODE_INTERNAL_ERROR, "A problem occurred while fetching the data", e.getMessage())
+                    .createHttpResponse();
             }
         }
 
@@ -416,8 +401,7 @@ public class MCRRestAPIObjectsHelper {
                     writer.beginObject();
                     writer.name("ID").value(oid.getId());
                     writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
-                    writer.name("href").value(
-                        info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
+                    writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
                     writer.endObject();
                 }
                 writer.endArray();
@@ -428,28 +412,26 @@ public class MCRRestAPIObjectsHelper {
                 return Response.ok(sw.toString()).type("application/json; charset=UTF-8").build();
             } catch (IOException e) {
                 return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                    "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
+                    MCRRestAPIError.CODE_INTERNAL_ERROR, "A problem occurred while fetching the data", e.getMessage())
+                    .createHttpResponse();
             }
         }
-        return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "A problem in programm flow", null)
-            .createHttpResponse();
+        return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
+            "A problem in programm flow", null).createHttpResponse();
     }
 
     /**
      * @see MCRRestAPIObjects#listDerivates(UriInfo, String, String, String)
      */
     public static Response listDerivates(UriInfo info, String mcrIDString, String format, String sort) {
-        //analyze sort
+        List<MCRRestAPIError> errors = new ArrayList<>();
         try {
-            MCRRestAPIError error = MCRRestAPIError.create(Response.Status.BAD_REQUEST,
-                "The syntax of one or more query parameters is wrong.", null);
-
             MCRRestAPISortObject sortObj = null;
             try {
                 sortObj = createSortObject(sort);
             } catch (MCRRestAPIException rae) {
-                for (MCRRestAPIFieldError fe : rae.getError().getFieldErrors()) {
-                    error.addFieldError(fe);
+                for (MCRRestAPIError fe : rae.getErrors()) {
+                    errors.add(fe);
                 }
             }
 
@@ -458,24 +440,19 @@ public class MCRRestAPIObjectsHelper {
             if (format.equals(MCRRestAPIObjects.FORMAT_JSON) || format.equals(MCRRestAPIObjects.FORMAT_XML)) {
                 //ok
             } else {
-                error.addFieldError(MCRRestAPIFieldError.create("format",
-                    "Allowed values for format are 'json' or 'xml'."));
+                errors.add(MCRRestAPIError.create(Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_PARAMETER,
+                    "The Parameter format is wrong.", "Allowed values for format are 'json' or 'xml'."));
             }
 
-            if (error.getFieldErrors().size() > 0) {
-                throw new MCRRestAPIException(error);
+            if (errors.size() > 0) {
+                throw new MCRRestAPIException(errors);
             }
 
             //Parameters are checked - continue to retrieve data
 
-            List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrIDString)
-                .getStructure()
-                .getDerivates()
-                .stream()
-                .map(MCRMetaLinkID::getXLinkHrefID)
-                .filter(MCRMetadataManager::exists)
-                .map(id -> {
-                    return new MCRObjectIDDate(){
+            List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrIDString).getStructure().getDerivates().stream()
+                .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> {
+                    return new MCRObjectIDDate() {
                         long lastModified;
                         {
                             try {
@@ -486,17 +463,17 @@ public class MCRRestAPIObjectsHelper {
                             }
                         }
 
-                        @Override public String getId() {
+                        @Override
+                        public String getId() {
                             return id.toString();
                         }
 
-                        @Override public Date getLastModified() {
+                        @Override
+                        public Date getLastModified() {
                             return new Date(lastModified);
                         }
                     };
-                })
-                .sorted(new MCRRestAPISortObjectComparator(sortObj)::compare)
-                .collect(Collectors.toList());
+                }).sorted(new MCRRestAPISortObjectComparator(sortObj)::compare).collect(Collectors.toList());
 
             //output as XML
             if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
@@ -513,8 +490,7 @@ public class MCRRestAPIObjectsHelper {
                         eDerObject.setAttribute("label", der.getLabel());
                     }
                     eDerObject.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
-                    eDerObject.setAttribute("href",
-                        info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
+                    eDerObject.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
 
                     eDerObjects.addContent(eDerObject);
                 }
@@ -524,8 +500,10 @@ public class MCRRestAPIObjectsHelper {
                     xout.output(docOut, sw);
                     return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").build();
                 } catch (IOException e) {
-                    return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                        "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
+                    return MCRRestAPIError
+                        .create(Response.Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
+                            "A problem occurred while fetching the data", e.getMessage())
+                        .createHttpResponse();
                 }
             }
 
@@ -549,8 +527,7 @@ public class MCRRestAPIObjectsHelper {
                             writer.name("label").value(der.getLabel());
                         }
                         writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
-                        writer.name("href").value(
-                            info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
+                        writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
                         writer.endObject();
                     }
                     writer.endArray();
@@ -561,28 +538,28 @@ public class MCRRestAPIObjectsHelper {
                     return Response.ok(sw.toString()).type("application/json; charset=UTF-8").build();
                 } catch (IOException e) {
                     throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                        "A problem occurred while fetching the data", e.getMessage()));
+                        MCRRestAPIError.CODE_INTERNAL_ERROR, "A problem occurred while fetching the data",
+                        e.getMessage()));
                 }
             }
         } catch (MCRRestAPIException rae) {
-            return rae.getError().createHttpResponse();
+            return MCRRestAPIError.createHttpResponseFromErrorList(Response.Status.INTERNAL_SERVER_ERROR,
+                rae.getErrors());
         }
 
-        return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "Unexepected program flow termination.",
-            "Please contact a developer!").createHttpResponse();
+        return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
+            "Unexepected program flow termination.", "Please contact a developer!").createHttpResponse();
     }
 
     public static Response listContents(Request request, String mcrIDString, String derIDString, String format,
-        String path, int depth, UriInfo info)
-        throws IOException {
+        String path, int depth, UriInfo info) throws IOException {
         try {
 
             if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
-                MCRRestAPIError error = MCRRestAPIError.create(Response.Status.BAD_REQUEST,
-                    "The syntax of one or more query parameters is wrong.", null);
-                error.addFieldError(MCRRestAPIFieldError.create("format",
-                    "Allowed values for format are 'json' or 'xml'."));
-                throw new MCRRestAPIException(error);
+                return MCRRestAPIError
+                    .create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_PARAMETER,
+                        "The syntax of format parameter is wrong.", "Allowed values for format are 'json' or 'xml'.")
+                    .createHttpResponse();
             }
             //TODO: parsing jdom documents is really necessary?
             MCRObject mcrObj = retrieveMCRObject(mcrIDString);
@@ -603,8 +580,10 @@ public class MCRRestAPIObjectsHelper {
                         xout.output(docOut, sw);
                         return response(sw.toString(), "application/xml", lastModified);
                     } catch (IOException e) {
-                        return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                            "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
+                        return MCRRestAPIError
+                            .create(Response.Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
+                                "A problem occurred while fetching the data", e.getMessage())
+                            .createHttpResponse();
                     }
                 case MCRRestAPIObjects.FORMAT_JSON:
                     if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
@@ -612,14 +591,16 @@ public class MCRRestAPIObjectsHelper {
                         return response(result, "application/json", lastModified);
                     }
                 default:
-                    return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR,
-                        "Unexepected program flow termination.", "Please contact a developer!").createHttpResponse();
+                    return MCRRestAPIError
+                        .create(Response.Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
+                            "Unexepected program flow termination.", "Please contact a developer!")
+                        .createHttpResponse();
             }
         } catch (MCRRestAPIException rae) {
-            return rae.getError().createHttpResponse();
+            return MCRRestAPIError.createHttpResponseFromErrorList(Status.BAD_REQUEST, rae.getErrors());
         }
     }
-    
+
     public static String retrieveMaindocURL(String mcrIDString, String derIDString, UriInfo info) throws IOException {
         try {
             MCRObject mcrObj = retrieveMCRObject(mcrIDString);
@@ -669,7 +650,7 @@ public class MCRRestAPIObjectsHelper {
         if (input == null) {
             return null;
         }
-        MCRRestAPIError error = MCRRestAPIError.create(Response.Status.BAD_REQUEST, "", null);
+        List<MCRRestAPIError> errors = new ArrayList<>();
         MCRRestAPISortObject result = new MCRRestAPISortObject();
 
         String[] data = input.split(":");
@@ -677,8 +658,8 @@ public class MCRRestAPIObjectsHelper {
             result.setField(data[0].replace("|", ""));
             String sortOrder = data[1].toLowerCase(Locale.GERMAN).replace("|", "");
             if (!"ID".equals(result.getField()) && !"lastModified".equals(result.getField())) {
-                error.addFieldError(MCRRestAPIFieldError.create("sort",
-                    "Allowed values for sortField are 'ID' and 'lastModified'."));
+                errors.add(MCRRestAPIError.create(Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_QUERY_PARAMETER,
+                    "The sortField is wrong", "Allowed values are 'ID' and 'lastModified'."));
             }
 
             if ("asc".equals(sortOrder)) {
@@ -688,15 +669,16 @@ public class MCRRestAPIObjectsHelper {
                 result.setOrder(SortOrder.DESC);
             }
             if (result.getOrder() == null) {
-                error.addFieldError(MCRRestAPIFieldError.create("sort",
-                    "Allowed values for sortOrder are 'asc' and 'desc'."));
+                errors.add(MCRRestAPIError.create(Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_QUERY_PARAMETER,
+                    "The sortOrder is wrong", "Allowed values for sortOrder are 'asc' and 'desc'."));
             }
 
         } else {
-            error.addFieldError(MCRRestAPIFieldError.create("sort", "The syntax should be [sortField]:[sortOrder]."));
+            errors.add(MCRRestAPIError.create(Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_QUERY_PARAMETER,
+                "The sort parameter is wrong.", "The syntax should be [sortField]:[sortOrder]."));
         }
-        if (error.getFieldErrors().size() > 0) {
-            throw new MCRRestAPIException(error);
+        if (errors.size() > 0) {
+            throw new MCRRestAPIException(errors);
         }
         return result;
     }
@@ -725,14 +707,17 @@ public class MCRRestAPIObjectsHelper {
             try {
                 mcrID = MCRObjectID.getInstance(idString);
             } catch (Exception e) {
-                throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.BAD_REQUEST, "The MyCoRe ID '"
-                    + idString + "' is not valid. Did you use the proper format: '{project}_{type}_{number}'?",
-                    e.getMessage()));
+                throw new MCRRestAPIException(
+                    MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_ID,
+                        "The MyCoRe ID '" + idString
+                            + "' is not valid. - Did you use the proper format: '{project}_{type}_{number}'?",
+                        e.getMessage()));
             }
 
             if (!MCRMetadataManager.exists(mcrID)) {
-                throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND,
-                    "There is no object with the given MyCoRe ID '" + idString + "'.", null));
+                throw new MCRRestAPIException(
+                    MCRRestAPIError.create(Response.Status.NOT_FOUND, MCRRestAPIError.CODE_NOT_FOUND,
+                        "There is no object with the given MyCoRe ID '" + idString + "'.", null));
             }
 
             return MCRMetadataManager.retrieveMCRObject(mcrID);
@@ -748,19 +733,22 @@ public class MCRRestAPIObjectsHelper {
                     return retrieveMCRObject(id);
                 } else {
                     if (solrResults.getNumFound() == 0) {
-                        throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND,
-                            "There is no object with the given ID '" + key + ":" + idString + "'.", null));
+                        throw new MCRRestAPIException(
+                            MCRRestAPIError.create(Response.Status.NOT_FOUND, MCRRestAPIError.CODE_NOT_FOUND,
+                                "There is no object with the given ID '" + key + ":" + idString + "'.", null));
                     } else {
-                        throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND,
-                            "The ID is not unique. There are " + solrResults.getNumFound()
-                                + " objecst fore the given ID '" + key + ":" + idString + "'.",
-                            null));
+                        throw new MCRRestAPIException(
+                            MCRRestAPIError.create(Response.Status.NOT_FOUND, MCRRestAPIError.CODE_NOT_FOUND,
+                                "The ID is not unique. There are " + solrResults.getNumFound()
+                                    + " objecst fore the given ID '" + key + ":" + idString + "'.",
+                                null));
                     }
                 }
             } catch (SolrServerException | IOException e) {
                 LOGGER.error(e);
+                throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.BAD_REQUEST,
+                    MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal server error.", e.getMessage()));
             }
-            return null;
         }
     }
 
@@ -772,8 +760,9 @@ public class MCRRestAPIObjectsHelper {
             derKey = derIDString.substring(0, pos);
             derIDString = derIDString.substring(pos + 1);
             if (!derKey.equals("mcr") && !derKey.equals("label")) {
-                throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.BAD_REQUEST,
-                    "The ID is not valid.", "The prefix is unkown. Only 'mcr' or 'label' are allowed."));
+                throw new MCRRestAPIException(
+                    MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_WRONG_ID,
+                        "The ID is not valid.", "The prefix is unkown. Only 'mcr' or 'label' are allowed."));
             }
         }
 
@@ -794,17 +783,16 @@ public class MCRRestAPIObjectsHelper {
         }
 
         if (matchedDerID == null) {
-            throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND, "Derivate not found.",
-                "The MyCoRe Object with id '" + mcrObj.getId().toString() + "' does not contain a derivate with id '"
-                    + derIDString + "'."));
+            throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND,
+                MCRRestAPIError.CODE_NOT_FOUND, "Derivate " + derIDString + " not found.", "The MyCoRe Object with id '"
+                    + mcrObj.getId().toString() + "' does not contain a derivate with id '" + derIDString + "'."));
         }
 
         MCRObjectID derID = MCRObjectID.getInstance(matchedDerID);
         if (!MCRMetadataManager.exists(derID)) {
             throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.NOT_FOUND,
-                "There is no derivate with the id '" + matchedDerID + "'.", null));
+                MCRRestAPIError.CODE_NOT_FOUND, "There is no derivate with the id '" + matchedDerID + "'.", null));
         }
-
         return MCRMetadataManager.retrieveMCRDerivate(derID);
     }
 

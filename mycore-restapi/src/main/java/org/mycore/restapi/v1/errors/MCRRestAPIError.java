@@ -22,15 +22,15 @@
 
 package org.mycore.restapi.v1.errors;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
-import java.util.Vector;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * stores error informations during REST requests
@@ -40,65 +40,102 @@ import com.google.gson.stream.JsonWriter;
  * @version $Revision: $ $Date: $
  */
 public class MCRRestAPIError {
+    public static final String CODE_WRONG_PARAMETER = "WRONG_PARAMETER";
+
+    public static final String CODE_WRONG_QUERY_PARAMETER = "WRONG_QUERY_PARAMETER";
+
+    public static final String CODE_WRONG_ID = "WRONG_ID";
+
+    public static final String CODE_NOT_FOUND = "NOT_FOUND";
+
+    public static final String CODE_INTERNAL_ERROR = "INTERNAL_ERROR";
+
+    public static final String CODE_ACCESS_DENIED = "ACCESS_DENIED";
+
+    public static final String CODE_INVALID_AUTHENCATION = "INVALID_AUTHENTICATION";
+
     Response.Status status = Response.Status.BAD_REQUEST;
 
-    String message = "";
+    String code = "";
 
-    String details = null;
+    String title = "";
 
-    List<MCRRestAPIFieldError> errors = new Vector<MCRRestAPIFieldError>();
+    String detail = null;
 
-    public MCRRestAPIError(Response.Status status, String message, String details) {
+    public MCRRestAPIError(Response.Status status, String code, String title, String detail) {
         this.status = status;
-        this.message = message;
-        this.details = details;
+        this.code = code;
+        this.title = title;
+        this.detail = detail;
     }
 
-    public static MCRRestAPIError create(Response.Status status, String message, String details) {
-        return new MCRRestAPIError(status, message, details);
+    public static MCRRestAPIError create(Response.Status status, String code, String title, String detail) {
+        return new MCRRestAPIError(status, code, title, detail);
     }
 
-    public void addFieldError(MCRRestAPIFieldError error) {
-        errors.add(error);
+    public JsonObject toJsonObject() {
+        JsonObject error = new JsonObject();
+        error.addProperty("status", String.valueOf(status.getStatusCode()));
+        error.addProperty("code", code);
+        error.addProperty("title", title);
+        if (detail != null) {
+            error.addProperty("detail", detail);
+        }
+        return error;
     }
 
     public String toJSONString() {
-        StringWriter sw = new StringWriter();
-        try {
-            JsonWriter writer = new JsonWriter(sw);
-            writer.setIndent("    ");
-            writer.beginObject();
-            writer.name("status").value(status.getStatusCode());
-            writer.name("message").value(message);
-            if (details != null) {
-                writer.name("details").value(details);
-            }
-            if (errors.size() > 0) {
-                writer.name("errors");
-                writer.beginArray();
-                for (MCRRestAPIFieldError err : errors) {
-                    writer.beginObject();
-                    writer.name("field").value(err.getField());
-                    writer.name("message").value(err.getMessage());
-                    writer.endObject();
-                }
-                writer.endArray();
-            }
+        JsonArray errors = new JsonArray();
+        errors.add(toJsonObject());
+        JsonObject errorMsg = new JsonObject();
+        errorMsg.add("errors", errors);
 
-            writer.endObject();
-            writer.close();
-        } catch (IOException e) {
-            //should not happen;
-        }
-
-        return sw.toString();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(errorMsg);
     }
 
     public Response createHttpResponse() {
         return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE).entity(toJSONString()).build();
     }
 
-    public List<MCRRestAPIFieldError> getFieldErrors() {
-        return errors;
+    public static String convertErrorListToJSONString(List<MCRRestAPIError> errors) {
+        JsonArray jaErrors = new JsonArray();
+        for (MCRRestAPIError e : errors) {
+            jaErrors.add(e.toJsonObject());
+        }
+
+        JsonObject errorMsg = new JsonObject();
+        errorMsg.add("errors", jaErrors);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(errorMsg);
     }
+
+    public Response.Status getStatus() {
+        return status;
+    }
+
+    public static Response createHttpResponseFromErrorList(Response.Status status, List<MCRRestAPIError> errors) {
+        if (errors.size() == 0) {
+            return Response.ok().build();
+        } else {
+            return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE)
+                .entity(convertErrorListToJSONString(errors)).build();
+        }
+    }
+
+    /**
+     * takes the status from the first error object
+     * @param errors
+     * @return
+     */
+    public static Response createHttpResponseFromErrorList(List<MCRRestAPIError> errors) {
+        if (errors.size() == 0) {
+            return Response.ok().build();
+        } else {
+            return Response.status(errors.get(0).getStatus()).type(MediaType.APPLICATION_JSON_TYPE)
+                .entity(convertErrorListToJSONString(errors)).build();
+        }
+    }
+
 }

@@ -91,7 +91,8 @@ public class MCRRestAPIClassifications {
     @GET
     @Path("/")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response listClassifications(@Context UriInfo info, @QueryParam("format") @DefaultValue("json") String format) {
+    public Response listClassifications(@Context UriInfo info,
+        @QueryParam("format") @DefaultValue("json") String format) {
         if (FORMAT_XML.equals(format)) {
             StringWriter sw = new StringWriter();
 
@@ -102,8 +103,7 @@ public class MCRRestAPIClassifications {
 
             for (MCRCategory cat : DAO.getRootCategories()) {
                 eRoot.addContent(new Element("mycoreclass").setAttribute("ID", cat.getId().getRootID()).setAttribute(
-                    "href",
-                    info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString()));
+                    "href", info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString()));
             }
             try {
                 xout.output(docOut, sw);
@@ -124,8 +124,8 @@ public class MCRRestAPIClassifications {
                 for (MCRCategory cat : DAO.getRootCategories()) {
                     writer.beginObject();
                     writer.name("ID").value(cat.getId().getRootID());
-                    writer.name("href").value(
-                        info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString());
+                    writer.name("href")
+                        .value(info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString());
                     writer.endObject();
                 }
                 writer.endArray();
@@ -168,10 +168,9 @@ public class MCRRestAPIClassifications {
     @Path("/{classID}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     public Response showObject(@PathParam("classID") String classID,
-        @QueryParam("format") @DefaultValue("xml") String format,
-        @QueryParam("filter") @DefaultValue("") String filter, 
-        @QueryParam("style") @DefaultValue("") String style, 
-        @QueryParam("callback") @DefaultValue("") String callback){
+        @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") @DefaultValue("") String filter,
+        @QueryParam("style") @DefaultValue("") String style,
+        @QueryParam("callback") @DefaultValue("") String callback) {
         String rootCateg = null;
         String lang = null;
         boolean filterNonEmpty = false;
@@ -194,13 +193,14 @@ public class MCRRestAPIClassifications {
 
         if (format == null || classID == null) {
             return Response.serverError().status(Status.BAD_REQUEST).build();
-            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Please specify parameters format and classid.");
+            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, 
+            //        "Please specify parameters format and classid.");
         }
         try {
             MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
             if (cl == null) {
-                return MCRRestAPIError.create(Response.Status.BAD_REQUEST, "Classification not found.",
-                    "There is no classification with the given ID.").createHttpResponse();
+                return MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_NOT_FOUND,
+                    "Classification not found.", "There is no classification with the given ID.").createHttpResponse();
             }
             Document docClass = MCRCategoryTransformer.getMetaDataDocument(cl, false);
             Element eRoot = docClass.getRootElement();
@@ -211,8 +211,9 @@ public class MCRRestAPIClassifications {
                 if (e != null) {
                     eRoot = e;
                 } else {
-                    return MCRRestAPIError.create(Response.Status.BAD_REQUEST, "Category not found.",
-                        "The classfication does not contain a category with the given ID.").createHttpResponse();
+                    return MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_NOT_FOUND,
+                        "Category not found.", "The classfication does not contain a category with the given ID.")
+                        .createHttpResponse();
                 }
             }
             if (filterNonEmpty) {
@@ -229,10 +230,10 @@ public class MCRRestAPIClassifications {
             if (FORMAT_JSON.equals(format)) {
                 String json = writeJSON(eRoot, lang, style);
                 //eventually: allow Cross Site Requests: .header("Access-Control-Allow-Origin", "*")
-                if(callback.length()>0){
-                    return Response.ok(callback+"("+json+")").type("application/javascript; charset=UTF-8").build();
-                }
-                else{
+                if (callback.length() > 0) {
+                    return Response.ok(callback + "(" + json + ")").type("application/javascript; charset=UTF-8")
+                        .build();
+                } else {
                     return Response.ok(json).type("application/json; charset=UTF-8").build();
                 }
             }
@@ -289,8 +290,8 @@ public class MCRRestAPIClassifications {
             }
             writer.beginObject();
             writer.name("identifier").value(eRoot.getAttributeValue("ID"));
-            for(Element eLabel: eRoot.getChildren("label")){
-                if(lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+            for (Element eLabel : eRoot.getChildren("label")) {
+                if (lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
                     writer.name("label").value(eLabel.getAttributeValue("text"));
                 }
             }
@@ -298,13 +299,13 @@ public class MCRRestAPIClassifications {
 
             writeChildrenAsJSONCBTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("checked"));
             writer.endObject();
-        } else if(style.contains("jstree")){
+        } else if (style.contains("jstree")) {
             if (lang == null) {
                 lang = "de";
             }
-            writeChildrenAsJSONJSTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("opened"), style.contains("disabled"), style.contains("selected"));
-        }
-        else {
+            writeChildrenAsJSONJSTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("opened"),
+                style.contains("disabled"), style.contains("selected"));
+        } else {
             writer.beginObject(); // {
             writer.name("ID").value(eRoot.getAttributeValue("ID"));
             writer.name("label");
@@ -402,7 +403,7 @@ public class MCRRestAPIClassifications {
         }
         writer.endArray();
     }
-    
+
     /**
      * output children in JSON format used as input for a jsTree
      *
@@ -415,8 +416,8 @@ public class MCRRestAPIClassifications {
      *
      * @throws IOException
      */
-    private static void writeChildrenAsJSONJSTree(Element eParent, JsonWriter writer, String lang, boolean opened, boolean disabled, boolean selected)
-        throws IOException {
+    private static void writeChildrenAsJSONJSTree(Element eParent, JsonWriter writer, String lang, boolean opened,
+        boolean disabled, boolean selected) throws IOException {
         writer.beginArray();
         for (Element e : eParent.getChildren("category")) {
             writer.beginObject();
@@ -426,16 +427,16 @@ public class MCRRestAPIClassifications {
                     writer.name("text").value(eLabel.getAttributeValue("text"));
                 }
             }
-            if(opened || disabled || selected){
+            if (opened || disabled || selected) {
                 writer.name("state");
                 writer.beginObject();
-                if(opened){
+                if (opened) {
                     writer.name("opened").value(true);
                 }
-                if(disabled){
+                if (disabled) {
                     writer.name("disabled").value(true);
                 }
-                if(selected){
+                if (selected) {
                     writer.name("selected").value(true);
                 }
                 writer.endObject();
@@ -455,8 +456,8 @@ public class MCRRestAPIClassifications {
             Element cat = e.getChildren("category").get(i);
 
             SolrQuery solrQquery = new SolrQuery();
-            solrQquery.setQuery("category:\""
-                + MCRSolrUtils.escapeSearchValue(classId + ":" + cat.getAttributeValue("ID")) + "\"");
+            solrQquery.setQuery(
+                "category:\"" + MCRSolrUtils.escapeSearchValue(classId + ":" + cat.getAttributeValue("ID")) + "\"");
             solrQquery.setRows(0);
             try {
                 QueryResponse response = solrClient.query(solrQquery);

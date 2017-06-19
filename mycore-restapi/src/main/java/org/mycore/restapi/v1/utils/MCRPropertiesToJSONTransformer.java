@@ -47,6 +47,7 @@ public class MCRPropertiesToJSONTransformer implements MessageBodyWriter<Propert
         throws IOException, WebApplicationException {
         httpHeaders.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_TYPE.withCharset(StandardCharsets.UTF_8.name()));
         final Type mapType = new TypeToken<Map<String, String>>() {
+            private static final long serialVersionUID = 1L;
         }.getType();
         Map<String, String> writeMap = t.entrySet()
             .stream()
@@ -120,5 +121,4 @@ public class MCRPropertiesToJSONTransformer implements MessageBodyWriter<Propert
             }
         }
     }
-
 }
