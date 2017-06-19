@@ -1551,6 +1551,11 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
+        <groupId>com.rometools</groupId>
+        <artifactId>rome</artifactId>
+        <version>1.7.3</version>
+      </dependency>
+      <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
         <version>2.5.1</version>
