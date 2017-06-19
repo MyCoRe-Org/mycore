@@ -30,11 +30,11 @@ import org.mycore.datamodel.metadata.MCRObjectID;
     @Index(name = "IDX_TIME", columnList = "time")
 })
 @NamedQueries({
-    @NamedQuery(name = "MCRMetaHistory.getLastDeleted",
-        query = "SELECT MAX(time) FROM MCRMetaHistoryItem WHERE id=:id and eventType='D'"),
+    @NamedQuery(name = "MCRMetaHistory.getLastOfType",
+        query = "SELECT MAX(time) FROM MCRMetaHistoryItem i WHERE i.id=:id and i.eventType=:type"),
     @NamedQuery(name = "MCRMetaHistory.getLastEventByID", query = "SELECT a FROM MCRMetaHistoryItem a "
         + "WHERE a.time in (SELECT max(time) as time FROM MCRMetaHistoryItem b "
-        + "WHERE a.id=b.id AND time BETWEEN :from AND :until group by id) "
+        + "WHERE a.id=b.id AND time BETWEEN :from AND :until) "
         + "AND a.eventType=:eventType"),
     @NamedQuery(name = "MCRMetaHistory.getFirstDate", query = "SELECT MIN(time) from MCRMetaHistoryItem"),
     @NamedQuery(name = "MCRMetaHistory.getHighestID", query = "SELECT MAX(id) from MCRMetaHistoryItem WHERE ID like :looksLike")
