@@ -6,6 +6,7 @@
   exclude-result-prefixes="xalan xlink mcr mcrxsl i18n acl mods mcrmods rdf"
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
+  <xsl:param name="MCR.DOI.Resolver.MasterURL" />
   <xsl:param name="MCR.Mods.SherpaRomeo.ApiKey" select="''" />
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="wcms.useTargets" select="'no'" /><!-- TODO: refacture! -->
@@ -731,7 +732,7 @@
             </a>
           </xsl:when>
           <xsl:when test="@type='doi' and not(contains($link,'http'))">
-            <a href="http://dx.doi.org/{$link}">
+            <a href="{$MCR.DOI.Resolver.MasterURL}{$link}">
               <xsl:value-of select="$link" />
             </a>
           </xsl:when>
