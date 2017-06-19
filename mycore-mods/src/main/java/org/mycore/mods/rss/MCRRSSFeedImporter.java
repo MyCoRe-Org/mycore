@@ -87,7 +87,7 @@ import com.rometools.rome.io.XmlReader;
  *
  * 4. Saves the publication in persistent store, with the given projectID and object type "mods".
  *
- * When the total number of publications imported is > 0 AND the property
+ * When the total number of publications imported is &gt; 0 AND the property
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].XSL2BuildNotificationMail=foo.xsl
  * is set, builds and sends a notification mail via MCRMailer.
  *
@@ -147,7 +147,7 @@ public class MCRRSSFeedImporter {
         LOGGER.info("Getting new publications from " + sourceSystemID + " RSS feed...");
         SyndFeed feed = retrieveFeed();
 
-        List<MCRObject> importedObjects = new ArrayList<MCRObject>();
+        List<MCRObject> importedObjects = new ArrayList<>();
         for (SyndEntry entry : feed.getEntries()) {
             MCRObject importedObject = handleFeedEntry(entry, projectID);
             if (importedObject != null) {
@@ -171,7 +171,7 @@ public class MCRRSSFeedImporter {
     }
 
     private MCRObject handleFeedEntry(SyndEntry entry, String projectID)
-            throws MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException {
         String publicationID = getPublicationID(entry);
         if (publicationID == null) {
             return null;
@@ -249,7 +249,7 @@ public class MCRRSSFeedImporter {
             xml.addContent(obj.createXML().detachRootElement());
         }
 
-        HashMap<String, String> parameters = new HashMap<String, String>();
+        HashMap<String, String> parameters = new HashMap<>();
         parameters.put(PROPERTY_MAIL_ADDRESS, MCRConfiguration.instance().getString(PROPERTY_MAIL_ADDRESS));
         MCRMailer.sendMail(new Document(xml), xsl2BuildNotificationMail, parameters);
     }
