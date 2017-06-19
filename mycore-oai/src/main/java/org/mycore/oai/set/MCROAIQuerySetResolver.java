@@ -38,6 +38,10 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
     public void init(String configPrefix, String setId, Map<String, MCRSet> setMap, Collection<SolrDocument> result,
         Function<SolrDocument, String> identifier) {
         super.init(configPrefix, setId, setMap, result, identifier);
+        if (result.isEmpty()) {
+            idsInSet = Collections.emptySet();
+            return;
+        }
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         QueryResponse response;
         try {

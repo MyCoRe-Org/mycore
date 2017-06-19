@@ -23,7 +23,6 @@ package org.mycore.oai;
 
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -292,10 +291,7 @@ public class MCROAIAdapter implements OAIAdapter {
         throws CannotDisseminateFormatException, NoSetHierarchyException, NoRecordsMatchException {
         //Update set for response header
         getSetManager().getDirectList();
-        ZonedDateTime fromDateTime = from != null ? from.atZone(UTC_ZONE) : null;
-        ZonedDateTime untilDateTime = until != null ? until.atZone(UTC_ZONE) : null;
-        OAIDataList<Record> recordList = getSearchManager().searchRecord(format, toMCRSet(set), fromDateTime,
-            untilDateTime);
+        OAIDataList<Record> recordList = getSearchManager().searchRecord(format, toMCRSet(set), from, until);
         if (recordList.isEmpty()) {
             throw new NoRecordsMatchException();
         }
@@ -323,12 +319,9 @@ public class MCROAIAdapter implements OAIAdapter {
     @Override
     public OAIDataList<Header> getHeaders(MetadataFormat format, Set set, Instant from, Instant until)
         throws CannotDisseminateFormatException, NoSetHierarchyException, NoRecordsMatchException {
-        ZonedDateTime fromDateTime = from != null ? from.atZone(UTC_ZONE) : null;
-        ZonedDateTime untilDateTime = until != null ? until.atZone(UTC_ZONE) : null;
         //Update set for response header
         getSetManager().getDirectList();
-        OAIDataList<Header> headerList = getSearchManager().searchHeader(format, toMCRSet(set), fromDateTime,
-            untilDateTime);
+        OAIDataList<Header> headerList = getSearchManager().searchHeader(format, toMCRSet(set), from, until);
         if (headerList.isEmpty()) {
             throw new NoRecordsMatchException();
         }

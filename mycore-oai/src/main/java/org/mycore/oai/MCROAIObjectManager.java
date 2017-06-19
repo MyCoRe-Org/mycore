@@ -21,20 +21,18 @@
  */
 package org.mycore.oai;
 
-import java.time.ZonedDateTime;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Header.Status;
 import org.mycore.oai.pmh.MetadataFormat;
@@ -128,8 +126,7 @@ public class MCROAIObjectManager {
     public Record getDeletedRecord(String mcrId) {
         try {
             // building the query
-            return MCRDeletedItemManager.getLastDeletedDate(mcrId)
-                .map(ZonedDateTime::toInstant)
+            return MCRMetadataHistoryManager.getLastDeletedDate(MCRObjectID.getInstance(mcrId))
                 .map(deletedDate -> new Record(
                     new Header(getOAIId(mcrId), deletedDate, Status.deleted)))
                 .orElse(null);

@@ -4,12 +4,13 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.mycore.backend.jpa.deleteditems.MCRDeletedItemManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Header.Status;
 import org.mycore.oai.pmh.Identify.DeletedRecordPolicy;
@@ -31,8 +32,7 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
 
     @Override
     public Optional<Header> getHeader(String mcrId) {
-        return MCRDeletedItemManager.getLastDeletedDate(mcrId)
-            .map(ZonedDateTime::toInstant)
+        return MCRMetadataHistoryManager.getLastDeletedDate(MCRObjectID.getInstance(mcrId))
             .map(deletedDate -> new Header(getObjectManager().getOAIId(mcrId), deletedDate, Status.deleted));
     }
 
@@ -64,14 +64,14 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
     }
 
     @Override
-    public MCROAIResult query(MCRSet set, ZonedDateTime from, ZonedDateTime until) {
+    public MCROAIResult query(MCRSet set, Instant from, Instant until) {
         this.deletedRecords = this.searchDeleted(from, until);
         return this.query(null);
     }
 
     @Override
     public Instant getEarliestTimestamp() {
-        return MCRDeletedItemManager.getFirstDate().map(ZonedDateTime::toInstant).orElse(null);
+        return MCRMetadataHistoryManager.getHistoryStart().orElse(null);
     }
 
     public List<Header> getDeletedRecords() {
@@ -104,29 +104,29 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
      * 
      * @return a list with identifiers of the deleted objects
      */
-    protected List<Header> searchDeleted(ZonedDateTime from, ZonedDateTime until) {
+    protected List<Header> searchDeleted(Instant from, Instant until) {
         DeletedRecordPolicy deletedRecordPolicy = this.identify.getDeletedRecordPolicy();
         if (from == null || DeletedRecordPolicy.No.equals(deletedRecordPolicy)
             || DeletedRecordPolicy.Transient.equals(deletedRecordPolicy)) {
             return new ArrayList<>();
         }
         LOGGER.info("Getting identifiers of deleted items");
-        List<Entry<String, ZonedDateTime>> deletedItems = MCRDeletedItemManager.getDeletedItems(from,
+        Map<MCRObjectID, Instant> deletedItems = MCRMetadataHistoryManager.getDeletedItems(from,
             Optional.ofNullable(until));
         List<String> types = getConfig().getStrings(getConfigPrefix() + "DeletedRecordTypes", null);
         if (types == null || types.isEmpty()) {
-            return deletedItems.stream()
+            return deletedItems.entrySet().stream()
                 .map(this::toHeader)
                 .collect(Collectors.toList());
         }
-        return deletedItems.stream()
-            .filter(e -> types.contains(MCRObjectID.getInstance(e.getKey()).getTypeId()))
+        return deletedItems.entrySet().stream()
+            .filter(e -> types.contains(e.getKey().getTypeId()))
             .map(this::toHeader)
             .collect(Collectors.toList());
     }
 
-    private Header toHeader(Entry<String, ZonedDateTime> p) {
-        return new Header(getObjectManager().getOAIId(p.getKey()), p.getValue().toInstant(), Status.deleted);
+    private Header toHeader(Entry<MCRObjectID, Instant> p) {
+        return new Header(getObjectManager().getOAIId(p.getKey().toString()), p.getValue(), Status.deleted);
     }
 
 }
