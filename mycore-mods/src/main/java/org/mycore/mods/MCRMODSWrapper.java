@@ -60,19 +60,18 @@ public class MCRMODSWrapper {
     private static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host' and ancestor::mycoreobject/structure/parents/parent or"
         + " string-length(substring-after(@xlink:href,'_')) > 0 and"
         + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
-        + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and"
-        + " contains('"
+        + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and" + " contains('"
         + MCRMODSRelationshipType.xPathList() + "', @type)]";
 
     private static final String MODS_CONTAINER = "modsContainer";
 
     private static final String DEF_MODS_CONTAINER = "def.modsContainer";
 
-    public static final String MODS_OBJECT_TYPE = "mods";
+    public static final String MODS_OBJECT_TYPE = MCRConfiguration.instance().getString("MCR.MODS.NewObjectType");
 
     private static final String MODS_DATAMODEL = "datamodel-mods.xsd";
 
-    private static List<String> topLevelElementOrder = new ArrayList<String>();
+    private static List<String> topLevelElementOrder = new ArrayList<>();
 
     private static Set<String> SUPPORTED_TYPES = MCRConfiguration.instance().getStrings("MCR.MODS.Types").stream()
         .collect(Collectors.toSet());
@@ -104,7 +103,7 @@ public class MCRMODSWrapper {
         wrapper.setMODS(modsDefinition);
         return wrapper.getMCRObject();
     }
-    
+
     /**
      * returns true if the given MCRObject can handle MODS metadata
      * @param obj - the MCRObject
@@ -138,7 +137,7 @@ public class MCRMODSWrapper {
 
     public MCRMODSWrapper(MCRObject object) {
         this.object = object;
-        if(object.getSchema()==null || object.getSchema().isEmpty()){
+        if (object.getSchema() == null || object.getSchema().isEmpty()) {
             object.setSchema(MODS_DATAMODEL);
         }
     }
@@ -172,8 +171,9 @@ public class MCRMODSWrapper {
 
     public void setMODS(Element mods) {
         MCRObjectMetadata om = object.getMetadata();
-        if (om.getMetadataElement(DEF_MODS_CONTAINER) != null)
+        if (om.getMetadataElement(DEF_MODS_CONTAINER) != null) {
             om.removeMetadataElement(DEF_MODS_CONTAINER);
+        }
 
         MCRMetaXML modsContainer = new MCRMetaXML(MODS_CONTAINER, null, 0);
         List<MCRMetaXML> list = Collections.nCopies(1, modsContainer);
@@ -244,8 +244,9 @@ public class MCRMODSWrapper {
                 Map.Entry<String, String> attribute = attributeIterator.next();
                 xPath.append("@" + attribute.getKey() + "='" + attribute.getValue() + "']");
 
-                if (attributeIterator.hasNext())
+                if (attributeIterator.hasNext()) {
                     xPath.append(" and ");
+                }
             }
         }
         Element element = getElement(xPath.toString());
@@ -253,18 +254,21 @@ public class MCRMODSWrapper {
         if (element == null) {
             element = addElement(elementName);
             if (isAttributeDataPresent) {
-                for (Map.Entry<String, String> entry : attributes.entrySet())
+                for (Map.Entry<String, String> entry : attributes.entrySet()) {
                     element.setAttribute(entry.getKey(), entry.getValue());
+                }
             }
         }
 
-        if (isValuePresent)
+        if (isValuePresent) {
             element.setText(elementValue.trim());
+        }
 
         return Optional.of(element);
     }
 
-    public Optional<Element> setElement(String elementName, String attributeName, String attributeValue, String elementValue) {
+    public Optional<Element> setElement(String elementName, String attributeName, String attributeValue,
+        String elementValue) {
         Map<String, String> attributes = Collections.emptyMap();
         if (attributeName != null && attributeValue != null) {
             attributes = new HashMap<>();
@@ -284,8 +288,9 @@ public class MCRMODSWrapper {
     }
 
     public void addElement(Element element) {
-        if (!element.getNamespace().equals(MCRConstants.MODS_NAMESPACE))
+        if (!element.getNamespace().equals(MCRConstants.MODS_NAMESPACE)) {
             throw new IllegalArgumentException("given element is no mods element");
+        }
 
         insertTopLevelElement(element);
     }
@@ -293,11 +298,12 @@ public class MCRMODSWrapper {
     private void insertTopLevelElement(Element element) {
         int rankOfNewElement = getRankOf(element);
         List<Element> topLevelElements = getMODS().getChildren();
-        for (int pos = 0; pos < topLevelElements.size(); pos++)
+        for (int pos = 0; pos < topLevelElements.size(); pos++) {
             if (getRankOf(topLevelElements.get(pos)) > rankOfNewElement) {
                 getMODS().addContent(pos, element);
                 return;
             }
+        }
 
         getMODS().addContent(element);
     }
@@ -329,10 +335,12 @@ public class MCRMODSWrapper {
 
     public void setServiceFlag(String type, String value) {
         MCRObjectService os = object.getService();
-        if (os.isFlagTypeSet(type))
+        if (os.isFlagTypeSet(type)) {
             os.removeFlags(type);
-        if ((value != null) && !value.trim().isEmpty())
+        }
+        if ((value != null) && !value.trim().isEmpty()) {
             os.addFlag(type, value.trim());
+        }
     }
 
     public List<MCRCategoryID> getMcrCategoryIDs() {
@@ -348,6 +356,7 @@ public class MCRMODSWrapper {
     }
 
     private List<Element> getCategoryNodes() {
-        return getElements("mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem)]");
+        return getElements(
+            "mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem)]");
     }
 }
