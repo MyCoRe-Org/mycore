@@ -25,6 +25,7 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
     }
 
     private MCRObjectID testObject;
+
     private Instant lastDelete;
 
     @Override
@@ -52,7 +53,8 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
 
     @Test
     public void testGetDeletedItems() {
-        Map<MCRObjectID, Instant> deletedItems = MCRMetadataHistoryManager.getDeletedItems(Instant.ofEpochMilli(0), Optional.empty());
+        Map<MCRObjectID, Instant> deletedItems = MCRMetadataHistoryManager.getDeletedItems(Instant.ofEpochMilli(0),
+            Optional.empty());
         assertEquals("Expected a single deletion event.", 1, deletedItems.size());
     }
 
