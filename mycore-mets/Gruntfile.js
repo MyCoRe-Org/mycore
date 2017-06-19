@@ -73,30 +73,15 @@ module.exports = function (grunt) {
         },
         copy: { // Copys files to the target folder
             sources: {
-                exampleJson: {
-                    expand: true,
-                    cwd: 'src/main/',
-                    src: ["json/**"],
-                    dest: '<%= properties.outputPath %>/'
-                },
-                exampleHtml: {
-                    expand: true,
-                    cwd: 'src/main/',
-                    src: ["example/**"],
-                    dest: '<%= properties.outputPath %>/'
-                },
-                images: {
-                    expand: true,
-                    cwd: 'src/main/',
-                    src: ["img/**"],
-                    dest: '<%= properties.outputPath %>/'
-                },
-                lib: {
-                    expand: true,
-                    cwd: 'src/main/',
-                    src: ["lib/**"],
-                    dest: '<%= properties.outputPath %>/'
-                }
+                expand: true,
+                cwd: 'src/main/',
+                src: [
+                    "json/**",
+                    "example/**",
+                    "img/**",
+                    "lib/**"
+                ],
+                dest: '<%= properties.outputPath %>/'
             },
             frontendFiles: {
                 expand: true,
