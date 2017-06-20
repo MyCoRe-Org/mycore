@@ -1,14 +1,31 @@
 package org.mycore.pi.urn.rest;
 
-import mockit.Mock;
-import mockit.MockUp;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRStoreTestCase;
-import org.mycore.datamodel.metadata.*;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRFileMetadata;
+import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -18,15 +35,8 @@ import org.mycore.pi.MockMetadataManager;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRUUIDURNGenerator;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Created by chi on 09.03.17.

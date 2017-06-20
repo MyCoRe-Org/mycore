@@ -1,5 +1,7 @@
 package org.mycore.frontend.jersey;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -19,8 +21,6 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
-
-import java.util.List;
 
 /**
  * Contains some jersey utility methods.

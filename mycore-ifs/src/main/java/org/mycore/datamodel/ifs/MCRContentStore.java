@@ -26,7 +26,6 @@ package org.mycore.datamodel.ifs;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -23,6 +23,9 @@
 
 package org.mycore.datamodel.niofs;
 
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
+
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
@@ -48,9 +51,6 @@ import java.util.Objects;
 import org.mycore.common.MCRException;
 
 import com.google.common.primitives.Ints;
-
-import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
-import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
 /**
  *  IFS implementation of the {@link Path} interface.

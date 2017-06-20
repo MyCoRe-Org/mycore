@@ -21,6 +21,8 @@
 
 package org.mycore.iiif.image;
 
+import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_API_2_LEVEL2;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Locale;
@@ -28,8 +30,6 @@ import java.util.Locale;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.model.MCRIIIFImageProfile;
-
-import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_API_2_LEVEL2;
 
 public class MCRIIIFImageUtil {
     public static void completeProfile(MCRIIIFImageImpl impl, MCRIIIFImageProfile profile) {

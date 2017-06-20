@@ -1,8 +1,5 @@
 package org.mycore.pi;
 
-import mockit.Mock;
-import mockit.MockUp;
-
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -12,6 +9,9 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * Created by chi on 29.03.17.

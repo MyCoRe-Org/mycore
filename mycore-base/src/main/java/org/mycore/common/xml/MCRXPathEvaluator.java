@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;

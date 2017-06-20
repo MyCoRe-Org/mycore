@@ -1,12 +1,12 @@
 package org.mycore.pi.urn;
 
 
+import static org.mycore.pi.urn.MCRDNBURN.URN_NID;
+import static org.mycore.pi.urn.MCRUniformResourceName.PREFIX;
+
 import java.util.Optional;
 
 import org.mycore.pi.MCRPersistentIdentifierParser;
-
-import static org.mycore.pi.urn.MCRDNBURN.URN_NID;
-import static org.mycore.pi.urn.MCRUniformResourceName.PREFIX;
 
 public class MCRDNBURNParser implements MCRPersistentIdentifierParser<MCRDNBURN> {
 

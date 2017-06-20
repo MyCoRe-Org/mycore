@@ -1,24 +1,5 @@
 package org.mycore.pi.urn.rest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessException;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectDerivate;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.pi.MCRPIRegistrationService;
-import org.mycore.pi.MCRPersistentIdentifierManager;
-import org.mycore.pi.backend.MCRPI;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.pi.urn.MCRDNBURNParser;
-
-import javax.persistence.EntityTransaction;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +17,26 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.persistence.EntityTransaction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.pi.MCRPIRegistrationService;
+import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.urn.MCRDNBURN;
+import org.mycore.pi.urn.MCRDNBURNParser;
 
 /**
  * Service for assigning granular URNs to Derivate. You can call it with a Derivate-ID and it will assign a Base-URN for

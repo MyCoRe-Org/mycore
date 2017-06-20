@@ -1,5 +1,10 @@
 package org.mycore.iview.tests.base;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.text.MessageFormat;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -14,11 +19,6 @@ import org.mycore.iview.tests.image.api.ColorFilter;
 import org.mycore.iview.tests.image.api.FilterSelection;
 import org.mycore.iview.tests.image.api.Selection;
 import org.mycore.iview.tests.model.TestDerivate;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.text.MessageFormat;
 
 /**
  * @author Sebastian Röher (basti890)

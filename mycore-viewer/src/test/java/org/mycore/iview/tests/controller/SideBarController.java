@@ -1,7 +1,7 @@
 package org.mycore.iview.tests.controller;
 
-import java.util.List;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.logging.log4j.LogManager;

@@ -1,12 +1,13 @@
 package org.mycore.pi.urn;
 
 
+import java.util.Objects;
+
+import javax.validation.constraints.NotNull;
+
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPersistentIdentifierGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 public abstract class MCRDNBURNGenerator extends MCRPersistentIdentifierGenerator<MCRDNBURN> {
     public MCRDNBURNGenerator(String generatorID) {

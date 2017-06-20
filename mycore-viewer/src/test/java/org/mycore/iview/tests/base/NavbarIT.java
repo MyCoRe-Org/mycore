@@ -1,6 +1,6 @@
 package org.mycore.iview.tests.base;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 

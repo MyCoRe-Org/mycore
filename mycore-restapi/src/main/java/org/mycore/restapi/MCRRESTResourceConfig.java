@@ -3,9 +3,9 @@
  */
 package org.mycore.restapi;
 
-import org.mycore.common.config.MCRConfiguration;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * @author Thomas Scheffler (yagee)

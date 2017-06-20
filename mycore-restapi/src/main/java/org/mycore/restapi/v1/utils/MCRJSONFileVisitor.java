@@ -12,16 +12,16 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import javax.ws.rs.core.UriInfo;
+
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.filter.MCRSecureTokenV2FilterConfig;
-
-import com.google.gson.stream.JsonWriter;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 
-import javax.ws.rs.core.UriInfo;
+import com.google.gson.stream.JsonWriter;
 
 /**
  * @author Thomas Scheffler (yagee)

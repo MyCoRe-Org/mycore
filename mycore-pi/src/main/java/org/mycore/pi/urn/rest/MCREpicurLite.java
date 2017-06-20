@@ -1,16 +1,16 @@
 package org.mycore.pi.urn.rest;
 
+import static org.mycore.common.MCRConstants.EPICURLITE_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
+import java.net.URL;
+
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.pi.MCRPIRegistrationInfo;
-
-import java.net.URL;
-
-import static org.mycore.common.MCRConstants.EPICURLITE_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * Created by chi on 25.01.17.

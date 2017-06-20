@@ -1,5 +1,9 @@
 package org.mycore.pi;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.UUID;
+
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,10 +14,6 @@ import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRUUIDURNGenerator;
 import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
 import org.mycore.pi.urn.rest.MCREpicurLite;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.UUID;
 
 /**
  * Created by chi on 23.02.17.

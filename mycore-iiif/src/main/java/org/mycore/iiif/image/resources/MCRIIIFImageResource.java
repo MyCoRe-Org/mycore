@@ -21,6 +21,12 @@
 
 package org.mycore.iiif.image.resources;
 
+import static org.mycore.iiif.image.MCRIIIFImageUtil.buildCanonicalURL;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.buildProfileURL;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.completeProfile;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.getIIIFURL;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
+
 import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -57,8 +63,6 @@ import org.mycore.iiif.model.MCRIIIFBase;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import static org.mycore.iiif.image.MCRIIIFImageUtil.*;
 
 @Path("/iiif/image/{impl}")
 @MCRStaticContent
