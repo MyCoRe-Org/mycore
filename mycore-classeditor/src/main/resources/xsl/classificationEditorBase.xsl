@@ -60,10 +60,10 @@
   <xsl:template name="classeditor.includeDojoJS">
     <xsl:choose>
       <xsl:when test="$classeditor.debug = true()">
-        <script type="text/javascript" src="{$classeditor.webURL}/bower_components/dojo/dojo.js"></script>
+        <script type="text/javascript" src="{$classeditor.webURL}/node_modules/dojo/dojo.js"></script>
       </xsl:when>
       <xsl:otherwise>
-        <script type="text/javascript" src="{$classeditor.webURL}/bower_components/dojo/dojo.js"></script>
+        <script type="text/javascript" src="{$classeditor.webURL}/node_modules/dojo/dojo.js"></script>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -80,7 +80,7 @@
   </xsl:template>
 
   <xsl:template name="classeditor.includeDojoCSS">
-    <link rel="stylesheet" type="text/css" href="{$classeditor.webURL}/bower_components/dijit/themes/claro/claro.css"></link>
+    <link rel="stylesheet" type="text/css" href="{$classeditor.webURL}/node_modules/dijit/themes/claro/claro.css"></link>
   </xsl:template>
 
   <xsl:template name="classeditor.includeCSS">

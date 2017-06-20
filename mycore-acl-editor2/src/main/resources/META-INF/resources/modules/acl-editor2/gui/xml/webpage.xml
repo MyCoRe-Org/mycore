@@ -4,7 +4,7 @@
   <section xml:lang="all" title="ACL Editor">
     <div id="mycore-acl-editor2">
       	<link href="gui/css/webpage.css" rel="stylesheet" type="text/css" />
-      	<link href="gui/bower_components/select2/select2.css" rel="stylesheet" type="text/css" />
+      	<link href="gui/node_modules/select2/select2.css" rel="stylesheet" type="text/css" />
       	<div id="acle2-header">
         	<span>          		
           		<text i18n="ACLE.labels.header"/>
@@ -161,9 +161,9 @@
       	<script type="text/javascript" src="gui/js/mycore-acl-editor-ruleSelector.js" />
       	<script type="text/javascript" src="gui/js/mycore-acl-editor-accessTable.js" />
       	<script type="text/javascript" src="gui/js/mycore-acl-editor-ruleList.js" />
-    	<script type="text/javascript" src="gui/bower_components/select2/select2.min.js" />
-    	<script type="text/javascript" src="gui/bower_components/stupidtable.min.js" />
-    	<script type="text/javascript" src="gui/bower_components/bootstrap3-typeahead.min.js" />
+    	<script type="text/javascript" src="gui/node_modules/select2/select2.js" />
+    	<script type="text/javascript" src="gui/node_modules/stupidtable.min.js" />
+    	<script type="text/javascript" src="gui/node_modules/bootstrap3-typeahead.min.js" />
     </div>
   </section>
 </MyCoReWebPage>

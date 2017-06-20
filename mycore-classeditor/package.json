@@ -1,17 +1,16 @@
 {
-  "name": "mycore-wcms2",
+  "name": "mycore-classeditor",
   "version": "1.0.0",
-  "description": "mycore-wcms2",
+  "description": "mycore-classeditor",
   "devDependencies": {
-    "bower": "1.8.0",
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",
     "grunt-contrib-copy": "^0.5.0",
     "grunt-maven": "~1.1.0",
     "grunt-newer": "^0.7.0",
-    "grunt-svninfo": "^0.1.4"
-  },
-  "scripts": {
-    "postinstall": "bower install"
+    "grunt-svninfo": "^0.1.4",
+    "dojo": "1.9.8",
+    "dijit": "1.9.8",
+    "font-awesome": "4.0.3"
   }
 }

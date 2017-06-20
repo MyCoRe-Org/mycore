@@ -41,7 +41,7 @@
           djConfig = {
             isDebug: true,
             parseOnLoad: true,
-            baseUrl: webApplicationBaseURL + "modules/wcms2/bower_components/dojo/",
+            baseUrl: webApplicationBaseURL + "modules/wcms2/node_modules/dojo/",
             modulePaths: {
             "dojoclasses": "../../js/dojoclasses"
             },
@@ -50,7 +50,7 @@
         </script>
 
         <!-- do includes -->
-        <script type="text/javascript" src="{$wcmsBasePath}/bower_components/dojo/dojo.js"></script>
+        <script type="text/javascript" src="{$wcmsBasePath}/node_modules/dojo/dojo.js"></script>
 
         <script type="text/javascript" src="{$jsPath}/dojoInclude.js"></script>
         <!-- util -->
@@ -103,13 +103,13 @@
         <script type="text/javascript" src="{$jsPath}/navigation/undo/EditUndo.js"></script>
         <script type="text/javascript" src="{$jsPath}/navigation/undo/RestoreUndo.js"></script>
 
-        <script type="text/javascript" src="{$wcmsBasePath}/bower_components/ckeditor/ckeditor.js"></script>
+        <script type="text/javascript" src="{$wcmsBasePath}/node_modules/ckeditor/ckeditor.js"></script>
         <!-- main -->
         <script type="text/javascript" src="{$jsPath}/Header.js"></script>
         <script type="text/javascript" src="{$jsPath}/WCMS2.js"></script>
 
         <link rel="stylesheet" type="text/css"
-          href="{$wcmsBasePath}/bower_components/dijit/themes/claro/claro.css"></link>
+          href="{$wcmsBasePath}/node_modules/dijit/themes/claro/claro.css"></link>
         <link rel="stylesheet" type="text/css" href="{$cssPath}/wcms2.css"></link>
         <link rel="stylesheet" type="text/css" href="{$cssPath}/dojo.treetable.css"></link>
 

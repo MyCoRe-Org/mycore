@@ -37,7 +37,7 @@
     <changelog.since>2016-12-21</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2017.05</changes.version>
-    <frontend.maven.plugin.version>1.3</frontend.maven.plugin.version>
+    <frontend.maven.plugin.version>1.4</frontend.maven.plugin.version>
     <guice.version>4.1.0</guice.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
     <hibernate.version>5.2.10.Final</hibernate.version>
@@ -60,7 +60,7 @@
     <sortpom.sortProps>true</sortpom.sortProps>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
-    <yarn.version>v0.16.1</yarn.version>
+    <yarn.version>v0.24.6</yarn.version>
   </properties>
   <build>
     <pluginManagement>
