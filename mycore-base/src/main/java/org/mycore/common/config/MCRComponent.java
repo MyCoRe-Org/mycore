@@ -62,7 +62,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
     private static final String DEFAULT_PRIORITY = "99";
 
     private enum Type {
-        base, complete, component, module
+        base, component, module
     }
 
     private Type type;
@@ -82,10 +82,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
     }
 
     public MCRComponent(String artifactId, Manifest manifest, File jarFile) {
-        if (artifactId.endsWith("complete")) {
-            type = Type.complete;
-            setName(artifactId.replaceAll("-?[^-]*complete", ""));
-        } else if (artifactId.startsWith("mycore-")) {
+        if (artifactId.startsWith("mycore-")) {
             if (artifactId.endsWith("base")) {
                 type = Type.base;
                 setName("base");
@@ -117,8 +114,6 @@ public class MCRComponent implements Comparable<MCRComponent> {
             throw new MCRException(artifactId + " has unsupported priority: " + priority);
         }
         switch (type) {
-            case complete:
-                break;
             case base:
                 priority += 100;
                 break;
@@ -177,13 +172,6 @@ public class MCRComponent implements Comparable<MCRComponent> {
      */
     public boolean isAppModule() {
         return type == Type.module;
-    }
-
-    /**
-     * Returns true, if this component is a mycore complete package and thus does not support auto-resolving of config resources.
-     */
-    public boolean isCompletePackage() {
-        return type == Type.complete;
     }
 
     /**
@@ -283,7 +271,6 @@ public class MCRComponent implements Comparable<MCRComponent> {
                 sb.append("app:");
                 break;
             default:
-                //complete
                 break;
         }
         sb.append(artifactId);
