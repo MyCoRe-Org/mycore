@@ -49,7 +49,6 @@ public class MCRMetsTestUtil {
             }
         }
 
-
         return PROPERTIES;
     }
 
@@ -69,7 +68,6 @@ public class MCRMetsTestUtil {
         return Arrays.stream(withList).noneMatch(with -> comparator.compare(object, with) != 0);
     }
 
-
     public static <T, R> List<R> bulk(BulkOperation<T, R> op, T... on) {
         return Arrays.asList(on).stream().map(op::doOperation).collect(toList());
     }
@@ -78,7 +76,7 @@ public class MCRMetsTestUtil {
         public R doOperation(T input);
     }
 
-    public static MCRMetsSimpleModel buildMetsSimpleModel()  {
+    public static MCRMetsSimpleModel buildMetsSimpleModel() {
         MCRMetsSimpleModel metsSimpleModel = new MCRMetsSimpleModel();
 
         builSimpleModelSections(metsSimpleModel);

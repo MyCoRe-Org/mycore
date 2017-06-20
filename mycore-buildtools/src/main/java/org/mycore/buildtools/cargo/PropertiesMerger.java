@@ -46,50 +46,50 @@ import org.mycore.buildtools.common.MCRSortedProperties;
  * @author Robert Stephan
  */
 public class PropertiesMerger implements MergeProcessor {
-	private ArrayList<ByteArrayInputStream> propsList;
+    private ArrayList<ByteArrayInputStream> propsList;
 
-	/**
-	 * the constructor
-	 */
-	public PropertiesMerger() {
-		propsList = new ArrayList<ByteArrayInputStream>();
+    /**
+     * the constructor
+     */
+    public PropertiesMerger() {
+        propsList = new ArrayList<ByteArrayInputStream>();
 
-	}
+    }
 
-	/**
-	 * adds an other property file to be merged as ByteArrayInputStream
-	 * 
-	 * see @ByteArrayInputStream 
-	 */
-	public void addMergeItem(Object o) throws MergeException {
-		propsList.add((ByteArrayInputStream) o);
+    /**
+     * adds an other property file to be merged as ByteArrayInputStream
+     * 
+     * see @ByteArrayInputStream 
+     */
+    public void addMergeItem(Object o) throws MergeException {
+        propsList.add((ByteArrayInputStream) o);
 
-	}
+    }
 
-	/**
-	 * merges the property files as described above
-	 */
-	@Override
-	public Object performMerge() throws MergeException {
-		if (propsList.size() == 0) {
-			return null;
-		}
-		try {
-			MCRSortedProperties baseProps = new MCRSortedProperties();
-			baseProps.load(propsList.get(0));
+    /**
+     * merges the property files as described above
+     */
+    @Override
+    public Object performMerge() throws MergeException {
+        if (propsList.size() == 0) {
+            return null;
+        }
+        try {
+            MCRSortedProperties baseProps = new MCRSortedProperties();
+            baseProps.load(propsList.get(0));
 
-			for (int i = 1; i < this.propsList.size(); i++) {
-				Properties deltaProps = new Properties();
-				deltaProps.load(this.propsList.get(i));
-				baseProps.putAll(deltaProps);
-			}
-			StringWriter sw = new StringWriter();
-			baseProps.store(sw, "These Properties were merged by org.mycore.buildtools.cargo.PropertiesMerger");
-			
-			//property files should always be ISO-8859-1 encoded in Java
-			return new ByteArrayInputStream(sw.toString().getBytes("ISO-8859-1"));		
-		} catch (Exception e) {
-			throw new MergeException("Error merging properties", e);
-		}
-	}
+            for (int i = 1; i < this.propsList.size(); i++) {
+                Properties deltaProps = new Properties();
+                deltaProps.load(this.propsList.get(i));
+                baseProps.putAll(deltaProps);
+            }
+            StringWriter sw = new StringWriter();
+            baseProps.store(sw, "These Properties were merged by org.mycore.buildtools.cargo.PropertiesMerger");
+
+            //property files should always be ISO-8859-1 encoded in Java
+            return new ByteArrayInputStream(sw.toString().getBytes("ISO-8859-1"));
+        } catch (Exception e) {
+            throw new MergeException("Error merging properties", e);
+        }
+    }
 }

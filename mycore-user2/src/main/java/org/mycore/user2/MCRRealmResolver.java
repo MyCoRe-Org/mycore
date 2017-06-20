@@ -66,9 +66,9 @@ public class MCRRealmResolver implements URIResolver {
         Document realmsDocument = MCRRealmFactory.getRealmsDocument();
         List<Element> realms = realmsDocument.getRootElement().getChildren("realm");
         return realms.stream()
-                     .filter(realm -> id.equals(realm.getAttributeValue("id")))
-                     .findAny()
-                     .orElse(null);
+            .filter(realm -> id.equals(realm.getAttributeValue("id")))
+            .findAny()
+            .orElse(null);
     }
 
 }

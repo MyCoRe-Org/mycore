@@ -55,7 +55,7 @@ public class MCRShutdownHandler {
          * process. As a object may need database access to close cleanly this method can be used to be ahead of
          * database outtake.
          */
-        default void prepareClose(){
+        default void prepareClose() {
             //should be overwritten if needed;
         }
 
@@ -69,7 +69,7 @@ public class MCRShutdownHandler {
          * Returns the priority. A Closeable with a higher priority will be closed before a Closeable with a lower
          * priority. Default priority is 5.
          */
-        default int getPriority(){
+        default int getPriority() {
             return DEFAULT_PRIORITY;
         }
 

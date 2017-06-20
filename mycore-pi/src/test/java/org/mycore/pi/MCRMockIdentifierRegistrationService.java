@@ -1,6 +1,5 @@
 package org.mycore.pi;
 
-
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -11,24 +10,28 @@ public class MCRMockIdentifierRegistrationService extends MCRPIRegistrationServi
         super(registrationServiceID, TYPE);
     }
 
-
     private boolean registerCalled = false;
+
     private boolean deleteCalled = false;
+
     private boolean updatedCalled = false;
 
     @Override
-    protected MCRMockIdentifier registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected MCRMockIdentifier registerIdentifier(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         registerCalled = true;
         return getNewIdentifier(obj.getId(), "");
     }
 
     @Override
-    public void delete(MCRMockIdentifier identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    public void delete(MCRMockIdentifier identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         deleteCalled = true;
     }
 
     @Override
-    public void update(MCRMockIdentifier identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    public void update(MCRMockIdentifier identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         updatedCalled = true;
     }
 

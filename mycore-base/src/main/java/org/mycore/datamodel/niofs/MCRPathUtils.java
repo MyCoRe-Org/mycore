@@ -59,7 +59,7 @@ public abstract class MCRPathUtils {
         } else {
             return targetFS.getPath(nameComps[0], Arrays.copyOfRange(nameComps, 1, nameComps.length));
         }
-    
+
     }
 
 }

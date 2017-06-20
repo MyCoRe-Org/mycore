@@ -55,7 +55,8 @@ public class MCRUserAgentFilter implements Filter {
 
     @Override
     public void init(final FilterConfig arg0) throws ServletException {
-        final String agentRegEx = MCRConfiguration.instance().getString("MCR.Filter.UserAgent", "(bot|spider|crawler|mercator|slurp|seek|nagios|Java)");
+        final String agentRegEx = MCRConfiguration.instance().getString("MCR.Filter.UserAgent",
+            "(bot|spider|crawler|mercator|slurp|seek|nagios|Java)");
         agentPattern = Pattern.compile(agentRegEx);
     }
 
@@ -64,7 +65,8 @@ public class MCRUserAgentFilter implements Filter {
     }
 
     @Override
-    public void doFilter(final ServletRequest sreq, final ServletResponse sres, final FilterChain chain) throws IOException, ServletException {
+    public void doFilter(final ServletRequest sreq, final ServletResponse sres, final FilterChain chain)
+        throws IOException, ServletException {
         final HttpServletRequest request = (HttpServletRequest) sreq;
         final boolean newSession = request.getSession(false) == null;
         chain.doFilter(sreq, sres);

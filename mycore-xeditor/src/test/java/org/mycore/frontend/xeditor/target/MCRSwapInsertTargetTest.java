@@ -42,7 +42,8 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
 
     @Test
     public void testSwapParameter() throws JaxenException, JDOMException {
-        Element template = new MCRNodeBuilder().buildElement("parent[name='aa'][name='ab'][name='bc'][name='ac']", null, null);
+        Element template = new MCRNodeBuilder().buildElement("parent[name='aa'][name='ab'][name='bc'][name='ac']", null,
+            null);
         Document doc = new Document(template);
         MCRBinding root = new MCRBinding(doc);
 
@@ -51,13 +52,16 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
 
         repeat.bindRepeatPosition();
         repeat.bindRepeatPosition();
-        assertEquals("/parent|1|build|name[contains(text(), \"a\")]", MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.MOVE_UP));
-        assertEquals("/parent|2|build|name[contains(text(), \"a\")]", MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.MOVE_DOWN));
+        assertEquals("/parent|1|build|name[contains(text(), \"a\")]",
+            MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.MOVE_UP));
+        assertEquals("/parent|2|build|name[contains(text(), \"a\")]",
+            MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.MOVE_DOWN));
     }
 
     @Test
     public void testSwap() throws JaxenException, JDOMException {
-        Element template = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name='b'][note[2]]", null, null);
+        Element template = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name='b'][note[2]]", null,
+            null);
         Document doc = new Document(template);
         MCRBinding root = new MCRBinding(doc);
 

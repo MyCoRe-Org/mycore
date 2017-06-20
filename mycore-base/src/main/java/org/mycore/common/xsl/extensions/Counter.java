@@ -23,7 +23,6 @@
 
 package org.mycore.common.xsl.extensions;
 
-
 /**
  * @author Thomas Scheffler (yagee)
  *

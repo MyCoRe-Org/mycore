@@ -49,7 +49,7 @@ public class MCRSolrLazyInputDocumentHandlerFactory extends MCRSolrIndexHandlerF
     @Override
     public MCRSolrIndexHandler getIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
         //contentMap is reused in different threads
-        HashMap<MCRObjectID, MCRContent> copyMap=new HashMap<>(contentMap);
+        HashMap<MCRObjectID, MCRContent> copyMap = new HashMap<>(contentMap);
         return new MCRSolrMCRContentMapIndexHandler(copyMap);
     }
 

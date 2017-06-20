@@ -21,7 +21,6 @@
 
 package org.mycore.iiif.image.parser;
 
-
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -30,8 +29,8 @@ import org.mycore.iiif.image.model.MCRIIIFImageSourceRegion;
 
 public class MCRIIIFRegionParserTest {
 
-
     public static final int IMAGE_WIDTH = 500;
+
     public static final int IMAGE_HEIGHT = 400;
 
     @org.junit.Test
@@ -45,12 +44,11 @@ public class MCRIIIFRegionParserTest {
         validCoords.put("pct:10,10,90,90", new MCRIIIFImageSourceRegion(50, 40, 499, 399));
         validCoords.put("pct:0,0,100,100", new MCRIIIFImageSourceRegion(0, 0, 499, 399));
 
-
         for (Map.Entry<String, MCRIIIFImageSourceRegion> entry : validCoords.entrySet()) {
-            MCRIIIFImageSourceRegion result = new MCRIIIFRegionParser(entry.getKey(), IMAGE_WIDTH, IMAGE_HEIGHT).parseImageRegion();
+            MCRIIIFImageSourceRegion result = new MCRIIIFRegionParser(entry.getKey(), IMAGE_WIDTH, IMAGE_HEIGHT)
+                .parseImageRegion();
             Assert.assertEquals(entry.getValue(), result);
         }
-
 
     }
 }

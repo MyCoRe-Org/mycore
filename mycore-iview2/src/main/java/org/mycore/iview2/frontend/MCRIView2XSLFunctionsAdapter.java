@@ -50,7 +50,7 @@ public class MCRIView2XSLFunctionsAdapter {
 
     public static MCRIView2XSLFunctionsAdapter getInstance() {
         return MCRConfiguration.instance().getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter",
-                MCRIView2XSLFunctionsAdapter.class.getName());
+            MCRIView2XSLFunctionsAdapter.class.getName());
     }
 
     public boolean hasMETSFile(String derivateID) {

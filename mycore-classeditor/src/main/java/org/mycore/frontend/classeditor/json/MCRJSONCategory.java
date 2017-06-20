@@ -18,7 +18,7 @@ public class MCRJSONCategory implements MCRCategory {
     private MCRCategoryImpl category;
 
     private Boolean hasChildren = null;
-    
+
     private int positionInParent;
 
     public void setParent(MCRCategory parent) {

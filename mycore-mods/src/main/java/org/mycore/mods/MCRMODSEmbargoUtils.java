@@ -57,7 +57,6 @@ public class MCRMODSEmbargoUtils {
 
     private static MCRCache<MCRObjectID, String> embargoCache = new MCRCache<>(CAPACITY, "MODS embargo filter cache");
 
-
     /**
      * Returns the embargo or <code>null</code> if none is set or is allowed to read.
      * 
@@ -86,7 +85,7 @@ public class MCRMODSEmbargoUtils {
 
     public static String getCachedEmbargo(final MCRObjectID objectId) {
         ModifiedHandle modifiedHandle = MCRXMLMetadataManager.instance().getLastModifiedHandle(objectId, 10,
-                TimeUnit.MINUTES);
+            TimeUnit.MINUTES);
         String embargo = null;
         try {
             embargo = embargoCache.getIfUpToDate(objectId, modifiedHandle);

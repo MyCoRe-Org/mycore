@@ -23,7 +23,7 @@ import org.mycore.pi.MCRPIRegistrationInfo;
  *
  */
 public class MCRURNGranularRESTRegistrationStarter
-        implements MCRStartupHandler.AutoExecutable, MCRShutdownHandler.Closeable {
+    implements MCRStartupHandler.AutoExecutable, MCRShutdownHandler.Closeable {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -55,17 +55,17 @@ public class MCRURNGranularRESTRegistrationStarter
     @Override
     public void startUp(ServletContext servletContext) {
         getUsernamePassword()
-                .map(this::getEpicureProvider)
-                .map(MCRDNBURNRestClient::new)
-                .map(MCRURNGranularRESTRegistrationTask::new)
-                .map(this::startTimerTask)
-                .orElseGet(this::couldNotStartTask)
-                .accept(LOGGER);
+            .map(this::getEpicureProvider)
+            .map(MCRDNBURNRestClient::new)
+            .map(MCRURNGranularRESTRegistrationTask::new)
+            .map(this::startTimerTask)
+            .orElseGet(this::couldNotStartTask)
+            .accept(LOGGER);
     }
 
     private Consumer<Logger> couldNotStartTask() {
         return logger -> logger
-                .warn("Could not start Task " + MCRURNGranularRESTRegistrationTask.class.getSimpleName());
+            .warn("Could not start Task " + MCRURNGranularRESTRegistrationTask.class.getSimpleName());
     }
 
     private ScheduledExecutorService getScheduler() {
@@ -80,13 +80,13 @@ public class MCRURNGranularRESTRegistrationStarter
     private Consumer<Logger> startTimerTask(TimerTask task) {
         getScheduler().scheduleAtFixedRate(task, 0, period, timeUnit);
         return logger -> logger
-                .info("Started task " + task.getClass().getSimpleName() + ", refresh every " + period + timeUnit
-                        .toString());
+            .info("Started task " + task.getClass().getSimpleName() + ", refresh every " + period + timeUnit
+                .toString());
     }
 
     public Function<MCRPIRegistrationInfo, MCREpicurLite> getEpicureProvider(UsernamePasswordCredentials credentials) {
         return urn -> MCREpicurLite.instance(urn, MCRDerivateURNUtils.getURL(urn))
-                                   .setCredentials(credentials);
+            .setCredentials(credentials);
     }
 
     public Optional<UsernamePasswordCredentials> getUsernamePassword() {
@@ -95,7 +95,7 @@ public class MCRURNGranularRESTRegistrationStarter
 
         if (username == null || password == null || username.length() == 0 || password.length() == 0) {
             LOGGER.warn("Could not instantiate " + this.getClass().getName()
-                                + " as required credentials are unset");
+                + " as required credentials are unset");
             LOGGER.warn("Please set MCR.URN.DNB.Credentials.Login and MCR.URN.DNB.Credentials.Password");
             return Optional.empty();
         }

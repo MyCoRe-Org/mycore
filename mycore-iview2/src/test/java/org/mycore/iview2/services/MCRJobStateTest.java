@@ -43,8 +43,8 @@ public class MCRJobStateTest {
         boolean completeContainsNotComplete = completeStates.stream().filter(notCompleteStates::contains).findAny()
             .isPresent();
 
-        boolean allStatesPresent =
-            Stream.concat(notCompleteStates.stream(), completeStates.stream()).distinct().count() == allStates.size();
+        boolean allStatesPresent = Stream.concat(notCompleteStates.stream(), completeStates.stream()).distinct()
+            .count() == allStates.size();
 
         Assert.assertFalse("There is a element in MCRJobState.COMPLETE_STATES and MCRJobState.NOT_COMPLETE_STATES",
             notCompleteContainsComplete || completeContainsNotComplete);

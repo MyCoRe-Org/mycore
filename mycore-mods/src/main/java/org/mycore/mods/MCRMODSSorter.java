@@ -45,11 +45,11 @@ import org.mycore.common.xml.MCRURIResolver;
 public class MCRMODSSorter implements URIResolver {
 
     private final static String[] ORDER = { "genre", "typeofResource", "titleInfo", "nonSort", "subTitle", "title",
-            "partNumber", "partName", "name", "namePart", "displayForm", "role", "affiliation", "originInfo", "place",
-            "publisher", "dateIssued", "dateCreated", "dateModified", "dateValid", "dateOther", "edition", "issuance",
-            "frequency", "relatedItem", "language", "physicalDescription", "abstract", "note", "subject",
-            "classification", "location", "shelfLocator", "url", "accessCondition", "part", "extension",
-            "recordInfo", };
+        "partNumber", "partName", "name", "namePart", "displayForm", "role", "affiliation", "originInfo", "place",
+        "publisher", "dateIssued", "dateCreated", "dateModified", "dateValid", "dateOther", "edition", "issuance",
+        "frequency", "relatedItem", "language", "physicalDescription", "abstract", "note", "subject",
+        "classification", "location", "shelfLocator", "url", "accessCondition", "part", "extension",
+        "recordInfo", };
 
     private final static List<String> ORDER_LIST = Arrays.asList(ORDER);
 

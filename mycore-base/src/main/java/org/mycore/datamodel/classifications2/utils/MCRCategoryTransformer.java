@@ -126,7 +126,8 @@ public class MCRCategoryTransformer {
      * @param emptyLeaves
      *            if true, also include empty leaves
      */
-    public static Element getEditorItems(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves, boolean completeId) {
+    public static Element getEditorItems(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves,
+        boolean completeId) {
         return new ItemElementFactory(cl, labelFormat, sort, emptyLeaves, completeId).getResult();
     }
 

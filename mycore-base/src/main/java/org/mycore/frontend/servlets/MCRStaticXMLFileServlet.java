@@ -58,10 +58,10 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
-            URISyntaxException, TransformerException {
+        URISyntaxException, TransformerException {
         String ruleID = MCRLayoutUtilities.getWebpageACLID(job.getRequest().getServletPath());
         if (MCRAccessManager.hasRule(ruleID, READ_WEBPAGE_PERMISSION)
-                && !MCRAccessManager.checkPermission(ruleID, READ_WEBPAGE_PERMISSION)) {
+            && !MCRAccessManager.checkPermission(ruleID, READ_WEBPAGE_PERMISSION)) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -76,7 +76,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     private void setXSLParameters(URL resource, HttpServletRequest request)
-            throws MalformedURLException, URISyntaxException {
+        throws MalformedURLException, URISyntaxException {
         String path = resource.getProtocol().equals("file") ? resource.getPath() : resource.toExternalForm();
         int lastPathElement = path.lastIndexOf('/') + 1;
         String fileName = path.substring(lastPathElement);
@@ -105,7 +105,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     protected MCRContent getResourceContent(HttpServletRequest request, HttpServletResponse response, URL resource)
-            throws IOException, JDOMException, SAXException, MalformedURLException {
+        throws IOException, JDOMException, SAXException, MalformedURLException {
         return new MCRURLContent(resource);
     }
 }

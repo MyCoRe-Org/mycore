@@ -37,7 +37,8 @@ public class MCRLanguageXML {
      */
     public static void setLangAttribute(MCRLanguage lang, Element element) {
         String code = lang.getCode(MCRLanguageCodeType.biblCode);
-        if( code != null ) element.setAttribute("lang", code);
+        if (code != null)
+            element.setAttribute("lang", code);
     }
 
     /**

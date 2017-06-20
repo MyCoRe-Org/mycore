@@ -62,7 +62,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     protected SVNURL repURL;
 
     protected final static boolean SYNC_LAST_MODIFIED_ON_SVN_COMMIT = MCRConfiguration.instance().getBoolean(
-            "MCR.IFS2.SyncLastModifiedOnSVNCommit", true);
+        "MCR.IFS2.SyncLastModifiedOnSVNCommit", true);
 
     static {
         FSRepositoryFactory.setup();
@@ -82,17 +82,19 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
     private void setupSVN(String type) {
         URI repositoryURI;
-        String repositoryURIString = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".SVNRepositoryURL");
+        String repositoryURIString = MCRConfiguration.instance()
+            .getString("MCR.IFS2.Store." + type + ".SVNRepositoryURL");
         try {
             repositoryURI = new URI(repositoryURIString);
         } catch (URISyntaxException e) {
-            String msg = "Syntax error in MCR.IFS2.Store." + type + ".SVNRepositoryURL property: " + repositoryURIString;
+            String msg = "Syntax error in MCR.IFS2.Store." + type + ".SVNRepositoryURL property: "
+                + repositoryURIString;
             throw new MCRConfigurationException(msg, e);
         }
         try {
             LOGGER.info("Versioning metadata store " + type + " repository URL: " + repositoryURI);
             repURL = SVNURL.create(repositoryURI.getScheme(), repositoryURI.getUserInfo(), repositoryURI.getHost(),
-                    repositoryURI.getPort(), repositoryURI.getPath(), true);
+                repositoryURI.getPort(), repositoryURI.getPath(), true);
             LOGGER.info("repURL: " + repURL);
             File dir = new File(repURL.getPath());
             if (!dir.exists() || (dir.isDirectory() && dir.list().length == 0)) {
@@ -128,7 +130,8 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     SVNRepository getRepository() throws SVNException {
         SVNRepository repository = SVNRepositoryFactory.create(repURL);
         String user = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-        SVNAuthentication[] auth = new SVNAuthentication[] { SVNUserNameAuthentication.newInstance(user, false, repURL, false) };
+        SVNAuthentication[] auth = new SVNAuthentication[] {
+            SVNUserNameAuthentication.newInstance(user, false, repURL, false) };
         BasicAuthenticationManager authManager = new BasicAuthenticationManager(auth);
         repository.setAuthenticationManager(authManager);
         return repository;

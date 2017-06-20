@@ -109,7 +109,7 @@ public final class MCRMODSClassificationSupport {
             return "";
         }
         return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(),
-                category.getID());
+            category.getID());
     }
 
     public static String getClassCategParentLink(final NodeList sources) {
@@ -123,7 +123,7 @@ public final class MCRMODSClassificationSupport {
             return "";
         }
         return MessageFormat
-                .format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), category.getID());
+            .format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), category.getID());
     }
 
     static String getText(final Element element) {

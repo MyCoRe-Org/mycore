@@ -160,9 +160,9 @@ public abstract class MCRJerseyUtil {
     public static String getBaseURL(UriInfo info) {
         String baseURL = info.getBaseUri().toString();
         List<String> applicationPaths = MCRConfiguration.instance()
-                .getStrings("MCR.Jersey.Resource.ApplicationPaths");
-        for(String path : applicationPaths){
-            if (baseURL.endsWith("/" + path + "/")){
+            .getStrings("MCR.Jersey.Resource.ApplicationPaths");
+        for (String path : applicationPaths) {
+            if (baseURL.endsWith("/" + path + "/")) {
                 return baseURL.substring(0, baseURL.indexOf(path));
             }
         }

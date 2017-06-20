@@ -34,7 +34,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
     private String baseURL;
 
     private String objId;
-    
+
     private String derId;
 
     public MCRJSONFileVisitor(JsonWriter jw, MCRObjectID objId, MCRObjectID derId, UriInfo info) {
@@ -93,7 +93,8 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         jw.beginObject();
         writePathInfo(file, attrs);
         jw.name("extension").value(getFileExtension(file.getFileName().toString()));
-        jw.name("href").value(MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(MCRObjectID.getInstance(derId), relativePath.toString(), this.baseURL));
+        jw.name("href").value(MCRSecureTokenV2FilterConfig.getFileNodeServletSecured(MCRObjectID.getInstance(derId),
+            relativePath.toString(), this.baseURL));
         jw.endObject();
         return super.visitFile(file, attrs);
     }

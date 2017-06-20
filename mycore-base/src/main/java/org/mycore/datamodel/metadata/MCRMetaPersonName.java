@@ -20,7 +20,6 @@
 
 package org.mycore.datamodel.metadata;
 
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -398,7 +397,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if(firstname == null || callname == null || fullname == null) {
+        if (firstname == null || callname == null || fullname == null) {
             throw new MCRException(getSubTag() + ": one of fullname, callname or firstname is null.");
         }
         if ((firstname = firstname.trim()).length() == 0) {
@@ -410,14 +409,14 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
         if ((fullname = fullname.trim()).length() == 0) {
             StringBuilder sb = new StringBuilder(128);
             sb.append(academic).append(' ').append(peerage).append(' ').append(firstname).append(' ').append(prefix)
-                    .append(' ').append(surname);
+                .append(' ').append(surname);
             fullname = sb.toString().trim();
             if (fullname.length() == 0) {
                 throw new MCRException(getSubTag() + ": full name / first name or surname is empty");
             }
         }
     }
-    
+
     /**
      * This method make a clone of this class.
      */
@@ -431,7 +430,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("First name         = " + firstname);
             LOGGER.debug("Call name          = " + callname);

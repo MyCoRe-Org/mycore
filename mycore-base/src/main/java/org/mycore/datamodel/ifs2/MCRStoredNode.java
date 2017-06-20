@@ -49,8 +49,11 @@ import org.mycore.common.config.MCRConfiguration;
 public abstract class MCRStoredNode extends MCRNode {
 
     private static final String LANG_ATT = "lang";
+
     private static final String LABEL_ELEMENT = "label";
+
     private static final String NAME_ATT = "name";
+
     /**
      * Any additional data of this node that is not stored in the file object
      */
@@ -150,8 +153,8 @@ public abstract class MCRStoredNode extends MCRNode {
         data.getChildren(LABEL_ELEMENT)
             .stream()
             .filter(child -> lang.equals(
-                                child.getAttributeValue(LANG_ATT,
-                                    Namespace.XML_NAMESPACE)))
+                child.getAttributeValue(LANG_ATT,
+                    Namespace.XML_NAMESPACE)))
             .findAny()
             .orElseGet(() -> {
                 Element newLabel = new Element(LABEL_ELEMENT).setAttribute(LANG_ATT, lang, Namespace.XML_NAMESPACE);
@@ -191,12 +194,12 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     public String getLabel(String lang) {
         return data.getChildren(LABEL_ELEMENT)
-                   .stream()
-                   .filter(label -> lang.equals(
-                       label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE)))
-                   .findAny()
-                   .map(Element::getText)
-                   .orElse(null);
+            .stream()
+            .filter(label -> lang.equals(
+                label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE)))
+            .findAny()
+            .map(Element::getText)
+            .orElse(null);
     }
 
     /**
@@ -212,7 +215,8 @@ public abstract class MCRStoredNode extends MCRNode {
             return label;
         }
 
-        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
+            MCRConstants.DEFAULT_LANG);
         label = getLabel(defaultLang);
         if (label != null) {
             return label;

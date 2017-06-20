@@ -4,7 +4,9 @@ import java.util.List;
 
 public class MCRDOIRestResponse {
     int responseCode;
+
     String handle;
+
     List<MCRDOIRestResponseEntry> values;
 
     /**

@@ -61,7 +61,8 @@ public class MCRRoleResolver implements URIResolver {
                 groupIDs.add(MCRRoleManager.getRole(id));
             }
         } else {
-            throw MCRAccessException.missingPrivilege("List asignable groups for new user.", MCRUser2Constants.USER_ADMIN_PERMISSION, MCRUser2Constants.USER_CREATE_PERMISSION);
+            throw MCRAccessException.missingPrivilege("List asignable groups for new user.",
+                MCRUser2Constants.USER_ADMIN_PERMISSION, MCRUser2Constants.USER_CREATE_PERMISSION);
         }
 
         // Loop over all assignable groups
@@ -73,7 +74,8 @@ public class MCRRoleResolver implements URIResolver {
             if (groupLabel != null && groupLabel.getText() != null) {
                 label = groupLabel.getText();
             }
-            final Element item = new Element("item").setAttribute("value", group.getName()).setAttribute("label", label);
+            final Element item = new Element("item").setAttribute("value", group.getName()).setAttribute("label",
+                label);
             root.addContent(item);
         }
         return root;

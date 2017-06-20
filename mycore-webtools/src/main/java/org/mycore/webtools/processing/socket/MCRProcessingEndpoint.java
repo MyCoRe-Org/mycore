@@ -34,8 +34,10 @@ import org.mycore.frontend.ws.endoint.MCRAbstractEndpoint;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 
-@ServerEndpoint(value = "/ws/mycore-webtools/processing", configurator = MCRWebsocketDefaultConfigurator.class, decoders = {
-    MCRWebsocketJSONDecoder.class })
+@ServerEndpoint(value = "/ws/mycore-webtools/processing",
+    configurator = MCRWebsocketDefaultConfigurator.class,
+    decoders = {
+        MCRWebsocketJSONDecoder.class })
 public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -80,7 +82,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
     @OnClose
     public void close(Session session) {
         SessionListener sessionListener = SESSIONS.get(session.getId());
-        if(session != null) {
+        if (session != null) {
             sessionListener.detachListeners(this.registry);
             SESSIONS.remove(session.getId());
         }

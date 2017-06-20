@@ -46,7 +46,7 @@ public class MCRTransferPackage {
     public static final String IMPORT_CONFIG_FILENAME = "import.xml";
 
     public static final String CONTENT_PATH = "content/";
-    
+
     public static final String CLASS_PATH = CONTENT_PATH + "classifications/";
 
     protected MCRObject source;
@@ -132,19 +132,19 @@ public class MCRTransferPackage {
     protected List<MCRTransferPackageFileContainer> buildFileContainers(MCRObject object) {
         List<MCRTransferPackageFileContainer> fileContainerList = new ArrayList<MCRTransferPackageFileContainer>();
         MCRObjectUtils.getDescendantsAndSelf(object)
-                      .stream()
-                      .map(MCRObject::getStructure)
-                      .map(MCRObjectStructure::getDerivates)
-                      .flatMap(Collection::stream)
-                      .map(MCRMetaLinkID::getXLinkHrefID)
-                      .peek(derivateId -> {
-                          if (!MCRMetadataManager.exists(derivateId)) {
-                              throw new MCRUsageException("Requested derivate '" + derivateId
-                                  + "' does not exist. Thus a transfer package cannot be created.");
-                          }
-                      })
-                      .map(MCRTransferPackageFileContainer::new)
-                      .forEach(fileContainerList::add);
+            .stream()
+            .map(MCRObject::getStructure)
+            .map(MCRObjectStructure::getDerivates)
+            .flatMap(Collection::stream)
+            .map(MCRMetaLinkID::getXLinkHrefID)
+            .peek(derivateId -> {
+                if (!MCRMetadataManager.exists(derivateId)) {
+                    throw new MCRUsageException("Requested derivate '" + derivateId
+                        + "' does not exist. Thus a transfer package cannot be created.");
+                }
+            })
+            .map(MCRTransferPackageFileContainer::new)
+            .forEach(fileContainerList::add);
         return fileContainerList;
     }
 

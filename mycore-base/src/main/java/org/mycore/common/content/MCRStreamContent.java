@@ -41,7 +41,7 @@ public class MCRStreamContent extends MCRContent {
     private InputStream in;
 
     public MCRStreamContent(InputStream in) {
-        if (in==null){
+        if (in == null) {
             throw new NullPointerException("Cannot instantiate MCRStreamContent without InputStream.");
         }
         this.in = in;

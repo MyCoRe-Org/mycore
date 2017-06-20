@@ -1,6 +1,5 @@
 package org.mycore.mods.identifier;
 
-
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
@@ -35,11 +34,10 @@ public class MCRURLIdentifierDetector implements MCRIdentifierDetector<URI> {
     @Override
     public Optional<Map.Entry<String, String>> detect(URI resolvable) {
         return this.normalizers.stream()
-                .map(detector -> detector.detect(resolvable))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst();
+            .map(detector -> detector.detect(resolvable))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
     }
-
 
 }

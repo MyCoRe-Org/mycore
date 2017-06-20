@@ -27,4 +27,5 @@ package org.mycore.common;
  * @author Thomas Scheffler (yagee)
  */
 @Deprecated
-public abstract class MCRHibTestCase extends MCRJPATestCase{}
+public abstract class MCRHibTestCase extends MCRJPATestCase {
+}

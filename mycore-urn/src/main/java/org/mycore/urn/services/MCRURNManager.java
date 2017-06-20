@@ -70,7 +70,7 @@ public class MCRURNManager {
     /** The MCRURNStore implementation to use */
     private static MCRURNStore store;
 
-   private static final Logger LOGGER = LogManager.getLogger(MCRURNManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRURNManager.class);
 
     static {
         try {
@@ -127,10 +127,11 @@ public class MCRURNManager {
         do {
             niss = builder.buildNISS();
             if (niss.equals(niss2)) { // The niss doest'n change (missing counter?)
-            	throw new MCRException("Could not get unique NISS for URN. Possible reason: Missing counter in NISS Pattern.");
+                throw new MCRException(
+                    "Could not get unique NISS for URN. Possible reason: Missing counter in NISS Pattern.");
             }
             urn = buildURN(configID, niss);
-            niss2=niss;
+            niss2 = niss;
         } while (isAssigned(urn));
         return urn;
     }
@@ -259,9 +260,9 @@ public class MCRURNManager {
      * @return the URN
      */
     public static synchronized String buildAndAssignURN(String documentID, String configID) {
-        if(hasURNAssigned(documentID)){
+        if (hasURNAssigned(documentID)) {
             String urn = getURNforDocument(documentID);
-            LOGGER.warn("Returning the already assign URN: "+ urn + " for document "+documentID+".");
+            LOGGER.warn("Returning the already assign URN: " + urn + " for document " + documentID + ".");
             return urn;
         }
         String urn = buildURN(configID);

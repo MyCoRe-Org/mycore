@@ -24,8 +24,8 @@ public class MCRSecureTokenV2FilterConfigTest extends MCRTestCase {
     @Test
     public void testGetExtensionPattern() {
         testMP4Files(MCRSecureTokenV2FilterConfig.getExtensionPattern(Arrays.asList("mp4")));
-        testMP4Files(MCRSecureTokenV2FilterConfig.getExtensionPattern(Arrays.asList("flv","mp4")));
-        testMP4Files(MCRSecureTokenV2FilterConfig.getExtensionPattern(Arrays.asList("mp4","flv")));
+        testMP4Files(MCRSecureTokenV2FilterConfig.getExtensionPattern(Arrays.asList("flv", "mp4")));
+        testMP4Files(MCRSecureTokenV2FilterConfig.getExtensionPattern(Arrays.asList("mp4", "flv")));
     }
 
     private void testMP4Files(Pattern mp4) {

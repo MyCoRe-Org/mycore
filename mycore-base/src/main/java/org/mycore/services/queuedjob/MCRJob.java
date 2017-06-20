@@ -263,7 +263,7 @@ public class MCRJob implements Cloneable {
     @Override
     public String toString() {
         return MessageFormat.format("MCRJob [id:{0}, action:{1}, status:{2}, added:{3}, parameters:{4}]", getId(),
-                getAction().getName(), getStatus(), getAdded(), getParameters());
+            getAction().getName(), getStatus(), getAdded(), getParameters());
     }
 
 }

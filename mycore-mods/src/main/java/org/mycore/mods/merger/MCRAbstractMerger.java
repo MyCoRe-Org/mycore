@@ -41,11 +41,11 @@ public class MCRAbstractMerger extends MCRMerger {
 
     /** Maximum Levenshtein distance to accept two abstracts as equal, in percent */
     private static final int MAX_DISTANCE_PERCENT = MCRConfiguration.instance()
-            .getInt("MCR.MODS.Merger.AbstractMerger.MaxDistancePercent");
+        .getInt("MCR.MODS.Merger.AbstractMerger.MaxDistancePercent");
 
     /** Maximum number of characters to compare from two abstracts */
     private static final int MAX_COMPARE_LENGTH = MCRConfiguration.instance()
-            .getInt("MCR.MODS.Merger.AbstractMerger.MaxCompareLength");
+        .getInt("MCR.MODS.Merger.AbstractMerger.MaxCompareLength");
 
     private String text;
 

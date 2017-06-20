@@ -96,9 +96,9 @@ public class MCRJMXBridge implements Closeable {
             }
             // As WeakReference does not overwrite Object.equals():
             ONAME_LIST.stream()
-                      .filter(wr -> name.equals(wr.get()))
-                      .findFirst()
-                      .ifPresent(ONAME_LIST::remove);
+                .filter(wr -> name.equals(wr.get()))
+                .findFirst()
+                .ifPresent(ONAME_LIST::remove);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -106,8 +106,10 @@ public class MCRJMXBridge implements Closeable {
     }
 
     private static ObjectName getObjectName(String type, String component) throws MalformedObjectNameException {
-        return new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type="
-            + type + ",component=" + component);
+        return new ObjectName(
+            MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ')
+                + ":type="
+                + type + ",component=" + component);
     }
 
     public void prepareClose() {
@@ -136,7 +138,8 @@ public class MCRJMXBridge implements Closeable {
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
     }
 
-    public static ObjectInstance getMBean(String type, String component) throws MalformedObjectNameException, InstanceNotFoundException {
+    public static ObjectInstance getMBean(String type, String component)
+        throws MalformedObjectNameException, InstanceNotFoundException {
         ObjectName name = getObjectName(type, component);
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();

@@ -1,6 +1,5 @@
 package org.mycore.mets.iiif;
 
-
 import java.util.List;
 
 import org.jdom2.Element;

@@ -74,7 +74,8 @@ public class MCRChangeTracker implements Cloneable {
     }
 
     public static void removeChangeTracking(Element element) {
-        for (Iterator<ProcessingInstruction> iter = element.getDescendants(Filters.processinginstruction()).iterator(); iter.hasNext();) {
+        for (Iterator<ProcessingInstruction> iter = element.getDescendants(Filters.processinginstruction())
+            .iterator(); iter.hasNext();) {
             if (iter.next().getTarget().startsWith(PREFIX))
                 iter.remove();
         }

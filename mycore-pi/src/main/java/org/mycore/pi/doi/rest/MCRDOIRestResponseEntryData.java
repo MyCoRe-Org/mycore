@@ -7,6 +7,7 @@ public class MCRDOIRestResponseEntryData {
     }
 
     String format;
+
     MCRDOIRestResponseEntryDataValue value;
 
     public MCRDOIRestResponseEntryDataValue getValue() {

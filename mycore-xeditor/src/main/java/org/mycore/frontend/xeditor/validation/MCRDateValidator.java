@@ -33,7 +33,7 @@ public class MCRDateValidator extends MCRValidator {
     private static final String ATTR_TYPE = "type";
 
     private static final String ATTR_FORMAT = "format";
-    
+
     /** The converter used to convert strings to dates */
     protected MCRDateConverter converter;
 

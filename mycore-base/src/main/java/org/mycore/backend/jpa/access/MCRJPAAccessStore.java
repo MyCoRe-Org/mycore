@@ -202,8 +202,8 @@ public class MCRJPAAccessStore extends MCRAccessStore {
         List<MCRACCESS> l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'", MCRACCESS.class)
             .getResultList();
         return l.stream()
-                .map(aL -> aL.getKey().getObjid())
-                .collect(Collectors.toCollection(ArrayList::new));
+            .map(aL -> aL.getKey().getObjid())
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -213,8 +213,8 @@ public class MCRJPAAccessStore extends MCRAccessStore {
         List<MCRACCESS> l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'", MCRACCESS.class)
             .getResultList();
         return l.stream()
-                .map(access -> access.getKey().getAcpool())
-                .collect(Collectors.toCollection(ArrayList::new));
+            .map(access -> access.getKey().getAcpool())
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override

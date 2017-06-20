@@ -136,7 +136,7 @@ public class MCRSession implements Cloneable {
 
     static {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRSession-OnCommitService-#%d")
-                                                                .build();
+            .build();
         COMMIT_SERVICE = Executors.newFixedThreadPool(4, threadFactory);
         MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
 
@@ -538,8 +538,8 @@ public class MCRSession implements Cloneable {
             .map(r -> new MCRTransactionableRunnable(r, this))
             .forEach(this::submitOrRunOnCommitTask);
     }
-    
-    private void submitOrRunOnCommitTask(MCRTransactionableRunnable task){
+
+    private void submitOrRunOnCommitTask(MCRTransactionableRunnable task) {
         try {
             COMMIT_SERVICE.submit(task);
         } catch (RuntimeException e) {

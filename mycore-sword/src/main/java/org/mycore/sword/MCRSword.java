@@ -20,7 +20,9 @@ import org.mycore.sword.application.MCRSwordLifecycleConfiguration;
 public class MCRSword {
 
     private static Logger LOGGER = LogManager.getLogger(MCRSword.class);
+
     private static Hashtable<String, MCRSwordCollectionProvider> collections = null;
+
     private static Hashtable<String, List<String>> workspaceCollectionTable = null;
 
     private static void initConfig() {
@@ -33,38 +35,38 @@ public class MCRSword {
             LOGGER.info("--- INITIALIZE SWORD SERVER ---");
 
             propertiesMap.keySet().stream()
-                    .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX)) // remove all which are not collections
-                    .filter(prop -> !prop.trim().equals(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX)) // remove all which have no suffix
-                    .map(prop -> prop.substring(lenghtOfPropertyPrefix)) // remove MCR_SWORD_COLLECTION_PREFIX
-                    .map(prop -> prop.split(Pattern.quote("."), 2)) // split to workspace name and collection name
-                    .filter(prop -> prop.length == 2) // remove all whith no workspace or collection name
-                    .forEach(workspaceCollectionEntry -> {
-                        final String collection = workspaceCollectionEntry[1];
-                        final String workspace = workspaceCollectionEntry[0];
+                .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX)) // remove all which are not collections
+                .filter(prop -> !prop.trim().equals(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX)) // remove all which have no suffix
+                .map(prop -> prop.substring(lenghtOfPropertyPrefix)) // remove MCR_SWORD_COLLECTION_PREFIX
+                .map(prop -> prop.split(Pattern.quote("."), 2)) // split to workspace name and collection name
+                .filter(prop -> prop.length == 2) // remove all whith no workspace or collection name
+                .forEach(workspaceCollectionEntry -> {
+                    final String collection = workspaceCollectionEntry[1];
+                    final String workspace = workspaceCollectionEntry[0];
 
-                        LOGGER.info("Found collection: " + collection + " in workspace " + workspace);
-                        String name = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX + workspace + "." + collection;
+                    LOGGER.info("Found collection: " + collection + " in workspace " + workspace);
+                    String name = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX + workspace + "." + collection;
 
-                        LOGGER.info("Try to init : " + name);
-                        MCRSwordCollectionProvider collectionProvider = mcrConfiguration.getInstanceOf(name);
-                        collections.put(collection, collectionProvider);
-                        final MCRSwordLifecycleConfiguration lifecycleConfiguration = new MCRSwordLifecycleConfiguration(collection);
-                        collectionProvider.init(lifecycleConfiguration);
+                    LOGGER.info("Try to init : " + name);
+                    MCRSwordCollectionProvider collectionProvider = mcrConfiguration.getInstanceOf(name);
+                    collections.put(collection, collectionProvider);
+                    final MCRSwordLifecycleConfiguration lifecycleConfiguration = new MCRSwordLifecycleConfiguration(
+                        collection);
+                    collectionProvider.init(lifecycleConfiguration);
 
-                        // This Map is needed to speed up the build of the {@link org.mycore.mir.sword2.manager.MCRServiceDocumentManager}
-                        List<String> collectionsOfWorkspace;
-                        if (workspaceCollectionTable.containsKey(workspace)) {
-                            collectionsOfWorkspace = workspaceCollectionTable.get(workspace);
-                        } else {
-                            collectionsOfWorkspace = new ArrayList<>();
-                            workspaceCollectionTable.put(workspace, collectionsOfWorkspace);
-                        }
-                        collectionsOfWorkspace.add(collection);
-                    });
+                    // This Map is needed to speed up the build of the {@link org.mycore.mir.sword2.manager.MCRServiceDocumentManager}
+                    List<String> collectionsOfWorkspace;
+                    if (workspaceCollectionTable.containsKey(workspace)) {
+                        collectionsOfWorkspace = workspaceCollectionTable.get(workspace);
+                    } else {
+                        collectionsOfWorkspace = new ArrayList<>();
+                        workspaceCollectionTable.put(workspace, collectionsOfWorkspace);
+                    }
+                    collectionsOfWorkspace.add(collection);
+                });
 
             addCollectionShutdownHook();
         }
-
 
     }
 

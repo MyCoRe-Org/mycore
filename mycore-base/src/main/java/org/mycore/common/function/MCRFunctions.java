@@ -29,7 +29,7 @@ public class MCRFunctions {
     public static String convertGlobToRegex(final String globPattern) {
         boolean isInGroup = false;
         final StringBuilder regex = new StringBuilder("^");
-    
+
         int nextPos = 0;
         while (nextPos < globPattern.length()) {
             final char c = globPattern.charAt(nextPos++);
@@ -68,11 +68,11 @@ public class MCRFunctions {
                     regex.append(c);
             }
         }
-    
+
         if (isInGroup) {
             throw new PatternSyntaxException("Missing '}'.", globPattern, nextPos - 1);
         }
-    
+
         final String regExp = regex.append('$').toString();
         return regExp;
     }

@@ -60,10 +60,10 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
     private static final Logger LOGGER = LogManager.getLogger(MCRCreatorRuleStrategy.class);
 
     private static final String SUBMITTED_CATEGORY = MCRConfiguration.instance()
-            .getString("MCR.Access.Strategy.SubmittedCategory", "state:submitted");
+        .getString("MCR.Access.Strategy.SubmittedCategory", "state:submitted");
 
     private static final String CREATOR_ROLE = MCRConfiguration.instance().getString("MCR.Access.Strategy.CreatorRole",
-            "submitter");
+        "submitter");
 
     private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 

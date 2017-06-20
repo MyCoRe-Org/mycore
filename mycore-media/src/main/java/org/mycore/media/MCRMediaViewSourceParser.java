@@ -53,8 +53,9 @@ import org.mycore.datamodel.ifs.MCROldFile;
  */
 @SuppressWarnings("deprecation")
 public class MCRMediaViewSourceParser extends MCRMediaParser {
-    private static final String[] supportedFileExts = { "ogg", "ogm", "avi", "wav", "mpeg", "mpg", "vob", "mp4", "mpgv", "mpv", "m1v",
-            "m2v", "mp2", "mp3", "asf", "wma", "wmv", "qt", "mov", "rm", "rmvb", "ra", "flv", "f4v", "flac", "dat", "w64" };
+    private static final String[] supportedFileExts = { "ogg", "ogm", "avi", "wav", "mpeg", "mpg", "vob", "mp4", "mpgv",
+        "mpv", "m1v",
+        "m2v", "mp2", "mp3", "asf", "wma", "wmv", "qt", "mov", "rm", "rmvb", "ra", "flv", "f4v", "flac", "dat", "w64" };
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMediaViewSourceParser.class);
 
@@ -271,11 +272,13 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                         } else if (key.equals("Stream:")) {
                             media.formatFull = (value.contains(" -") ? value.substring(0, value.indexOf(" -")) : value);
                             if (media.formatFull.contains(" Stream"))
-                                media.formatFull = media.format = media.formatFull.substring(0, media.formatFull.indexOf(" Stream"));
+                                media.formatFull = media.format = media.formatFull.substring(0,
+                                    media.formatFull.indexOf(" Stream"));
                         } else if ("File Name:".equals(key))
                             media.fileName = value;
                         else if ("File Size:".equals(key))
-                            media.fileSize = Long.parseLong((value.substring(0, value.indexOf(" "))).replaceAll(",", ""));
+                            media.fileSize = Long
+                                .parseLong((value.substring(0, value.indexOf(" "))).replaceAll(",", ""));
                         else if ("Duration:".equals(key)) {
                             StringTokenizer st1 = new StringTokenizer(value, ":.");
                             int durationMinutes = Integer.parseInt(st1.nextToken());
@@ -304,7 +307,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                                 media.mimeType = value;
                         } else if ("Avg Stream Bit Rate:".equals(key)) {
                             ((MCRVideoObject) media).streamBitRate = Math.round(1024 * Float
-                                    .valueOf(value.substring(0, value.indexOf(" "))));
+                                .valueOf(value.substring(0, value.indexOf(" "))));
                         } else if ("Dimensions:".equals(key)) {
                             StringTokenizer st1 = new StringTokenizer(value, "x");
                             ((MCRVideoObject) media).width = Integer.parseInt(st1.nextToken());
@@ -314,13 +317,16 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
 
                             while (st1.hasMoreTokens()) {
                                 float fvalue = Float.valueOf(st1.nextToken());
-                                ((MCRVideoObject) media).frameRate = Math.max(((MCRVideoObject) media).frameRate, fvalue);
+                                ((MCRVideoObject) media).frameRate = Math.max(((MCRVideoObject) media).frameRate,
+                                    fvalue);
                             }
                         } else if ("Video Codec:".equals(key)) {
                             if (value.contains("(")) {
-                                ((MCRVideoObject) media).subFormatFull = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
+                                ((MCRVideoObject) media).subFormatFull = value.substring(value.indexOf("(") + 1,
+                                    value.indexOf(")"));
                                 if (((MCRVideoObject) media).subFormatFull.contains(" ")) {
-                                    StringTokenizer st1 = new StringTokenizer(((MCRVideoObject) media).subFormatFull, " ");
+                                    StringTokenizer st1 = new StringTokenizer(((MCRVideoObject) media).subFormatFull,
+                                        " ");
                                     ((MCRVideoObject) media).subFormat = st1.nextToken();
                                     ((MCRVideoObject) media).subFormatVersion = st1.nextToken();
                                 }
@@ -344,9 +350,11 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                             } else if (audio.mimeType == null)
                                 audio.mimeType = value;
                         } else if ("Avg Stream Bit Rate:".equals(key)) {
-                            audio.streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))));
+                            audio.streamBitRate = Math
+                                .round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))));
                         } else if ("Max Stream Bit Rate:".equals(key) && audio.streamBitRate == 0) {
-                            audio.streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))));
+                            audio.streamBitRate = Math
+                                .round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))));
                         } else if ("Audio Codec:".equals(key)) {
                             if (value.contains("(")) {
                                 audio.subFormatFull = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
@@ -357,7 +365,8 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                                 }
 
                                 if (value.contains("Khz")) {
-                                    audio.samplingRate = Integer.parseInt(value.substring(value.indexOf(")") + 1, value.indexOf("Khz"))
+                                    audio.samplingRate = Integer
+                                        .parseInt(value.substring(value.indexOf(")") + 1, value.indexOf("Khz"))
                                             .trim());
                                 }
                             }
@@ -383,7 +392,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
      *            the OutputStream to write the bytes to
      */
     protected void forwardData(URLConnection connection, OutputStream out) throws IOException {
-        try (InputStream in = connection.getInputStream()){
+        try (InputStream in = connection.getInputStream()) {
             IOUtils.copy(in, out);
             out.close();
         }

@@ -1,6 +1,5 @@
 package org.mycore.sword.servlets;
 
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -17,25 +16,24 @@ import org.swordapp.server.CollectionAPI;
 public class MCRSwordCollectionServlet extends MCRSwordServlet {
 
     private MCRSwordConfigurationDefault swordConfiguration;
+
     private MCRSwordCollectionManager colMgr;
+
     private CollectionAPI api;
 
-
-    public void init(){
+    public void init() {
         swordConfiguration = new MCRSwordConfigurationDefault();
         colMgr = new MCRSwordCollectionManager();
         api = new CollectionAPI(colMgr, colMgr, swordConfiguration);
     }
 
-
-    public void doGet( HttpServletRequest req,  HttpServletResponse resp) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.get(req, resp);
         afterRequest(req, resp);
     }
 
-
-    public void doPost( HttpServletRequest req,  HttpServletResponse resp) throws ServletException, IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.post(req, resp);
         afterRequest(req, resp);

@@ -41,9 +41,9 @@ import org.mycore.frontend.cli.MCRCommandLineInterface;
 @Documented
 @Target(ElementType.TYPE)
 public @interface MCRCommandGroup {
-	/**
-	 * A name for this command group
-	 */
-	String name();
+    /**
+     * A name for this command group
+     */
+    String name();
 
 }

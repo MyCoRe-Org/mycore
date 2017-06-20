@@ -34,11 +34,12 @@ import org.mycore.frontend.xeditor.MCREditorSession;
  */
 public class MCRRemoveTarget extends MCRRepeaterControl {
 
-    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
+    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session,
+        String xPath) throws Exception {
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         binding.removeBoundNode(0);
         binding.detach();
-        
+
         session.setBreakpoint("After handling target remove " + xPath);
     }
 }

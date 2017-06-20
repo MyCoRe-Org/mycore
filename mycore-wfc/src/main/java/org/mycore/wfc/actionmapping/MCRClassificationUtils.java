@@ -61,12 +61,12 @@ public class MCRClassificationUtils {
     private static String getCollectionFromObject(MCRObjectID mcrObjectID) {
         MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
         return LINK_SERVICE.getLinksFromReference(reference)
-                           .stream()
-                           .filter(categID -> categID.getRootID()
-                                                     .equals(MCRConstants.COLLECTION_CLASS_ID.getRootID()))
-                           .findFirst()
-                           .map(MCRCategoryID::getID)
-                           .orElse(null);
+            .stream()
+            .filter(categID -> categID.getRootID()
+                .equals(MCRConstants.COLLECTION_CLASS_ID.getRootID()))
+            .findFirst()
+            .map(MCRCategoryID::getID)
+            .orElse(null);
     }
 
     private static String getCollectionFromDerivate(MCRObjectID mcrObjectID) {

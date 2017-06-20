@@ -8,23 +8,22 @@ import java.net.URL;
  * @author Sebastian Hofmann
  */
 public abstract class TestDerivate {
-    
+
     /**
      * @return gets the file wich should be show first
      */
     public abstract String getStartFile();
-    
-    
+
     /**
      * @return the location to zip file!
      * @throws IOException
      */
     public abstract URL getZipLocation() throws IOException;
-    
+
     /**
      * Used to identify the TestDerivate for debugging 
      * @return a simple name
      */
     public abstract String getName();
-    
+
 }

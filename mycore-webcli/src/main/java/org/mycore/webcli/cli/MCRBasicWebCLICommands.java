@@ -18,7 +18,8 @@ public class MCRBasicWebCLICommands {
         return MCRCommandLineInterface.readCommandsFile(file);
     }
 
-    @MCRCommand(syntax = "show command statistics", help = "Show statistics on number of commands processed and execution time needed per command")
+    @MCRCommand(syntax = "show command statistics",
+        help = "Show statistics on number of commands processed and execution time needed per command")
     public static void showCommandStatistics() {
         MCRCommandStatistics.showCommandStatistics();
     }
@@ -34,7 +35,7 @@ public class MCRBasicWebCLICommands {
         setContinueIfOneFails(true);
         MCRCommandLineInterface.skipOnError();
     }
-    
+
     private static void setContinueIfOneFails(boolean value) {
         Object sessionValue;
         synchronized (MCRSessionMgr.getCurrentSession()) {

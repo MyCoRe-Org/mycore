@@ -62,7 +62,8 @@ public class EpicurLite {
         Element epicurLite = new Element("epicurlite", EPICURLITE_NAMESPACE);
         epicurLite.addNamespaceDeclaration(XSI_NAMESPACE);
         epicurLite.setAttribute("schemaLocation",
-                "http://nbn-resolving.org/epicurlite http://nbn-resolving.org/schemas/epicurlite/1.0/epicurlite.xsd", XSI_NAMESPACE);
+            "http://nbn-resolving.org/epicurlite http://nbn-resolving.org/schemas/epicurlite/1.0/epicurlite.xsd",
+            XSI_NAMESPACE);
         Document epicurLiteDoc = new Document(epicurLite);
 
         // authentication information

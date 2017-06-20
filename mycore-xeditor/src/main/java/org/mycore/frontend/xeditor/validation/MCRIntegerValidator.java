@@ -29,7 +29,7 @@ package org.mycore.frontend.xeditor.validation;
 public class MCRIntegerValidator extends MCRValidator {
 
     private static final String ATTR_TYPE = "type";
-    
+
     private static final String TYPE_INTEGER = "integer";
 
     @Override

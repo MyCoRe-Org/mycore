@@ -34,11 +34,12 @@ public class DFGViewerEpicurLiteProvider extends BaseEpicurLiteProvider {
 
             String spec = null;
             if (mainDoc != null && mainDoc.length() > 0) {
-                spec = MessageFormat.format(MCRFrontendUtil.getBaseURL() + "servlets/MCRDFGLinkServlet?deriv={0}&file={1}",
-                        URLEncoder.encode(derivateId.toString(), "UTF-8"), URLEncoder.encode(mainDoc, "UTF-8"));
+                spec = MessageFormat.format(
+                    MCRFrontendUtil.getBaseURL() + "servlets/MCRDFGLinkServlet?deriv={0}&file={1}",
+                    URLEncoder.encode(derivateId.toString(), "UTF-8"), URLEncoder.encode(mainDoc, "UTF-8"));
             } else {
                 spec = MCRFrontendUtil.getBaseURL() + "servlets/MCRDFGLinkServlet?deriv="
-                        + URLEncoder.encode(derivateId.toString(), "UTF-8");
+                    + URLEncoder.encode(derivateId.toString(), "UTF-8");
             }
 
             LOGGER.debug("Generated URL for urn " + urn.getURN() + " is " + spec);

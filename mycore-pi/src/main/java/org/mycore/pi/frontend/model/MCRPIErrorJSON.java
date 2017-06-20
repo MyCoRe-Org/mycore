@@ -7,8 +7,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPIErrorJSON {
 
-
     public String message;
+
     public String stackTrace;
 
     public String translatedAdditionalInformation;

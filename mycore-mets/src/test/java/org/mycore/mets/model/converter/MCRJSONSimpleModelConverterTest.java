@@ -30,15 +30,18 @@ public class MCRJSONSimpleModelConverterTest {
         Assert.assertEquals("labels of root must be the same", s1RootSection.getLabel(), s2RootSection.getLabel());
         Assert.assertEquals("types of root must be the same", s1RootSection.getType(), s2RootSection.getType());
 
-        Assert.assertEquals("page count must be the same", metsSimpleModel.getMetsPageList().size()
-                , compareSimpleModel.getMetsPageList().size());
+        Assert.assertEquals("page count must be the same", metsSimpleModel.getMetsPageList().size(),
+            compareSimpleModel.getMetsPageList().size());
 
         List<MCRMetsLink> s1SectionPageLinkList = metsSimpleModel.getSectionPageLinkList();
         List<MCRMetsLink> s2SectionPageLinkList = compareSimpleModel.getSectionPageLinkList();
 
         for (int n = 0; n < 3; n++) {
-            Assert.assertEquals("from of " + n + " link must be the same", s1SectionPageLinkList.get(n).getFrom().getLabel(), s2SectionPageLinkList.get(n).getFrom().getLabel());
-            Assert.assertEquals("to of " + n + " link must be the same", s1SectionPageLinkList.get(n).getTo().getOrderLabel(), s2SectionPageLinkList.get(n).getTo().getOrderLabel());
+            Assert.assertEquals("from of " + n + " link must be the same",
+                s1SectionPageLinkList.get(n).getFrom().getLabel(), s2SectionPageLinkList.get(n).getFrom().getLabel());
+            Assert.assertEquals("to of " + n + " link must be the same",
+                s1SectionPageLinkList.get(n).getTo().getOrderLabel(),
+                s2SectionPageLinkList.get(n).getTo().getOrderLabel());
         }
     }
 }

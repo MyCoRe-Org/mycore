@@ -9,7 +9,7 @@ public class MCRUniformResourceName implements MCRPersistentIdentifier {
         return PREFIX;
     }
 
-    protected MCRUniformResourceName(){
+    protected MCRUniformResourceName() {
     };
 
     public MCRUniformResourceName(String subNamespace, String namespaceSpecificString) {
@@ -18,6 +18,7 @@ public class MCRUniformResourceName implements MCRPersistentIdentifier {
     }
 
     protected String subNamespace;
+
     protected String namespaceSpecificString;
 
     public String getSubNamespace() {

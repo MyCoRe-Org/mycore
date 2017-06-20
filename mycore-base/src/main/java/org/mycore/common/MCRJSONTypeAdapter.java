@@ -8,7 +8,7 @@ import com.google.gson.JsonSerializer;
 
 public abstract class MCRJSONTypeAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T> {
     public Type bindTo() {
-        ParameterizedType superclass = (ParameterizedType)getClass().getGenericSuperclass();
+        ParameterizedType superclass = (ParameterizedType) getClass().getGenericSuperclass();
         return superclass.getActualTypeArguments()[0];
     }
 }

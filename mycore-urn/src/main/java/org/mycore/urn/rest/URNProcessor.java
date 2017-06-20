@@ -25,8 +25,9 @@ public class URNProcessor {
     protected MCRIURNProvider urnProvider;
 
     @SuppressWarnings("unchecked")
-    public URNProcessor(URNServer server, IEpicurLiteProvider epicurLiteProvider) throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException {
+    public URNProcessor(URNServer server, IEpicurLiteProvider epicurLiteProvider)
+        throws ClassNotFoundException, InstantiationException,
+        IllegalAccessException {
         this.server = server;
         this.epicurLiteProvider = epicurLiteProvider;
 
@@ -42,68 +43,70 @@ public class URNProcessor {
             int headStatus = server.head(urn);
             EpicurLite elp = null;
             switch (headStatus) {
-            // urn already registered
-            case HttpStatus.SC_NO_CONTENT:
-                LOGGER.info("URN " + urn + " is already registered, performing update of url");
-                if (!urn.isRegistered()) {
-                    // setting attribute in database
-                    urn.setRegistered(true);
-                }
-                elp = epicurLiteProvider.getEpicurLite(urn);
-
-                if (elp.getUrl() == null) {
-                    LOGGER.warn("The url for " + urn + " is " + null + ". Canceling request");
-                    return;
-                }
-
-                // performing update
-                int postStatus = server.post(elp);
-                switch (postStatus) {
+                // urn already registered
                 case HttpStatus.SC_NO_CONTENT:
-                    LOGGER.info("URN " + urn + " updated to " + elp.getUrl());
-                    if (urn.toString().contains(urnProvider.getNISS() + "-dfg")) {
-                        modifyToOriginalURN(urn);
-                        urn.setDfg(true);
-                    }
-                    // update record in database
-                    MCRURNManager.update(urn);
-                    break;
-                default:
-                    LOGGER.warn("URN " + urn + " could not be updated. Status " + postStatus);
-                }
-
-                break;
-            // urn not registered
-            case HttpStatus.SC_NOT_FOUND:
-                LOGGER.info("URN " + urn + " is NOT registered");
-                elp = epicurLiteProvider.getEpicurLite(urn);
-                int putStatus = server.put(elp);
-                switch (putStatus) {
-                case HttpStatus.SC_CREATED:
-                    LOGGER.info("URN " + urn + " registered to " + elp.getUrl());
-                    if (!urn.toString().contains(urnProvider.getNISS() + "-dfg")) {
+                    LOGGER.info("URN " + urn + " is already registered, performing update of url");
+                    if (!urn.isRegistered()) {
+                        // setting attribute in database
                         urn.setRegistered(true);
-                    } else {
-                        modifyToOriginalURN(urn);
-                        urn.setDfg(true);
                     }
-                    MCRURNManager.update(urn);
+                    elp = epicurLiteProvider.getEpicurLite(urn);
+
+                    if (elp.getUrl() == null) {
+                        LOGGER.warn("The url for " + urn + " is " + null + ". Canceling request");
+                        return;
+                    }
+
+                    // performing update
+                    int postStatus = server.post(elp);
+                    switch (postStatus) {
+                        case HttpStatus.SC_NO_CONTENT:
+                            LOGGER.info("URN " + urn + " updated to " + elp.getUrl());
+                            if (urn.toString().contains(urnProvider.getNISS() + "-dfg")) {
+                                modifyToOriginalURN(urn);
+                                urn.setDfg(true);
+                            }
+                            // update record in database
+                            MCRURNManager.update(urn);
+                            break;
+                        default:
+                            LOGGER.warn("URN " + urn + " could not be updated. Status " + postStatus);
+                    }
+
                     break;
-                case HttpStatus.SC_SEE_OTHER:
-                    LOGGER.warn("URN " + urn + " could NOT registered to " + elp.getUrl() + "\n"
-                            + "At least one of the given URLs is already registered under another URN");
-                    break;
-                case HttpStatus.SC_CONFLICT:
-                    LOGGER.warn("URN " + urn + " could NOT registered to " + elp.getUrl() + "\n"
-                            + "Conflict: URN-Record already exists and can not be created again");
+                // urn not registered
+                case HttpStatus.SC_NOT_FOUND:
+                    LOGGER.info("URN " + urn + " is NOT registered");
+                    elp = epicurLiteProvider.getEpicurLite(urn);
+                    int putStatus = server.put(elp);
+                    switch (putStatus) {
+                        case HttpStatus.SC_CREATED:
+                            LOGGER.info("URN " + urn + " registered to " + elp.getUrl());
+                            if (!urn.toString().contains(urnProvider.getNISS() + "-dfg")) {
+                                urn.setRegistered(true);
+                            } else {
+                                modifyToOriginalURN(urn);
+                                urn.setDfg(true);
+                            }
+                            MCRURNManager.update(urn);
+                            break;
+                        case HttpStatus.SC_SEE_OTHER:
+                            LOGGER.warn("URN " + urn + " could NOT registered to " + elp.getUrl() + "\n"
+                                + "At least one of the given URLs is already registered under another URN");
+                            break;
+                        case HttpStatus.SC_CONFLICT:
+                            LOGGER.warn("URN " + urn + " could NOT registered to " + elp.getUrl() + "\n"
+                                + "Conflict: URN-Record already exists and can not be created again");
+                            break;
+                        default:
+                            LOGGER.warn("Could not handle urn request: status=" + putStatus + ", urn=" + urn + ", url="
+                                + elp.getUrl()
+                                + "\nEpicur Lite:\n\n"
+                                + new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite()));
+                    }
                     break;
                 default:
-                    LOGGER.warn("Could not handle urn request: status=" + putStatus + ", urn=" + urn + ", url=" + elp.getUrl()
-                            + "\nEpicur Lite:\n\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite()));
-                }
-                break;
-            default:
-                LOGGER.warn("Could not handle request for urn " + urn + " Status code " + headStatus);
+                    LOGGER.warn("Could not handle request for urn " + urn + " Status code " + headStatus);
             }
         } catch (Exception ex) {
             LOGGER.error("Error while registering urn" + ex);

@@ -50,14 +50,15 @@ public class MCRJobQueuePermission implements MCRResourceAccessChecker {
      */
     @Override
     public boolean isPermitted(ContainerRequestContext request) {
-        String queueName = request.getUriInfo().getPathSegments().size() > 1 ? request.getUriInfo().getPathSegments().get(1).getPath() : null;
+        String queueName = request.getUriInfo().getPathSegments().size() > 1
+            ? request.getUriInfo().getPathSegments().get(1).getPath() : null;
         try {
             if (queueName == null || queueName.isEmpty()) {
                 return MCRAccessManager.checkPermission(PERMISSION_LIST);
             }
 
             String permissionType = request.getMethod().matches("(?i)(POST|PUT|DELETE)") ? PERMISSION_WRITE
-                    : PERMISSION_READ;
+                : PERMISSION_READ;
             if (!MCRAccessManager.checkPermission(queueName, permissionType)) {
                 LOGGER.info("Permission \"" + permissionType + "\" denied for queue \"" + queueName + "\".");
                 return false;
@@ -66,10 +67,10 @@ public class MCRJobQueuePermission implements MCRResourceAccessChecker {
             return true;
         } catch (Exception exc) {
             throw new WebApplicationException(exc,
-                    Response.status(Status.INTERNAL_SERVER_ERROR)
-                            .entity("Unable to check permission for request " + request.getUriInfo().getRequestUri()
-                                    + " containing entity value " + queueName)
-                            .build());
+                Response.status(Status.INTERNAL_SERVER_ERROR)
+                    .entity("Unable to check permission for request " + request.getUriInfo().getRequestUri()
+                        + " containing entity value " + queueName)
+                    .build());
         }
     }
 

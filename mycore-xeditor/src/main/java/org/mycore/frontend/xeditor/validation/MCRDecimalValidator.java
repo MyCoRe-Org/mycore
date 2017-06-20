@@ -29,13 +29,13 @@ package org.mycore.frontend.xeditor.validation;
 public class MCRDecimalValidator extends MCRValidator {
 
     private static final String ATTR_LOCALE = "locale";
-    
+
     private static final String ATTR_TYPE = "type";
-    
+
     private static final String TYPE_DECIMAL = "decimal";
-    
+
     protected MCRDecimalConverter converter;
-    
+
     @Override
     public boolean hasRequiredAttributes() {
         return TYPE_DECIMAL.equals(getAttributeValue(ATTR_TYPE)) && hasAttributeValue(ATTR_LOCALE);

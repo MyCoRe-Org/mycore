@@ -63,12 +63,14 @@ public class MCRConditionTransformer {
 
     private static HashSet<String> joinFields = null;
 
-    public static String toSolrQueryString(@SuppressWarnings("rawtypes") MCRCondition condition, Set<String> usedFields) {
+    public static String toSolrQueryString(@SuppressWarnings("rawtypes") MCRCondition condition,
+        Set<String> usedFields) {
         return toSolrQueryString(condition, usedFields, false).toString();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static StringBuilder toSolrQueryString(MCRCondition condition, Set<String> usedFields, boolean subCondition) {
+    private static StringBuilder toSolrQueryString(MCRCondition condition, Set<String> usedFields,
+        boolean subCondition) {
         if (condition instanceof MCRQueryCondition) {
             MCRQueryCondition qCond = (MCRQueryCondition) condition;
             return handleQueryCondition(qCond, usedFields);
@@ -164,9 +166,11 @@ public class MCRConditionTransformer {
         sb.append(field);
         sb.append(":");
         sb.append(includeLower ? '[' : '{');
-        sb.append(lowerTerm != null ? ("*".equals(lowerTerm) ? "\\*" : MCRSolrUtils.escapeSearchValue(lowerTerm)) : "*");
+        sb.append(
+            lowerTerm != null ? ("*".equals(lowerTerm) ? "\\*" : MCRSolrUtils.escapeSearchValue(lowerTerm)) : "*");
         sb.append(" TO ");
-        sb.append(upperTerm != null ? ("*".equals(upperTerm) ? "\\*" : MCRSolrUtils.escapeSearchValue(upperTerm)) : "*");
+        sb.append(
+            upperTerm != null ? ("*".equals(upperTerm) ? "\\*" : MCRSolrUtils.escapeSearchValue(upperTerm)) : "*");
         sb.append(includeUpper ? ']' : '}');
         return sb;
     }
@@ -338,9 +342,9 @@ public class MCRConditionTransformer {
 
         // mixed indexes here!
         return children.stream()
-                       .map(MCRConditionTransformer::getIndex)
-                       .reduce((l, r) -> l.equals(r) ? l : mixed)
-                       .get();
+            .map(MCRConditionTransformer::getIndex)
+            .reduce((l, r) -> l.equals(r) ? l : mixed)
+            .get();
     }
 
     public static String getIndex(String fieldName) {

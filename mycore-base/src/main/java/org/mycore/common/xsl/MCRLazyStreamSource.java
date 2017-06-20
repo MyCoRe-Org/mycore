@@ -11,7 +11,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.mycore.common.MCRException;
 
-
 /**
  * A {@link StreamSource} that offers a lazy initialization to {@link #getInputStream()}.
  * 
@@ -39,9 +38,9 @@ public class MCRLazyStreamSource extends StreamSource {
             throw new MCRException(e);
         }
     }
-    
+
     @FunctionalInterface
-    public static interface InputStreamSupplier{
+    public static interface InputStreamSupplier {
         public InputStream get() throws IOException;
     }
 

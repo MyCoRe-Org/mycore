@@ -27,6 +27,7 @@ public interface MCRSolrIndexHandler {
      * @return list of <code>MCRSolrIndexHandler</code>
      */
     public List<MCRSolrIndexHandler> getSubHandlers();
+
     /**
      * Time in milliseconds solr should index the stream.
      *  -1 by default, says that solr decide when to commit.
@@ -34,11 +35,11 @@ public interface MCRSolrIndexHandler {
     public void setCommitWithin(int commitWithin);
 
     public int getCommitWithin();
-    
+
     public SolrClient getSolrClient();
-    
+
     public void setSolrServer(SolrClient solrClient);
-    
+
     public MCRSolrIndexStatistic getStatistic();
 
     public int getDocuments();

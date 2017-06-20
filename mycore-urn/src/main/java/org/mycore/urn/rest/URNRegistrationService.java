@@ -36,7 +36,7 @@ public class URNRegistrationService extends TimerTask implements Closeable {
         server = new URNServer(new DefaultURNServerConfiguration());
 
         String epicurLiteProviderClass = MCRConfiguration.instance().getString("MCR.URN.EpicurLiteProvider.Class",
-                BaseEpicurLiteProvider.class.getName());
+            BaseEpicurLiteProvider.class.getName());
         Class<IEpicurLiteProvider> c = (Class<IEpicurLiteProvider>) Class.forName(epicurLiteProviderClass);
         epicurLiteProvider = c.newInstance();
 

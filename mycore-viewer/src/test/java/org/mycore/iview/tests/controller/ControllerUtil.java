@@ -23,7 +23,9 @@ public class ControllerUtil {
     private static final Logger LOGGER = LogManager.getLogger(ControllerUtil.class);
 
     private static final Properties TEST_PROPERTIES = TestProperties.getInstance();
+
     public static final String RESULT_FOLDER = "test.result.folder";
+
     public static final String SCREENSHOT_FOLDER = TEST_PROPERTIES.getProperty(RESULT_FOLDER) + "/screenshots/";
 
     /**
@@ -54,10 +56,11 @@ public class ControllerUtil {
             try {
                 Thread.sleep(1000);
                 ByteArrayInputStream input = new ByteArrayInputStream(((TakesScreenshot) driver)
-                        .getScreenshotAs(OutputType.BYTES));
+                    .getScreenshotAs(OutputType.BYTES));
                 byte[] imageBytes = IOUtils.toByteArray(input);
                 new File(SCREENSHOT_FOLDER).mkdirs();
-                IOUtils.copy(new ByteArrayInputStream(imageBytes), new FileOutputStream(new File(SCREENSHOT_FOLDER + name + ".png")));
+                IOUtils.copy(new ByteArrayInputStream(imageBytes),
+                    new FileOutputStream(new File(SCREENSHOT_FOLDER + name + ".png")));
                 return ImageIO.read(new ByteArrayInputStream(imageBytes));
             } catch (IOException e) {
                 LOGGER.error("Error while taking screenshot!");

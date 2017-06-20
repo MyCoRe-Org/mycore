@@ -27,10 +27,10 @@ public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
     @Override
     protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs,
         TarArchiveOutputStream container) throws IOException {
-            TarArchiveEntry entry = new TarArchiveEntry(getFilename(file), TarArchiveEntry.LF_DIR);
-            entry.setModTime(attrs.lastModifiedTime().toMillis());
-            container.putArchiveEntry(entry);
-            container.closeArchiveEntry();
+        TarArchiveEntry entry = new TarArchiveEntry(getFilename(file), TarArchiveEntry.LF_DIR);
+        entry.setModTime(attrs.lastModifiedTime().toMillis());
+        container.putArchiveEntry(entry);
+        container.closeArchiveEntry();
     }
 
     @Override

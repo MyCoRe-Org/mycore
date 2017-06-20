@@ -56,7 +56,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         leakPreventor.contextInitialized(new ServletContextEvent(ctx));
         MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
         shutdownHandler.isWebAppRunning = true;
-        shutdownHandler.leakPreventor =leakPreventor;
+        shutdownHandler.leakPreventor = leakPreventor;
         MCRStartupHandler.startUp(ctx);
         //Make sure logging is configured
         //initialize MCRURIResolver

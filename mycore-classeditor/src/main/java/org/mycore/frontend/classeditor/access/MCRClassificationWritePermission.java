@@ -75,7 +75,8 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
         } catch (Exception exc) {
             throw new WebApplicationException(exc,
                 Response.status(Status.INTERNAL_SERVER_ERROR)
-                    .entity("Unable to check permission for request " + request.getUriInfo().getRequestUri() + " containing entity value " + value)
+                    .entity("Unable to check permission for request " + request.getUriInfo().getRequestUri()
+                        + " containing entity value " + value)
                     .build());
         }
     }

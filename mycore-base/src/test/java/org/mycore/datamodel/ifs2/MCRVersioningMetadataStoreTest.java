@@ -50,18 +50,17 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
     public void createDocument() throws Exception {
         Document testXmlDoc = new Document(new Element("root"));
         MCRContent testContent = new MCRJDOMContent(testXmlDoc);
-        
+
         MCRVersionedMetadata versionedMetadata = getVersStore().create(testContent);
         MCRContent contentFromStore = getVersStore().retrieve(versionedMetadata.getID()).getMetadata();
         String contentStrFromStore = contentFromStore.asString();
-        
+
         MCRContent mcrContent = new MCRJDOMContent(testXmlDoc);
         String expectedContentStr = mcrContent.asString();
-        
-        
+
         assertNotNull(versionedMetadata);
         assertEquals(expectedContentStr, contentStrFromStore);
-        
+
         assertTrue(versionedMetadata.getID() > 0);
         assertTrue(versionedMetadata.getRevision() > 0);
 
@@ -77,7 +76,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         Document xml1 = new Document(new Element("root"));
         MCRVersionedMetadata vm1 = getVersStore().create(new MCRJDOMContent(xml1), id);
         MCRContent xml2 = getVersStore().retrieve(id).getMetadata();
-        
+
         assertNotNull(vm1);
         assertEquals(new MCRJDOMContent(xml1).asString(), xml2.asString());
         getVersStore().create(new MCRJDOMContent(xml1), id + 1);

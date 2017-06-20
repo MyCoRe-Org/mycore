@@ -46,15 +46,22 @@ import org.mycore.mets.model.struct.PhysicalSubDiv;
 public class MCRMetsMods2IIIFConverter {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    protected final Document metsDocument;
-    protected final Mets mets;
-    protected final String identifier;
-    protected final FileGrp imageGrp;
-    protected final Map<String, List<String>> logicalIdIdentifiersMap = new HashMap<>();
-    protected final Map<String, PhysicalSubDiv> identifierPhysicalMap = new ConcurrentHashMap<>();
-    protected final Map<PhysicalSubDiv, String> physicalIdentifierMap = new ConcurrentHashMap<>();
-    protected final Map<String, PhysicalSubDiv> idPhysicalMetsMap = new ConcurrentHashMap<>();
 
+    protected final Document metsDocument;
+
+    protected final Mets mets;
+
+    protected final String identifier;
+
+    protected final FileGrp imageGrp;
+
+    protected final Map<String, List<String>> logicalIdIdentifiersMap = new HashMap<>();
+
+    protected final Map<String, PhysicalSubDiv> identifierPhysicalMap = new ConcurrentHashMap<>();
+
+    protected final Map<PhysicalSubDiv, String> physicalIdentifierMap = new ConcurrentHashMap<>();
+
+    protected final Map<String, PhysicalSubDiv> idPhysicalMetsMap = new ConcurrentHashMap<>();
 
     public MCRMetsMods2IIIFConverter(Document metsDocument, String identifier) {
         this.metsDocument = metsDocument;
@@ -63,23 +70,23 @@ public class MCRMetsMods2IIIFConverter {
 
         FileGrp imageGrp;
         if ((imageGrp = mets.getFileSec().getFileGroup("MASTER")) == null &&
-                (imageGrp = mets.getFileSec().getFileGroup("IVIEW")) == null &&
-                (imageGrp = mets.getFileSec().getFileGroup("MAX")) == null &&
-                (imageGrp = mets.getFileSec().getFileGroup("DEFAULT")) == null) {
+            (imageGrp = mets.getFileSec().getFileGroup("IVIEW")) == null &&
+            (imageGrp = mets.getFileSec().getFileGroup("MAX")) == null &&
+            (imageGrp = mets.getFileSec().getFileGroup("DEFAULT")) == null) {
             throw new MCRException("Could not find a image file group in mets!");
         }
         this.imageGrp = imageGrp;
 
         this.mets.getPhysicalStructMap()
-                .getDivContainer()
-                .getChildren()
-                .parallelStream()
-                .forEach(physicalSubDiv -> {
-                    String id = getIIIFIdentifier(physicalSubDiv);
-                    identifierPhysicalMap.put(id, physicalSubDiv);
-                    physicalIdentifierMap.put(physicalSubDiv, id);
-                    idPhysicalMetsMap.put(physicalSubDiv.getId(), physicalSubDiv);
-                });
+            .getDivContainer()
+            .getChildren()
+            .parallelStream()
+            .forEach(physicalSubDiv -> {
+                String id = getIIIFIdentifier(physicalSubDiv);
+                identifierPhysicalMap.put(id, physicalSubDiv);
+                physicalIdentifierMap.put(physicalSubDiv, id);
+                idPhysicalMetsMap.put(physicalSubDiv.getId(), physicalSubDiv);
+            });
 
         mets.getStructLink().getSmLinks().forEach(smLink -> {
             String logicalId = smLink.getFrom();
@@ -99,7 +106,6 @@ public class MCRMetsMods2IIIFConverter {
 
     public MCRIIIFManifest convert() {
         MCRIIIFManifest manifest = new MCRIIIFManifest();
-
 
         // root chapter ^= manifest metadata
         LogicalStructMap logicalStructMap = (LogicalStructMap) mets.getStructMap("LOGICAL");
@@ -123,8 +129,8 @@ public class MCRMetsMods2IIIFConverter {
             String orderLabel = physicalSubDiv.getOrderLabel();
             String contentids = physicalSubDiv.getContentids();
             String label = Stream.of(order, orderLabel, contentids)
-                    .filter(o -> o != null && !o.isEmpty())
-                    .collect(Collectors.joining(" - "));
+                .filter(o -> o != null && !o.isEmpty())
+                .collect(Collectors.joining(" - "));
 
             String identifier = this.physicalIdentifierMap.get(physicalSubDiv);
             try {
@@ -144,7 +150,6 @@ public class MCRMetsMods2IIIFConverter {
 
                 annotation.setResource(resource);
 
-
                 return canvas;
             } catch (MCRIIIFImageNotFoundException | MCRIIIFImageProvidingException e) {
                 throw new MCRException("Error while providing ImageInfo for " + identifier, e);
@@ -153,7 +158,7 @@ public class MCRMetsMods2IIIFConverter {
                 return null;
             }
         }).filter(o -> o != null)
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
 
         manifest.sequences.add(sequence);
 
@@ -161,14 +166,15 @@ public class MCRMetsMods2IIIFConverter {
         processDivContainer(complete, divContainer);
         manifest.structures.addAll(complete);
 
-        manifest.setLabel(metadata.stream().filter(m -> m.getLabel().equals("title")).findFirst().get().getStringValue().get());
+        manifest.setLabel(
+            metadata.stream().filter(m -> m.getLabel().equals("title")).findFirst().get().getStringValue().get());
 
         return manifest;
     }
 
     protected void processDivContainer(List<MCRIIIFRange> complete, LogicalDiv divContainer) {
         MCRIIIFRange range = new MCRIIIFRange(divContainer.getId());
-        if(divContainer.getParent() == null ){
+        if (divContainer.getParent() == null) {
             range.setViewingHint(MCRIIIFViewingHint.top);
         }
         complete.add(range);
@@ -179,15 +185,14 @@ public class MCRMetsMods2IIIFConverter {
         }).forEach(canvasRef -> range.canvases.add(canvasRef));
 
         divContainer.getChildren().stream()
-                .forEach(div -> {
-                    processDivContainer(complete, div);
-                    range.ranges.add(div.getId());
-                });
+            .forEach(div -> {
+                processDivContainer(complete, div);
+                range.ranges.add(div.getId());
+            });
 
         range.metadata = extractMedataFromLogicalDiv(mets, divContainer);
 
     }
-
 
     protected String getImageImplName() {
         return "Iview";
@@ -195,10 +200,10 @@ public class MCRMetsMods2IIIFConverter {
 
     protected String getIIIFIdentifier(PhysicalSubDiv subDiv) {
         File file = subDiv.getChildren()
-                .stream()
-                .map(fptr -> imageGrp.getFileById(fptr.getFileId()))
-                .filter(fileInGrp -> fileInGrp != null)
-                .findAny().get();
+            .stream()
+            .map(fptr -> imageGrp.getFileById(fptr.getFileId()))
+            .filter(fileInGrp -> fileInGrp != null)
+            .findAny().get();
 
         String cleanHref = file.getFLocat().getHref();
         cleanHref = cleanHref.substring(cleanHref.indexOf(this.identifier), cleanHref.length());
@@ -223,12 +228,12 @@ public class MCRMetsMods2IIIFConverter {
                         return Collections.emptyList();
                 }
 
-                return extractor.extractModsMetadata(mdWrap.asElement().getChild("xmlData", MCRConstants.METS_NAMESPACE));
+                return extractor
+                    .extractModsMetadata(mdWrap.asElement().getChild("xmlData", MCRConstants.METS_NAMESPACE));
             }
         }
 
         return Collections.emptyList();
     }
-
 
 }

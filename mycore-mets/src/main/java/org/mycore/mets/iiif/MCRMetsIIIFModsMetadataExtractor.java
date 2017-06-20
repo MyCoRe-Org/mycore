@@ -1,6 +1,5 @@
 package org.mycore.mets.iiif;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.iiif.presentation.model.attributes.MCRIIIFMetadata;
 
-public class MCRMetsIIIFModsMetadataExtractor implements  MCRMetsIIIFMetadataExtractor {
+public class MCRMetsIIIFModsMetadataExtractor implements MCRMetsIIIFMetadataExtractor {
 
     @Override
     public List<MCRIIIFMetadata> extractModsMetadata(Element xmlData) {
@@ -26,14 +25,15 @@ public class MCRMetsIIIFModsMetadataExtractor implements  MCRMetsIIIFMetadataExt
 
         return elementLabelMap.entrySet().stream().map(entry -> {
             XPathExpression<Text> pathExpression = XPathFactory.instance().compile(entry.getValue(), Filters.text(),
-                    null, MCRConstants.MODS_NAMESPACE);
+                null, MCRConstants.MODS_NAMESPACE);
             List<Text> texts = pathExpression.evaluate(xmlData);
             if (texts.size() == 0) {
                 return null;
             }
-            return new MCRIIIFMetadata(entry.getKey(), texts.stream().map(Text::getText).collect(Collectors.joining(", ")));
+            return new MCRIIIFMetadata(entry.getKey(),
+                texts.stream().map(Text::getText).collect(Collectors.joining(", ")));
         }).filter(e -> e != null)
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
 }

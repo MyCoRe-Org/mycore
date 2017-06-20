@@ -23,6 +23,7 @@ public abstract class MCRNavigationI18nItem implements MCRNavigationBaseItem {
     public String getI18n() {
         return i18nKey;
     }
+
     public void setI18n(String i18nKey) {
         this.i18nKey = i18nKey;
     }
@@ -30,12 +31,15 @@ public abstract class MCRNavigationI18nItem implements MCRNavigationBaseItem {
     public void addLabel(String language, String text) {
         this.labelMap.put(language, text);
     }
+
     public void removeLabel(String language) {
         this.labelMap.remove(language);
     }
+
     public boolean containsLabel(String language) {
         return this.labelMap.containsKey(language);
     }
+
     public String getLabel(String language) {
         return this.labelMap.get(language);
     }
@@ -43,12 +47,13 @@ public abstract class MCRNavigationI18nItem implements MCRNavigationBaseItem {
     @XmlElement(name = "label")
     public Label[] getLabelArray() {
         return this.labelMap.entrySet()
-                            .stream()
-                            .map(entry -> new Label(entry.getKey(), entry.getValue()))
-                            .toArray(Label[]::new);
+            .stream()
+            .map(entry -> new Label(entry.getKey(), entry.getValue()))
+            .toArray(Label[]::new);
     }
+
     public void setLabelArray(Label[] labelArray) {
-        for(Label label : labelArray) {
+        for (Label label : labelArray) {
             this.labelMap.put(label.getLanguage(), label.getText());
         }
     }
@@ -56,18 +61,23 @@ public abstract class MCRNavigationI18nItem implements MCRNavigationBaseItem {
     public static class Label {
         @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
         private String language;
+
         @XmlValue
         private String text;
+
         public Label() {
             this(null, null);
         }
+
         public Label(String language, String text) {
             this.language = language;
             this.text = text;
         }
+
         public String getLanguage() {
             return language;
         }
+
         public String getText() {
             return text;
         }

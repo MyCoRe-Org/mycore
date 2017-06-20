@@ -64,7 +64,7 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
      */
     protected void delete(SolrClient solrClient, MCRCategLinkReference reference) throws SolrServerException,
         IOException {
-        solrClient.deleteByQuery("+type:link +object:" + reference.getObjectID(),500);
+        solrClient.deleteByQuery("+type:link +object:" + reference.getObjectID(), 500);
     }
 
 }

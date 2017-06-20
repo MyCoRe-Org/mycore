@@ -64,7 +64,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
         map.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         return map;
     }
-    
+
     @Before
     public void init() {
         MCRJSONManager mg = MCRJSONManager.instance();

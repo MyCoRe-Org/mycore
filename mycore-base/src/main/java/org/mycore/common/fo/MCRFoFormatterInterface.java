@@ -45,7 +45,7 @@ public interface MCRFoFormatterInterface {
     @Deprecated
     public void transform(InputStream fo_stream, OutputStream out) throws TransformerException, IOException;
 
-    default public void transform(MCRContent input, OutputStream out) throws TransformerException, IOException{
+    default public void transform(MCRContent input, OutputStream out) throws TransformerException, IOException {
         transform(input.getInputStream(), out);
     }
 }

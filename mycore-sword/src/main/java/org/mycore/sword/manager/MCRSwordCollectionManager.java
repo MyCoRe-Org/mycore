@@ -1,6 +1,5 @@
 package org.mycore.sword.manager;
 
-
 import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,7 +31,8 @@ public class MCRSwordCollectionManager implements CollectionListManager, Collect
     private static Logger LOGGER = LogManager.getLogger(MCRSwordCollectionManager.class);
 
     @Override
-    public Feed listCollectionContents(IRI collectionIRI, AuthCredentials authCredentials, SwordConfiguration config) throws SwordServerException, SwordAuthException, SwordError {
+    public Feed listCollectionContents(IRI collectionIRI, AuthCredentials authCredentials, SwordConfiguration config)
+        throws SwordServerException, SwordAuthException, SwordError {
         String collection = MCRSwordUtil.ParseLinkUtil.CollectionIRI.getCollectionNameFromCollectionIRI(collectionIRI);
         String path = collectionIRI.getPath();
 
@@ -44,40 +44,41 @@ public class MCRSwordCollectionManager implements CollectionListManager, Collect
 
             collectionProvider.getAuthHandler().authentication(authCredentials);
             if (collectionProvider.isVisible()) {
-                Integer paginationFromIRI = MCRSwordUtil.ParseLinkUtil.CollectionIRI.getPaginationFromCollectionIRI(collectionIRI);
+                Integer paginationFromIRI = MCRSwordUtil.ParseLinkUtil.CollectionIRI
+                    .getPaginationFromCollectionIRI(collectionIRI);
                 final int start = (paginationFromIRI - 1) * MCRSwordConstants.MAX_ENTRYS_PER_PAGE;
 
                 collectionProvider.getIDSupplier().get(start, MCRSwordConstants.MAX_ENTRYS_PER_PAGE).stream()
-                        .map(id -> {
-                            try {
-                                return collectionProvider.getMetadataProvider().provideListMetadata(id);
-                            } catch (SwordError swordError) {
-                                LOGGER.warn("Error while creating feed for [" + id + "]! (Will be removed from List)");
-                                return null;
-                            }
-                        }).filter(e -> e != null)
-                        .forEach(feed::addEntry);
+                    .map(id -> {
+                        try {
+                            return collectionProvider.getMetadataProvider().provideListMetadata(id);
+                        } catch (SwordError swordError) {
+                            LOGGER.warn("Error while creating feed for [" + id + "]! (Will be removed from List)");
+                            return null;
+                        }
+                    }).filter(e -> e != null)
+                    .forEach(feed::addEntry);
 
                 MCRSwordUtil.BuildLinkUtil.addPaginationLinks(collectionIRI, collection, feed, collectionProvider);
             }
 
         } else {
-            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND, "The collection '" + collection + "' does not exist!");
+            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND,
+                "The collection '" + collection + "' does not exist!");
         }
 
         return feed;
     }
 
-
-
     @Override
-    public DepositReceipt createNew(String editIRI, Deposit deposit, AuthCredentials authCredentials, SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+    public DepositReceipt createNew(String editIRI, Deposit deposit, AuthCredentials authCredentials,
+        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
         LOGGER.info("createNew:" + editIRI);
-        String collection = MCRSwordUtil.ParseLinkUtil.CollectionIRI.getCollectionNameFromCollectionIRI(new IRI(editIRI));
+        String collection = MCRSwordUtil.ParseLinkUtil.CollectionIRI
+            .getCollectionNameFromCollectionIRI(new IRI(editIRI));
         MCRSwordCollectionProvider collectionProvider = MCRSword.getCollection(collection);
         collectionProvider.getAuthHandler().authentication(authCredentials);
         return collectionProvider.getContainerHandler().addObject(deposit);
     }
-
 
 }

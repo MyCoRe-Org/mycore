@@ -111,5 +111,4 @@ public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
         }
     }
 
-    
 }

@@ -54,7 +54,8 @@ public class MCRTemplatesCompiler {
     private static SAXTransformerFactory factory;
 
     static {
-        System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
+        System.setProperty("javax.xml.transform.TransformerFactory",
+            "org.apache.xalan.processor.TransformerFactoryImpl");
         TransformerFactory tf = TransformerFactory.newInstance();
         LOGGER.info("Transformerfactory: " + tf.getClass().getName());
 

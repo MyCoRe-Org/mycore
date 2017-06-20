@@ -120,7 +120,8 @@ public abstract class MCRPath implements Path {
         }
         if (prevChar == SEPARATOR) {
             //remove final slash
-            return normalize(unicodeNormalizedUncleanPath, unicodeNormalizedUncleanPath.length(), unicodeNormalizedUncleanPath.length() - 1);
+            return normalize(unicodeNormalizedUncleanPath, unicodeNormalizedUncleanPath.length(),
+                unicodeNormalizedUncleanPath.length() - 1);
         }
         return unicodeNormalizedUncleanPath;
     }

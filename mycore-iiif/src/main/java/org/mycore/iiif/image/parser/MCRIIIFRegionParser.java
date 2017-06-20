@@ -61,9 +61,8 @@ public class MCRIIIFRegionParser {
     }
 
     public MCRIIIFImageSourceRegion parseImageRegion() throws NumberFormatException {
-        return isPercent() ?
-            parsePercentImageRegion() : isFull() ?
-            new MCRIIIFImageSourceRegion(0, 0, w - 1, h - 1) : parseAbsoluteImageRegion();
+        return isPercent() ? parsePercentImageRegion()
+            : isFull() ? new MCRIIIFImageSourceRegion(0, 0, w - 1, h - 1) : parseAbsoluteImageRegion();
     }
 
     private MCRIIIFImageSourceRegion parsePercentImageRegion() {

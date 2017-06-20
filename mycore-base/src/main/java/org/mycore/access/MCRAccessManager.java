@@ -57,22 +57,22 @@ public class MCRAccessManager {
     public static final String PERMISSION_WRITE = "writedb";
 
     public static final String PERMISSION_DELETE = "deletedb";
-    
+
     private static final ExecutorService EXECUTOR_SERVICE;
-    
+
     static {
         EXECUTOR_SERVICE = Executors.newWorkStealingPool();
         MCRShutdownHandler.getInstance().addCloseable(EXECUTOR_SERVICE::shutdownNow);
     }
-    
+
     public static MCRAccessInterface getAccessImpl() {
         return MCRConfiguration.instance().<MCRAccessInterface> getSingleInstanceOf("MCR.Access.Class",
-                MCRAccessBaseImpl.class.getName());
+            MCRAccessBaseImpl.class.getName());
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
         return MCRConfiguration.instance().getInstanceOf("MCR.Access.Strategy.Class",
-                MCRDerivateIDStrategy.class.getName());
+            MCRDerivateIDStrategy.class.getName());
     }
 
     /**
@@ -91,7 +91,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
     public static void addRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
-            throws MCRException {
+        throws MCRException {
         getAccessImpl().addRule(id.toString(), permission, rule, description);
     }
 
@@ -111,7 +111,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
     public static void addRule(String id, String permission, org.jdom2.Element rule, String description)
-            throws MCRException {
+        throws MCRException {
         getAccessImpl().addRule(id, permission, rule, description);
     }
 
@@ -174,7 +174,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
-            throws MCRException {
+        throws MCRException {
         getAccessImpl().updateRule(id.toString(), permission, rule, description);
     }
 
@@ -194,7 +194,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(String id, String permission, org.jdom2.Element rule, String description)
-            throws MCRException {
+        throws MCRException {
         getAccessImpl().updateRule(id, permission, rule, description);
     }
 
@@ -354,15 +354,16 @@ public class MCRAccessManager {
     public static boolean hasRule(String id, String permission) {
         return getAccessImpl().hasRule(id, permission);
     }
-    
-    public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier){
+
+    public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier) {
         return checkPermission(user, checkSuplier, EXECUTOR_SERVICE);
     }
-    
-    public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier, ExecutorService es){
+
+    public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier,
+        ExecutorService es) {
         return CompletableFuture.supplyAsync(getWrappedFixedUserCallable(user, checkSuplier), es);
     }
-    
+
     private static Supplier<Boolean> getWrappedFixedUserCallable(MCRUserInformation user,
         Supplier<Boolean> checkSuplier) {
         MCRFixedUserCallable<Boolean> mcrFixedUserCallable = new MCRFixedUserCallable<>(checkSuplier::get, user);

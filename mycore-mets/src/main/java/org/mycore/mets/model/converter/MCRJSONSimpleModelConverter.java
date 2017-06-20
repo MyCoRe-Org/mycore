@@ -44,17 +44,17 @@ public class MCRJSONSimpleModelConverter {
 
         List<MCRMetsLink> sectionPageLinkList = metsSimpleModel.getSectionPageLinkList();
         List<MCRMetsLink> metsLinks = sectionPageLinkList
-                .stream()
-                .map((link) -> {
-                    if (link instanceof MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder) {
-                        MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder placeholder = (MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder) link;
-                        MCRMetsSection metsSection = idSectionMap.get(placeholder.getFromString());
-                        MCRMetsPage metsPage = idPageMap.get(placeholder.getToString());
-                        return new MCRMetsLink(metsSection, metsPage);
-                    } else {
-                        return link;
-                    }
-                }).collect(toList());
+            .stream()
+            .map((link) -> {
+                if (link instanceof MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder) {
+                    MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder placeholder = (MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder) link;
+                    MCRMetsSection metsSection = idSectionMap.get(placeholder.getFromString());
+                    MCRMetsPage metsPage = idPageMap.get(placeholder.getToString());
+                    return new MCRMetsLink(metsSection, metsPage);
+                } else {
+                    return link;
+                }
+            }).collect(toList());
 
         sectionPageLinkList.clear();
         sectionPageLinkList.addAll(metsLinks);
@@ -66,23 +66,25 @@ public class MCRJSONSimpleModelConverter {
         final Map<String, MCRMetsFile> idFileMap = new Hashtable<>();
         pages.forEach(p -> {
             p.getFileList().stream()
-                    .filter(file -> file.getUse().equals(MCRMetsFileUse.ALTO))
-                    .forEach(file -> {
-                        idFileMap.put(file.getId(), file);
-                    });
+                .filter(file -> file.getUse().equals(MCRMetsFileUse.ALTO))
+                .forEach(file -> {
+                    idFileMap.put(file.getId(), file);
+                });
         });
 
         return idFileMap;
     }
 
-    private static void processSections(MCRMetsSection current, Hashtable<String, MCRMetsSection> idSectionTable, Map<String, MCRMetsFile> idFileMap) {
+    private static void processSections(MCRMetsSection current, Hashtable<String, MCRMetsSection> idSectionTable,
+        Map<String, MCRMetsFile> idFileMap) {
         idSectionTable.put(current.getId(), current);
 
         final List<MCRMetsAltoLink> altoLinks = current.getAltoLinks().stream().map(altoLink -> {
             if (altoLink instanceof MCRAltoLinkTypeAdapter.MCRAltoLinkPlaceHolder) {
                 MCRAltoLinkTypeAdapter.MCRAltoLinkPlaceHolder ph = (MCRAltoLinkTypeAdapter.MCRAltoLinkPlaceHolder) altoLink;
                 if (!idFileMap.containsKey(ph.getFileID())) {
-                    throw new MCRException("Could not parse link from section to alto! (FileID of alto not found in file list)");
+                    throw new MCRException(
+                        "Could not parse link from section to alto! (FileID of alto not found in file list)");
                 }
                 return new MCRMetsAltoLink(idFileMap.get(ph.getFileID()), ph.getBegin(), ph.getEnd());
             }

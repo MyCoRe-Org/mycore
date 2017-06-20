@@ -121,7 +121,8 @@ public class MCRObjectServlet extends MCRContentServlet {
         return null;
     }
 
-    private MCRObjectID getMCRObjectID(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    private MCRObjectID getMCRObjectID(final HttpServletRequest req, final HttpServletResponse resp)
+        throws IOException {
         final String pathInfo = req.getPathInfo();
         final String id = pathInfo == null ? null : pathInfo.substring(1);
 

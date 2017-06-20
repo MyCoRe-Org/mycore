@@ -22,8 +22,10 @@ public abstract class MCRSwordMetadataProvider implements MCRSwordLifecycle {
         Entry feedEntry = Abdera.getInstance().newEntry();
 
         feedEntry.setId(id.toString());
-        MCRSwordUtil.BuildLinkUtil.getEditMediaIRIStream(lifecycleConfiguration.getCollection(), id.toString()).forEach(feedEntry::addLink);
-        feedEntry.addLink(MCRFrontendUtil.getBaseURL() + MCRSwordConstants.SWORD2_EDIT_IRI + lifecycleConfiguration.getCollection() + "/" + id.toString(), "edit");
+        MCRSwordUtil.BuildLinkUtil.getEditMediaIRIStream(lifecycleConfiguration.getCollection(), id.toString())
+            .forEach(feedEntry::addLink);
+        feedEntry.addLink(MCRFrontendUtil.getBaseURL() + MCRSwordConstants.SWORD2_EDIT_IRI
+            + lifecycleConfiguration.getCollection() + "/" + id.toString(), "edit");
         return feedEntry;
     }
 

@@ -1,6 +1,5 @@
 package org.mycore.pi;
 
-
 import java.util.stream.Stream;
 
 public class MCRMockResolver extends MCRPersistentIdentifierResolver<MCRMockIdentifier> {

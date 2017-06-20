@@ -33,38 +33,39 @@ import java.util.concurrent.ExecutionException;
  */
 public abstract class MCRJobAction {
     protected MCRJob job;
-    
+
     /**
      * The constructor of the job action.
      */
-    public MCRJobAction() {}
-    
+    public MCRJobAction() {
+    }
+
     /**
      * The constructor of the job action with specific {@link MCRJob}.
      */
     public MCRJobAction(MCRJob job) {
         this.job = job;
     }
-    
+
     /**
      * Returns if this action is activated.
      * 
      * @return <code>true</code> if activated, <code>false</code> if isn't
      */
     abstract public boolean isActivated();
-    
+
     /**
      * Returns the name of the action.
      * 
      * @return the name
      */
     abstract public String name();
-    
+
     /**
      * Does the work for given {@link MCRJob}.
      */
     abstract public void execute() throws ExecutionException;
-    
+
     /**
      * When errors occurs during executing it can be necessary to rollback
      * performed actions

@@ -21,7 +21,6 @@
 
 package org.mycore.iiif.image.parser;
 
-
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -30,6 +29,7 @@ import org.mycore.iiif.image.model.MCRIIIFImageTargetSize;
 
 public class MCRIIIFScaleParserTest {
     public static final int IMAGE_WIDTH = 500;
+
     public static final int IMAGE_HEIGHT = 400;
 
     @org.junit.Test
@@ -46,7 +46,8 @@ public class MCRIIIFScaleParserTest {
         testValues.put("pct:50", new MCRIIIFImageTargetSize(250, 200));
 
         testValues.forEach((scale, expectedResult) -> {
-            Assert.assertEquals(expectedResult, new MCRIIIFScaleParser(scale, IMAGE_WIDTH, IMAGE_HEIGHT).parseTargetScale());
+            Assert.assertEquals(expectedResult,
+                new MCRIIIFScaleParser(scale, IMAGE_WIDTH, IMAGE_HEIGHT).parseTargetScale());
         });
 
     }

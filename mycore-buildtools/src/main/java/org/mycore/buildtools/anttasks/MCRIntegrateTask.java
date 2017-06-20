@@ -205,8 +205,8 @@ public class MCRIntegrateTask extends Task {
             return Collections.emptySet();
         log("Excluding " + excludedValue + " from integration.");
         return Arrays.stream(excludedValue.split(","))
-                     .map(String::trim)
-                     .collect(Collectors.toCollection(HashSet::new));
+            .map(String::trim)
+            .collect(Collectors.toCollection(HashSet::new));
     }
 
     private void writeIntegrationHelperFile() throws IOException, TransformerConfigurationException,

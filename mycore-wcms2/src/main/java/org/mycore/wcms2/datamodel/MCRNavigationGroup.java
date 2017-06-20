@@ -23,7 +23,7 @@ public class MCRNavigationGroup extends MCRNavigationI18nItem implements MCRNavi
 
     // children
     @XmlElementRefs({ @XmlElementRef(type = MCRNavigationItem.class),
-            @XmlElementRef(type = MCRNavigationInsertItem.class) })
+        @XmlElementRef(type = MCRNavigationInsertItem.class) })
     private List<MCRNavigationBaseItem> children;
 
     public MCRNavigationGroup() {

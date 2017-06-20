@@ -73,7 +73,7 @@ public class MCRLINKHREFPK implements Serializable {
      * @return Returns the mcrfrom.
      */
     @Basic
-    @Column(length=64, name="MCRFROM")
+    @Column(length = 64, name = "MCRFROM")
     public String getMcrfrom() {
         return mcrfrom;
     }
@@ -94,7 +94,7 @@ public class MCRLINKHREFPK implements Serializable {
      * @return Returns the mcrto.
      */
     @Basic
-    @Column(length=194, name="MCRTO")
+    @Column(length = 194, name = "MCRTO")
     public String getMcrto() {
         return mcrto;
     }
@@ -115,7 +115,7 @@ public class MCRLINKHREFPK implements Serializable {
      * @return Returns the mcrtype.
      */
     @Basic
-    @Column(length=75, name="MCRTYPE")
+    @Column(length = 75, name = "MCRTYPE")
     public String getMcrtype() {
         return mcrtype;
     }
@@ -181,4 +181,4 @@ public class MCRLINKHREFPK implements Serializable {
         return "MCRLINKHREFPK [mcrfrom=" + mcrfrom + ", mcrto=" + mcrto + ", mcrtype=" + mcrtype + "]";
     }
 
- }
+}

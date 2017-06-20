@@ -51,17 +51,18 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
     private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-    private static String storedrules = MCRConfiguration.instance().getString("MCR.Access.StorePermissions", "read,write,delete");
+    private static String storedrules = MCRConfiguration.instance().getString("MCR.Access.StorePermissions",
+        "read,write,delete");
 
     // get the standard read rule from config or it's the true rule
     private static String strReadRule = MCRConfiguration.instance().getString("MCR.Access.Rule.STANDARD-READ-RULE",
-            "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
+        "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element readrule;
 
     // get the standard edit rule from config or it's the true rule
     private static String strEditRule = MCRConfiguration.instance().getString("MCR.Access.Rule.STANDARD-EDIT-RULE",
-            "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
+        "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element editrule;
     static {

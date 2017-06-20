@@ -1,14 +1,9 @@
 package org.mycore.mets.model.simple;
 
+public enum MCRMetsFileUse {
+    ALTO("ALTO"), TRANSLATION("TRANSLATION"), TRANSCRIPTION("TRANSCRIPTION"), MASTER("MASTER"), DEFAULT("DEFAULT");
 
-public enum MCRMetsFileUse{
-    ALTO("ALTO"),
-    TRANSLATION("TRANSLATION"),
-    TRANSCRIPTION("TRANSCRIPTION"),
-    MASTER("MASTER"),
-    DEFAULT("DEFAULT");
-
-    MCRMetsFileUse(final String use){
+    MCRMetsFileUse(final String use) {
         this.use = use;
     }
 

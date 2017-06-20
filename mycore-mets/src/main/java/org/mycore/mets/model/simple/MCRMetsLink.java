@@ -11,6 +11,7 @@ public class MCRMetsLink {
     }
 
     private MCRMetsSection from;
+
     private MCRMetsPage to;
 
     public MCRMetsSection getFrom() {

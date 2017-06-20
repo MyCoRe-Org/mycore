@@ -143,7 +143,8 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         for (JsonElement e : items) {
             if (e.isJsonObject()) {
                 JsonObject item = e.getAsJsonObject();
-                if (item.has(JSON_WCMS_ID) && item.has(JSON_WCMS_TYPE) && wcmsId.equals(item.get(JSON_WCMS_ID).getAsString())) {
+                if (item.has(JSON_WCMS_ID) && item.has(JSON_WCMS_TYPE)
+                    && wcmsId.equals(item.get(JSON_WCMS_ID).getAsString())) {
                     WCMSType wcmsType = WCMSType.valueOf(item.get(JSON_WCMS_TYPE).getAsString());
                     if (wcmsType.equals(WCMSType.root)) {
                         return gson.fromJson(item, MCRNavigation.class);

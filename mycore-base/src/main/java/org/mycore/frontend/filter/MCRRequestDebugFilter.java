@@ -89,12 +89,12 @@ public class MCRRequestDebugFilter implements Filter {
                 headerValues
                     .apply(header)
                     .forEachOrdered(value -> {
-                    sb
-                        .append(header)
-                        .append(": ")
-                        .append(value)
-                        .append("\n");
-                });
+                        sb
+                            .append(header)
+                            .append(": ")
+                            .append(value)
+                            .append("\n");
+                    });
             });
         sb.append("HEADERS END \n\n");
     }

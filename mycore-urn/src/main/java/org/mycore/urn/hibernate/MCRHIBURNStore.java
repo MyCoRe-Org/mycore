@@ -417,8 +417,7 @@ public class MCRHIBURNStore implements MCRURNStore {
                         cb.isNull(root.get(MCRURN_.path)),
                         cb.isNull(root.get(MCRURN_.filename)),
                         cb.equal(root.get(MCRURN_.registered), registered),
-                        cb.equal(root.get(MCRURN_.dfg), dfg)
-                        )
+                        cb.equal(root.get(MCRURN_.dfg), dfg))
                         .orderBy(cb.asc(root.get(MCRURN_.key))))
                 .setFirstResult(start)
                 .setMaxResults(rows)

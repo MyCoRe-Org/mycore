@@ -20,7 +20,8 @@ public abstract class MCRAbstractURNProvider implements MCRIURNProvider {
         MCRURN[] urn = new MCRURN[amount];
 
         for (int i = 1; i <= amount; i++) {
-            urn[i - 1] = MCRURN.create(base.getSubNamespaces(), base.getNamespaceSpecificString() + "-" + this.addLeadingZeroes(amount, i));
+            urn[i - 1] = MCRURN.create(base.getSubNamespaces(),
+                base.getNamespaceSpecificString() + "-" + this.addLeadingZeroes(amount, i));
         }
         return urn;
     }
@@ -46,7 +47,7 @@ public abstract class MCRAbstractURNProvider implements MCRIURNProvider {
 
         for (int i = 1; i <= amount; i++) {
             urn[i - 1] = MCRURN.create(base.getSubNamespaces(), base.getNamespaceSpecificString() + "-" + setId + "-"
-                    + this.addLeadingZeroes(amount, i));
+                + this.addLeadingZeroes(amount, i));
         }
         return urn;
     }

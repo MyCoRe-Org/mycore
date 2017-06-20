@@ -71,19 +71,19 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
     /** For defined document types like static webpages, replace editor elements with complete editor definition */
     @Override
     protected MCRContent getResourceContent(HttpServletRequest request, HttpServletResponse response, URL resource)
-            throws IOException, JDOMException, SAXException, MalformedURLException {
+        throws IOException, JDOMException, SAXException, MalformedURLException {
         MCRContent content = super.getResourceContent(request, response, resource);
         if (mayContainEditorForm(content)) {
             content = doExpandEditorElements(content, request, response,
-                    request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM),
-                    request.getRequestURL().toString());
+                request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM),
+                request.getRequestURL().toString());
         }
         return content;
     }
 
     public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request,
-            HttpServletResponse response, String sessionID, String pageURL)
-            throws IOException, JDOMException, SAXException, MalformedURLException {
+        HttpServletResponse response, String sessionID, String pageURL)
+        throws IOException, JDOMException, SAXException, MalformedURLException {
         MCRParameterCollector pc = new MCRParameterCollector(request, false);
         MCREditorSession session = null;
 

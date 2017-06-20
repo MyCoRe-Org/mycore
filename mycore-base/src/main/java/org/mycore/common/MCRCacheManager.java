@@ -58,7 +58,7 @@ public class MCRCacheManager implements MCRCacheManagerMBean {
     public long getRequests() {
         return cache.backingCache.stats().requestCount();
     }
-    
+
     public long getEvictions() {
         return cache.backingCache.stats().evictionCount();
     }

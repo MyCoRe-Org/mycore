@@ -130,7 +130,7 @@ public class MCRJobMaster implements Runnable, Closeable {
     public static void startMasterThread(Class<? extends MCRJobAction> action) {
         if (!isRunning(action)) {
             LOGGER.info("Starting job master thread" + (action == null ? "" : " for action \"" + action.getName())
-                    + "\".");
+                + "\".");
             final Thread master = new Thread(getInstance(action));
             master.start();
         }
@@ -150,15 +150,15 @@ public class MCRJobMaster implements Runnable, Closeable {
 
         boolean activated = CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated", true);
         activated = activated
-                && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "activated", true);
+            && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "activated", true);
 
         LOGGER.info("JobQueue" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " is "
-                + (activated ? "activated" : "deactivated"));
+            + (activated ? "activated" : "deactivated"));
         if (activated) {
             running = true;
             int jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads", 2);
             jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "JobThreads",
-                    jobThreadCount);
+                jobThreadCount);
 
             ThreadFactory slaveFactory = new ThreadFactory() {
                 AtomicInteger tNum = new AtomicInteger();
@@ -172,8 +172,9 @@ public class MCRJobMaster implements Runnable, Closeable {
             };
             final AtomicInteger activeThreads = new AtomicInteger();
             final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
-            ThreadPoolExecutor executor = new ThreadPoolExecutor(jobThreadCount, jobThreadCount, 1, TimeUnit.DAYS, workQueue,
-                    slaveFactory) {
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(jobThreadCount, jobThreadCount, 1, TimeUnit.DAYS,
+                workQueue,
+                slaveFactory) {
 
                 @Override
                 protected void afterExecute(Runnable r, Throwable t) {
@@ -192,7 +193,7 @@ public class MCRJobMaster implements Runnable, Closeable {
             processableCollection.setProperty("running", running);
 
             LOGGER.info("JobMaster" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " with "
-                    + jobThreadCount + " thread(s) is started");
+                + jobThreadCount + " thread(s) is started");
             while (running) {
                 try {
                     while (activeThreads.get() < jobThreadCount) {
@@ -234,7 +235,8 @@ public class MCRJobMaster implements Runnable, Closeable {
                             } finally {
                                 em.close();
                             }
-                            if (job != null && action != null && action.isActivated() && !jobServe.getExecutor().isShutdown()) {
+                            if (job != null && action != null && action.isActivated()
+                                && !jobServe.getExecutor().isShutdown()) {
                                 LOGGER.info("Creating:" + job);
                                 jobServe.submit(new MCRJobThread(job));
                             } else {
@@ -275,7 +277,7 @@ public class MCRJobMaster implements Runnable, Closeable {
             } // while(running)
             processableCollection.setProperty("running", running);
         }
-        LOGGER.info(getName()+ " thread finished");
+        LOGGER.info(getName() + " thread finished");
         MCRSessionMgr.releaseCurrentSession();
     }
 

@@ -99,9 +99,9 @@ public abstract class MCRWrappedContent extends MCRContent {
     public void sendTo(OutputStream out, boolean close) throws IOException {
         getBaseContent().sendTo(out, close);
     }
-    
+
     @Override
-    public void sendTo(Path target, CopyOption... options) throws IOException{
+    public void sendTo(Path target, CopyOption... options) throws IOException {
         getBaseContent().sendTo(target, options);
     }
 

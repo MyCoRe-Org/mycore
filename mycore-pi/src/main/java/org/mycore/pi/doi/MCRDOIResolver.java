@@ -20,12 +20,12 @@ public class MCRDOIResolver extends MCRPersistentIdentifierResolver<MCRDigitalOb
 
         if (restResponse.getResponseCode() == 1) {
             return restResponse.getValues()
-                               .stream()
-                               .filter(responseEntry -> responseEntry.getType().equals("URL"))
-                               .map(MCRDOIRestResponseEntry::getData)
-                               .filter(responseEntryData -> responseEntryData.getFormat().equals("string"))
-                               .map(responseEntryData -> ((MCRDOIRestResponseEntryDataStringValue) responseEntryData
-                                       .getValue()).getValue());
+                .stream()
+                .filter(responseEntry -> responseEntry.getType().equals("URL"))
+                .map(MCRDOIRestResponseEntry::getData)
+                .filter(responseEntryData -> responseEntryData.getFormat().equals("string"))
+                .map(responseEntryData -> ((MCRDOIRestResponseEntryDataStringValue) responseEntryData
+                    .getValue()).getValue());
         }
 
         return Stream.empty();

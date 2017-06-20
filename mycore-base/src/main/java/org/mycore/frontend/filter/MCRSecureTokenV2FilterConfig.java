@@ -26,8 +26,8 @@ public class MCRSecureTokenV2FilterConfig {
     private static String sharedSecret;
 
     private static Pattern securedExtensions;
-    
-    private static Logger LOGGER=LogManager.getLogger();
+
+    private static Logger LOGGER = LogManager.getLogger();
 
     static {
         MCRConfiguration configuration = MCRConfiguration.instance();
@@ -56,12 +56,12 @@ public class MCRSecureTokenV2FilterConfig {
     public static boolean isFilterEnabled() {
         return enabled;
     }
-    
-    public static String getHashParameterName(){
+
+    public static String getHashParameterName() {
         return hashParameter;
     }
 
-    public static String getSharedSecret(){
+    public static String getSharedSecret() {
         return sharedSecret;
     }
 

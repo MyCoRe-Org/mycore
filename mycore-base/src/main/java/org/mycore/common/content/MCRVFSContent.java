@@ -83,15 +83,16 @@ public class MCRVFSContent extends MCRContent {
             }
         };
     }
-    private String getDebugMessage(String paramMsg){
+
+    private String getDebugMessage(String paramMsg) {
         final String uri = fo.getName().getURI();
         final String id = toString().substring(toString().indexOf('@'));
-        return new ParameterizedMessage(paramMsg+"\n{}", id, uri, getDebugStacktrace()).getFormattedMessage();
+        return new ParameterizedMessage(paramMsg + "\n{}", id, uri, getDebugStacktrace()).getFormattedMessage();
     }
 
     private String getDebugStacktrace() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        int i=0;
+        int i = 0;
         for (StackTraceElement se : stackTrace) {
             i++;
             if (se.getClassName().contains(getClass().getName()) && se.getMethodName().contains("close")
@@ -103,7 +104,7 @@ public class MCRVFSContent extends MCRContent {
             .of(stackTrace)
             .skip(i)
             .filter(s -> !(s.getClassName().equals(getClass()) && s.getMethodName().contains("Debug")))
-            .map(s -> "\tat "+s.toString())
+            .map(s -> "\tat " + s.toString())
             .collect(Collectors.joining(System.getProperty("line.separator")));
     }
 

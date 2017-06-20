@@ -401,10 +401,10 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         }
         PhysicalDiv mainDiv = this.physicalStructMap.getDivContainer();
         return mainDiv.getChildren()
-                      .stream()
-                      .filter(subDiv -> Objects.nonNull(subDiv.getFptr(fileId)))
-                      .findAny()
-                      .orElse(null);
+            .stream()
+            .filter(subDiv -> Objects.nonNull(subDiv.getFptr(fileId)))
+            .findAny()
+            .orElse(null);
     }
 
     /**
@@ -419,11 +419,11 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             return Optional.empty();
         }
         return StreamSupport.stream(me.spliterator(), false)
-                            .filter(metaInterface -> metaInterface instanceof MCRMetaDerivateLink)
-                            .map(MCRMetaDerivateLink.class::cast)
-                            .filter(link -> this.mcrDer.getId().equals(MCRObjectID.getInstance(link.getOwner())))
-                            .map(MCRMetaDerivateLink::getRawPath)
-                            .findFirst();
+            .filter(metaInterface -> metaInterface instanceof MCRMetaDerivateLink)
+            .map(MCRMetaDerivateLink.class::cast)
+            .filter(link -> this.mcrDer.getId().equals(MCRObjectID.getInstance(link.getOwner())))
+            .map(MCRMetaDerivateLink::getRawPath)
+            .findFirst();
     }
 
     /**

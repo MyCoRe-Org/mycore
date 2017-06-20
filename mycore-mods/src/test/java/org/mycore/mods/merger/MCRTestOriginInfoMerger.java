@@ -31,9 +31,9 @@ public class MCRTestOriginInfoMerger extends MCRTestCase {
     public void testMerge() throws Exception {
         String a = "[mods:originInfo[mods:dateIssued='2017'][mods:publisher='Elsevier']]";
         String b = "[mods:originInfo[mods:dateIssued[@encoding='w3cdtf']='2017']"
-                + "[mods:edition='4. Aufl.'][mods:place='Berlin']]";
+            + "[mods:edition='4. Aufl.'][mods:place='Berlin']]";
         String e = "[mods:originInfo[mods:dateIssued[@encoding='w3cdtf']='2017']"
-                + "[mods:publisher='Elsevier'][mods:edition='4. Aufl.'][mods:place='Berlin']]";
+            + "[mods:publisher='Elsevier'][mods:edition='4. Aufl.'][mods:place='Berlin']]";
         MCRTestMerger.test(a, b, e);
     }
 
@@ -42,7 +42,7 @@ public class MCRTestOriginInfoMerger extends MCRTestCase {
         String a = "[mods:originInfo[mods:dateOther[@type='accepted']='2017']]";
         String b = "[mods:originInfo[mods:dateOther[@type='submitted']='2018']]";
         String e = "[mods:originInfo[mods:dateOther[@type='accepted']='2017']"
-                + "[mods:dateOther[@type='submitted']='2018']]";
+            + "[mods:dateOther[@type='submitted']='2018']]";
         MCRTestMerger.test(a, b, e);
     }
 }

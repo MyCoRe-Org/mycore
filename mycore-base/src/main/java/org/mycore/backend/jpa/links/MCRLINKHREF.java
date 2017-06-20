@@ -159,7 +159,7 @@ public class MCRLINKHREF {
      * @return the attr value as a String.
      */
     @Basic
-    @Column(length=194, name="MCRATTR")
+    @Column(length = 194, name = "MCRATTR")
     public String getMcrattr() {
         return attr;
     }

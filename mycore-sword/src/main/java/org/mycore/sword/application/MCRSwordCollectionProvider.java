@@ -19,7 +19,9 @@ import org.swordapp.server.SwordError;
 public abstract class MCRSwordCollectionProvider implements MCRSwordLifecycle {
 
     protected static Logger LOGGER = LogManager.getLogger(MCRSwordCollectionProvider.class);
+
     private MCRSwordContainerHandler mcrSwordContainerHandler;
+
     private MCRSwordMediaHandler mcrSwordMediaHandler;
 
     protected MCRSwordCollectionProvider() {
@@ -46,7 +48,6 @@ public abstract class MCRSwordCollectionProvider implements MCRSwordLifecycle {
      */
     public abstract MCRSwordObjectIDSupplier getIDSupplier();
 
-
     public MCRSwordContainerHandler getContainerHandler() {
         return mcrSwordContainerHandler;
     }
@@ -65,7 +66,8 @@ public abstract class MCRSwordCollectionProvider implements MCRSwordLifecycle {
     public abstract MCRSwordAuthHandler getAuthHandler();
 
     public Stream<String> getDerivateIDsofObject(final String mcrObjectId) throws SwordError {
-        final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(mcrObjectId), 10, TimeUnit.SECONDS);
+        final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(mcrObjectId),
+            10, TimeUnit.SECONDS);
         return derivateIds.stream().map(oid -> oid.toString());
     }
 

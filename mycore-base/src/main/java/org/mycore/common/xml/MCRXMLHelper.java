@@ -424,7 +424,7 @@ public class MCRXMLHelper {
         private static String getName(Namespace ns) {
             StringBuffer buffer = new StringBuffer("_");
             buffer.append("xmlns:")
-            .append(getCononicalizedPrefix(ns));
+                .append(getCononicalizedPrefix(ns));
             return buffer.toString();
         }
 

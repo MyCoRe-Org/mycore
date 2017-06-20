@@ -129,9 +129,9 @@ public class MCRFileNodeServlet extends MCRContentServlet {
     public static String getOwnerID(HttpServletRequest request) {
         String pI = request.getPathInfo();
         return Arrays.stream(pI.split("/"))
-                     .filter(fragment -> patternDerivateID.matcher(fragment).matches())
-                     .findFirst()
-                     .orElse("");
+            .filter(fragment -> patternDerivateID.matcher(fragment).matches())
+            .findFirst()
+            .orElse("");
     }
 
     /**
@@ -142,8 +142,8 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         String pI = request.getPathInfo();
         String ownerID = getOwnerID(request);
         int pos = pI.indexOf(ownerID) + ownerID.length() + 1;
-        if (pos -1 >= pI.length()) {
-        	return "/";
+        if (pos - 1 >= pI.length()) {
+            return "/";
         }
         String path = pI.substring(pos);
         if (path.endsWith("/")) {

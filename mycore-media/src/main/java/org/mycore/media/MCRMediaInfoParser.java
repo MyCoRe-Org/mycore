@@ -57,10 +57,13 @@ import com.sun.jna.Platform;
  */
 @SuppressWarnings("deprecation")
 public class MCRMediaInfoParser extends MCRMediaParser {
-    private static final String[] supportedFileExts = { "mkv", "mka", "mks", "ogg", "ogm", "avi", "wav", "mpeg", "mpg", "vob", "mp4",
-            "mpgv", "mpv", "m1v", "m2v", "mp2", "mp3", "asf", "wma", "wmv", "qt", "mov", "rm", "rmvb", "ra", "ifo", "ac3", "dts", "aac",
-            "ape", "mac", "flv", "f4v", "flac", "dat", "aiff", "aifc", "au", "iff", "paf", "sd2", "irca", "w64", "mat", "pvf", "xi", "sds",
-            "avr" };
+    private static final String[] supportedFileExts = { "mkv", "mka", "mks", "ogg", "ogm", "avi", "wav", "mpeg", "mpg",
+        "vob", "mp4",
+        "mpgv", "mpv", "m1v", "m2v", "mp2", "mp3", "asf", "wma", "wmv", "qt", "mov", "rm", "rmvb", "ra", "ifo", "ac3",
+        "dts", "aac",
+        "ape", "mac", "flv", "f4v", "flac", "dat", "aiff", "aifc", "au", "iff", "paf", "sd2", "irca", "w64", "mat",
+        "pvf", "xi", "sds",
+        "avr" };
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMediaInfoParser.class);
 
@@ -191,7 +194,7 @@ public class MCRMediaInfoParser extends MCRMediaParser {
 
         if (libExporter.isValid() && MI.isValid() && MI.Open(file.getAbsolutePath()) > 0) {
             LOGGER.info("parse " + file.getName() + "...");
-            
+
             try {
                 String info = MI.Inform();
                 MediaInfo.StreamKind step = MediaInfo.StreamKind.General;
@@ -258,9 +261,10 @@ public class MCRMediaInfoParser extends MCRMediaParser {
                                     media.bitRate = Integer.parseInt(value);
                                 else if (key.equals("Encoded_Library"))
                                     media.encoderStr = ovalue;
-                                else if (key.equals("Title") || key.equals("Album") || key.equals("Track") || key.equals("Track/Position")
-                                        || key.equals("Performer") || key.equals("Genre") || key.equals("Recorded_Date")
-                                        || key.equals("Comment")) {
+                                else if (key.equals("Title") || key.equals("Album") || key.equals("Track")
+                                    || key.equals("Track/Position")
+                                    || key.equals("Performer") || key.equals("Genre") || key.equals("Recorded_Date")
+                                    || key.equals("Comment")) {
 
                                     if (media.tags == null)
                                         media.tags = new MCRMediaTagObject();

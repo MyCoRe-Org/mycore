@@ -31,17 +31,17 @@ public class MCRHttpsClient {
 
     private static RequestConfig noRedirect() {
         return RequestConfig
-                .copy(RequestConfig.DEFAULT)
-                .setRedirectsEnabled(false)
-                .build();
+            .copy(RequestConfig.DEFAULT)
+            .setRedirectsEnabled(false)
+            .build();
     }
 
     public static CloseableHttpClient getHttpsClient() {
         return HttpClientBuilder
-                .create()
-                .setConnectionTimeToLive(1, TimeUnit.MINUTES)
-                .setSSLContext(SSLContexts.createSystemDefault())
-                .build();
+            .create()
+            .setConnectionTimeToLive(1, TimeUnit.MINUTES)
+            .setSSLContext(SSLContexts.createSystemDefault())
+            .build();
     }
 
     public static CloseableHttpResponse head(String url) {
@@ -64,8 +64,8 @@ public class MCRHttpsClient {
     }
 
     public static <R extends HttpEntityEnclosingRequestBase> CloseableHttpResponse request(
-            Supplier<R> requestSupp, String url,
-            String contentType, HttpEntity entity) {
+        Supplier<R> requestSupp, String url,
+        String contentType, HttpEntity entity) {
 
         try (CloseableHttpClient httpClient = getHttpsClient()) {
             R request = requestSupp.get();

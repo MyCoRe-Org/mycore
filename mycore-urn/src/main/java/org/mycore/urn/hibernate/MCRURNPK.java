@@ -102,7 +102,7 @@ public class MCRURNPK implements Serializable {
         MCRURNPK castother = (MCRURNPK) other;
 
         return new EqualsBuilder().append(getMcrid(), castother.getMcrid()).append(getMcrurn(), castother.getMcrurn())
-                .isEquals();
+            .isEquals();
     }
 
     /**

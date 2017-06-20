@@ -153,7 +153,8 @@ public class MCRRoleServlet extends MCRServlet {
             //do not handle error here
             throw ex;
         }
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent((Document) job.getRequest().getAttribute(LAYOUT_ELEMENT_KEY)));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(),
+            new MCRJDOMContent((Document) job.getRequest().getAttribute(LAYOUT_ELEMENT_KEY)));
     }
 
 }

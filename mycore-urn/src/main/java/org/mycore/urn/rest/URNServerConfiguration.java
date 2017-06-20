@@ -1,6 +1,5 @@
 package org.mycore.urn.rest;
 
-
 /**
  * Interface to configure an urn server.
  */

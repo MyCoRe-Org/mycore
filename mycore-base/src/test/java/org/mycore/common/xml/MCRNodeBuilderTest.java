@@ -43,7 +43,7 @@ import org.mycore.common.MCRTestCase;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRNodeBuilderTest extends MCRTestCase{
+public class MCRNodeBuilderTest extends MCRTestCase {
 
     @Test
     public void testBuildingElements() throws JaxenException, JDOMException {
@@ -181,7 +181,7 @@ public class MCRNodeBuilderTest extends MCRTestCase{
     @Test
     public void testPredicatesWithValues() throws JaxenException, JDOMException {
         Element built = new MCRNodeBuilder()
-                .buildElement("contributor[role/roleTerm[@type='code'][@authority='ude']='author']", null, null);
+            .buildElement("contributor[role/roleTerm[@type='code'][@authority='ude']='author']", null, null);
         assertNotNull(built);
         assertEquals("contributor", built.getName());
         assertNotNull(built.getChild("role"));
@@ -269,7 +269,8 @@ public class MCRNodeBuilderTest extends MCRTestCase{
 
     @Test
     public void testNamespaces() throws JaxenException, JDOMException {
-        Element role = new MCRNodeBuilder().buildElement("mods:name[@xlink:href='id']/mods:role[@type='creator']", null, null);
+        Element role = new MCRNodeBuilder().buildElement("mods:name[@xlink:href='id']/mods:role[@type='creator']", null,
+            null);
         assertEquals("role", role.getName());
         assertEquals(MCRConstants.MODS_NAMESPACE, role.getNamespace());
         assertEquals("creator", role.getAttributeValue("type"));
@@ -286,7 +287,8 @@ public class MCRNodeBuilderTest extends MCRTestCase{
 
     @Test
     public void testBuildingNodeName() throws JaxenException, JDOMException {
-        Element generated = new MCRNodeBuilder().buildElement("mycoreobject/metadata/def.modsContainer/modsContainer", null, null);
+        Element generated = new MCRNodeBuilder().buildElement("mycoreobject/metadata/def.modsContainer/modsContainer",
+            null, null);
         assertEquals("modsContainer", generated.getName());
         assertEquals("def.modsContainer", generated.getParentElement().getName());
     }

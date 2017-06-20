@@ -25,6 +25,7 @@ public final class MCREpicurLite {
     private UsernamePasswordCredentials credentials;
 
     private boolean isFrontpage = false;
+
     private boolean isPrimary = true;
 
     private MCREpicurLite(MCRPIRegistrationInfo urn, URL url) {
@@ -32,7 +33,7 @@ public final class MCREpicurLite {
         this.url = url;
     }
 
-    public static MCREpicurLite instance(MCRPIRegistrationInfo urn, URL url){
+    public static MCREpicurLite instance(MCRPIRegistrationInfo urn, URL url) {
         return new MCREpicurLite(urn, url);
     }
 
@@ -45,7 +46,8 @@ public final class MCREpicurLite {
         Element epicurLite = newEpicureElement("epicurlite");
         epicurLite.addNamespaceDeclaration(XSI_NAMESPACE);
         epicurLite.setAttribute("schemaLocation",
-                                "http://nbn-resolving.org/epicurlite http://nbn-resolving.org/schemas/epicurlite/1.0/epicurlite.xsd", XSI_NAMESPACE);
+            "http://nbn-resolving.org/epicurlite http://nbn-resolving.org/schemas/epicurlite/1.0/epicurlite.xsd",
+            XSI_NAMESPACE);
         Document epicurLiteDoc = new Document(epicurLite);
 
         // authentication information
@@ -84,12 +86,14 @@ public final class MCREpicurLite {
         return epicurLiteDoc;
     }
 
-    public String asXMLString(){
+    public String asXMLString() {
         return new XMLOutputter(
-                Format.getPrettyFormat()).outputString(toXML());
+            Format.getPrettyFormat()).outputString(toXML());
     }
 
-    private Element newEpicureElement(String epicurlite) {return new Element(epicurlite, EPICURLITE_NAMESPACE);}
+    private Element newEpicureElement(String epicurlite) {
+        return new Element(epicurlite, EPICURLITE_NAMESPACE);
+    }
 
     public MCREpicurLite setCredentials(UsernamePasswordCredentials credentials) {
         this.credentials = credentials;

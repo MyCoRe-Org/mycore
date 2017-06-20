@@ -72,6 +72,7 @@ class StatisticsEntry {
     }
 
     public String toString() {
-        return "  total=" + totalTimeNeeded + " ms, average=" + getAverage() + " ms, " + numInvocations + " invocations.";
+        return "  total=" + totalTimeNeeded + " ms, average=" + getAverage() + " ms, " + numInvocations
+            + " invocations.";
     }
 }

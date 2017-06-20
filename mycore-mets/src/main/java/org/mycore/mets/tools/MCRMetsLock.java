@@ -47,7 +47,8 @@ public class MCRMetsLock {
      */
     public static synchronized boolean doLock(String derivateIdString) {
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
-        if (isLocked(derivateIdString) && MCRMetsLock.metsAccessSessionTable.get(derivateId) != MCRSessionMgr.getCurrentSessionID()) {
+        if (isLocked(derivateIdString)
+            && MCRMetsLock.metsAccessSessionTable.get(derivateId) != MCRSessionMgr.getCurrentSessionID()) {
             LOGGER.info(MessageFormat.format("Could not lock {0}, because its already locked.", derivateIdString));
             return false;
         } else {
@@ -74,7 +75,8 @@ public class MCRMetsLock {
                     derivateIdString));
                 String message = MessageFormat.format(
                     "Could not unlock {0}, because the session wich locked it was : ''{1}'' "
-                        + "and current sesssion is ''{2}''", derivateIdString, sessionId,
+                        + "and current sesssion is ''{2}''",
+                    derivateIdString, sessionId,
                     MCRSessionMgr.getCurrentSessionID());
                 throw new MCRException(message);
             }

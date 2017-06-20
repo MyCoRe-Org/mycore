@@ -1,7 +1,6 @@
 package org.mycore.pi.exceptions;
 
-
-public class MCRIdentifierUnresolvableException extends MCRDatacenterException{
+public class MCRIdentifierUnresolvableException extends MCRDatacenterException {
 
     private final String identifier;
 

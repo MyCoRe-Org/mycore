@@ -136,7 +136,8 @@ public class MCRTraceListener implements TraceListener {
      */
     public void selected(SelectionEvent ev) {
         if (LOGGER.isDebugEnabled()) {
-            String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString() + "\">";
+            String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\""
+                + ev.m_xpath.getPatternString() + "\">";
             LOGGER.debug(log);
             try {
                 if ("true".equals(ev.m_processor.getParameter("DEBUG"))) {

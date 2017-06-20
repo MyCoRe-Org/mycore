@@ -1,6 +1,5 @@
 package org.mycore.pi.doi.rest;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,15 +33,17 @@ public class MCRDOIRest {
             CloseableHttpResponse response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
 
-            try (BufferedReader buffer = new BufferedReader(new InputStreamReader(entity.getContent(), Charset.forName("UTF-8")))) {
+            try (BufferedReader buffer = new BufferedReader(
+                new InputStreamReader(entity.getContent(), Charset.forName("UTF-8")))) {
                 String json = buffer.lines().collect(Collectors.joining("\n"));
                 Gson gson = new GsonBuilder().registerTypeAdapter(MCRDOIRestResponseEntryData.class,
-                        new MCRDOIRestResponseEntryDataValueDeserializer()).create();
+                    new MCRDOIRestResponseEntryDataValueDeserializer()).create();
                 return gson.fromJson(json, MCRDOIRestResponse.class);
             }
 
         } catch (IOException e) {
-            throw new MCRIdentifierUnresolvableException(doi.asString(), "The identifier " + doi.asString() + " is not resolvable!", e);
+            throw new MCRIdentifierUnresolvableException(doi.asString(),
+                "The identifier " + doi.asString() + " is not resolvable!", e);
         }
 
     }

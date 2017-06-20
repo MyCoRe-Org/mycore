@@ -56,7 +56,7 @@ public class MCRStalledJobResetter implements Runnable {
         if (action != null) {
             this.action = action;
             maxTimeDiff = MCRConfiguration.instance()
-                    .getInt(MCRJobQueue.CONFIG_PREFIX + action.getSimpleName() + ".TimeTillReset", maxTimeDiff);
+                .getInt(MCRJobQueue.CONFIG_PREFIX + action.getSimpleName() + ".TimeTillReset", maxTimeDiff);
         }
     }
 
@@ -92,24 +92,24 @@ public class MCRStalledJobResetter implements Runnable {
         long current = new Date(System.currentTimeMillis()).getTime() / 60000;
 
         boolean reset = query
-                .getResultList()
-                .stream()
-                .map(job -> {
-                    boolean ret = false;
-                    long start = job.getStart().getTime() / 60000;
-                    if (current - start >= maxTimeDiff) {
-                        LOGGER.debug("->Resetting too long in queue");
+            .getResultList()
+            .stream()
+            .map(job -> {
+                boolean ret = false;
+                long start = job.getStart().getTime() / 60000;
+                if (current - start >= maxTimeDiff) {
+                    LOGGER.debug("->Resetting too long in queue");
 
-                        job.setStatus(MCRJobStatus.NEW);
-                        job.setStart(null);
-                        ret = true;
-                    } else {
-                        LOGGER.debug("->ok");
-                    }
-                    return ret;
-                })
-                .reduce(Boolean::logicalOr)
-                .orElse(false);
+                    job.setStatus(MCRJobStatus.NEW);
+                    job.setStart(null);
+                    ret = true;
+                } else {
+                    LOGGER.debug("->ok");
+                }
+                return ret;
+            })
+            .reduce(Boolean::logicalOr)
+            .orElse(false);
         try {
             transaction.commit();
         } catch (RollbackException e) {

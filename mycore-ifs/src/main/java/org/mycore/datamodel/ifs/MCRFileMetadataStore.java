@@ -99,7 +99,7 @@ public interface MCRFileMetadataStore {
      *            the unique ID of the MCRFilesystemNode to delete
      */
     public void deleteNode(String ID) throws MCRPersistenceException;
-    
+
     /**
      * Returns an object to iterate over the owner IDs.
      */

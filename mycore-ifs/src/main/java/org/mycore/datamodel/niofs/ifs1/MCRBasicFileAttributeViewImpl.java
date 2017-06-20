@@ -35,12 +35,15 @@ abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
             FileTime lastAccessTime = localFileAttributes.lastAccessTime(); //unavailable in IFS1
             if (localFileAttributes.size() != file.getSize()) {
                 LOGGER.error(MessageFormat.format(
-                        "File size mismatch detected for {0}. Local file should be {1} bytes long but is {2} bytes long.", node.getPath(),
-                        file.getSize(), localFileAttributes.size()));
+                    "File size mismatch detected for {0}. Local file should be {1} bytes long but is {2} bytes long.",
+                    node.getPath(),
+                    file.getSize(), localFileAttributes.size()));
             }
-            return MCRFileAttributes.file(file.getID(), file.getSize(), file.getMD5(), creationTime, lastModified, lastAccessTime);
+            return MCRFileAttributes.file(file.getID(), file.getSize(), file.getMD5(), creationTime, lastModified,
+                lastAccessTime);
         }
-        return MCRFileAttributes.directory(node.getID(), node.getSize(), FileTime.fromMillis(node.getLastModified().getTimeInMillis()));
+        return MCRFileAttributes.directory(node.getID(), node.getSize(),
+            FileTime.fromMillis(node.getLastModified().getTimeInMillis()));
     }
 
     @Override
@@ -60,8 +63,9 @@ abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
         if (node instanceof MCRFile) {
             MCRFile file = (MCRFile) node;
             file.adjustMetadata(lastModifiedTime, file.getMD5(), file.getSize());
-            Files.getFileAttributeView(file.getLocalFile().toPath(), BasicFileAttributeView.class).setTimes(lastModifiedTime,
-                    lastAccessTime, createTime);
+            Files.getFileAttributeView(file.getLocalFile().toPath(), BasicFileAttributeView.class).setTimes(
+                lastModifiedTime,
+                lastAccessTime, createTime);
         } else if (node instanceof MCRDirectory) {
             LOGGER.warn("Setting times on directories is not supported: " + node.toPath());
         }

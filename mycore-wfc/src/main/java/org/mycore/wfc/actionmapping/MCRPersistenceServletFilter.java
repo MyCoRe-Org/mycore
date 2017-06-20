@@ -59,7 +59,8 @@ public class MCRPersistenceServletFilter implements Filter {
      * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         if (req.getServletPath().length() > 0) {
             String url = getURL(req);
@@ -76,16 +77,16 @@ public class MCRPersistenceServletFilter implements Filter {
         Map<String, String[]> parameterMap = req.getParameterMap();
         for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
             switch (entry.getValue().length) {
-            case 0:
-                break;
-            case 1:
-                if (!entry.getKey().equals("layout")) {
-                    req.setAttribute(entry.getKey(), entry.getValue()[0]);
-                }
-                break;
-            default:
-                req.setAttribute(entry.getKey(), entry.getValue());
-                break;
+                case 0:
+                    break;
+                case 1:
+                    if (!entry.getKey().equals("layout")) {
+                        req.setAttribute(entry.getKey(), entry.getValue()[0]);
+                    }
+                    break;
+                default:
+                    req.setAttribute(entry.getKey(), entry.getValue());
+                    break;
             }
         }
     }

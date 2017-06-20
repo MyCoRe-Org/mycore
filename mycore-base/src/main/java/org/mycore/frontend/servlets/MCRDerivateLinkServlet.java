@@ -52,7 +52,8 @@ public class MCRDerivateLinkServlet extends MCRServlet {
 
         // check if root element has content -> if not, show an error page
         if (rootElement.getContentSize() == 0) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + derivateLinkErrorPage));
+            job.getResponse().sendRedirect(
+                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + derivateLinkErrorPage));
             return;
         }
 

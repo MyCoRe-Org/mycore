@@ -31,7 +31,8 @@ import org.mycore.common.MCRSessionMgr;
  */
 public class MCRXEditorTransformerStore {
 
-    private static MCRCache<String, MCRXEditorTransformer> cache = new MCRCache<String, MCRXEditorTransformer>(100, "XEditorTransformers");
+    private static MCRCache<String, MCRXEditorTransformer> cache = new MCRCache<String, MCRXEditorTransformer>(100,
+        "XEditorTransformers");
 
     public static String storeTransformer(MCRXEditorTransformer transformer) {
         String key = MCRSessionMgr.getCurrentSession().getID() + "-" + String.valueOf(System.nanoTime());

@@ -272,13 +272,13 @@ public class MCRFrontendUtil {
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Trusted proxies: " + trustedProxies.stream()
-                                                             .map(InetAddress::toString)
-                                                             .sorted()
-                                                             .collect(Collectors.joining(", ")));
+                .map(InetAddress::toString)
+                .sorted()
+                .collect(Collectors.joining(", ")));
         }
         return trustedProxies.stream()
-                             .map(InetAddress::getHostAddress)
-                             .collect(Collectors.toCollection(TreeSet::new));
+            .map(InetAddress::getHostAddress)
+            .collect(Collectors.toCollection(TreeSet::new));
     }
 
     /**

@@ -60,7 +60,6 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
         setRule(rule);
         setDescription(description);
 
-
     }
 
     public boolean checkAccess(String userID, Date date, MCRIPAddress ip) {

@@ -46,13 +46,13 @@ public abstract class MCRCategoryMapperBase {
             Set<MCRCategoryID> mapped = collectMappings(categoryID);
             output.addAll(mapped);
         }
-    
+
         return output;
     }
 
     private Set<MCRCategoryID> collectMappings(MCRCategoryID categoryID) {
         Set<MCRCategoryID> mapped = new TreeSet<MCRCategoryID>();
-    
+
         for (MCRCategoryID parent : resolveParentOrSelf(categoryID)) {
             for (MCRCategoryID mapping : getMappings(parent)) {
                 if (!alreadyContainsCategoryOfSameClassification(mapped, mapping)) {
@@ -60,11 +60,12 @@ public abstract class MCRCategoryMapperBase {
                 }
             }
         }
-    
+
         return mapped;
     }
 
-    private boolean alreadyContainsCategoryOfSameClassification(Collection<MCRCategoryID> collection, MCRCategoryID candidate) {
+    private boolean alreadyContainsCategoryOfSameClassification(Collection<MCRCategoryID> collection,
+        MCRCategoryID candidate) {
         String classificationID = candidate.getRootID();
         return collection.stream().map(MCRCategoryID::getRootID).anyMatch(classificationID::equals);
     }

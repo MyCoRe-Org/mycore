@@ -241,7 +241,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     @Override
-    public synchronized long receiveFile(String path, InputStream in, long length, String checksum) throws IOException, MCRPersistenceException, MCRAccessException {
+    public synchronized long receiveFile(String path, InputStream in, long length, String checksum)
+        throws IOException, MCRPersistenceException, MCRAccessException {
         LOGGER.debug("incoming receiveFile request: " + path + " " + checksum + " " + length + " bytes");
 
         this.setProgressText(path);
@@ -275,7 +276,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 }
             });
             this.filesUploaded++;
-            int progress = (int)(((float)this.filesUploaded / (float)getNumFiles()) * 100f);
+            int progress = (int) (((float) this.filesUploaded / (float) getNumFiles()) * 100f);
             this.setProgress(progress);
         }
     }

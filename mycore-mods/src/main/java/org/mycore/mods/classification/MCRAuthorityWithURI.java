@@ -133,10 +133,10 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
                 }
             }
             return getCategoryByURI(authorityURI).stream()
-                                                 .map(cat -> new MCRCategoryID(cat.getId().getRootID(), categId))
-                                                 .filter(DAO::exist)
-                                                 .findFirst()
-                                                 .orElse(null);
+                .map(cat -> new MCRCategoryID(cat.getId().getRootID(), categId))
+                .filter(DAO::exist)
+                .findFirst()
+                .orElse(null);
         }
         return null;
     }

@@ -76,13 +76,13 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
     public void delete() throws Exception {
         MCRFileCollection col = getStore().create();
         assertTrue(getStore().exists(col.getID()));
-        
+
         getStore().delete(col.getID());
         assertFalse(getStore().exists(col.getID()));
-        
+
         MCRFileCollection col2 = getStore().retrieve(col.getID());
         assertNull(col2);
-        
+
         MCRFileCollection col3 = getStore().create();
         col3.delete();
         assertFalse(getStore().exists(col3.getID()));
@@ -128,9 +128,9 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         assertFalse(getStore().listIDs(true).hasNext());
         assertFalse(getStore().listIDs(false).hasNext());
         int expectedNumOfFileCollections = 3;
-        
+
         createFileCollection(expectedNumOfFileCollections);
-        
+
         ArrayList<Integer> l1 = new ArrayList<Integer>();
         IDs = getStore().listIDs(true);
         assertTrue("IDs iterator has no next element? ", IDs.hasNext());
@@ -156,14 +156,15 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         assertEquals(l1, l2);
     }
 
-	private void createFileCollection(int numOfCollections) throws Exception,
-			IOException {
-		for (int i = 0; i < numOfCollections; i++) {
-        	MCRFileCollection fileCollection = getStore().create();
-        	int collectionID = fileCollection.getID();
-        	assertTrue("File collection with ID " + collectionID + " does not exists.",getStore().exists(collectionID));
-		}
-	}
+    private void createFileCollection(int numOfCollections) throws Exception,
+        IOException {
+        for (int i = 0; i < numOfCollections; i++) {
+            MCRFileCollection fileCollection = getStore().create();
+            int collectionID = fileCollection.getID();
+            assertTrue("File collection with ID " + collectionID + " does not exists.",
+                getStore().exists(collectionID));
+        }
+    }
 
     @Test
     public void basicFunctionality() throws Exception {
@@ -216,7 +217,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         col.clearLabels();
         assertTrue(col.getLabels().isEmpty());
     }
-    
+
     @Test
     public void repairMetadata() throws Exception {
         MCRFileCollection col = getStore().create();

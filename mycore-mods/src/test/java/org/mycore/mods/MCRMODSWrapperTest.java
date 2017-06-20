@@ -65,7 +65,8 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         //check load from XML throws no exception
         MCRObject mcrObj2 = new MCRObject(mcrObjXml);
         mcrObjXml = mcrObj2.createXML();
-        XPathExpression<Element> xpathCheck = XPathFactory.instance().compile("//mods:mods", Filters.element(), null, MCRConstants.MODS_NAMESPACE);
+        XPathExpression<Element> xpathCheck = XPathFactory.instance().compile("//mods:mods", Filters.element(), null,
+            MCRConstants.MODS_NAMESPACE);
         assertEquals("Did not find mods data", 1, xpathCheck.evaluate(mcrObjXml).size());
     }
 
@@ -82,7 +83,8 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         wrapper.setID("JUnit", 4711);
         wrapper.setMODS(mods);
         Document mcrObjXml = wrapper.getMCRObject().createXML();
-        XPathExpression<Element> xpathCheck = XPathFactory.instance().compile("//mods:mods", Filters.element(), null, MCRConstants.MODS_NAMESPACE);
+        XPathExpression<Element> xpathCheck = XPathFactory.instance().compile("//mods:mods", Filters.element(), null,
+            MCRConstants.MODS_NAMESPACE);
         assertEquals("Did not find mods data", 1, xpathCheck.evaluate(mcrObjXml).size());
     }
 
@@ -108,7 +110,6 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         Element mods = loadMODSDocument().detachRootElement();
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
 
-
         Element relatedItem = new Element("relatedItem", MCRConstants.MODS_NAMESPACE);
         relatedItem.setAttribute("href", "mir_test_00000001", MCRConstants.XLINK_NAMESPACE);
         relatedItem.setAttribute("type", "series");
@@ -117,7 +118,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         wrapper.setID("JUnit", 4711);
         wrapper.setMODS(mods);
 
-        assertEquals("There should be one related item!",wrapper.getLinkedRelatedItems().size(),1);
+        assertEquals("There should be one related item!", wrapper.getLinkedRelatedItems().size(), 1);
     }
 
     @Override

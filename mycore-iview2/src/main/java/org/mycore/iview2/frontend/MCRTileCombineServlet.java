@@ -285,7 +285,8 @@ public class MCRTileCombineServlet extends MCRServlet {
                 response.setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                 response.setContentType("image/jpeg");
                 response.setContentLength((int) ze.getSize());
-                try (ServletOutputStream out = response.getOutputStream(); InputStream zin = zipFile.getInputStream(ze);) {
+                try (ServletOutputStream out = response.getOutputStream();
+                    InputStream zin = zipFile.getInputStream(ze);) {
                     IOUtils.copy(zin, out);
                 }
             } else {

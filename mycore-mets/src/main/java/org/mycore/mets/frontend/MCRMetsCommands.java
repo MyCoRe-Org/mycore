@@ -68,7 +68,9 @@ public class MCRMetsCommands extends MCRAbstractCommands {
         }
     }
 
-    @MCRCommand(syntax = "try fix invalid mets", help = "This Command can be used to fix invalid mets files that was found in any validate selected mets runs.", order = 15)
+    @MCRCommand(syntax = "try fix invalid mets",
+        help = "This Command can be used to fix invalid mets files that was found in any validate selected mets runs.",
+        order = 15)
     public static void fixInvalidMets() {
         String selectedObjectID;
         while ((selectedObjectID = invalidMetsQueue.poll()) != null) {
@@ -79,7 +81,8 @@ public class MCRMetsCommands extends MCRAbstractCommands {
             try (InputStream metsInputStream = Files.newInputStream(metsFile)) {
                 metsDocument = saxBuilder.build(metsInputStream);
             } catch (IOException | JDOMException e) {
-                LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not parse mets.xml!", selectedObjectID), e);
+                LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not parse mets.xml!", selectedObjectID),
+                    e);
                 return;
             }
 
@@ -87,7 +90,9 @@ public class MCRMetsCommands extends MCRAbstractCommands {
             try {
                 mcrMetsSimpleModel = MCRXMLSimpleModelConverter.fromXML(metsDocument);
             } catch (Exception e) {
-                LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not convert to SimpleModel!", selectedObjectID), e);
+                LOGGER.error(
+                    MessageFormat.format("Cannot fix METS of {0}. Can not convert to SimpleModel!", selectedObjectID),
+                    e);
                 return;
             }
 
@@ -96,7 +101,8 @@ public class MCRMetsCommands extends MCRAbstractCommands {
             try (OutputStream os = Files.newOutputStream(metsFile)) {
                 xmlOutputter.output(newMets, os);
             } catch (IOException e) {
-                LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not write mets to derivate.", selectedObjectID));
+                LOGGER.error(
+                    MessageFormat.format("Cannot fix METS of {0}. Can not write mets to derivate.", selectedObjectID));
             }
         }
     }
@@ -109,26 +115,26 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                 LOGGER.debug("Start MCRMETSGenerator for derivate " + derivateID);
                 HashSet<MCRPath> ignoreNodes = new HashSet<MCRPath>();
                 Document mets = MCRMETSGenerator.getGenerator()
-                        .getMETS(MCRPath.getPath(derivateID, "/"), ignoreNodes)
-                        .asDocument();
+                    .getMETS(MCRPath.getPath(derivateID, "/"), ignoreNodes)
+                    .asDocument();
                 MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivateID));
                 LOGGER.debug("Stop MCRMETSGenerator for derivate " + derivateID);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 LOGGER.error("Can't create mets file for derivate "
-                        + derivateID);
+                    + derivateID);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 LOGGER.error("Can't create mets file for derivate "
-                        + derivateID);
+                    + derivateID);
             } catch (InstantiationException e) {
                 e.printStackTrace();
                 LOGGER.error("Can't create mets file for derivate "
-                        + derivateID);
+                    + derivateID);
             } catch (IOException e) {
                 e.printStackTrace();
                 LOGGER.error("Can't create mets file for derivate "
-                        + derivateID);
+                    + derivateID);
             }
         }
     }
@@ -136,7 +142,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "add mets files for project id {0}", help = "", order = 30)
     public static void addMetsFileForProjectID(String projectID) {
         MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
-        List <String> dervate_list = manager.listIDsForBase(projectID + "_derivate");
+        List<String> dervate_list = manager.listIDsForBase(projectID + "_derivate");
         for (String derivateID : dervate_list) {
             addMetsFileForDerivate(derivateID);
         }

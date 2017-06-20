@@ -91,7 +91,7 @@ public class MCRRestAPIMessages {
         for (String prefix : check) {
             data.putAll(MCRTranslation.translatePrefix(prefix, locale));
         }
-        
+
         try {
             if (FORMAT_PROPERTY.equals(format)) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -139,7 +139,8 @@ public class MCRRestAPIMessages {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=UTF-8" })
     public Response getMessage(@Context UriInfo info, @PathParam("value") String key,
-        @QueryParam("lang") @DefaultValue("de") String lang, @QueryParam("format") @DefaultValue("text") String format) {
+        @QueryParam("lang") @DefaultValue("de") String lang,
+        @QueryParam("format") @DefaultValue("text") String format) {
 
         Locale locale = Locale.forLanguageTag(lang);
         String result = MCRTranslation.translate(key, locale);

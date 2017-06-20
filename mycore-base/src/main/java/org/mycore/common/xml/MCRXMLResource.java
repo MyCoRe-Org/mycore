@@ -227,7 +227,8 @@ public class MCRXMLResource {
         }
 
         public URL getURL() {
-            return this.resolvedURL == null ? MCRConfigurationDir.getConfigResource(name, classLoader) : this.resolvedURL;
+            return this.resolvedURL == null ? MCRConfigurationDir.getConfigResource(name, classLoader)
+                : this.resolvedURL;
         }
 
         @Override

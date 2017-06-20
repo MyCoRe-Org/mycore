@@ -100,7 +100,8 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
     @Test
     public void testSetElementText() throws JaxenException {
-        Document doc = new Document(new MCRNodeBuilder().buildElement("document[@id='foo'][titles/title][author]", null, null));
+        Document doc = new Document(
+            new MCRNodeBuilder().buildElement("document[@id='foo'][titles/title][author]", null, null));
         MCRChangeTracker tracker = new MCRChangeTracker();
 
         tracker.track(MCRSetElementText.setText(doc.getRootElement(), "text"));
@@ -132,7 +133,8 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         doc.getRootElement().setAttribute(lang);
         tracker.track(MCRAddedAttribute.added(lang));
 
-        Element author = (Element) (new MCRBinding("document/authors/author", true, new MCRBinding(doc)).getBoundNode());
+        Element author = (Element) (new MCRBinding("document/authors/author", true, new MCRBinding(doc))
+            .getBoundNode());
         tracker.track(MCRRemoveElement.remove(author));
 
         tracker.undoChanges(doc);
@@ -156,7 +158,8 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         doc.getRootElement().setAttribute(lang);
         tracker.track(MCRAddedAttribute.added(lang));
 
-        Element author = (Element) (new MCRBinding("document/authors/author", true, new MCRBinding(doc)).getBoundNode());
+        Element author = (Element) (new MCRBinding("document/authors/author", true, new MCRBinding(doc))
+            .getBoundNode());
         tracker.track(MCRRemoveElement.remove(author));
 
         doc = MCRChangeTracker.removeChangeTracking(doc);
@@ -259,7 +262,8 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
     @Test
     public void testSwapElements() throws JaxenException {
-        Element root = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name[2]='b'][note[2]]", null, null);
+        Element root = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name[2]='b'][note[2]]", null,
+            null);
         Document doc = new Document(root);
 
         assertEquals("a", root.getChildren().get(0).getText());

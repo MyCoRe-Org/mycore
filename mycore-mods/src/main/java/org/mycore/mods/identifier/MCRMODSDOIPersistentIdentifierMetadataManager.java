@@ -17,7 +17,6 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 public class MCRMODSDOIPersistentIdentifierMetadataManager
     extends MCRPersistentIdentifierMetadataManager<MCRDigitalObjectIdentifier> {
 
-
     public MCRMODSDOIPersistentIdentifierMetadataManager(String inscriberID) {
         super(inscriberID);
     }
@@ -31,9 +30,8 @@ public class MCRMODSDOIPersistentIdentifierMetadataManager
             .orElseThrow(() -> new MCRException("Could not insert doi into mods document!"));
     }
 
-
     private MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {
-        if(!(base instanceof MCRObject)){
+        if (!(base instanceof MCRObject)) {
             throw new MCRPersistentIdentifierException(getClass().getName() + " does only support MyCoReObjects!");
         }
         return (MCRObject) base;
@@ -44,17 +42,17 @@ public class MCRMODSDOIPersistentIdentifierMetadataManager
         // not supported
     }
 
-    @Override public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase base, String additional)
+    @Override
+    public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase base, String additional)
         throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(base);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
         Element element = wrapper.getElement("mods:identifier[@type='doi']");
-        if(element==null){
+        if (element == null) {
             return Optional.empty();
         }
 
         String doiText = element.getTextNormalize();
-
 
         return new MCRDOIParser()
             .parse(doiText)

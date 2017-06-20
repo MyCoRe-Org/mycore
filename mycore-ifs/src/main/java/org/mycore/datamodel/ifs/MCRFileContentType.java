@@ -119,8 +119,7 @@ public class MCRFileContentType {
     }
 
     @Override
-    public boolean equals( Object other )
-    {
+    public boolean equals(Object other) {
         if (other instanceof MCRFileContentType)
             return ((MCRFileContentType) other).ID.equals(ID);
         else
@@ -128,8 +127,7 @@ public class MCRFileContentType {
     }
 
     @Override
-    public int hashCode()
-    {
-      return ID.hashCode();
+    public int hashCode() {
+        return ID.hashCode();
     }
 }

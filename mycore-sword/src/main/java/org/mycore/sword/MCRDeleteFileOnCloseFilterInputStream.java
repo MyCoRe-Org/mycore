@@ -1,6 +1,5 @@
 package org.mycore.sword;
 
-
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,16 +15,16 @@ public class MCRDeleteFileOnCloseFilterInputStream extends FilterInputStream {
 
     private final Path fileToDelete;
 
-    public MCRDeleteFileOnCloseFilterInputStream(InputStream source, Path fileToDelete){
+    public MCRDeleteFileOnCloseFilterInputStream(InputStream source, Path fileToDelete) {
         super(source);
         this.fileToDelete = fileToDelete;
     }
 
     @Override
     public void close() throws IOException {
-        try{
+        try {
             in.close();
-        } catch (IOException e){
+        } catch (IOException e) {
             throw e;
         } finally {
             LOGGER.info("Delete File : " + fileToDelete.toString());

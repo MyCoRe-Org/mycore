@@ -7,6 +7,7 @@ import org.mycore.iview.tests.model.TestDerivate;
 
 public class BaseTestConstants {
     public static final int TIME_OUT_IN_SECONDS = 30;
+
     protected static final TestDerivate RGB_TEST_DERIVATE = new TestDerivate() {
 
         @Override

@@ -85,13 +85,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
                 CONFIG_PREFIX_ADD = CONFIG_PREFIX_ADD.concat(".");
             }
             waitTime = MCRConfiguration.instance()
-                    .getInt(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "TimeTillReset", waitTime);
+                .getInt(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "TimeTillReset", waitTime);
         }
         waitTime = waitTime * 60;
 
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(this.action), waitTime, waitTime,
-                TimeUnit.SECONDS);
+            TimeUnit.SECONDS);
         preFetch = new ConcurrentLinkedQueue<MCRJob>();
         running = true;
         pollLock = new ReentrantLock();
@@ -290,7 +290,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      * @param action the {@link MCRJobAction}
      */
     public MCRJob getElementOutOfOrder(Class<? extends MCRJobAction> action, Map<String, String> params)
-            throws NoSuchElementException {
+        throws NoSuchElementException {
         if (!running)
             return null;
         MCRJob job = getJob(action, params);
@@ -321,7 +321,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '"
-                + action.getName() + "' ");
+            + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }

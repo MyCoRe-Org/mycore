@@ -59,7 +59,8 @@ public class MCRURNObjectXPathMetadataManager extends MCRPersistentIdentifierMet
             .forEach(Element::detach);
     }
 
-    @Override public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
+    @Override
+    public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
@@ -71,7 +72,7 @@ public class MCRURNObjectXPathMetadataManager extends MCRPersistentIdentifierMet
                 "Got " + evaluate.size() + " matches for " + obj.getId() + " with xpath " + xpath + "");
         }
 
-        if(evaluate.size() == 0){
+        if (evaluate.size() == 0) {
             return Optional.empty();
         }
 

@@ -127,7 +127,8 @@ public class MCREditorSession {
     }
 
     public String getRedirectURL(String anchor) {
-        return url + "?" + MCREditorSessionStore.XEDITOR_SESSION_PARAM + "=" + id + (anchor != null ? "#" + anchor : "");
+        return url + "?" + MCREditorSessionStore.XEDITOR_SESSION_PARAM + "=" + id
+            + (anchor != null ? "#" + anchor : "");
     }
 
     public Map<String, String[]> getRequestParameters() {
@@ -171,7 +172,7 @@ public class MCREditorSession {
         this.editedXML = editedXML;
         addNamespacesFrom(editedXML.getRootElement());
     }
-    
+
     private void addNamespacesFrom(Element element) {
         MCRConstants.registerNamespace(element.getNamespace());
         for (Namespace ns : element.getAdditionalNamespaces()) {

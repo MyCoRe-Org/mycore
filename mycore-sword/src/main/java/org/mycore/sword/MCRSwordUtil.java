@@ -79,10 +79,13 @@ import org.swordapp.server.UriRegistry;
 public class MCRSwordUtil {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
+
     private static final int COPY_BUFFER_SIZE = 32 * 1024;
+
     private static Logger LOGGER = LogManager.getLogger(MCRSwordUtil.class);
 
-    public static MCRDerivate createDerivate(String documentID) throws MCRPersistenceException, IOException, MCRAccessException {
+    public static MCRDerivate createDerivate(String documentID)
+        throws MCRPersistenceException, IOException, MCRAccessException {
         final String projectId = MCRObjectID.getInstance(documentID).getProjectId();
         MCRObjectID oid = MCRObjectID.getNextFreeId(projectId, "derivate");
         final String derivateID = oid.toString();
@@ -92,7 +95,7 @@ public class MCRSwordUtil {
         derivate.setLabel("data object from " + documentID);
 
         String schema = CONFIG.getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml").replaceAll(".xml",
-                ".xsd");
+            ".xsd");
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();
@@ -114,7 +117,7 @@ public class MCRSwordUtil {
             Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
-                        "default derivate rule");
+                    "default derivate rule");
             }
         }
 
@@ -126,7 +129,6 @@ public class MCRSwordUtil {
         return derivate;
     }
 
-
     public static MediaResource getZippedDerivateMediaResource(String object) {
         final Path tempFile;
 
@@ -135,7 +137,6 @@ public class MCRSwordUtil {
         } catch (IOException e) {
             throw new MCRException("Could not create temp file!", e);
         }
-
 
         try (final OutputStream tempFileStream = Files.newOutputStream(tempFile)) {
             final ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(tempFileStream);
@@ -152,7 +153,8 @@ public class MCRSwordUtil {
         InputStream is;
         try {
             is = new MCRDeleteFileOnCloseFilterInputStream(Files.newInputStream(tempFile), tempFile);
-            resultRessource = new MediaResource(is, MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP, UriRegistry.PACKAGE_SIMPLE_ZIP);
+            resultRessource = new MediaResource(is, MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP,
+                UriRegistry.PACKAGE_SIMPLE_ZIP);
         } catch (IOException e) {
             throw new MCRException("could not read from temp file!", e);
         }
@@ -180,7 +182,7 @@ public class MCRSwordUtil {
                     zipArchiveEntry = new ZipArchiveEntry(fileName);
                     zipArchiveEntry.setSize(Files.size(p));
                     zipOutputStream.putArchiveEntry(zipArchiveEntry);
-                    if(currentSession.isTransactionActive()){
+                    if (currentSession.isTransactionActive()) {
                         currentSession.commitTransaction();
                     }
                     Files.copy(p, zipOutputStream);
@@ -205,9 +207,10 @@ public class MCRSwordUtil {
      * @return the path to the temp file
      * @throws IOException if md5 does mismatch or if stream could not be read
      */
-    public static Path createTempFileFromStream(String fileName, InputStream inputStream, String checkMd5) throws IOException {
+    public static Path createTempFileFromStream(String fileName, InputStream inputStream, String checkMd5)
+        throws IOException {
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-        if(currentSession.isTransactionActive()){
+        if (currentSession.isTransactionActive()) {
             currentSession.commitTransaction();
         }
 
@@ -238,64 +241,68 @@ public class MCRSwordUtil {
         return zipTempFile;
     }
 
-    public static void extractZipToPath(Path zipFilePath, MCRPath target) throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
+    public static void extractZipToPath(Path zipFilePath, MCRPath target)
+        throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
         LOGGER.info("Extracting zip: " + zipFilePath.toString());
-        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri().toString()), new HashMap<String, Object>())) {
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri().toString()),
+            new HashMap<String, Object>())) {
             final Path sourcePath = zipfs.getPath("/");
             Files.walkFileTree(sourcePath,
-                    new SimpleFileVisitor<Path>() {
-                        @Override
-                        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
-                                throws IOException {
-                            final Path relativeSP = sourcePath.relativize(dir);
-                            //WORKAROUND for bug
-                            Path targetdir = relativeSP.getNameCount() == 0 ? target : target.resolve(relativeSP);
-                            try {
-                                Files.copy(dir, targetdir);
-                            } catch (FileAlreadyExistsException e) {
-                                if (!Files.isDirectory(targetdir))
-                                    throw e;
+                new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+                        throws IOException {
+                        final Path relativeSP = sourcePath.relativize(dir);
+                        //WORKAROUND for bug
+                        Path targetdir = relativeSP.getNameCount() == 0 ? target : target.resolve(relativeSP);
+                        try {
+                            Files.copy(dir, targetdir);
+                        } catch (FileAlreadyExistsException e) {
+                            if (!Files.isDirectory(targetdir))
+                                throw e;
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                        throws IOException {
+                        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+
+                        LOGGER.info("Extracting: " + file.toString());
+                        Path targetFilePath = target.resolve(sourcePath.relativize(file));
+                        // WORKAROUND: copy is bad with IFS because fsnodes is locked until copy is completed
+                        // so we end the transaction after we got a byte channel, then we write the data
+                        // and before completion we start the transaction to let niofs write the md5 to the table
+                        try (SeekableByteChannel destinationChannel = Files.newByteChannel(targetFilePath,
+                            StandardOpenOption.WRITE, StandardOpenOption.SYNC, StandardOpenOption.CREATE);
+                            SeekableByteChannel sourceChannel = Files.newByteChannel(file, StandardOpenOption.READ)) {
+                            if (currentSession.isTransactionActive()) {
+                                currentSession.commitTransaction();
                             }
-                            return FileVisitResult.CONTINUE;
+                            ByteBuffer buffer = ByteBuffer.allocateDirect(COPY_BUFFER_SIZE);
+                            while (sourceChannel.read(buffer) != -1 || buffer.position() > 0) {
+                                buffer.flip();
+                                destinationChannel.write(buffer);
+                                buffer.compact();
+                            }
+                        } finally {
+                            if (!currentSession.isTransactionActive()) {
+                                currentSession.beginTransaction();
+                            }
                         }
 
-                        @Override
-                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                                throws IOException {
-                            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-
-                            LOGGER.info("Extracting: " + file.toString());
-                            Path targetFilePath = target.resolve(sourcePath.relativize(file));
-                            // WORKAROUND: copy is bad with IFS because fsnodes is locked until copy is completed
-                            // so we end the transaction after we got a byte channel, then we write the data
-                            // and before completion we start the transaction to let niofs write the md5 to the table
-                            try (SeekableByteChannel destinationChannel = Files.newByteChannel(targetFilePath, StandardOpenOption.WRITE, StandardOpenOption.SYNC, StandardOpenOption.CREATE);
-                                 SeekableByteChannel sourceChannel = Files.newByteChannel(file, StandardOpenOption.READ)) {
-                                if (currentSession.isTransactionActive()) {
-                                    currentSession.commitTransaction();
-                                }
-                                ByteBuffer buffer = ByteBuffer.allocateDirect(COPY_BUFFER_SIZE);
-                                while (sourceChannel.read(buffer) != -1 || buffer.position() > 0) {
-                                    buffer.flip();
-                                    destinationChannel.write(buffer);
-                                    buffer.compact();
-                                }
-                            } finally {
-                                if (!currentSession.isTransactionActive()) {
-                                    currentSession.beginTransaction();
-                                }
-                            }
-
-
-                            return FileVisitResult.CONTINUE;
-                        }
-                    });
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
         }
 
     }
 
-    public static List<MCRValidationResult> validateZipFile(final MCRFileValidator validator, Path zipFile) throws IOException, URISyntaxException {
-        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri().toString()), new HashMap<String, Object>())) {
+    public static List<MCRValidationResult> validateZipFile(final MCRFileValidator validator, Path zipFile)
+        throws IOException, URISyntaxException {
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri().toString()),
+            new HashMap<String, Object>())) {
             final Path sourcePath = zipfs.getPath("/");
             ArrayList<MCRValidationResult> validationResults = new ArrayList<>();
             Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
@@ -359,8 +366,12 @@ public class MCRSwordUtil {
     public static class ParseLinkUtil {
 
         public static final Pattern COLLECTION_IRI_PATTERN = Pattern.compile("([a-zA-Z0-9]+)/([0-9]*)");
-        public static final Pattern COLLECTION_MCRID_IRI_PATTERN = Pattern.compile("([a-zA-Z0-9]+)/([a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9]+)");
-        public static final Pattern COLLECTION_DERIVATEID_IRI_PATTERN = Pattern.compile("([a-zA-Z0-9]+)/([a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9]+)(/.+)?");
+
+        public static final Pattern COLLECTION_MCRID_IRI_PATTERN = Pattern
+            .compile("([a-zA-Z0-9]+)/([a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9]+)");
+
+        public static final Pattern COLLECTION_DERIVATEID_IRI_PATTERN = Pattern
+            .compile("([a-zA-Z0-9]+)/([a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9]+)(/.+)?");
 
         private static String getXFromXIRI(IRI editIRI, Integer x, String iri, Pattern iriPattern) {
             return getXFromXIRI(editIRI, x, iri, iriPattern, true);
@@ -384,7 +395,8 @@ public class MCRSwordUtil {
                 }
             } else {
                 if (required) {
-                    throw new IllegalArgumentException(MessageFormat.format("{0} does not match the pattern {1}", uriPathAsString, iriPattern));
+                    throw new IllegalArgumentException(
+                        MessageFormat.format("{0} does not match the pattern {1}", uriPathAsString, iriPattern));
                 } else {
                     return null;
                 }
@@ -399,7 +411,8 @@ public class MCRSwordUtil {
                 if (matcher.matches()) {
                     return matcher.group(1);
                 } else {
-                    throw new IllegalArgumentException(MessageFormat.format("{0} does not match the pattern {1}", uriPathAsString, COLLECTION_IRI_PATTERN));
+                    throw new IllegalArgumentException(MessageFormat.format("{0} does not match the pattern {1}",
+                        uriPathAsString, COLLECTION_IRI_PATTERN));
                 }
             }
 
@@ -430,15 +443,18 @@ public class MCRSwordUtil {
         public static class MediaEditIRI {
 
             public static String getCollectionFromMediaEditIRI(IRI mediaEditIRI) {
-                return getXFromXIRI(mediaEditIRI, 1, MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, COLLECTION_DERIVATEID_IRI_PATTERN);
+                return getXFromXIRI(mediaEditIRI, 1, MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI,
+                    COLLECTION_DERIVATEID_IRI_PATTERN);
             }
 
             public static String getDerivateFromMediaEditIRI(IRI mediaEditIRI) {
-                return getXFromXIRI(mediaEditIRI, 2, MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, COLLECTION_DERIVATEID_IRI_PATTERN);
+                return getXFromXIRI(mediaEditIRI, 2, MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI,
+                    COLLECTION_DERIVATEID_IRI_PATTERN);
             }
 
             public static String getFilePathFromMediaEditIRI(IRI mediaEditIRI) {
-                return decodeURLPart(getXFromXIRI(mediaEditIRI, 3, MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, COLLECTION_DERIVATEID_IRI_PATTERN, false));
+                return decodeURLPart(getXFromXIRI(mediaEditIRI, 3, MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI,
+                    COLLECTION_DERIVATEID_IRI_PATTERN, false));
             }
         }
     }
@@ -446,15 +462,17 @@ public class MCRSwordUtil {
     public static class BuildLinkUtil {
 
         public static final String DEFAULT_URL_ENCODING = "UTF-8";
+
         private static Logger LOGGER = LogManager.getLogger(BuildLinkUtil.class);
 
-
         public static String getEditHref(String collection, String id) {
-            return MessageFormat.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(), MCRSwordConstants.SWORD2_EDIT_IRI, collection, id);
+            return MessageFormat.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(),
+                MCRSwordConstants.SWORD2_EDIT_IRI, collection, id);
         }
 
         public static String getEditMediaHrefOfDerivate(String collection, String id) {
-            return MessageFormat.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(), MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, collection, id);
+            return MessageFormat.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(),
+                MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, collection, id);
         }
 
         /**
@@ -463,20 +481,21 @@ public class MCRSwordUtil {
          * @param mcrObjId the mcrobject id as String
          * @return returns a Stream which contains links to every derivate.
          */
-        public static Stream<Link> getEditMediaIRIStream(final String collection, final String mcrObjId) throws SwordError {
+        public static Stream<Link> getEditMediaIRIStream(final String collection, final String mcrObjId)
+            throws SwordError {
             return MCRSword.getCollection(collection).getDerivateIDsofObject(mcrObjId).map(derivateId -> {
                 final Factory abderaFactory = Abdera.getNewFactory();
                 final String id = derivateId;
                 final Stream<IRI> editMediaFileIRIStream = getEditMediaFileIRIStream(collection, id);
-                return Stream.concat(Stream.of(getEditMediaHrefOfDerivate(collection, id)), editMediaFileIRIStream).map(link -> {
-                    final Link newLinkElement = abderaFactory.newLink();
-                    newLinkElement.setHref(link.toString());
-                    newLinkElement.setRel("edit-media");
-                    return newLinkElement;
-                });
+                return Stream.concat(Stream.of(getEditMediaHrefOfDerivate(collection, id)), editMediaFileIRIStream)
+                    .map(link -> {
+                        final Link newLinkElement = abderaFactory.newLink();
+                        newLinkElement.setHref(link.toString());
+                        newLinkElement.setRel("edit-media");
+                        return newLinkElement;
+                    });
             }).flatMap(s -> s);
         }
-
 
         /**
          * Creates a Stream which contains edit-media-IRIs to all files in a specific derivate derivate.
@@ -490,7 +509,8 @@ public class MCRSwordUtil {
             try {
                 List<IRI> iris = new ArrayList<IRI>();
                 Files.walkFileTree(derivateRootPath, new SimpleFileVisitor<Path>() {
-                    @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                         throws IOException {
                         String relativePath = derivateRootPath.relativize(file).toString();
                         final String URI = MessageFormat.format("{0}{1}{2}/{3}/{4}", MCRFrontendUtil.getBaseURL(),
@@ -520,8 +540,10 @@ public class MCRSwordUtil {
          * @param collectionProvider {@link MCRSwordCollectionProvider} of the collection (needed to count how much objects)
          * @throws SwordServerException when the {@link MCRSwordObjectIDSupplier} throws a exception.
          */
-        public static void addPaginationLinks(IRI collectionIRI, String collection, Feed feed, MCRSwordCollectionProvider collectionProvider) throws SwordServerException {
-            final int lastPage = (int) Math.ceil((double) collectionProvider.getIDSupplier().getCount() / (double) MCRSwordConstants.MAX_ENTRYS_PER_PAGE);
+        public static void addPaginationLinks(IRI collectionIRI, String collection, Feed feed,
+            MCRSwordCollectionProvider collectionProvider) throws SwordServerException {
+            final int lastPage = (int) Math.ceil((double) collectionProvider.getIDSupplier().getCount()
+                / (double) MCRSwordConstants.MAX_ENTRYS_PER_PAGE);
             Integer currentPage = ParseLinkUtil.CollectionIRI.getPaginationFromCollectionIRI(collectionIRI);
 
             feed.addLink(buildCollectionPaginationLinkHref(collection, 1), "first");
@@ -542,6 +564,7 @@ public class MCRSwordUtil {
 
     public static class MCRValidationResult {
         private boolean valid;
+
         private Optional<String> message;
 
         public MCRValidationResult(boolean valid, String message) {

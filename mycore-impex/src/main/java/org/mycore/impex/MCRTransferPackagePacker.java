@@ -103,7 +103,8 @@ public class MCRTransferPackagePacker extends MCRPacker {
     public void pack() throws ExecutionException {
         String sourceId = getSourceId();
         try {
-            LOGGER.info("Creating transfer package for " + sourceId + " at " + SAVE_DIRECTORY_PATH.toAbsolutePath().toString());
+            LOGGER.info(
+                "Creating transfer package for " + sourceId + " at " + SAVE_DIRECTORY_PATH.toAbsolutePath().toString());
             MCRTransferPackage transferPackage = build();
             checkAndCreateSaveDirectory();
             buildTar(getTarPath(transferPackage), transferPackage);

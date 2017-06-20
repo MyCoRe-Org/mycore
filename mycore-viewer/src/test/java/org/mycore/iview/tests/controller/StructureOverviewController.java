@@ -35,14 +35,14 @@ public class StructureOverviewController extends SideBarController {
      */
     public void selectImageByOrder(String orderLabel) {
         String xpath = MessageFormat.format("//li/a[../span[@class=\"childLabel\" and contains(text(),\"{0}\")]"
-                + "]|//li/a[contains(text(),\"{0}\")]",
+            + "]|//li/a[contains(text(),\"{0}\")]",
             orderLabel);
         clickElementByXpath(xpath);
     }
 
     public boolean isImageSelected(String orderLabel) {
         String xPath = MessageFormat.format("//li[./span[@class=\"childLabel\" and contains(text(),\"{0}\")]|"
-                + "./a[contains(text(),\"{0}\")]]",
+            + "./a[contains(text(),\"{0}\")]]",
             orderLabel);
         return assertAttributeByXpath(xPath, "data-selected", true);
     }

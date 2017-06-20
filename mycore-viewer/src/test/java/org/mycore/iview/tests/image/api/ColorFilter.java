@@ -11,7 +11,9 @@ public class ColorFilter implements PixelFilter {
     }
 
     private final Color colorToFilter;
+
     private final boolean throwOut;
+
     private final int tolerance;
 
     @Override

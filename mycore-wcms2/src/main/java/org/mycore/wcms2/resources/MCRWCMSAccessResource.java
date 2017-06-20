@@ -43,11 +43,12 @@ public class MCRWCMSAccessResource {
 
     @POST
     public String createOrUpdate(@QueryParam("webPageID") String webPageID, @QueryParam("perm") String perm,
-            @QueryParam("ruleID") String ruleID) {
+        @QueryParam("ruleID") String ruleID) {
         MCRAccessStore accessStore = MCRAccessStore.getInstance();
         JsonObject returnObject = new JsonObject();
         if (MCRLayoutUtilities.hasRule(perm, webPageID)) {
-            MCRRuleMapping ruleMap = accessStore.getAccessDefinition(perm, MCRLayoutUtilities.getWebpageACLID(webPageID));
+            MCRRuleMapping ruleMap = accessStore.getAccessDefinition(perm,
+                MCRLayoutUtilities.getWebpageACLID(webPageID));
             ruleMap.setRuleId(ruleID);
             accessStore.updateAccessDefinition(ruleMap);
         } else {

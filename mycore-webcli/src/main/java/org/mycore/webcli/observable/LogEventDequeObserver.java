@@ -18,21 +18,22 @@ import com.google.gson.JsonObject;
  * @author Michel Buechner (mcrmibue)
  * 
  */
-public class LogEventDequeObserver  implements Observer{
-    
+public class LogEventDequeObserver implements Observer {
+
     private ObservableLogEventDeque obLogEventDeque;
+
     private Session session;
-    
+
     private boolean sendMessages;
-    
+
     private static final Logger LOGGER = LogManager.getLogger();
-    
+
     public LogEventDequeObserver(ObservableLogEventDeque obsLogEventQueue, Session session) {
         this.obLogEventDeque = obsLogEventQueue;
         this.session = session;
         this.sendMessages = true;
     }
-    
+
     public void update(Observable observable, Object obj) {
         if (observable == obLogEventDeque) {
             if (sendMessages && session.isOpen()) {
@@ -44,16 +45,16 @@ public class LogEventDequeObserver  implements Observer{
             }
         }
     }
-    
+
     private void sendAsMessage(ObservableLogEventDeque events) throws IOException {
         JsonObject jObject = new JsonObject();
         jObject.addProperty("type", "log");
         jObject.addProperty("return", getJSONLogAsString(events));
         session.getBasicRemote().sendText(jObject.toString());
     }
-        
+
     private String getJSONLogAsString(ObservableLogEventDeque events) {
-        if(!events.isEmpty()) {
+        if (!events.isEmpty()) {
             LogEvent event = events.pollLast();
             JsonObject json = new JsonObject();
             json.addProperty("logLevel", event.getLevel().toString());
@@ -72,15 +73,15 @@ public class LogEventDequeObserver  implements Observer{
         }
         return "";
     }
-    
+
     public void changeSession(Session session) {
         this.session = session;
     }
-    
+
     public void stopSendMessages() {
         this.sendMessages = false;
     }
-    
+
     public void startSendMessages() {
         this.sendMessages = true;
         try {

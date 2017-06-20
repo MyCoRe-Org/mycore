@@ -75,16 +75,20 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
 
     @Test
     public void testJavaCall() throws JaxenException, JDOMException {
-        String res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testNoArgs')");
+        String res = evaluator.replaceXPathOrI18n(
+            "xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testNoArgs')");
         assertEquals(testNoArgs(), res);
 
-        res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testOneArg',name[2])");
+        res = evaluator.replaceXPathOrI18n(
+            "xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testOneArg',name[2])");
         assertEquals("n2", res);
 
-        res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testTwoArgs',string(name[1]/@id),string(note[1]/@href))");
+        res = evaluator.replaceXPathOrI18n(
+            "xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testTwoArgs',string(name[1]/@id),string(note[1]/@href))");
         assertEquals("true", res);
 
-        res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testTwoArgs',string(name[2]/@id),string(note[1]/@href))");
+        res = evaluator.replaceXPathOrI18n(
+            "xed:call-java('org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactoryTest','testTwoArgs',string(name[2]/@id),string(note[1]/@href))");
         assertEquals("false", res);
     }
 
@@ -95,9 +99,8 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
     public static String testOneArg(List<Element> nodes) {
         return nodes.get(0).getAttributeValue("id");
     }
-    
-    public static boolean testTwoArgs(String id, String href)
-    {
+
+    public static boolean testTwoArgs(String id, String href) {
         return id.equals(href.substring(1));
     }
 
@@ -105,6 +108,7 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
     public void testExternalJavaTest() throws JaxenException, JDOMException {
         assertTrue(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserGuestUser')"));
         assertFalse(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserSuperUser')"));
-        assertFalse(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserInRole','admins')"));
+        assertFalse(
+            evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserInRole','admins')"));
     }
 }

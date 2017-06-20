@@ -1,6 +1,5 @@
 package org.mycore.sword.application;
 
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +38,9 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
 
             return queryResponse.getResults().getNumFound();
         } catch (SolrServerException | IOException e) {
-            throw new SwordServerException("Error while getting count with MCRSword2SolrObjectIDSupplier and Query: " + this.solrQuery.toString(), e);
+            throw new SwordServerException(
+                "Error while getting count with MCRSword2SolrObjectIDSupplier and Query: " + this.solrQuery.toString(),
+                e);
         }
     }
 
@@ -51,11 +52,12 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
         try {
             final QueryResponse queryResponse = MCRSolrClientFactory.getSolrClient().query(queryCopy);
             return queryResponse.getResults().stream()
-                    .map(r -> (String) r.getFieldValue("id"))
-                    .map(MCRObjectID::getInstance)
-                    .collect(Collectors.toList());
+                .map(r -> (String) r.getFieldValue("id"))
+                .map(MCRObjectID::getInstance)
+                .collect(Collectors.toList());
         } catch (SolrServerException | IOException e) {
-            throw new SwordServerException("Error while getting id list with MCRSword2SolrObjectIDSupplier and Query: " + this.solrQuery.toString(), e);
+            throw new SwordServerException("Error while getting id list with MCRSword2SolrObjectIDSupplier and Query: "
+                + this.solrQuery.toString(), e);
         }
     }
 }

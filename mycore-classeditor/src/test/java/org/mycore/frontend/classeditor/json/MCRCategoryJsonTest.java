@@ -18,11 +18,11 @@ public class MCRCategoryJsonTest {
         mcrProperties.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
         mcrProperties.set("MCR.Metadata.DefaultLang", "de");
         mcrProperties.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
-        
+
         SAXBuilder saxBuilder = new SAXBuilder();
         Document doc = saxBuilder.build(getClass().getResourceAsStream("/classi/categoryJsonErr.xml"));
         String json = doc.getRootElement().getText();
-        
+
         Gson gson = MCRJSONManager.instance().createGson();
         try {
             MCRCategoryImpl fromJson = gson.fromJson(json, MCRCategoryImpl.class);

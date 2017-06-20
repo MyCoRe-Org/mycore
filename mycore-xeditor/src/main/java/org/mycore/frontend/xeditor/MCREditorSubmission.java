@@ -27,7 +27,7 @@ public class MCREditorSubmission {
     public MCREditorSubmission(MCREditorSession session) {
         this.session = session;
     }
-    
+
     public void clear() {
         xPaths2CheckResubmission.clear();
         xPath2DefaultValue.clear();
@@ -91,7 +91,7 @@ public class MCREditorSubmission {
                 valuesToSet.put(binding, values.get(paramName));
             } else if (paramName.startsWith(PREFIX_DEFAULT_VALUE)) {
                 String xPath = paramName.substring(PREFIX_DEFAULT_VALUE.length());
-                
+
                 MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
                 boolean noSuchNode = binding.getBoundNodes().isEmpty();
                 binding.detach();

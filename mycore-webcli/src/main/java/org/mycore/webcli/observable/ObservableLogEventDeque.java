@@ -10,25 +10,25 @@ import org.apache.logging.log4j.core.LogEvent;
  * 
  */
 public class ObservableLogEventDeque extends Observable {
-    
+
     ConcurrentLinkedDeque<LogEvent> logEventDeque;
-    
+
     public ObservableLogEventDeque() {
         this.logEventDeque = new ConcurrentLinkedDeque<LogEvent>();
     }
-    
+
     public void add(LogEvent event) {
         logEventDeque.add(event);
         setChanged();
         notifyObservers();
     }
-    
+
     public void clear() {
         logEventDeque.clear();
         setChanged();
         notifyObservers();
     }
-    
+
     public boolean isEmpty() {
         return logEventDeque.isEmpty();
     }
@@ -39,7 +39,7 @@ public class ObservableLogEventDeque extends Observable {
         notifyObservers();
         return event;
     }
-    
+
     public LogEvent pollLast() {
         LogEvent event = logEventDeque.pollLast();
         setChanged();

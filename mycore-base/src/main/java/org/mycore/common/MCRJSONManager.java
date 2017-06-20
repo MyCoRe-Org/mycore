@@ -1,14 +1,13 @@
 package org.mycore.common;
 
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-
 public class MCRJSONManager {
     private GsonBuilder gsonBuilder;
+
     private static MCRJSONManager instance;
-    
+
     private MCRJSONManager() {
         gsonBuilder = new GsonBuilder();
     }
@@ -18,7 +17,7 @@ public class MCRJSONManager {
     }
 
     public static MCRJSONManager instance() {
-        if(instance == null){
+        if (instance == null) {
             instance = new MCRJSONManager();
         }
         return instance;

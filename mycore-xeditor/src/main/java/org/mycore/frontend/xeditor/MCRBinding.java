@@ -92,7 +92,8 @@ public class MCRBinding {
         bind(xPath, buildIfNotExists, null);
     }
 
-    public MCRBinding(String xPath, String initialValue, String name, MCRBinding parent) throws JDOMException, JaxenException {
+    public MCRBinding(String xPath, String initialValue, String name, MCRBinding parent)
+        throws JDOMException, JaxenException {
         this(parent);
         this.name = (name != null) && !name.isEmpty() ? name : null;
         bind(xPath, true, initialValue);
@@ -110,7 +111,8 @@ public class MCRBinding {
 
         for (Object boundNode : boundNodes)
             if (!(boundNode instanceof Element || boundNode instanceof Attribute || boundNode instanceof Document))
-                throw new RuntimeException("XPath MUST only bind either element, attribute or document nodes: " + xPath);
+                throw new RuntimeException(
+                    "XPath MUST only bind either element, attribute or document nodes: " + xPath);
 
         LOGGER.debug("Bind to " + xPath + " selected " + boundNodes.size() + " node(s)");
 
@@ -274,7 +276,7 @@ public class MCRBinding {
     public String getAbsoluteXPath() {
         return MCRXPathBuilder.buildXPath(getBoundNode());
     }
-    
+
     public MCRXPathEvaluator getXPathEvaluator() {
         return new MCRXPathEvaluator(buildXPathVariables(), getBoundNodes());
     }

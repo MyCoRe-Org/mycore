@@ -44,7 +44,6 @@ public class MCRWorkflowRuleParser extends MCRRuleParser {
 
     private MCRCategoryID statusClassId;
 
-
     protected MCRWorkflowRuleParser() {
         super();
         this.statusClassId = MCRConstants.STATUS_CLASS_ID;

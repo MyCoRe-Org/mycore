@@ -1,6 +1,5 @@
 package org.mycore.pi.urn;
 
-
 /**
  * Base class for every DNBURN
  *
@@ -10,6 +9,7 @@ package org.mycore.pi.urn;
  */
 public class MCRDNBURN extends MCRUniformResourceName {
     public static final String TYPE = "dnbUrn";
+
     public static final String URN_NID = "nbn:de:";
 
     @Override
@@ -184,7 +184,7 @@ public class MCRDNBURN extends MCRUniformResourceName {
     }
 
     private String getGranularNamespaceSpecificString(String setID, String index) {
-        return getNamespaceSpecificString()+ "-" + setID + "-" + index;
+        return getNamespaceSpecificString() + "-" + setID + "-" + index;
     }
 
     @Override

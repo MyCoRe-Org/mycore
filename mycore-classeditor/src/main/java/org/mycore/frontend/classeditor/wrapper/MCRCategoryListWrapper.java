@@ -9,6 +9,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 public class MCRCategoryListWrapper {
 
     private List<MCRCategory> categList;
+
     private Map<MCRCategoryID, Boolean> linkMap = null;
 
     public MCRCategoryListWrapper(List<MCRCategory> categList) {
@@ -24,7 +25,7 @@ public class MCRCategoryListWrapper {
         return categList;
     }
 
-    public Map<MCRCategoryID, Boolean> getLinkMap(){
+    public Map<MCRCategoryID, Boolean> getLinkMap() {
         return linkMap;
     }
 }

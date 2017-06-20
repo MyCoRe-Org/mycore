@@ -26,15 +26,15 @@ public class JSONSectionProviderTest {
         Document doc = builder.build(new File("src/test/resources/navigation/content.xml"));
         MCRWCMSDefaultSectionProvider prov = new MCRWCMSDefaultSectionProvider();
         JsonArray sectionArray = prov.toJSON(doc.getRootElement());
-        
+
         assertEquals(2, sectionArray.size());
         // test section one
-        JsonObject section1 = (JsonObject)sectionArray.get(0);
+        JsonObject section1 = (JsonObject) sectionArray.get(0);
         assertEquals("Title one", section1.getAsJsonPrimitive("title").getAsString());
         assertEquals("de", section1.getAsJsonPrimitive("lang").getAsString());
         assertEquals("<div><p>Content one</p><br /></div>", section1.getAsJsonPrimitive("data").getAsString());
         // test section two
-        JsonObject section2 = (JsonObject)sectionArray.get(1);
+        JsonObject section2 = (JsonObject) sectionArray.get(1);
         assertEquals("Title two", section2.getAsJsonPrimitive("title").getAsString());
         assertEquals("en", section2.getAsJsonPrimitive("lang").getAsString());
         assertEquals("Content two", section2.getAsJsonPrimitive("data").getAsString());

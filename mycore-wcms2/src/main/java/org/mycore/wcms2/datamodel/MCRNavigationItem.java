@@ -50,7 +50,7 @@ public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavig
 
     // children
     @XmlElementRefs({ @XmlElementRef(type = MCRNavigationItem.class),
-            @XmlElementRef(type = MCRNavigationInsertItem.class) })
+        @XmlElementRef(type = MCRNavigationInsertItem.class) })
     private List<MCRNavigationBaseItem> children;
 
     public MCRNavigationItem() {

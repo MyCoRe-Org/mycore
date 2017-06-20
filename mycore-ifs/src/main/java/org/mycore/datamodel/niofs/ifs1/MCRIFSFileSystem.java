@@ -68,8 +68,7 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
     public Iterable<Path> getRootDirectories() {
         return StreamSupport
             .stream(MCRFileMetadataManager.instance().getOwnerIDs().spliterator(), false)
-            .map(owner -> (Path)getPath(owner, "", this))
-            ::iterator;
+            .map(owner -> (Path) getPath(owner, "", this))::iterator;
     }
 
     /* (non-Javadoc)
@@ -81,11 +80,10 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
             .getAvailableStores()
             .keySet()
             .stream()
-            .map(MCRIFSFileSystem::getFileStore)
-            ::iterator;
+            .map(MCRIFSFileSystem::getFileStore)::iterator;
     }
-    
-    private static FileStore getFileStore(String id){
+
+    private static FileStore getFileStore(String id) {
         try {
             return MCRFileStore.getInstance(id);
         } catch (IOException e) {

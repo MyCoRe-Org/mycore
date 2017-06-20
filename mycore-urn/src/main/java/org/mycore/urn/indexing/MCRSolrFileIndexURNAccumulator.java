@@ -14,7 +14,8 @@ import org.mycore.urn.services.MCRURNManager;
  * Changeable in property <code>MCR.Module-solr.Indexer.File.AccumulatorList</code>
  */
 public class MCRSolrFileIndexURNAccumulator implements MCRSolrFileIndexAccumulator {
-    @Override public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)
+    @Override
+    public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)
         throws IOException {
         MCRPath mcrPath = MCRPath.toMCRPath(filePath); //check if this is an MCRPath -> more metadata
         String ownerID = mcrPath.getOwner();

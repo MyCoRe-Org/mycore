@@ -54,8 +54,8 @@ public class MCREnrichmentResolver implements URIResolver {
     private static final Logger LOGGER = LogManager.getLogger(MCREnrichmentResolver.class);
 
     private static final XPathExpression<Element> xPath2RelatedItems = XPathFactory.instance().compile(
-            "mods:relatedItem[@type='host' or @type='series']", Filters.element(), null,
-            MCRConstants.getStandardNamespaces());
+        "mods:relatedItem[@type='host' or @type='series']", Filters.element(), null,
+        MCRConstants.getStandardNamespaces());
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {

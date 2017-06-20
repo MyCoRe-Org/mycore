@@ -44,7 +44,6 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 /**
  * MCRContent implementation that uses Java 7 {@link FileSystem} features.
  * 

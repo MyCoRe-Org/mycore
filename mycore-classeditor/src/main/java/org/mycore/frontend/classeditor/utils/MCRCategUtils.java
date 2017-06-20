@@ -38,11 +38,12 @@ public class MCRCategUtils {
                 //jsonObject.item.id.rootid
                 JsonObject root = jsonElement.getAsJsonObject();
                 String rootId = root.getAsJsonObject("item").getAsJsonObject("id").getAsJsonPrimitive("rootid")
-                        .getAsString();
+                    .getAsString();
 
                 String state = root.getAsJsonPrimitive("state").getAsString();
                 JsonElement parentIdJSON = root.get("parentId");
-                if(parentIdJSON != null && parentIdJSON.isJsonPrimitive() && "_placeboid_".equals(parentIdJSON.getAsString())){
+                if (parentIdJSON != null && parentIdJSON.isJsonPrimitive()
+                    && "_placeboid_".equals(parentIdJSON.getAsString())) {
                     state = "new";
                 }
 

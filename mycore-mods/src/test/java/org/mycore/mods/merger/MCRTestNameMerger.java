@@ -59,12 +59,12 @@ public class MCRTestNameMerger extends MCRTestCase {
         assertTrue(f.isProbablySameAs(g));
 
         MCRNameMerger h = buildNameEntry(
-                "[mods:namePart[@type='given']='Thomas'][mods:namePart[@type='family']='Müller']");
+            "[mods:namePart[@type='given']='Thomas'][mods:namePart[@type='family']='Müller']");
         assertTrue(h.isProbablySameAs(a));
         assertTrue(h.isProbablySameAs(d));
 
         MCRNameMerger i = buildNameEntry("[mods:namePart[@type='given']='T.'][mods:namePart[@type='family']='Müller']"
-                + "[mods:namePart[@type='termsOfAddress']='Jun.']");
+            + "[mods:namePart[@type='termsOfAddress']='Jun.']");
         assertTrue(i.isProbablySameAs(h));
         assertTrue(i.isProbablySameAs(a));
         assertTrue(i.isProbablySameAs(d));
@@ -74,29 +74,29 @@ public class MCRTestNameMerger extends MCRTestCase {
     public void testCompareBasedOnDisplayForm() throws Exception {
         MCRNameMerger a = buildNameEntry("[mods:displayForm='Thomas Müller']");
         MCRNameMerger b = buildNameEntry(
-                "[mods:namePart[@type='given']='Thomas'][mods:namePart[@type='family']='Müller']");
+            "[mods:namePart[@type='given']='Thomas'][mods:namePart[@type='family']='Müller']");
         assertTrue(a.isProbablySameAs(b));
     }
 
     @Test
     public void testMergeTermsOfAddress() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart[@type='given']='Thomas']"
-                + "[mods:namePart[@type='family']='Müller']]";
+            + "[mods:namePart[@type='family']='Müller']]";
         String b = "[mods:name[@type='personal'][mods:namePart[@type='given']='T.']"
-                + "[mods:namePart[@type='family']='Müller'][mods:namePart[@type='termsOfAddress']='Jun.']]";
+            + "[mods:namePart[@type='family']='Müller'][mods:namePart[@type='termsOfAddress']='Jun.']]";
         String e = "[mods:name[@type='personal'][mods:namePart[@type='given']='Thomas']"
-                + "[mods:namePart[@type='family']='Müller'][mods:namePart[@type='termsOfAddress']='Jun.']]";
+            + "[mods:namePart[@type='family']='Müller'][mods:namePart[@type='termsOfAddress']='Jun.']]";
         MCRTestMerger.test(a, b, e);
     }
 
     @Test
     public void testMergeNameIdentifier() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
-                + "[mods:nameIdentifier[@type='gnd']='2']]";
+            + "[mods:nameIdentifier[@type='gnd']='2']]";
         String b = "[mods:name[@type='personal'][mods:namePart='Mueller, T']"
-                + "[mods:nameIdentifier[@type='lsf']='1'][mods:nameIdentifier[@type='gnd']='2']]";
+            + "[mods:nameIdentifier[@type='lsf']='1'][mods:nameIdentifier[@type='gnd']='2']]";
         String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
-                + "[mods:nameIdentifier[@type='gnd']='2'][mods:nameIdentifier[@type='lsf']='1']]";
+            + "[mods:nameIdentifier[@type='gnd']='2'][mods:nameIdentifier[@type='lsf']='1']]";
         MCRTestMerger.test(a, b, e);
     }
 

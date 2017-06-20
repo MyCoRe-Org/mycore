@@ -88,7 +88,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
                     .orElseGet(MCRSystemUserInformation.getGuestInstance()::getUserID));
             return lastUser;
         }
-        
+
         @Override
         public boolean isUserInRole(String role) {
             return getCurrentRequest().map(r -> r.isUserInRole(role)).orElse(Boolean.FALSE);

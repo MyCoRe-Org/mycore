@@ -65,7 +65,7 @@ public class MCRMetaNumberTest extends MCRTestCase {
     }
 
     @Test
-    public void numberTransformation () {
+    public void numberTransformation() {
         MCRMetaNumber meta_number = new MCRMetaNumber("number", 0, null, null, "0,1");
         String number_string = meta_number.getNumberAsString();
         assertEquals("datamodel", "0.100", number_string);
@@ -76,7 +76,7 @@ public class MCRMetaNumberTest extends MCRTestCase {
         number_string = meta_number.getNumberAsString();
         assertEquals("datamodel", "12345.679", number_string);
         // geo data
-        MCRConfiguration.instance().set("MCR.Metadata.MetaNumber.FractionDigits",8);
+        MCRConfiguration.instance().set("MCR.Metadata.MetaNumber.FractionDigits", 8);
         meta_number = new MCRMetaNumber("number", 0, null, null, "123.45678999");
         number_string = meta_number.getNumberAsString();
         assertEquals("datamodel", "123.45678999", number_string);
@@ -99,7 +99,7 @@ public class MCRMetaNumberTest extends MCRTestCase {
         print_data(imported, exported);
         check_data(imported, exported);
     }
-    
+
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
@@ -122,7 +122,7 @@ public class MCRMetaNumberTest extends MCRTestCase {
             }
         }
     }
-    
+
     private void check_data(Element imported, Element exported) {
         try {
             assertTrue(MCRXMLHelper.deepEqual(new Document(imported), new Document(exported)));
@@ -141,5 +141,5 @@ public class MCRMetaNumberTest extends MCRTestCase {
             throw e;
         }
     }
-    
+
 }

@@ -39,68 +39,61 @@ import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 
 public class MediaInfo {
-    private static final Logger LOGGER = LogManager.getLogger( MediaInfo.class );
-    
-    static
-    {
+    private static final Logger LOGGER = LogManager.getLogger(MediaInfo.class);
+
+    static {
         // libmediainfo for linux depends on libzen
-        try
-        {
+        try {
             // We need to load dependencies first, because we know where our native libs are (e.g. Jetty Classpath).
             // If we do not, the system will look for dependencies, but only in the library path.
             if (!Platform.isWindows() && !Platform.isMac())
                 NativeLibrary.getInstance("zen");
-        }
-        catch (LinkageError  e)
-        {
+        } catch (LinkageError e) {
             LOGGER.warn("Failed to preload libzen");
         }
     }
 
     //Internal stuff
-    interface MediaInfoDLL_Internal extends Library
-    {
+    interface MediaInfoDLL_Internal extends Library {
 
-        MediaInfoDLL_Internal INSTANCE = (MediaInfoDLL_Internal) Native.loadLibrary((Platform.isWindows()&&Platform.is64Bit())?"mediainfo64":"mediainfo", MediaInfoDLL_Internal.class, singletonMap(OPTION_FUNCTION_MAPPER, new FunctionMapper()
-            {
+        MediaInfoDLL_Internal INSTANCE = (MediaInfoDLL_Internal) Native.loadLibrary(
+            (Platform.isWindows() && Platform.is64Bit()) ? "mediainfo64" : "mediainfo", MediaInfoDLL_Internal.class,
+            singletonMap(OPTION_FUNCTION_MAPPER, new FunctionMapper() {
 
                 @Override
-                public String getFunctionName(NativeLibrary lib, Method method)
-                {
+                public String getFunctionName(NativeLibrary lib, Method method) {
                     // MediaInfo_New(), MediaInfo_Open() ...
                     return "MediaInfo_" + method.getName();
                 }
-            }
-        ));
-
+            }));
 
         //Constructor/Destructor
         Pointer New();
+
         void Delete(Pointer Handle);
 
         //File
         int Open(Pointer Handle, WString file);
+
         void Close(Pointer Handle);
 
         //Info
         WString Inform(Pointer Handle);
+
         WString Get(Pointer Handle, int StreamKind, int StreamNumber, WString parameter, int infoKind, int searchKind);
+
         WString GetI(Pointer Handle, int StreamKind, int StreamNumber, int parameterIndex, int infoKind);
-        int     Count_Get(Pointer Handle, int StreamKind, int StreamNumber);
+
+        int Count_Get(Pointer Handle, int StreamKind, int StreamNumber);
 
         //Options
         WString Option(Pointer Handle, WString option, WString value);
     }
+
     private Pointer Handle;
 
     public enum StreamKind {
-        General,
-        Video,
-        Audio,
-        Text,
-        Chapters,
-        Image,
-        Menu
+        General, Video, Audio, Text, Chapters, Image, Menu
     }
 
     //Enums
@@ -150,26 +143,24 @@ public class MediaInfo {
     }
 
     //Constructor/Destructor
-    public MediaInfo()
-    {
+    public MediaInfo() {
         try {
-        	Handle = MediaInfoDLL_Internal.INSTANCE.New();
+            Handle = MediaInfoDLL_Internal.INSTANCE.New();
         } catch (Throwable e) {
-        	if (e != null)
-        		LOGGER.error("Error loading MediaInfo library: " + e.getMessage());
-        	if (!Platform.isWindows() && !Platform.isMac()) {
-        	    LOGGER.error("Make sure you have libmediainfo and libzen installed");
-        	}
-        	LOGGER.error("The server will now use the less accurate parsing method");
+            if (e != null)
+                LOGGER.error("Error loading MediaInfo library: " + e.getMessage());
+            if (!Platform.isWindows() && !Platform.isMac()) {
+                LOGGER.error("Make sure you have libmediainfo and libzen installed");
+            }
+            LOGGER.error("The server will now use the less accurate parsing method");
         }
     }
 
     public boolean isValid() {
-    	return Handle != null;
+        return Handle != null;
     }
 
-     public void dispose()
-    {
+    public void dispose() {
         if (Handle == null)
             throw new IllegalStateException();
 
@@ -178,8 +169,7 @@ public class MediaInfo {
     }
 
     @Override
-    protected void finalize() throws Throwable
-    {
+    protected void finalize() throws Throwable {
         if (Handle != null)
             dispose();
     }
@@ -191,8 +181,7 @@ public class MediaInfo {
      * @param File_Name full name of the file to open
      * @return 1 if file was opened, 0 if file was not not opened
      */
-    public int Open(String File_Name)
-    {
+    public int Open(String File_Name) {
         return MediaInfoDLL_Internal.INSTANCE.Open(Handle, new WString(File_Name));
     }
 
@@ -200,8 +189,7 @@ public class MediaInfo {
      * Close a file opened before with Open().
      *
      */
-    public void Close()
-    {
+    public void Close() {
         MediaInfoDLL_Internal.INSTANCE.Close(Handle);
     }
 
@@ -211,8 +199,7 @@ public class MediaInfo {
      *
      * @return All details about a file in one string
      */
-    public String Inform()
-    {
+    public String Inform() {
         return MediaInfoDLL_Internal.INSTANCE.Inform(Handle).toString();
     }
 
@@ -225,11 +212,9 @@ public class MediaInfo {
      *            in string format ("Codec", "Width"...)
      * @return a string about information you search, an empty string if there is a problem
      */
-    public String Get(StreamKind StreamKind, int StreamNumber, String parameter)
-    {
+    public String Get(StreamKind StreamKind, int StreamNumber, String parameter) {
         return Get(StreamKind, StreamNumber, parameter, InfoKind.Text, InfoKind.Name);
     }
-
 
     /**
      * Get a piece of information about a file (parameter is a string).
@@ -241,11 +226,9 @@ public class MediaInfo {
      * @param infoKind Kind of information you want about the parameter (the text, the measure,
      *            the help...)
      */
-    public String Get(StreamKind StreamKind, int StreamNumber, String parameter, InfoKind infoKind)
-    {
+    public String Get(StreamKind StreamKind, int StreamNumber, String parameter, InfoKind infoKind) {
         return Get(StreamKind, StreamNumber, parameter, infoKind, InfoKind.Name);
     }
-
 
     /**
      * Get a piece of information about a file (parameter is a string).
@@ -259,11 +242,11 @@ public class MediaInfo {
      * @param searchKind Where to look for the parameter
      * @return a string about information you search, an empty string if there is a problem
      */
-    public String Get(StreamKind StreamKind, int StreamNumber, String parameter, InfoKind infoKind, InfoKind searchKind)
-    {
-        return MediaInfoDLL_Internal.INSTANCE.Get(Handle, StreamKind.ordinal(), StreamNumber, new WString(parameter), infoKind.ordinal(), searchKind.ordinal()).toString();
+    public String Get(StreamKind StreamKind, int StreamNumber, String parameter, InfoKind infoKind,
+        InfoKind searchKind) {
+        return MediaInfoDLL_Internal.INSTANCE.Get(Handle, StreamKind.ordinal(), StreamNumber, new WString(parameter),
+            infoKind.ordinal(), searchKind.ordinal()).toString();
     }
-
 
     /**
      * Get a piece of information about a file (parameter is an integer).
@@ -274,11 +257,9 @@ public class MediaInfo {
      *            in integer format (first parameter, second parameter...)
      * @return a string about information you search, an empty string if there is a problem
      */
-    public String get(StreamKind StreamKind, int StreamNumber, int parameterIndex)
-    {
+    public String get(StreamKind StreamKind, int StreamNumber, int parameterIndex) {
         return Get(StreamKind, StreamNumber, parameterIndex, InfoKind.Text);
     }
-
 
     /**
      * Get a piece of information about a file (parameter is an integer).
@@ -291,9 +272,9 @@ public class MediaInfo {
      *            the help...)
      * @return a string about information you search, an empty string if there is a problem
      */
-    public String Get(StreamKind StreamKind, int StreamNumber, int parameterIndex, InfoKind infoKind)
-    {
-        return MediaInfoDLL_Internal.INSTANCE.GetI(Handle, StreamKind.ordinal(), StreamNumber, parameterIndex, infoKind.ordinal()).toString();
+    public String Get(StreamKind StreamKind, int StreamNumber, int parameterIndex, InfoKind infoKind) {
+        return MediaInfoDLL_Internal.INSTANCE
+            .GetI(Handle, StreamKind.ordinal(), StreamNumber, parameterIndex, infoKind.ordinal()).toString();
     }
 
     /**
@@ -303,11 +284,9 @@ public class MediaInfo {
      * @param StreamKind Kind of Stream (general, video, audio...)
      * @return number of Streams of the given Stream kind
      */
-    public int Count_Get(StreamKind StreamKind)
-    {
+    public int Count_Get(StreamKind StreamKind) {
         return MediaInfoDLL_Internal.INSTANCE.Count_Get(Handle, StreamKind.ordinal(), -1);
     }
-
 
     /**
      * Count of Streams of a Stream kind (StreamNumber not filled), or count of piece of
@@ -317,12 +296,9 @@ public class MediaInfo {
      * @param StreamNumber Stream number in this kind of Stream (first, second...)
      * @return number of Streams of the given Stream kind
      */
-    public int Count_Get(StreamKind StreamKind, int StreamNumber)
-    {
+    public int Count_Get(StreamKind StreamKind, int StreamNumber) {
         return MediaInfoDLL_Internal.INSTANCE.Count_Get(Handle, StreamKind.ordinal(), StreamNumber);
     }
-
-
 
     //Options
     /**
@@ -331,8 +307,7 @@ public class MediaInfo {
      * @param Option The name of option
      * @return Depends on the option: by default "" (nothing) means No, other means Yes
      */
-    public String Option(String Option)
-    {
+    public String Option(String Option) {
         return MediaInfoDLL_Internal.INSTANCE.Option(Handle, new WString(Option), new WString("")).toString();
     }
 
@@ -343,8 +318,7 @@ public class MediaInfo {
      * @param Value The value of option
      * @return Depends on the option: by default "" (nothing) means No, other means Yes
      */
-    public String Option(String Option, String Value)
-    {
+    public String Option(String Option, String Value) {
         return MediaInfoDLL_Internal.INSTANCE.Option(Handle, new WString(Option), new WString(Value)).toString();
     }
 
@@ -354,9 +328,9 @@ public class MediaInfo {
      * @param Option The name of option
      * @return Depends on the option: by default "" (nothing) means No, other means Yes
      */
-    public static String Option_Static(String Option)
-    {
-        return MediaInfoDLL_Internal.INSTANCE.Option(MediaInfoDLL_Internal.INSTANCE.New(), new WString(Option), new WString("")).toString();
+    public static String Option_Static(String Option) {
+        return MediaInfoDLL_Internal.INSTANCE
+            .Option(MediaInfoDLL_Internal.INSTANCE.New(), new WString(Option), new WString("")).toString();
     }
 
     /**
@@ -366,8 +340,8 @@ public class MediaInfo {
      * @param Value The value of option
      * @return Depends on the option: by default "" (nothing) means No, other means Yes
      */
-    public static String Option_Static(String Option, String Value)
-    {
-        return MediaInfoDLL_Internal.INSTANCE.Option(MediaInfoDLL_Internal.INSTANCE.New(), new WString(Option), new WString(Value)).toString();
+    public static String Option_Static(String Option, String Value) {
+        return MediaInfoDLL_Internal.INSTANCE
+            .Option(MediaInfoDLL_Internal.INSTANCE.New(), new WString(Option), new WString(Value)).toString();
     }
 }

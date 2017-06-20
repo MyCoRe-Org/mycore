@@ -40,7 +40,7 @@ public class MCRTestRelatedItemMerger extends MCRTestCase {
         String a = "[mods:relatedItem[@type='series'][mods:identifier='foo']]";
         String b = "[mods:relatedItem[@type='series'][mods:note='bar']]";
         String e = "[mods:relatedItem[@type='series'][mods:identifier='foo']]"
-                + "[mods:relatedItem[@type='series'][mods:note='bar']]";
+            + "[mods:relatedItem[@type='series'][mods:note='bar']]";
         MCRTestMerger.test(a, b, e);
     }
 }

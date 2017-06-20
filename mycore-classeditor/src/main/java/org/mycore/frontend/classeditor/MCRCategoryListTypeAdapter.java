@@ -28,21 +28,22 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 
-public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryListWrapper>{
+public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryListWrapper> {
     private JsonSerializationContext serializationContext;
 
     @Override
-    public JsonElement serialize(MCRCategoryListWrapper categListWrapper, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(MCRCategoryListWrapper categListWrapper, Type typeOfSrc,
+        JsonSerializationContext context) {
         this.serializationContext = context;
         Map<MCRCategoryID, Boolean> linkMap = categListWrapper.getLinkMap();
-        
-        if(linkMap == null){
+
+        if (linkMap == null) {
             throw new RuntimeException("For serializing link map must not be null.");
         }
-        
+
         return categListToJsonArray(categListWrapper.getList(), linkMap);
     }
-    
+
     private JsonElement categListToJsonArray(List<MCRCategory> categList, Map<MCRCategoryID, Boolean> linkMap) {
         JsonArray categJsonArray = new JsonArray();
         for (MCRCategory categ : categList) {
@@ -50,7 +51,7 @@ public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryLi
             JsonElement element = createCategRefJSONObj(categ, hasLink);
             categJsonArray.add(element);
         }
-        
+
         return categJsonArray;
     }
 
@@ -60,7 +61,7 @@ public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryLi
         Set<MCRLabel> labels = categ.getLabels();
         categRefJsonObject.add(LABELS, serializationContext.serialize(new MCRLabelSetWrapper(labels)));
         URI uri = categ.getURI();
-        if(uri != null) {
+        if (uri != null) {
             categRefJsonObject.addProperty(URISTR, uri.toString());
         }
         categRefJsonObject.addProperty(HASCHILDREN, categ.hasChildren());
@@ -69,16 +70,17 @@ public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryLi
     }
 
     @Override
-    public MCRCategoryListWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public MCRCategoryListWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
         List<MCRCategory> categList = new ArrayList<MCRCategory>();
-        
+
         for (JsonElement categRef : json.getAsJsonArray()) {
             JsonObject categRefJsonObject = categRef.getAsJsonObject();
 
             MCRCategory categ = context.deserialize(categRefJsonObject, MCRJSONCategory.class);
             categList.add(categ);
         }
-        
+
         return new MCRCategoryListWrapper(categList);
     }
 }

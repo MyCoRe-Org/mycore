@@ -29,11 +29,11 @@ package org.mycore.frontend.xeditor.validation;
 public class MCRMaxStringValidator extends MCRValidator {
 
     private static final String ATTR_MAX = "max";
-    
+
     private static final String ATTR_TYPE = "type";
-    
+
     private static final String TYPE_STRING = "string";
-    
+
     private String max;
 
     @Override

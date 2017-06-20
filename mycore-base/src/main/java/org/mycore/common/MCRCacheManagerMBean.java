@@ -28,7 +28,7 @@ public interface MCRCacheManagerMBean {
     public long getSize();
 
     public long getRequests();
-    
+
     public long getEvictions();
 
     public long getHits();

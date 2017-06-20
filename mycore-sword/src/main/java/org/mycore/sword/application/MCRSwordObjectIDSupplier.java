@@ -1,6 +1,5 @@
 package org.mycore.sword.application;
 
-
 import java.util.List;
 
 import org.mycore.datamodel.metadata.MCRObjectID;

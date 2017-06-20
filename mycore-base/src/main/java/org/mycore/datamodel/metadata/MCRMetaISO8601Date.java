@@ -216,7 +216,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Date=" + (isoDate != null ? isoDate.getISOString() : "null"));
             if (isoDate != null) {
@@ -253,7 +253,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if(isoDate == null || isoDate.getDt() == null) {
+        if (isoDate == null || isoDate.getDt() == null) {
             throw new MCRException(getSubTag() + ": date is invalid");
         }
     }

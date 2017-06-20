@@ -30,7 +30,7 @@ package org.mycore.frontend.xeditor.validation;
 public class MCRMinDecimalValidator extends MCRDecimalValidator {
 
     private static final String ATTR_MIN = "min";
-    
+
     private double min;
 
     @Override

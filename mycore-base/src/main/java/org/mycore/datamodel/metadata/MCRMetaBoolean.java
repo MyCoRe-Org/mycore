@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -198,7 +197,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Value              = " + Boolean.toString(value));
             LOGGER.debug(" ");

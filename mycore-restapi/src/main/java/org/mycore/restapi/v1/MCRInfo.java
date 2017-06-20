@@ -16,8 +16,8 @@ public class MCRInfo {
 
     @GET
     @Path("version")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Properties getGitInfos(){
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Properties getGitInfos() {
         Properties properties = new Properties();
         properties.putAll(MCRCoreVersion.getVersionProperties());
         return properties;

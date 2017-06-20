@@ -21,7 +21,8 @@ public class DFGURNRegistrationService extends URNRegistrationService {
     public DFGURNRegistrationService() throws Exception {
         super();
         // use different epicur lite provider
-        String clazz = MCRConfiguration.instance().getString("MCR.URN.EpicurLiteProvider.DFG.Class", DFGViewerEpicurLiteProvider.class.getName());
+        String clazz = MCRConfiguration.instance().getString("MCR.URN.EpicurLiteProvider.DFG.Class",
+            DFGViewerEpicurLiteProvider.class.getName());
         Class<IEpicurLiteProvider> c = (Class<IEpicurLiteProvider>) Class.forName(clazz);
         epicurLiteProvider = c.newInstance();
     }

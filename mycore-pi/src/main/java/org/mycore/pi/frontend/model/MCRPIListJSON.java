@@ -6,7 +6,6 @@ import org.mycore.pi.MCRPIRegistrationInfo;
 
 public class MCRPIListJSON {
 
-
     public MCRPIListJSON(String type, int from, int size, int count, List<MCRPIRegistrationInfo> list) {
         this.type = type;
         this.from = from;
@@ -16,8 +15,12 @@ public class MCRPIListJSON {
     }
 
     public String type;
+
     public int from;
+
     public int size;
+
     public int count;
+
     public List<MCRPIRegistrationInfo> list;
 }

@@ -38,7 +38,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
     /***/
     private static final long serialVersionUID = 1L;
 
-    private static final String USER_ERROR_PAGE =  "editor_error_user.xml";
+    private static final String USER_ERROR_PAGE = "editor_error_user.xml";
 
     @Override
     protected void doGetPost(MCRServletJob job) throws IOException, MCRException {
@@ -69,67 +69,73 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
         MCRURNAdder urnAdder = new MCRURNAdder();
 
         switch (target) {
-        case "file":
-            try {
-                LOGGER.info("Adding URN to single file");
-                String path = job.getRequest().getParameter("path");
-                if (path == null) {
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
-                    return;
-                }
+            case "file":
+                try {
+                    LOGGER.info("Adding URN to single file");
+                    String path = job.getRequest().getParameter("path");
+                    if (path == null) {
+                        job.getResponse().sendRedirect(
+                            job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
+                        return;
+                    }
 
-                urnAdder.addURNToSingleFile(object, path);
-            } catch (Exception e) {
-                throw new MCRException("Error while assigning urn to single file",e);
-            }
-            break;
-        case "derivate":
-            if (object.contains("_derivate_")) {
-                try {
-                    LOGGER.info("Adding URN to derivate " + object);
-                    if (!urnAdder.addURNToDerivate(object)) {
-                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
-                        return;
-                    }
+                    urnAdder.addURNToSingleFile(object, path);
                 } catch (Exception e) {
-                    throw new MCRException("Error while assigning urn to derivate '" + object + "'", e);
+                    throw new MCRException("Error while assigning urn to single file", e);
                 }
-            } else {
-                throw new MCRException("Error while assigning urn to derivate '" + object + "'. No derivateID given.");
-            }
-            break;
-        default:
-            /* assign urn to derivate */
-            if (object.contains("_derivate_")) {
-                try {
-                    LOGGER.info("Adding URN to all files in derivate (urn granular) " + object);
-                    if (!urnAdder.addURNToDerivates(object)) {
-                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
-                        return;
+                break;
+            case "derivate":
+                if (object.contains("_derivate_")) {
+                    try {
+                        LOGGER.info("Adding URN to derivate " + object);
+                        if (!urnAdder.addURNToDerivate(object)) {
+                            job.getResponse().sendRedirect(
+                                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
+                            return;
+                        }
+                    } catch (Exception e) {
+                        throw new MCRException("Error while assigning urn to derivate '" + object + "'", e);
                     }
-                } catch (Exception e) {
-                    throw new MCRException("Error while assigning urn to derivate '" + object + "'",e);
+                } else {
+                    throw new MCRException(
+                        "Error while assigning urn to derivate '" + object + "'. No derivateID given.");
                 }
-            } else {
-                /* assign urn to a mycore object */
-                try {
-                    LOGGER.info("Assigning urn to object '" + object);
-                    if (!urnAdder.addURN(object)) {
-                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
-                        return;
+                break;
+            default:
+                /* assign urn to derivate */
+                if (object.contains("_derivate_")) {
+                    try {
+                        LOGGER.info("Adding URN to all files in derivate (urn granular) " + object);
+                        if (!urnAdder.addURNToDerivates(object)) {
+                            job.getResponse().sendRedirect(
+                                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
+                            return;
+                        }
+                    } catch (Exception e) {
+                        throw new MCRException("Error while assigning urn to derivate '" + object + "'", e);
                     }
-                } catch (Exception e) {
-                    throw new MCRException("Error while assigning urn to object '" + object,e);
+                } else {
+                    /* assign urn to a mycore object */
+                    try {
+                        LOGGER.info("Assigning urn to object '" + object);
+                        if (!urnAdder.addURN(object)) {
+                            job.getResponse().sendRedirect(
+                                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
+                            return;
+                        }
+                    } catch (Exception e) {
+                        throw new MCRException("Error while assigning urn to object '" + object, e);
+                    }
                 }
-            }
-            break;
+                break;
         }
 
         String referrer = job.getRequest().getHeader("referer"); // yes, with misspelling.
         if (referrer != null && referrer.length() > 0) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(referrer));
         } else {
-            job.getResponse().sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "Could not get referrer from request");
+            job.getResponse().sendError(HttpServletResponse.SC_EXPECTATION_FAILED,
+                "Could not get referrer from request");
         }
     }
 }

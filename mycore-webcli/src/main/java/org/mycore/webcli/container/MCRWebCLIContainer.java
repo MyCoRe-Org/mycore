@@ -337,7 +337,7 @@ public class MCRWebCLIContainer {
                 LOGGER.printf(Level.INFO, "There are %d other commands still unprocessed.", commands.size());
             }
             String unprocessedCommandsFile = MCRConfiguration.instance()
-                                                             .getString("MCR.WebCLI.UnprocessedCommandsFile");
+                .getString("MCR.WebCLI.UnprocessedCommandsFile");
             File file = new File(unprocessedCommandsFile);
             LOGGER.info("Writing unprocessed commands to file " + file.getAbsolutePath());
 

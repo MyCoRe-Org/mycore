@@ -157,7 +157,8 @@ public class MCRNodeBuilder {
             return buildNameStep((NameStep) step, value, parent);
         else {
             if (LOGGER.isDebugEnabled())
-                LOGGER.debug("ignoring step, can not be built: " + step.getClass().getName() + " " + simplify(step.getText()));
+                LOGGER.debug(
+                    "ignoring step, can not be built: " + step.getClass().getName() + " " + simplify(step.getText()));
             return null;
         }
     }
@@ -177,7 +178,8 @@ public class MCRNodeBuilder {
             return buildAttribute(ns, name, value, (Element) parent);
         } else {
             if (LOGGER.isDebugEnabled())
-                LOGGER.debug("ignoring axis, can not be built: " + nameStep.getAxis() + " " + (prefix.isEmpty() ? "" : prefix + ":") + name);
+                LOGGER.debug("ignoring axis, can not be built: " + nameStep.getAxis() + " "
+                    + (prefix.isEmpty() ? "" : prefix + ":") + name);
             return null;
         }
     }
@@ -274,7 +276,8 @@ public class MCRNodeBuilder {
 
     private Object canNotBuild(Expr expression) {
         if (LOGGER.isDebugEnabled())
-            LOGGER.debug("ignoring expression, can not be built: " + expression.getClass().getName() + " " + simplify(expression.getText()));
+            LOGGER.debug("ignoring expression, can not be built: " + expression.getClass().getName() + " "
+                + simplify(expression.getText()));
         return null;
     }
 }

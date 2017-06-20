@@ -26,13 +26,14 @@ public class MCRPIUtils {
     public static MCRPI generateMCRPI(String fileName, String serviceID) throws MCRPersistentIdentifierException {
         MCRObjectID mycoreID = getNextFreeID();
         return new MCRPI(generateURNFor(mycoreID).asString(), MCRDNBURN.TYPE,
-                         mycoreID.toString(), fileName, serviceID, null);
+            mycoreID.toString(), fileName, serviceID, null);
     }
 
-    public static MCRObjectID getNextFreeID() {return MCRObjectID.getNextFreeId("MyCoRe_test");}
+    public static MCRObjectID getNextFreeID() {
+        return MCRObjectID.getNextFreeId("MyCoRe_test");
+    }
 
-    private static MCRDNBURN generateURNFor(MCRObjectID mycoreID) throws
-            MCRPersistentIdentifierException {
+    private static MCRDNBURN generateURNFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {
         String testGenerator = "testGenerator";
         MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator(testGenerator);
         return mcruuidurnGenerator.generate(mycoreID, "");
@@ -40,8 +41,8 @@ public class MCRPIUtils {
 
     public static String randomFilename() {
         return UUID.randomUUID()
-                   .toString()
-                   .concat(".tif");
+            .toString()
+            .concat(".tif");
     }
 
     public static URL getUrl(MCRPIRegistrationInfo info) {
@@ -62,6 +63,6 @@ public class MCRPIUtils {
 
     public static MCREpicurLite getEpicure(MCRPIRegistrationInfo urnInfo) {
         return MCREpicurLite.instance(urnInfo, MCRPIUtils.getUrl(urnInfo))
-                            .setCredentials(new UsernamePasswordCredentials("test", "test"));
+            .setCredentials(new UsernamePasswordCredentials("test", "test"));
     }
 }

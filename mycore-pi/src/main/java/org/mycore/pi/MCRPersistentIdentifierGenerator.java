@@ -17,10 +17,9 @@ public abstract class MCRPersistentIdentifierGenerator<T extends MCRPersistentId
 
     private String generatorID;
 
-
     protected final Map<String, String> getProperties() {
         Map<String, String> propertiesMap = MCRConfiguration.instance()
-                .getPropertiesMap(GENERATOR_CONFIG_PREFIX + generatorID + ".");
+            .getPropertiesMap(GENERATOR_CONFIG_PREFIX + generatorID + ".");
 
         Map<String, String> shortened = new HashMap<>();
 

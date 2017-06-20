@@ -7,6 +7,7 @@ import org.mycore.datamodel.common.MCRObjectIDDate;
 public class MCRObjectIDDateImpl implements MCRObjectIDDate {
 
     protected Date lastModified;
+
     protected String id;
 
     protected MCRObjectIDDateImpl() {

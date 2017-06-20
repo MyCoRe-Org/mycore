@@ -55,7 +55,8 @@ public class MCRXMLSimpleModelConverter {
         return msm;
     }
 
-    private static MCRMetsSection buidRootSection(Mets mets, Map<String, MCRMetsSection> idSectionMap, Map<String, MCRMetsFile> idFileMap) {
+    private static MCRMetsSection buidRootSection(Mets mets, Map<String, MCRMetsSection> idSectionMap,
+        Map<String, MCRMetsFile> idFileMap) {
         IStructMap structMap = mets.getStructMap(LogicalStructMap.TYPE);
         LogicalStructMap logicalStructMap = (LogicalStructMap) structMap;
         LogicalDiv divContainer = logicalStructMap.getDivContainer();
@@ -63,13 +64,13 @@ public class MCRXMLSimpleModelConverter {
         return buildSection(divContainer, idSectionMap, null, idFileMap);
     }
 
-    private static MCRMetsSection buildSection(LogicalDiv current, Map<String, MCRMetsSection> idSectionMap, MCRMetsSection parent, Map<String, MCRMetsFile> idFileMap) {
+    private static MCRMetsSection buildSection(LogicalDiv current, Map<String, MCRMetsSection> idSectionMap,
+        MCRMetsSection parent, Map<String, MCRMetsFile> idFileMap) {
         MCRMetsSection metsSection = new MCRMetsSection();
 
         metsSection.setLabel(current.getLabel());
         metsSection.setType(current.getType());
         metsSection.setParent(parent);
-
 
         current.getFptrList().forEach(fptr -> {
             fptr.getSeqList().forEach(seq -> {
@@ -78,7 +79,7 @@ public class MCRXMLSimpleModelConverter {
                     String begin = area.getBegin();
                     String end = area.getEnd();
 
-                    if(!idFileMap.containsKey(fileId)){
+                    if (!idFileMap.containsKey(fileId)) {
                         throw new MCRException("No file with id " + fileId + " found!");
                     }
 
@@ -95,53 +96,55 @@ public class MCRXMLSimpleModelConverter {
 
         List<MCRMetsSection> childSectionList = metsSection.getMetsSectionList();
         current.getChildren()
-                .stream()
-                .map(section -> MCRXMLSimpleModelConverter.buildSection(section, idSectionMap, metsSection, idFileMap))
-                .forEachOrdered(metsSection::addSection);
+            .stream()
+            .map(section -> MCRXMLSimpleModelConverter.buildSection(section, idSectionMap, metsSection, idFileMap))
+            .forEachOrdered(metsSection::addSection);
 
         return metsSection;
     }
 
-    private static List<MCRMetsPage> buildPageList(Mets mets, Map<String, MCRMetsPage> idPageMap, Map<String, MCRMetsFile> idFileMap) {
+    private static List<MCRMetsPage> buildPageList(Mets mets, Map<String, MCRMetsPage> idPageMap,
+        Map<String, MCRMetsFile> idFileMap) {
         PhysicalStructMap physicalStructMap = (PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE);
         List<PhysicalSubDiv> physicalSubDivs = physicalStructMap.getDivContainer().getChildren();
 
         List<MCRMetsPage> result = new ArrayList<>();
 
         physicalSubDivs.stream()
-                .map((physicalSubDiv) -> {
-                    // Convert PhysicalSubDiv to MetsPage
-                    MCRMetsPage metsPage = new MCRMetsPage();
-                    metsPage.setOrderLabel(physicalSubDiv.getOrderLabel());
-                    metsPage.setContentIds(physicalSubDiv.getContentids());
+            .map((physicalSubDiv) -> {
+                // Convert PhysicalSubDiv to MetsPage
+                MCRMetsPage metsPage = new MCRMetsPage();
+                metsPage.setOrderLabel(physicalSubDiv.getOrderLabel());
+                metsPage.setContentIds(physicalSubDiv.getContentids());
 
-                    // Add all MetsFile to the MetsPage
-                    List<MCRMetsFile> fileList = metsPage.getFileList();
-                    physicalSubDiv.getChildren().stream()
-                            .map(file -> idFileMap.get(file.getFileId()))
-                            .forEachOrdered(fileList::add);
+                // Add all MetsFile to the MetsPage
+                List<MCRMetsFile> fileList = metsPage.getFileList();
+                physicalSubDiv.getChildren().stream()
+                    .map(file -> idFileMap.get(file.getFileId()))
+                    .forEachOrdered(fileList::add);
 
-                    // return a entry of physicalSubDiv.id and MetsPage
-                    return new AbstractMap.SimpleEntry<String, MCRMetsPage>(physicalSubDiv.getId(), metsPage);
-                })
-                .forEachOrdered((entry) -> {
-                    // Put page to list
-                    result.add(entry.getValue());
-                    // Put that generated entry to a Hashtable
-                    idPageMap.put(entry.getKey(), entry.getValue());
-                });
+                // return a entry of physicalSubDiv.id and MetsPage
+                return new AbstractMap.SimpleEntry<String, MCRMetsPage>(physicalSubDiv.getId(), metsPage);
+            })
+            .forEachOrdered((entry) -> {
+                // Put page to list
+                result.add(entry.getValue());
+                // Put that generated entry to a Hashtable
+                idPageMap.put(entry.getKey(), entry.getValue());
+            });
 
         return result;
     }
 
-    private static void linkPages(Mets mets, Map<String, MCRMetsSection> idSectionMap, Map<String, MCRMetsPage> idPageMap, MCRMetsSimpleModel metsSimpleModel) {
+    private static void linkPages(Mets mets, Map<String, MCRMetsSection> idSectionMap,
+        Map<String, MCRMetsPage> idPageMap, MCRMetsSimpleModel metsSimpleModel) {
         mets.getStructLink().getSmLinks().stream()
-                .filter(smLink -> idSectionMap.containsKey(smLink.getFrom()) && idPageMap.containsKey(smLink.getTo()))
-                .map((smLink) -> {
-            MCRMetsSection metsSection = idSectionMap.get(smLink.getFrom());
-            MCRMetsPage metsPage = idPageMap.get(smLink.getTo());
-            return new MCRMetsLink(metsSection, metsPage);
-        }).forEach(metsSimpleModel.getSectionPageLinkList()::add);
+            .filter(smLink -> idSectionMap.containsKey(smLink.getFrom()) && idPageMap.containsKey(smLink.getTo()))
+            .map((smLink) -> {
+                MCRMetsSection metsSection = idSectionMap.get(smLink.getFrom());
+                MCRMetsPage metsPage = idPageMap.get(smLink.getTo());
+                return new MCRMetsLink(metsSection, metsPage);
+            }).forEach(metsSimpleModel.getSectionPageLinkList()::add);
     }
 
     private static Map<String, MCRMetsFile> buildidFileMap(Mets mets) {
@@ -159,6 +162,5 @@ public class MCRXMLSimpleModelConverter {
             idPageMap.put(file.getId(), new MCRMetsFile(file.getFLocat().getHref(), file.getMimeType(), use));
         });
     }
-
 
 }

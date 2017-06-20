@@ -7,7 +7,6 @@ import java.net.URL;
 
 import org.mycore.urn.hibernate.MCRURN;
 
-
 /**
  * @author shermann
  *

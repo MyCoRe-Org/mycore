@@ -160,7 +160,7 @@ public final class MCRURIResolver implements URIResolver {
 
     private static MCRResolverProvider getExternalResolverProvider() {
         String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class",
-                null);
+            null);
         final MCRResolverProvider emptyResolver = () -> new HashMap<String, URIResolver>();
         if (externalClassName == null) {
             return emptyResolver;
@@ -186,7 +186,7 @@ public final class MCRURIResolver implements URIResolver {
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
         HashMap<String, URIResolver> supportedSchemes = new HashMap<String, URIResolver>(10 + extResolverMapping.size(),
-                1);
+            1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
@@ -213,7 +213,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("chooseTemplate", new MCRChooseTemplateResolver());
         supportedSchemes.put("redirect", new MCRRedirectResolver());
         supportedSchemes.put("data", new MCRDataURLResolver());
-        MCRRESTResolver restResolver=new MCRRESTResolver();
+        MCRRESTResolver restResolver = new MCRRESTResolver();
         supportedSchemes.put("http", restResolver);
         supportedSchemes.put("https", restResolver);
         supportedSchemes.put("file", new MCRFileResolver());
@@ -401,7 +401,7 @@ public final class MCRURIResolver implements URIResolver {
         public Map<String, URIResolver> getURIResolverMapping();
     }
 
-    public static interface MCRCacheableURIResolver extends URIResolver{
+    public static interface MCRCacheableURIResolver extends URIResolver {
         public MCRCacheableURIResponse getResponse(String href, String base) throws TransformerException;
 
         @Override
@@ -411,22 +411,29 @@ public final class MCRURIResolver implements URIResolver {
 
     }
 
-    public static class MCRCacheableURIResponse{
+    public static class MCRCacheableURIResponse {
         private Source source;
+
         private Supplier<Integer> hash;
+
         private boolean support;
-        public MCRCacheableURIResponse(Source source, Supplier<Integer> hashSupplier, Supplier<Boolean> supportSupplier){
-            this.source=source;
-            this.hash=hashSupplier;
-            this.support=supportSupplier.get();
+
+        public MCRCacheableURIResponse(Source source, Supplier<Integer> hashSupplier,
+            Supplier<Boolean> supportSupplier) {
+            this.source = source;
+            this.hash = hashSupplier;
+            this.support = supportSupplier.get();
         }
-        public Source getSource(){
+
+        public Source getSource() {
             return source;
         }
-        public int getHash(){
+
+        public int getHash() {
             return hash.get();
         }
-        public boolean supportsHash(){
+
+        public boolean supportsHash() {
             return support;
         }
     }
@@ -448,7 +455,7 @@ public final class MCRURIResolver implements URIResolver {
                 } catch (Exception e) {
                     LOGGER.error("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey());
                     throw new MCRException(
-                            "Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey(), e);
+                        "Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey(), e);
                 }
             }
             return map;
@@ -461,8 +468,8 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             URI hrefURI = MCRURIResolver.resolveURI(href, base);
-            if (!hrefURI.getScheme().equals("file")){
-                throw new TransformerException("Unsupport file uri scheme: "+hrefURI.getScheme());
+            if (!hrefURI.getScheme().equals("file")) {
+                throw new TransformerException("Unsupport file uri scheme: " + hrefURI.getScheme());
             }
             Path path = Paths.get(hrefURI);
             StreamSource source;
@@ -558,7 +565,7 @@ public final class MCRURIResolver implements URIResolver {
 
                 try {
                     InputStream content = response.getEntity().getContent();
-                    responseStream =  new FilterInputStream(content) {
+                    responseStream = new FilterInputStream(content) {
                         @Override
                         public void close() throws IOException {
                             super.close();
@@ -573,7 +580,8 @@ public final class MCRURIResolver implements URIResolver {
             } catch (IOException e) {
                 throw new TransformerException(e);
             }
-            return new MCRCacheableURIResponse(new StreamSource(responseStream, hrefURI.toASCIIString()), () -> getHash(lastModified, eTag), () -> lastModified!=null || eTag!=null);
+            return new MCRCacheableURIResponse(new StreamSource(responseStream, hrefURI.toASCIIString()),
+                () -> getHash(lastModified, eTag), () -> lastModified != null || eTag != null);
         }
 
         private static int getHash(String lastModified, String eTag) {
@@ -612,8 +620,8 @@ public final class MCRURIResolver implements URIResolver {
             MCRObjectID mcrid = MCRObjectID.getInstance(id);
             try {
                 MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.instance();
-                MCRContent content = params.containsKey("r") ?
-                    xmlmm.retrieveContent(mcrid, Long.valueOf(params.get("r"))) : xmlmm.retrieveContent(mcrid);
+                MCRContent content = params.containsKey("r")
+                    ? xmlmm.retrieveContent(mcrid, Long.valueOf(params.get("r"))) : xmlmm.retrieveContent(mcrid);
                 if (content == null) {
                     return null;
                 }
@@ -690,24 +698,24 @@ public final class MCRURIResolver implements URIResolver {
 
             for (String templateName : temps) {
                 rootOut.addContent(
-                        new Element("include", MCRConstants.XSL_NAMESPACE).setAttribute("href", templateName + ".xsl"));
+                    new Element("include", MCRConstants.XSL_NAMESPACE).setAttribute("href", templateName + ".xsl"));
             }
 
             // first template named "chooseTemplate" in chooseTemplate.xsl
             Element template = new Element("template", MCRConstants.XSL_NAMESPACE).setAttribute("name",
-                    "chooseTemplate");
+                "chooseTemplate");
             Element choose = new Element("choose", MCRConstants.XSL_NAMESPACE);
             // second template named "get.templates" in chooseTemplate.xsl
             Element template2 = new Element("template", MCRConstants.XSL_NAMESPACE).setAttribute("name",
-                    "get.templates");
+                "get.templates");
             Element templates = new Element("templates");
 
             for (String templateName : temps) {
                 // add elements in the first template
                 Element when = new Element("when", MCRConstants.XSL_NAMESPACE).setAttribute("test",
-                        "$template = '" + templateName + "'");
+                    "$template = '" + templateName + "'");
                 when.addContent(
-                        new Element("call-template", MCRConstants.XSL_NAMESPACE).setAttribute("name", templateName));
+                    new Element("call-template", MCRConstants.XSL_NAMESPACE).setAttribute("name", templateName));
                 choose.addContent(when);
 
                 // add elements in the second template
@@ -934,8 +942,8 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 DAO = MCRCategoryDAOFactory.getInstance();
                 categoryCache = new MCRCache<String, Element>(
-                        MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
-                        "URIResolver categories");
+                    MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
+                    "URIResolver categories");
             } catch (Exception exc) {
                 LOGGER.error("Unable to initialize classification resolver", exc);
             }
@@ -1026,8 +1034,8 @@ public final class MCRURIResolver implements URIResolver {
                 if (categ.length() == 0) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
                     throw new IllegalArgumentException(
-                            "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: "
-                                    + uri);
+                        "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: "
+                            + uri);
                 }
                 cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
             }
@@ -1051,7 +1059,7 @@ public final class MCRURIResolver implements URIResolver {
             } else {
                 LOGGER.error("Unknown target format given. URI: " + uri);
                 throw new IllegalArgumentException(
-                        "Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
+                    "Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
             }
             LOGGER.debug("end resolving " + uri);
             return returns;
@@ -1092,7 +1100,7 @@ public final class MCRURIResolver implements URIResolver {
                 Element message = new Element("message");
                 Element stacktraceElement = new Element("stacktrace");
 
-                stacktraceElement.setAttribute("space","preserve", Namespace.XML_NAMESPACE);
+                stacktraceElement.setAttribute("space", "preserve", Namespace.XML_NAMESPACE);
 
                 exception.addContent(message);
                 exception.addContent(stacktraceElement);
@@ -1300,7 +1308,7 @@ public final class MCRURIResolver implements URIResolver {
             List<String> propValue = Collections.emptyList();
             if (includePart.startsWith("class.")) {
                 MCRXslIncludeHrefs incHrefClass = MCRConfiguration.instance()
-                        .<MCRXslIncludeHrefs> getInstanceOf(propertyName);
+                    .<MCRXslIncludeHrefs> getInstanceOf(propertyName);
                 propValue = incHrefClass.getHrefs();
             } else {
                 propValue = MCRConfiguration.instance().getStrings(propertyName, propValue);

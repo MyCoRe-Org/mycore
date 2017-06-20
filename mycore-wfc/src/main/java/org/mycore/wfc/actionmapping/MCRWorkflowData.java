@@ -33,7 +33,7 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 public class MCRWorkflowData extends MCRAccessData {
 
     MCRCategLinkReference categoryReference;
-    
+
     public MCRWorkflowData(MCRCategLinkReference categoryReference) {
         this.categoryReference = categoryReference;
     }

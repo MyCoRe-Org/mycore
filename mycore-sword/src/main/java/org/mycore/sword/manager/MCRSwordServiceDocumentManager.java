@@ -1,6 +1,5 @@
 package org.mycore.sword.manager;
 
-
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,8 @@ import org.swordapp.server.SwordWorkspace;
 public class MCRSwordServiceDocumentManager implements ServiceDocumentManager {
 
     @Override
-    public ServiceDocument getServiceDocument(String sdUri, AuthCredentials auth, SwordConfiguration config) throws SwordError, SwordServerException, SwordAuthException {
+    public ServiceDocument getServiceDocument(String sdUri, AuthCredentials auth, SwordConfiguration config)
+        throws SwordError, SwordServerException, SwordAuthException {
         ServiceDocument serviceDocument = new ServiceDocument();
 
         MCRSword.getWorkspaces().forEach(workspaceName -> {
@@ -50,20 +50,21 @@ public class MCRSwordServiceDocumentManager implements ServiceDocumentManager {
         List<SwordCollection> swordCollections = new ArrayList<>();
 
         MCRSword.getCollectionsOfWorkspace(workspaceName).stream()
-                .map(collection -> new AbstractMap.SimpleEntry<String, MCRSwordCollectionProvider>(collection, MCRSword.getCollection(collection)))
-                .filter(collectionEntry -> collectionEntry.getValue().isVisible())
-                .forEach(collection -> {
-                    SwordCollection swordCollection = new SwordCollection();
-                    final String collectionTitle = collection.getKey();
-                    swordCollection.setTitle(collectionTitle);
+            .map(collection -> new AbstractMap.SimpleEntry<String, MCRSwordCollectionProvider>(collection,
+                MCRSword.getCollection(collection)))
+            .filter(collectionEntry -> collectionEntry.getValue().isVisible())
+            .forEach(collection -> {
+                SwordCollection swordCollection = new SwordCollection();
+                final String collectionTitle = collection.getKey();
+                swordCollection.setTitle(collectionTitle);
 
-                    // add the supported packaging to the collection Provider
-                    final MCRSwordCollectionProvider collectionProvider = collection.getValue();
-                    collectionProvider.getSupportedPagacking().forEach(swordCollection::addAcceptPackaging);
+                // add the supported packaging to the collection Provider
+                final MCRSwordCollectionProvider collectionProvider = collection.getValue();
+                collectionProvider.getSupportedPagacking().forEach(swordCollection::addAcceptPackaging);
 
-                    swordCollection.setHref(baseURL + MCRSwordConstants.SWORD2_COL_IRI + collectionTitle + "/");
-                    swordCollections.add(swordCollection);
-                });
+                swordCollection.setHref(baseURL + MCRSwordConstants.SWORD2_COL_IRI + collectionTitle + "/");
+                swordCollections.add(swordCollection);
+            });
 
         return swordCollections;
     }

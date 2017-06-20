@@ -10,6 +10,7 @@ public class Pixel {
     }
 
     private Color color;
+
     private Position position;
 
     public Color getColor() {

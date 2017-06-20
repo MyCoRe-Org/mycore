@@ -87,14 +87,17 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         String xPath2i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']][mods:relatedItem/@xlink:href='test']]";
         String xPath2o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:relatedItem/@xlink:href='test']]";
 
-        MCRCleaningRule removeElementsWithoutChildrenOrText = new MCRCleaningRule("//*", "* or (string-length(text()) > 0)");
-        MCRCleaningRule keepRelatedItemWithReference = new MCRCleaningRule("//mods:relatedItem", "* or string-length(@xlink:href > 0)");
+        MCRCleaningRule removeElementsWithoutChildrenOrText = new MCRCleaningRule("//*",
+            "* or (string-length(text()) > 0)");
+        MCRCleaningRule keepRelatedItemWithReference = new MCRCleaningRule("//mods:relatedItem",
+            "* or string-length(@xlink:href > 0)");
 
         cleanAndCompareTo(xPath2i, xPath2o, removeElementsWithoutChildrenOrText, keepRelatedItemWithReference);
     }
 
-    private void cleanAndCompareTo(String xPathInput, String xPathExpectedOutput, MCRCleaningRule... rules) throws JaxenException,
-            JDOMException {
+    private void cleanAndCompareTo(String xPathInput, String xPathExpectedOutput, MCRCleaningRule... rules)
+        throws JaxenException,
+        JDOMException {
         Document xmlToClean = buildTestDocument(xPathInput);
         Document expectedXML = buildTestDocument(xPathExpectedOutput);
 

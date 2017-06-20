@@ -29,7 +29,7 @@ package org.mycore.frontend.xeditor.validation;
 public class MCRMaxLengthValidator extends MCRValidator {
 
     private static final String ATTR_MAX_LENGTH = "maxLength";
-    
+
     private int maxLength;
 
     @Override

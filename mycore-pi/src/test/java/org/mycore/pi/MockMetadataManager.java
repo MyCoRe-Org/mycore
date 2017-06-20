@@ -26,7 +26,7 @@ public class MockMetadataManager extends MockUp<MCRMetadataManager> {
 
     @Mock
     public void update(final MCRDerivate mcrDerivate) throws MCRPersistenceException, IOException,
-            MCRAccessException {
+        MCRAccessException {
     }
 
     @Mock

@@ -62,7 +62,7 @@ public class MCRExternalProcess {
         errors.start();
 
         exitValue = p.waitFor();
-        
+
         output.join(); // wait for the stream suckers in case output is not read fully yet.
         errors.join();
 

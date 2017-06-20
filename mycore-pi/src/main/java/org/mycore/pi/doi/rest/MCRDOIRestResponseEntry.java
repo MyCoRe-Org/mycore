@@ -2,9 +2,13 @@ package org.mycore.pi.doi.rest;
 
 public class MCRDOIRestResponseEntry {
     int index;
+
     String type;
+
     MCRDOIRestResponseEntryData data;
+
     int ttl;
+
     String timestamp;
 
     public int getIndex() {

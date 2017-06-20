@@ -42,45 +42,45 @@ import org.mycore.frontend.cli.MCRCommandLineInterface;
  * 
  */
 public class MCRExecuteCommandTask extends Task {
-	private String commands;
-	/**
-	 * method used, to read the body of an ant task xml element
-	 */
-	public void addText(String commands) {
-		this.commands = commands;
-	}
+    private String commands;
 
-	/* (non-Javadoc)
-	 * @see org.apache.tools.ant.Task#execute()
-	 */
-	public void execute() throws BuildException {
-		commands = getProject().replaceProperties(commands);
-		BufferedReader reader = new BufferedReader(new StringReader(commands));
-		String line;
-		List<String> list = new ArrayList<String>();
-		try {
-			while ((line = reader.readLine()) != null) {
-				line = line.trim();
+    /**
+     * method used, to read the body of an ant task xml element
+     */
+    public void addText(String commands) {
+        this.commands = commands;
+    }
 
-				if (line.startsWith("#") || (line.length() == 0)) {
-					continue;
-				}
-				list.add(line);
-			}
-		} catch (IOException e) {
-			// do nothing
-		}
-		StringBuilder sbCommands = new StringBuilder();
-		for (String s : list) {
-		    getProject().log(s, LogLevel.INFO.getLevel());
-			sbCommands.append(s).append(";;");
-		}
-				
-		try{
-			MCRCommandLineInterface.main(new String[] { sbCommands.toString() });
-		}
-		catch(SecurityException e){
-			//catches System.exit() in MCRCommandLineInterface.main()
-		}
-	}
+    /* (non-Javadoc)
+     * @see org.apache.tools.ant.Task#execute()
+     */
+    public void execute() throws BuildException {
+        commands = getProject().replaceProperties(commands);
+        BufferedReader reader = new BufferedReader(new StringReader(commands));
+        String line;
+        List<String> list = new ArrayList<String>();
+        try {
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+
+                if (line.startsWith("#") || (line.length() == 0)) {
+                    continue;
+                }
+                list.add(line);
+            }
+        } catch (IOException e) {
+            // do nothing
+        }
+        StringBuilder sbCommands = new StringBuilder();
+        for (String s : list) {
+            getProject().log(s, LogLevel.INFO.getLevel());
+            sbCommands.append(s).append(";;");
+        }
+
+        try {
+            MCRCommandLineInterface.main(new String[] { sbCommands.toString() });
+        } catch (SecurityException e) {
+            //catches System.exit() in MCRCommandLineInterface.main()
+        }
+    }
 }

@@ -98,7 +98,7 @@ public abstract class MCRBase {
 
         // Default Encoding
         mcr_encoding = mcr_conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Encoding = " + mcr_encoding);
         }
     }
@@ -327,8 +327,8 @@ public abstract class MCRBase {
         try {
             validate();
             return true;
-        } catch(MCRException exc) {
-            LOGGER.warn("The content of this object '" +  mcr_id + "' is invalid.", exc);
+        } catch (MCRException exc) {
+            LOGGER.warn("The content of this object '" + mcr_id + "' is invalid.", exc);
         }
         return false;
     }
@@ -351,12 +351,12 @@ public abstract class MCRBase {
             throw new MCRException("XML Schema of '" + mcr_id + "' is undefined.");
         }
         MCRObjectService service = getService();
-        if(service == null) {
+        if (service == null) {
             throw new MCRException("The <service> part of '" + mcr_id + "' is undefined.");
         }
         try {
             service.validate();
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             throw new MCRException("The <service> part of '" + mcr_id + "' is invalid.", exc);
         }
     }

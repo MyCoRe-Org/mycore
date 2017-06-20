@@ -33,18 +33,19 @@ import org.mycore.common.MCRSessionMgr;
  */
 public class MCRJPATransactionWrapper implements AutoCloseable {
     private boolean responsibleForTransaction = false;
-     
+
     public MCRJPATransactionWrapper() {
         if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
             responsibleForTransaction = true;
             MCRSessionMgr.getCurrentSession().beginTransaction();
-        } 
+        }
     }
+
     @Override
     public void close() throws MCRException {
-        if(responsibleForTransaction){
+        if (responsibleForTransaction) {
             MCRSessionMgr.getCurrentSession().commitTransaction();
-            responsibleForTransaction=false;
+            responsibleForTransaction = false;
         }
     }
 }

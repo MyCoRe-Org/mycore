@@ -5,6 +5,7 @@ import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
 class MCRStoreDefaultConfig implements MCRStoreConfig {
     private String storeConfigPrefix;
+
     private String id;
 
     public MCRStoreDefaultConfig(String id) {

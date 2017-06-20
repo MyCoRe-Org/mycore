@@ -38,8 +38,9 @@ import org.mycore.frontend.xeditor.MCRRepeatBinding;
  */
 public abstract class MCRSwapInsertTarget extends MCRRepeaterControl {
 
-    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String param)
-            throws Exception {
+    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session,
+        String param)
+        throws Exception {
         handle(param, session.getRootBinding());
         session.setBreakpoint("After handling target " + getClass().getName() + " " + param);
     }
@@ -50,7 +51,8 @@ public abstract class MCRSwapInsertTarget extends MCRRepeaterControl {
         String posString = tokens[1];
         int pos = Integer.parseInt(posString);
         String method = tokens[2];
-        String elementNameWithPredicates = swapParameter.substring(parentXPath.length() + posString.length() + method.length() + 3);
+        String elementNameWithPredicates = swapParameter
+            .substring(parentXPath.length() + posString.length() + method.length() + 3);
 
         MCRBinding parentBinding = new MCRBinding(parentXPath, false, root);
         MCRRepeatBinding repeatBinding = new MCRRepeatBinding(elementNameWithPredicates, parentBinding, method);

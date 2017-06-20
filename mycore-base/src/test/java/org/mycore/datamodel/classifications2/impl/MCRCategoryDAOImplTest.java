@@ -479,7 +479,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategoryImpl aa = newCategory(child2ID, "child node 2");
         MCRCategoryImpl aaa = newCategory(child3ID, "child node 3");
         MCRCategoryImpl aab = newCategory(child4ID, "child node 4");
-        
+
         addChild(root, a);
         addChild(a, aa);
         addChild(aa, aaa);
@@ -697,7 +697,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
 
     private static int countNodes(MCRCategory category) {
         return (int) MCRStreamUtils.flatten(category, MCRCategory::getChildren, Collection::parallelStream)
-                      .count();
+            .count();
     }
 
     private int checkLeftRightLevelValue(MCRCategoryImpl node, int leftStart, int levelStart) {

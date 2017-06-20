@@ -33,7 +33,7 @@ public class MCRMapObjectIDDOIGeneratorTest extends MCRTestCase {
     @Test(expected = MCRPersistentIdentifierException.class)
     public void missingMappingTest() throws Exception {
         MCRObjectID brandNewTest00000001 = MCRObjectID.getInstance("brandNew_test_00000001");
-        doiGenerator.generate(brandNewTest00000001,null);
+        doiGenerator.generate(brandNewTest00000001, null);
     }
 
     @Override

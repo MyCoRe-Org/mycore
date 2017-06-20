@@ -89,7 +89,8 @@ public class MCRXMLTransformer {
         return children;
     }
 
-    public static Set<MCRLabel> getLabels(List<Element> elements) throws NullPointerException, IllegalArgumentException {
+    public static Set<MCRLabel> getLabels(List<Element> elements)
+        throws NullPointerException, IllegalArgumentException {
         Set<MCRLabel> labels = new HashSet<MCRLabel>(elements.size(), 1l);
         for (Element labelElement : elements) {
             MCRLabel label = getLabel(labelElement);
@@ -104,7 +105,7 @@ public class MCRXMLTransformer {
             labelElement.getAttributeValue("description"));
         return label;
     }
-        
+
     private static void setURL(Element e, MCRCategory category) throws URISyntaxException {
         if (e.getChild("url") != null) {
             final String uri = e.getChild("url").getAttributeValue("href", XLINK_NAMESPACE);
@@ -113,5 +114,5 @@ public class MCRXMLTransformer {
             }
         }
     }
-    
+
 }

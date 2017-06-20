@@ -1,6 +1,5 @@
 package org.mycore.pi;
 
-
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +16,6 @@ public abstract class MCRPersistentIdentifierResolver<T extends MCRPersistentIde
         this.name = name;
     }
 
-
     public abstract Stream<String> resolve(T identifier) throws MCRIdentifierUnresolvableException;
 
     public Stream<String> resolveSuppress(T identifier) {
@@ -33,4 +31,3 @@ public abstract class MCRPersistentIdentifierResolver<T extends MCRPersistentIde
         return name;
     }
 }
-

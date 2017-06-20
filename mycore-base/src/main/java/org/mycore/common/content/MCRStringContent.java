@@ -39,7 +39,6 @@ public class MCRStringContent extends MCRContent {
 
     private String text;
 
-
     private byte[] bytes;
 
     /**

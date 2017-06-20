@@ -41,8 +41,8 @@ public class MCRUserInformationLookupTest extends MCRTestCase {
             }
         });
         String[] testRoles = new String[] { "admin", "editor", "submitter" };
-        String expRole=testRoles[1];
-        assertTrue("Current user should be in role "+expRole, mcrSession.getUserInformation().isUserInRole(expRole));
+        String expRole = testRoles[1];
+        assertTrue("Current user should be in role " + expRole, mcrSession.getUserInformation().isUserInRole(expRole));
         assertEquals(expRole,
             lookup.lookup("role:" + Arrays.asList(testRoles).stream().collect(Collectors.joining(","))));
     }

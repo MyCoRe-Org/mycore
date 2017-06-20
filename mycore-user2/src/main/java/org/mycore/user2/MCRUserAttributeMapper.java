@@ -92,7 +92,7 @@ public class MCRUserAttributeMapper {
     public static MCRUserAttributeMapper instance(Element attributeMapping) {
         try {
             JAXBContext jaxb = JAXBContext.newInstance(Mappings.class.getPackage().getName(),
-                    Mappings.class.getClassLoader());
+                Mappings.class.getClassLoader());
 
             Unmarshaller unmarshaller = jaxb.createUnmarshaller();
             Mappings mappings = (Mappings) unmarshaller.unmarshal(new JDOMSource(attributeMapping));
@@ -145,7 +145,7 @@ public class MCRUserAttributeMapper {
                             Class<? extends MCRUserAttributeConverter> convCls = null;
                             if (attribute.converter != null) {
                                 convCls = (Class<? extends MCRUserAttributeConverter>) Class
-                                        .forName(attribute.converter);
+                                    .forName(attribute.converter);
                             } else if (aConv != null) {
                                 convCls = aConv.value();
                             }
@@ -153,11 +153,11 @@ public class MCRUserAttributeMapper {
                             if (convCls != null) {
                                 MCRUserAttributeConverter converter = convCls.newInstance();
                                 LOGGER.debug(
-                                        "convert value \"" + value + "\" with \"" + converter.getClass().getName()
-                                                + "\"");
+                                    "convert value \"" + value + "\" with \"" + converter.getClass().getName()
+                                        + "\"");
                                 value = converter.convert(value,
-                                        attribute.separator != null ? attribute.separator : attrAnno.separator(),
-                                        attribute.getValueMap());
+                                    attribute.separator != null ? attribute.separator : attrAnno.separator(),
+                                    attribute.getValueMap());
                             }
 
                             if (value != null || ((attrAnno.nullable() || attribute.nullable) && value == null)) {
@@ -169,7 +169,7 @@ public class MCRUserAttributeMapper {
                                     final Field field = (Field) annotated;
 
                                     LOGGER.debug("map attribute \"" + attribute.mapping + "\" with value \""
-                                            + value.toString() + "\" to field \"" + field.getName() + "\"");
+                                        + value.toString() + "\" to field \"" + field.getName() + "\"");
 
                                     boolean accState = field.isAccessible();
                                     field.setAccessible(true);
@@ -181,7 +181,7 @@ public class MCRUserAttributeMapper {
                                     final Method method = (Method) annotated;
 
                                     LOGGER.debug("map attribute \"" + attribute.mapping + "\" with value \""
-                                            + value.toString() + "\" to method \"" + method.getName() + "\"");
+                                        + value.toString() + "\" to method \"" + method.getName() + "\"");
 
                                     boolean accState = method.isAccessible();
                                     method.setAccessible(true);
@@ -192,7 +192,7 @@ public class MCRUserAttributeMapper {
                                 }
                             } else {
                                 throw new IllegalArgumentException(
-                                        "A not nullable attribute \"" + name + "\" was null.");
+                                    "A not nullable attribute \"" + name + "\" was null.");
                             }
                         }
                     }
@@ -234,14 +234,14 @@ public class MCRUserAttributeMapper {
 
     private List<Object> getAnnotatedFields(final Class<?> cls) {
         return Arrays.stream(cls.getDeclaredFields())
-                     .filter(field -> field.getAnnotation(MCRUserAttribute.class) != null)
-                     .collect(Collectors.toList());
+            .filter(field -> field.getAnnotation(MCRUserAttribute.class) != null)
+            .collect(Collectors.toList());
     }
 
     private List<Object> getAnnotatedMethods(final Class<?> cls) {
         return Arrays.stream(cls.getDeclaredMethods())
-                     .filter(method -> method.getAnnotation(MCRUserAttribute.class) != null)
-                     .collect(Collectors.toList());
+            .filter(method -> method.getAnnotation(MCRUserAttribute.class) != null)
+            .collect(Collectors.toList());
     }
 
     private String getAttriutebName(final Object annotated) {
@@ -258,7 +258,7 @@ public class MCRUserAttributeMapper {
     }
 
     private Object getValue(final Object object, final Object annotated) throws IllegalArgumentException,
-            IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException {
         Object value = null;
 
         if (annotated instanceof Field) {

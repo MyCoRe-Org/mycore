@@ -18,6 +18,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 public class MCRMapObjectIDDOIGenerator extends MCRPersistentIdentifierGenerator<MCRDigitalObjectIdentifier> {
 
     private final MCRDOIParser mcrdoiParser;
+
     private String generatorID;
 
     public MCRMapObjectIDDOIGenerator(String generatorID) {

@@ -162,7 +162,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
                     List<Fptr> fptrList = physicalSubDiv.getChildren();
                     for (Fptr fptr : fptrList) {
                         if (fptr.getFileId().equals(fileID))
-                            orderNumber = index+1;
+                            orderNumber = index + 1;
                     }
                 }
             }

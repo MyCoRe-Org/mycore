@@ -71,7 +71,7 @@ public class MCRCalendarTest extends MCRTestCase {
         String cstring, dstring;
         cstring = MCRCalendar.getCalendarDateToFormattedString(new GregorianCalendar());
         Calendar cal;
-        
+
         /* check julian calendar implementation */
         // all entries are empty
         try {
@@ -119,8 +119,7 @@ public class MCRCalendarTest extends MCRTestCase {
         cal.set(Calendar.JULIAN_DAY, MCRCalendar.MAX_JULIAN_DAY_NUMBER);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
         assertEquals("julian: 28.01.4000 AD", "3182057", dstring);
-        
-        
+
         // 02.01.4713 BC (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("02.01.4713 bc", false, MCRCalendar.TAG_JULIAN);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
@@ -193,7 +192,7 @@ public class MCRCalendarTest extends MCRTestCase {
         cal = MCRCalendar.getHistoryDateAsCalendar("29.02.1800", false, MCRCalendar.TAG_JULIAN);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
         assertEquals("julian: 29.02.1800 AD", "2378567", dstring);
-       // 01.03.1800 AD (julian)
+        // 01.03.1800 AD (julian)
         cal = MCRCalendar.getHistoryDateAsCalendar("01.03.1800", false, MCRCalendar.TAG_JULIAN);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
         assertEquals("julian: 01.03.1800 AD", "2378568", dstring);
@@ -205,8 +204,7 @@ public class MCRCalendarTest extends MCRTestCase {
         cal = MCRCalendar.getHistoryDateAsCalendar("29.02.2100", false, MCRCalendar.TAG_JULIAN);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
         assertEquals("julian: 29.02.2100 AD", "2488142", dstring);
-        
-        
+
         /* gregorian date check */
         // 04.10.1582 AD (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("04.10.1582", false, MCRCalendar.TAG_GREGORIAN);
@@ -240,7 +238,7 @@ public class MCRCalendarTest extends MCRTestCase {
         cal = MCRCalendar.getHistoryDateAsCalendar("1964-02-24", true, MCRCalendar.TAG_GREGORIAN);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
         assertEquals("gregorian: 1964-02-24 AD", "2438450", dstring);
-        
+
         // 01.01.0001 h. (islamic)
         cal = MCRCalendar.getHistoryDateAsCalendar("01.01.0001 h.", false, MCRCalendar.TAG_ISLAMIC);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
@@ -257,7 +255,7 @@ public class MCRCalendarTest extends MCRTestCase {
         cal = MCRCalendar.getHistoryDateAsCalendar("800", true, MCRCalendar.TAG_ISLAMIC);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
         assertEquals("islamic: 29.12.800 H.", "2231932", dstring);
-        
+
         // 01.01.0001 A.M. (coptioc)
         cal = MCRCalendar.getHistoryDateAsCalendar("1.1.1 a.M.", false, MCRCalendar.TAG_COPTIC);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
@@ -278,7 +276,7 @@ public class MCRCalendarTest extends MCRTestCase {
         cal = MCRCalendar.getHistoryDateAsCalendar("2000 E.E.", true, MCRCalendar.TAG_ETHIOPIC);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
         assertEquals("coptic: 05.13.2000 E.E.", "2454720", dstring);
-   }
+    }
 
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRCalendar.getJulianDayNumberAsString(Calendar)'
@@ -287,56 +285,56 @@ public class MCRCalendarTest extends MCRTestCase {
     public void getDateToFormattedStringForCalendar() {
         Calendar calendar;
         String dstring;
-        
+
         // 15.03.44 BC (julian)
         calendar = MCRCalendar.getHistoryDateAsCalendar("-15.3.44", true, MCRCalendar.TAG_JULIAN);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyyy G");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy G");
         assertEquals("is not julian date 15.03.44 BC", "15.03.0044 BC", dstring);
         // 15.03.44 BC (gregorian)
         calendar = MCRCalendar.getHistoryDateAsCalendar("-15.3.44", true, MCRCalendar.TAG_GREGORIAN);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyyy G");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy G");
         assertEquals("is not gregorian date 15.03.44 BC", "15.03.0044 BC", dstring);
         // 29.02.1700 BC (julian)
         calendar = MCRCalendar.getHistoryDateAsCalendar("29.02.1700", true, MCRCalendar.TAG_JULIAN);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyyy G");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy G");
         assertEquals("is not julian date 11.03.1700 AD", "11.03.1700 AD", dstring);
         // 29.02.1700 BC (julian)
         calendar = MCRCalendar.getHistoryDateAsCalendar("29.02.1700", true, MCRCalendar.TAG_GREGORIAN);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyyy G");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy G");
         assertEquals("is not julian date 01.03.1700 AD", "01.03.1700 AD", dstring);
         // 30.01.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("30.1.800 H.", true, MCRCalendar.TAG_ISLAMIC);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyy");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
         assertEquals("is not islamic date 30.01.0800 H.", "30.01.800 h.", dstring);
         // 01.01.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("1.800 H.", false, MCRCalendar.TAG_ISLAMIC);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyy");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
         assertEquals("is not islamic date 01.01.0800 H.", "01.01.800 h.", dstring);
         // 30.01.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("1.800 H.", true, MCRCalendar.TAG_ISLAMIC);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyy");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
         assertEquals("is not islamic date 30.01.0800 H.", "30.01.800 h.", dstring);
         // 01.01.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("800", false, MCRCalendar.TAG_ISLAMIC);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyy");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
         assertEquals("is not islamic date 01.01.0800 H.", "01.01.800 h.", dstring);
         // 29.12.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("800", true, MCRCalendar.TAG_ISLAMIC);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyy");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
         assertEquals("is not islamic date 29.12.0800 H.", "29.12.800 h.", dstring);
         // 29.12.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("800 H.", true, MCRCalendar.TAG_ISLAMIC);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyy");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
         assertEquals("is not islamic date 29.12.0800 H.", "29.12.800 h.", dstring);
-        
+
         // 01.01.1724 A.M. (coptic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("1724", false, MCRCalendar.TAG_COPTIC);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyy");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
         assertEquals("is not coptic date 01.01.1724 A.M.", "01.01.1724 A.M.", dstring);
-        
+
         // 01.01.2000 A.M. (ethiopic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("2000", true, MCRCalendar.TAG_ETHIOPIC);
-        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar,"dd.MM.yyy");
+        dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
         assertEquals("is not ethiopic date 05.13.2000 E.E.", "05.13.2000 E.E.", dstring);
     }
 }

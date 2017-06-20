@@ -26,7 +26,8 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 public class MCRSolrURL {
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrURL.class);
 
-    public static final String FIXED_URL_PART = MessageFormat.format("{0}?version={1}", QUERY_PATH, QUERY_XML_PROTOCOL_VERSION);
+    public static final String FIXED_URL_PART = MessageFormat.format("{0}?version={1}", QUERY_PATH,
+        QUERY_XML_PROTOCOL_VERSION);
 
     private HttpSolrClient solrClient;
 
@@ -77,9 +78,11 @@ public class MCRSolrURL {
     public URL getUrl() {
         try {
             if (this.urlQuery == null) {
-                return new URL(solrClient.getBaseURL() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start
-                    + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : "")
-                    + (wt != null ? "&wt=" + wt : ""));
+                return new URL(
+                    solrClient.getBaseURL() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start
+                        + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8")
+                        + (returnScore ? "&fl=*,score" : "")
+                        + (wt != null ? "&wt=" + wt : ""));
             } else {
                 return new URL(solrClient.getBaseURL() + FIXED_URL_PART + "&" + urlQuery);
             }

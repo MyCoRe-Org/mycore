@@ -33,7 +33,8 @@ public class MCRTransferPackageCommands {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTransferPackageCommands.class);
 
-    @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.", syntax = "create transfer package for objects matching {0}")
+    @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.",
+        syntax = "create transfer package for objects matching {0}")
     public static void create(String query) throws Exception {
         List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrClientFactory.getSolrClient(), query);
         for (String objectId : ids) {
@@ -44,7 +45,8 @@ public class MCRTransferPackageCommands {
         }
     }
 
-    @MCRCommand(help = "Imports all transfer packages located in the directory {0}.", syntax = "import transfer packages from directory {0}")
+    @MCRCommand(help = "Imports all transfer packages located in the directory {0}.",
+        syntax = "import transfer packages from directory {0}")
     public static List<String> importTransferPackagesFromDirectory(String directory) throws Exception {
         Path dir = Paths.get(directory);
         if (!(Files.exists(dir) || Files.isDirectory(dir))) {
@@ -62,7 +64,8 @@ public class MCRTransferPackageCommands {
         return importStatements;
     }
 
-    @MCRCommand(help = "Imports a transfer package located at {0}. Where {0} is the absolute path to the tar file.", syntax = "import transfer package from tar {0}")
+    @MCRCommand(help = "Imports a transfer package located at {0}. Where {0} is the absolute path to the tar file.",
+        syntax = "import transfer package from tar {0}")
     public static List<String> importTransferPackageFromTar(String pathToTar) throws Exception {
         Path tar = Paths.get(pathToTar);
         if (!Files.exists(tar)) {
@@ -94,7 +97,8 @@ public class MCRTransferPackageCommands {
         // load classifications
         List<Path> classificationPaths = MCRTransferPackageUtil.getClassifications(targetDirectory);
         for (Path pathToClassification : classificationPaths) {
-            commands.add("_import transfer package classification from " + pathToClassification.toAbsolutePath().toString());
+            commands.add(
+                "_import transfer package classification from " + pathToClassification.toAbsolutePath().toString());
         }
 
         // import objects

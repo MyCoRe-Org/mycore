@@ -36,23 +36,30 @@ public class MCRSwordMediaManager implements MediaResourceManager {
 
     protected static void checkObject(String objectID) throws SwordError {
         if (objectID == null) {
-            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, "Could not extract ObjectID from IRI.");
+            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST,
+                "Could not extract ObjectID from IRI.");
         }
 
         if (!MCRMetadataManager.exists(MCRObjectID.getInstance(objectID))) {
-            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND, "The requested object " + objectID + " does not exist!");
+            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND,
+                "The requested object " + objectID + " does not exist!");
         }
     }
 
-    public static void doAuthentication(AuthCredentials authCredentials, String collection) throws SwordError, SwordServerException, SwordAuthException {
+    public static void doAuthentication(AuthCredentials authCredentials, String collection)
+        throws SwordError, SwordServerException, SwordAuthException {
         MCRSword.getCollection(collection).getAuthHandler().authentication(authCredentials);
     }
 
-    public MediaResource getMediaResourceRepresentation(String editMediaIRI, Map<String, String> accept, AuthCredentials authCredentials, SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+    public MediaResource getMediaResourceRepresentation(String editMediaIRI, Map<String, String> accept,
+        AuthCredentials authCredentials, SwordConfiguration swordConfiguration)
+        throws SwordError, SwordServerException, SwordAuthException {
         LOGGER.info("getMediaResourceRepresentation: " + editMediaIRI);
         final IRI mediaEditIRI = new IRI(editMediaIRI);
-        final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getDerivateFromMediaEditIRI(mediaEditIRI);
-        final String requestFilePath = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getFilePathFromMediaEditIRI(mediaEditIRI);
+        final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
+            .getDerivateFromMediaEditIRI(mediaEditIRI);
+        final String requestFilePath = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
+            .getFilePathFromMediaEditIRI(mediaEditIRI);
         final String collection = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getCollectionFromMediaEditIRI(mediaEditIRI);
 
         doAuthentication(authCredentials, collection);
@@ -61,12 +68,15 @@ public class MCRSwordMediaManager implements MediaResourceManager {
         return getMediaProvider(collection).getMediaResourceRepresentation(requestDerivateID, requestFilePath, accept);
     }
 
-    public DepositReceipt replaceMediaResource(String editMediaIRI, Deposit deposit, AuthCredentials authCredentials, SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+    public DepositReceipt replaceMediaResource(String editMediaIRI, Deposit deposit, AuthCredentials authCredentials,
+        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
         LOGGER.info("replaceMediaResource: " + editMediaIRI);
         final IRI mediaEditIRI = new IRI(editMediaIRI);
 
-        final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getDerivateFromMediaEditIRI(mediaEditIRI);
-        final String requestFilePath = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getFilePathFromMediaEditIRI(mediaEditIRI);
+        final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
+            .getDerivateFromMediaEditIRI(mediaEditIRI);
+        final String requestFilePath = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
+            .getFilePathFromMediaEditIRI(mediaEditIRI);
         final String collection = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getCollectionFromMediaEditIRI(mediaEditIRI);
 
         doAuthentication(authCredentials, collection);
@@ -77,11 +87,13 @@ public class MCRSwordMediaManager implements MediaResourceManager {
         return MCRSword.getCollection(collection).getMetadataProvider().provideMetadata(mcrObject);
     }
 
-    public DepositReceipt addResource(String editMediaIRI, Deposit deposit, AuthCredentials authCredentials, SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+    public DepositReceipt addResource(String editMediaIRI, Deposit deposit, AuthCredentials authCredentials,
+        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
         LOGGER.info("addResource: " + editMediaIRI);
 
         final IRI mediaEditIRI = new IRI(editMediaIRI);
-        final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getDerivateFromMediaEditIRI(mediaEditIRI);
+        final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
+            .getDerivateFromMediaEditIRI(mediaEditIRI);
         String requestFilePath = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getFilePathFromMediaEditIRI(mediaEditIRI);
         final String collection = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getCollectionFromMediaEditIRI(mediaEditIRI);
 
@@ -97,16 +109,18 @@ public class MCRSwordMediaManager implements MediaResourceManager {
         return MCRSword.getCollection(collection).getMetadataProvider().provideMetadata(mcrObject);
     }
 
-    public void deleteMediaResource(String editMediaIRI, AuthCredentials authCredentials, SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
+    public void deleteMediaResource(String editMediaIRI, AuthCredentials authCredentials,
+        SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
         LOGGER.info("deleteMediaResource: " + editMediaIRI);
         final IRI mediaEditIRI = new IRI(editMediaIRI);
-        final String requestObjectID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getDerivateFromMediaEditIRI(mediaEditIRI);
-        final String requestFilePath = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getFilePathFromMediaEditIRI(mediaEditIRI);
+        final String requestObjectID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
+            .getDerivateFromMediaEditIRI(mediaEditIRI);
+        final String requestFilePath = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
+            .getFilePathFromMediaEditIRI(mediaEditIRI);
         final String collection = MCRSwordUtil.ParseLinkUtil.MediaEditIRI.getCollectionFromMediaEditIRI(mediaEditIRI);
 
         doAuthentication(authCredentials, collection);
         getMediaProvider(collection).deleteMediaResource(requestObjectID, requestFilePath);
     }
-
 
 }

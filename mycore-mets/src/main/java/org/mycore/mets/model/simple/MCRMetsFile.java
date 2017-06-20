@@ -14,8 +14,11 @@ public class MCRMetsFile {
     }
 
     private String id = UUID.randomUUID().toString();
+
     private String href;
+
     private String mimeType;
+
     private MCRMetsFileUse use;
 
     public String getId() {

@@ -42,8 +42,7 @@ public class MCRLanguage {
      * A map of labels for this language, by language 
      */
     private Map<MCRLanguage, String> labelsByLanguage = new HashMap<MCRLanguage, String>();
-    
-    
+
     private Locale locale;
 
     /**

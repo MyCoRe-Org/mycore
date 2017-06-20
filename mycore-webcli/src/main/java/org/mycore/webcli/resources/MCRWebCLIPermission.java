@@ -12,9 +12,9 @@ import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
  * 
  */
 public class MCRWebCLIPermission implements MCRResourceAccessChecker {
-    
+
     private static final Logger LOGGER = LogManager.getLogger();
-    
+
     @Override
     public boolean isPermitted(ContainerRequestContext request) {
         if (!MCRAccessManager.getAccessImpl().checkPermission("use-webcli")) {

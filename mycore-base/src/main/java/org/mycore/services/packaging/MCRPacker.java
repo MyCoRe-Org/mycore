@@ -1,6 +1,5 @@
 package org.mycore.services.packaging;
 
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -15,7 +14,9 @@ import org.mycore.common.MCRUsageException;
 public abstract class MCRPacker {
 
     public static final String PACKER_CONFIGURATION_PREFIX = "MCR.Packaging.Packer.";
+
     private Map<String, String> configuration;
+
     private Map<String, String> parameter;
 
     /**

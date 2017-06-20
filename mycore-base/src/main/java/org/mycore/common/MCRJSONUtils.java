@@ -52,8 +52,9 @@ public class MCRJSONUtils {
         Map<String, String> transMap = new HashMap<>();
 
         Arrays.stream(prefixes.split(","))
-                .map(currentPrefix->MCRTranslation.translatePrefix(currentPrefix.substring(0,currentPrefix.length()-1), MCRTranslation.getLocale(lang)))
-                .forEach(transMap::putAll);
+            .map(currentPrefix -> MCRTranslation.translatePrefix(currentPrefix.substring(0, currentPrefix.length() - 1),
+                MCRTranslation.getLocale(lang)))
+            .forEach(transMap::putAll);
 
         Gson gson = new Gson();
         return gson.toJson(transMap);

@@ -41,7 +41,7 @@ class MCRIdentifierTypeFactory {
     }
 
     private MCRCache<String, MCRIdentifierType> id2type = new MCRCache<String, MCRIdentifierType>(30,
-            "identifier types");
+        "identifier types");
 
     private MCRIdentifierTypeFactory() {
     }

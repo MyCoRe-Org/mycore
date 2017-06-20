@@ -29,7 +29,7 @@ package org.mycore.frontend.xeditor.validation;
 public class MCRMinIntegerValidator extends MCRIntegerValidator {
 
     private static final String ATTR_MIN = "min";
-    
+
     private int min;
 
     @Override

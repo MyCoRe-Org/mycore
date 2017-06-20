@@ -37,8 +37,9 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 public class MCRServletTarget implements MCREditorTarget {
 
     @Override
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
-            throws Exception {
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session,
+        String servletNameOrPath)
+        throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
         Document result = session.getEditedXML();
 

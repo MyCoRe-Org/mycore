@@ -82,7 +82,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the password of the new user
      */
     @MCRCommand(
-        syntax = "change to user {0} with {1}", help = "Changes to the user {0} with the given password {1}.",
+        syntax = "change to user {0} with {1}",
+        help = "Changes to the user {0} with the given password {1}.",
         order = 10)
     public static void changeToUser(String user, String password) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
@@ -166,7 +167,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "delete role {0}",
-        help = "Deletes the role {0} from the user system, but only if it has no user assigned.", order = 80)
+        help = "Deletes the role {0} from the user system, but only if it has no user assigned.",
+        order = 80)
     public static void deleteRole(String roleID) {
         MCRRoleManager.deleteRole(roleID);
     }
@@ -194,7 +196,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            a valid user XML file
      */
     @MCRCommand(
-        syntax = "import role from file {0}", help = "Imports a role from file, if that role does not exist",
+        syntax = "import role from file {0}",
+        help = "Imports a role from file, if that role does not exist",
         order = 90)
     public static void addRole(String fileName) throws SAXParseException, IOException {
         LOGGER.info("Reading file " + fileName + " ...");
@@ -245,7 +248,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "encrypt passwords in user xml file {0} to file {1}",
-        help = "A migration tool to change old plain text password entries to encrpted entries.", order = 40)
+        help = "A migration tool to change old plain text password entries to encrpted entries.",
+        order = 40)
     public static void encryptPasswordsInXMLFile(String oldFile, String newFile) throws SAXParseException, IOException {
         File inputFile = getCheckedFile(oldFile);
         if (inputFile == null) {
@@ -319,7 +323,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            Name of the file to store the exported user
      */
     @MCRCommand(
-        syntax = "export user {0} to file {1}", help = "Exports the data of user {0} to the file {1}.",
+        syntax = "export user {0} to file {1}",
+        help = "Exports the data of user {0} to the file {1}.",
         order = 180)
     public static void exportUserToFile(String userID, String filename) throws IOException {
         MCRUser user = MCRUserManager.getUser(userID);
@@ -365,7 +370,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (!dir.isDirectory()) {
             throw new FileNotFoundException(dir.getAbsolutePath() + " is not a directory.");
         }
-        File[] listFiles = dir.listFiles((FileFilter) pathname -> pathname.isFile() && pathname.getName().endsWith(".xml"));
+        File[] listFiles = dir
+            .listFiles((FileFilter) pathname -> pathname.isFile() && pathname.getName().endsWith(".xml"));
         if (listFiles.length == 0) {
             LOGGER.warn("Did not find any user files in " + dir.getAbsolutePath());
             return null;
@@ -534,7 +540,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the role to which the user with ID mbrUserID will be added
      */
     @MCRCommand(
-        syntax = "assign user {0} to role {1}", help = "Adds a user {0} as secondary member in the role {1}.",
+        syntax = "assign user {0} to role {1}",
+        help = "Adds a user {0} as secondary member in the role {1}.",
         order = 120)
     public static void assignUserToRole(String userID, String roleID) throws MCRException {
         try {
@@ -556,7 +563,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "unassign user {0} from role {1}",
-        help = "Removes the user {0} as secondary member from the role {1}.", order = 130)
+        help = "Removes the user {0} as secondary member from the role {1}.",
+        order = 130)
     public static void unassignUserFromRole(String userID, String roleID) throws MCRException {
         try {
             MCRUser user = MCRUserManager.getUser(userID);

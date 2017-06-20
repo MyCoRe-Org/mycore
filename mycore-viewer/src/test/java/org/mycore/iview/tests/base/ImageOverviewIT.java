@@ -101,7 +101,8 @@ public class ImageOverviewIT extends ViewerTestBase {
 
         String message = label + " should be selected (class-attribut 'selected' should be set)!";
         Assert.assertTrue(message, ioController.isImageSelected(label));
-        String fileName = String.format("%s-%s-%s-%s-%s", this.getClassname(), label, color.getRed(), color.getBlue(), color.getGreen());
+        String fileName = String.format("%s-%s-%s-%s-%s", this.getClassname(), label, color.getRed(), color.getBlue(),
+            color.getGreen());
         BufferedImage bImage = ControllerUtil.getScreenshot(getDriver(), fileName);
         return getColorCount(bImage, color);
     }

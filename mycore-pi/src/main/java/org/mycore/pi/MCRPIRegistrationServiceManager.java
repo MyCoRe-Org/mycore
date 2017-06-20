@@ -1,6 +1,5 @@
 package org.mycore.pi;
 
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -20,11 +19,11 @@ public class MCRPIRegistrationServiceManager {
 
     public List<String> getServiceIDList() {
         return MCRConfiguration.instance()
-                .getPropertiesMap(REGISTRATION_SERVICE_CONFIG_PREFIX)
-                .keySet()
-                .stream()
-                .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
-                .collect(Collectors.toList());
+            .getPropertiesMap(REGISTRATION_SERVICE_CONFIG_PREFIX)
+            .keySet()
+            .stream()
+            .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
+            .collect(Collectors.toList());
     }
 
     public List<MCRPIRegistrationService> getServiceList() {
@@ -34,7 +33,8 @@ public class MCRPIRegistrationServiceManager {
             .collect(Collectors.toList());
     }
 
-    public <T extends MCRPersistentIdentifier> MCRPIRegistrationService<T> getRegistrationService(String registrationServiceID) {
+    public <T extends MCRPersistentIdentifier> MCRPIRegistrationService<T> getRegistrationService(
+        String registrationServiceID) {
         String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
         String className = MCRConfiguration.instance().getString(propertyName);
 
@@ -45,7 +45,8 @@ public class MCRPIRegistrationServiceManager {
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException("The property : " + propertyName + " points to not existing class!", e);
         } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException("The property : " + propertyName + " points to existing class, but without string constructor(serviceid)!", e);
+            throw new MCRConfigurationException("The property : " + propertyName
+                + " points to existing class, but without string constructor(serviceid)!", e);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new MCRException("Cant initialize class the class defined in: " + propertyName, e);
         }

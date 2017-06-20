@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class MCRVZGURIDetectorTest {
 
     private Hashtable<URI, String> testData;
@@ -32,8 +31,10 @@ public class MCRVZGURIDetectorTest {
 
             Assert.assertTrue("Should have a detected PPN", maybeDetectedGND.isPresent());
 
-            maybeDetectedGND.ifPresent(gnd -> Assert.assertEquals("Should have detected the right type!", gnd.getKey(), "ppn"));
-            maybeDetectedGND.ifPresent(gnd -> Assert.assertEquals("Should have detected the right value!", gnd.getValue(), d.getValue()));
+            maybeDetectedGND
+                .ifPresent(gnd -> Assert.assertEquals("Should have detected the right type!", gnd.getKey(), "ppn"));
+            maybeDetectedGND.ifPresent(
+                gnd -> Assert.assertEquals("Should have detected the right value!", gnd.getValue(), d.getValue()));
         });
     }
 }

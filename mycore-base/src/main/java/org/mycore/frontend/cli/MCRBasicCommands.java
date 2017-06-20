@@ -60,10 +60,10 @@ public class MCRBasicCommands {
         MCRCommandLineInterface.output("");
 
         MCRCommandManager
-                .getKnownCommands().entrySet().stream().forEach(e -> {
-                    outputGroup(e.getKey());
-                    e.getValue().forEach(org.mycore.frontend.cli.MCRCommand::outputHelp);
-                });
+            .getKnownCommands().entrySet().stream().forEach(e -> {
+                outputGroup(e.getKey());
+                e.getValue().forEach(org.mycore.frontend.cli.MCRCommand::outputHelp);
+            });
     }
 
     /**
@@ -75,10 +75,10 @@ public class MCRBasicCommands {
     @MCRCommand(syntax = "help {0}", help = "Show the help text for the commands beginning with {0}.", order = 10)
     public static void listKnownCommandsBeginningWithPrefix(String pattern) {
         TreeMap<String, List<org.mycore.frontend.cli.MCRCommand>> matchingCommands = MCRCommandManager
-                .getKnownCommands().entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().stream()
-                        .filter(cmd -> cmd.getSyntax().contains(pattern) || cmd.getHelpText().contains(pattern))
-                        .collect(Collectors.toList()), (k, v) -> k, TreeMap::new));
+            .getKnownCommands().entrySet().stream()
+            .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().stream()
+                .filter(cmd -> cmd.getSyntax().contains(pattern) || cmd.getHelpText().contains(pattern))
+                .collect(Collectors.toList()), (k, v) -> k, TreeMap::new));
 
         matchingCommands.entrySet().removeIf(e -> e.getValue().isEmpty());
 
@@ -86,7 +86,7 @@ public class MCRBasicCommands {
             MCRCommandLineInterface.output("Unknown command:" + pattern);
         } else {
             MCRCommandLineInterface.output("");
-            
+
             matchingCommands.forEach((grp, cmds) -> {
                 outputGroup(grp);
                 cmds.forEach(org.mycore.frontend.cli.MCRCommand::outputHelp);
@@ -115,7 +115,9 @@ public class MCRBasicCommands {
         MCRCommandLineInterface.exit();
     }
 
-    @MCRCommand(syntax = "! {0}", help = "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'", order = 60)
+    @MCRCommand(syntax = "! {0}",
+        help = "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'",
+        order = 60)
     public static void executeShellCommand(String command) throws Exception {
         MCRCommandLineInterface.executeShellCommand(command);
     }
@@ -130,7 +132,9 @@ public class MCRBasicCommands {
         MCRCommandLineInterface.whoami();
     }
 
-    @MCRCommand(syntax = "show command statistics", help = "Show statistics on number of commands processed and execution time needed per command", order = 90)
+    @MCRCommand(syntax = "show command statistics",
+        help = "Show statistics on number of commands processed and execution time needed per command",
+        order = 90)
     public static void showCommandStatistics() {
         MCRCommandStatistics.showCommandStatistics();
     }
@@ -145,18 +149,22 @@ public class MCRBasicCommands {
         MCRCommandLineInterface.skipOnError();
     }
 
-    @MCRCommand(syntax = "get uri {0} to file {1}", help = "Get XML content from URI {0} and save it to a local file {1}", order = 120)
+    @MCRCommand(syntax = "get uri {0} to file {1}",
+        help = "Get XML content from URI {0} and save it to a local file {1}",
+        order = 120)
     public static void getURI(String uri, String file) throws Exception {
         MCRCommandLineInterface.getURI(uri, file);
     }
 
-    @MCRCommand(syntax = "create configuration directory", help = "Creates the MCRConfiguration directory if it does not exist.", order = 130)
+    @MCRCommand(syntax = "create configuration directory",
+        help = "Creates the MCRConfiguration directory if it does not exist.",
+        order = 130)
     public static void createConfigurationDirectory() throws IOException {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         ArrayList<File> directories = new ArrayList<>(3);
         directories.add(configurationDirectory);
         for (String dir : MCRConfiguration.instance().getString("MCR.ConfigurationDirectory.template.directories", "")
-                .split(",")) {
+            .split(",")) {
             if (!dir.trim().isEmpty()) {
                 directories.add(new File(configurationDirectory, dir.trim()));
             }
@@ -168,7 +176,7 @@ public class MCRBasicCommands {
         }
 
         for (String f : MCRConfiguration.instance().getString("MCR.ConfigurationDirectory.template.files", "")
-                .split(",")) {
+            .split(",")) {
             if (!f.trim().isEmpty()) {
                 createSampleConfigFile(f.trim());
             }
@@ -201,7 +209,7 @@ public class MCRBasicCommands {
             throw new IOException("Could not create directory for file: " + targetFile);
         }
         try (InputStream templateResource = classLoader.getResourceAsStream("configdir.template/" + path);
-                FileOutputStream fout = new FileOutputStream(targetFile)) {
+            FileOutputStream fout = new FileOutputStream(targetFile)) {
             if (templateResource == null) {
                 throw new IOException("Could not find template for " + path);
             }

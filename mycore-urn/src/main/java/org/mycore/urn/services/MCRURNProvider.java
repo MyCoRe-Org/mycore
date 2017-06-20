@@ -8,12 +8,11 @@ import java.util.Vector;
 
 import org.mycore.common.MCRException;
 
-
 /**
  * @author shermann
  * 
  */
-public class MCRURNProvider extends MCRAbstractURNProvider  {
+public class MCRURNProvider extends MCRAbstractURNProvider {
 
     /* (non-Javadoc)
      * @see fsu.archiv.mycore.urn.IURNProvider#generateURN()

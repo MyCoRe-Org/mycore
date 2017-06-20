@@ -36,7 +36,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  *
  * @author Arne Seifert
  */
-@MCRCommandGroup(name="Access Control Commands")
+@MCRCommandGroup(name = "Access Control Commands")
 public class MCRAccessCtrlCommands extends MCRAbstractCommands {
     public static Logger logger = LogManager.getLogger(MCRAccessCtrlCommands.class.getName());
 
@@ -48,7 +48,9 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
      * @param permission
      *            the access permission for the rule
      */
-    @MCRCommand(syntax="validate objectid {0} in pool {1}", help="Validates access for given object and given permission", order=10)
+    @MCRCommand(syntax = "validate objectid {0} in pool {1}",
+        help = "Validates access for given object and given permission",
+        order = 10)
     public static void validate(String objid, String permission) {
         System.out.println("current user has access: " + MCRAccessManager.checkPermission(objid, permission));
     }

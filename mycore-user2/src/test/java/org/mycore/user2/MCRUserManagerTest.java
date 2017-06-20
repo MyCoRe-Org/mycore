@@ -168,12 +168,14 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         user.disableLogin();
         MCRUserManager.updateUser(user);
         startNewTransaction();
-        assertNull("Should not login user when account is disabled", MCRUserManager.login(this.user.getUserName(), clearPasswd));
+        assertNull("Should not login user when account is disabled",
+            MCRUserManager.login(this.user.getUserName(), clearPasswd));
         user.enableLogin();
         user.setValidUntil(new Date());
         MCRUserManager.updateUser(user);
         startNewTransaction();
-        assertNull("Should not login user when password is expired", MCRUserManager.login(this.user.getUserName(), clearPasswd));
+        assertNull("Should not login user when password is expired",
+            MCRUserManager.login(this.user.getUserName(), clearPasswd));
     }
 
     @Test
@@ -196,13 +198,13 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(exportableXML, System.out);
     }
-    
-   @Test
-   public final void testLoadTestUser(){
-       Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
-       MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
-       mcrUser.setUserName("junit2");
-       MCRUserManager.createUser(mcrUser);
-   }
+
+    @Test
+    public final void testLoadTestUser() {
+        Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
+        MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
+        mcrUser.setUserName("junit2");
+        MCRUserManager.createUser(mcrUser);
+    }
 
 }

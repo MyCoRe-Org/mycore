@@ -10,7 +10,6 @@ import org.mycore.pi.MCRPersistentIdentifierGenerator;
 
 public class MCRUUIDDOIGenerator extends MCRPersistentIdentifierGenerator<MCRDigitalObjectIdentifier> {
 
-
     private final MCRDOIParser mcrdoiParser;
 
     private String prefix = MCRConfiguration.instance().getString("MCR.DOI.Prefix");

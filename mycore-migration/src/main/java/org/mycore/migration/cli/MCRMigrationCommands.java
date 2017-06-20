@@ -67,7 +67,9 @@ public class MCRMigrationCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @MCRCommand(syntax = "migrate author servflags", help = "Create missing servflags for createdby and modifiedby. (MCR-786)", order = 20)
+    @MCRCommand(syntax = "migrate author servflags",
+        help = "Create missing servflags for createdby and modifiedby. (MCR-786)",
+        order = 20)
     public static List<String> addServFlags() {
         TreeSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.instance().listIDs());
         ArrayList<String> cmds = new ArrayList<>(ids.size());
@@ -77,7 +79,9 @@ public class MCRMigrationCommands {
         return cmds;
     }
 
-    @MCRCommand(syntax = "migrate author servflags for {0}", help = "Create missing servflags for createdby and modifiedby for object {0}. (MCR-786)", order = 10)
+    @MCRCommand(syntax = "migrate author servflags for {0}",
+        help = "Create missing servflags for createdby and modifiedby for object {0}. (MCR-786)",
+        order = 10)
     public static void addServFlags(String id)
         throws IOException, MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
@@ -119,8 +123,10 @@ public class MCRMigrationCommands {
         }
     }
 
-    @MCRCommand(syntax = "fix invalid derivate links {0} for {1}", help = "Fixes the paths of all derivate links "
-        + "({0} -> xpath -> e.g. /mycoreobject/metadata/derivateLinks/derivateLink) for object {1}. (MCR-1267)", order = 15)
+    @MCRCommand(syntax = "fix invalid derivate links {0} for {1}",
+        help = "Fixes the paths of all derivate links "
+            + "({0} -> xpath -> e.g. /mycoreobject/metadata/derivateLinks/derivateLink) for object {1}. (MCR-1267)",
+        order = 15)
     public static void fixDerivateLinks(String xpath, String id) throws IOException, JDOMException, SAXException {
         // get mcr object
         MCRObjectID objectID = MCRObjectID.getInstance(id);
@@ -247,11 +253,11 @@ public class MCRMigrationCommands {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
 
         entityManager.createQuery("select u from MCRURN u", MCRURN.class)
-                     .getResultList()
-                     .stream()
-                     .flatMap(mcrurn -> toMCRPI(mcrurn, serviceID))
-                     .peek(MCRMigrationCommands::logInfo)
-                     .forEach(entityManager::persist);
+            .getResultList()
+            .stream()
+            .flatMap(mcrurn -> toMCRPI(mcrurn, serviceID))
+            .peek(MCRMigrationCommands::logInfo)
+            .forEach(entityManager::persist);
 
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.commit();
@@ -260,31 +266,31 @@ public class MCRMigrationCommands {
     private static Stream<MCRPI> toMCRPI(MCRURN mcrurn, String serviceID) {
         String derivID = mcrurn.getId();
         String additional = Optional
-                .ofNullable(mcrurn.getPath())
-                .flatMap(path -> Optional.ofNullable(mcrurn.getFilename())
-                                         .map(filename -> Paths.get(path, filename)))
-                .map(Path::toString)
-                .orElse("");
+            .ofNullable(mcrurn.getPath())
+            .flatMap(path -> Optional.ofNullable(mcrurn.getFilename())
+                .map(filename -> Paths.get(path, filename)))
+            .map(Path::toString)
+            .orElse("");
 
         MCRPI mcrpi = new MCRPI(mcrurn.getURN(), MCRDNBURN.TYPE, derivID, additional, serviceID, null);
         String suffix = "-dfg";
 
         return Optional.of(mcrurn)
-                       .filter(u -> u.isDfg())
-                       .flatMap(MCRMigrationCommands::parse)
-                       .map(dnbURN -> dnbURN.withSuffix(suffix))
-                       .map(MCRDNBURN::asString)
-                       .map(dfgURN -> new MCRPI(dfgURN, MCRDNBURN.TYPE + suffix, derivID, additional,
-                               serviceID + suffix, null))
-                       .map(dfgMcrPi -> Stream.of(mcrpi, dfgMcrPi))
-                       .orElse(Stream.of(mcrpi));
+            .filter(u -> u.isDfg())
+            .flatMap(MCRMigrationCommands::parse)
+            .map(dnbURN -> dnbURN.withSuffix(suffix))
+            .map(MCRDNBURN::asString)
+            .map(dfgURN -> new MCRPI(dfgURN, MCRDNBURN.TYPE + suffix, derivID, additional,
+                serviceID + suffix, null))
+            .map(dfgMcrPi -> Stream.of(mcrpi, dfgMcrPi))
+            .orElse(Stream.of(mcrpi));
     }
 
     private static Optional<MCRDNBURN> parse(MCRURN urn) {
         return new MCRDNBURNParser().parse(urn.getURN());
     }
 
-    private static void logInfo(MCRPI urn){
+    private static void logInfo(MCRPI urn) {
         String urnStr = urn.getIdentifier();
         String mycoreID = urn.getMycoreID();
         String path = urn.getAdditional();

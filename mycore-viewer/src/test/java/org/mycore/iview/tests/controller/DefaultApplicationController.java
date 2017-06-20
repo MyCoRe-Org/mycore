@@ -33,14 +33,14 @@ public class DefaultApplicationController extends ApplicationController {
     private static final String webpath = "target/test-classes/testFiles";
 
     private static Map<TestDerivate, String> derivateHTMLMapping;
-    
+
     private static final Logger LOGGER = LogManager.getLogger(DefaultApplicationController.class);
-    
+
     private static Properties PROPERTIES = TestProperties.getInstance();
-    
+
     private static Boolean SKIP_DOWNLOAD = Boolean
-            .parseBoolean(PROPERTIES.getProperty("test.viewer.skipDownload", "False"));
-    
+        .parseBoolean(PROPERTIES.getProperty("test.viewer.skipDownload", "False"));
+
     @Override
     public void init() {
         DefaultApplicationController.derivateHTMLMapping = new HashMap<TestDerivate, String>();
@@ -156,7 +156,8 @@ public class DefaultApplicationController extends ApplicationController {
         webdriver.navigate().to(path);
 
         WebDriverWait wait = new WebDriverWait(webdriver, 5000);
-        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("/.//ol[contains(@class, 'chapterTreeDesktop')]")));
+        wait.until(ExpectedConditions
+            .presenceOfAllElementsLocatedBy(By.xpath("/.//ol[contains(@class, 'chapterTreeDesktop')]")));
 
     }
 

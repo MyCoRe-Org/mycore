@@ -36,7 +36,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 public class MCRXPathTestValidator extends MCRValidator {
 
     private static final String ATTR_TEST = "test";
-    
+
     private String xPathExpression;
 
     @Override

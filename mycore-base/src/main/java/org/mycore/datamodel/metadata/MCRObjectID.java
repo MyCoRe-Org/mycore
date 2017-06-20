@@ -158,7 +158,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return getNextFreeId(base_id, 0);
     }
 
-
     public static synchronized MCRObjectID getNextFreeId(String base, String type) {
         return getNextFreeId(base + "_" + type);
     }
@@ -352,7 +351,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      *         otherwise return false
      */
     private boolean setID(String id) {
-        if(!isValid(id)) {
+        if (!isValid(id)) {
             return false;
         }
         String[] idParts = getIDParts(id.trim());
@@ -392,7 +391,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return false;
     }
 
-    @Override public int compareTo(MCRObjectID o) {
+    @Override
+    public int compareTo(MCRObjectID o) {
         return MCRUtils.compareParts(this, o,
             MCRObjectID::getProjectId,
             MCRObjectID::getTypeId,

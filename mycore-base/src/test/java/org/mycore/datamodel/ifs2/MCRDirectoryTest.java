@@ -21,15 +21,15 @@ import org.mycore.common.MCRSessionMgr;
 public class MCRDirectoryTest extends MCRIFS2TestCase {
 
     private MCRFileCollection col;
-    
+
     @Override
     public void setUp() throws Exception {
-    	super.setUp();
-    	
-    	col = getStore().create();
+        super.setUp();
+
+        col = getStore().create();
     }
 
-	@Test
+    @Test
     public void name() throws Exception {
         MCRDirectory dir = col.createDir("foo");
         Date created = dir.getLastModified();
