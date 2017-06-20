@@ -74,5 +74,4 @@ public class MCRFLURNGenerator extends MCRDNBURNGenerator {
         }
     }
 
-
 }

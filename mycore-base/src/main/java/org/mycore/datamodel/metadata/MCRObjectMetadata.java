@@ -73,7 +73,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      */
     public MCRObjectMetadata() throws MCRConfigurationException {
         herited_xml = MCRConfiguration.instance()
-                                      .getBoolean("MCR.Metadata.HeritedForXML", true);
+            .getBoolean("MCR.Metadata.HeritedForXML", true);
         meta_list = new ArrayList<MCRMetaElement>();
     }
 
@@ -103,7 +103,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
 
                 for (int j = 0; j < nme.size(); j++) {
                     nme.getElement(j)
-                       .incrementInherited();
+                        .incrementInherited();
                 }
 
                 heritMeta.setMetadataElement(nme);
@@ -143,22 +143,22 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
 
             for (int j = 0; j < size(); j++) {
                 if (meta_list.get(j)
-                             .getTag()
-                             .equals(newelm.getTag())) {
+                    .getTag()
+                    .equals(newelm.getTag())) {
                     pos = j;
                 }
             }
 
             if (pos != -1) {
                 if (!meta_list.get(pos)
-                              .inheritsNot()) {
+                    .inheritsNot()) {
                     meta_list.get(pos)
-                             .setHeritable(true);
+                        .setHeritable(true);
 
                     for (int j = 0; j < newelm.size(); j++) {
                         MCRMetaInterface obj = newelm.getElement(j);
                         meta_list.get(pos)
-                                 .addMetaObject(obj);
+                            .addMetaObject(obj);
                     }
                 }
             } else {
@@ -182,8 +182,8 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
             int pos = -1;
             for (int j = 0; j < size(); j++) {
                 if (meta_list.get(j)
-                             .getTag()
-                             .equals(metaElement.getTag())) {
+                    .getTag()
+                    .equals(metaElement.getTag())) {
                     pos = j;
                 }
             }
@@ -193,17 +193,17 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                     for (MCRMetaInterface mcrMetaInterface : meta_list.get(pos)) {
                         Element xml = mcrMetaInterface.createXML();
                         Element xmlNEW = metaElement.getElement(j)
-                                                    .createXML();
+                            .createXML();
                         List<Element> childrenXML = xml.getChildren();
                         if (childrenXML.size() > 0 && xmlNEW.getChildren()
-                                                            .size() > 0) {
+                            .size() > 0) {
                             int i = 0;
                             for (Element element : childrenXML) {
                                 Element elementNew = xmlNEW.getChild(element.getName());
 
                                 if (elementNew != null && element != null) {
                                     if (element.getText()
-                                               .equals(elementNew.getText())) {
+                                        .equals(elementNew.getText())) {
                                         i++;
                                     }
                                 }
@@ -213,7 +213,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                             }
                         } else {
                             if (xml.getText()
-                                   .equals(xmlNEW.getText())) {
+                                .equals(xmlNEW.getText())) {
                                 found = true;
                             } else if (!found) {
                                 int i = 0;
@@ -234,7 +234,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                     MCRMetaInterface obj = metaElement.getElement(j);
                     if (!found) {
                         meta_list.get(pos)
-                                 .addMetaObject(obj);
+                            .addMetaObject(obj);
                     } else if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Found equal tags: \n\r"
                             + new XMLOutputter(Format.getPrettyFormat()).outputString(obj.createXML()));
@@ -371,8 +371,8 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     public final <T extends MCRMetaInterface> Optional<T> findFirst(String tag, String type, Integer inherited) {
         Stream<T> stream = stream(tag);
         return stream.filter(filterByType(type))
-                     .filter(filterByInherited(inherited))
-                     .findFirst();
+            .filter(filterByInherited(inherited))
+            .findFirst();
     }
 
     /**
@@ -474,7 +474,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     public final org.jdom2.Element createXML() throws MCRException {
         try {
             validate();
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             throw new MCRException("MCRObjectMetadata : The content is not valid.", exc);
         }
         Element elm = new Element("metadata");
@@ -504,9 +504,9 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     public JsonObject createJSON() {
         JsonObject metadata = new JsonObject();
         StreamSupport.stream(spliterator(), true)
-                     .forEach(metaElement -> {
-                         metadata.add(metaElement.getTag(), metaElement.createJSON(herited_xml));
-                     });
+            .forEach(metaElement -> {
+                metadata.add(metaElement.getTag(), metaElement.createJSON(herited_xml));
+            });
         return metadata;
     }
 
@@ -543,7 +543,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
         for (MCRMetaElement e : this) {
             try {
                 e.validate();
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new MCRException("The <metadata> element is invalid because '" + e.getTag() + "' is invalid.",
                     exc);
             }
@@ -554,7 +554,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             for (MCRMetaElement sub : this) {
                 sub.debug();
             }

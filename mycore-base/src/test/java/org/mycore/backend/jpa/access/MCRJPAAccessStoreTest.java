@@ -100,7 +100,8 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
         startNewTransaction();
-        assertNotNull(MCRHIBConnection.instance().getSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
+        assertNotNull(
+            MCRHIBConnection.instance().getSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
     }
 
     private MCRRuleMapping addRuleMapping(final String objID, final String permission, final String rid) {

@@ -297,7 +297,7 @@ public class MCRSolrIndexer {
                 contentMap.put(objId, content);
                 if (i % BULK_SIZE == 0 || totalCount == i) {
                     MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance()
-                                                                                 .getIndexHandler(contentMap);
+                        .getIndexHandler(contentMap);
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     indexHandler.setSolrServer(solrClient);
                     statistic = indexHandler.getStatistic();

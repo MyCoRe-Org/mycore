@@ -25,10 +25,11 @@ public class MCRPersistentIdentifierResolvingResource {
         HashMap<String, List<String>> resolveMap = new HashMap<>();
         MCRPersistentIdentifierManager.getInstance().getResolvers().forEach(resolver -> {
             MCRPersistentIdentifierManager
-                    .getInstance().get(identifier)
-                    .forEach(mcrPersistentIdentifier -> {
-                        resolveMap.put(resolver.getName(), resolver.resolveSuppress(mcrPersistentIdentifier).collect(Collectors.toList()));
-                    });
+                .getInstance().get(identifier)
+                .forEach(mcrPersistentIdentifier -> {
+                    resolveMap.put(resolver.getName(),
+                        resolver.resolveSuppress(mcrPersistentIdentifier).collect(Collectors.toList()));
+                });
         });
         return Response.ok().entity(new Gson().toJson(resolveMap)).build();
     }

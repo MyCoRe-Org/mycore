@@ -16,7 +16,7 @@ import java.util.function.Function;
  * @since 2015.12
  */
 @FunctionalInterface
-public interface MCRThrowFunction<T,R,E extends Throwable>{
+public interface MCRThrowFunction<T, R, E extends Throwable> {
     /**
      * Applies this function to the given argument.
      *
@@ -64,7 +64,7 @@ public interface MCRThrowFunction<T,R,E extends Throwable>{
         Objects.requireNonNull(after);
         return (T t) -> after.apply(apply(t));
     }
-    
+
     /**
      * Returns a function that catches &lt;E&gt; and forwards it to the <code>throwableHandler</code> together with the Exception.
      * 
@@ -72,21 +72,21 @@ public interface MCRThrowFunction<T,R,E extends Throwable>{
      * @param throwableHandler a BiFunction that handles original Input and caught Exception
      * @param exClass class of exception to catch
      */
-    default Function<T, R> toFunction(BiFunction<T,E,R> throwableHandler, Class<? super E> exClass){
+    default Function<T, R> toFunction(BiFunction<T, E, R> throwableHandler, Class<? super E> exClass) {
         return t -> {
             try {
                 return this.apply(t);
             } catch (Throwable e) {
-                if (exClass.isAssignableFrom(e.getClass())){
+                if (exClass.isAssignableFrom(e.getClass())) {
                     @SuppressWarnings("unchecked")
                     E handableException = (E) e;
                     return throwableHandler.apply(t, handableException);
                 }
-                throw (RuntimeException)e;
+                throw (RuntimeException) e;
             }
         };
     }
-    
+
     /**
      * Returns a Function that applies &lt;T&gt; and catches any exception and wraps it into a {@link RuntimeException} if needed.
      * Use this if you just want no specific exception handling.
@@ -97,6 +97,6 @@ public interface MCRThrowFunction<T,R,E extends Throwable>{
                 throw (RuntimeException) e;
             }
             throw new RuntimeException(e);
-        } , Throwable.class);
+        }, Throwable.class);
     }
 }

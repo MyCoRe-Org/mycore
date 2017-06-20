@@ -43,7 +43,7 @@ public class MCRPICommands {
                 MCRPIRegistrationService.addFlagToObject(base, (MCRPI) registrationInfo);
                 try {
                     MCRMetadataManager.update(base);
-                } catch (IOException|MCRAccessException|MCRActiveLinkException e) {
+                } catch (IOException | MCRAccessException | MCRActiveLinkException e) {
                     throw new MCRException(e);
                 }
             }
@@ -60,13 +60,13 @@ public class MCRPICommands {
             if (urn != null) {
                 LOGGER.info("Found URN in :" + derivateID);
                 MCRPI derivatePI = new MCRPI(urn, MCRDNBURN.TYPE, derivateID, "", serviceID, new Date());
-                if(MCRPersistentIdentifierManager.getInstance().exist(derivatePI)){
+                if (MCRPersistentIdentifierManager.getInstance().exist(derivatePI)) {
                     LOGGER.warn("PI-Entry for " + urn + " already exist!");
                 } else {
                     session.save(derivatePI);
                     derivate.getUrnMap().forEach((file, fileURN) -> {
                         MCRPI filePI = new MCRPI(fileURN, MCRDNBURN.TYPE, derivateID, file, serviceID, new Date());
-                        if(MCRPersistentIdentifierManager.getInstance().exist(filePI)){
+                        if (MCRPersistentIdentifierManager.getInstance().exist(filePI)) {
                             LOGGER.warn("PI-Entry for " + fileURN + " already exist!");
                         } else {
                             session.save(fileURN);
@@ -80,7 +80,7 @@ public class MCRPICommands {
     @MCRCommand(syntax = "try to control {0} with service {1} with additional {2}", help = "")
     public static void migrateURNGranularToServiceID(String objectIDString, String serviceID, final String additional)
         throws MCRAccessException, MCRActiveLinkException, IOException {
-        String trimAdditional=additional.trim();
+        String trimAdditional = additional.trim();
         MCRPIRegistrationService<MCRPersistentIdentifier> service = MCRPIRegistrationServiceManager
             .getInstance().getRegistrationService(serviceID);
 

@@ -1,6 +1,5 @@
 package org.mycore.mods.identifier;
 
-
 import java.net.URI;
 import java.util.AbstractMap;
 import java.util.Map;
@@ -15,8 +14,8 @@ import java.util.regex.Pattern;
 public class MCRGBVURLDetector implements MCRIdentifierDetector<URI> {
 
     public static final String GBV_PREFIX = "uri.gbv.de/document/";
-    public static final String GVK_PREFIX = "gso.gbv.de/DB=2.1/PPNSET?PPN=";
 
+    public static final String GVK_PREFIX = "gso.gbv.de/DB=2.1/PPNSET?PPN=";
 
     @Override
     public Optional<Map.Entry<String, String>> detect(URI resolvable) {

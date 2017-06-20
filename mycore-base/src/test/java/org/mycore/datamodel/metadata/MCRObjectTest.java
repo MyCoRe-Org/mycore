@@ -51,7 +51,8 @@ public class MCRObjectTest extends MCRTestCase {
         JsonObject json = testObject.createJSON();
         assertEquals("Invalid id", "mcr_test_00000001", json.getAsJsonPrimitive("id").getAsString());
         JsonObject textfield = json.getAsJsonObject("metadata").getAsJsonObject("def.textfield");
-        String text = textfield.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonPrimitive("text").getAsString();
+        String text = textfield.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonPrimitive("text")
+            .getAsString();
         assertEquals("Invalid text metadata", "JUnit Test object 1", text);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         System.out.println(gson.toJson(json));

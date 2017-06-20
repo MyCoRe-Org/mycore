@@ -71,7 +71,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Assert.assertNull("The mapped classification of the child should not be contained in the MyCoReObject now!",
             expressionObject.evaluateFirst(xml));
 
-
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 

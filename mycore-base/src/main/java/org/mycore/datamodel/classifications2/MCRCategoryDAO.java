@@ -228,7 +228,8 @@ public interface MCRCategoryDAO {
      *             if old version of MCRCategory does not exist
      * @return collection of replaced categories
      */
-    public abstract Collection<? extends MCRCategory> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException;
+    public abstract Collection<? extends MCRCategory> replaceCategory(MCRCategory newCategory)
+        throws IllegalArgumentException;
 
     /**
      * Sets or updates a label from a Category.

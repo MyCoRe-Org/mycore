@@ -5,14 +5,12 @@
 // Generated on: 2013.06.18 at 04:23:29 PM CEST 
 //
 
-
 package org.mycore.solr.index.document.jaxb;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-
 
 /**
  * This object contains factory methods for each 

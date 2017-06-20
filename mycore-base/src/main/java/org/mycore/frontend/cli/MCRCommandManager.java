@@ -103,15 +103,15 @@ public class MCRCommandManager {
     }
 
     protected void addAnnotatedCLIClass(Class<?> cliClass) {
-        String groupName=Optional.ofNullable(cliClass.getAnnotation(MCRCommandGroup.class))
-                                 .map(MCRCommandGroup::name)
-                                 .orElse(cliClass.getSimpleName());
+        String groupName = Optional.ofNullable(cliClass.getAnnotation(MCRCommandGroup.class))
+            .map(MCRCommandGroup::name)
+            .orElse(cliClass.getSimpleName());
         final Class<org.mycore.frontend.cli.annotation.MCRCommand> mcrCommandAnnotation = org.mycore.frontend.cli.annotation.MCRCommand.class;
         ArrayList<MCRCommand> commands = Arrays.stream(cliClass.getDeclaredMethods())
-                         .filter(method -> method.isAnnotationPresent(mcrCommandAnnotation))
-                         .sorted(Comparator.comparingInt(m -> m.getAnnotation(mcrCommandAnnotation).order()))
-                         .map(MCRCommand::new)
-                         .collect(Collectors.toCollection(ArrayList::new));
+            .filter(method -> method.isAnnotationPresent(mcrCommandAnnotation))
+            .sorted(Comparator.comparingInt(m -> m.getAnnotation(mcrCommandAnnotation).order()))
+            .map(MCRCommand::new)
+            .collect(Collectors.toCollection(ArrayList::new));
         addCommandGroup(groupName, commands);
     }
 

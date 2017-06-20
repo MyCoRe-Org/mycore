@@ -18,9 +18,9 @@ public class MCRRESTResourceConfig extends ResourceConfig {
     public MCRRESTResourceConfig() {
         super();
         String[] restPackages = MCRConfiguration.instance()
-                                            .getStrings("MCR.RestAPI.Resource.Packages")
-                                            .stream()
-                                            .toArray(String[]::new);
+            .getStrings("MCR.RestAPI.Resource.Packages")
+            .stream()
+            .toArray(String[]::new);
         packages(restPackages);
         register(MultiPartFeature.class);
     }

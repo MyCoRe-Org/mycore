@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class MCRCollection {
     @XmlElement(name = "action")
     MCRAction[] actions;
-    
+
     @XmlAttribute
     String name;
 

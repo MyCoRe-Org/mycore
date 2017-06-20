@@ -21,12 +21,14 @@ public class MCRRepeatBinding extends MCRBinding {
 
     private int maxRepeats;
 
-    private final static String DEFAULT_METHOD = MCRConfiguration.instance().getString("MCR.XEditor.InsertTarget.DefaultMethod", "build");
+    private final static String DEFAULT_METHOD = MCRConfiguration.instance()
+        .getString("MCR.XEditor.InsertTarget.DefaultMethod", "build");
 
     private String method = DEFAULT_METHOD; // build|clone
 
-    public MCRRepeatBinding(String xPath, MCRBinding parent, int minRepeats, int maxRepeats, String method) throws JaxenException,
-            JDOMException {
+    public MCRRepeatBinding(String xPath, MCRBinding parent, int minRepeats, int maxRepeats, String method)
+        throws JaxenException,
+        JDOMException {
         this(xPath, parent, method);
 
         while (getBoundNodes().size() < minRepeats)

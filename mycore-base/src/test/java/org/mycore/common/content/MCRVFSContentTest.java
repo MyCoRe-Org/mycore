@@ -116,7 +116,7 @@ public class MCRVFSContentTest extends MCRTestCase {
         assertFalse("File is open after simple transformation", resolver.isContentOpen());
         //cacheable transformation
         Templates templates = TransformerFactory.newInstance().newTemplates(xsl);
-        transformer=templates.newTransformer();
+        transformer = templates.newTransformer();
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setURIResolver(resolver);

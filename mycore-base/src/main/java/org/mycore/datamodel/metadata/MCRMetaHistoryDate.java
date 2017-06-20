@@ -184,9 +184,9 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             return null;
         }
         return texts.stream()
-                    .filter(text -> text.getLang().equals(set_lang))
-                    .findFirst()
-                    .orElse(null);
+            .filter(text -> text.getLang().equals(set_lang))
+            .findFirst()
+            .orElse(null);
     }
 
     /**
@@ -232,7 +232,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         if (calstr == null || calstr.trim().length() == 0 || (!MCRCalendar.CALENDARS_LIST.contains(calstr))) {
             calendar = MCRCalendar.TAG_GREGORIAN;
             LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to default " + MCRCalendar.TAG_GREGORIAN
-                    + ".");
+                + ".");
             return;
         }
         calendar = calstr;
@@ -297,7 +297,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.warn("The von date " + date_string + " for calendar " + calendar_string
-                    + " is false. Set to default!");
+                + " is false. Set to default!");
             setDefaultVon();
         }
     }
@@ -508,7 +508,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             for (MCRMetaHistoryDateText text : texts) {
                 LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());

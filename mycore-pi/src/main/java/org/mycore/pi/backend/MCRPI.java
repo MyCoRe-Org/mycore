@@ -16,39 +16,33 @@ import org.mycore.common.MCRCoreVersion;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "Count.PI.Created",
-                query = "select count(u) from MCRPI u "
-                        + "where u.mycoreID = :mcrId "
-                        + "and u.type = :type "
-                        + "and u.additional = :additional "
-                        + "and u.service = :service"
-        ),
-        @NamedQuery(name = "Count.PI.Registered",
-                query = "select count(u) from MCRPI u "
-                        + "where u.mycoreID = :mcrId "
-                        + "and u.type = :type "
-                        + "and u.additional = :additional "
-                        + "and u.service = :service "
-                        + "and u.registered is not null"
-        ),
-        @NamedQuery(name = "Get.PI.Created",
-                query = "select u from MCRPI u "
-                        + "where u.mycoreID = :mcrId "
-                        + "and u.type = :type "
-                        + "and u.additional != '' "
-                        + "and u.service = :service"
-        ),
-        @NamedQuery(name = "Get.PI.Unregistered",
-                query = "select u from MCRPI u "
-                        + "where u.type = :type "
-                        + "and u.registered is null"
-        ),
-        @NamedQuery(name = "Update.PI.Registered.Date",
-                query = "update from MCRPI u "
-                        + "set u.registered = :date "
-                        + "where u.id = :id"
-        )
-
+    @NamedQuery(name = "Count.PI.Created",
+        query = "select count(u) from MCRPI u "
+            + "where u.mycoreID = :mcrId "
+            + "and u.type = :type "
+            + "and u.additional = :additional "
+            + "and u.service = :service"),
+    @NamedQuery(name = "Count.PI.Registered",
+        query = "select count(u) from MCRPI u "
+            + "where u.mycoreID = :mcrId "
+            + "and u.type = :type "
+            + "and u.additional = :additional "
+            + "and u.service = :service "
+            + "and u.registered is not null"),
+    @NamedQuery(name = "Get.PI.Created",
+        query = "select u from MCRPI u "
+            + "where u.mycoreID = :mcrId "
+            + "and u.type = :type "
+            + "and u.additional != '' "
+            + "and u.service = :service"),
+    @NamedQuery(name = "Get.PI.Unregistered",
+        query = "select u from MCRPI u "
+            + "where u.type = :type "
+            + "and u.registered is null"),
+    @NamedQuery(name = "Update.PI.Registered.Date",
+        query = "update from MCRPI u "
+            + "set u.registered = :date "
+            + "where u.id = :id")
 
 })
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "identifier", "type" }) })

@@ -102,7 +102,7 @@ public abstract class MCRContentTransformer {
     protected String getDefaultExtension() {
         return "bin";
     }
-    
+
     protected String getDefaultMimeType() {
         return defaultMimeType;
     }

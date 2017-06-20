@@ -157,7 +157,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if(content == null) {
+        if (content == null) {
             throw new MCRException(getSubTag() + ": content is null or empty");
         }
     }
@@ -177,7 +177,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      */
     @Override
     public void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Number of contents  = \n" + content.size());
         }

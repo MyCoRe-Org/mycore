@@ -8,11 +8,13 @@ import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 public class MCRStoreManager {
     private static final Logger LOGGER = LogManager.getLogger(MCRStoreManager.class);
 
-    public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass) throws InstantiationException, IllegalAccessException {
+    public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass)
+        throws InstantiationException, IllegalAccessException {
         return createStore(new MCRStoreDefaultConfig(ID), storeClass);
     }
 
-    public static <T extends MCRStore> T createStore(MCRStoreConfig config, Class<T> storeClass) throws InstantiationException, IllegalAccessException {
+    public static <T extends MCRStore> T createStore(MCRStoreConfig config, Class<T> storeClass)
+        throws InstantiationException, IllegalAccessException {
         T store = storeClass.newInstance();
         store.init(config);
         try {

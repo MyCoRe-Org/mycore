@@ -22,10 +22,12 @@ public class MCRMetsSection {
     private List<MCRMetsSection> metsSectionList;
 
     private String id = UUID.randomUUID().toString();
-    private String type;
-    private String label;
-    private List<MCRMetsAltoLink> altoLinks;
 
+    private String type;
+
+    private String label;
+
+    private List<MCRMetsAltoLink> altoLinks;
 
     private transient MCRMetsSection parent;
 
@@ -79,13 +81,12 @@ public class MCRMetsSection {
         this.altoLinks = altoLinks;
     }
 
-    public void addAltoLink(MCRMetsAltoLink link){
+    public void addAltoLink(MCRMetsAltoLink link) {
         this.altoLinks.add(link);
     }
 
-    public void removeAltoLink(MCRMetsAltoLink link){
+    public void removeAltoLink(MCRMetsAltoLink link) {
         this.altoLinks.remove(link);
     }
-
 
 }

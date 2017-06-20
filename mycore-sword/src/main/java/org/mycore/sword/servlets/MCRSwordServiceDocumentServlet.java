@@ -16,7 +16,9 @@ import org.swordapp.server.ServiceDocumentAPI;
 public class MCRSwordServiceDocumentServlet extends MCRSwordServlet {
 
     private MCRSwordConfigurationDefault swordConfiguration;
+
     private MCRSwordServiceDocumentManager sdMgr;
+
     private ServiceDocumentAPI api;
 
     @Override

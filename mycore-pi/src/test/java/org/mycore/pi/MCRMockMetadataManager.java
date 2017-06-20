@@ -8,10 +8,10 @@ import org.junit.Assert;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-
 public class MCRMockMetadataManager extends MCRPersistentIdentifierMetadataManager<MCRMockIdentifier> {
 
     public static final String TEST_PROPERTY = "mockProperty";
+
     public static final String TEST_PROPERTY_VALUE = "mockPropertyValue";
 
     private Map<String, MCRMockIdentifier> map = new HashMap<>();

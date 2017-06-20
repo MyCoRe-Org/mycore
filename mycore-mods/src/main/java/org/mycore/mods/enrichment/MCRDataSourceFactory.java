@@ -46,7 +46,7 @@ class MCRDataSourceFactory {
         MCRDataSource dataSource = new MCRDataSource(sourceID);
 
         String[] identifierTypes = config
-                .getString("MCR.MODS.EnrichmentResolver.DataSource." + sourceID + ".IdentifierTypes").split("\\s");
+            .getString("MCR.MODS.EnrichmentResolver.DataSource." + sourceID + ".IdentifierTypes").split("\\s");
         for (String typeID : identifierTypes) {
             String prefix = "MCR.MODS.EnrichmentResolver.DataSource." + sourceID + "." + typeID + ".";
             String uri = config.getString(prefix + "URI");

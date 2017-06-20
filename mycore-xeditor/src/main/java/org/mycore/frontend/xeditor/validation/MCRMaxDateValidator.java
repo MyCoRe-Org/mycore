@@ -32,7 +32,7 @@ import java.util.Date;
 public class MCRMaxDateValidator extends MCRDateValidator {
 
     private static final String ATTR_MAX = "max";
-    
+
     private Date maxDate;
 
     @Override

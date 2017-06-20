@@ -8,7 +8,7 @@ import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 
 public class MCRLocalPersistentIdentifierResolver extends MCRPersistentIdentifierResolver<MCRPersistentIdentifier> {
     private final Function<String, String> toReceiveObjectURL = mcrID -> MCRFrontendUtil.getBaseURL() + "receive/"
-            + mcrID;
+        + mcrID;
 
     public MCRLocalPersistentIdentifierResolver() {
         super("Local-Resolver");
@@ -17,9 +17,9 @@ public class MCRLocalPersistentIdentifierResolver extends MCRPersistentIdentifie
     @Override
     public Stream<String> resolve(MCRPersistentIdentifier identifier) throws MCRIdentifierUnresolvableException {
         return MCRPersistentIdentifierManager.getInstance()
-                                             .getInfo(identifier)
-                                             .stream()
-                                             .map(MCRPIRegistrationInfo::getMycoreID)
-                                             .map(toReceiveObjectURL);
+            .getInfo(identifier)
+            .stream()
+            .map(MCRPIRegistrationInfo::getMycoreID)
+            .map(toReceiveObjectURL);
     }
 }

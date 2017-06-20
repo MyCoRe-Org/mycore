@@ -75,7 +75,8 @@ public class MCRUserTransformerTest extends MCRUserTestCase {
         xout.output(input, System.out);
         System.out.println();
         xout.output(output, System.out);
-        assertTrue("Input element is not the same as outputElement", MCRXMLHelper.deepEqual(input, output.getRootElement()));
+        assertTrue("Input element is not the same as outputElement",
+            MCRXMLHelper.deepEqual(input, output.getRootElement()));
     }
 
     @XmlRootElement(name = "root")

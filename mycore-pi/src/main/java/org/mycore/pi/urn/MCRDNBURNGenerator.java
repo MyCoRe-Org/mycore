@@ -1,6 +1,5 @@
 package org.mycore.pi.urn;
 
-
 import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
@@ -16,8 +15,6 @@ public abstract class MCRDNBURNGenerator extends MCRPersistentIdentifierGenerato
 
     protected abstract String buildNISS();
 
-
-
     public MCRDNBURN generate(@NotNull String namespace, String additional) throws MCRPersistentIdentifierException {
         Objects.requireNonNull(namespace, "Namespace for an URN must not be null!");
         return new MCRDNBURN(namespace, buildNISS());
@@ -26,6 +23,5 @@ public abstract class MCRDNBURNGenerator extends MCRPersistentIdentifierGenerato
     public MCRDNBURN generate(MCRObjectID mcrID, String additional) throws MCRPersistentIdentifierException {
         return generate(getProperties().get("Namespace"), additional);
     }
-
 
 }

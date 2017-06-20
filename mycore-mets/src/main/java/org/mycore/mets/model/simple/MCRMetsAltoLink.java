@@ -1,6 +1,5 @@
 package org.mycore.mets.model.simple;
 
-
 public class MCRMetsAltoLink {
 
     public MCRMetsAltoLink(MCRMetsFile file, String begin, String end) {
@@ -10,9 +9,10 @@ public class MCRMetsAltoLink {
     }
 
     private MCRMetsFile file;
-    private String begin;
-    private String end;
 
+    private String begin;
+
+    private String end;
 
     public MCRMetsFile getFile() {
         return file;

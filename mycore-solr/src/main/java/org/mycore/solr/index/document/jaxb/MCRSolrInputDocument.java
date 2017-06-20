@@ -5,7 +5,6 @@
 // Generated on: 2014.04.29 at 08:30:43 AM CEST 
 //
 
-
 package org.mycore.solr.index.document.jaxb;
 
 import java.util.ArrayList;
@@ -21,7 +20,6 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 
 /**
  * <p>Java class for MCRSolrInputDocument complex type.
@@ -56,6 +54,7 @@ public class MCRSolrInputDocument {
         @XmlElement(name = "doc", type = MCRSolrInputDocument.class)
     })
     protected List<Object> fieldOrDoc;
+
     @XmlAttribute(name = "id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
@@ -115,5 +114,5 @@ public class MCRSolrInputDocument {
     public void setId(String value) {
         this.id = value;
     }
- 
+
 }

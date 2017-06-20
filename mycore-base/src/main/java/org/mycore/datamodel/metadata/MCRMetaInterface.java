@@ -133,7 +133,7 @@ public interface MCRMetaInterface extends Cloneable {
      * 
      * @return a GSON object containing the json data of the metadata part 
      */
-    public JsonObject createJSON(); 
+    public JsonObject createJSON();
 
     /**
      * This method check the validation of the content of this class.

@@ -15,12 +15,14 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-
 public class MCRTEIValidator implements ErrorHandler {
 
     public static final String MCR_TRANSCRIPTION_SCHEMA = "xsd/mcrtranscr.xsd";
+
     public static final String FATAL_ERROR = "fatalError";
+
     public static final String ERROR = "error";
+
     public static final String WARNING = "warning";
 
     public MCRTEIValidator(Source teiSource) {
@@ -38,14 +40,13 @@ public class MCRTEIValidator implements ErrorHandler {
             schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
             schemaFactory.setErrorHandler(this);
             return schemaFactory.newSchema(MCRTEIValidator.class.getClassLoader().getResource(
-                    path));
+                path));
         } catch (SAXException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void validate() throws
-            IOException, SAXException {
+    public void validate() throws IOException, SAXException {
         Validator validator = this.getSchema(MCR_TRANSCRIPTION_SCHEMA).newValidator();
         validator.setErrorHandler(this);
 
@@ -57,6 +58,7 @@ public class MCRTEIValidator implements ErrorHandler {
     }
 
     private Hashtable<String, List<SAXParseException>> exceptionMap;
+
     private Source teiSource;
 
     @Override

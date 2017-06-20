@@ -62,7 +62,7 @@ public class MCRUtilsTest extends MCRTestCase {
     @Test
     public final void testAsMD5String() {
         try {
-            String md5String = MCRUtils.asMD5String(1,null,TEST);
+            String md5String = MCRUtils.asMD5String(1, null, TEST);
             assertEquals("MD5 string has not the right length", TEST_MD5.length(), md5String.length());
             assertEquals("MD5 string does not match", TEST_MD5, md5String);
         } catch (NoSuchAlgorithmException e) {

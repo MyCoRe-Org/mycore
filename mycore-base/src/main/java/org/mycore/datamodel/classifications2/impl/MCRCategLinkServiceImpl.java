@@ -322,15 +322,15 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static Collection<MCRCategoryID> getAllCategIDs(MCRCategory category) {
         return MCRStreamUtils.flatten(category, MCRCategory::getChildren, Collection::parallelStream)
-                      .map(MCRCategory::getId)
-                      .collect(Collectors.toCollection(HashSet::new));
+            .map(MCRCategory::getId)
+            .collect(Collectors.toCollection(HashSet::new));
     }
 
     private static Collection<MCRCategoryID> getAllChildIDs(MCRCategory category) {
         return category.getChildren()
-                       .stream()
-                       .map(MCRCategory::getId)
-                       .collect(Collectors.toCollection(HashSet::new));
+            .stream()
+            .map(MCRCategory::getId)
+            .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
@@ -386,7 +386,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return em
             .createQuery(
                 query
-                    .where(cb.equal(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type), type)))
+                    .where(
+                        cb.equal(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type), type)))
             .getResultList();
     }
 

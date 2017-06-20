@@ -41,7 +41,7 @@ public class MCRRestAPIException extends Exception {
     public MCRRestAPIException(MCRRestAPIError error) {
         errors.add(error);
     }
-    
+
     public MCRRestAPIException(List<MCRRestAPIError> errors) {
         this.errors.addAll(errors);
     }

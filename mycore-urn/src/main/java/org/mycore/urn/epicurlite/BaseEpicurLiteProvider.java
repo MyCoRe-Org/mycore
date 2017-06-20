@@ -32,8 +32,9 @@ import org.mycore.urn.hibernate.MCRURN;
  *
  */
 public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
-    
-    private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration.instance().getString("MCR.URN.URNGranular.SupportedContentTypes", "");
+
+    private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration.instance()
+        .getString("MCR.URN.URNGranular.SupportedContentTypes", "");
 
     static final Logger LOGGER = LogManager.getLogger(BaseEpicurLiteProvider.class);
 
@@ -51,7 +52,8 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
         url = getURL(urn);
         elp.setUrl(url);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Generated Epicur Lite for urn " + urn + " is \n" + new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite()));
+            LOGGER.debug("Generated Epicur Lite for urn " + urn + " is \n"
+                + new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite()));
         }
         return elp;
     }
@@ -66,11 +68,13 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
             // the base urn, links to frontpage (metadata + viewer)
             if (urn.getPath() == null || urn.getPath().trim().length() == 0) {
                 MCRDerivate derivate = (MCRDerivate) MCRMetadataManager.retrieve(MCRObjectID.getInstance(urn.getId()));
-                url = new URL(MCRFrontendUtil.getBaseURL() + "receive/" + derivate.getOwnerID() + "?derivate=" + urn.getId());
+                url = new URL(
+                    MCRFrontendUtil.getBaseURL() + "receive/" + derivate.getOwnerID() + "?derivate=" + urn.getId());
             }
             // an urn for a certain file, links to iview2
             else {
-                MCRFile file = MCRFile.getMCRFile(MCRObjectID.getInstance(urn.getId()), urn.getPath() + urn.getFilename());
+                MCRFile file = MCRFile.getMCRFile(MCRObjectID.getInstance(urn.getId()),
+                    urn.getPath() + urn.getFilename());
                 if (file == null) {
                     LOGGER.warn("File " + urn.getFilename() + " in object " + urn.getId() + " could NOT be found");
                     return null;
@@ -78,7 +82,8 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
 
                 String spec = BaseEpicurLiteProvider.getViewerURL(file.toPath());
                 if (spec == null) {
-                    LOGGER.info("File is not displayable within iView2. Use " + MCRFileNodeServlet.class.getSimpleName() + " as url");
+                    LOGGER.info("File is not displayable within iView2. Use " + MCRFileNodeServlet.class.getSimpleName()
+                        + " as url");
                     String derivateId = file.getOwnerID();
                     String filePath = "/" + derivateId + file.getAbsolutePath();
                     spec = MCRServlet.getServletBaseURL() + MCRFileNodeServlet.class.getSimpleName() + filePath;
@@ -106,17 +111,19 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
 
         String url = null;
         if (useNewViewer) {
-            url = MessageFormat.format("{0}rsc/viewer/{1}/{2}", MCRFrontendUtil.getBaseURL(), file.getOwner(), file.getFileName());
+            url = MessageFormat.format("{0}rsc/viewer/{1}/{2}", MCRFrontendUtil.getBaseURL(), file.getOwner(),
+                file.getFileName());
         } else {
-            MCRObjectID mcrObjectID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(file.getOwner()), 10, TimeUnit.SECONDS);
-            String params = MCRXMLFunctions.encodeURIPath(MessageFormat.format("jumpback=true&maximized=true&page={0}&derivate={1}",
+            MCRObjectID mcrObjectID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(file.getOwner()), 10,
+                TimeUnit.SECONDS);
+            String params = MCRXMLFunctions
+                .encodeURIPath(MessageFormat.format("jumpback=true&maximized=true&page={0}&derivate={1}",
                     file.subpathComplete(), file.getOwner()));
             url = MessageFormat.format("{0}receive/{1}?{2}", MCRFrontendUtil.getBaseURL(), mcrObjectID, params);
         }
 
         return url;
     }
-    
 
     /**
      * @param file

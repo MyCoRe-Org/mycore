@@ -54,7 +54,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     // common data
     protected final static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    public final static String DEFAULT_LANGUAGE = CONFIG.getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+    public final static String DEFAULT_LANGUAGE = CONFIG.getString("MCR.Metadata.DefaultLang",
+        MCRConstants.DEFAULT_LANG);
 
     public final static boolean DEFAULT_HERITABLE = CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", false);
 
@@ -81,7 +82,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      */
     public MCRMetaElement() {
         list = new ArrayList<MCRMetaInterface>();
-        heritable=DEFAULT_HERITABLE;
+        heritable = DEFAULT_HERITABLE;
         notinherit = DEFAULT_NOT_INHERIT;
     }
 
@@ -98,7 +99,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * @param set_list
      *            a list of MCRMeta... data lines to add in this element (can be null)
      */
-    public MCRMetaElement(Class<? extends MCRMetaInterface> clazz, String set_tag, boolean set_heritable, boolean set_notinherit,
+    public MCRMetaElement(Class<? extends MCRMetaInterface> clazz, String set_tag, boolean set_heritable,
+        boolean set_notinherit,
         List<? extends MCRMetaInterface> set_list) {
         this();
         this.clazz = clazz;
@@ -305,7 +307,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         Class<? extends MCRMetaInterface> forName;
         try {
             String classname = element.getAttributeValue("class");
-            if(classname == null) {
+            if (classname == null) {
                 throw new MCRException("Missing required class attribute in element " + element.getName());
             }
             fullname = META_PACKAGE_NAME + classname;
@@ -354,7 +356,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     public final Element createXML(boolean flag) throws MCRException {
         try {
             validate();
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             debug();
             throw new MCRException("MCRMetaElement : The content is not valid: Tag=" + this.tag, exc);
         }
@@ -444,7 +446,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             throw new MCRException(getTag() + ": @class is not defined");
         }
         if (!clazz.getPackage().getName().equals(META_PACKAGE_NAME.substring(0, META_PACKAGE_NAME.length() - 1))) {
-            throw new MCRException(getTag() + ": package " + clazz.getPackage().getName() + " does not equal " + META_PACKAGE_NAME);
+            throw new MCRException(
+                getTag() + ": package " + clazz.getPackage().getName() + " does not equal " + META_PACKAGE_NAME);
         }
         if (list.size() == 0) {
             throw new MCRException(getTag() + ": does not contain any sub elements");
@@ -474,7 +477,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("ClassName          = " + getClassName());
             LOGGER.debug("Tag                = " + tag);
             LOGGER.debug("Heritable          = " + String.valueOf(heritable));

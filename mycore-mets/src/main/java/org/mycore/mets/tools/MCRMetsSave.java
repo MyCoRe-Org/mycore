@@ -77,9 +77,10 @@ public class MCRMetsSave {
     public static final String ALTO_FOLDER_PREFIX = "alto/";
 
     public static final String TEI_FOLDER_PREFIX = "tei/";
-    public static final String TRANSLATION_FOLDER_PREFIX = "translation.";
-    public static final String TRANSCRIPTION_FOLDER_PREFIX = "transcription";
 
+    public static final String TRANSLATION_FOLDER_PREFIX = "translation.";
+
+    public static final String TRANSCRIPTION_FOLDER_PREFIX = "transcription";
 
     /**
      * Saves the content of the given document to file and then adds the file to
@@ -107,7 +108,8 @@ public class MCRMetsSave {
      * @return
      *          true if the given document was successfully saved, otherwise false
      */
-    public static synchronized boolean saveMets(Document document, MCRObjectID derivateId, boolean overwrite, boolean validate) {
+    public static synchronized boolean saveMets(Document document, MCRObjectID derivateId, boolean overwrite,
+        boolean validate) {
         // add the file to the existing derivate in ifs
         MCRPath metsFile = getMetsFile(derivateId.toString());
 
@@ -240,17 +242,17 @@ public class MCRMetsSave {
     private static void updateOnImageFile(Document mets, String fileId, String path) {
         LOGGER.debug("FILE is a image!");
         //check if custom files are present and save the ids
-        String[] customFileGroups = {TRANSCRIPTION_FILE_GROUP_USE, ALTO_FILE_GROUP_USE, TRANSLATION_FILE_GROUP_USE};
+        String[] customFileGroups = { TRANSCRIPTION_FILE_GROUP_USE, ALTO_FILE_GROUP_USE, TRANSLATION_FILE_GROUP_USE };
 
         // add to structMap physical
         PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE);
         div.add(new Fptr(fileId));
 
         Arrays.stream(customFileGroups)
-              .map(customFileGroup -> searchFileInGroup(mets, path, customFileGroup))
-              .filter(Objects::nonNull)
-              .map(Fptr::new)
-              .forEach(div::add);
+            .map(customFileGroup -> searchFileInGroup(mets, path, customFileGroup))
+            .filter(Objects::nonNull)
+            .map(Fptr::new)
+            .forEach(div::add);
 
         // actually alter the mets document
         Element structMapPhys = getPhysicalStructmap(mets);
@@ -414,7 +416,7 @@ public class MCRMetsSave {
             String hrefAttributeValue = hrefAttribute.getValue();
             String hrefPath = getCleanPath(removeExtension(hrefAttributeValue));
 
-             if (hrefPath.equals(removeExtension(path))) {
+            if (hrefPath.equals(removeExtension(path))) {
                 matchId = ((Element) fileLoc.getParent()).getAttributeValue("ID");
                 break;
             }
@@ -431,9 +433,9 @@ public class MCRMetsSave {
             if (path.startsWith(TRANSLATION_FOLDER_PREFIX)) {
                 // e.g. tei/TRANSLATION_FOLDER_PREFIXDE/folder/file.tif -> folder/file.tif
                 path = path.substring(TRANSLATION_FOLDER_PREFIX.length());
-                path = path.substring(path.indexOf("/") +1);
+                path = path.substring(path.indexOf("/") + 1);
             } else if (path.startsWith(TRANSCRIPTION_FOLDER_PREFIX)) {
-                path = path.substring(TRANSCRIPTION_FOLDER_PREFIX.length()+1);
+                path = path.substring(TRANSCRIPTION_FOLDER_PREFIX.length() + 1);
             }
         }
         return path;
@@ -470,7 +472,8 @@ public class MCRMetsSave {
      * @param derivateID The {@link MCRObjectID} of the Derivate wich contains the METs file
      * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
      */
-    public static void updateMetsOnUrnGenerate(MCRObjectID derivateID, Map<String, String> fileUrnMap) throws Exception {
+    public static void updateMetsOnUrnGenerate(MCRObjectID derivateID, Map<String, String> fileUrnMap)
+        throws Exception {
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
             LOGGER.info(MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivateID));
@@ -560,11 +563,11 @@ public class MCRMetsSave {
                         //remove links in mets:structLink section
                         List<SmLink> list = modifiedMets.getStructLink().getSmLinkByTo(physicalSubDivToRemove.getId());
                         LogicalStructMap logicalStructMap = (LogicalStructMap) modifiedMets
-                                .getStructMap(LogicalStructMap.TYPE);
+                            .getStructMap(LogicalStructMap.TYPE);
 
                         for (SmLink linkToRemove : list) {
                             LOGGER.warn(String.format(Locale.ROOT, "remove smLink from \"%s\" to \"%s\"",
-                                    linkToRemove.getFrom(), linkToRemove.getTo()));
+                                linkToRemove.getFrom(), linkToRemove.getTo()));
                             modifiedMets.getStructLink().removeSmLink(linkToRemove);
                             // modify logical struct Map
                             String logID = linkToRemove.getFrom();
@@ -575,10 +578,10 @@ public class MCRMetsSave {
                             }
 
                             LogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
-                                    logID);
+                                logID);
                             if (!(logicalDiv instanceof LogicalDiv)) {
                                 LOGGER.error("Could not find " + LogicalDiv.class.getSimpleName() + " with id "
-                                        + logID);
+                                    + logID);
                                 LOGGER.error("Mets document remains unchanged");
                                 return mets;
                             }
@@ -595,11 +598,11 @@ public class MCRMetsSave {
                                 continue;
                             }
 
-                                /*
-                                 * the log div might be in a hierarchy of divs, which may now be empty
-                                 * (only containing empty directories), if so the parent of the log div
-                                 * must be deleted
-                                 * */
+                            /*
+                             * the log div might be in a hierarchy of divs, which may now be empty
+                             * (only containing empty directories), if so the parent of the log div
+                             * must be deleted
+                             * */
                             handleParents(logicalSubDiv, modifiedMets);
 
                             logicalStructMap.getDivContainer().remove(logicalSubDiv);
@@ -615,7 +618,6 @@ public class MCRMetsSave {
 
         return modifiedMets.asDocument();
     }
-
 
     /**
      * @param mets

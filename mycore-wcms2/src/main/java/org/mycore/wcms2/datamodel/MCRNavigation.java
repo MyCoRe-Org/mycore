@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Matthias Eichner
  */
-@XmlRootElement(name="navigation")
+@XmlRootElement(name = "navigation")
 @XmlAccessorType(XmlAccessType.NONE)
 public class MCRNavigation implements MCRNavigationBaseItem, MCRNavigationItemContainer {
 
@@ -37,7 +37,8 @@ public class MCRNavigation implements MCRNavigationBaseItem, MCRNavigationItemCo
     private String historyTitle;
 
     // children
-    @XmlElementRefs({ @XmlElementRef(type = MCRNavigationMenuItem.class), @XmlElementRef(type = MCRNavigationInsertItem.class) })
+    @XmlElementRefs({ @XmlElementRef(type = MCRNavigationMenuItem.class),
+        @XmlElementRef(type = MCRNavigationInsertItem.class) })
     private List<MCRNavigationBaseItem> children;
 
     public MCRNavigation() {

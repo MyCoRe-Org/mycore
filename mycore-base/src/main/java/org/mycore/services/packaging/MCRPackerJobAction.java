@@ -10,7 +10,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
 
-
 /**
  * Used to run a {@link MCRPacker} inside a {@link org.mycore.services.queuedjob.MCRJobQueue}
  *
@@ -19,6 +18,7 @@ import org.mycore.services.queuedjob.MCRJobAction;
 public class MCRPackerJobAction extends MCRJobAction {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
     private MCRPacker packerInstance;
 
     public MCRPackerJobAction() {
@@ -50,7 +50,8 @@ public class MCRPackerJobAction extends MCRJobAction {
     public final void execute() throws ExecutionException {
         String packerId = getPackerId();
         Map<String, String> packerConfiguration = getConfiguration(packerId);
-        packerInstance = MCRConfiguration.instance().getInstanceOf(MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".Class");
+        packerInstance = MCRConfiguration.instance()
+            .getInstanceOf(MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".Class");
 
         Map<String, String> parameters = getParameters();
 
@@ -59,7 +60,8 @@ public class MCRPackerJobAction extends MCRJobAction {
         LOGGER.info(() -> {
             StringBuilder messageBuilder = new StringBuilder();
             messageBuilder.append(getPackerId()).append(" starts packing with parameters: ");
-            parameters.entrySet().forEach((entry) -> messageBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append(";"));
+            parameters.entrySet().forEach(
+                (entry) -> messageBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append(";"));
             return messageBuilder.toString();
         });
         packerInstance.pack();
@@ -72,15 +74,13 @@ public class MCRPackerJobAction extends MCRJobAction {
     public static final Map<String, String> getConfiguration(String packerId) {
         String packerConfigPrefix = MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".";
         return MCRConfiguration
-                .instance()
-                .getPropertiesMap(packerConfigPrefix)
-                .entrySet()
-                .stream()
-                .collect(
-                        Collectors.toMap(e -> e.getKey().substring(packerConfigPrefix.length()), Map.Entry::getValue)
-                );
+            .instance()
+            .getPropertiesMap(packerConfigPrefix)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(e -> e.getKey().substring(packerConfigPrefix.length()), Map.Entry::getValue));
     }
-
 
     @Override
     public void rollback() {

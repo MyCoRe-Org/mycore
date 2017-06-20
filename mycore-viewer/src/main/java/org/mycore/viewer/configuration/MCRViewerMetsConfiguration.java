@@ -14,7 +14,7 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
         // properties
         setProperty("metsURL", MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + getDerivate(request));
         String imageXmlPath = MCRConfiguration.instance().getString("MCR.Viewer.BaseURL", null); // Parameter can be used to provide multiple urls
-        
+
         if (imageXmlPath == null || imageXmlPath.isEmpty()) {
             imageXmlPath = MCRServlet.getServletBaseURL() + "MCRTileServlet/";
         }
@@ -23,7 +23,7 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
             imageXmlPath = imageXmlPath.split(",")[0];
         }
         setProperty("imageXmlPath", imageXmlPath);
-        
+
         setProperty("pdfCreatorStyle", MCRConfiguration.instance().getString("MCR.Viewer.PDFCreatorStyle", null));
         setProperty("pdfCreatorURI", MCRConfiguration.instance().getString("MCR.Viewer.PDFCreatorURI", null));
         setProperty("text.enabled", MCRConfiguration.instance().getString("MCR.Viewer.text.enabled", "false"));

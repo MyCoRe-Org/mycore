@@ -40,30 +40,23 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void compareTo(){
-        Set<MCRObjectID> testIds =
-            IntStream.range(0, 17)
-                     .mapToObj(i ->
-                         MCRObjectID.getInstance(MCRObjectID.formatID("MyCoRe", "test", i)))
-                     .flatMap(o -> Stream.of(o, MCRObjectID.getInstance(
-                         MCRObjectID.formatID(o.getProjectId(), "junit", o.getNumberAsInteger()))))
-                     .flatMap(o ->
-                         Stream.concat(Stream.of(o),
-                             Stream.of("junit", "mcr", "JUnit")
-                                   .map(projectId -> MCRObjectID
-                                       .getInstance(
-                                           MCRObjectID.formatID(
-                                               projectId,
-                                               o.getTypeId(),
-                                               o.getNumberAsInteger())
-                                       )
-                                   )
-                         )
-                     )
-                     .collect(Collectors.toSet());
+    public void compareTo() {
+        Set<MCRObjectID> testIds = IntStream.range(0, 17)
+            .mapToObj(i -> MCRObjectID.getInstance(MCRObjectID.formatID("MyCoRe", "test", i)))
+            .flatMap(o -> Stream.of(o, MCRObjectID.getInstance(
+                MCRObjectID.formatID(o.getProjectId(), "junit", o.getNumberAsInteger()))))
+            .flatMap(o -> Stream.concat(Stream.of(o),
+                Stream.of("junit", "mcr", "JUnit")
+                    .map(projectId -> MCRObjectID
+                        .getInstance(
+                            MCRObjectID.formatID(
+                                projectId,
+                                o.getTypeId(),
+                                o.getNumberAsInteger())))))
+            .collect(Collectors.toSet());
         ArrayList<MCRObjectID> first = new ArrayList<>(testIds);
         ArrayList<MCRObjectID> test = new ArrayList<>(testIds);
-        first.sort((f , o) -> f.toString().compareTo(o.toString()));
+        first.sort((f, o) -> f.toString().compareTo(o.toString()));
         test.sort(MCRObjectID::compareTo);
         assertArrayEquals("Order should be the same.", first.toArray(), test.toArray());
     }

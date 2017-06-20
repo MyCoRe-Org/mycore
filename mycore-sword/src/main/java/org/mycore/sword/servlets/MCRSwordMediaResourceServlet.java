@@ -1,6 +1,5 @@
 package org.mycore.sword.servlets;
 
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -14,9 +13,10 @@ import org.swordapp.server.MediaResourceAPI;
 public class MCRSwordMediaResourceServlet extends MCRSwordServlet {
 
     private MCRSwordConfigurationDefault swordConfiguration;
-    private MCRSwordMediaManager mrm;
-    private MediaResourceAPI api;
 
+    private MCRSwordMediaManager mrm;
+
+    private MediaResourceAPI api;
 
     public void init() throws ServletException {
         swordConfiguration = new MCRSwordConfigurationDefault();
@@ -30,13 +30,11 @@ public class MCRSwordMediaResourceServlet extends MCRSwordServlet {
         afterRequest(req, resp);
     }
 
-
     public void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.head(req, resp);
         afterRequest(req, resp);
     }
-
 
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
@@ -44,13 +42,11 @@ public class MCRSwordMediaResourceServlet extends MCRSwordServlet {
         afterRequest(req, resp);
     }
 
-
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.put(req, resp);
         afterRequest(req, resp);
     }
-
 
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);

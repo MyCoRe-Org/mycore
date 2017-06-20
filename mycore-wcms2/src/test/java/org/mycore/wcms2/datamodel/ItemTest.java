@@ -32,7 +32,7 @@ public class ItemTest {
         this.item.setTemplate("template_mysample");
         this.item.setConstrainPopUp(true);
         this.item.setReplaceMenu(false);
-        
+
         this.item.setI18n("item.test.key");
         this.item.addLabel("de", "Deutschland");
         this.item.addLabel("en", "England");
@@ -45,7 +45,7 @@ public class ItemTest {
         JDOMResult JDOMResult = new JDOMResult();
         m.marshal(this.item, JDOMResult);
         Element itemElement = JDOMResult.getDocument().getRootElement();
-        
+
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
         out.output(itemElement, System.out);
 
@@ -56,9 +56,9 @@ public class ItemTest {
         assertEquals("true", itemElement.getAttributeValue("constrainPopUp"));
         assertEquals("false", itemElement.getAttributeValue("replaceMenu"));
         assertEquals("item.test.key", itemElement.getAttributeValue("i18nKey"));
-        
-        Element label1 = (Element)itemElement.getChildren().get(0);
-        Element label2 = (Element)itemElement.getChildren().get(1);
+
+        Element label1 = (Element) itemElement.getChildren().get(0);
+        Element label2 = (Element) itemElement.getChildren().get(1);
 
         assertEquals("Deutschland", label1.getValue());
         assertEquals("England", label2.getValue());

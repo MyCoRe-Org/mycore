@@ -140,7 +140,8 @@ final public class MCRDerivate extends MCRBase {
     public Map<String, String> getUrnMap() {
         Map<String, String> fileUrnMap = new HashMap<String, String>();
 
-        XPathExpression<Element> filesetPath = XPathFactory.instance().compile("./mycorederivate/derivate/fileset", Filters.element());
+        XPathExpression<Element> filesetPath = XPathFactory.instance().compile("./mycorederivate/derivate/fileset",
+            Filters.element());
 
         Element result = filesetPath.evaluateFirst(this.createXML());
         if (result == null) {
@@ -167,7 +168,7 @@ final public class MCRDerivate extends MCRBase {
      * The method print all informations about this MCRObject.
      */
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("MCRDerivate ID : " + mcr_id);
             LOGGER.debug("MCRDerivate Label : " + mcr_label);
             LOGGER.debug("MCRDerivate Schema : " + mcr_schema);
@@ -189,12 +190,12 @@ final public class MCRDerivate extends MCRBase {
     public void validate() throws MCRException {
         super.validate();
         MCRObjectDerivate derivate = getDerivate();
-        if(derivate == null) {
+        if (derivate == null) {
             throw new MCRException("The <derivate> part of '" + getId().toString() + "' is undefined.");
         }
         try {
             derivate.validate();
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new MCRException("The <derivate> part of '" + getId().toString() + "' is invalid.", exc);
         }
     }

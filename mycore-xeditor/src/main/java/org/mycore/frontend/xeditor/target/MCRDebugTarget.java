@@ -46,7 +46,8 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 public class MCRDebugTarget implements MCREditorTarget {
 
     @Override
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
+        throws Exception {
         job.getResponse().setContentType("text/html; charset=UTF-8");
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");

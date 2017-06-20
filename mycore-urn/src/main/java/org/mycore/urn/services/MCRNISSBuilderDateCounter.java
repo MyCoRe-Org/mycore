@@ -121,7 +121,7 @@ public class MCRNISSBuilderDateCounter implements MCRNISSBuilder {
         }
 
         niss = sb.toString();
-        
+
         return niss;
     }
 }

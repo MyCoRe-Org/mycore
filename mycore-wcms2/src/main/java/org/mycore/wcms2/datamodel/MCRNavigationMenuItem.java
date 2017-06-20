@@ -12,19 +12,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "menu")
 @XmlAccessorType(XmlAccessType.NONE)
-public class MCRNavigationMenuItem extends MCRNavigationI18nItem implements MCRNavigationBaseItem, MCRNavigationItemContainer {
+public class MCRNavigationMenuItem extends MCRNavigationI18nItem
+    implements MCRNavigationBaseItem, MCRNavigationItemContainer {
 
     @XmlAttribute(required = true)
     private String id;
+
     @XmlAttribute
     private String dir;
+
     // children
-    @XmlElementRefs ({
+    @XmlElementRefs({
         @XmlElementRef(type = MCRNavigationItem.class),
         @XmlElementRef(type = MCRNavigationGroup.class),
         @XmlElementRef(type = MCRNavigationInsertItem.class)
     })
-//    @XmlAnyElement(lax = true)
+    //    @XmlAnyElement(lax = true)
     private List<MCRNavigationBaseItem> children;
 
     public MCRNavigationMenuItem() {
@@ -34,6 +37,7 @@ public class MCRNavigationMenuItem extends MCRNavigationI18nItem implements MCRN
     public String getId() {
         return id;
     }
+
     public String getDir() {
         return dir;
     }
@@ -41,6 +45,7 @@ public class MCRNavigationMenuItem extends MCRNavigationI18nItem implements MCRN
     public void setId(String id) {
         this.id = id;
     }
+
     public void setDir(String dir) {
         this.dir = dir;
     }
@@ -48,9 +53,11 @@ public class MCRNavigationMenuItem extends MCRNavigationI18nItem implements MCRN
     public void addItem(MCRNavigationItem item) {
         this.children.add(item);
     }
+
     public void addInsertItem(MCRNavigationInsertItem insertItem) {
         this.children.add(insertItem);
     }
+
     public List<MCRNavigationBaseItem> getChildren() {
         return this.children;
     }

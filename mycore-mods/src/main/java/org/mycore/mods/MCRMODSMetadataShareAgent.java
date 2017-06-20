@@ -145,7 +145,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                 continue;
             }
             MCRObjectID holderObjectID = MCRObjectID.getInstance(holderId);
-            if(MCRMODSWrapper.isSupported(holderObjectID)){
+            if (MCRMODSWrapper.isSupported(holderObjectID)) {
                 MCRObject targetObject = MCRMetadataManager.retrieveMCRObject(holderObjectID);
                 MCRMODSWrapper targetWrapper = new MCRMODSWrapper(targetObject);
                 relatedItem.addContent(targetWrapper.getMODS().cloneContent());

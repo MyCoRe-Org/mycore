@@ -38,7 +38,7 @@ public class MCRURL {
     private Map<String, List<String>> buildParameterMap(URL url) {
         Map<String, List<String>> p = new HashMap<String, List<String>>();
         String queryString = url.getQuery();
-        if(queryString == null) {
+        if (queryString == null) {
             return p;
         }
         for (String pair : queryString.split("&")) {
@@ -73,7 +73,8 @@ public class MCRURL {
         try {
             URI uri = this.url.toURI();
             StringBuffer urlBuffer = new StringBuffer();
-            urlBuffer.append(new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), null, null)
+            urlBuffer.append(
+                new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), null, null)
                     .toString());
             if (query != null) {
                 urlBuffer.append("?").append(query);

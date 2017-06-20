@@ -60,7 +60,8 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
      */
     public boolean checkPermission(String id, String permission) {
         String currentID;
-        for (currentID = id; currentID != null && !MCRAccessManager.getAccessImpl().hasRule(currentID, permission); currentID = getParentID(currentID)) {
+        for (currentID = id; currentID != null
+            && !MCRAccessManager.getAccessImpl().hasRule(currentID, permission); currentID = getParentID(currentID)) {
             LOGGER.debug("No access rule specified for: " + currentID + ". Trying to use parent ID.");
         }
         LOGGER.debug("Using access rule defined for: " + currentID);

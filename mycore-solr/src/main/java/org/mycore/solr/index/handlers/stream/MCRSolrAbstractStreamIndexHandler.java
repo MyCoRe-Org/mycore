@@ -1,13 +1,13 @@
 package org.mycore.solr.index.handlers.stream;
 
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.cs.MCRSolrAbstractContentStream;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 
-public abstract class MCRSolrAbstractStreamIndexHandler extends MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler {
+public abstract class MCRSolrAbstractStreamIndexHandler extends MCRSolrAbstractIndexHandler
+    implements MCRSolrIndexHandler {
 
     protected MCRSolrAbstractContentStream<?> stream;
 

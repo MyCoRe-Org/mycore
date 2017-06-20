@@ -178,7 +178,7 @@ public class MCRObjectStructure {
      * @return boolean true, if successfully completed
      */
     public final boolean removeChild(MCRObjectID href) {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Remove child ID " + href);
         }
         return removeMetaLink(getChildren().iterator(), href);
@@ -194,7 +194,7 @@ public class MCRObjectStructure {
      * @return boolean true, if successfully completed
      */
     public final boolean removeDerivate(MCRObjectID href) {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Remove derivate ID " + href);
         }
         return removeMetaLink(getDerivates().iterator(), href);
@@ -280,9 +280,9 @@ public class MCRObjectStructure {
      */
     public final MCRMetaLinkID getDerivateLink(MCRObjectID derivateId) {
         return getDerivates().stream()
-                             .filter(derivate -> derivate.getXLinkHrefID().equals(derivateId))
-                             .findAny()
-                             .orElse(null);
+            .filter(derivate -> derivate.getXLinkHrefID().equals(derivateId))
+            .findAny()
+            .orElse(null);
     }
 
     /** 
@@ -348,7 +348,7 @@ public class MCRObjectStructure {
     public final Element createXML() throws MCRException {
         try {
             validate();
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             throw new MCRException("The content is not valid.", exc);
         }
 
@@ -426,7 +426,7 @@ public class MCRObjectStructure {
      * The method print all informations about this MCRObjectStructure.
      */
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             for (MCRMetaLinkID linkID : derivates) {
                 linkID.debug();
             }

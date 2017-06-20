@@ -28,13 +28,16 @@ package org.mycore.access;
  *
  */
 class MCRPermissionHandle {
-    
+
     private String id;
+
     private String permission;
+
     public MCRPermissionHandle(String id, String permission) {
         this.id = id;
         this.permission = permission.intern();
     }
+
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
@@ -46,6 +49,7 @@ class MCRPermissionHandle {
         result = prime * result + ((permission == null) ? 0 : permission.hashCode());
         return result;
     }
+
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */

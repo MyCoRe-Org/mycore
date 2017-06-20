@@ -71,7 +71,8 @@ public class MCRTranslationTest extends MCRTestCase {
 
     @Test
     public void getDeprecatedMessageKeys() {
-        assertEquals("Depreacted I18N keys do not work", "MyCoRe ID", MCRTranslation.translate("oldLabel", Locale.ENGLISH));
+        assertEquals("Depreacted I18N keys do not work", "MyCoRe ID",
+            MCRTranslation.translate("oldLabel", Locale.ENGLISH));
     }
 
 }

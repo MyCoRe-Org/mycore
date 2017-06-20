@@ -352,7 +352,7 @@ public class MCRObjectDerivate {
     public final org.jdom2.Element createXML() throws MCRException {
         try {
             validate();
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             throw new MCRException("The content is not valid.", exc);
         }
         org.jdom2.Element elm = new org.jdom2.Element("derivate");

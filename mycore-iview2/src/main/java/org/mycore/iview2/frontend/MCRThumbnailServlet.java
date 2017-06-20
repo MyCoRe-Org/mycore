@@ -196,7 +196,8 @@ public class MCRThumbnailServlet extends MCRServlet {
             //get next bigger zoomLevel and scale image to THUMBNAIL_SIZE
             ImageReader reader = MCRIView2Tools.getTileImageReader();
             try {
-                level1Image = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, reader, Math.min(1, props.getZoomlevel()));
+                level1Image = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, reader,
+                    Math.min(1, props.getZoomlevel()));
             } finally {
                 reader.dispose();
             }

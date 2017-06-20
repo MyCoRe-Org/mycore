@@ -1,6 +1,5 @@
 package org.mycore.services.packaging;
 
-
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -11,7 +10,6 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobQueue;
-
 
 /**
  * <p>Used to pack packages in a specific format, using {@link MCRJobQueue}.</p>
@@ -31,6 +29,7 @@ import org.mycore.services.queuedjob.MCRJobQueue;
 public class MCRPackerManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
     private static final MCRJobQueue PACKER_JOB_QUEUE = initializeJobQueue();
 
     private static MCRJobQueue initializeJobQueue() {
@@ -65,7 +64,8 @@ public class MCRPackerManager {
         return mcrJob;
     }
 
-    private static void checkPacker(String packer, Map<String, String> jobParameters) throws MCRUsageException, MCRAccessException {
+    private static void checkPacker(String packer, Map<String, String> jobParameters)
+        throws MCRUsageException, MCRAccessException {
         MCRPacker instance = MCRConfiguration.instance().getInstanceOf("MCR.Packaging.Packer." + packer + ".Class");
         instance.setParameter(jobParameters);
         instance.setConfiguration(MCRPackerJobAction.getConfiguration(packer));

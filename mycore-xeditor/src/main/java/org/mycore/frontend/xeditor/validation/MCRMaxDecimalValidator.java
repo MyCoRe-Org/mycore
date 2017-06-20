@@ -30,7 +30,7 @@ package org.mycore.frontend.xeditor.validation;
 public class MCRMaxDecimalValidator extends MCRDecimalValidator {
 
     private static final String ATTR_MAX = "max";
-    
+
     private double max;
 
     @Override

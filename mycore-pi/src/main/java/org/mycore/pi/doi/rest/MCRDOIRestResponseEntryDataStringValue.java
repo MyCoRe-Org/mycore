@@ -11,5 +11,4 @@ public class MCRDOIRestResponseEntryDataStringValue extends MCRDOIRestResponseEn
         return value;
     }
 
-
 }

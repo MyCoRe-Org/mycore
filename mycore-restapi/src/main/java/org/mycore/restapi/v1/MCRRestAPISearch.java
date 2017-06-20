@@ -115,13 +115,13 @@ public class MCRRestAPISearch {
             if (fl != null) {
                 url.append("&fl=").append(URLEncoder.encode(fl, "UTF-8"));
             }
-            if(facet!=null){
+            if (facet != null) {
                 url.append("&facet=").append(URLEncoder.encode(facet, "UTF-8"));
             }
-            for(String ff: facetFields){
+            for (String ff : facetFields) {
                 url.append("&facet.field=").append(URLEncoder.encode(ff, "UTF-8"));
             }
-            if(jsonWrf!=null){
+            if (jsonWrf != null) {
                 url.append("&json.wrf=").append(jsonWrf);
             }
         } catch (UnsupportedEncodingException e) {

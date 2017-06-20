@@ -100,10 +100,11 @@ public class MCRCalendar {
 
     /** all available calendars of ICU as String area */
     public static final String CALENDARS_ICU[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN,
-            TAG_HEBREW, TAG_ISLAMIC, TAG_JAPANESE };
+        TAG_HEBREW, TAG_ISLAMIC, TAG_JAPANESE };
 
     /** a list of calendar tags they are supported in this class */
-    public static final List<String> CALENDARS_LIST = Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(TAG_GREGORIAN,
+    public static final List<String> CALENDARS_LIST = Collections
+        .unmodifiableList(new ArrayList<String>(Arrays.asList(TAG_GREGORIAN,
             TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC, TAG_JAPANESE, TAG_ARMENIAN,
             TAG_EGYPTIAN)));
 
@@ -126,11 +127,11 @@ public class MCRCalendar {
      * @exception MCRException if parsing has an error
      */
     public static Calendar getHistoryDateAsCalendar(String date_string, boolean last, String calendar_string)
-            throws MCRException {
+        throws MCRException {
         Calendar out = null;
         // check date_string
         LOGGER.debug("Input of getHistoryDateAsCalendar: " + date_string + "  " + calendar_string + "  "
-                + Boolean.toString(last));
+            + Boolean.toString(last));
         if (date_string == null || date_string.trim().length() == 0) {
             throw new MCRException("The ancient date string is null or empty");
         }
@@ -331,8 +332,8 @@ public class MCRCalendar {
 
         // Test of the daily
         if ((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31
-                || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29 && year % 4 == 0
-                || mon == 1 && day > 28 && year % 4 > 0 || day < 1) {
+            || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29 && year % 4 == 0
+            || mon == 1 && day > 28 && year % 4 > 0 || day < 1) {
             throw new MCRException("The day of the date is inadmissible.");
         }
         fields[0] = year;
@@ -367,7 +368,8 @@ public class MCRCalendar {
      *         occurred.
      * @exception MCRException if parsing has an error
      */
-    protected static GregorianCalendar getCalendarFromGregorianDate(String date_string, boolean last) throws MCRException {
+    protected static GregorianCalendar getCalendarFromGregorianDate(String date_string, boolean last)
+        throws MCRException {
         try {
             int fields[] = checkDateStringForJulianCalendar(date_string, last);
             GregorianCalendar calendar = new GregorianCalendar();
@@ -440,8 +442,9 @@ public class MCRCalendar {
                 julian_day = 2299170;
             if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 15 && fields[3] == 1)
                 julian_day = 2299171;
-            if ((fields[0] > 1582 || (fields[0] == 1582 && fields[1] > 9) || (fields[0] == 1582 && fields[1] == 9 && fields[2] > 15))
-                    && fields[3] == 1)
+            if ((fields[0] > 1582 || (fields[0] == 1582 && fields[1] > 9)
+                || (fields[0] == 1582 && fields[1] == 9 && fields[2] > 15))
+                && fields[3] == 1)
                 julian_day += 10;
             if ((fields[0] > 1700 || (fields[0] == 1700 && fields[1] >= 2)) && fields[3] == 1)
                 julian_day += 1;
@@ -1076,8 +1079,9 @@ public class MCRCalendar {
 
             // Test of the daily
             if ((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31
-                    || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29
-                    && year % 4 == 0 || mon == 1 && day > 28 && year % 4 > 0 || day < 1) {
+                || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29
+                    && year % 4 == 0
+                || mon == 1 && day > 28 && year % 4 > 0 || day < 1) {
                 throw new MCRException("The day of the date is inadmissible.");
             }
             if (bb) {
@@ -1639,12 +1643,12 @@ public class MCRCalendar {
      *            an instance of a Calendar
      * @return a Gregorian calendar
      */
-     public static GregorianCalendar getGregorianCalendarOfACalendar(Calendar input_calendar) {
-         int julian_day = getJulianDayNumber(input_calendar);
-         GregorianCalendar ret = new GregorianCalendar();
-         ret.set(Calendar.JULIAN_DAY, julian_day);
-         return ret;
-     }
+    public static GregorianCalendar getGregorianCalendarOfACalendar(Calendar input_calendar) {
+        int julian_day = getJulianDayNumber(input_calendar);
+        GregorianCalendar ret = new GregorianCalendar();
+        ret.set(Calendar.JULIAN_DAY, julian_day);
+        return ret;
+    }
 
     /**
      * This method returns the date as string in format 'yy-MM-dd G'.

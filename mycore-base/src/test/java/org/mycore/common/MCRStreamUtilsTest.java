@@ -35,7 +35,8 @@ public class MCRStreamUtilsTest {
         ArrayList<String> sortedNodes = new ArrayList<>(Arrays.asList(nodes));
         sortedNodes.sort(String.CASE_INSENSITIVE_ORDER);
         String[] nodesPreOrder = MCRStreamUtils
-            .flatten("F", ((Function<String, String[]>) children::get).andThen(Arrays::asList), Collection::parallelStream)
+            .flatten("F", ((Function<String, String[]>) children::get).andThen(Arrays::asList),
+                Collection::parallelStream)
             .collect(Collectors.toList())
             .toArray(new String[nodes.length]);
         assertEquals("Node count differs", nodes.length, nodesPreOrder.length);

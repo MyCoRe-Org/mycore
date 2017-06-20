@@ -33,7 +33,7 @@ public class MCRDerivateURNUtils {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String SUPPORTED_CONTENT_TYPE = MCRConfiguration.instance().getString(
-            "MCR.URN.URNGranular.SupportedContentTypes", "");
+        "MCR.URN.URNGranular.SupportedContentTypes", "");
 
     public static URL getURL(MCRPIRegistrationInfo piInfo) {
         String derivateID = piInfo.getMycoreID();
@@ -47,7 +47,7 @@ public class MCRDerivateURNUtils {
             if (piInfo.getAdditional() == null || piInfo.getAdditional().trim().length() == 0) {
                 MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
                 return new URL(
-                        MCRFrontendUtil.getBaseURL() + "receive/" + derivate.getOwnerID() + "?derivate=" + derivateID);
+                    MCRFrontendUtil.getBaseURL() + "receive/" + derivate.getOwnerID() + "?derivate=" + derivateID);
             }
             // an urn for a certain file, links to iview2
             else {
@@ -60,11 +60,11 @@ public class MCRDerivateURNUtils {
 
                 if (!isFileSupported(file)) {
                     LOGGER.info("File is not displayable within iView2. Use " + MCRFileNodeServlet.class.getSimpleName()
-                                        + " as url");
+                        + " as url");
                     String filePath = "/" + file.getOwner() + file.toString();
                     return new URL(
-                            MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
-                                    + filePath);
+                        MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
+                            + filePath);
                 }
 
                 return new URL(getViewerURL(file));
@@ -84,7 +84,7 @@ public class MCRDerivateURNUtils {
      */
     private static String getViewerURL(MCRPath file) {
         return MessageFormat.format("{0}rsc/viewer/{1}/{2}", MCRFrontendUtil.getBaseURL(), file.getOwner(),
-                                    file.getFileName().toString());
+            file.getFileName().toString());
     }
 
     public static URL getDFGViewerURL(MCRPIRegistrationInfo urn) {
@@ -93,10 +93,10 @@ public class MCRDerivateURNUtils {
             MCRObjectID derivateId = MCRObjectID.getInstance(urn.getMycoreID());
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
             String mainDoc = Optional.ofNullable(derivate.getDerivate())
-                                     .map(MCRObjectDerivate::getInternals)
-                                     .map(MCRMetaIFS::getMainDoc)
-                                     .orElseThrow(() -> new RuntimeException(
-                                             "Could not get main doc for " + derivateId.toString()));
+                .map(MCRObjectDerivate::getInternals)
+                .map(MCRMetaIFS::getMainDoc)
+                .orElseThrow(() -> new RuntimeException(
+                    "Could not get main doc for " + derivateId.toString()));
 
             String spec = null;
             String baseURL = MCRFrontendUtil.getBaseURL();
@@ -104,11 +104,11 @@ public class MCRDerivateURNUtils {
             if (mainDoc != null && mainDoc.length() > 0) {
                 String mainDocEnc = URLEncoder.encode(mainDoc, "UTF-8");
                 spec = MessageFormat
-                        .format(baseURL + "servlets/MCRDFGLinkServlet?deriv={0}&file={1}",
-                                id, mainDocEnc);
+                    .format(baseURL + "servlets/MCRDFGLinkServlet?deriv={0}&file={1}",
+                        id, mainDocEnc);
             } else {
                 spec = baseURL + "servlets/MCRDFGLinkServlet?deriv="
-                        + id;
+                    + id;
             }
 
             LOGGER.debug("Generated URL for urn " + urn.getIdentifier() + " is " + spec);
@@ -133,6 +133,6 @@ public class MCRDerivateURNUtils {
         }
 
         return false;
-//        return true;
+        //        return true;
     }
 }

@@ -36,7 +36,7 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
             elements = webDriver.findElements(byTextIgnoreCSS);
             Thread.sleep(ONE_SECOND_IN_MILLISECONDS);
         }
-        if (elements.isEmpty()){
+        if (elements.isEmpty()) {
             throw new AssertionError("The element to wait for was not found!");
         }
     }

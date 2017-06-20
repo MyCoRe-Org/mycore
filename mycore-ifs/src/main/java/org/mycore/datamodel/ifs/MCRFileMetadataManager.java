@@ -202,9 +202,11 @@ public class MCRFileMetadataManager {
      * raw data that is retrieved from the persistent store, or uses the
      * existing copy in the MCRCache instance.
      */
-    public MCRFilesystemNode buildNode(String type, String ID, String parentID, String ownerID, String name, String label, long size,
-            GregorianCalendar date, String storeID, String storageID, String fctID, String md5, int numchdd, int numchdf, int numchtd,
-            int numchtf) throws MCRPersistenceException {
+    public MCRFilesystemNode buildNode(String type, String ID, String parentID, String ownerID, String name,
+        String label, long size,
+        GregorianCalendar date, String storeID, String storageID, String fctID, String md5, int numchdd, int numchdf,
+        int numchtd,
+        int numchtf) throws MCRPersistenceException {
         MCRFilesystemNode n = (MCRFilesystemNode) cache.get(ID);
 
         if (n != null) {
@@ -244,15 +246,15 @@ public class MCRFileMetadataManager {
         cache.remove(ID);
         store.deleteNode(ID);
     }
-    
-    void clearMetadataCache(){
+
+    void clearMetadataCache() {
         cache.clear();
     }
-    
+
     /**
      * Returns an object to iterate over the owner IDs.
      */
-    public Iterable<String> getOwnerIDs(){
+    public Iterable<String> getOwnerIDs() {
         return store.getOwnerIDs();
     }
 }

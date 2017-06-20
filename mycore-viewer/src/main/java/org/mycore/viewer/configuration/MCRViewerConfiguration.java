@@ -58,7 +58,7 @@ public class MCRViewerConfiguration {
     private Map<String, Object> properties;
 
     private static boolean DEBUG_MODE;
-    
+
     private static Pattern REQUEST_PATH_PATTERN;
 
     static {
@@ -119,7 +119,7 @@ public class MCRViewerConfiguration {
     public static String getDerivate(HttpServletRequest request) {
         try {
             return getFromPath(request.getPathInfo(), 1);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             LOGGER.warn("Unable to get the derivate id of request " + request.getRequestURI());
             return null;
         }
@@ -135,7 +135,7 @@ public class MCRViewerConfiguration {
     public static String getFilePath(HttpServletRequest request) {
         try {
             return getFromPath(request.getPathInfo(), 2);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             LOGGER.warn("Unable to get the file path of request " + request.getRequestURI());
             return null;
         }
@@ -273,18 +273,18 @@ public class MCRViewerConfiguration {
         @XmlElementWrapper(name = "resources")
         public final List<MCRIViewClientResource> getResources() {
             return resources.entries()
-                            .stream()
-                            .map(entry -> new MCRIViewClientResource(entry.getKey(), entry.getValue()))
-                            .collect(Collectors.toList());
+                .stream()
+                .map(entry -> new MCRIViewClientResource(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
         }
 
         @XmlElements({ @XmlElement(name = "property") })
         @XmlElementWrapper(name = "properties")
         public final List<MCRIViewClientProperty> getProperties() {
             return properties.entrySet()
-                             .stream()
-                             .map(entry -> new MCRIViewClientProperty(entry.getKey(), entry.getValue()))
-                             .collect(Collectors.toList());
+                .stream()
+                .map(entry -> new MCRIViewClientProperty(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
         }
 
     }

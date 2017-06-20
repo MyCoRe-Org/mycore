@@ -16,7 +16,9 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 public class MCRCreateDateDOIGenerator extends MCRPersistentIdentifierGenerator<MCRDigitalObjectIdentifier> {
 
     private static final String DATE_PATTERN = "yyyyMMdd-HHmmss";
+
     private final MCRDOIParser mcrdoiParser;
+
     private String prefix = MCRConfiguration.instance().getString("MCR.DOI.Prefix");
 
     public MCRCreateDateDOIGenerator(String generatorID) {
@@ -25,7 +27,8 @@ public class MCRCreateDateDOIGenerator extends MCRPersistentIdentifierGenerator<
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRObjectID mcrID, String additional) throws MCRPersistentIdentifierException {
+    public MCRDigitalObjectIdentifier generate(MCRObjectID mcrID, String additional)
+        throws MCRPersistentIdentifierException {
         Date createdate = MCRMetadataManager.retrieveMCRObject(mcrID).getService().getDate("createdate");
         if (createdate != null) {
             MCRISO8601Date mcrdate = new MCRISO8601Date();

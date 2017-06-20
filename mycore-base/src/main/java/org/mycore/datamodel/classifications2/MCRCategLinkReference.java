@@ -47,7 +47,7 @@ public class MCRCategLinkReference implements Serializable {
     private String objectID;
 
     @Basic
-    @Column(name="objectType", length=128)
+    @Column(name = "objectType", length = 128)
     private String type;
 
     public MCRCategLinkReference() {

@@ -151,7 +151,7 @@ final public class MCRObject extends MCRBase {
             elm.addContent(mcr_metadata.createXML());
             elm.addContent(mcr_service.createXML());
             return doc;
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             throw new MCRException("The content of '" + mcr_id + "' is invalid.", exc);
         }
     }
@@ -187,7 +187,7 @@ final public class MCRObject extends MCRBase {
      * The method print all informations about this MCRObject.
      */
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             if (mcr_id == null) {
                 LOGGER.debug("MCRObject ID : missing");
             } else {
@@ -217,20 +217,20 @@ final public class MCRObject extends MCRBase {
         super.validate();
         MCRObjectStructure structure = getStructure();
         MCRObjectMetadata metadata = getMetadata();
-        if(structure == null) {
+        if (structure == null) {
             throw new MCRException("The <structure> part of '" + getId() + "' is undefined.");
         }
-        if(metadata == null) {
+        if (metadata == null) {
             throw new MCRException("The <metadata> part of '" + getId() + "' is undefined.");
         }
         try {
             structure.validate();
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             throw new MCRException("The <structure> part of '" + getId() + "' is invalid.", exc);
         }
         try {
             metadata.validate();
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             throw new MCRException("The <metadata> part of '" + getId() + "' is invalid.", exc);
         }
     }
@@ -259,7 +259,7 @@ final public class MCRObject extends MCRBase {
                         continue;
                     }
                     MCRActiveLinkException activeLink = new MCRActiveLinkException(
-                            "Failure while adding link!. Destination does not exist.");
+                        "Failure while adding link!. Destination does not exist.");
                     String destination = classID + "##" + categID;
                     activeLink.addLink(getId().toString(), destination);
                     // throw activeLink;
@@ -271,7 +271,7 @@ final public class MCRObject extends MCRBase {
                         continue;
                     }
                     MCRActiveLinkException activeLink = new MCRActiveLinkException(
-                            "Failure while adding link!. Destination does not exist.");
+                        "Failure while adding link!. Destination does not exist.");
                     activeLink.addLink(getId().toString(), destination.toString());
                     // throw activeLink;
                     // TODO: should trigger undo-Event

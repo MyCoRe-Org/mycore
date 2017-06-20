@@ -24,6 +24,7 @@ import org.mycore.services.queuedjob.MCRJob;
 public class MCRPackerServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
@@ -42,7 +43,7 @@ public class MCRPackerServlet extends MCRServlet {
 
         try {
             MCRJob mcrJob = MCRPackerManager.startPacking(jobParameters);
-            if(mcrJob==null){
+            if (mcrJob == null) {
                 job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "No packer parameter!");
             }
         } catch (MCRAccessException e) {
@@ -50,7 +51,6 @@ public class MCRPackerServlet extends MCRServlet {
         } catch (MCRUsageException e) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Parameters: " + e.getMessage());
         }
-
 
         if (jobParameters.containsKey("redirect")) {
             String redirect = jobParameters.get("redirect");

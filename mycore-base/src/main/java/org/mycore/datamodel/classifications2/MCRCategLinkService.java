@@ -73,7 +73,8 @@ public interface MCRCategLinkService {
      *            if only direct children of category should be queried (query may be more optimized)
      * @return a Map with MCRCategoryID as key and the number of links as value
      */
-    public abstract Map<MCRCategoryID, Number> countLinksForType(MCRCategory category, String type, boolean childrenOnly);
+    public abstract Map<MCRCategoryID, Number> countLinksForType(MCRCategory category, String type,
+        boolean childrenOnly);
 
     /**
      * Delete all links that refer to the given {@link MCRCategLinkReference}.

@@ -55,7 +55,7 @@ public class URNServer {
             // init the client
             this.httpClient = new HttpClient(connectionMgr);
             getHttpClient().getState().setCredentials(new AuthScope("ipaddress", 443, "realm"),
-                    new UsernamePasswordCredentials(getConfiguration().getLogin(), getConfiguration().getPassword()));
+                new UsernamePasswordCredentials(getConfiguration().getLogin(), getConfiguration().getPassword()));
         }
         return this.httpClient;
     }

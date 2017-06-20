@@ -68,7 +68,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
     private static Logger LOGGER = LogManager.getLogger(MCRMediaThumbnailServlet.class);
 
     private int thumbnailSize = 128;
-    
+
     /**
      * how long should a tile be cached by the client
      */
@@ -124,7 +124,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
                     ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
                     ImageWriter imageWriter = getImageWriter();
                     try {
-                        imageWriter.setOutput(imageOutputStream);   
+                        imageWriter.setOutput(imageOutputStream);
                         IIOImage iioImage = new IIOImage(thumbnail, null, null);
                         imageWriter.write(null, iioImage, imageWriteParam);
                     } finally {
@@ -163,7 +163,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
         bg.dispose();
         return bicubic;
     }
-    
+
     private BufferedImage readThumb(MCRFile thumbFile, ImageReader imageReader) throws IOException {
         try {
             InputStream zin = thumbFile.getContent().getInputStream();
@@ -177,15 +177,15 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
             } finally {
                 zin.close();
             }
-        } catch ( Exception ex ) {
-            throw new IOException( ex );
+        } catch (Exception ex) {
+            throw new IOException(ex);
         }
     }
-    
+
     private static ImageReader getImageReader() {
         return ImageIO.getImageReadersByMIMEType("image/png").next();
     }
-    
+
     private ImageWriter getImageWriter() {
         ImageWriter imageWriter = imageWriters.poll();
         if (imageWriter == null) {

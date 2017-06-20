@@ -155,7 +155,8 @@ public class MCRLanguageFactory {
      * should be read again.
      */
     private boolean classificationHasChanged() {
-        return MCRHIBConnection.isEnabled() && (classification != null) && (DAO.getLastModified() > classificationLastRead);
+        return MCRHIBConnection.isEnabled() && (classification != null)
+            && (DAO.getLastModified() > classificationLastRead);
     }
 
     /**
@@ -194,20 +195,20 @@ public class MCRLanguageFactory {
             addCode(language, MCRLanguageCodeType.biblCode, biblCode == null ? termCode : biblCode);
         }
         Locale locale = Arrays.stream(Locale.getAvailableLocales())
-                              .filter(l -> l.toString().equals(xmlCode))
-                              .findFirst()
-                              .orElseGet(() -> {
-                                  String[] codeParts = xmlCode.split("_");
-                                  switch (codeParts.length) {
-                                      case 1:
-                                          return new Locale(codeParts[0]);
-                                      case 2:
-                                          return new Locale(codeParts[0], codeParts[1]);
-                                      default:
-                                          return new Locale(codeParts[0], codeParts[1], codeParts[2]);
-                                  }
+            .filter(l -> l.toString().equals(xmlCode))
+            .findFirst()
+            .orElseGet(() -> {
+                String[] codeParts = xmlCode.split("_");
+                switch (codeParts.length) {
+                    case 1:
+                        return new Locale(codeParts[0]);
+                    case 2:
+                        return new Locale(codeParts[0], codeParts[1]);
+                    default:
+                        return new Locale(codeParts[0], codeParts[1], codeParts[2]);
+                }
 
-                              });
+            });
         language.setLocale(locale);
         return language;
     }
@@ -259,7 +260,7 @@ public class MCRLanguageFactory {
         String biblCode = category.getLabel("x-bibl").map(MCRLabel::getText).orElse(termCode);
 
         MCRLanguage language = buildLanguage(xmlCode, termCode, biblCode);
-        
+
         category
             .getLabels()
             .stream()

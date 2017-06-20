@@ -34,11 +34,12 @@ public class MCRURNUtils {
     }
 
     public static Date getDNBRegisterDate(String identifier) throws MCRIdentifierUnresolvableException,
-            ParseException {
+        ParseException {
         Document document = MCRDNBPIDefProvider.get(identifier);
         XPathExpression<Element> xp = XPathFactory.instance().compile(
-                ".//pidef:created[contains(../pidef:identifier, '" + identifier
-                        + "')]", Filters.element(), null, MCRConstants.PIDEF_NAMESPACE);
+            ".//pidef:created[contains(../pidef:identifier, '" + identifier
+                + "')]",
+            Filters.element(), null, MCRConstants.PIDEF_NAMESPACE);
         Element element = xp.evaluateFirst(document);
         if (element == null) {
             return null;

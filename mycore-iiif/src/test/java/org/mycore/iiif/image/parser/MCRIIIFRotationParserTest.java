@@ -28,7 +28,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.iiif.image.model.MCRIIIFImageTargetRotation;
 
-
 public class MCRIIIFRotationParserTest {
 
     @Test
@@ -44,7 +43,7 @@ public class MCRIIIFRotationParserTest {
         testValues.put("270", new MCRIIIFImageTargetRotation(false, 270));
         testValues.put("!270", new MCRIIIFImageTargetRotation(true, 270));
 
-        testValues.forEach((rotationString, expectedResult)->{
+        testValues.forEach((rotationString, expectedResult) -> {
             Assert.assertEquals(new MCRIIIFRotationParser(rotationString).parse(), expectedResult);
         });
     }

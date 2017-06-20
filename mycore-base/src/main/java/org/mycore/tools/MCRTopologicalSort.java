@@ -207,8 +207,8 @@ public class MCRTopologicalSort {
                                 String href = xmlStreamReader
                                     .getAttributeValue("http://www.w3.org/1999/xlink", "href");
                                 if (xmlStreamReader.getLocalName().equals("parent")) {
-                                    List<String> dependencyList = parentNames.
-                                        computeIfAbsent(i, e -> new ArrayList<String>());
+                                    List<String> dependencyList = parentNames.computeIfAbsent(i,
+                                        e -> new ArrayList<String>());
                                     dependencyList.add(
                                         href);
                                 } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {

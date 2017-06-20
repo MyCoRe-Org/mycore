@@ -19,7 +19,8 @@ public class MCRXMLFunctions {
 
     private static final String[] EMPTY_ARRAY = new String[0];
 
-    public static NodeList getSources(String derivateId, String path) throws IOException, ParserConfigurationException, URISyntaxException {
+    public static NodeList getSources(String derivateId, String path)
+        throws IOException, ParserConfigurationException, URISyntaxException {
         return getSources(derivateId, path, null);
     }
 

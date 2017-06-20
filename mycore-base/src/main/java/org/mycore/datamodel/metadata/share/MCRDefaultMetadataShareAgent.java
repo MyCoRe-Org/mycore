@@ -80,7 +80,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
                     Element jelmold = null;
                     try {
                         jelmold = melmold.createXML(true);
-                    } catch(MCRException exc) {
+                    } catch (MCRException exc) {
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("One of the old metadata elements is invalid.", exc);
                         }
@@ -94,8 +94,8 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
             }
         }
         numheritablemdold = (int) StreamSupport.stream(mdold.spliterator(), false)
-                                               .filter(MCRMetaElement::isHeritable)
-                                               .count();
+            .filter(MCRMetaElement::isHeritable)
+            .count();
         if (numheritablemd != numheritablemdold) {
             return true;
         }

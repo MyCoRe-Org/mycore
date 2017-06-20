@@ -33,7 +33,8 @@ import org.mycore.frontend.xeditor.MCREditorSession;
  */
 public abstract class MCRRepeaterControl implements MCREditorTarget {
 
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String buttonName) throws Exception {
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String buttonName)
+        throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
         int posOfAnchor = buttonName.lastIndexOf('|');
         String param = buttonName.substring(0, posOfAnchor);
@@ -42,6 +43,7 @@ public abstract class MCRRepeaterControl implements MCREditorTarget {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(session.getRedirectURL(anchor)));
     }
 
-    protected abstract void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String param)
-            throws Exception;
+    protected abstract void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session,
+        String param)
+        throws Exception;
 }

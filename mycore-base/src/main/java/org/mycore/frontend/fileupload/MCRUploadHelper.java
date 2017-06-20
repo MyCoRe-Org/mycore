@@ -54,8 +54,9 @@ public abstract class MCRUploadHelper {
      * reserved URI characters should not be in uploaded filenames. See RFC3986,
      * Section 2.2
      */
-    private static final String reserverdCharacters = new String(new char[]{ ':', '?', '%', '#', '[', ']', '@', '!', '$', '&', '\'', '(',
-        ')', '*', ',', ';', '=', '\'', '+' });
+    private static final String reserverdCharacters = new String(
+        new char[] { ':', '?', '%', '#', '[', ']', '@', '!', '$', '&', '\'', '(',
+            ')', '*', ',', ';', '=', '\'', '+' });
 
     private static final String WINDOWS_RESERVED_CHARS = "<>:\"|?*";
 
@@ -132,7 +133,7 @@ public abstract class MCRUploadHelper {
                 + getOSIllegalCharacterStream(pathElement)
                     .mapToObj(Character::toChars)
                     .map(CharBuffer::wrap)
-                    .collect(Collectors.joining("', '","'","'")));
+                    .collect(Collectors.joining("', '", "'", "'")));
         }
     }
 
@@ -140,7 +141,8 @@ public abstract class MCRUploadHelper {
         //https://msdn.microsoft.com/en-us/library/aa365247.aspx
         return path
             .chars()
-            .filter(c -> c < '\u0020' || WINDOWS_RESERVED_CHARS.indexOf(c) != -1 || reserverdCharacters.indexOf(c) != -1);
+            .filter(
+                c -> c < '\u0020' || WINDOWS_RESERVED_CHARS.indexOf(c) != -1 || reserverdCharacters.indexOf(c) != -1);
     }
 
     static String getFileName(String path) {

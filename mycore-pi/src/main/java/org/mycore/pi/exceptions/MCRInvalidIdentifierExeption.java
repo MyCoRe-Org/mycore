@@ -1,6 +1,5 @@
 package org.mycore.pi.exceptions;
 
-
 import java.util.Locale;
 
 public class MCRInvalidIdentifierExeption extends MCRPersistentIdentifierException {

@@ -9,14 +9,12 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-
 /**
  * This is a helper class to help GSON to convert simple model to JSON.
  *
  * @author Sebastian Hofmann(mcrshofm)
  */
 public class MCRAltoLinkTypeAdapter extends TypeAdapter<MCRMetsAltoLink> {
-
 
     @Override
     public void write(JsonWriter jsonWriter, MCRMetsAltoLink altoLink) throws IOException {
@@ -67,7 +65,6 @@ public class MCRAltoLinkTypeAdapter extends TypeAdapter<MCRMetsAltoLink> {
             super(null, begin, end);
             this.fileID = fileID;
         }
-
 
         public String getFileID() {
             return fileID;

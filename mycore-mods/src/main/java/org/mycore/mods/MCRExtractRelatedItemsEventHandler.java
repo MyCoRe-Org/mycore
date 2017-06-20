@@ -74,7 +74,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
     }
 
     private void extractRelatedItems(final MCREvent evt, final MCRObject object) {
-        if (!MCRMODSWrapper.isSupported(object)){
+        if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
 
@@ -128,7 +128,8 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         return "host".equals(relatedItem.getAttributeValue("type"));
     }
 
-    private MCRObjectID createRelatedObject(Element relatedItem, MCRObjectID childID) throws MCRPersistenceException, MCRAccessException {
+    private MCRObjectID createRelatedObject(Element relatedItem, MCRObjectID childID)
+        throws MCRPersistenceException, MCRAccessException {
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
         MCRObject object = wrapper.getMCRObject();
         MCRObjectID oid = MCRObjectID.getNextFreeId(childID.getBase());

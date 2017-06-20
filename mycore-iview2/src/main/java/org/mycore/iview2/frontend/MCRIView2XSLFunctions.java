@@ -140,17 +140,17 @@ public class MCRIView2XSLFunctions {
     private static Node getElementById(Node base, String ID) {
         NamedNodeMap attributes = base.getAttributes();
         if (IntStream.range(0, attributes.getLength())
-                     .mapToObj(i -> (Attr) attributes.item(i))
-                     .anyMatch(attr -> attr.getLocalName().equalsIgnoreCase("id") && attr.getNodeValue().equals(ID))) {
+            .mapToObj(i -> (Attr) attributes.item(i))
+            .anyMatch(attr -> attr.getLocalName().equalsIgnoreCase("id") && attr.getNodeValue().equals(ID))) {
             return base;
         }
         NodeList childNodes = base.getChildNodes();
         return IntStream.range(0, childNodes.getLength())
-                        .mapToObj(childNodes::item)
-                        .filter(child -> child.getNodeType() == Node.ELEMENT_NODE)
-                        .map(child -> getElementById(child, ID))
-                        .filter(Objects::nonNull)
-                        .findFirst()
-                        .orElse(null);
+            .mapToObj(childNodes::item)
+            .filter(child -> child.getNodeType() == Node.ELEMENT_NODE)
+            .map(child -> getElementById(child, ID))
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(null);
     }
 }

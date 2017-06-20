@@ -50,7 +50,7 @@ public class MCRContentInputStream extends FilterInputStream {
 
     /** The MD5 checksum of all bytes read through this stream */
     protected byte[] md5 = null;
-    
+
     /** The message digest to build the MD5 checksum */
     protected MessageDigest digest = null;
 

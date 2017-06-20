@@ -23,7 +23,6 @@
 
 package org.mycore.solr.index.statistic;
 
-
 /**
  * @author Thomas Scheffler (yagee)
  *

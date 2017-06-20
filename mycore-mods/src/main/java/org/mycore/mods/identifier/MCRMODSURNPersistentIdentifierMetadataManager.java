@@ -37,7 +37,8 @@ public class MCRMODSURNPersistentIdentifierMetadataManager
         // not supported
     }
 
-    @Override public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
+    @Override
+    public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(obj);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
@@ -55,7 +56,7 @@ public class MCRMODSURNPersistentIdentifierMetadataManager
     }
 
     private MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {
-        if(!(base instanceof MCRObject)){
+        if (!(base instanceof MCRObject)) {
             throw new MCRPersistentIdentifierException(getClass().getName() + " does only support MyCoReObjects!");
         }
         return (MCRObject) base;

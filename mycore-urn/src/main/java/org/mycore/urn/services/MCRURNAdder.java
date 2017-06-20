@@ -59,26 +59,28 @@ public class MCRURNAdder {
 
             MCRConfiguration conf = MCRConfiguration.instance();
             String xPathString = conf.getString("MCR.Persistence.URN.XPath." + type,
-                conf.getString("MCR.Persistence.URN.XPath", "/mycoreobject/metadata/def.identifier[@class='MCRMetaLangText']/identifier[@type='urn']"));
+                conf.getString("MCR.Persistence.URN.XPath",
+                    "/mycoreobject/metadata/def.identifier[@class='MCRMetaLangText']/identifier[@type='urn']"));
 
             String urnToAssign = this.generateURN();
 
             try {
-                LOGGER.info("Updating metadata of object " + objectId + " with URN " + urnToAssign + " [" + xPathString + "]");
+                LOGGER.info(
+                    "Updating metadata of object " + objectId + " with URN " + urnToAssign + " [" + xPathString + "]");
                 Document xml = mcrobj.createXML();
                 MCRNodeBuilder nb = new MCRNodeBuilder();
                 nb.buildElement(xPathString, urnToAssign, xml);
                 mcrobj = new MCRObject(xml);
                 MCRMetadataManager.update(mcrobj);
             } catch (Exception ex) {
-                LOGGER.error("Updating metadata of object " + objectId + " with URN " + urnToAssign + " failed. [" + xPathString + "]", ex);
+                LOGGER.error("Updating metadata of object " + objectId + " with URN " + urnToAssign + " failed. ["
+                    + xPathString + "]", ex);
                 return false;
             }
         }
 
         return true;
     }
-
 
     /**
      * Method generates a single URN with attached checksum.
@@ -90,7 +92,7 @@ public class MCRURNAdder {
         MCRIURNProvider urnProvider = this.getURNProvider();
         MCRURN myURN = urnProvider.generateURN();
         return myURN.toString();
-        
+
     }
 
     /**
@@ -198,7 +200,7 @@ public class MCRURNAdder {
             MCRURNManager.assignURN(parentURN.toString(), derivate.getId().toString(), null, null);
         } catch (Exception ex) {
             LOGGER.error("Assigning base urn " + parentURN.toString() + " to derivate " + derivate.getId().toString()
-                    + " failed.", ex);
+                + " failed.", ex);
             return false;
         }
 
@@ -232,7 +234,7 @@ public class MCRURNAdder {
         int fileCount = getFilesWithURNCount(derivate) + 1;
         MCRURN[] u = provider.generateURN(1, base, derivate.getId().getNumberAsString() + "-" + fileCount);
         MCRURN urn = u[0];
-        
+
         LOGGER.info("Assigning urn " + urn + " to " + path);
         MCRURNManager.assignURN(urn.toString(), derivateId, path);
         objectDerivate.getOrCreateFileMetadata(path).setUrn(urn.toString());
@@ -245,10 +247,10 @@ public class MCRURNAdder {
      */
     private int getFilesWithURNCount(MCRDerivate derivate) throws Exception {
         return (int) derivate.getDerivate()
-                             .getFileMetadata()
-                             .stream()
-                             .filter(fileMetadata -> fileMetadata.getUrn() != null)
-                             .count();
+            .getFileMetadata()
+            .stream()
+            .filter(fileMetadata -> fileMetadata.getUrn() != null)
+            .count();
     }
 
     /**
@@ -289,8 +291,9 @@ public class MCRURNAdder {
                 return true;
             }
         }
-        LOGGER.warn("URN assignment failed as the object type " + givenType + " is not in the list of allowed objects. See property \""
-                + propertyName + "\"");
+        LOGGER.warn("URN assignment failed as the object type " + givenType
+            + " is not in the list of allowed objects. See property \""
+            + propertyName + "\"");
         return false;
     }
 
@@ -302,7 +305,8 @@ public class MCRURNAdder {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    private MCRIURNProvider getURNProvider() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    private MCRIURNProvider getURNProvider()
+        throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         String className = MCRConfiguration.instance().getString("MCR.URN.Provider.Class");
         LOGGER.info("Loading class " + className + " as IURNProvider");
         Class<MCRIURNProvider> c = (Class<MCRIURNProvider>) Class.forName(className);
@@ -333,7 +337,7 @@ public class MCRURNAdder {
             MCRMetadataManager.updateMCRDerivateXML(derivate);
         } catch (Exception ex) {
             LOGGER.error("An exception occured while updating the object " + derivate.getId()
-                    + " in database. The adding of the fileset element failed.", ex);
+                + " in database. The adding of the fileset element failed.", ex);
             handleError(derivate);
         }
     }

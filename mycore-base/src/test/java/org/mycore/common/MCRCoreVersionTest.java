@@ -47,7 +47,7 @@ public class MCRCoreVersionTest extends MCRTestCase {
     @Test
     public void getRevision() {
         assertTrue("Revision is not a SHA1 hash: " + MCRCoreVersion.getRevision(),
-           MCRCoreVersion.getRevision().matches("[a-fA-F0-9]{40}"));
+            MCRCoreVersion.getRevision().matches("[a-fA-F0-9]{40}"));
     }
 
 }

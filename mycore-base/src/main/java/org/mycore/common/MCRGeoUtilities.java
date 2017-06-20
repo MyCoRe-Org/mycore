@@ -75,7 +75,7 @@ public class MCRGeoUtilities {
         }
 
         return MessageFormat.format("{0}° {1}'' {2} {3}", Integer.valueOf(strings[1]), Integer.valueOf(strings[2]),
-                Math.round(seconds * 100d) / 100d, strings[0]);
+            Math.round(seconds * 100d) / 100d, strings[0]);
     }
 
     /**

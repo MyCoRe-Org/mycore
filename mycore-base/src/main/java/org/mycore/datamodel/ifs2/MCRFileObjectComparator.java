@@ -5,7 +5,7 @@ import java.util.Comparator;
 
 import org.apache.commons.vfs2.FileObject;
 
-class MCRFileObjectComparator implements Comparator<FileObject>, Serializable{
+class MCRFileObjectComparator implements Comparator<FileObject>, Serializable {
 
     @Override
     public int compare(FileObject o1, FileObject o2) {
@@ -13,5 +13,5 @@ class MCRFileObjectComparator implements Comparator<FileObject>, Serializable{
         String path2 = o2.getName().getBaseName();
         return path1.compareTo(path2);
     }
-    
+
 }

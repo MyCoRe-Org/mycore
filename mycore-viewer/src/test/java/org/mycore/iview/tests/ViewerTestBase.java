@@ -30,7 +30,7 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
     public void tearDown() throws Exception {
         this.takeScreenshot();
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
         appController.shutDownDerivate(driver, null);
@@ -53,12 +53,11 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
     private ApplicationController getApplicationControllerInstance() {
         if (applicationController == null) {
             String applicationControllerClassName = TestProperties.getInstance().getProperty(
-                    APPLICATION_CONTROLLER_PROPERTY_NAME);
+                APPLICATION_CONTROLLER_PROPERTY_NAME);
             applicationController = TestUtil.instantiate(applicationControllerClassName,
-                    ApplicationController.class);
+                ApplicationController.class);
             applicationController.init();
         }
-
 
         return applicationController;
     }

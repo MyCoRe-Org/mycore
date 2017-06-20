@@ -30,7 +30,9 @@ import org.mycore.common.config.MCRConfigurationException;
 public class MCRCORSFilter implements Filter {
 
     private static final String CORS_FILTER_NAME = "corsFilterSuffix";
+
     private static final Logger LOGGER;
+
     private static final String CONFIGURATION_PREFIX = "MCR.CORSFilter";
 
     private String allowOriginValue;
@@ -38,7 +40,6 @@ public class MCRCORSFilter implements Filter {
     static {
         LOGGER = LogManager.getLogger(MCRCORSFilter.class);
     }
-
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -56,7 +57,8 @@ public class MCRCORSFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+        throws IOException, ServletException {
         // check if the request is a http request
         if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
             HttpServletRequest req = (HttpServletRequest) servletRequest;

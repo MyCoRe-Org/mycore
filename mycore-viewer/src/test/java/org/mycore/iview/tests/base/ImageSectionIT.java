@@ -27,6 +27,7 @@ public class ImageSectionIT extends ViewerTestBase {
     private static final int TOLERANCE = 20;
 
     private static final Logger LOGGER = LogManager.getLogger(ImageSectionIT.class);
+
     private static final int DELAY_TIME = 3000;
 
     @Test

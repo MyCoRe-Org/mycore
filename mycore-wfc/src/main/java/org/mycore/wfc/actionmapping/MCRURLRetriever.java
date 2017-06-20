@@ -49,7 +49,7 @@ public final class MCRURLRetriever {
     private static final Logger LOGGER = LogManager.getLogger(MCRURLRetriever.class);
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
-    
+
     private static Map<String, MCRCollection> COLLECTION_MAP = initActionsMappings();
 
     private MCRURLRetriever() {

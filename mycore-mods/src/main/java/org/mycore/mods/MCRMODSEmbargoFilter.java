@@ -70,7 +70,8 @@ public class MCRMODSEmbargoFilter implements Filter {
         }
 
         return MCRAccessManager.checkPermission(objectId, MCRAccessManager.PERMISSION_READ)
-                && (MCRAccessManager.checkPermission(POOLPRIVILEGE_EMBARGO) || MCRMODSEmbargoUtils.isCurrentUserCreator(objectId));
+            && (MCRAccessManager.checkPermission(POOLPRIVILEGE_EMBARGO)
+                || MCRMODSEmbargoUtils.isCurrentUserCreator(objectId));
     }
 
     /* (non-Javadoc)
@@ -93,7 +94,7 @@ public class MCRMODSEmbargoFilter implements Filter {
      */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException,
-            ServletException {
+        ServletException {
         boolean forward = true; //forward to servlet by default
         HttpServletRequest req = (HttpServletRequest) request;
         boolean newSession = req.getSession(false) == null;
@@ -112,9 +113,9 @@ public class MCRMODSEmbargoFilter implements Filter {
                 final String embargo = MCRMODSEmbargoUtils.getEmbargo(objectId);
                 if (embargo != null) {
                     LOGGER.warn(MessageFormat.format("Denied request {0} that is under embargo until {1}.",
-                            req.getPathInfo(), embargo));
+                        req.getPathInfo(), embargo));
                     String embargoMsg = MCRTranslation.translate("component.mods.error.underEmbargo",
-                            objectId.toString(), embargo);
+                        objectId.toString(), embargo);
                     ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN, embargoMsg);
                     forward = false;
                     return;

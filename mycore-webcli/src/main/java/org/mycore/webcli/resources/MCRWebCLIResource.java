@@ -27,9 +27,9 @@ public class MCRWebCLIResource {
 
     @Context
     HttpServletRequest request;
-    
+
     private static final Logger LOGGER = LogManager.getLogger();
-        
+
     @GET
     @MCRRestrictedAccess(MCRWebCLIPermission.class)
     @Produces(MediaType.TEXT_HTML)
@@ -40,18 +40,18 @@ public class MCRWebCLIResource {
         LOGGER.info("REST ThreadID: " + Thread.currentThread().getName());
         return Response.ok(mainGui).build();
     }
-    
+
     @GET
     @Path("gui/{filename:.*}")
     @MCRStaticContent
-    public Response getResources(@PathParam("filename") String filename){
+    public Response getResources(@PathParam("filename") String filename) {
         if (filename.endsWith(".js")) {
             return Response.ok(getClass()
                 .getResourceAsStream("/META-INF/resources/modules/webcli/" + filename))
                 .header("Content-Type", "application/javascript")
                 .build();
         }
-        
+
         if (filename.endsWith(".css")) {
             return Response.ok(getClass()
                 .getResourceAsStream("/META-INF/resources/modules/webcli/" + filename))

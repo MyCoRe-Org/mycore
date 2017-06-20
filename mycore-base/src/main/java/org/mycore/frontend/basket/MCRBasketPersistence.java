@@ -87,7 +87,8 @@ public class MCRBasketPersistence {
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
      * @throws MCRPersistenceException 
      */
-    public static void createDerivateWithBasket(MCRBasket basket, MCRObjectID ownerID) throws IOException, MCRPersistenceException, MCRAccessException {
+    public static void createDerivateWithBasket(MCRBasket basket, MCRObjectID ownerID)
+        throws IOException, MCRPersistenceException, MCRAccessException {
         String base = ownerID.getProjectId() + "_derivate";
         MCRObjectID derivateOID = MCRObjectID.getNextFreeId(base);
         String derivateID = derivateOID.toString();
@@ -108,7 +109,8 @@ public class MCRBasketPersistence {
      * @throws MCRPersistenceException 
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
      */
-    private static MCRDerivate createNewDerivate(MCRObjectID ownerID, MCRObjectID derivateOID) throws MCRPersistenceException, IOException, MCRAccessException {
+    private static MCRDerivate createNewDerivate(MCRObjectID ownerID, MCRObjectID derivateOID)
+        throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateOID);
         derivate.setLabel("Saved basket data for " + ownerID.toString());
@@ -138,7 +140,8 @@ public class MCRBasketPersistence {
      * @param basketFile the file holding the basket's data.
      * @throws IOException 
      */
-    private static void writeBasketToFile(MCRBasket basket, MCRDerivate derivate, MCRPath basketFile) throws IOException {
+    private static void writeBasketToFile(MCRBasket basket, MCRDerivate derivate, MCRPath basketFile)
+        throws IOException {
         Document xml = new MCRBasketXMLBuilder(false).buildXML(basket);
         XMLOutputter xout = new XMLOutputter();
         xout.output(xml, Files.newOutputStream(basketFile));

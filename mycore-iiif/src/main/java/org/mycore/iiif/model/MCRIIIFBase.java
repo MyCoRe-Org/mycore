@@ -21,17 +21,16 @@
 
 package org.mycore.iiif.model;
 
-
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Base Class for most IIIF model classes
  */
-public class MCRIIIFBase implements Cloneable{
+public class MCRIIIFBase implements Cloneable {
 
     public static final String API_PRESENTATION_2 = "http://iiif.io/api/presentation/2/context.json";
-    public static final String API_IMAGE_2 = "http://iiif.io/api/image/2/context.json";
 
+    public static final String API_IMAGE_2 = "http://iiif.io/api/image/2/context.json";
 
     @SerializedName("@context")
     private String context;

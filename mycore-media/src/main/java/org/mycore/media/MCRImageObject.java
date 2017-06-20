@@ -30,73 +30,84 @@ package org.mycore.media;
  *
  */
 public class MCRImageObject extends MCRMediaObject {
-    protected String    subFormat;
-    protected String    subFormatFull;
-    protected String    codecID;
-    protected String    codec;
-    protected String    codecFull;
-    protected String    codecURL;
-    
-    protected int       width;
-    protected int       height;
-    protected int       resolution;
-    
+    protected String subFormat;
+
+    protected String subFormatFull;
+
+    protected String codecID;
+
+    protected String codec;
+
+    protected String codecFull;
+
+    protected String codecURL;
+
+    protected int width;
+
+    protected int height;
+
+    protected int resolution;
+
     public MCRImageObject() {
         type = MCRMediaObject.MediaType.IMAGE;
     }
-    
+
     public String getSubFormat() {
         return subFormat;
     }
-    
+
     public String getSubFormatFull() {
         return subFormatFull;
     }
-    
+
     public String getCodecID() {
         return codecID;
     }
-    
+
     public String getCodec() {
         return codec;
     }
-    
+
     public String getCodecFull() {
         return codecFull;
     }
-    
+
     public String getCodecURL() {
         return codecURL;
     }
-    
+
     public int getWidth() {
         return width;
     }
-    
+
     public int getHeight() {
         return height;
     }
-    
+
     public int getResolution() {
         return resolution;
     }
-    
+
     @Override
     public String toString() {
-        String  out = fileName + " (" + fileSize +")\n";
-                String _fill = "";
-                for ( int c=0; c < out.length(); c++ ) _fill+="-";
-                out+= _fill + "\n";
-                out+= "Type             : " + type.toString() + "\n";
-                out+= ( mimeType != null ? "mimeType         : " + mimeType + "\n" : "" );
-                out+= ( format != null ? "Container Format : " + format + ( formatFull != null ? " (" + formatFull + ")" : "" ) + "\n" : "" );
-                out+= "Format           : " + subFormat + ( subFormatFull != null ? " (" + subFormatFull + ")" : "" ) + "\n";
-                out+= "Codec            : " + codec + ( codecFull != null ? " - " + codecFull : "" ) + ( codecURL != null ? " (" + codecURL + ")" : "" ) + "\n";
-                out+= "Dimention        : " + width + "x" + height + " @ " + resolution + "\n";
-                out+= ( encoderStr != null ? "Encoder          : " + encoderStr + "\n" : "" );
-                
-                if ( tags != null ) out+= tags.toString();
-                
+        String out = fileName + " (" + fileSize + ")\n";
+        String _fill = "";
+        for (int c = 0; c < out.length(); c++)
+            _fill += "-";
+        out += _fill + "\n";
+        out += "Type             : " + type.toString() + "\n";
+        out += (mimeType != null ? "mimeType         : " + mimeType + "\n" : "");
+        out += (format != null
+            ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n" : "");
+        out += "Format           : " + subFormat + (subFormatFull != null ? " (" + subFormatFull + ")" : "") + "\n";
+        out += "Codec            : " + codec + (codecFull != null ? " - " + codecFull : "")
+            + (codecURL != null ? " (" + codecURL + ")" : "") + "\n";
+        out += "Dimention        : " + width + "x" + height + " @ " + resolution + "\n";
+        out += (encoderStr != null ? "Encoder          : " + encoderStr + "\n" : "");
+
+        if (tags != null)
+            out += tags.toString();
+
         return out;
     }
 }

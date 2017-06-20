@@ -77,7 +77,7 @@ public interface MCRFileReader {
      * Returns the content type of the content of this file
      */
     public String getContentTypeID();
-    
+
     /**
      * Returns MD5 checksum of this file
      */
@@ -87,7 +87,7 @@ public interface MCRFileReader {
      * Returns the content type of this file
      */
     public MCRFileContentType getContentType();
-    
+
     /**
      * Returns the ID of the owner of this file
      */

@@ -63,28 +63,28 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
 
         Function<MCRDerivate, Stream<MCRPath>> foo = deriv -> {
             return IntStream
-                    .iterate(0, i -> i + 1)
-                    .mapToObj(i -> {
-                        return "/foo/" + UUID.randomUUID().toString() + "_" + String
-                                .format(Locale.getDefault(), "%02d", i);
-                    })
-                    .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
-                    .limit(numOfDerivFiles);
+                .iterate(0, i -> i + 1)
+                .mapToObj(i -> {
+                    return "/foo/" + UUID.randomUUID().toString() + "_" + String
+                        .format(Locale.getDefault(), "%02d", i);
+                })
+                .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
+                .limit(numOfDerivFiles);
         };
         String serviceID = "TestService";
         MCRURNGranularRESTRegistrationService testService = new MCRURNGranularRESTRegistrationService(serviceID,
-                                                                                                      foo);
+            foo);
         testService.fullRegister(derivate, "");
         timerTask();
 
         List<MCRPIRegistrationInfo> registeredURNs = MCREntityManagerProvider
-                .getEntityManagerFactory()
-                .createEntityManager()
-                .createNamedQuery("Get.PI.Created", MCRPIRegistrationInfo.class)
-                .setParameter("mcrId", mcrObjectID.toString())
-                .setParameter("type", MCRDNBURN.TYPE)
-                .setParameter("service", serviceID)
-                .getResultList();
+            .getEntityManagerFactory()
+            .createEntityManager()
+            .createNamedQuery("Get.PI.Created", MCRPIRegistrationInfo.class)
+            .setParameter("mcrId", mcrObjectID.toString())
+            .setParameter("type", MCRDNBURN.TYPE)
+            .setParameter("service", serviceID)
+            .getResultList();
 
         Assert.assertEquals("Wrong number of registered URNs: ", numOfDerivFiles, registeredURNs.size());
     }
@@ -131,7 +131,9 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
 
     public class MockFiles extends MockUp<Files> {
         @Mock
-        public boolean exists(Path path, LinkOption... options) {return true;}
+        public boolean exists(Path path, LinkOption... options) {
+            return true;
+        }
     }
 
     public class MockFrontendUtil extends MockUp<MCRFrontendUtil> {

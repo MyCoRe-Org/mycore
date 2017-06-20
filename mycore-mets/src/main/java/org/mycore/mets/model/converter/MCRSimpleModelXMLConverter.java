@@ -35,7 +35,9 @@ import org.mycore.mets.model.struct.StructLink;
 public class MCRSimpleModelXMLConverter {
 
     public static final String DEFAULT_PHYSICAL_TYPE = "page";
+
     public static final String PHYSICAL_ID_PREFIX = "phys_";
+
     public static final String LOGICAL_ID_PREFIX = "log_";
 
     /**
@@ -55,22 +57,24 @@ public class MCRSimpleModelXMLConverter {
 
         StructLink structLink = mets.getStructLink();
         msm.getSectionPageLinkList().stream()
-                .map((metsLink) -> {
-                    MCRMetsSection section = metsLink.getFrom();
-                    MCRMetsPage page = metsLink.getTo();
-                    String fromId = sectionIdMap.get(section);
-                    String toId = pageIdMap.get(page);
-                    return new SmLink(fromId, toId);
-                })
-                .forEach(structLink::addSmLink);
+            .map((metsLink) -> {
+                MCRMetsSection section = metsLink.getFrom();
+                MCRMetsPage page = metsLink.getTo();
+                String fromId = sectionIdMap.get(section);
+                String toId = pageIdMap.get(page);
+                return new SmLink(fromId, toId);
+            })
+            .forEach(structLink::addSmLink);
 
         return mets.asDocument();
     }
 
-    private static void buildPhysicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsPage, String> pageIdMap, Map<String, String> idToNewIDMap) {
+    private static void buildPhysicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsPage, String> pageIdMap,
+        Map<String, String> idToNewIDMap) {
         List<MCRMetsPage> pageList = msm.getMetsPageList();
         PhysicalStructMap structMap = (PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE);
-        structMap.setDivContainer(new PhysicalDiv(PHYSICAL_ID_PREFIX + UUID.randomUUID().toString(),PhysicalDiv.TYPE_PHYS_SEQ));
+        structMap.setDivContainer(
+            new PhysicalDiv(PHYSICAL_ID_PREFIX + UUID.randomUUID().toString(), PhysicalDiv.TYPE_PHYS_SEQ));
 
         for (int order = 0; order < pageList.size(); order++) {
             MCRMetsPage page = pageList.get(order);
@@ -79,11 +83,11 @@ public class MCRSimpleModelXMLConverter {
 
             PhysicalSubDiv physicalSubDiv = new PhysicalSubDiv(id, DEFAULT_PHYSICAL_TYPE);
             String orderLabel = page.getOrderLabel();
-            if(orderLabel != null){
+            if (orderLabel != null) {
                 physicalSubDiv.setOrderLabel(orderLabel);
             }
             String contentIds = page.getContentIds();
-            if (contentIds!=null){
+            if (contentIds != null) {
                 physicalSubDiv.setContentids(contentIds);
             }
 
@@ -94,7 +98,7 @@ public class MCRSimpleModelXMLConverter {
                 String href = simpleFile.getHref();
                 MCRMetsFileUse use = simpleFile.getUse();
                 String mimeType = simpleFile.getMimeType();
-                String fileID = use.toString().toLowerCase(Locale.ROOT) + "_"  + simpleFile.getId();
+                String fileID = use.toString().toLowerCase(Locale.ROOT) + "_" + simpleFile.getId();
                 idToNewIDMap.put(simpleFile.getId(), fileID);
                 File file = new File(fileID, mimeType);
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
@@ -108,7 +112,8 @@ public class MCRSimpleModelXMLConverter {
         }
     }
 
-    private static void buildLogicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsSection, String> sectionIdMap, Map<String, String> idToNewIDMap) {
+    private static void buildLogicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsSection, String> sectionIdMap,
+        Map<String, String> idToNewIDMap) {
         LogicalStructMap logicalStructMap = (LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE);
         MCRMetsSection rootSection = msm.getRootSection();
         String type = rootSection.getType();
@@ -123,12 +128,12 @@ public class MCRSimpleModelXMLConverter {
         logicalStructMap.setDivContainer(logicalDiv);
     }
 
-
-    private static void buildLogicalSubDiv(MCRMetsSection metsSection, LogicalDiv parent, Map<MCRMetsSection, String> sectionIdMap, Map<String, String> idToNewIDMap) {
+    private static void buildLogicalSubDiv(MCRMetsSection metsSection, LogicalDiv parent,
+        Map<MCRMetsSection, String> sectionIdMap, Map<String, String> idToNewIDMap) {
         String id = LOGICAL_ID_PREFIX + UUID.randomUUID().toString();
         LogicalDiv logicalSubDiv = new LogicalDiv(id, metsSection.getType(), metsSection.getLabel());
 
-        if(metsSection.getAltoLinks().size()>0){
+        if (metsSection.getAltoLinks().size() > 0) {
             Fptr fptr = new Fptr();
             List<Seq> seqList = fptr.getSeqList();
 
@@ -168,6 +173,5 @@ public class MCRSimpleModelXMLConverter {
 
         return fileGroup;
     }
-
 
 }

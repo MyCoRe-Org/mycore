@@ -264,7 +264,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     @Override
     public boolean equals(Object obj) {
-        if(!super.equals(obj)) {
+        if (!super.equals(obj)) {
             return false;
         }
         MCRMetaLink other = (MCRMetaLink) obj;
@@ -390,7 +390,7 @@ public class MCRMetaLink extends MCRMetaDefault {
             obj.addProperty("label", label);
         }
         if (role != null) {
-            
+
         }
         if (linktype.equals("locator")) {
             obj.addProperty("href", href);
@@ -443,7 +443,7 @@ public class MCRMetaLink extends MCRMetaDefault {
             }
         }
     }
-    
+
     /**
      * This method make a clone of this class.
      */
@@ -466,7 +466,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Link Type          = " + linktype);
             LOGGER.debug("Label              = " + label);

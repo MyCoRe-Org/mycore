@@ -29,6 +29,7 @@ import org.mycore.common.MCRSessionMgr;
 public class MCRUserInformationLookup implements StrLookup {
 
     private static final Pattern ROLE_SEPARATOR = Pattern.compile(",");
+
     private static final String ROLE_PREFIX = "role:";
 
     @Override

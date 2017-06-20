@@ -37,7 +37,7 @@ public class MCRRolesConverter implements MCRUserAttributeConverter<String, Coll
 
     @Override
     public Collection<String> convert(String value, String separator, Map<String, String> valueMapping)
-            throws Exception {
+        throws Exception {
         Collection<String> roles = new HashSet<String>();
 
         if (value != null) {

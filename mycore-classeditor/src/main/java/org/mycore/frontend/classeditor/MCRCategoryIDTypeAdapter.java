@@ -17,13 +17,14 @@ import com.google.gson.JsonSerializationContext;
 public class MCRCategoryIDTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryID> {
 
     @Override
-    public MCRCategoryID deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public MCRCategoryID deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
         JsonObject idJsonObj = json.getAsJsonObject();
         JsonElement rootIDObj = idJsonObj.get(ROOTID);
         JsonElement categIDObj = idJsonObj.get(CATEGID);
-        
+
         String rootID = rootIDObj.getAsString();
-        String categID = categIDObj == null? "" : categIDObj.getAsString();
+        String categID = categIDObj == null ? "" : categIDObj.getAsString();
         return new MCRCategoryID(rootID, categID);
     }
 
@@ -31,13 +32,13 @@ public class MCRCategoryIDTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryID> 
     public JsonElement serialize(MCRCategoryID id, Type typeOfSrc, JsonSerializationContext context) {
         String rootID = id.getRootID();
         String categID = id.getID();
-        
+
         JsonObject idJsonObj = new JsonObject();
         idJsonObj.addProperty(ROOTID, rootID);
-        if(categID != null && !"".equals(categID)) {
+        if (categID != null && !"".equals(categID)) {
             idJsonObj.addProperty(CATEGID, categID);
         }
-        
+
         return idJsonObj;
     }
 }

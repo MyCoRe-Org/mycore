@@ -81,12 +81,13 @@ public class MCRIPAddress {
         }
 
         return IntStream.range(0, address.length)
-                        .noneMatch(t -> (address[t] & mask[t]) != (other.address[t] & mask[t]));
+            .noneMatch(t -> (address[t] & mask[t]) != (other.address[t] & mask[t]));
     }
 
-    public byte[] getAddress(){
+    public byte[] getAddress() {
         return address;
     }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("");

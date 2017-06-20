@@ -81,11 +81,14 @@ public class MCRCategoryImplTest extends MCRTestCase {
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
         MCRCategoryImpl germany = (MCRCategoryImpl) europe.getChildren().get(0);
-        assertEquals("Did not get Europe as left sibling of Asia", europe.getId(), asia.getLeftSiblingOrOfAncestor().getId());
-        assertEquals("Did not get World as left sibling or ancestor of Germany", category.getId(), germany.getLeftSiblingOrOfAncestor().getId());
+        assertEquals("Did not get Europe as left sibling of Asia", europe.getId(),
+            asia.getLeftSiblingOrOfAncestor().getId());
+        assertEquals("Did not get World as left sibling or ancestor of Germany", category.getId(),
+            germany.getLeftSiblingOrOfAncestor().getId());
         MCRCategoryImpl america = buildNode(new MCRCategoryID(category.getRootID(), "America"));
         category.getChildren().add(0, america);
-        assertEquals("Did not get America as left sibling or ancestor of Germany", america.getId(), germany.getLeftSiblingOrOfAncestor().getId());
+        assertEquals("Did not get America as left sibling or ancestor of Germany", america.getId(),
+            germany.getLeftSiblingOrOfAncestor().getId());
     }
 
     @Test
@@ -94,8 +97,10 @@ public class MCRCategoryImplTest extends MCRTestCase {
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
         MCRCategoryImpl germany = (MCRCategoryImpl) europe.getChildren().get(0);
-        assertEquals("Did not get Europe as left sibling of Asia", europe.getId(), asia.getLeftSiblingOrParent().getId());
-        assertEquals("Did not get Europa as left sibling or ancestor of Germany", europe.getId(), germany.getLeftSiblingOrParent().getId());
+        assertEquals("Did not get Europe as left sibling of Asia", europe.getId(),
+            asia.getLeftSiblingOrParent().getId());
+        assertEquals("Did not get Europa as left sibling or ancestor of Germany", europe.getId(),
+            germany.getLeftSiblingOrParent().getId());
     }
 
     @Test
@@ -104,9 +109,12 @@ public class MCRCategoryImplTest extends MCRTestCase {
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
         MCRCategoryImpl spain = (MCRCategoryImpl) europe.getChildren().get(3);
-        assertEquals("Did not get Asia as right sibling of Europe", asia.getId(), europe.getRightSiblingOrOfAncestor().getId());
-        assertEquals("Did not get Asia as right sibling or ancestor of Spain", asia.getId(), spain.getRightSiblingOrOfAncestor().getId());
-        assertEquals("Did not get World as right sibling or ancestor of Asia", category.getId(), asia.getRightSiblingOrOfAncestor().getId());
+        assertEquals("Did not get Asia as right sibling of Europe", asia.getId(),
+            europe.getRightSiblingOrOfAncestor().getId());
+        assertEquals("Did not get Asia as right sibling or ancestor of Spain", asia.getId(),
+            spain.getRightSiblingOrOfAncestor().getId());
+        assertEquals("Did not get World as right sibling or ancestor of Asia", category.getId(),
+            asia.getRightSiblingOrOfAncestor().getId());
     }
 
     @Test
@@ -115,8 +123,10 @@ public class MCRCategoryImplTest extends MCRTestCase {
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
         MCRCategoryImpl spain = (MCRCategoryImpl) europe.getChildren().get(3);
-        assertEquals("Did not get Asia as right sibling of Europe", asia.getId(), europe.getRightSiblingOrParent().getId());
-        assertEquals("Did not get Europa as right sibling or ancestor of Spain", europe.getId(), spain.getRightSiblingOrParent().getId());
+        assertEquals("Did not get Asia as right sibling of Europe", asia.getId(),
+            europe.getRightSiblingOrParent().getId());
+        assertEquals("Did not get Europa as right sibling or ancestor of Spain", europe.getId(),
+            spain.getRightSiblingOrParent().getId());
     }
 
     /**

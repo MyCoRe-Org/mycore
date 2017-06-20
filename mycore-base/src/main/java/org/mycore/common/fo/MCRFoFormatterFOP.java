@@ -108,13 +108,13 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         try {
             // use restricted io to prevent issues with font caching on some systems 
             fopFactoryBuilder = new FopFactoryBuilder(
-                    EnvironmentalProfileFactory.createRestrictedIO(new URI(BASE_URI), resolver));
+                EnvironmentalProfileFactory.createRestrictedIO(new URI(BASE_URI), resolver));
             final String fo_cfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
             if (!fo_cfg.isEmpty()) {
                 try {
                     final DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
                     final Configuration cfg = cfgBuilder
-                            .build(MCRConfigurationDir.getConfigResource(fo_cfg).toString());
+                        .build(MCRConfigurationDir.getConfigResource(fo_cfg).toString());
                     fopFactoryBuilder.setConfiguration(cfg);
 
                     // FIXME Workaround to get hyphenation work in FOP.
@@ -165,7 +165,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         try {
             final FOUserAgent userAgent = fopFactory.newFOUserAgent();
             userAgent.setProducer(MessageFormat.format("MyCoRe {0} ({1})", MCRCoreVersion.getCompleteVersion(),
-                    userAgent.getProducer()));
+                userAgent.getProducer()));
 
             final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, out);
             final Source src = input.getSource();

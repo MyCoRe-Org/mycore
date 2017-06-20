@@ -103,7 +103,7 @@ public class MCRTextResolverTest extends MCRTestCase {
         resolver.addVariable("c", "{a}");
         try {
             resolver.resolve("{a}");
-        } catch(CircularDependencyExecption cde) {
+        } catch (CircularDependencyExecption cde) {
             return;
         }
         assertFalse("No circular dependency occurred", true);

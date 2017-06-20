@@ -75,12 +75,14 @@ public class MCRSolrPathDocumentFactory {
                 } catch (ClassNotFoundException e) {
                     throw new MCRConfigurationException(
                         "AccumulatorClass configurated in " + ACCUMULATOR_LIST_PROPERTY_NAME + " not found : "
-                            + accumulatorClassRef, e);
+                            + accumulatorClassRef,
+                        e);
 
                 } catch (IllegalAccessException | InstantiationException e) {
                     throw new MCRConfigurationException(
                         "Construxtor of the AccumulatorClass configurated in " + ACCUMULATOR_LIST_PROPERTY_NAME
-                            + " can not be invoked.", e);
+                            + " can not be invoked.",
+                        e);
 
                 }
             }).collect(Collectors.toList());

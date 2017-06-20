@@ -35,14 +35,14 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  */
 public class MCRTestCategoryMapper extends MCRCategoryMapperBase {
 
-    private Map<MCRCategoryID,MCRCategoryID> parents = new HashMap<MCRCategoryID,MCRCategoryID>();
+    private Map<MCRCategoryID, MCRCategoryID> parents = new HashMap<MCRCategoryID, MCRCategoryID>();
 
     private Map<MCRCategoryID, String> mappingRules = new HashMap<MCRCategoryID, String>();
 
     public void setParent(MCRCategoryID childID, MCRCategoryID parentID) {
         parents.put(childID, parentID);
     }
-    
+
     @Override
     protected void addParentsToList(MCRCategoryID childID, List<MCRCategoryID> list) {
         MCRCategoryID parent = parents.get(childID);
@@ -60,7 +60,7 @@ public class MCRTestCategoryMapper extends MCRCategoryMapperBase {
     protected String getMappingRule(MCRCategoryID categoryID) {
         return mappingRules.get(categoryID);
     }
-   
+
     @Test
     public void doNothing() throws Exception {
         // remove me if needed, just prevent test errors java.lang.Exception: No runnable methods

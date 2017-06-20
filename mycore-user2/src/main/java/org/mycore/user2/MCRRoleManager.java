@@ -201,7 +201,8 @@ public class MCRRoleManager {
     }
 
     private static MCRCategLinkReference getLinkID(MCRUser user) {
-        return new MCRCategLinkReference(user.getUserName() + "@" + user.getRealmID(), MCRUser2Constants.CATEG_LINK_TYPE);
+        return new MCRCategLinkReference(user.getUserName() + "@" + user.getRealmID(),
+            MCRUser2Constants.CATEG_LINK_TYPE);
     }
 
     /**

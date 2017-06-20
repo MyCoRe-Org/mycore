@@ -18,7 +18,7 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration;
 
 public class MCRHttpUtils {
-    
+
     public static CloseableHttpClient getHttpClient(HttpClientConnectionManager connectionManager, int maxConnections) {
 
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(30000).setSocketTimeout(30000).build();

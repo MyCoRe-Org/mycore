@@ -16,7 +16,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 
 @XmlRootElement(name = "login")
-@XmlType(name="base-login")
+@XmlType(name = "base-login")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MCRLogin {
 

@@ -8,7 +8,8 @@ import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 public class MCRTargetUtility {
-    static Map<String, String[]> getSubmittedValues(MCRServletJob job, String baseXPath) throws JDOMException, JaxenException {
+    static Map<String, String[]> getSubmittedValues(MCRServletJob job, String baseXPath)
+        throws JDOMException, JaxenException {
         Map<String, String[]> valuesToSet = new HashMap<String, String[]>();
 
         for (String paramName : job.getRequest().getParameterMap().keySet()) {

@@ -38,9 +38,9 @@ public class MCRTestCaseHelper {
         String mcrComp = MCRRuntimeComponentDetector.getMyCoReComponents().stream().map(MCRComponent::toString).collect(
             Collectors.joining(", "));
         String appMod = MCRRuntimeComponentDetector.getApplicationModules()
-                                                   .stream()
-                                                   .map(MCRComponent::toString)
-                                                   .collect(Collectors.joining(", "));
+            .stream()
+            .map(MCRComponent::toString)
+            .collect(Collectors.joining(", "));
         System.out.printf("MyCoRe components detected: %s\nApplications modules detected: %s\n",
             mcrComp.isEmpty() ? "'none'" : mcrComp, appMod.isEmpty() ? "'none'" : appMod);
         MCRConfiguration config = MCRConfiguration.instance();
@@ -54,7 +54,7 @@ public class MCRTestCaseHelper {
         MCRConfiguration.instance().initialize(Collections.<String, String> emptyMap(), true);
         MCRSessionMgr.releaseCurrentSession();
     }
-    
+
     public static String getCurrentComponentName() {
         String userDir = System.getProperty("user.dir");
         String currentComponent = Paths.get(userDir).getFileName().toString();

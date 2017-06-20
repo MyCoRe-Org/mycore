@@ -94,11 +94,11 @@ public abstract class MCRObjectUtils {
      */
     public static List<MCRObject> getChildren(MCRObject mcrObject) {
         return mcrObject.getStructure()
-                        .getChildren()
-                        .stream()
-                        .map(link -> link.getXLinkHrefID())
-                        .map(MCRMetadataManager::retrieveMCRObject)
-                        .collect(Collectors.toList());
+            .getChildren()
+            .stream()
+            .map(link -> link.getXLinkHrefID())
+            .map(MCRMetadataManager::retrieveMCRObject)
+            .collect(Collectors.toList());
     }
 
     /**

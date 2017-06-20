@@ -52,7 +52,8 @@ public abstract class MCRConstants {
 
     private static JAXBContext initContext() {
         try {
-            return JAXBContext.newInstance(MCRActionMappings.class, MCRCollection.class, MCRAction.class, MCRDecision.class);
+            return JAXBContext.newInstance(MCRActionMappings.class, MCRCollection.class, MCRAction.class,
+                MCRDecision.class);
         } catch (JAXBException e) {
             throw new MCRException("Could not initialize JAXBContext.", e);
         }
@@ -65,7 +66,8 @@ public abstract class MCRConstants {
     }
 
     private static MCRCategoryID getCollectionClassID() {
-        final String classID = MCRConfiguration.instance().getString(CONFIG_PREFIX + "CollectionClassID", "objectCollection");
+        final String classID = MCRConfiguration.instance().getString(CONFIG_PREFIX + "CollectionClassID",
+            "objectCollection");
         final MCRCategoryID categoryID = MCRCategoryID.rootID(classID);
         return categoryID;
     }

@@ -18,8 +18,8 @@ public class MCRMetsSimpleModel {
     }
 
     private MCRMetsSection rootSection;
-    private List<MCRMetsPage> metsPageList;
 
+    private List<MCRMetsPage> metsPageList;
 
     public List<MCRMetsLink> sectionPageLinkList;
 
@@ -40,5 +40,3 @@ public class MCRMetsSimpleModel {
     }
 
 }
-
-

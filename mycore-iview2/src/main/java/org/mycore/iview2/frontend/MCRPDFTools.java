@@ -76,9 +76,9 @@ class MCRPDFTools implements AutoCloseable {
             final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
             //if centered make thumbnailSize x thumbnailSize image
             final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth,
-                    centered ? thumbnailSize
-                            : newHeight,
-                    imageType);
+                centered ? thumbnailSize
+                    : newHeight,
+                imageType);
             LOGGER.info("target image dimensions: " + bicubic.getWidth() + "x" + bicubic.getHeight());
             final Graphics2D bg = bicubic.createGraphics();
             bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
@@ -88,7 +88,7 @@ class MCRPDFTools implements AutoCloseable {
                 LOGGER.warn("Writing at position " + x + "," + y);
             }
             bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
-                    (int) Math.ceil(height), null);
+                (int) Math.ceil(height), null);
             bg.dispose();
             return bicubic;
         } finally {
@@ -97,7 +97,7 @@ class MCRPDFTools implements AutoCloseable {
     }
 
     MCRContent getThumnail(Path pdfFile, BasicFileAttributes attrs, int thumbnailSize, boolean centered)
-            throws IOException {
+        throws IOException {
         BufferedImage thumbnail = MCRPDFTools.getThumbnail(pdfFile, thumbnailSize, centered);
         MCRContent pngContent = pngTools.toPNGContent(thumbnail);
         BasicFileAttributes fattrs = attrs != null ? attrs : Files.readAttributes(pdfFile, BasicFileAttributes.class);

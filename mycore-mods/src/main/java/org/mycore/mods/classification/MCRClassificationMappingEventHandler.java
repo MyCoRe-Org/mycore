@@ -53,8 +53,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 .map(categIdString -> categIdString.split(":"))
                 .map(categIdArr -> new MCRCategoryID(categIdArr[0], categIdArr[1]))
                 .filter(DAO::exist)
-                    .map(mappingTarget -> new AbstractMap.SimpleEntry<>(category.getId(), mappingTarget))
-                    .collect(Collectors.toList());
+                .map(mappingTarget -> new AbstractMap.SimpleEntry<>(category.getId(), mappingTarget))
+                .collect(Collectors.toList());
         }
 
         return Collections.emptyList();
@@ -81,28 +81,29 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     private void createMapping(MCRObject obj) {
         MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
-        if(mcrmodsWrapper.getMODS()==null){
+        if (mcrmodsWrapper.getMODS() == null) {
             return;
         }
         // vorher alle mit generator *-mycore löschen
         mcrmodsWrapper.getElements("mods:classification[contains(@generator, '" + GENERATOR_SUFFIX + "')]")
-                .stream().forEach(Element::detach);
+            .stream().forEach(Element::detach);
 
         LOGGER.info("check mappings " + obj.getId().toString());
         mcrmodsWrapper.getMcrCategoryIDs().stream()
-                .map(categoryId -> DAO.getCategory(categoryId, 0))
-                .filter(Objects::nonNull)
-                .map(MCRClassificationMappingEventHandler::getMappings)
-                .flatMap(list -> list.stream())
-                .distinct()
-                .forEach(mapping -> {
-                    String taskMessage = String.format(Locale.ROOT, "add mapping from '%s' to '%s'", mapping.getKey().toString(), mapping.getValue().toString());
-                    LOGGER.info(taskMessage);
-                    Element mappedClassification = mcrmodsWrapper.addElement("classification");
-                    String generator = getGenerator(mapping.getKey(), mapping.getValue());
-                    mappedClassification.setAttribute("generator", generator);
-                    MCRClassMapper.assignCategory(mappedClassification, mapping.getValue());
-                });
+            .map(categoryId -> DAO.getCategory(categoryId, 0))
+            .filter(Objects::nonNull)
+            .map(MCRClassificationMappingEventHandler::getMappings)
+            .flatMap(list -> list.stream())
+            .distinct()
+            .forEach(mapping -> {
+                String taskMessage = String.format(Locale.ROOT, "add mapping from '%s' to '%s'",
+                    mapping.getKey().toString(), mapping.getValue().toString());
+                LOGGER.info(taskMessage);
+                Element mappedClassification = mcrmodsWrapper.addElement("classification");
+                String generator = getGenerator(mapping.getKey(), mapping.getValue());
+                mappedClassification.setAttribute("generator", generator);
+                MCRClassMapper.assignCategory(mappedClassification, mapping.getValue());
+            });
         LOGGER.debug("mapping complete.");
     }
 

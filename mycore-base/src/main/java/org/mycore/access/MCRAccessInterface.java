@@ -176,7 +176,7 @@ public interface MCRAccessInterface {
      * </pre>
      */
     public boolean checkPermission(String id, String permission);
-    
+
     /**
      * returns a MCRAccessRule which could be validated
      * 

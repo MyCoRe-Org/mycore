@@ -83,7 +83,9 @@ public class MCRMODSLinkedMetadataTest extends MCRJPATestCase {
         builder.setNamespace(MCRConstants.MODS_NAMESPACE);
         XPathExpression<Element> seriesTitlePath = builder.compileWith(XPathFactory.instance());
         Element titleElement = seriesTitlePath.evaluateFirst(bookNew);
-        Assert.assertNotNull("No title element in related item: " + new XMLOutputter(Format.getPrettyFormat()).outputString(bookNew), titleElement);
+        Assert.assertNotNull(
+            "No title element in related item: " + new XMLOutputter(Format.getPrettyFormat()).outputString(bookNew),
+            titleElement);
         Assert.assertEquals("Title update from series was not promoted to book of series.",
             "Updated series title", titleElement.getText());
     }

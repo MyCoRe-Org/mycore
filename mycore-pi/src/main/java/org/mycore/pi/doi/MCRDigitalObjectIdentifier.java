@@ -1,17 +1,17 @@
 package org.mycore.pi.doi;
 
-
 import java.util.Locale;
 
 import org.mycore.pi.MCRPersistentIdentifier;
-
 
 public class MCRDigitalObjectIdentifier implements MCRPersistentIdentifier {
 
     public static final String TYPE = "doi";
 
     public static final String TEST_DOI_PREFIX = "10.5072";
+
     private String prefix;
+
     private String suffix;
 
     protected MCRDigitalObjectIdentifier(String prefix, String suffix) {

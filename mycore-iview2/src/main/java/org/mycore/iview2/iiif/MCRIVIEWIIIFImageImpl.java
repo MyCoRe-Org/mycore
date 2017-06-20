@@ -45,13 +45,19 @@ import org.mycore.iview2.services.MCRIView2Tools;
 public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     public static final String DEFAULT_PROTOCOL = "http://iiif.io/api/image";
+
     public static final double LOG_HALF = Math.log(1.0 / 2.0);
+
     public static final java.util.List<String> SUPPORTED_FORMATS = Arrays.asList(ImageIO.getReaderFileSuffixes());
+
     public static final String MAX_BYTES = "MCR.IIIFImage.Iview.MaxImageBytes";
+
     private static final String TILE_FILE_PROVIDER_PROPERTY = "TileFileProvider";
 
     private static Logger LOGGER = LogManager.getLogger(MCRIVIEWIIIFImageImpl.class);
+
     private java.util.List<String> transparentFormats;
+
     private MCRTileFileProvider tileFileProvider;
 
     public MCRIVIEWIIIFImageImpl(String implName) {
@@ -65,13 +71,16 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         }
 
         try {
-            Class<MCRTileFileProvider> classObject = (Class<MCRTileFileProvider>) Class.forName(tileFileProviderClassName);
+            Class<MCRTileFileProvider> classObject = (Class<MCRTileFileProvider>) Class
+                .forName(tileFileProviderClassName);
             Constructor<MCRTileFileProvider> constructor = classObject.getConstructor();
             tileFileProvider = constructor.newInstance();
         } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException("Configurated class (" + TILE_FILE_PROVIDER_PROPERTY + ") not found: " + tileFileProviderClassName, e);
+            throw new MCRConfigurationException(
+                "Configurated class (" + TILE_FILE_PROVIDER_PROPERTY + ") not found: " + tileFileProviderClassName, e);
         } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException("Configurated class (" + TILE_FILE_PROVIDER_PROPERTY + ") needs a default constructor: " + tileFileProviderClassName);
+            throw new MCRConfigurationException("Configurated class (" + TILE_FILE_PROVIDER_PROPERTY
+                + ") needs a default constructor: " + tileFileProviderClassName);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new MCRException(e);
         }
@@ -80,7 +89,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     private String buildURL(String identifier) {
         try {
-            return MCRFrontendUtil.getBaseURL() + "rsc/iiif/image/" + getImplName() + "/" + URLEncoder.encode(identifier, "UTF-8");
+            return MCRFrontendUtil.getBaseURL() + "rsc/iiif/image/" + getImplName() + "/"
+                + URLEncoder.encode(identifier, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new MCRException("UTF-8 is not supported!", e);
         }
@@ -88,24 +98,25 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     @Override
     public BufferedImage provide(String identifier,
-                                 MCRIIIFImageSourceRegion region,
-                                 MCRIIIFImageTargetSize targetSize,
-                                 MCRIIIFImageTargetRotation rotation,
-                                 MCRIIIFImageQuality imageQuality,
-                                 String format) throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException, MCRIIIFUnsupportedFormatException, MCRAccessException {
+        MCRIIIFImageSourceRegion region,
+        MCRIIIFImageTargetSize targetSize,
+        MCRIIIFImageTargetRotation rotation,
+        MCRIIIFImageQuality imageQuality,
+        String format) throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException,
+        MCRIIIFUnsupportedFormatException, MCRAccessException {
 
-
-        long resultingSize = (long) targetSize.getHeight() * targetSize.getWidth() * (imageQuality.equals(MCRIIIFImageQuality.color) ? 3 : 1);
+        long resultingSize = (long) targetSize.getHeight() * targetSize.getWidth()
+            * (imageQuality.equals(MCRIIIFImageQuality.color) ? 3 : 1);
 
         long maxImageSize = MCRConfiguration.instance().getLong(MAX_BYTES);
         if (resultingSize > maxImageSize) {
-            throw new MCRIIIFImageProvidingException("Maximal image size is " + (maxImageSize / 1024 / 1024) + "MB. [" + resultingSize + "/" + maxImageSize + "]");
+            throw new MCRIIIFImageProvidingException("Maximal image size is " + (maxImageSize / 1024 / 1024) + "MB. ["
+                + resultingSize + "/" + maxImageSize + "]");
         }
 
         if (!SUPPORTED_FORMATS.contains(format.toLowerCase(Locale.ENGLISH))) {
             throw new MCRIIIFUnsupportedFormatException(format);
         }
-
 
         Path tiledFile = tileFileProvider.getTiledFile(identifier);
         MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
@@ -115,7 +126,6 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
         double targetWidth = targetSize.getWidth();
         double targetHeight = targetSize.getHeight();
-
 
         double rotatationRadians = Math.toRadians(rotation.getDegrees());
         double sinRotation = Math.sin(rotatationRadians);
@@ -141,30 +151,32 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
                 }
         }
 
-
         // this value determines the zoom level!
         double largestScaling = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight);
 
         // We always want to use the the best needed zoom level!
-        int sourceZoomLevel = (int) Math.min(Math.max(0, Math.ceil(tiledPictureProps.getZoomlevel() - Math.log(largestScaling) / LOG_HALF)), tiledPictureProps.getZoomlevel());
+        int sourceZoomLevel = (int) Math.min(
+            Math.max(0, Math.ceil(tiledPictureProps.getZoomlevel() - Math.log(largestScaling) / LOG_HALF)),
+            tiledPictureProps.getZoomlevel());
 
         // largestScaling is the real scale which is needed! zoomLevelScale is the scale of the nearest zoom level!
         double zoomLevelScale = Math.min(1.0, Math.pow(0.5, tiledPictureProps.getZoomlevel() - sourceZoomLevel));
 
         // this is the scale which is needed from the nearest zoom level to the required size of image
-        double drawScaleX = (targetWidth / (sourceWidth * zoomLevelScale)), drawScaleY = (targetHeight / (sourceHeight * zoomLevelScale));
+        double drawScaleX = (targetWidth / (sourceWidth * zoomLevelScale)),
+            drawScaleY = (targetHeight / (sourceHeight * zoomLevelScale));
 
         // absolute region in zoom level this nearest zoom level
         double x1 = region.getX1() * zoomLevelScale,
-                x2 = region.getX2() * zoomLevelScale,
-                y1 = region.getY1() * zoomLevelScale,
-                y2 = region.getY2() * zoomLevelScale;
+            x2 = region.getX2() * zoomLevelScale,
+            y1 = region.getY1() * zoomLevelScale,
+            y2 = region.getY2() * zoomLevelScale;
 
         // now we detect the tiles to draw!
         int x1Tile = (int) Math.floor(x1 / 256),
-                y1Tile = (int) Math.floor(y1 / 256),
-                x2Tile = (int) Math.ceil(x2 / 256),
-                y2Tile = (int) Math.ceil(y2 / 256);
+            y1Tile = (int) Math.floor(y1 / 256),
+            x2Tile = (int) Math.ceil(x2 / 256),
+            y2Tile = (int) Math.ceil(y2 / 256);
 
         try (FileSystem zipFileSystem = MCRIView2Tools.getFileSystem(tileFileProvider.getTiledFile(identifier))) {
             Path rootPath = zipFileSystem.getPath("/");
@@ -186,7 +198,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             graphics.setClip(region.getX1(), region.getY1(), sourceWidth, sourceHeight);
             graphics.scale(1 / zoomLevelScale, 1 / zoomLevelScale);
 
-            LOGGER.info(String.format(Locale.ROOT, "Using zoom-level: %d and scales %s/%s!", sourceZoomLevel, drawScaleX, drawScaleY));
+            LOGGER.info(String.format(Locale.ROOT, "Using zoom-level: %d and scales %s/%s!", sourceZoomLevel,
+                drawScaleX, drawScaleY));
 
             for (int x = x1Tile; x < x2Tile; x++) {
                 for (int y = y1Tile; y < y2Tile; y++) {
@@ -203,13 +216,14 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         return targetImage;
     }
 
-    public MCRIIIFImageInformation getInformation(String identifier) throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException, MCRAccessException {
+    public MCRIIIFImageInformation getInformation(String identifier)
+        throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException, MCRAccessException {
         try {
             Path tiledFile = tileFileProvider.getTiledFile(identifier);
             MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
 
-            MCRIIIFImageInformation imageInformation = new MCRIIIFImageInformation(MCRIIIFBase.API_IMAGE_2, buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight());
-
+            MCRIIIFImageInformation imageInformation = new MCRIIIFImageInformation(MCRIIIFBase.API_IMAGE_2,
+                buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight());
 
             MCRIIIFImageTileInformation tileInformation = new MCRIIIFImageTileInformation(256, 256);
             for (int i = 0; i < tiledPictureProps.getZoomlevel(); i++) {
@@ -229,7 +243,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     public MCRIIIFImageProfile getProfile() {
         MCRIIIFImageProfile mcriiifImageProfile = new MCRIIIFImageProfile();
 
-        mcriiifImageProfile.formats = this.SUPPORTED_FORMATS.stream().filter(s -> !s.isEmpty()).collect(Collectors.toSet());
+        mcriiifImageProfile.formats = this.SUPPORTED_FORMATS.stream().filter(s -> !s.isEmpty())
+            .collect(Collectors.toSet());
 
         mcriiifImageProfile.qualities.add("color");
         mcriiifImageProfile.qualities.add("bitonal");
@@ -253,7 +268,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     private MCRTiledPictureProps getTiledPictureProps(Path tiledFile) throws MCRIIIFImageProvidingException {
         MCRTiledPictureProps tiledPictureProps = null;
-        try(FileSystem fileSystem = MCRIView2Tools.getFileSystem(tiledFile)) {
+        try (FileSystem fileSystem = MCRIView2Tools.getFileSystem(tiledFile)) {
             tiledPictureProps = MCRTiledPictureProps.getInstanceFromDirectory(fileSystem.getPath("/"));
         } catch (IOException | JDOMException e) {
             throw new MCRIIIFImageProvidingException("Could not provide image information!", e);

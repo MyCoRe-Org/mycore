@@ -172,7 +172,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     }
 
     /** Add link count to each category */
-    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category, List<Element> data) {
+    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category,
+        List<Element> data) {
         if (!Boolean.valueOf(req.getParameter("countlinks")))
             return;
         if (objectType != null && objectType.trim().length() == 0) {
@@ -180,7 +181,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         }
 
         String classifID = category.getId().getRootID();
-        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category, objectType, true);
+        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category,
+            objectType, true);
         for (Iterator<Element> it = data.iterator(); it.hasNext();) {
             Element child = it.next();
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
@@ -208,8 +210,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     /** Sends output to client browser 
      * @throws SAXException 
      * @throws TransformerException */
-    private void renderToHTML(MCRServletJob job, HttpServletRequest req, Element xml) throws IOException, TransformerException,
-            SAXException {
+    private void renderToHTML(MCRServletJob job, HttpServletRequest req, Element xml)
+        throws IOException, TransformerException,
+        SAXException {
         String style = req.getParameter("style"); // XSL.Style, optional
         if ((style != null) && (style.length() > 0))
             req.setAttribute("XSL.Style", style);

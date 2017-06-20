@@ -31,7 +31,7 @@ public class MCRDeleteDerivateServlet extends MCRPersistenceServlet {
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,
         ServletException, MCRActiveLinkException, SAXParseException, JDOMException, IOException {
-        MCRDerivateCommands.delete(getProperty(request, "id"));        
+        MCRDerivateCommands.delete(getProperty(request, "id"));
     }
 
     @Override

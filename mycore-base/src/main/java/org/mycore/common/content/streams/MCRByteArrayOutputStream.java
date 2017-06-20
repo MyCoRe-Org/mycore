@@ -34,15 +34,15 @@ public class MCRByteArrayOutputStream extends ByteArrayOutputStream {
     /**
      * Initital buffer size is 4k.
      */
-    public MCRByteArrayOutputStream(){
-        this(4*1024);
+    public MCRByteArrayOutputStream() {
+        this(4 * 1024);
     }
 
     public MCRByteArrayOutputStream(int i) {
         super(i);
     }
 
-    public byte[] getBuffer(){
+    public byte[] getBuffer() {
         return super.buf;
     }
 }

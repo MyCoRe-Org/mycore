@@ -77,7 +77,8 @@ public class MCRMediaIFSTools {
         }
     }
 
-    public static void storeMetadata(org.jdom2.Element mediaXML, String derivateID, String filePath) throws MCRException {
+    public static void storeMetadata(org.jdom2.Element mediaXML, String derivateID, String filePath)
+        throws MCRException {
         LOGGER.debug("Store metadata for file \"" + filePath + "\" in Derivate " + derivateID);
         try {
             MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);

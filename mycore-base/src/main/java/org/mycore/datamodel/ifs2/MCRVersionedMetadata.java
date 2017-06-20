@@ -122,7 +122,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         try {
             // 1. current revision, 2. deleted revision, empty()
             revision = Optional.ofNullable(Optional.ofNullable(getStore().getRepository().info(getFilePath(), -1))
-                    .map(SVNDirEntry::getRevision).orElseGet(this::getLastRevision));
+                .map(SVNDirEntry::getRevision).orElseGet(this::getLastRevision));
         } catch (SVNException e) {
             LOGGER.error("Could not get last revision of " + getStore().getID() + "_" + id, e);
             revision = Optional.empty();
@@ -257,7 +257,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             revision = Optional.of(info.getNewRevision());
             LOGGER.info("SVN commit of delete finished, new revision " + getRevision());
         } catch (SVNException e) {
-        	LOGGER.error("Error while deleting " + id + " in SVN ", e);
+            LOGGER.error("Error while deleting " + id + " in SVN ", e);
         } finally {
             super.delete();
         }
@@ -333,7 +333,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 revision = getLastPresentRevision();
                 if (revision < 0) {
                     LOGGER.warn(
-                            MessageFormat.format("Metadata object {0} in store {1} has no last revision!", getID(), getStore().getID()));
+                        MessageFormat.format("Metadata object {0} in store {1} has no last revision!", getID(),
+                            getStore().getID()));
                     return null;
                 }
             }
@@ -349,8 +350,9 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                     return new MCRMetadataVersion(this, logEntry, type);
                 }
             }
-            LOGGER.warn(MessageFormat.format("Metadata object {0} in store {1} has no revision ''{2}''!", getID(), getStore().getID(),
-                    getRevision()));
+            LOGGER.warn(MessageFormat.format("Metadata object {0} in store {1} has no revision ''{2}''!", getID(),
+                getStore().getID(),
+                getRevision()));
             return null;
         } catch (SVNException svnExc) {
             throw new IOException(svnExc);
@@ -372,7 +374,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         LastRevisionLogHandler lastRevisionLogHandler = new LastRevisionLogHandler(path, deleted);
         int limit = 0; //we stop through LastRevisionFoundException
         try {
-            repository.log(new String[] { dir }, repository.getLatestRevision(), 0, true, true, limit, false, null, lastRevisionLogHandler);
+            repository.log(new String[] { dir }, repository.getLatestRevision(), 0, true, true, limit, false, null,
+                lastRevisionLogHandler);
         } catch (LastRevisionFoundException e) {
         }
         return lastRevisionLogHandler.getLastRevision();

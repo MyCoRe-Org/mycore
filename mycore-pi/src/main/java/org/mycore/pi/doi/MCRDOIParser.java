@@ -1,6 +1,5 @@
 package org.mycore.pi.doi;
 
-
 import java.util.Optional;
 
 import org.mycore.pi.MCRPersistentIdentifierParser;

@@ -10,7 +10,7 @@ public abstract class MCRJerseyResource {
     @Context
     protected UriInfo uriInfo;
 
-    protected URI getBaseURI(){
+    protected URI getBaseURI() {
         return uriInfo.getBaseUri();
     }
 

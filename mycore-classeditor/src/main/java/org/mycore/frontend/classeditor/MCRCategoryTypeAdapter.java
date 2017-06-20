@@ -36,7 +36,8 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
     private MCRCategLinkService linkService;
 
     @Override
-    public MCRJSONCategory deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public MCRJSONCategory deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
         JsonObject categJsonObject = json.getAsJsonObject();
         MCRJSONCategory deserializedCateg = new MCRJSONCategory();
 
@@ -51,9 +52,9 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
             MCRCategoryID parentId = context.deserialize(parentIdJsonElement, MCRCategoryID.class);
             deserializedCateg.setParentID(parentId);
         }
-        
+
         JsonElement positionJsonElem = categJsonObject.get(POSITION);
-        if(positionJsonElem != null){
+        if (positionJsonElem != null) {
             deserializedCateg.setPositionInParent(positionJsonElem.getAsInt());
         }
 
@@ -90,15 +91,16 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
         if (category.hasChildren()) {
             List<MCRCategory> children = category.getChildren();
             Map<MCRCategoryID, Boolean> linkMap = getLinkService().hasLinks(category);
-            if(linkMap.values().contains(true)) {
+            if (linkMap.values().contains(true)) {
                 rubricJsonObject.addProperty(HASLINK, true);
             }
-            rubricJsonObject.add(CHILDREN, contextSerialization.serialize(new MCRCategoryListWrapper(children, linkMap)));
+            rubricJsonObject.add(CHILDREN,
+                contextSerialization.serialize(new MCRCategoryListWrapper(children, linkMap)));
         }
 
         return rubricJsonObject;
     }
-    
+
     private MCRCategLinkService getLinkService() {
         if (linkService == null) {
             try {

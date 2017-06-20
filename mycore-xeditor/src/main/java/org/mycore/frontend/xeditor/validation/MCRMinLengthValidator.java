@@ -29,7 +29,7 @@ package org.mycore.frontend.xeditor.validation;
 public class MCRMinLengthValidator extends MCRValidator {
 
     private static final String ATTR_MIN_LENGTH = "minLength";
-    
+
     private int minLength;
 
     @Override

@@ -95,7 +95,7 @@ public class MCRTileServlet extends HttpServlet {
             try (ServletOutputStream out = resp.getOutputStream()) {
                 Files.copy(tilePath, out);
             }
-            
+
         }
         LOGGER.debug("Ending MCRTileServlet");
     }

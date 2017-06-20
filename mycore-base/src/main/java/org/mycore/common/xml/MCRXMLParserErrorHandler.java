@@ -51,7 +51,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
      * Handles parser warnings
      */
     public void warning(SAXParseException ex) {
-        if(!silent) {
+        if (!silent) {
             LOGGER.warn(getSAXErrorMessage(ex), ex);
         }
     }
@@ -60,7 +60,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
      * Handles parse errors
      */
     public void error(SAXParseException ex) {
-        if(!silent) {
+        if (!silent) {
             LOGGER.error(getSAXErrorMessage(ex), ex);
         }
         throw new RuntimeException(ex);
@@ -70,7 +70,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
      * Handles fatal parse errors
      */
     public void fatalError(SAXParseException ex) {
-        if(!silent) {
+        if (!silent) {
             LOGGER.fatal(getSAXErrorMessage(ex));
         }
         throw new RuntimeException(ex);

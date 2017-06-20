@@ -88,8 +88,10 @@ public class MCRMetadataStore extends MCRStore {
         suffix = ".xml";
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML", true);
         if (forceXML) {
-            forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType", null);
-            LogManager.getLogger(MCRMetadataStore.class).info("Set doctype for " + config.getID() + " to " + forceDocType);
+            forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType",
+                null);
+            LogManager.getLogger(MCRMetadataStore.class)
+                .info("Set doctype for " + config.getID() + " to " + forceDocType);
         }
     }
 

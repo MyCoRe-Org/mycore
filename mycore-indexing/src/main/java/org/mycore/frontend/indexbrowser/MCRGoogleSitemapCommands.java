@@ -46,7 +46,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-@MCRCommandGroup(name="Google Sitemap Commands")
+@MCRCommandGroup(name = "Google Sitemap Commands")
 public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
 
     /** The logger */
@@ -55,7 +55,9 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
     /**
      * The build and store method.
      */
-    @MCRCommand(syntax="build google sitemap", help="Creates the google sitemap(s) in webapps directory.", order=10)    
+    @MCRCommand(syntax = "build google sitemap",
+        help = "Creates the google sitemap(s) in webapps directory.",
+        order = 10)
     public static void buildSitemap() throws Exception {
         // check time
         LOGGER.debug("Build Google sitemap start.");
@@ -67,21 +69,21 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
         common.removeSitemapFiles();
         // compute number of files
         int number = common.checkSitemapFile();
-        LOGGER.debug("Build Google number of URL files "+Integer.toString(number)+".");
+        LOGGER.debug("Build Google number of URL files " + Integer.toString(number) + ".");
         if (number == 1) {
-            String fn = common.getFileName(1,true);
+            String fn = common.getFileName(1, true);
             File xml = new File(fn);
             Document jdom = common.buildSingleSitemap();
             LOGGER.info("Write Google sitemap file " + fn + ".");
             new MCRJDOMContent(jdom).sendTo(xml);
         } else {
-            String fn = common.getFileName(1,true);
+            String fn = common.getFileName(1, true);
             File xml = new File(fn);
             Document jdom = common.buildSitemapIndex(number);
             LOGGER.info("Write Google sitemap file " + fn + ".");
             new MCRJDOMContent(jdom).sendTo(xml);
             for (int i = 0; i < number; i++) {
-                fn = common.getFileName(i+2,true);
+                fn = common.getFileName(i + 2, true);
                 xml = new File(fn);
                 jdom = common.buildPartSitemap(i);
                 LOGGER.info("Write Google sitemap file " + fn + ".");

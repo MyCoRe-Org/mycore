@@ -30,7 +30,8 @@ import org.junit.Test;
 public class MCRMycoreObjectSolrXSLTest {
 
     @Test
-    public void singleTransform() throws JDOMException, IOException, TransformerFactoryConfigurationError, TransformerException {
+    public void singleTransform()
+        throws JDOMException, IOException, TransformerFactoryConfigurationError, TransformerException {
         String testFilePath = "/" + getClass().getSimpleName() + "/oneObj.xml";
         InputStream testXMLAsStream = getClass().getResourceAsStream(testFilePath);
 
@@ -41,15 +42,18 @@ public class MCRMycoreObjectSolrXSLTest {
         //        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         //        xmlOutputter.output(resultXML, System.out);
 
-        List<Element> mycoreojectTags = XPathFactory.instance().compile("/solr-document-container/source/mycoreobject", Filters.element()).evaluate(resultXML);
+        List<Element> mycoreojectTags = XPathFactory.instance()
+            .compile("/solr-document-container/source/mycoreobject", Filters.element()).evaluate(resultXML);
         assertEquals(1, mycoreojectTags.size());
 
-        List<Element> userFieldTags = XPathFactory.instance().compile("/solr-document-container/source/user", Filters.element()).evaluate(resultXML);
+        List<Element> userFieldTags = XPathFactory.instance()
+            .compile("/solr-document-container/source/user", Filters.element()).evaluate(resultXML);
         assertEquals(1, userFieldTags.size());
     }
 
     @Test
-    public void multiTransform() throws JDOMException, IOException, TransformerFactoryConfigurationError, TransformerException {
+    public void multiTransform()
+        throws JDOMException, IOException, TransformerFactoryConfigurationError, TransformerException {
         String testFilePath = "/" + getClass().getSimpleName() + "/multiplObj.xml";
         InputStream testXMLAsStream = getClass().getResourceAsStream(testFilePath);
 
@@ -60,19 +64,22 @@ public class MCRMycoreObjectSolrXSLTest {
         //        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         //        xmlOutputter.output(resultXML, System.out);
 
-        List<Element> mycoreojectTags = XPathFactory.instance().compile("/solr-document-container/source/mycoreobject", Filters.element()).evaluate(resultXML);
+        List<Element> mycoreojectTags = XPathFactory.instance()
+            .compile("/solr-document-container/source/mycoreobject", Filters.element()).evaluate(resultXML);
         assertEquals(3, mycoreojectTags.size());
 
-        List<Element> userFieldTags = XPathFactory.instance().compile("/solr-document-container/source/user", Filters.element()).evaluate(resultXML);
+        List<Element> userFieldTags = XPathFactory.instance()
+            .compile("/solr-document-container/source/user", Filters.element()).evaluate(resultXML);
         assertEquals(3, userFieldTags.size());
     }
 
     @Test
-    public void derivates() throws JDOMException, IOException, TransformerFactoryConfigurationError, TransformerException {
+    public void derivates()
+        throws JDOMException, IOException, TransformerFactoryConfigurationError, TransformerException {
         String testFilePath = "/" + getClass().getSimpleName() + "/xml/derivateObj.xml";
         InputStream testXMLAsStream = getClass().getResourceAsStream(testFilePath);
 
-//        JDOMResult jdomResult = xslTransformation(testXMLAsStream, "/" + getClass().getSimpleName() + "/xsl/mcr2solrOld.xsl");
+        //        JDOMResult jdomResult = xslTransformation(testXMLAsStream, "/" + getClass().getSimpleName() + "/xsl/mcr2solrOld.xsl");
         JDOMResult jdomResult = xslTransformation(testXMLAsStream);
 
         Document resultXML = jdomResult.getDocument();
@@ -80,16 +87,19 @@ public class MCRMycoreObjectSolrXSLTest {
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         xmlOutputter.output(resultXML, System.out);
 
-        List<Element> mycoreojectTags = XPathFactory.instance().compile("/solr-document-container/source/mycorederivate", Filters.element()).evaluate(resultXML);
+        List<Element> mycoreojectTags = XPathFactory.instance()
+            .compile("/solr-document-container/source/mycorederivate", Filters.element()).evaluate(resultXML);
         assertEquals(1, mycoreojectTags.size());
     }
 
-    private JDOMResult xslTransformation(InputStream testXMLAsStream) throws TransformerFactoryConfigurationError, TransformerException {
+    private JDOMResult xslTransformation(InputStream testXMLAsStream)
+        throws TransformerFactoryConfigurationError, TransformerException {
         return xslTransformation(testXMLAsStream, "/xsl/mycoreobject-solr.xsl");
     }
 
-    private JDOMResult xslTransformation(InputStream testXMLAsStream, String styleSheetPath) throws TransformerConfigurationException,
-            TransformerFactoryConfigurationError, TransformerException {
+    private JDOMResult xslTransformation(InputStream testXMLAsStream, String styleSheetPath)
+        throws TransformerConfigurationException,
+        TransformerFactoryConfigurationError, TransformerException {
         InputStream stylesheetAsStream = getClass().getResourceAsStream(styleSheetPath);
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -108,8 +118,8 @@ public class MCRMycoreObjectSolrXSLTest {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String testFilePath = "/" + MCRMycoreObjectSolrXSLTest.class.getSimpleName() 
-                    + "/mockClassification.xml";
+            String testFilePath = "/" + MCRMycoreObjectSolrXSLTest.class.getSimpleName()
+                + "/mockClassification.xml";
             InputStream testXMLAsStream = getClass().getResourceAsStream(testFilePath);
             return new StreamSource(testXMLAsStream);
         }

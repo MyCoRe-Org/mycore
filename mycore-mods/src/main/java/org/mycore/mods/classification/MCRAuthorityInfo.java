@@ -51,7 +51,7 @@ abstract class MCRAuthorityInfo {
     public MCRCategoryID getCategoryID() {
         String key = toString();
         LOGGER.debug("get categoryID for " + key);
-    
+
         Object categoryID = categoryIDbyAuthorityInfo.getIfUpToDate(key, DAO.getLastModified());
         if (categoryID == null) {
             LOGGER.debug("lookup categoryID for " + key);
@@ -79,5 +79,5 @@ abstract class MCRAuthorityInfo {
      * attributes and/or value code as text.
      */
     public abstract void setInElement(Element modsElement);
-    
+
 }

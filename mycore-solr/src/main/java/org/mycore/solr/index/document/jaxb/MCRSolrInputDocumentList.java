@@ -5,7 +5,6 @@
 // Generated on: 2013.06.18 at 04:23:29 PM CEST 
 //
 
-
 package org.mycore.solr.index.document.jaxb;
 
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
 
 /**
  * <p>Java class for MCRSolrInputDocumentList complex type.
@@ -43,12 +41,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "MCRSolrInputDocumentList", propOrder = {
     "doc"
 })
-@XmlRootElement(name="add")
+@XmlRootElement(name = "add")
 public class MCRSolrInputDocumentList {
 
     protected List<MCRSolrInputDocument> doc;
+
     @XmlAttribute(name = "commitWithin")
     protected Integer commitWithin;
+
     @XmlAttribute(name = "overwrite")
     protected Boolean overwrite;
 

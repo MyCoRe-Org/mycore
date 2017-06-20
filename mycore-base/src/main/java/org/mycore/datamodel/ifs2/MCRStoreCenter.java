@@ -9,7 +9,7 @@ public class MCRStoreCenter {
     private static MCRStoreCenter instance = new MCRStoreCenter();
 
     private MCRStoreCenter() {
-        this.storeHeap=new HashMap<String, MCRStore>();
+        this.storeHeap = new HashMap<String, MCRStore>();
     }
 
     public static MCRStoreCenter instance() {
@@ -22,7 +22,7 @@ public class MCRStoreCenter {
      * @param store - Add this store to store center
      * @throws MCRStoreAlreadyExistsException If with the same id already exists in the store center
      */
-    public void addStore(String id, MCRStore store) throws MCRStoreAlreadyExistsException  {
+    public void addStore(String id, MCRStore store) throws MCRStoreAlreadyExistsException {
         if (storeHeap.containsKey(id)) {
             throw new MCRStoreAlreadyExistsException("Could not add store with ID " + id + ", store allready exists");
         }
@@ -37,7 +37,7 @@ public class MCRStoreCenter {
      * @param storeClass - The class type of the retrieved store
      * @return The retrieved store or null if not exists
      */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     public <T extends MCRStore> T getStore(String id, Class<T> storeClass) {
         return (T) storeHeap.get(id);
     }

@@ -94,9 +94,9 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
         MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(dir.getOwner()));
 
-        mets.getLogicalStructMap().getDivContainer().setLabel(MCRTranslation.exists("MCR.Mets.LogicalStructMap.Default.Label") ?
-                MCRTranslation.translate("MCR.Mets.LogicalStructMap.Default.Label") :
-                owner.getId().toString());
+        mets.getLogicalStructMap().getDivContainer()
+            .setLabel(MCRTranslation.exists("MCR.Mets.LogicalStructMap.Default.Label")
+                ? MCRTranslation.translate("MCR.Mets.LogicalStructMap.Default.Label") : owner.getId().toString());
 
         Map<String, String> urnFileMap = owner.getUrnMap();
         if (urnFileMap.size() > 0) {
@@ -285,7 +285,6 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
             return FileUse.ALTO;
         return FileUse.MASTER;
     }
-
 
     /**
      * Checks if a root directory should be included in mets.xml

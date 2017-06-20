@@ -53,7 +53,7 @@ public class ToolBarController extends WebDriverController {
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                    selector.toString()));
+                selector.toString()));
         }
 
         element.click();
@@ -73,7 +73,7 @@ public class ToolBarController extends WebDriverController {
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                    selector.toString()));
+                selector.toString()));
         }
 
         List<WebElement> webElements = getDriver().findElements(selector);
@@ -86,8 +86,8 @@ public class ToolBarController extends WebDriverController {
 
     // TODO: do this better!
     private WebElement getNotStaleElement(int trys, By selector) {
-        if(trys<=0){
-            throw new IllegalArgumentException("trys should be more then 0! ["+trys+"]");
+        if (trys <= 0) {
+            throw new IllegalArgumentException("trys should be more then 0! [" + trys + "]");
         }
 
         Exception sere = null;
@@ -131,7 +131,8 @@ public class ToolBarController extends WebDriverController {
         By selector = By.cssSelector(SELECTBOX_SELECTOR);
         WebElement element = this.getDriver().findElement(selector);
         Select select = new Select(element);
-        return select != null && select.getFirstSelectedOption() != null && select.getFirstSelectedOption().getText().equalsIgnoreCase(oderLabel);
+        return select != null && select.getFirstSelectedOption() != null
+            && select.getFirstSelectedOption().getText().equalsIgnoreCase(oderLabel);
     }
 
 }

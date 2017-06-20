@@ -45,7 +45,7 @@ public class MCRCoreVersion {
     public static final String BRANCH = prop.getProperty("git.branch");
 
     public static final String REVISION = prop.getProperty("git.commit.id.full");
-    
+
     public static final String DESCRIBE = prop.getProperty("git.commit.id.describe");
 
     public static final String COMPLETE = VERSION + " " + BRANCH + ":" + DESCRIBE;
@@ -92,8 +92,8 @@ public class MCRCoreVersion {
     public static String getCompleteVersion() {
         return COMPLETE;
     }
-    
-    public static Map<String,String> getVersionProperties(){
+
+    public static Map<String, String> getVersionProperties() {
         return prop.entrySet()
             .stream()
             .collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().toString()));

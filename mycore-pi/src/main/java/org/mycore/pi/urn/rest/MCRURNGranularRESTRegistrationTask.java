@@ -37,12 +37,12 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
     @Override
     public void run() {
         UnaryOperator<Integer> register = b -> MCRPersistentIdentifierManager
-                .getInstance()
-                .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, dnburnClient::register, b);
+            .getInstance()
+            .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, dnburnClient::register, b);
 
         Integer numOfRegisteredObj = MCRTransactionExec.cute(register).apply(BATCH_SIZE);
 
-        while (numOfRegisteredObj > 0){
+        while (numOfRegisteredObj > 0) {
             numOfRegisteredObj = MCRTransactionExec.cute(register).apply(BATCH_SIZE);
         }
 
@@ -68,8 +68,8 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
 
         private static EntityTransaction beginTransaction() {
             EntityTransaction tx = MCREntityManagerProvider
-                    .getCurrentEntityManager()
-                    .getTransaction();
+                .getCurrentEntityManager()
+                .getTransaction();
 
             tx.begin();
             return tx;

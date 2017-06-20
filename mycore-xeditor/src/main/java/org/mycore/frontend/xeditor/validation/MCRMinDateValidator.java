@@ -32,7 +32,7 @@ import java.util.Date;
 public class MCRMinDateValidator extends MCRDateValidator {
 
     private static final String ATTR_MIN = "min";
-    
+
     private Date minDate;
 
     @Override

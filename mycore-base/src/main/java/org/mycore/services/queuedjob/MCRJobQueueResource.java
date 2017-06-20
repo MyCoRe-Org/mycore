@@ -66,13 +66,13 @@ public class MCRJobQueueResource {
         try {
             Queues queuesEntity = new Queues();
             queuesEntity.addAll(
-                    MCRJobQueue.INSTANCES.keySet().stream().map(n -> new Queue(n)).collect(Collectors.toList()));
+                MCRJobQueue.INSTANCES.keySet().stream().map(n -> new Queue(n)).collect(Collectors.toList()));
 
             return Response.ok().status(Response.Status.OK).entity(queuesEntity)
-                    .build();
+                .build();
         } catch (Exception e) {
             final StreamingOutput so = (OutputStream os) -> e
-                    .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
+                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
@@ -84,13 +84,13 @@ public class MCRJobQueueResource {
         try {
             Queues queuesEntity = new Queues();
             queuesEntity.addAll(
-                    MCRJobQueue.INSTANCES.keySet().stream().map(n -> new Queue(n)).collect(Collectors.toList()));
+                MCRJobQueue.INSTANCES.keySet().stream().map(n -> new Queue(n)).collect(Collectors.toList()));
 
             return Response.ok().status(Response.Status.OK).entity(toJSON(queuesEntity))
-                    .build();
+                .build();
         } catch (Exception e) {
             final StreamingOutput so = (OutputStream os) -> e
-                    .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
+                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
@@ -102,22 +102,22 @@ public class MCRJobQueueResource {
     public Response queueJSON(@PathParam("name") String name) {
         try {
             Queue queue = MCRJobQueue.INSTANCES.entrySet().stream().filter(e -> e.getKey().equals(name)).findFirst()
-                    .map(e -> {
-                        Queue q = new Queue(e.getKey());
+                .map(e -> {
+                    Queue q = new Queue(e.getKey());
 
-                        MCRJobQueue jq = e.getValue();
-                        Iterable<MCRJob> iterable = () -> jq.iterator(null);
-                        q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(j -> new Job(j))
-                                .collect(Collectors.toList());
+                    MCRJobQueue jq = e.getValue();
+                    Iterable<MCRJob> iterable = () -> jq.iterator(null);
+                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(j -> new Job(j))
+                        .collect(Collectors.toList());
 
-                        return q;
-                    }).orElse(null);
+                    return q;
+                }).orElse(null);
 
             return Response.ok().status(Response.Status.OK).entity(toJSON(queue))
-                    .build();
+                .build();
         } catch (Exception e) {
             final StreamingOutput so = (OutputStream os) -> e
-                    .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
+                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
@@ -129,22 +129,22 @@ public class MCRJobQueueResource {
     public Response queueXML(@PathParam("name") String name) {
         try {
             Queue queue = MCRJobQueue.INSTANCES.entrySet().stream().filter(e -> e.getKey().equals(name)).findFirst()
-                    .map(e -> {
-                        Queue q = new Queue(e.getKey());
+                .map(e -> {
+                    Queue q = new Queue(e.getKey());
 
-                        MCRJobQueue jq = e.getValue();
-                        Iterable<MCRJob> iterable = () -> jq.iterator(null);
-                        q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(j -> new Job(j))
-                                .collect(Collectors.toList());
+                    MCRJobQueue jq = e.getValue();
+                    Iterable<MCRJob> iterable = () -> jq.iterator(null);
+                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(j -> new Job(j))
+                        .collect(Collectors.toList());
 
-                        return q;
-                    }).orElse(null);
+                    return q;
+                }).orElse(null);
 
             return Response.ok().status(Response.Status.OK).entity(queue)
-                    .build();
+                .build();
         } catch (Exception e) {
             final StreamingOutput so = (OutputStream os) -> e
-                    .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
+                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
@@ -232,7 +232,7 @@ public class MCRJobQueueResource {
             }
 
             this.parameters = job.getParameters().entrySet().stream().map(e -> new Parameter(e.getKey(), e.getValue()))
-                    .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
             if (!dates.isEmpty()) {
                 this.dates = dates;

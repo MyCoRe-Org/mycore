@@ -172,7 +172,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             qBf.append(" and MCRFROM like \'%_").append(fromtype).append("_%\'");
         }
 
-        Query<Number> q = session.createQuery(qBf.toString(),Number.class);
+        Query<Number> q = session.createQuery(qBf.toString(), Number.class);
         returns = q.getSingleResult();
 
         return returns.intValue();

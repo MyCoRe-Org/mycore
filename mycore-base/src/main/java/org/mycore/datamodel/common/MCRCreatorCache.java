@@ -48,46 +48,46 @@ public class MCRCreatorCache {
     private static final long CACHE_SIZE = 5000;
 
     private static LoadingCache<MCRObjectID, String> CACHE = CacheBuilder.newBuilder()
-            .maximumSize(CACHE_SIZE).build(new CacheLoader<MCRObjectID, String>() {
-                @Override
-                public String load(final MCRObjectID objectId) throws Exception {
-                    return Optional.ofNullable(MCRMetadataManager.retrieveMCRObject(objectId).getService()).map(os -> {
-                        if (os.isFlagTypeSet("createdby")) {
-                            final String creator = os.getFlags("createdby").get(0);
-                            LOGGER.info("Found creator " + creator + " of " + objectId);
-                            return creator;
-                        }
-                        LOGGER.info("Try to get creator information of " + objectId + " from svn history.");
-                        return null;
-                    }).orElseGet(() -> {
-                        try {
-                            return Optional.ofNullable(MCRXMLMetadataManager.instance().listRevisions(objectId))
-                                    .map(versions -> {
-                                        return versions.stream()
-                                                .sorted(Comparator.comparingLong(MCRMetadataVersion::getRevision)
-                                                        .reversed())
-                                                .filter(v -> v.getType() == MCRMetadataVersion.CREATED).findFirst()
-                                                .map(version -> {
-                                                    LOGGER.info(
-                                                            "Found creator " + version.getUser() + " in revision "
-                                                                    + version.getRevision()
-                                                                    + " of " + objectId);
-                                                    return version.getUser();
-                                                }).orElseGet(() -> {
-                                                    LOGGER.info(
-                                                            "Could not get creator information of " + objectId + ".");
-                                                    return null;
-                                                });
+        .maximumSize(CACHE_SIZE).build(new CacheLoader<MCRObjectID, String>() {
+            @Override
+            public String load(final MCRObjectID objectId) throws Exception {
+                return Optional.ofNullable(MCRMetadataManager.retrieveMCRObject(objectId).getService()).map(os -> {
+                    if (os.isFlagTypeSet("createdby")) {
+                        final String creator = os.getFlags("createdby").get(0);
+                        LOGGER.info("Found creator " + creator + " of " + objectId);
+                        return creator;
+                    }
+                    LOGGER.info("Try to get creator information of " + objectId + " from svn history.");
+                    return null;
+                }).orElseGet(() -> {
+                    try {
+                        return Optional.ofNullable(MCRXMLMetadataManager.instance().listRevisions(objectId))
+                            .map(versions -> {
+                                return versions.stream()
+                                    .sorted(Comparator.comparingLong(MCRMetadataVersion::getRevision)
+                                        .reversed())
+                                    .filter(v -> v.getType() == MCRMetadataVersion.CREATED).findFirst()
+                                    .map(version -> {
+                                        LOGGER.info(
+                                            "Found creator " + version.getUser() + " in revision "
+                                                + version.getRevision()
+                                                + " of " + objectId);
+                                        return version.getUser();
                                     }).orElseGet(() -> {
-                                        LOGGER.info("Could not get creator information.");
+                                        LOGGER.info(
+                                            "Could not get creator information of " + objectId + ".");
                                         return null;
                                     });
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                }
-            });
+                            }).orElseGet(() -> {
+                                LOGGER.info("Could not get creator information.");
+                                return null;
+                            });
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        });
 
     /**
      * Returns the creator by given {@link MCRObjectID}.

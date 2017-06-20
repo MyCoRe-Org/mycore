@@ -32,7 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MCRResourceAccessCheckerFactory {
     private static ConcurrentHashMap<Class<? extends MCRResourceAccessChecker>, MCRResourceAccessChecker> implMap = new ConcurrentHashMap<>();
 
-    public static <T extends MCRResourceAccessChecker> T getInstance(Class<T> clazz) throws InstantiationException, IllegalAccessException {
+    public static <T extends MCRResourceAccessChecker> T getInstance(Class<T> clazz)
+        throws InstantiationException, IllegalAccessException {
         @SuppressWarnings("unchecked")
         T accessChecker = (T) implMap.get(clazz);
         if (accessChecker != null) {

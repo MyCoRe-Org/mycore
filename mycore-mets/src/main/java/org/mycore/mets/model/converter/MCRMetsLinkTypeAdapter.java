@@ -10,13 +10,11 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-
 /**
  * This is a helper class to help GSON to convert simple model to JSON.
  * @author Sebastian Hofmann(mcrshofm)
  */
 public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
-
 
     @Override
     public void write(JsonWriter jsonWriter, MCRMetsLink metsLink) throws IOException {
@@ -48,7 +46,9 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
 
     protected class MCRMetsLinkPlaceholder extends MCRMetsLink {
         public static final String PLACEHOLDER_EXCEPTION_MESSAGE = "this is a placeholder class";
+
         private String fromString;
+
         private String toString;
 
         public String getFromString() {
@@ -66,7 +66,6 @@ public class MCRMetsLinkTypeAdapter extends TypeAdapter<MCRMetsLink> {
         public void setToString(String toString) {
             this.toString = toString;
         }
-
 
         @Override
         public MCRMetsPage getTo() {

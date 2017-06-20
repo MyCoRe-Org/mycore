@@ -1,6 +1,5 @@
 package org.mycore.sword.application;
 
-
 public class MCRSwordLifecycleConfiguration {
 
     private String collection;

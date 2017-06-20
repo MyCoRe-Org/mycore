@@ -14,11 +14,11 @@ import org.mycore.common.MCRTestCase;
 public class MCRXMLFunctionsTest extends MCRTestCase {
 
     private final static String[] HTML_STRINGS = new String[] { "<h1>Hello World!</h1>",
-            "<h1>Hell<i>o</i> World!<br /></h1>", "<h1>Hell<i>o</i> World!<br></h1>",
-            "<h1>Hell<i>o</i> World!&lt;br&gt;</h1>", "<h1>Hell<i>&ouml;</i> World!&lt;br&gt;</h1>",
-            "<h1>Hello</h1> <h2>World!</h2><br/>", "Hello <a href=\"http://www.mycore.de\">MyCoRe</a>!",
-            "Hello <a href='http://www.mycore.de'>MyCoRe</a>!",
-            "Gläser und Glaskeramiken im MgO-Al<sub>2</sub>O<sub>3</sub>-SiO<sub>2</sub>-System mit hoher Mikrohärte und hohem Elastizitätsmodul" };
+        "<h1>Hell<i>o</i> World!<br /></h1>", "<h1>Hell<i>o</i> World!<br></h1>",
+        "<h1>Hell<i>o</i> World!&lt;br&gt;</h1>", "<h1>Hell<i>&ouml;</i> World!&lt;br&gt;</h1>",
+        "<h1>Hello</h1> <h2>World!</h2><br/>", "Hello <a href=\"http://www.mycore.de\">MyCoRe</a>!",
+        "Hello <a href='http://www.mycore.de'>MyCoRe</a>!",
+        "Gläser und Glaskeramiken im MgO-Al<sub>2</sub>O<sub>3</sub>-SiO<sub>2</sub>-System mit hoher Mikrohärte und hohem Elastizitätsmodul" };
 
     private final static String[] NON_HTML_STRINGS = new String[] { "Hello MyCoRe!", "a < b > c" };
 
@@ -38,7 +38,7 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     public void getISODate() throws ParseException {
         assertEquals("1964-02-24", MCRXMLFunctions.getISODate("24.02.1964", "dd.MM.yyyy", "YYYY-MM-DD"));
         assertEquals("Timezone was not correctly detected", "1964-02-23T22:00:00Z", MCRXMLFunctions
-                .getISODate("24.02.1964 00:00:00 +0200", "dd.MM.yyyy HH:mm:ss Z", "YYYY-MM-DDThh:mm:ssTZD"));
+            .getISODate("24.02.1964 00:00:00 +0200", "dd.MM.yyyy HH:mm:ss Z", "YYYY-MM-DDThh:mm:ssTZD"));
     }
 
     /*
@@ -47,13 +47,13 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     @Test
     public void getISODateFromMCRHistoryDate() throws ParseException {
         assertEquals("1964-02-24T00:00:00.000Z",
-                MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "gregorian"));
+            MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "gregorian"));
         assertEquals("1964-03-08T00:00:00.000Z",
-                MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "julian"));
+            MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "julian"));
         assertEquals("1964-02-28T00:00:00.000Z",
-                MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02", "bis", "gregorian"));
+            MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02", "bis", "gregorian"));
         assertEquals("-0100-12-31T00:00:00.000Z",
-                MCRXMLFunctions.getISODateFromMCRHistoryDate("100 BC", "bis", "gregorian"));
+            MCRXMLFunctions.getISODateFromMCRHistoryDate("100 BC", "bis", "gregorian"));
     }
 
     @Test
@@ -62,12 +62,12 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
         String result = "http://www.mycore.de/Space%20Character.test";
         assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
         assertEquals("URL differs,  but was already RFC 2396 conform.", result,
-                MCRXMLFunctions.normalizeAbsoluteURL(result));
+            MCRXMLFunctions.normalizeAbsoluteURL(result));
         source = "http://www.mycore.de/Hühnerstall.pdf";
         result = "http://www.mycore.de/H%C3%BChnerstall.pdf";
         assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
         assertEquals("URL differs,  but was already RFC 2396 conform.", result,
-                MCRXMLFunctions.normalizeAbsoluteURL(result));
+            MCRXMLFunctions.normalizeAbsoluteURL(result));
     }
 
     @Test

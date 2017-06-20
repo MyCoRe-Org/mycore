@@ -26,7 +26,8 @@ import javax.persistence.UniqueConstraint;
     @Index(columnList = "derivate,status")
 })
 @NamedQueries({
-    @NamedQuery(name = "MCRTileJob.countByStateListByDerivate", query = "SELECT count(job) FROM MCRTileJob as job WHERE job.derivate= :derivateId AND job.status IN (:states)")
+    @NamedQuery(name = "MCRTileJob.countByStateListByDerivate",
+        query = "SELECT count(job) FROM MCRTileJob as job WHERE job.derivate= :derivateId AND job.status IN (:states)")
 })
 public class MCRTileJob implements Cloneable {
 
@@ -216,7 +217,7 @@ public class MCRTileJob implements Cloneable {
     @Override
     public String toString() {
         return MessageFormat.format("MCRTileJob [derivate:{0}, path:{1}, added:{2}]", getDerivate(), getPath(),
-                getAdded());
+            getAdded());
     }
 
 }

@@ -79,10 +79,14 @@ import org.mycore.datamodel.classifications2.MCRLabel;
     @UniqueConstraint(columnNames = { "ClassID", "leftValue" }, name = "ClassLeftUnique"),
     @UniqueConstraint(columnNames = { "ClassID", "rightValue" }, name = "ClassRightUnique") })
 @NamedQueries({
-    @NamedQuery(name = "MCRCategory.updateLeft", query = "UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.id.rootID= :classID AND cat.left >= :left"),
-    @NamedQuery(name = "MCRCategory.updateRight", query = "UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.id.rootID= :classID AND cat.right >= :left"),
-    @NamedQuery(name = "MCRCategory.commonAncestor", query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:rootID AND cat.left < :left AND cat.right > :right ORDER BY cat.left DESC"),
-    @NamedQuery(name = "MCRCategory.byNaturalId", query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL)"),
+    @NamedQuery(name = "MCRCategory.updateLeft",
+        query = "UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.id.rootID= :classID AND cat.left >= :left"),
+    @NamedQuery(name = "MCRCategory.updateRight",
+        query = "UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.id.rootID= :classID AND cat.right >= :left"),
+    @NamedQuery(name = "MCRCategory.commonAncestor",
+        query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:rootID AND cat.left < :left AND cat.right > :right ORDER BY cat.left DESC"),
+    @NamedQuery(name = "MCRCategory.byNaturalId",
+        query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL)"),
     @NamedQuery(name = "MCRCategory.byLabelInClass", query = "FROM MCRCategoryImpl as cat "
         + "INNER JOIN cat.labels as label "
         + "  WHERE cat.id.rootID=:rootID AND "
@@ -108,7 +112,8 @@ import org.mycore.datamodel.classifications2.MCRLabel;
     @NamedQuery(name = "MCRCategory.rootCategs", query = MCRCategoryDTO.SELECT
         + " WHERE cat.left = 0 ORDER BY cat.id.rootID"),
     @NamedQuery(name = "MCRCategory.rootIds", query = "SELECT cat.id FROM MCRCategoryImpl cat WHERE cat.left = 0"),
-    @NamedQuery(name = "MCRCategory.childCount", query = "SELECT CAST(count(*) AS integer) FROM MCRCategoryImpl children WHERE children.parent=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL))")
+    @NamedQuery(name = "MCRCategory.childCount",
+        query = "SELECT CAST(count(*) AS integer) FROM MCRCategoryImpl children WHERE children.parent=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL))")
 })
 
 @Access(AccessType.PROPERTY)
@@ -153,7 +158,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         LOGGER.debug("getposition called for " + getId());
         if (parent == null) {
             LOGGER.debug("getposition called with no parent set.");
-            return - 1;
+            return -1;
         }
         try {
             int position = getParent().getChildren().indexOf(this);

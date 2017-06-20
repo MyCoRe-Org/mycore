@@ -31,7 +31,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 public class MCRRequiredValidator extends MCRValidator {
 
     private static final String VALUE_TRUE = "true";
-    
+
     private static final String ATTR_REQUIRED = "required";
 
     @Override

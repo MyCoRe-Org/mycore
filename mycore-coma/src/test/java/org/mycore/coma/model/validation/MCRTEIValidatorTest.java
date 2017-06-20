@@ -1,6 +1,5 @@
 package org.mycore.coma.model.validation;
 
-
 import java.io.IOException;
 import java.net.URL;
 
@@ -11,7 +10,6 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 public class MCRTEIValidatorTest {
-
 
     @Test
     public void validate() throws IOException, SAXException {
@@ -33,6 +31,5 @@ public class MCRTEIValidatorTest {
         URL resource = MCRTEIValidatorTest.class.getClassLoader().getResource(path);
         return new MCRTEIValidator(new StreamSource(resource.openStream()));
     }
-
 
 }

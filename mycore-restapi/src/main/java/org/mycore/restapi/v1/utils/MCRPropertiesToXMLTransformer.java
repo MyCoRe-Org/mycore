@@ -33,7 +33,8 @@ public class MCRPropertiesToXMLTransformer implements MessageBodyWriter<Properti
     public void writeTo(Properties t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
         throws IOException, WebApplicationException {
-        httpHeaders.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_TYPE.withCharset(StandardCharsets.UTF_8.name()));
+        httpHeaders.putSingle(HttpHeaders.CONTENT_TYPE,
+            MediaType.APPLICATION_XML_TYPE.withCharset(StandardCharsets.UTF_8.name()));
         t.storeToXML(entityStream, null);
     }
 

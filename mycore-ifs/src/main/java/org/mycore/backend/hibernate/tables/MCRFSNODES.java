@@ -35,8 +35,8 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(
-    uniqueConstraints = {@UniqueConstraint(columnNames = { "pid", "name" }, name = "mcrfsnodes_pid_name_idx") },
-    indexes = {@Index(columnList = "pid, owner", name = "mcrfsnodes_pid_owner_idx") })
+    uniqueConstraints = { @UniqueConstraint(columnNames = { "pid", "name" }, name = "mcrfsnodes_pid_name_idx") },
+    indexes = { @Index(columnList = "pid, owner", name = "mcrfsnodes_pid_owner_idx") })
 public class MCRFSNODES {
     private String id;
 

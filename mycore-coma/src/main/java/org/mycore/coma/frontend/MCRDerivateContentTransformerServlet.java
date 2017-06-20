@@ -26,6 +26,7 @@ import org.xml.sax.SAXException;
 public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
 
     private static final int CACHE_TIME = 24 * 60 * 60;
+
     private static final Logger LOGGER = LogManager.getLogger(MCRDerivateContentTransformerServlet.class);
 
     @Override
@@ -51,7 +52,7 @@ public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
 
         try {
             return getLayoutService().getTransformedContent(req, resp, pc);
-        } catch (TransformerException|SAXException e) {
+        } catch (TransformerException | SAXException e) {
             throw new IOException("could not transform content", e);
         }
     }

@@ -70,7 +70,8 @@ public class MCRLabel implements Cloneable, Serializable {
      * @throws NullPointerException if lang or text is null
      * @throws IllegalArgumentException if lang or text is invalid
      */
-    public MCRLabel(String lang, String text, String description) throws NullPointerException, IllegalArgumentException {
+    public MCRLabel(String lang, String text, String description)
+        throws NullPointerException, IllegalArgumentException {
         super();
         setLang(lang);
         setText(text);
@@ -100,7 +101,7 @@ public class MCRLabel implements Cloneable, Serializable {
         this.lang = languageTag;
     }
 
-    @Column(length=4096)
+    @Column(length = 4096)
     public String getText() {
         return text;
     }
@@ -118,7 +119,7 @@ public class MCRLabel implements Cloneable, Serializable {
         this.text = text;
     }
 
-    @Column(length=4096, nullable=true)
+    @Column(length = 4096, nullable = true)
     public String getDescription() {
         if (description == null) {
             return "";

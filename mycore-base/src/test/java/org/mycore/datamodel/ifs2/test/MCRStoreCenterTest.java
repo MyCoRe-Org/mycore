@@ -44,8 +44,8 @@ public class MCRStoreCenterTest {
         storeHeap.addStore(config.getID(), fakeStore);
         storeHeap.addStore(config.getID(), fakeStore);
     }
-    
-    class FakeStoreConfig implements MCRStoreConfig{
+
+    class FakeStoreConfig implements MCRStoreConfig {
 
         @Override
         public String getID() {
@@ -61,7 +61,7 @@ public class MCRStoreCenterTest {
         public String getSlotLayout() {
             return "4-4-2";
         }
-        
+
     }
 
     private String getPropName(String storeID, String propType) {

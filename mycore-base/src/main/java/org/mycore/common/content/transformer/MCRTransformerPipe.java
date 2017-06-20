@@ -65,7 +65,8 @@ public class MCRTransformerPipe extends MCRParameterizedTransformer {
             String transformerID = tokens.nextToken();
             MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerID);
             if (transformer == null) {
-                throw new MCRConfigurationException("Transformer pipe element '" + transformerID + "' is not configured.");
+                throw new MCRConfigurationException(
+                    "Transformer pipe element '" + transformerID + "' is not configured.");
             }
             transformers.add(transformer);
         }

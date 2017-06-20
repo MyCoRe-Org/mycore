@@ -17,12 +17,12 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  *
  * @author shermann
  */
-@MCRCommandGroup(name="Logging Commands")
+@MCRCommandGroup(name = "Logging Commands")
 public class MCRLoggingCommands extends MCRAbstractCommands {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRLoggingCommands.class);
 
-   /**
+    /**
      * @param name
      *            the name of the java class or java package to set the log
      *            level for
@@ -31,9 +31,9 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
      *            FATAL, providing any other value will lead to DEBUG as new log
      *            level
      */
-    @MCRCommand(syntax="change log level of {0} to {1}",
-            help="{0} the package or class name for which to change the log level, {1} the log level to set. If the log level cannot be read it is set to DEBUG by default.",
-            order=10)
+    @MCRCommand(syntax = "change log level of {0} to {1}",
+        help = "{0} the package or class name for which to change the log level, {1} the log level to set. If the log level cannot be read it is set to DEBUG by default.",
+        order = 10)
     synchronized public static void changeLogLevel(String name, String logLevelToSet) {
         LOGGER.info("Setting log level for \"" + name + "\" to \"" + logLevelToSet + "\"");
 

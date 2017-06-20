@@ -113,19 +113,20 @@ public abstract class Selection {
         Position upperLeft = this.getUpperLeft();
         Position lowerRight = this.getLowerRight();
 
-        BufferedImage result = new BufferedImage(lowerRight.getX() - upperLeft.getX() + 1, lowerRight.getY() - upperLeft.getY() + 1, BufferedImage.TYPE_INT_RGB);
+        BufferedImage result = new BufferedImage(lowerRight.getX() - upperLeft.getX() + 1,
+            lowerRight.getY() - upperLeft.getY() + 1, BufferedImage.TYPE_INT_RGB);
 
         Map<Position, Pixel> positionPixelMap = this.getPositionPixelMap();
         Set<Position> positionSet = positionPixelMap.keySet();
 
         LOGGER.debug("start-Set-RGB()");
         for (Position position : positionSet) {
-            result.setRGB(position.getX() - upperLeft.getX(), position.getY() - upperLeft.getY(), positionPixelMap.get(position).getColor().getRGB());
+            result.setRGB(position.getX() - upperLeft.getX(), position.getY() - upperLeft.getY(),
+                positionPixelMap.get(position).getColor().getRGB());
         }
         LOGGER.debug("end-Set-RGB()");
 
         return result;
     }
-
 
 }

@@ -104,7 +104,7 @@ public class MCRLinkTableManager {
      */
     private boolean checkType(String type) {
         if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT)
-                || type.equals(ENTRY_TYPE_REFERENCE)) {
+            || type.equals(ENTRY_TYPE_REFERENCE)) {
             return true;
         }
         logger.warn("The value " + type + " is not a defined type for the link table.");
@@ -165,7 +165,8 @@ public class MCRLinkTableManager {
         try {
             persistenceclass.create(from, to, type, attr);
         } catch (Exception e) {
-            logger.warn("An error occured while adding a dataset from the reference link table, adding not succesful.", e);
+            logger.warn("An error occured while adding a dataset from the reference link table, adding not succesful.",
+                e);
         }
     }
 
@@ -187,7 +188,8 @@ public class MCRLinkTableManager {
      */
     public void deleteReferenceLink(String from) {
         if (from == null || (from = from.trim()).length() == 0) {
-            logger.warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
+            logger
+                .warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
         }
 
@@ -195,7 +197,7 @@ public class MCRLinkTableManager {
             persistenceclass.delete(from, null, null);
         } catch (Exception e) {
             logger.warn("An error occured while deleting a dataset from the" + from
-                    + " reference link table, deleting could be not succesful.", e);
+                + " reference link table, deleting could be not succesful.", e);
         }
     }
 
@@ -211,13 +213,15 @@ public class MCRLinkTableManager {
      */
     public void deleteReferenceLink(String from, String to, String type) {
         if (from == null || (from = from.trim()).length() == 0) {
-            logger.warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
+            logger
+                .warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
         }
         try {
             persistenceclass.delete(from, to, type);
         } catch (Exception e) {
-            logger.warn("An error occured while deleting a dataset from the" + " reference link table, deleting is not succesful.", e);
+            logger.warn("An error occured while deleting a dataset from the"
+                + " reference link table, deleting is not succesful.", e);
         }
     }
 

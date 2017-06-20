@@ -255,7 +255,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
     @Override
     public File getLocalFile(String storageId) throws IOException {
-        if(storageId==null || storageId.isEmpty()){
+        if (storageId == null || storageId.isEmpty()) {
             throw new IOException("No storage id");
         }
         MCRFile file = getFile(storageId);
@@ -267,8 +267,8 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             .ofNullable(getStore(derivateID.getBase()).retrieve(derivateID.getNumberAsInteger()))
             .orElseThrow(() -> getIOException(derivateID.getBase(), derivateID.getNumberAsInteger()));
     }
-    
-    private MCRObjectID toDerivateID(String storageID){
+
+    private MCRObjectID toDerivateID(String storageID) {
         return MCRObjectID.getInstance(storageID.substring(0, storageID.indexOf("/")));
     }
 
@@ -291,7 +291,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         return new IOException(
             "Could not resolve slot '" + slotID + "' of store: " + getStore(base).getID());
     }
-    
+
     private IOException getIOException(MCRFileCollection slot, String path, String storageID) {
         return new IOException(
             "Could not find path '" + path + "' in file collection '" + slot.getID() + "' for storageID: " + storageID);

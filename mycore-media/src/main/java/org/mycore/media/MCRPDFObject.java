@@ -64,7 +64,8 @@ public class MCRPDFObject extends MCRMediaObject {
         maxHeight = (maxHeight == 0 ? 256 : maxHeight);
 
         if (keepAspect) {
-            float scaleFactor = (maxWidth >= maxHeight ? Float.intBitsToFloat(maxWidth) / Float.intBitsToFloat(width) : Float
+            float scaleFactor = (maxWidth >= maxHeight ? Float.intBitsToFloat(maxWidth) / Float.intBitsToFloat(width)
+                : Float
                     .intBitsToFloat(maxHeight) / Float.intBitsToFloat(height));
 
             scaledSize[0] = Math.round(width * scaleFactor);
@@ -92,8 +93,9 @@ public class MCRPDFObject extends MCRMediaObject {
      *              set to keep aspect ratio
      */
     @SuppressWarnings("unchecked")
-    public synchronized byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect)
-            throws Exception {
+    public synchronized byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight,
+        boolean keepAspect)
+        throws Exception {
         byte[] imageInByte = null;
 
         PDDocument pdf = PDDocument.load(new File(media.folderName + media.fileName));
@@ -108,7 +110,8 @@ public class MCRPDFObject extends MCRMediaObject {
 
             BufferedImage resized = new BufferedImage(scaledSize[0], scaledSize[1], image.getType());
             Graphics2D g = resized.createGraphics();
-            g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+                RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
             g.drawImage(image, 0, 0, scaledSize[0], scaledSize[1], 0, 0, image.getWidth(), image.getHeight(), null);
             g.dispose();
 

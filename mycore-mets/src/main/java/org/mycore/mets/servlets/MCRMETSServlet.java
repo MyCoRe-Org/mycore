@@ -63,7 +63,8 @@ public class MCRMETSServlet extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMETSServlet.class);
 
-    public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration.instance().getBoolean("MCR.Mets.storeMetsOnGenerate");
+    public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration.instance()
+        .getBoolean("MCR.Mets.storeMetsOnGenerate");
 
     private boolean useExpire;
 
@@ -79,7 +80,8 @@ public class MCRMETSServlet extends MCRServlet {
         MCRPath rootPath = MCRPath.getPath(derivate, "/");
 
         if (!Files.isDirectory(rootPath)) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format("Derivate {0} does not exist.", derivate));
+            response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                MessageFormat.format("Derivate {0} does not exist.", derivate));
             return;
         }
         request.setAttribute("XSL.derivateID", derivate);
@@ -91,7 +93,8 @@ public class MCRMETSServlet extends MCRServlet {
                 linkList.add(ownerID.toString());
             } else {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        MessageFormat.format("Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivate));
+                    MessageFormat.format(
+                        "Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivate));
                 return;
             }
         }
@@ -104,7 +107,8 @@ public class MCRMETSServlet extends MCRServlet {
         long start = System.currentTimeMillis();
         MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivate);
         MCRLayoutService.instance().doLayout(request, response, metsContent);
-        LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took " + (System.currentTimeMillis() - start) + " ms");
+        LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took "
+            + (System.currentTimeMillis() - start) + " ms");
     }
 
     /**
@@ -138,7 +142,8 @@ public class MCRMETSServlet extends MCRServlet {
             if (metsExists) {
                 ignoreNodes.add(metsPath);
             }
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(derivate, "/"), ignoreNodes).asDocument();
+            Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(derivate, "/"), ignoreNodes)
+                .asDocument();
 
             if (!metsExists && STORE_METS_ON_GENERATE) {
                 MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivate));
@@ -174,12 +179,12 @@ public class MCRMETSServlet extends MCRServlet {
         boolean running = true;
         for (int i = (pathInfo.charAt(0) == '/') ? 1 : 0; (i < pathInfo.length() && running); i++) {
             switch (pathInfo.charAt(i)) {
-            case '/':
-                running = false;
-                break;
-            default:
-                ownerID.append(pathInfo.charAt(i));
-                break;
+                case '/':
+                    running = false;
+                    break;
+                default:
+                    ownerID.append(pathInfo.charAt(i));
+                    break;
             }
         }
         return ownerID.toString();

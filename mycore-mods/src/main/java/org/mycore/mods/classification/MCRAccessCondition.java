@@ -39,7 +39,8 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
     protected MCRCategoryID lookupCategoryID() {
         Collection<MCRCategory> categoryByURI = MCRAuthorityWithURI.getCategoryByURI(href);
         if (categoryByURI.size() > 1) {
-            throw new MCRException(href + " is ambigous: " + categoryByURI.stream().map(c->c.getId()).collect(Collectors.toList()));
+            throw new MCRException(
+                href + " is ambigous: " + categoryByURI.stream().map(c -> c.getId()).collect(Collectors.toList()));
         }
         if (!categoryByURI.isEmpty()) {
             return categoryByURI.iterator().next().getId();
@@ -63,10 +64,10 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
         }
         Collection<MCRCategory> classes = MCRAuthorityWithURI.getCategoryByURI(authorityURI);
         return classes.stream()
-                      .map(cat -> new MCRCategoryID(cat.getId().getRootID(), categId))
-                      .filter(DAO::exist)
-                      .findFirst()
-                      .orElse(null);
+            .map(cat -> new MCRCategoryID(cat.getId().getRootID(), categId))
+            .filter(DAO::exist)
+            .findFirst()
+            .orElse(null);
     }
 
     /* (non-Javadoc)

@@ -140,7 +140,8 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         Method[] methods = getStore().getClass().getMethods();
         for (Method method : methods) {
             if (method.getName().equals("getHighestStoredID") && method.getParameterTypes().length == 0) {
-                fail("org.mycore.datamodel.ifs2.MCRObjectMetadataStoreIFS2.getHighestStoredID() does not respect ProjectID");
+                fail(
+                    "org.mycore.datamodel.ifs2.MCRObjectMetadataStoreIFS2.getHighestStoredID() does not respect ProjectID");
             }
         }
     }

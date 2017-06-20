@@ -181,10 +181,10 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
 
     private String getType(String objectID) {
         return testLinks.stream()
-                        .filter(link -> link.getObjectReference().getObjectID().equals(objectID))
-                        .findFirst()
-                        .map(link -> link.getObjectReference().getType())
-                        .orElse(null);
+            .filter(link -> link.getObjectReference().getObjectID().equals(objectID))
+            .findFirst()
+            .map(link -> link.getObjectReference().getType())
+            .orElse(null);
     }
 
     /**
@@ -261,8 +261,9 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         }
         assertEquals("Collection is not complete",
             testLinks.stream()
-                     .filter(link -> link.getObjectReference().getType().equals(type))
-                     .count(), references.size());
+                .filter(link -> link.getObjectReference().getType().equals(type))
+                .count(),
+            references.size());
     }
 
     private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {

@@ -37,38 +37,38 @@ import com.sun.jna.Platform;
  */
 public class NativeLibExporter {
     private static NativeLibExporter instance = null;
-    
+
     private File libraryFile;
-    
+
     /**
      * @return an instance of this class.
      */
     public static NativeLibExporter getInstance() {
         if (instance == null) {
             instance = new NativeLibExporter();
-            
+
             try {
-                if ( Platform.isMac() )
-                    instance.exportLibrary( "lib/darwin/libmediainfo.dylib" );
-                else if ( Platform.isWindows() && Platform.is64Bit() )
-                    instance.exportLibrary( "lib/win64/MediaInfo64.dll" );
-                else if ( Platform.isWindows() )
-                    instance.exportLibrary( "lib/win32/MediaInfo.dll" );
-            } catch ( Throwable e) {
-                System.err.println( e.getMessage() );
+                if (Platform.isMac())
+                    instance.exportLibrary("lib/darwin/libmediainfo.dylib");
+                else if (Platform.isWindows() && Platform.is64Bit())
+                    instance.exportLibrary("lib/win64/MediaInfo64.dll");
+                else if (Platform.isWindows())
+                    instance.exportLibrary("lib/win32/MediaInfo.dll");
+            } catch (Throwable e) {
+                System.err.println(e.getMessage());
             }
         }
-        
+
         return instance;
     }
-    
+
     public boolean isValid() {
-        return ( instance.libraryFile != null || Platform.isLinux() );
+        return (instance.libraryFile != null || Platform.isLinux());
     }
-    
-    public void exportLibrary( final String libraryName ) throws Exception {
+
+    public void exportLibrary(final String libraryName) throws Exception {
         String fName = new File(libraryName).getName();
-        
+
         InputStream inputStream = instance.getClass().getClassLoader().getResourceAsStream(libraryName);
         instance.libraryFile = new File(fName);
         instance.libraryFile.deleteOnExit();
@@ -76,7 +76,7 @@ public class NativeLibExporter {
             FileOutputStream fileOutputStream = new FileOutputStream(instance.libraryFile);
             byte[] buffer = new byte[8192];
             int bytesRead;
-            while((bytesRead = inputStream.read(buffer)) > 0){
+            while ((bytesRead = inputStream.read(buffer)) > 0) {
                 fileOutputStream.write(buffer, 0, bytesRead);
             }
             fileOutputStream.close();

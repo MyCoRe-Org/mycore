@@ -79,14 +79,14 @@ public class MCRFileSystemPromoter implements AutoExecutable {
     public void startUp(ServletContext servletContext) {
         if (servletContext != null) {
             HashSet<String> installedSchemes = FileSystemProvider.installedProviders()
-                                                                 .stream()
-                                                                 .map(FileSystemProvider::getScheme)
-                                                                 .collect(Collectors.toCollection(HashSet::new));
+                .stream()
+                .map(FileSystemProvider::getScheme)
+                .collect(Collectors.toCollection(HashSet::new));
             ServiceLoader<FileSystemProvider> sl = ServiceLoader.load(FileSystemProvider.class, getClass()
                 .getClassLoader());
-            promoteFileSystemProvider(StreamSupport.stream(sl.spliterator(),false)
-                                                   .filter(p -> !installedSchemes.contains(p.getScheme()))
-                                                   .collect(Collectors.toCollection(LinkedList::new)));
+            promoteFileSystemProvider(StreamSupport.stream(sl.spliterator(), false)
+                .filter(p -> !installedSchemes.contains(p.getScheme()))
+                .collect(Collectors.toCollection(LinkedList::new)));
         }
     }
 

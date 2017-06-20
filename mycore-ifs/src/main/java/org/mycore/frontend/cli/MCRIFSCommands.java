@@ -251,7 +251,8 @@ public class MCRIFSCommands {
         }
     }
 
-    @MCRCommand(syntax = "generate md5sum files in directory {0}", help = "writes md5sum files for every content store in directory {0}")
+    @MCRCommand(syntax = "generate md5sum files in directory {0}",
+        help = "writes md5sum files for every content store in directory {0}")
     public static void writeMD5SumFile(String targetDirectory) throws IOException {
         File targetDir = getDirectory(targetDirectory);
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
@@ -307,7 +308,8 @@ public class MCRIFSCommands {
         }
     }
 
-    @MCRCommand(syntax = "generate missing file report in directory {0}", help = "generates XML a report over all content stores about missing files and write it in directory {0}")
+    @MCRCommand(syntax = "generate missing file report in directory {0}",
+        help = "generates XML a report over all content stores about missing files and write it in directory {0}")
     public static void writeMissingFileReport(String targetDirectory) throws IOException, SAXException,
         TransformerConfigurationException {
         File targetDir = getDirectory(targetDirectory);
@@ -315,7 +317,8 @@ public class MCRIFSCommands {
         writeReport(targetDir, checker);
     }
 
-    @MCRCommand(syntax = "generate md5 file report in directory {0}", help = "generates XML a report over all content stores about failed md5 checks and write it in directory {0}")
+    @MCRCommand(syntax = "generate md5 file report in directory {0}",
+        help = "generates XML a report over all content stores about failed md5 checks and write it in directory {0}")
     public static void writeFileMD5Report(String targetDirectory) throws IOException, SAXException,
         TransformerConfigurationException {
         File targetDir = getDirectory(targetDirectory);
@@ -428,7 +431,8 @@ public class MCRIFSCommands {
         return targetDir;
     }
 
-    @MCRCommand(syntax = "generate missing nodes report in directory {0}", help = "generates XML report over all content stores about missing ifs nodes and write it in directory {0}")
+    @MCRCommand(syntax = "generate missing nodes report in directory {0}",
+        help = "generates XML report over all content stores about missing ifs nodes and write it in directory {0}")
     public static void writeMissingNodesReport(String targetDirectory) throws SAXException,
         TransformerConfigurationException, IOException {
         File targetDir = getDirectory(targetDirectory);
@@ -620,14 +624,16 @@ public class MCRIFSCommands {
 
     private static int MAX_COUNTER = 10000;
 
-    @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for owner {2}", help = "moves all files of derivates from content store {0} to content store {1} for defined owner {2}")
+    @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for owner {2}",
+        help = "moves all files of derivates from content store {0} to content store {1} for defined owner {2}")
     public static void moveContentOfOwnerToNewStore(String source_store, String target_store, String owner) {
         LOGGER.info("Start move data from content store " + source_store + " to store " + target_store + " for owner "
             + owner);
         moveContentToNewStore(source_store, target_store, "owner", owner, 0);
     }
 
-    @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for filetype {2}", help = "moves all files of derivates from content store {0} to content store {1} for defined file type {2} - delimiting number of moved files with property MCR.IFS.ContentStore.MoveCounter")
+    @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for filetype {2}",
+        help = "moves all files of derivates from content store {0} to content store {1} for defined file type {2} - delimiting number of moved files with property MCR.IFS.ContentStore.MoveCounter")
     public static void moveContentOfFiletypeToNewStore(String source_store, String target_store, String file_type) {
         LOGGER.info("Start move data from content store " + source_store + " to store " + target_store
             + " for file type " + file_type);
@@ -735,7 +741,8 @@ public class MCRIFSCommands {
         }
     }
 
-    @MCRCommand(syntax = "check derivates of mcrfsnodes with project id {0}", help = "check the entries of MCRFSNODES for all derivates with project ID {0}")
+    @MCRCommand(syntax = "check derivates of mcrfsnodes with project id {0}",
+        help = "check the entries of MCRFSNODES for all derivates with project ID {0}")
     public static void checkMCRFSNODESForDerivatesWithProjectID(String project_id) {
         LOGGER.info("Start check of MCRFSNODES for derivates with project ID " + project_id);
         if (project_id == null || project_id.length() == 0) {
@@ -810,7 +817,8 @@ public class MCRIFSCommands {
         LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
     }
 
-    @MCRCommand(syntax = "check mcrfsnodes of derivates with project id {0}", help = "check the entries of MCRFSNODES with project ID {0} that the derivate exists")
+    @MCRCommand(syntax = "check mcrfsnodes of derivates with project id {0}",
+        help = "check the entries of MCRFSNODES with project ID {0} that the derivate exists")
     public static void checkDerivatesWithProjectIDInMCRFSNODES(String project_id) {
         LOGGER.info("Start check of MCRFSNODES for derivates with project ID " + project_id);
         if (project_id == null || project_id.length() == 0) {

@@ -49,7 +49,8 @@ public class MCRCLIExceptionHandler {
     }
 
     private static void showActiveLinks(MCRActiveLinkException activeLinks) {
-        MCRCommandLineInterface.output("There are links active preventing the commit of work, see error message for details.");
+        MCRCommandLineInterface
+            .output("There are links active preventing the commit of work, see error message for details.");
         MCRCommandLineInterface.output("The following links where affected:");
 
         Map<String, Collection<String>> links = activeLinks.getActiveLinks();

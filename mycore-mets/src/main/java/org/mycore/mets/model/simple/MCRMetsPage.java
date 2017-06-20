@@ -6,7 +6,9 @@ import java.util.UUID;
 
 public class MCRMetsPage {
     private String id = UUID.randomUUID().toString();
+
     private String orderLabel;
+
     private String contentIds;
 
     private Boolean hidden;
@@ -41,7 +43,6 @@ public class MCRMetsPage {
         }
         this.orderLabel = orderLabel;
     }
-
 
     public String getContentIds() {
         return contentIds;

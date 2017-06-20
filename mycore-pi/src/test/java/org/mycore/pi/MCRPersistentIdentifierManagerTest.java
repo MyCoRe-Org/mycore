@@ -39,9 +39,9 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
 
         Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = MCRPersistentIdentifierManager
-                .getInstance()
-                .get(mockString)
-                .findFirst();
+            .getInstance()
+            .get(mockString)
+            .findFirst();
 
         Assert.assertTrue(mockIdentifierOptional.isPresent());
         Assert.assertEquals(mockIdentifierOptional.get().asString(), mockString);
@@ -51,22 +51,22 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     public void testParseIdentifier() {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
         Stream<MCRPersistentIdentifier> mcrPersistentIdentifierStream = MCRPersistentIdentifierManager
-                .getInstance()
-                .get(mockString);
+            .getInstance()
+            .get(mockString);
 
         Optional<? extends MCRPersistentIdentifier> mcrMockIdentifier = mcrPersistentIdentifierStream
-                .findFirst();
+            .findFirst();
         Assert.assertEquals(mcrMockIdentifier.get().asString(), mockString);
     }
 
     @Test
     public void testRegistrationService()
-            throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         MockMetadataManager mockMetadataManager = new MockMetadataManager();
 
         MCRPIRegistrationService<MCRMockIdentifier> registrationService = MCRPIRegistrationServiceManager
-                .getInstance()
-                .getRegistrationService(MOCK_SERVICE);
+            .getInstance()
+            .getRegistrationService(MOCK_SERVICE);
 
         MCRObject mcrObject = new MCRObject();
         MCRObjectID id = MCRObjectID.getNextFreeId("test", "mock");
@@ -84,23 +84,23 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertTrue("The identifier " + identifier.asString() + " should be registered now!",
-                          registrationService.isCreated(id, ""));
+            registrationService.isCreated(id, ""));
 
         registrationService.onUpdate(identifier, mcrObject, "");
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertTrue("The identifier " + identifier.asString() + " should have been updated!",
-                          casted.isUpdatedCalled());
+            casted.isUpdatedCalled());
 
         registrationService.onDelete(identifier, mcrObject, "");
         Assert.assertFalse("The identifier " + identifier.asString() + " should not be registered now!",
-                           registrationService.isCreated(id, ""));
+            registrationService.isCreated(id, ""));
 
         Assert.assertTrue("There should be one resolver", MCRPersistentIdentifierManager.getInstance()
-                                                                                        .getResolvers().stream()
-                                                                                        .filter(r -> {
-                                                                                            return r.getName()
-                                                                                                    .equals(MCRMockResolver.NAME);
-                                                                                        }).count() > 0);
+            .getResolvers().stream()
+            .filter(r -> {
+                return r.getName()
+                    .equals(MCRMockResolver.NAME);
+            }).count() > 0);
 
     }
 
@@ -110,10 +110,10 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
 
         long numOfUnregisteredPI = MCRPersistentIdentifierManager
-                .getInstance()
-                .getUnregisteredIdentifiers("Unregistered")
-                .stream()
-                .count();
+            .getInstance()
+            .getUnregisteredIdentifiers("Unregistered")
+            .stream()
+            .count();
 
         Assert.assertEquals("Wrong number of unregistered PI: ", 2, numOfUnregisteredPI);
     }
@@ -121,11 +121,10 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
     private MCRPI generateMCRPI() throws MCRPersistentIdentifierException {
         MCRObjectID mycoreID = MCRObjectID.getNextFreeId("test_unregisterd");
         return new MCRPI(generatePIFor(mycoreID).asString(), "Unregistered",
-                         mycoreID.toString(), null);
+            mycoreID.toString(), null);
     }
 
-    private MCRMockIdentifier generatePIFor(MCRObjectID mycoreID) throws
-            MCRPersistentIdentifierException {
+    private MCRMockIdentifier generatePIFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {
         MCRMockIdentifierGenerator mcruuidurnGenerator = new MCRMockIdentifierGenerator(MOCK_PID_GENERATOR);
         return mcruuidurnGenerator.generate(mycoreID, "");
     }
@@ -165,15 +164,15 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
         configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER, MCRMockMetadataManager.class.getName());
         configuration.put("MCR.PI.Inscriber." + MOCK_INSCRIBER + "." + MCRMockMetadataManager.TEST_PROPERTY,
-                          MCRMockMetadataManager.TEST_PROPERTY_VALUE);
+            MCRMockMetadataManager.TEST_PROPERTY_VALUE);
 
         configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR, MCRMockIdentifierGenerator.class.getName());
         configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR + "." + MCRMockIdentifierGenerator.TEST_PROPERTY,
-                          MCRMockIdentifierGenerator.TEST_PROPERTY_VALUE);
+            MCRMockIdentifierGenerator.TEST_PROPERTY_VALUE);
         configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR + ".Namespace", "frontend-");
 
         configuration.put("MCR.PI.Parsers." + MCRMockIdentifierRegistrationService.TYPE,
-                          MCRMockIdentifierParser.class.getName());
+            MCRMockIdentifierParser.class.getName());
 
         return configuration;
     }

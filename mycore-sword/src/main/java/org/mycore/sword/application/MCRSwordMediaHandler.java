@@ -52,15 +52,18 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
 
     protected static void checkFile(MCRPath path) throws SwordError {
         if (!Files.exists(path)) {
-            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND, "The requested file '" + path.toString() + "' does not exists.");
+            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND,
+                "The requested file '" + path.toString() + "' does not exists.");
         }
     }
 
-    public MediaResource getMediaResourceRepresentation(String derivateID, String requestFilePath, Map<String, String> accept) throws SwordError, SwordServerException {
+    public MediaResource getMediaResourceRepresentation(String derivateID, String requestFilePath,
+        Map<String, String> accept) throws SwordError, SwordServerException {
         MediaResource resultRessource;
 
-        if(!MCRAccessManager.checkPermission(derivateID, MCRAccessManager.PERMISSION_READ)){
-            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "You dont have the right to read from the derivate!");
+        if (!MCRAccessManager.checkPermission(derivateID, MCRAccessManager.PERMISSION_READ)) {
+            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
+                "You dont have the right to read from the derivate!");
         }
 
         if (requestFilePath != null && isValidFilePath(requestFilePath)) {
@@ -92,42 +95,48 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
         return resultRessource;
     }
 
-    public void replaceMediaResource(String derivateId, String requestFilePath, Deposit deposit) throws SwordError, SwordServerException {
-        if(!MCRAccessManager.checkPermission(derivateId, MCRAccessManager.PERMISSION_WRITE)){
-            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "You dont have the right to write to the derivate!");
+    public void replaceMediaResource(String derivateId, String requestFilePath, Deposit deposit)
+        throws SwordError, SwordServerException {
+        if (!MCRAccessManager.checkPermission(derivateId, MCRAccessManager.PERMISSION_WRITE)) {
+            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
+                "You dont have the right to write to the derivate!");
         }
 
         MCRPath path = MCRPath.getPath(derivateId, requestFilePath);
         if (!Files.exists(path)) {
-            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND, "Cannot replace a not existing file.");
+            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND,
+                "Cannot replace a not existing file.");
         }
 
         final boolean pathIsDirectory = Files.isDirectory(path);
         final String depositFilename = deposit.getFilename();
 
         if (pathIsDirectory) {
-            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_METHOD_NOT_ALLOWED, "replaceMediaResource is not supported with directories");
+            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+                "replaceMediaResource is not supported with directories");
         }
 
         // TODO: replace file
 
     }
 
-
-    public void addResource(String derivateId, String requestFilePath, Deposit deposit) throws SwordError, SwordServerException {
+    public void addResource(String derivateId, String requestFilePath, Deposit deposit)
+        throws SwordError, SwordServerException {
         MCRPath ifsRootPath = MCRPath.getPath(derivateId, requestFilePath);
         final boolean pathIsDirectory = Files.isDirectory(ifsRootPath);
         final String depositFilename = deposit.getFilename();
         final String packaging = deposit.getPackaging();
 
-        if(!MCRAccessManager.checkPermission(derivateId, MCRAccessManager.PERMISSION_WRITE)){
-            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "You dont have the right to write to the derivate!");
+        if (!MCRAccessManager.checkPermission(derivateId, MCRAccessManager.PERMISSION_WRITE)) {
+            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
+                "You dont have the right to write to the derivate!");
         }
 
         Path tempFile = null;
         try {
             try {
-                tempFile = MCRSwordUtil.createTempFileFromStream(deposit.getFilename(), deposit.getInputStream(), deposit.getMd5());
+                tempFile = MCRSwordUtil.createTempFileFromStream(deposit.getFilename(), deposit.getInputStream(),
+                    deposit.getMd5());
             } catch (IOException e) {
                 throw new SwordServerException("Could not store deposit to temp files", e);
             }
@@ -136,13 +145,15 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                 if (pathIsDirectory && deposit.getMimeType().equals(MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP)) {
                     ifsRootPath = MCRPath.getPath(derivateId, requestFilePath);
                     try {
-                        List<MCRSwordUtil.MCRValidationResult> invalidResults = MCRSwordUtil.validateZipFile(this, tempFile)
-                                .stream()
-                                .filter(validationResult -> !validationResult.isValid())
-                                .collect(Collectors.toList());
+                        List<MCRSwordUtil.MCRValidationResult> invalidResults = MCRSwordUtil
+                            .validateZipFile(this, tempFile)
+                            .stream()
+                            .filter(validationResult -> !validationResult.isValid())
+                            .collect(Collectors.toList());
 
                         if (invalidResults.size() > 0) {
-                            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, invalidResults.stream()
+                            throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST,
+                                invalidResults.stream()
                                     .map(MCRSwordUtil.MCRValidationResult::getMessage)
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
@@ -154,13 +165,16 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                         throw new SwordServerException("Error while extracting ZIP.", e);
                     }
                 } else {
-                    throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, "The Request makes no sense. (mime type must be " + MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP + " and path must be a directory)");
+                    throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST,
+                        "The Request makes no sense. (mime type must be " + MCRSwordConstants.MIME_TYPE_APPLICATION_ZIP
+                            + " and path must be a directory)");
                 }
             } else if (packaging != null && packaging.equals(UriRegistry.PACKAGE_BINARY)) {
                 try {
                     MCRSwordUtil.MCRValidationResult validationResult = validate(tempFile);
                     if (!validationResult.isValid()) {
-                        throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, validationResult.getMessage().get());
+                        throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST,
+                            validationResult.getMessage().get());
                     }
                     ifsRootPath = MCRPath.getPath(derivateId, requestFilePath + depositFilename);
                     try (InputStream is = Files.newInputStream(tempFile)) {
@@ -183,8 +197,9 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
     }
 
     public void deleteMediaResource(String derivateId, String requestFilePath) throws SwordError, SwordServerException {
-        if(!MCRAccessManager.checkPermission(derivateId, MCRAccessManager.PERMISSION_DELETE)){
-            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "You dont have the right to delete (from) the derivate!");
+        if (!MCRAccessManager.checkPermission(derivateId, MCRAccessManager.PERMISSION_DELETE)) {
+            throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
+                "You dont have the right to delete (from) the derivate!");
         }
 
         if (requestFilePath == null || requestFilePath.equals("/")) {
@@ -197,13 +212,14 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                     throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, e);
                 }
             } else {
-                throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND, "The requested Object '" + requestFilePath + "' does not exists.");
+                throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND,
+                    "The requested Object '" + requestFilePath + "' does not exists.");
             }
         } else {
             final MCRPath path = MCRPath.getPath(derivateId, requestFilePath);
             checkFile(path);
             try {
-                if(Files.isDirectory(path)){
+                if (Files.isDirectory(path)) {
                     Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -218,7 +234,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                         }
                     });
                 } else {
-                Files.delete(path);
+                    Files.delete(path);
                 }
             } catch (IOException e) {
                 throw new SwordServerException("Error while deleting media resource!", e);
@@ -245,7 +261,8 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                 List<ValidationException> validateResult = validator.validate();
 
                 if (validateResult.size() > 0) {
-                    String result = validateResult.stream().map(Throwable::getMessage).collect(Collectors.joining(System.lineSeparator()));
+                    String result = validateResult.stream().map(Throwable::getMessage)
+                        .collect(Collectors.joining(System.lineSeparator()));
                     return new MCRSwordUtil.MCRValidationResult(false, result);
                 } else {
                     return new MCRSwordUtil.MCRValidationResult(true, null);
@@ -259,5 +276,3 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
         }
     }
 }
-
-

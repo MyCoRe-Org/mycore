@@ -17,7 +17,7 @@ import org.mycore.common.MCRUserInformation;
  *
  */
 @XmlRootElement(name = "login")
-@XmlType(name="user2-login")
+@XmlType(name = "user2-login")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MCRLogin extends org.mycore.frontend.support.MCRLogin {
 

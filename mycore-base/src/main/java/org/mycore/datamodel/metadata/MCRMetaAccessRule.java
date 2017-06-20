@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -73,7 +72,8 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * @param set_condition    the JDOM Element included the condition tree
      * @exception MCRException if the set_subtag value or set_condition is null or empty
      */
-    public MCRMetaAccessRule(String set_subtag, String set_type, int set_inherted, String set_permission, org.jdom2.Element set_condition) throws MCRException {
+    public MCRMetaAccessRule(String set_subtag, String set_type, int set_inherted, String set_permission,
+        org.jdom2.Element set_condition) throws MCRException {
         super(set_subtag, null, set_type, set_inherted);
         if (set_condition == null || !set_condition.getName().equals("condition")) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
@@ -205,7 +205,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Permission         = " + permission);
             LOGGER.debug("Rule               = " + "condition");

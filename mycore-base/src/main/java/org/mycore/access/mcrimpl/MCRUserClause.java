@@ -38,36 +38,38 @@ class MCRUserClause implements MCRCondition<Object> {
     private String user;
 
     private Pattern userRegEx;
+
     private boolean not;
 
     MCRUserClause(String user, boolean not) {
-    	 if (user.contains("*")) {
-    		 userRegEx = toRegex(user);
-    	 }
+        if (user.contains("*")) {
+            userRegEx = toRegex(user);
+        }
         this.user = user;
         this.not = not;
     }
 
     private Pattern toRegex(String userExp) {
-    	StringBuilder regex = new StringBuilder("^");
+        StringBuilder regex = new StringBuilder("^");
 
-    	for(int i = 0; i < userExp.length(); i++) {
-    		char c = userExp.charAt(i);
-    		if(c == '*') {
-    			regex.append(".*");
-    		} else {
-    			regex.append(c);
-    		}
-    	}
-    	
-    	regex = regex.append('$');
-			return Pattern.compile(regex.toString());
-		}
+        for (int i = 0; i < userExp.length(); i++) {
+            char c = userExp.charAt(i);
+            if (c == '*') {
+                regex.append(".*");
+            } else {
+                regex.append(c);
+            }
+        }
 
-		public boolean evaluate(Object o) {
-			 if (userRegEx!=null) {
-				 return userRegEx.matcher(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()).matches() ^ not;
-			 }
+        regex = regex.append('$');
+        return Pattern.compile(regex.toString());
+    }
+
+    public boolean evaluate(Object o) {
+        if (userRegEx != null) {
+            return userRegEx.matcher(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()).matches()
+                ^ not;
+        }
         return user.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()) ^ not;
     }
 

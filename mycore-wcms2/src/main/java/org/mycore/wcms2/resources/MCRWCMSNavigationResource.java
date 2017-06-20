@@ -96,8 +96,8 @@ public class MCRWCMSNavigationResource {
         Document xml = MCRWCMSNavigationManager.getNavigationAsXML();
         List<Element> elementList = TEMPLATE_PATH.evaluate(xml);
         HashSet<String> entries = elementList.stream()
-                                             .map(e -> e.getAttributeValue("template"))
-                                             .collect(Collectors.toCollection(HashSet::new));
+            .map(e -> e.getAttributeValue("template"))
+            .collect(Collectors.toCollection(HashSet::new));
 
         // templates by folder
         String templatePath = MCRConfiguration.instance().getString("MCR.WCMS2.templatePath", "/templates/master/");

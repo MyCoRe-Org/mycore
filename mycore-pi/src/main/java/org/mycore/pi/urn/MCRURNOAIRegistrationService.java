@@ -24,24 +24,25 @@ public class MCRURNOAIRegistrationService extends MCRPIRegistrationService<MCRDN
         super(registrationServiceID, MCRDNBURN.TYPE);
     }
 
-
     @Override
     protected MCRDNBURN registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
-                    getClass().getName() + " doesn't support additional information! (" + additional + ")");
+                getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
 
         return getNewIdentifier(obj.getId(), additional);
     }
 
     @Override
-    protected void delete(MCRDNBURN identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected void delete(MCRDNBURN identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         throw new MCRPersistentIdentifierException("Not supported!");
     }
 
     @Override
-    protected void update(MCRDNBURN identifier, MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
 
     }
 
@@ -53,7 +54,8 @@ public class MCRURNOAIRegistrationService extends MCRPIRegistrationService<MCRDN
     @Override
     public boolean isRegistered(MCRObjectID id, String additional) {
         boolean registered = super.isRegistered(id, additional);
-        if (registered) return true;
+        if (registered)
+            return true;
 
         if (!isCreated(id, additional)) {
             return false;
@@ -62,8 +64,8 @@ public class MCRURNOAIRegistrationService extends MCRPIRegistrationService<MCRDN
         // URN is created. Now we need to check if it is resolvable
         MCRPI mcrpi = getTableEntry(id, additional);
         MCRDNBURN dnburn = new MCRDNBURNParser()
-                .parse(mcrpi.getIdentifier())
-                .orElseThrow(() -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
+            .parse(mcrpi.getIdentifier())
+            .orElseThrow(() -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
 
         try {
             // Find register date in dnb rest
@@ -83,8 +85,6 @@ public class MCRURNOAIRegistrationService extends MCRPIRegistrationService<MCRDN
             return false;
         }
 
-
     }
-
 
 }

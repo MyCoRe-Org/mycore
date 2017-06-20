@@ -182,8 +182,9 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running)
             return 0;
         Session session = MCRHIBConnection.instance().getSession();
-        Query<Number> query = session.createQuery("SELECT count(*) FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar()
-            + "'", Number.class);
+        Query<Number> query = session
+            .createQuery("SELECT count(*) FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar()
+                + "'", Number.class);
         return query.getSingleResult().intValue();
     }
 
@@ -208,14 +209,15 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running)
             return null;
         Session session = MCRHIBConnection.instance().getSession();
-        Query<MCRTileJob> query = session.createQuery("FROM MCRTileJob WHERE  derivate= :derivate AND path = :path", MCRTileJob.class);
+        Query<MCRTileJob> query = session.createQuery("FROM MCRTileJob WHERE  derivate= :derivate AND path = :path",
+            MCRTileJob.class);
         query.setParameter("derivate", derivate);
         query.setParameter("path", path);
         try {
             MCRTileJob job = query.getSingleResult();
             clearPreFetch();
             return job;
-        } catch (NoResultException e){
+        } catch (NoResultException e) {
             return null;
         }
     }
@@ -243,7 +245,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     private int preFetch(int amount) {
         Session session = MCRHIBConnection.instance().getSession();
         Query<MCRTileJob> query = session.createQuery(
-            "FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC", MCRTileJob.class).setMaxResults(amount);
+            "FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC", MCRTileJob.class)
+            .setMaxResults(amount);
         Iterator<MCRTileJob> queryResult = query.getResultList().iterator();
         int i = 0;
         while (queryResult.hasNext()) {
@@ -313,7 +316,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running)
             return 0;
         Session session = MCRHIBConnection.instance().getSession();
-        Query<?> query = session.createQuery("DELETE FROM " + MCRTileJob.class.getName() + " WHERE derivate = :derivate");
+        Query<?> query = session
+            .createQuery("DELETE FROM " + MCRTileJob.class.getName() + " WHERE derivate = :derivate");
         query.setParameter("derivate", derivate);
         try {
             return query.executeUpdate();

@@ -894,11 +894,11 @@ public class MCRUtils {
      * @throws NullPointerException if either <code>first</code> or <code>other</code> is null
      */
     @SafeVarargs
-    public static <T> int compareParts(T first, T other, Function<T, Comparable>...part){
+    public static <T> int compareParts(T first, T other, Function<T, Comparable>... part) {
         return Stream.of(part)
-              .mapToInt(f -> f.apply(first).compareTo(f.apply(other)))
-              .filter(i -> i != 0)
-              .findFirst()
-              .orElse(0);
+            .mapToInt(f -> f.apply(first).compareTo(f.apply(other)))
+            .filter(i -> i != 0)
+            .findFirst()
+            .orElse(0);
     }
 }

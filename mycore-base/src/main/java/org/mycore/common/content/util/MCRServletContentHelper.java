@@ -143,7 +143,8 @@ public abstract class MCRServletContentHelper {
      * This method handles both GET and HEAD requests.
      */
     public static void serveContent(final MCRContent content, final HttpServletRequest request,
-        final HttpServletResponse response, final ServletContext context, final Config config, final boolean withContent)
+        final HttpServletResponse response, final ServletContext context, final Config config,
+        final boolean withContent)
         throws IOException {
 
         boolean serveContent = withContent;
@@ -234,7 +235,8 @@ public abstract class MCRServletContentHelper {
                 ranges = FULL;
             }
 
-            if (isError || (ranges == null || ranges.isEmpty()) && request.getHeader("Range") == null || ranges == FULL) {
+            if (isError || (ranges == null || ranges.isEmpty()) && request.getHeader("Range") == null
+                || ranges == FULL) {
                 //No ranges
                 if (contentType != null) {
                     if (LOGGER.isDebugEnabled()) {
@@ -588,10 +590,9 @@ public abstract class MCRServletContentHelper {
             }
         }
 
-
         try (final InputStream resourceInputStream = content.getInputStream();
-             final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
-                     : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
+            final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
+                : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
             endCurrentTransaction();
             final IOException exception = copyRange(in, out, 0, range.start, range.end, outputBufferSize);
             if (exception != null) {
@@ -633,7 +634,8 @@ public abstract class MCRServletContentHelper {
         return null;
     }
 
-    public static long copyLarge(InputStream input, OutputStream output, long inputOffset, long length, byte[] buffer) throws IOException {
+    public static long copyLarge(InputStream input, OutputStream output, long inputOffset, long length, byte[] buffer)
+        throws IOException {
         if (inputOffset > 0L) {
             long bytesToSkip = inputOffset;
             while (bytesToSkip > 0) {

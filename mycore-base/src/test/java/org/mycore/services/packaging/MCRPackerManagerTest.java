@@ -1,6 +1,5 @@
 package org.mycore.services.packaging;
 
-
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -57,12 +56,12 @@ public class MCRPackerManagerTest extends MCRJPATestCase {
         startNewTransaction();
 
         int waitTime = 10;
-        while (waitTime > 0 && !mcrConfiguration.getBoolean(MCRPackerMock.FINISHED_PROPERTY, false) && !mcrConfiguration.getBoolean(MCRPackerMock.SETUP_CHECKED_PROPERTY, false)) {
+        while (waitTime > 0 && !mcrConfiguration.getBoolean(MCRPackerMock.FINISHED_PROPERTY, false)
+            && !mcrConfiguration.getBoolean(MCRPackerMock.SETUP_CHECKED_PROPERTY, false)) {
             Thread.sleep(1000);
             waitTime -= 1;
         }
         Assert.assertTrue("PackerJob did not finish in time!", waitTime > 0);
     }
-
 
 }

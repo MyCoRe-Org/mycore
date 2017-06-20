@@ -29,5 +29,6 @@ import javax.ws.rs.core.MediaType;
 public class MCRIIIFMediaType {
 
     public static final String APPLICATION_LD_JSON = "application/ld+json";
+
     public static final MediaType APPLICATION_LD_JSON_TYPE = new MediaType("application", "ld+json");
 }

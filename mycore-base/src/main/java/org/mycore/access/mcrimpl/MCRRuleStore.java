@@ -40,12 +40,13 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public abstract class MCRRuleStore {
     private static final Logger LOGGER = LogManager.getLogger(MCRRuleStore.class);
-    
+
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
-    
-    final protected static String ruletablename = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule",
-            "MCRACCESSRULE");
-    
+
+    final protected static String ruletablename = MCRConfiguration.instance().getString(
+        "MCR.Persistence.Access.Store.Table.Rule",
+        "MCRACCESSRULE");
+
     static private MCRRuleStore implementation;
 
     public abstract void createRule(MCRAccessRule rule);
@@ -57,7 +58,7 @@ public abstract class MCRRuleStore {
     public abstract MCRAccessRule getRule(String ruleid);
 
     public abstract boolean existsRule(String ruleid);
-    
+
     public abstract Collection<String> retrieveAllIDs();
 
     public abstract Collection<String> retrieveRuleIDs(String ruleExpression, String description);
@@ -67,8 +68,9 @@ public abstract class MCRRuleStore {
     public static MCRRuleStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRRuleStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.Rule.Store_Class",
-                        "org.mycore.backend.hibernate.MCRHIBRuleStore");
+                implementation = (MCRRuleStore) MCRConfiguration.instance().getSingleInstanceOf(
+                    "MCR.Persistence.Rule.Store_Class",
+                    "org.mycore.backend.hibernate.MCRHIBRuleStore");
             }
         } catch (Exception e) {
             LOGGER.error(e);

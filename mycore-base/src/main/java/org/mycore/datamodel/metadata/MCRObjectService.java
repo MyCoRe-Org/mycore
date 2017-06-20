@@ -73,7 +73,7 @@ import com.google.gson.JsonObject;
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
-	private static Logger LOGGER = LogManager.getLogger();
+    private static Logger LOGGER = LogManager.getLogger();
 
     /**
      * constant for create date
@@ -84,22 +84,23 @@ public class MCRObjectService {
      * constant for modify date
      */
     public static final String DATE_TYPE_MODIFYDATE = "modifydate";
-    
+
     /**
      * constant for create user
      */
     public static final String FLAG_TYPE_CREATEDBY = "createdby";
+
     /**
      * constant for modify user
      */
     public static final String FLAG_TYPE_MODIFIEDBY = "modifiedby";
-    
+
     private final ArrayList<MCRMetaISO8601Date> dates;
 
     private final ArrayList<MCRMetaAccessRule> rules;
 
     private final ArrayList<MCRMetaLangText> flags;
-    
+
     private MCRCategoryID state;
 
     /**
@@ -178,7 +179,7 @@ public class MCRObjectService {
                 flags.add(flag);
             }
         }
-        
+
         org.jdom2.Element statesElement = service.getChild("servstates");
         if (statesElement != null) {
             List<Element> flagList = statesElement.getChildren();
@@ -219,8 +220,9 @@ public class MCRObjectService {
      * 
      */
     public final MCRCategoryID getState() {
-       return state;
+        return state;
     }
+
     /**
      * This method get a date for a given type. If the type was not found, an
      * null was returned.
@@ -246,10 +248,10 @@ public class MCRObjectService {
         }
 
         return IntStream.range(0, dates.size())
-                        .mapToObj(i -> dates.get(i))
-                        .filter(d -> d.getType().equals(type))
-                        .findAny()
-                        .orElse(null);
+            .mapToObj(i -> dates.get(i))
+            .filter(d -> d.getType().equals(type))
+            .findAny()
+            .orElse(null);
     }
 
     /**
@@ -262,22 +264,21 @@ public class MCRObjectService {
     public final void setDate(String type) {
         setDate(type, new Date());
     }
-    
+
     /**
      * This method sets the status classification
      */
     public final void setState(MCRCategoryID state) {
-    	if(state==null){
-    		this.state = state;
-    	}
-    	else{
-    		if(MCRCategoryDAOFactory.getInstance().exist(state)){
-    			this.state = state;
-    		}
-    		else{
-    			LOGGER.error("Error at setting servstate classification.", new MCRException("The category "+state.toString() + " does not exist."));
-    		}
-    	}
+        if (state == null) {
+            this.state = state;
+        } else {
+            if (MCRCategoryDAOFactory.getInstance().exist(state)) {
+                this.state = state;
+            } else {
+                LOGGER.error("Error at setting servstate classification.",
+                    new MCRException("The category " + state.toString() + " does not exist."));
+            }
+        }
     }
 
     /**
@@ -385,8 +386,8 @@ public class MCRObjectService {
      */
     protected final ArrayList<MCRMetaLangText> getFlagsAsMCRMetaLangText(String type) {
         return flags.stream()
-                    .filter(metaLangText -> type.equals(metaLangText.getType()))
-                    .collect(Collectors.toCollection(ArrayList::new));
+            .filter(metaLangText -> type.equals(metaLangText.getType()))
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -398,8 +399,8 @@ public class MCRObjectService {
      */
     public final ArrayList<String> getFlags(String type) {
         return getFlagsAsMCRMetaLangText(type).stream()
-                                              .map(MCRMetaLangText::getText)
-                                              .collect(Collectors.toCollection(ArrayList::new));
+            .map(MCRMetaLangText::getText)
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -585,9 +586,9 @@ public class MCRObjectService {
             return notFound;
         }
         return IntStream.range(0, rules.size())
-                       .filter(i -> rules.get(i).getPermission().equals(permission))
-                       .findAny()
-                       .orElse(notFound);
+            .filter(i -> rules.get(i).getPermission().equals(permission))
+            .findAny()
+            .orElse(notFound);
     }
 
     /**
@@ -653,8 +654,8 @@ public class MCRObjectService {
     public final org.jdom2.Element createXML() throws MCRException {
         try {
             validate();
-        } catch(MCRException exc) {
-            throw new MCRException("The content is not valid.", exc);            
+        } catch (MCRException exc) {
+            throw new MCRException("The content is not valid.", exc);
         }
         org.jdom2.Element elm = new org.jdom2.Element("service");
 
@@ -690,8 +691,8 @@ public class MCRObjectService {
 
             elm.addContent(elmm);
         }
-        if(state!=null){
-        	org.jdom2.Element elmm = new org.jdom2.Element("servstates");
+        if (state != null) {
+            org.jdom2.Element elmm = new org.jdom2.Element("servstates");
             elmm.setAttribute("class", "MCRMetaClassification");
             MCRMetaClassification stateClass = new MCRMetaClassification("servstate", 0, null, state);
             elmm.addContent(stateClass.createXML());
@@ -700,7 +701,7 @@ public class MCRObjectService {
 
         return elm;
     }
-    
+
     /**
      * Creates the JSON representation of this service.
      * 
@@ -729,7 +730,7 @@ public class MCRObjectService {
     public final JsonObject createJSON() {
         JsonObject service = new JsonObject();
         // dates
-        if(!getDates().isEmpty()) {
+        if (!getDates().isEmpty()) {
             JsonObject dates = new JsonObject();
             getDates()
                 .stream()
@@ -741,7 +742,7 @@ public class MCRObjectService {
             service.add("dates", dates);
         }
         // rules
-        if(!getRules().isEmpty()) {
+        if (!getRules().isEmpty()) {
             JsonArray rules = new JsonArray();
             getRules()
                 .stream()
@@ -750,7 +751,7 @@ public class MCRObjectService {
             service.add("rules", rules);
         }
         // flags
-        if(!getFlags().isEmpty()) {
+        if (!getFlags().isEmpty()) {
             JsonArray flags = new JsonArray();
             getFlagsAsList()
                 .stream()
@@ -761,7 +762,7 @@ public class MCRObjectService {
         // state
         Optional.ofNullable(getState()).ifPresent(stateId -> {
             JsonObject state = new JsonObject();
-            if(stateId.getID() != null) {
+            if (stateId.getID() != null) {
                 state.addProperty("id", stateId.getID());
             }
             state.addProperty("rootId", stateId.getRootID());
@@ -784,7 +785,7 @@ public class MCRObjectService {
         try {
             validate();
             return true;
-        } catch(MCRException exc) {
+        } catch (MCRException exc) {
             LOGGER.warn("The <service> part is invalid.");
         }
         return false;
@@ -808,7 +809,7 @@ public class MCRObjectService {
             setDate(DATE_TYPE_MODIFYDATE);
         }
     }
-    
+
     /**
      * This method returns the index for the given flag value.
      * 

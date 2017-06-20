@@ -1,6 +1,5 @@
 package org.mycore.pi.urn;
 
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -40,8 +39,11 @@ import java.util.TimeZone;
 public class MCRURNDateCounterGenerator extends MCRDNBURNGenerator {
 
     private DecimalFormat fmtCount;
+
     private SimpleDateFormat fmtDate;
+
     private String lastDate;
+
     private int counter = 1;
 
     public MCRURNDateCounterGenerator(String generatorID) {
@@ -102,6 +104,5 @@ public class MCRURNDateCounterGenerator extends MCRDNBURNGenerator {
 
         return niss;
     }
-
 
 }

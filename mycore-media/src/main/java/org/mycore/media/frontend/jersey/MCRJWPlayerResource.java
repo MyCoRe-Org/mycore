@@ -57,8 +57,8 @@ public class MCRJWPlayerResource {
             MCRMediaSourceProvider formatter = new MCRMediaSourceProvider(derivateId, path,
                 Optional.ofNullable(request.getHeader("User-Agent")),
                 () -> Arrays.stream(Optional.ofNullable(request.getQueryString()).orElse("").split("&"))
-                            .filter(p -> !p.startsWith("callback="))
-                            .toArray(size -> new String[size]));
+                    .filter(p -> !p.startsWith("callback="))
+                    .toArray(size -> new String[size]));
             return toJson(formatter.getSources());
         } catch (NoSuchFileException e) {
             LogManager.getLogger().warn("Could not find video file.", e);

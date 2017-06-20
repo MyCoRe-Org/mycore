@@ -65,7 +65,8 @@ public abstract class MCRUserTransformer {
             sortAttributes(userXML);
             return userXML;
         } catch (SAXParseException | JDOMException | IOException e) {
-            throw new MCRException("Exception while transforming MCRUser " + user.getUserID() + " to JDOM document.", e);
+            throw new MCRException("Exception while transforming MCRUser " + user.getUserID() + " to JDOM document.",
+                e);
         }
     }
 

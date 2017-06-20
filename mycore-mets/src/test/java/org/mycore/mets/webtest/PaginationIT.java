@@ -39,7 +39,7 @@ public class PaginationIT extends MetsEditorTestBase {
         row.findElement(By.xpath("//button[@title=\"???editPagination???\"]")).click();
         row.findElement(By.xpath("//input")).sendKeys(TEST_STRING);
         row.findElement(By.xpath("//button[@title=\"???paginationAbort???\"]")).click();
-        Assert.assertTrue("Pagination should not be set!",row.findElements(MCRBy.partialText(TEST_STRING)).isEmpty());
+        Assert.assertTrue("Pagination should not be set!", row.findElements(MCRBy.partialText(TEST_STRING)).isEmpty());
     }
 
     @Test
@@ -58,7 +58,6 @@ public class PaginationIT extends MetsEditorTestBase {
         Assert.assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("1v")));
         Assert.assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("18r")));
     }
-
 
     /**
      * Does not work (Actions) not supported
@@ -87,7 +86,7 @@ public class PaginationIT extends MetsEditorTestBase {
         webDriver.findElement(MCRBy.partialText("8v"));
     }
      */
-   /* @Test
+    /* @Test
     public void deletePaginationFew() throws InterruptedException {
         WebDriver webDriver = getDriver();
         autoPaginationFew();
@@ -97,7 +96,7 @@ public class PaginationIT extends MetsEditorTestBase {
             throw new AssertionError("Pagination has not been removed!");
     }*/
 
-   /*
+    /*
     @Test
     public void revertChange() throws InterruptedException {
         WebDriver webDriver = getDriver();

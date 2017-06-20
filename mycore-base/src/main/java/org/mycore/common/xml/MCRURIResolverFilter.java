@@ -95,7 +95,8 @@ public class MCRURIResolverFilter implements Filter {
              * to byte arrays.
              */
             if (!uriList.get().isEmpty() && origOutput.length() > 0
-                && (response.getContentType().contains("text/html") || response.getContentType().contains("text/xml"))) {
+                && (response.getContentType().contains("text/html")
+                    || response.getContentType().contains("text/xml"))) {
                 final String insertString = "\n<!-- \n" + uriList.get().toString() + "\n-->";
                 final byte[] insertBytes = insertString.getBytes(characterEncoding);
                 response.setContentLength(origOutput.getBytes(characterEncoding).length + insertBytes.length);

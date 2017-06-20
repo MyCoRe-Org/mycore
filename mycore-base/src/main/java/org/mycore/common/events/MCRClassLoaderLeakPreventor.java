@@ -42,7 +42,7 @@ class MCRClassLoaderLeakPreventor extends ClassLoaderLeakPreventor {
             @SuppressWarnings("unchecked")
             Class<IIOServiceProvider> category = (Class<IIOServiceProvider>) categories.next();
             Iterator<IIOServiceProvider> serviceProviders = registry.<IIOServiceProvider> getServiceProviders(category,
-                    classLoaderFilter, true);
+                classLoaderFilter, true);
             if (serviceProviders.hasNext()) {
                 info("removing service provider of category: " + category.getSimpleName());
                 //copy to list
@@ -65,6 +65,5 @@ class MCRClassLoaderLeakPreventor extends ClassLoaderLeakPreventor {
          * bug id=4405807 was fixed in ver 1.4.2_06 no working link use use Google cache instead
          */
     };
-
 
 }

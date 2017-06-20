@@ -18,10 +18,11 @@ public class MCRXMLCleaner {
 
     private static final MCRCleaningRule REMOVE_EMPTY_ATTRIBUTES = new MCRCleaningRule("//@*", "string-length(.) > 0");
 
-    private static final MCRCleaningRule REMOVE_EMPTY_ELEMENTS = new MCRCleaningRule("//*", "@* or * or (string-length(text()) > 0)");
+    private static final MCRCleaningRule REMOVE_EMPTY_ELEMENTS = new MCRCleaningRule("//*",
+        "@* or * or (string-length(text()) > 0)");
 
     private static final MCRCleaningRule PRESERVE_STRUCTURE_AND_SERVICE = new MCRCleaningRule(
-            "/mycoreobject/structure|/mycoreobject/service", "true()");
+        "/mycoreobject/structure|/mycoreobject/service", "true()");
 
     private List<MCRCleaningRule> rules = new ArrayList<MCRCleaningRule>();
 
@@ -97,7 +98,8 @@ class MCRCleaningRule {
 
     public MCRCleaningRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
         this.xPathExprNodesToInspect = xPathExprNodesToInspect;
-        this.xPathNodesToInspect = XPathFactory.instance().compile(xPathExprNodesToInspect, Filters.fpassthrough(), null,
+        this.xPathNodesToInspect = XPathFactory.instance().compile(xPathExprNodesToInspect, Filters.fpassthrough(),
+            null,
             MCRConstants.getStandardNamespaces());
         this.xPathRelevancyTest = XPathFactory.instance().compile(xPathExprRelevancyTest, Filters.fpassthrough(), null,
             MCRConstants.getStandardNamespaces());

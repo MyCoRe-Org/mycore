@@ -144,7 +144,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             long tStart = System.currentTimeMillis();
             try {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing");
+                    LOGGER
+                        .debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing");
                 }
                 MCRContent content = (MCRContent) evt.get("content");
                 if (content == null) {

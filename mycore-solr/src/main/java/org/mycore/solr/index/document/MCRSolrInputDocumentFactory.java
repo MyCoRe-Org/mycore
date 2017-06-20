@@ -44,7 +44,8 @@ import org.xml.sax.SAXException;
  */
 public abstract class MCRSolrInputDocumentFactory {
 
-    private static MCRSolrInputDocumentFactory instance = MCRConfiguration.instance().<MCRSolrInputDocumentFactory> getInstanceOf(CONFIG_PREFIX + "SolrInputDocument.Factory", (String) null);
+    private static MCRSolrInputDocumentFactory instance = MCRConfiguration.instance()
+        .<MCRSolrInputDocumentFactory> getInstanceOf(CONFIG_PREFIX + "SolrInputDocument.Factory", (String) null);
 
     public static MCRSolrInputDocumentFactory getInstance() {
         return instance;
@@ -52,7 +53,8 @@ public abstract class MCRSolrInputDocumentFactory {
 
     public abstract SolrInputDocument getDocument(MCRObjectID id, MCRContent content) throws SAXException, IOException;
 
-    public abstract Iterator<SolrInputDocument> getDocuments(Map<MCRObjectID, MCRContent> contentMap) throws IOException, SAXException;
+    public abstract Iterator<SolrInputDocument> getDocuments(Map<MCRObjectID, MCRContent> contentMap)
+        throws IOException, SAXException;
 
     public SolrInputDocument getDocument(MCRObjectID id) throws SAXException, IOException {
         MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(id);

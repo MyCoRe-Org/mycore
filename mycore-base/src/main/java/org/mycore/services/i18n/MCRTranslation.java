@@ -81,9 +81,10 @@ public class MCRTranslation {
 
     private static Set<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
 
-    static{
+    static {
         debug();
     }
+
     /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.

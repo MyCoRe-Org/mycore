@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.XmlEnum;
  */
 @XmlEnum
 public enum MCRPasswordHashType {
-    
-    crypt,md5,sha1,sha256
+
+    crypt, md5, sha1, sha256
 
 }

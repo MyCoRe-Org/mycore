@@ -6,7 +6,6 @@ import java.nio.file.FileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 
-
 public class MCRFileCollectingFileVisitor<T> implements FileVisitor<T> {
 
     public ArrayList<T> getPaths() {
@@ -15,10 +14,9 @@ public class MCRFileCollectingFileVisitor<T> implements FileVisitor<T> {
 
     private final ArrayList<T> paths;
 
-    public MCRFileCollectingFileVisitor(){
+    public MCRFileCollectingFileVisitor() {
         paths = new ArrayList<>();
     }
-
 
     @Override
     public FileVisitResult preVisitDirectory(T dir, BasicFileAttributes attrs) throws IOException {

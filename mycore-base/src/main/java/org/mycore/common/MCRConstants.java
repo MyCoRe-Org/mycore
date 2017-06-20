@@ -120,7 +120,8 @@ public final class MCRConstants {
                     Namespace namespace = (Namespace) f.get(null);
                     registerNamespace(namespace);
                 } catch (Exception e) {
-                    LogManager.getLogger(MCRConstants.class).error("Error while initialising Namespace list and HashMap",
+                    LogManager.getLogger(MCRConstants.class).error(
+                        "Error while initialising Namespace list and HashMap",
                         e);
                 }
             }

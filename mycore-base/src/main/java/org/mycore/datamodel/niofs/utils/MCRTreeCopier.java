@@ -77,7 +77,6 @@ public class MCRTreeCopier implements FileVisitor<Path> {
         }
     }
 
-
     private Path toTargetFS(Path source) {
         if (target.getFileSystem().equals(source.getFileSystem())) {
             return source;

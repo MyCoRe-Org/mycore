@@ -57,8 +57,8 @@ public class MCRPersistentIdentifierManager {
             String type = k.substring(PARSER_CONFIGURATION.length());
             try {
                 @SuppressWarnings("unchecked")
-                Class<? extends MCRPersistentIdentifierParser<?>> parserClass =
-                        (Class<? extends MCRPersistentIdentifierParser<?>>) Class.forName(v);
+                Class<? extends MCRPersistentIdentifierParser<?>> parserClass = (Class<? extends MCRPersistentIdentifierParser<?>>) Class
+                    .forName(v);
                 registerParser(type, parserClass);
             } catch (ClassNotFoundException e) {
                 throw new MCRConfigurationException("Could not load class " + v + " defined in " + k);
@@ -66,31 +66,30 @@ public class MCRPersistentIdentifierManager {
         });
 
         Stream.of(MCRConfiguration.instance().getString(RESOLVER_CONFIGURATION).split(","))
-              .forEach(className -> {
-                  try {
-                      Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClass =
-                              (Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>>) Class
-                                      .forName(className);
-                      Constructor<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClassConstructor =
-                              resolverClass.getConstructor();
-                      MCRPersistentIdentifierResolver<MCRPersistentIdentifier> resolver = resolverClassConstructor
-                              .newInstance();
-                      resolverList.add(resolver);
-                  } catch (ClassNotFoundException e) {
-                      throw new MCRConfigurationException(
-                              RESOLVER_CONFIGURATION + " contains " + className + " but the class could not be found!",
-                              e);
-                  } catch (NoSuchMethodException e) {
-                      throw new MCRConfigurationException("The class " + className + " has no default constructor!", e);
-                  } catch (IllegalAccessException e) {
-                      throw new MCRConfigurationException("Cannot invoke default constructor of " + className + "!", e);
-                  } catch (InstantiationException e) {
-                      throw new MCRConfigurationException("The class " + className + " seems to be abstract!", e);
-                  } catch (InvocationTargetException e) {
-                      throw new MCRConfigurationException(
-                              "The default constructor of class " + className + " throws a exception!", e);
-                  }
-              });
+            .forEach(className -> {
+                try {
+                    Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClass = (Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>>) Class
+                        .forName(className);
+                    Constructor<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClassConstructor = resolverClass
+                        .getConstructor();
+                    MCRPersistentIdentifierResolver<MCRPersistentIdentifier> resolver = resolverClassConstructor
+                        .newInstance();
+                    resolverList.add(resolver);
+                } catch (ClassNotFoundException e) {
+                    throw new MCRConfigurationException(
+                        RESOLVER_CONFIGURATION + " contains " + className + " but the class could not be found!",
+                        e);
+                } catch (NoSuchMethodException e) {
+                    throw new MCRConfigurationException("The class " + className + " has no default constructor!", e);
+                } catch (IllegalAccessException e) {
+                    throw new MCRConfigurationException("Cannot invoke default constructor of " + className + "!", e);
+                } catch (InstantiationException e) {
+                    throw new MCRConfigurationException("The class " + className + " seems to be abstract!", e);
+                } catch (InvocationTargetException e) {
+                    throw new MCRConfigurationException(
+                        "The default constructor of class " + className + " throws a exception!", e);
+                }
+            });
 
     }
 
@@ -103,7 +102,7 @@ public class MCRPersistentIdentifierManager {
     }
 
     private static MCRPersistentIdentifierParser getParserInstance(
-            Class<? extends MCRPersistentIdentifierParser> detectorClass) {
+        Class<? extends MCRPersistentIdentifierParser> detectorClass) {
         try {
             return detectorClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
@@ -121,13 +120,14 @@ public class MCRPersistentIdentifierManager {
         CriteriaQuery<Number> rowCountQuery = cb.createQuery(Number.class);
         Root<MCRPI> pi = rowCountQuery.from(MCRPI.class);
         return em.createQuery(
-                rowCountQuery
-                        .select(cb.count(pi))
-                    .where(cb.equal(pi.get(MCRPI_.type), mcrpiRegistrationInfo.getType()),
-                        cb.equal(pi.get(MCRPI_.additional), mcrpiRegistrationInfo.getAdditional()),
-                        cb.equal(pi.get(MCRPI_.identifier), mcrpiRegistrationInfo.getIdentifier()),
-                        cb.equal(pi.get(MCRPI_.service), mcrpiRegistrationInfo.getService()),
-                        cb.equal(pi.get(MCRPI_.mycoreID), mcrpiRegistrationInfo.getMycoreID()))).getSingleResult()
+            rowCountQuery
+                .select(cb.count(pi))
+                .where(cb.equal(pi.get(MCRPI_.type), mcrpiRegistrationInfo.getType()),
+                    cb.equal(pi.get(MCRPI_.additional), mcrpiRegistrationInfo.getAdditional()),
+                    cb.equal(pi.get(MCRPI_.identifier), mcrpiRegistrationInfo.getIdentifier()),
+                    cb.equal(pi.get(MCRPI_.service), mcrpiRegistrationInfo.getService()),
+                    cb.equal(pi.get(MCRPI_.mycoreID), mcrpiRegistrationInfo.getMycoreID())))
+            .getSingleResult()
             .intValue() > 0;
     }
 
@@ -138,35 +138,36 @@ public class MCRPersistentIdentifierManager {
         CriteriaQuery<MCRPI> getQuery = cb.createQuery(MCRPI.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
         return em.createQuery(
-                getQuery
-                    .where(
-                        cb.equal(pi.get(MCRPI_.additional), additional),
-                        cb.equal(pi.get(MCRPI_.mycoreID), mycoreID),
-                        cb.equal(pi.get(MCRPI_.service), service))).getSingleResult();
+            getQuery
+                .where(
+                    cb.equal(pi.get(MCRPI_.additional), additional),
+                    cb.equal(pi.get(MCRPI_.mycoreID), mycoreID),
+                    cb.equal(pi.get(MCRPI_.service), service)))
+            .getSingleResult();
 
     }
 
     public List<MCRPIRegistrationInfo> getCreatedIdentifiers(MCRObjectID id, String type,
-                                                             String registrationServiceID) {
+        String registrationServiceID) {
         return MCREntityManagerProvider
-                .getCurrentEntityManager()
-                .createNamedQuery("Get.PI.Created", MCRPIRegistrationInfo.class)
-                .setParameter(MCRID, id.toString())
-                .setParameter(TYPE, type)
-                .setParameter(SERVICE, registrationServiceID)
-                .getResultList();
+            .getCurrentEntityManager()
+            .createNamedQuery("Get.PI.Created", MCRPIRegistrationInfo.class)
+            .setParameter(MCRID, id.toString())
+            .setParameter(TYPE, type)
+            .setParameter(SERVICE, registrationServiceID)
+            .getResultList();
     }
 
     public boolean isCreated(MCRObjectID id, String additional, String type, String registrationServiceID) {
         return MCREntityManagerProvider
-                .getCurrentEntityManager()
-                .createNamedQuery("Count.PI.Created", Number.class)
-                .setParameter(MCRID, id.toString())
-                .setParameter(TYPE, type)
-                .setParameter(ADDITIONAL, additional)
-                .setParameter(SERVICE, registrationServiceID)
-                .getSingleResult()
-                .shortValue() > 0;
+            .getCurrentEntityManager()
+            .createNamedQuery("Count.PI.Created", Number.class)
+            .setParameter(MCRID, id.toString())
+            .setParameter(TYPE, type)
+            .setParameter(ADDITIONAL, additional)
+            .setParameter(SERVICE, registrationServiceID)
+            .getSingleResult()
+            .shortValue() > 0;
     }
 
     public boolean isRegistered(MCRPI mcrPi) {
@@ -179,14 +180,14 @@ public class MCRPersistentIdentifierManager {
 
     public boolean isRegistered(String mcrId, String additional, String type, String registrationServiceID) {
         return MCREntityManagerProvider
-                .getCurrentEntityManager()
-                .createNamedQuery("Count.PI.Registered", Number.class)
-                .setParameter(MCRID, mcrId)
-                .setParameter(TYPE, type)
-                .setParameter(ADDITIONAL, additional)
-                .setParameter(SERVICE, registrationServiceID)
-                .getSingleResult()
-                .shortValue() > 0;
+            .getCurrentEntityManager()
+            .createNamedQuery("Count.PI.Registered", Number.class)
+            .setParameter(MCRID, mcrId)
+            .setParameter(TYPE, type)
+            .setParameter(ADDITIONAL, additional)
+            .setParameter(SERVICE, registrationServiceID)
+            .getSingleResult()
+            .shortValue() > 0;
     }
 
     public int getCount(String type) {
@@ -195,10 +196,10 @@ public class MCRPersistentIdentifierManager {
         CriteriaQuery<Number> rowCountQuery = cb.createQuery(Number.class);
         Root<MCRPI> pi = rowCountQuery.from(MCRPI.class);
         return em.createQuery(
-                rowCountQuery
-                        .select(cb.count(pi))
-                        .where(cb.equal(pi.get(MCRPI_.type), type)))
-                 .getSingleResult().intValue();
+            rowCountQuery
+                .select(cb.count(pi))
+                .where(cb.equal(pi.get(MCRPI_.type), type)))
+            .getSingleResult().intValue();
     }
 
     public void delete(String objectID, String additional, String type, String service) {
@@ -211,14 +212,14 @@ public class MCRPersistentIdentifierManager {
         CriteriaQuery<MCRPI> getQuery = cb.createQuery(MCRPI.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
         em.remove(
-                em.createQuery(
-                        getQuery
-                                .where(
-                                        cb.equal(pi.get(MCRPI_.mycoreID), objectID),
-                                        cb.equal(pi.get(MCRPI_.type), type),
-                                        cb.equal(pi.get(MCRPI_.additional), additional),
-                                        cb.equal(pi.get(MCRPI_.service), service)))
-                  .getSingleResult());
+            em.createQuery(
+                getQuery
+                    .where(
+                        cb.equal(pi.get(MCRPI_.mycoreID), objectID),
+                        cb.equal(pi.get(MCRPI_.type), type),
+                        cb.equal(pi.get(MCRPI_.additional), additional),
+                        cb.equal(pi.get(MCRPI_.service), service)))
+                .getSingleResult());
     }
 
     public List<MCRPIRegistrationInfo> getList() {
@@ -235,7 +236,7 @@ public class MCRPersistentIdentifierManager {
         CriteriaQuery<MCRPIRegistrationInfo> getQuery = cb.createQuery(MCRPIRegistrationInfo.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
         CriteriaQuery<MCRPIRegistrationInfo> all = getQuery
-                .select(pi);
+            .select(pi);
 
         if (type != null) {
             all = all.where(cb.equal(pi.get(MCRPI_.type), type));
@@ -252,28 +253,27 @@ public class MCRPersistentIdentifierManager {
         }
 
         return typedQuery
-                .getResultList();
+            .getResultList();
     }
 
     public Integer setRegisteredDateForUnregisteredIdenifiers(
-            String type,
-            Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider, Integer batchSize) {
+        String type,
+        Function<MCRPIRegistrationInfo, Optional<Date>> dateProvider, Integer batchSize) {
 
         List<MCRPI> unregisteredIdentifiers = getUnregisteredIdentifiers(type, batchSize);
         unregisteredIdentifiers
-                .forEach(ident -> dateProvider
-                        .apply(ident)
-                        .ifPresent(ident::setRegistered)
-                );
+            .forEach(ident -> dateProvider
+                .apply(ident)
+                .ifPresent(ident::setRegistered));
 
         return unregisteredIdentifiers.size();
     }
 
     public List<MCRPI> getUnregisteredIdentifiers(String type, int maxSize) {
         TypedQuery<MCRPI> getUnregisteredQuery = MCREntityManagerProvider
-                .getCurrentEntityManager()
-                .createNamedQuery("Get.PI.Unregistered", MCRPI.class)
-                .setParameter("type", type);
+            .getCurrentEntityManager()
+            .createNamedQuery("Get.PI.Unregistered", MCRPI.class)
+            .setParameter("type", type);
 
         if (maxSize >= 0) {
             getUnregisteredQuery.setMaxResults(maxSize);
@@ -292,11 +292,11 @@ public class MCRPersistentIdentifierManager {
         CriteriaQuery<MCRPIRegistrationInfo> getQuery = cb.createQuery(MCRPIRegistrationInfo.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
         return em.createQuery(
-                getQuery
-                        .select(pi)
-                        .where(
-                                cb.equal(pi.get(MCRPI_.mycoreID), object.getId().toString())))
-                 .getResultList();
+            getQuery
+                .select(pi)
+                .where(
+                    cb.equal(pi.get(MCRPI_.mycoreID), object.getId().toString())))
+            .getResultList();
     }
 
     public List<MCRPIRegistrationInfo> getInfo(MCRPersistentIdentifier identifier) {
@@ -309,10 +309,10 @@ public class MCRPersistentIdentifierManager {
         CriteriaQuery<MCRPIRegistrationInfo> getQuery = cb.createQuery(MCRPIRegistrationInfo.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
         return em.createQuery(
-                getQuery
-                        .select(pi)
-                        .where(cb.equal(pi.get(MCRPI_.identifier), identifier)))
-                 .getResultList();
+            getQuery
+                .select(pi)
+                .where(cb.equal(pi.get(MCRPI_.identifier), identifier)))
+            .getResultList();
     }
 
     public MCRPersistentIdentifierParser getParserForType(String type) {
@@ -320,8 +320,8 @@ public class MCRPersistentIdentifierManager {
     }
 
     public void registerParser(
-            String type,
-            Class<? extends MCRPersistentIdentifierParser<? extends MCRPersistentIdentifier>> parserClass) {
+        String type,
+        Class<? extends MCRPersistentIdentifierParser<? extends MCRPersistentIdentifier>> parserClass) {
 
         this.parserList.add(parserClass);
         this.typeParserMap.put(type, parserClass);
@@ -333,11 +333,11 @@ public class MCRPersistentIdentifierManager {
 
     public Stream<MCRPersistentIdentifier> get(String pi) {
         return parserList
-                .stream()
-                .map(MCRPersistentIdentifierManager::getParserInstance)
-                .map(p -> p.parse(pi))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(MCRPersistentIdentifier.class::cast);
+            .stream()
+            .map(MCRPersistentIdentifierManager::getParserInstance)
+            .map(p -> p.parse(pi))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(MCRPersistentIdentifier.class::cast);
     }
 }

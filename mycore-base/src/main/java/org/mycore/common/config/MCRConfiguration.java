@@ -147,7 +147,7 @@ public class MCRConfiguration {
      *                if props is null - an empty properties object that supports sorting by key will be created
      * @return a new properties object sorted by keys
      */
-    public static Properties sortProperties(Properties props){
+    public static Properties sortProperties(Properties props) {
         Properties sortedProps = new Properties() {
             private static final long serialVersionUID = 1L;
 
@@ -156,7 +156,7 @@ public class MCRConfiguration {
                 return Collections.enumeration(new TreeSet<Object>(super.keySet()));
             }
         };
-        if(props!=null){
+        if (props != null) {
             sortedProps.putAll(props);
         }
         return sortedProps;
@@ -272,7 +272,7 @@ public class MCRConfiguration {
         Logger logger = LogManager.getLogger();
         if (logger.isDebugEnabled()) {
             try (StringWriter sw = new StringWriter(); PrintWriter out = new PrintWriter(sw)) {
-                tmp = tmp == null ?  MCRConfiguration.sortProperties(getResolvedProperties()) : tmp;
+                tmp = tmp == null ? MCRConfiguration.sortProperties(getResolvedProperties()) : tmp;
                 tmp.store(out, comments);
                 out.flush();
                 sw.flush();

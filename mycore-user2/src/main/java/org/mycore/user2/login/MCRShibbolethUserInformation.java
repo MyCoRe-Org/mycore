@@ -33,7 +33,7 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
     private Set<String> roles = new HashSet<String>();
 
     public MCRShibbolethUserInformation(String userId, String realmId, Map<String, Object> attributes)
-            throws Exception {
+        throws Exception {
         this.userId = userId;
         this.realmId = realmId;
         this.attributes = attributes;
@@ -67,13 +67,13 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
     public String getUserAttribute(String attribute) {
         String key;
         switch (attribute) {
-        case MCRUserInformation.ATT_REAL_NAME:
-            return this.realName;
-        case MCRRealm.USER_INFORMATION_ATTR:
-            return this.realmId;
-        default:
-            key = attribute;
-            break;
+            case MCRUserInformation.ATT_REAL_NAME:
+                return this.realName;
+            case MCRRealm.USER_INFORMATION_ATTR:
+                return this.realmId;
+            default:
+                key = attribute;
+                break;
         }
 
         Object value = attributes.get(key);

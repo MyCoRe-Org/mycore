@@ -174,7 +174,8 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
                     if (contentTypeID == null) {
                         LOGGER.info("Try to detect file content type with subformat '"
                             + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
-                        contentTypeID = detectContentTypeIDByFormat(isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
+                        contentTypeID = detectContentTypeIDByFormat(
+                            isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
                         if (contentTypeID == null) {
                             contentTypeID = file.getContentTypeID();
                         }
@@ -192,7 +193,8 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
                 if (contentTypeID == null) {
                     LOGGER.info("Try to detect file content type with subformat '"
                         + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
-                    contentTypeID = detectContentTypeIDByFormat(isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
+                    contentTypeID = detectContentTypeIDByFormat(
+                        isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
                     if (contentTypeID == null) {
                         contentTypeID = file.getContentTypeID();
                     }

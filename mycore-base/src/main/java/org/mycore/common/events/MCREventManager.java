@@ -46,19 +46,19 @@ import org.mycore.common.config.MCRConfigurationException;
  * @author Frank Lützenkirchen
  */
 public class MCREventManager {
-    
+
     private static Logger logger = LogManager.getLogger(MCREventManager.class);
 
     private static MCREventManager instance;
 
     public static final String CONFIG_PREFIX = "MCR.EventHandler.";
-    
+
     /** Table of all configured event handlers * */
     private Hashtable<String, List<MCREventHandler>> handlers;
-    
+
     /** Call event handlers in forward direction (create, update) */
     public final static boolean FORWARD = true;
-    
+
     /** Call event handlers in backward direction (delete) */
     public final static boolean BACKWARD = false;
 

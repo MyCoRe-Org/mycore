@@ -61,12 +61,12 @@ public class MetsResource {
             String htmlTemplate = writer.toString();
             // add additional javascript code
             String js = MCRConfiguration.instance().getString("MCR.Mets.Editor.additional.javascript", null);
-            if(js != null && !js.isEmpty()) {
+            if (js != null && !js.isEmpty()) {
                 htmlTemplate = htmlTemplate.replace("<link rel=\"additionalJS\" />", js);
             }
             // replace variables
             htmlTemplate = htmlTemplate.replaceAll("\\{baseURL\\}", MCRFrontendUtil.getBaseURL())
-                    .replaceAll("\\{derivateID\\}", derivateId);
+                .replaceAll("\\{derivateID\\}", derivateId);
             return htmlTemplate;
         } catch (IOException e) {
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
@@ -126,7 +126,6 @@ public class MetsResource {
         }
     }
 
-
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -140,8 +139,9 @@ public class MetsResource {
         MCRMetsSimpleModel model = MCRJSONSimpleModelConverter.toSimpleModel(data);
         Document document = MCRSimpleModelXMLConverter.toXML(model);
         XMLOutputter o = new XMLOutputter();
-        try (OutputStream out = Files.newOutputStream(MCRPath.getPath(derivateId, METS_XML_PATH), StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING)) {
+        try (OutputStream out = Files.newOutputStream(MCRPath.getPath(derivateId, METS_XML_PATH),
+            StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING)) {
             o.output(document, out);
         } catch (IOException e) {
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
@@ -178,15 +178,16 @@ public class MetsResource {
 
         if (!Files.exists(metsPath)) {
             try {
-                mets = MCRMETSGenerator.getGenerator().getMETS(metsPath.getParent(), new HashSet<MCRPath>()).asDocument();
+                mets = MCRMETSGenerator.getGenerator().getMETS(metsPath.getParent(), new HashSet<MCRPath>())
+                    .asDocument();
             } catch (Exception e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }
         } else {
-            try(InputStream inputStream = Files.newInputStream(metsPath)){
+            try (InputStream inputStream = Files.newInputStream(metsPath)) {
                 SAXBuilder builder = new SAXBuilder();
                 mets = builder.build(inputStream);
-            } catch (JDOMException|IOException e) {
+            } catch (JDOMException | IOException e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }
         }

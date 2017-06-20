@@ -115,7 +115,7 @@ public class MCRSecureTokenV2 {
         URI context = new URI(baseURL);
         URI completeURI = context.resolve(Stream
             .concat(Arrays.stream(queryParameters).filter(Objects::nonNull), Stream.of(hashParameterName + "=" + hash))
-            .collect(Collectors.joining("&", baseURL+contentPath + suffix + "?", "")));
+            .collect(Collectors.joining("&", baseURL + contentPath + suffix + "?", "")));
         return completeURI;
     }
 

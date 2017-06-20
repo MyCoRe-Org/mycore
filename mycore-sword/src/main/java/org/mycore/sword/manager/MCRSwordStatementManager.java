@@ -15,7 +15,8 @@ import org.swordapp.server.SwordServerException;
  */
 public class MCRSwordStatementManager implements StatementManager {
     @Override
-    public Statement getStatement(String iri, Map<String, String> accept, AuthCredentials auth, SwordConfiguration config) throws SwordServerException, SwordError, SwordAuthException {
+    public Statement getStatement(String iri, Map<String, String> accept, AuthCredentials auth,
+        SwordConfiguration config) throws SwordServerException, SwordError, SwordAuthException {
         return null;
     }
 }

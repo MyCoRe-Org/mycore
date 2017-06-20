@@ -263,12 +263,12 @@ public abstract class MCRContent {
     public String asString() throws IOException, UnsupportedEncodingException {
         return new String(asByteArray(), getSafeEncoding());
     }
-    
+
     /**
      * Returns content as "data:" URL.
      * @throws IOException
      */
-    public MCRDataURL asDataURL() throws IOException{
+    public MCRDataURL asDataURL() throws IOException {
         return new MCRDataURL(asByteArray(), getDataURLEncoding(), getMimeType(), getSafeEncoding());
     }
 

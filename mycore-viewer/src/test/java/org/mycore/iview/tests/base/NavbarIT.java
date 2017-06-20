@@ -163,7 +163,8 @@ public class NavbarIT extends ViewerTestBase {
     private int countColor(ToolBarController tbController, String label, Color color) {
         String message = color.toString() + " schould be selected (class-attribut 'selected' should be set)!";
         Assert.assertTrue(message, tbController.isImageSelected(label));
-        String fileName = String.format("%s-%s-%s-%s-%s", this.getClassname(), label, color.getRed(), color.getBlue(), color.getGreen());
+        String fileName = String.format("%s-%s-%s-%s-%s", this.getClassname(), label, color.getRed(), color.getBlue(),
+            color.getGreen());
         BufferedImage bImage = ControllerUtil.getScreenshot(getDriver(), fileName);
 
         return new FilterSelection(Selection.fromBufferedImage(bImage), new ColorFilter(color, false, TOLERANCE))

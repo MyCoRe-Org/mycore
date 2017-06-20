@@ -449,7 +449,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /** Sorts children by filename, case insensitive * */
-    public final static Comparator<MCRFilesystemNode> SORT_BY_NAME_IGNORECASE = (a, b) -> a.getName().compareToIgnoreCase(b.getName());
+    public final static Comparator<MCRFilesystemNode> SORT_BY_NAME_IGNORECASE = (a, b) -> a.getName()
+        .compareToIgnoreCase(b.getName());
 
     /** Sorts children by filename, case sensitive * */
     public final static Comparator<MCRFilesystemNode> SORT_BY_NAME = (a, b) -> a.getName().compareTo(b.getName());
@@ -458,7 +459,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     public final static Comparator<MCRFilesystemNode> SORT_BY_SIZE = (a, b) -> (int) (a.getSize() - b.getSize());
 
     /** Sorts children by date of last modification * */
-    public final static Comparator<MCRFilesystemNode> SORT_BY_DATE = (a, b) -> a.getLastModified().getTime().compareTo(b.getLastModified().getTime());
+    public final static Comparator<MCRFilesystemNode> SORT_BY_DATE = (a, b) -> a.getLastModified().getTime()
+        .compareTo(b.getLastModified().getTime());
 
     /**
      * Creates a list of all MD5 checksums of all files that are direct or

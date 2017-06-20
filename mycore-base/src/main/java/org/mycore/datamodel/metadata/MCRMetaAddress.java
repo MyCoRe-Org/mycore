@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -87,8 +86,10 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaAddress(final String set_subtag, final String default_lang, final String set_type, final int set_inherted, final String set_country,
-        final String set_state, final String set_zipcode, final String set_city, final String set_street, final String set_number) throws MCRException {
+    public MCRMetaAddress(final String set_subtag, final String default_lang, final String set_type,
+        final int set_inherted, final String set_country,
+        final String set_state, final String set_zipcode, final String set_city, final String set_street,
+        final String set_number) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
         country = set_country;
         state = set_state;
@@ -103,7 +104,8 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     @Override
     public MCRMetaAddress clone() {
-        return new MCRMetaAddress(subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipCode, city, street, number);
+        return new MCRMetaAddress(subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipCode, city, street,
+            number);
     }
 
     /**
@@ -184,7 +186,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     @Override
     public final void debug() {
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Country            = " + country);
             LOGGER.debug("State              = " + state);
@@ -251,7 +253,8 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if (getCountry() == null && getState() == null && getZipCode() == null && getCity() == null && getStreet() == null && getNumber() == null) {
+        if (getCountry() == null && getState() == null && getZipCode() == null && getCity() == null
+            && getStreet() == null && getNumber() == null) {
             throw new MCRException(getSubTag() + ": address is empty");
         }
     }

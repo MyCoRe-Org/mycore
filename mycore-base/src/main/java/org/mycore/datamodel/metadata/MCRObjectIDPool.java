@@ -51,8 +51,8 @@ class MCRObjectIDPool {
             return objectIDCache.getUnchecked(id);
         } catch (UncheckedExecutionException e) {
             Throwable cause = e.getCause();
-            if(cause instanceof MCRException) {
-                throw (MCRException)cause;
+            if (cause instanceof MCRException) {
+                throw (MCRException) cause;
             }
             throw e;
         }
@@ -68,8 +68,8 @@ class MCRObjectIDPool {
             .filter(e -> e.getValue() != null)
             .count();
     }
-    
-    static MCRObjectID getIfPresent(String id){
+
+    static MCRObjectID getIfPresent(String id) {
         return objectIDCache.getIfPresent(id);
     }
 
