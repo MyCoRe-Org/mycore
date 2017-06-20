@@ -1,5 +1,7 @@
 package org.mycore.viewer.resources;
 
+import static org.mycore.common.xml.MCRLayoutService.getContentTransformer;
+
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
@@ -35,8 +37,6 @@ import org.mycore.viewer.configuration.MCRViewerConfiguration;
 import org.mycore.viewer.configuration.MCRViewerConfigurationStrategy;
 import org.mycore.viewer.configuration.MCRViewerDefaultConfigurationStrategy;
 import org.xml.sax.SAXException;
-
-import static org.mycore.common.xml.MCRLayoutService.getContentTransformer;
 
 /**
  * Base resource for the mycore image viewer.

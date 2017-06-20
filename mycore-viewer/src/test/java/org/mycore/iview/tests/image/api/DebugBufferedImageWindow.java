@@ -1,8 +1,9 @@
 package org.mycore.iview.tests.image.api;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+
+import javax.swing.JFrame;
 
 public class DebugBufferedImageWindow extends JFrame {
 

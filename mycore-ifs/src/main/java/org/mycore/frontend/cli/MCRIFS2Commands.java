@@ -64,9 +64,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
-import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
 
 @MCRCommandGroup(name = "IFS2 Maintenance Commands")
 public class MCRIFS2Commands {

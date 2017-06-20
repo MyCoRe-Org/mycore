@@ -1,13 +1,13 @@
 package org.mycore.pi;
 
+import static org.mycore.pi.MCRPIRegistrationService.GENERATOR_CONFIG_PREFIX;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import static org.mycore.pi.MCRPIRegistrationService.GENERATOR_CONFIG_PREFIX;
 
 public abstract class MCRPersistentIdentifierGenerator<T extends MCRPersistentIdentifier> {
 

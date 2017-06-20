@@ -1,14 +1,14 @@
 package org.mycore.pi.doi;
 
+import static org.junit.Assert.assertEquals;
+import static org.mycore.pi.doi.MCRDigitalObjectIdentifier.TEST_DOI_PREFIX;
+
 import java.util.Map;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import static org.junit.Assert.assertEquals;
-import static org.mycore.pi.doi.MCRDigitalObjectIdentifier.TEST_DOI_PREFIX;
 
 /**
  * @author Thomas Scheffler (yagee)

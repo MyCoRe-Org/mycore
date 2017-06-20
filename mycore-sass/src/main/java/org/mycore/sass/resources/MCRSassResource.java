@@ -42,8 +42,6 @@
 
 package org.mycore.sass.resources;
 
-import io.bit3.jsass.CompilationException;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -66,6 +64,8 @@ import javax.ws.rs.core.StreamingOutput;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.sass.MCRSassCompilerManager;
 import org.mycore.sass.MCRServletContextResourceImporter;
+
+import io.bit3.jsass.CompilationException;
 
 @Path("/sass/")
 @MCRStaticContent

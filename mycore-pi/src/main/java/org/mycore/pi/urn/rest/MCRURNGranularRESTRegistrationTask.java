@@ -1,18 +1,19 @@
 package org.mycore.pi.urn.rest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.pi.MCRPersistentIdentifierManager;
-import org.mycore.pi.urn.MCRDNBURN;
-
-import javax.persistence.EntityTransaction;
-import javax.persistence.RollbackException;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.TimerTask;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.urn.MCRDNBURN;
 
 /**
  * Created by chi on 26.01.17.

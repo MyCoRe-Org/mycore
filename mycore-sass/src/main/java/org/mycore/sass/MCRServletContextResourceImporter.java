@@ -42,9 +42,6 @@
 
 package org.mycore.sass;
 
-import io.bit3.jsass.importer.Import;
-import io.bit3.jsass.importer.Importer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -65,6 +62,9 @@ import javax.servlet.ServletContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.util.IOUtils;
+
+import io.bit3.jsass.importer.Import;
+import io.bit3.jsass.importer.Importer;
 
 /**
  * Imports scss files using {@link ServletContext}.

@@ -1,12 +1,6 @@
 package org.mycore.pi.urn.rest;
 
-import org.apache.http.Header;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.pi.MCRPIRegistrationInfo;
+import static org.apache.http.entity.ContentType.APPLICATION_XML;
 
 import java.net.URL;
 import java.time.Instant;
@@ -15,7 +9,13 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.apache.http.entity.ContentType.APPLICATION_XML;
+import org.apache.http.Header;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.pi.MCRPIRegistrationInfo;
 
 /**
  * Created by chi on 25.01.17.

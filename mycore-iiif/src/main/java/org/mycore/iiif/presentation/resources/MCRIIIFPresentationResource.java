@@ -21,6 +21,8 @@
 
 package org.mycore.iiif.presentation.resources;
 
+import static org.mycore.iiif.presentation.MCRIIIFPresentationUtil.correctIDs;
+
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -40,8 +42,6 @@ import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import static org.mycore.iiif.presentation.MCRIIIFPresentationUtil.correctIDs;
 
 @Path("/iiif/presentation/{impl}")
 public class MCRIIIFPresentationResource {
