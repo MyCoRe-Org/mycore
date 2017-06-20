@@ -18,7 +18,6 @@
     <module name="NeedBraces"/>
     <module name="EmptyBlock"/>
     <module name="RedundantImport"/>
-    <module name="MagicNumber"/>
     <module name="RedundantModifier"/>
     <module name="ArrayTrailingComma"/>
 
