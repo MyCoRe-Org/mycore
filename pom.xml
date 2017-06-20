@@ -33,9 +33,9 @@
     <tag>2017.06.0.x</tag>
   </scm>
   <properties>
-    <changelog.since>2017-05-30</changelog.since>
+    <changelog.since>2017-06-20</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2017.06.0</changes.version>
+    <changes.version>2017.06.0.1</changes.version>
     <frontend.maven.plugin.version>1.4</frontend.maven.plugin.version>
     <guice.version>4.1.0</guice.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
