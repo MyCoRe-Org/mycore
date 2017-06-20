@@ -4,7 +4,7 @@ dist: trusty
 group: beta
 install: true
 addons:
-  firefox: "52.0.2"
+  firefox: "54.0"
   apt:
     packages:
     - google-chrome-stable
@@ -15,10 +15,11 @@ cache:
 env:
   global:
     - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
-    - GECKODRIVER_VERSION="0.12.0"
+    - GECKODRIVER_VERSION="0.17.0"
     - CHROMEDRIVER_VERSION=$(curl http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
     - XVFBARGS=":99 -ac -screen 0 1280x1024x24 -ac +extension GLX +extension RANDR +render -noreset"
     - FIREFOX_BIN=$(which firefox)
+    - SELENIUM_BROWSER=firefox
 before_install:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- $XVFBARGS"
 
@@ -45,6 +46,6 @@ before_script:
 script:
   - mkdir ${HOME}/tmp
   - export TMPDIR="${HOME}/tmp"
-  - mvn -B -Plocal-testing,!standard-with-extra-repos clean install -DDriverProvider=org.mycore.common.selenium.drivers.MCRChromeDriverFactory && mvn -P!standard-with-extra-repos -B javadoc:javadoc && mvn -P!standard-with-extra-repos com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
+  - mvn -B -Plocal-testing,!standard-with-extra-repos clean install && mvn -P!standard-with-extra-repos -B javadoc:javadoc && mvn -P!standard-with-extra-repos com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
 after_failure:
   - sh travis/autodeploy.sh "$TRAVIS_BUILD_NUMBER-$TRAVIS_EVENT_TYPE-$TRAVIS_PULL_REQUEST" "https://MyCoRe-Travis:$GITHUB_TOKEN@github.com/MyCoRe-Travis/test_artifacts.git"
