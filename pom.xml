@@ -2128,7 +2128,6 @@
     <module>mycore-webtools</module>
     <module>mycore-wfc</module>
     <module>mycore-xeditor</module>
-    <module>mycore-complete</module>
     <module>mycore-coma</module>
   </modules>
 </project>
