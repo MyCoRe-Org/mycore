@@ -232,7 +232,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         america.getLabels().add(new MCRLabel("en", "America", null));
         DAO.addCategory(category.getId(), america, 1);
         startNewTransaction();
-        america = MCRCategoryDAOImpl.getByNaturalID(entityManager, america.getId());
+        america = MCRCategoryDAOImpl.getByNaturalID(entityManager.get(), america.getId());
         assertNotNull(categoryID + " was not added to database.", america);
         assertEquals("invalid position in parent", 1, america.getPositionInParent());
     }
