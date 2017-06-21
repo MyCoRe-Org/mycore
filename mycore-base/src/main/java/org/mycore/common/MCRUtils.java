@@ -23,12 +23,7 @@
 
 package org.mycore.common;
 
-import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
-
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -51,15 +46,10 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.bind.DatatypeConverter;
@@ -71,18 +61,10 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
-import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.niofs.MCRPathUtils;
-import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -99,213 +81,8 @@ public class MCRUtils {
     // The file slash
     private static String SLASH = System.getProperty("file.separator");
 
-    @Deprecated
-    public final static char COMMAND_OR = 'O';
-
-    @Deprecated
-    public final static char COMMAND_AND = 'A';
-
-    @Deprecated
-    public final static char COMMAND_XOR = 'X';
-
     // public constant data
     private static final Logger LOGGER = LogManager.getLogger();
-
-    /**
-     * This methode replace any characters to XML entity references.
-     * <p>
-     * <ul>
-     * <li>&lt; to &amp;lt;
-     * <li>&gt; to &amp;gt;
-     * <li>&amp; to &amp;amp;
-     * <li>&quot; to &amp;quot;
-     * <li>' to &amp;apos;
-     * </ul>
-     * 
-     * @param in
-     *            a string
-     * @return the converted string.
-     * @deprecated as it is not used anymore
-     */
-    @Deprecated
-    public static String stringToXML(String in) {
-        if (in == null) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder(2048);
-
-        for (int i = 0; i < in.length(); i++) {
-            if (in.charAt(i) == '<') {
-                sb.append("&lt;");
-
-                continue;
-            }
-
-            if (in.charAt(i) == '>') {
-                sb.append("&gt;");
-
-                continue;
-            }
-
-            if (in.charAt(i) == '&') {
-                sb.append("&amp;");
-
-                continue;
-            }
-
-            if (in.charAt(i) == '\"') {
-                sb.append("&quot;");
-
-                continue;
-            }
-
-            if (in.charAt(i) == '\'') {
-                sb.append("&apos;");
-
-                continue;
-            }
-
-            sb.append(in.charAt(i));
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * This method convert a JDOM tree to a byte array.
-     * 
-     * @param jdom
-     *            the JDOM tree format the JDOM output format
-     * @return a byte array of the JDOM tree
-     * @deprecated use {@link MCRJDOMContent#asByteArray()}
-     */
-    @Deprecated
-    public static byte[] getByteArray(org.jdom2.Document jdom, Format format) throws MCRPersistenceException {
-        MCRConfiguration conf = MCRConfiguration.instance();
-        String mcr_encoding = conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
-        ByteArrayOutputStream outb = new ByteArrayOutputStream();
-
-        try {
-            XMLOutputter outp = new XMLOutputter(format.setEncoding(mcr_encoding));
-            outp.output(jdom, outb);
-        } catch (Exception e) {
-            throw new MCRPersistenceException("Can't produce byte array.");
-        }
-
-        return outb.toByteArray();
-    }
-
-    /**
-     * This method convert a JDOM tree to a byte array.
-     * 
-     * @param jdom
-     *            the JDOM tree
-     * @return a byte array of the JDOM tree
-     * @deprecated uses {@link MCRJDOMContent#asByteArray()}
-     */
-    @Deprecated
-    public static byte[] getByteArray(org.jdom2.Document jdom) throws MCRPersistenceException {
-        return getByteArray(jdom, Format.getRawFormat());
-    }
-
-    /**
-     * Converts an Array of Objects to an Array of Strings using the toString() method.
-     * 
-     * @param objects
-     *            Array of Objects to be converted
-     * @return Array of Strings representing Objects
-     * @deprecated use {@link Stream}s to convert arrays
-     */
-    @Deprecated
-    public static String[] getStringArray(Object[] objects) {
-        String[] returns = new String[objects.length];
-
-        for (int i = 0; i < objects.length; i++) {
-            returns[i] = objects[i].toString();
-        }
-
-        return returns;
-    }
-
-    /**
-     * Converts an Array of Objects to an Array of Strings using the toString() method.
-     * 
-     * @param objects
-     *            Array of Objects to be converted
-     * @param maxitems
-     *            The maximum of items to convert
-     * @return Array of Strings representing Objects
-     * @deprecated use {@link Stream}s to convert arrays
-     */
-    public static String[] getStringArray(Object[] objects, int maxitems) {
-        String[] returns = new String[maxitems];
-
-        for (int i = 0; i < maxitems; i++) {
-            returns[i] = objects[i].toString();
-        }
-
-        return returns;
-    }
-
-    /**
-     * merges to HashSets of MyCoreIDs after specific rules
-     * 
-     * @see #COMMAND_OR
-     * @see #COMMAND_AND
-     * @see #COMMAND_XOR
-     * @param set1
-     *            1st HashSet to be merged
-     * @param set2
-     *            2nd HashSet to be merged
-     * @param operation
-     *            available COMMAND_XYZ
-     * @return merged HashSet
-     * @deprecated use {@link Stream}s for this
-     */
-    @Deprecated
-    public static <T> HashSet<T> mergeHashSets(HashSet<? extends T> set1, HashSet<? extends T> set2, char operation) {
-        Predicate<T> inSet1 = set1::contains;
-        Predicate<T> inSet2 = set2::contains;
-        Predicate<T> op;
-
-        switch (operation) {
-            case COMMAND_OR:
-                op = t -> true;//inSet1.or(inSet2);
-                break;
-
-            case COMMAND_AND:
-                op = inSet1.and(inSet2);
-                break;
-
-            case COMMAND_XOR:
-                op = inSet1.and(inSet2).negate();
-                break;
-
-            default:
-                throw new IllegalArgumentException("operation not permited: " + operation);
-        }
-
-        return Stream
-            .concat(set1.stream(), set2.stream())
-            .filter(op)
-            .collect(Collectors.toCollection(HashSet::new));
-    }
-
-    /**
-     * The method cut an ArrayList for a maximum of items.
-     * 
-     * @param arrayin
-     *            The incoming ArrayList
-     * @param maxitems
-     *            The maximum number of items
-     * @return the cutted ArrayList
-     * @deprecated use {@link List#subList(int, int)} instead
-     */
-    @Deprecated
-    public static <T> ArrayList<T> cutArrayList(ArrayList<T> arrayin, int maxitems) {
-        return new ArrayList<>(arrayin.subList(0, Math.max(0, maxitems)));
-    }
 
     /**
      * Reads exactly <code>len</code> bytes from the input stream into the byte array. This method reads repeatedly from
@@ -376,37 +153,6 @@ public class MCRUtils {
     } // end readBlocking
 
     /**
-     * <p>
-     * Returns String in with newStr substituted for find String.
-     * 
-     * @param in
-     *            String to edit
-     * @param find
-     *            string to match
-     * @param newStr
-     *            string to substitude for find
-     * @deprecated use {@link MCRXMLFunctions#regexp(String, String, String)}
-     */
-    @Deprecated
-    public static String replaceString(String in, String find, String newStr) {
-        return in.replace(find, newStr);
-    }
-
-    /**
-     * The method wrap the org.jdom2.Element in a org.jdom2.Document and write it to a file.
-     * 
-     * @param elm
-     *            the JDOM Document
-     * @param xml
-     *            the File instance
-     * @deprecated use {@link MCRJDOMContent#sendTo(Path, java.nio.file.CopyOption...)}
-     */
-    @Deprecated
-    public static void writeElementToFile(Element elm, File xml) {
-        writeJDOMToFile(new Document().addContent(elm), xml);
-    }
-
-    /**
      * Writes plain text to a file.
      * 
      * @param textToWrite
@@ -419,66 +165,6 @@ public class MCRUtils {
         Path file = Paths.get(fileName);
         Files.write(file, Arrays.asList(textToWrite), cs, StandardOpenOption.CREATE);
         return file;
-    }
-
-    /**
-     * The method write a given JDOM Document to a file.
-     * 
-     * @param jdom
-     *            the JDOM Document
-     * @param xml
-     *            the File instance
-     * @deprecated use {@link MCRJDOMContent#sendTo(Path, java.nio.file.CopyOption...)}
-     */
-    @Deprecated
-    public static void writeJDOMToFile(Document jdom, File xml) {
-        try {
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(xml));
-            xout.output(jdom, out);
-            out.close();
-        } catch (IOException ioe) {
-            if (LOGGER.isDebugEnabled()) {
-                ioe.printStackTrace();
-            } else {
-                LOGGER.error("Can't write org.jdom2.Document to file " + xml.getName() + ".");
-            }
-        }
-    }
-
-    /**
-     * The method wrap the org.jdom2.Element in a org.jdom2.Document and write it to Sysout.
-     * 
-     * @param elm
-     *            the JDOM Document
-     * @deprecated use {@link MCRJDOMContent#sendTo(java.io.OutputStream)}
-     */
-    @Deprecated
-    public static void writeElementToSysout(Element elm) {
-        writeJDOMToSysout(new Document().addContent(elm));
-    }
-
-    /**
-     * The method write a given JDOM Document to the system output.
-     * 
-     * @param jdom
-     *            the JDOM Document
-     * @deprecated use {@link MCRJDOMContent#sendTo(java.io.OutputStream)}
-     */
-    @Deprecated
-    public static void writeJDOMToSysout(Document jdom) {
-        try {
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            BufferedOutputStream out = new BufferedOutputStream(System.out);
-            xout.output(jdom, out);
-            out.flush();
-        } catch (IOException ioe) {
-            if (LOGGER.isDebugEnabled()) {
-                ioe.printStackTrace();
-            } else {
-                LOGGER.error("Can't write org.jdom2.Document to Sysout.");
-            }
-        }
     }
 
     /**
@@ -575,46 +261,6 @@ public class MCRUtils {
         return out;
     }
 
-    /**
-     * This method deletes a directory and all its content.
-     * 
-     * @param dir
-     *            the File instance of the directory to delete
-     * @return true if the directory was deleted successfully, otherwise false
-     * @deprecated use {@link MCRRecursiveDeleter} instead
-     */
-    public static boolean deleteDirectory(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-            for (String element : children) {
-                boolean success = deleteDirectory(new File(dir, element));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-        // The directory is now empty so delete it
-        return dir.delete();
-    }
-
-    /**
-     * @deprecated use {@link Stream#collect(java.util.stream.Collector)} instead
-     */
-    @Deprecated
-    public static String arrayToString(Object[] objArray, String seperator) {
-        StringBuilder buf = new StringBuilder();
-
-        for (Object element : objArray) {
-            buf.append(element).append(seperator);
-        }
-
-        if (objArray.length > 0) {
-            buf.setLength(buf.length() - seperator.length());
-        }
-
-        return buf.toString();
-    }
-
     public static String parseDocumentType(InputStream in) {
         SAXParser parser = null;
 
@@ -654,28 +300,6 @@ public class MCRUtils {
         }
         return docType;
 
-    }
-
-    /**
-     * Transforms the given {@link Document} into a String
-     * 
-     * @return the xml document as {@link String} or null if an {@link Exception} occurs
-     * @deprecated use {@link XMLOutputter} directly
-     */
-    @Deprecated
-    public static String asString(Document doc) {
-        return new XMLOutputter(Format.getPrettyFormat()).outputString(doc);
-    }
-
-    /**
-     * Transforms the given Element into a String
-     * 
-     * @return the xml element as {@link String}
-     * @deprecated use {@link XMLOutputter} directly
-     */
-    @Deprecated
-    public static String asString(Element elm) {
-        return new XMLOutputter(Format.getPrettyFormat()).outputString(elm);
     }
 
     public static String asSHA1String(int iterations, byte[] salt, String text) throws NoSuchAlgorithmException {
@@ -722,22 +346,6 @@ public class MCRUtils {
     }
 
     /**
-     * @deprecated use {@link Base64} instead
-     */
-    @Deprecated
-    public static String toBase64String(byte[] data) {
-        return Base64.getEncoder().encodeToString(data);
-    }
-
-    /**
-     * @deprecated use {@link Base64} instead
-     */
-    @Deprecated
-    public static byte[] fromBase64String(String base64) {
-        return Base64.getDecoder().decode(base64);
-    }
-
-    /**
      * Calculates md5 sum of InputStream. InputStream is consumed after calling this method and automatically closed.
      */
     public static String getMD5Sum(InputStream inputStream) throws IOException {
@@ -751,14 +359,6 @@ public class MCRUtils {
                 md5InputStream.close();
             }
         }
-    }
-
-    /**
-     * @deprecated use {@link #untar(Path, Path)} instead
-     */
-    @Deprecated
-    public static void untar(File source, File expandToDirectory) throws IOException {
-        untar(source.toPath(), expandToDirectory.toPath());
     }
 
     /**

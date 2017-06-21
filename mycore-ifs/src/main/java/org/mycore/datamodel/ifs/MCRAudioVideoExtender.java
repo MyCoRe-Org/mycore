@@ -91,7 +91,7 @@ public abstract class MCRAudioVideoExtender {
     protected String baseMetadata = "";
 
     /** The asset file this extender belongs to */
-    protected MCRFileReader file;
+    protected MCRFile file;
 
     /**
      * Creates a new MCRAudioVideoExtender. The instance has to be initialized
@@ -108,7 +108,7 @@ public abstract class MCRAudioVideoExtender {
      * @param file
      *            the MCRFile that this extender belongs to
      */
-    public void init(MCRFileReader file) throws MCRException {
+    public void init(MCRFile file) throws MCRException {
         this.file = file;
     }
 

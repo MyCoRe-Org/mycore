@@ -49,9 +49,6 @@ import org.mycore.user2.utils.MCRUserTransformer;
 public class MCRUserManagerTest extends MCRUserTestCase {
     MCRUser user;
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRHibTestCase#setUp()
-     */
     @Before
     public void setUp() throws Exception {
         super.setUp();

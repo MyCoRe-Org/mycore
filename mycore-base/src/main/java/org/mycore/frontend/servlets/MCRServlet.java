@@ -34,10 +34,8 @@ import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -51,19 +49,13 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.DocType;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xsl.MCRErrorListener;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
@@ -478,63 +470,6 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * @deprecated use {@link HttpServletResponse#sendError(int, String)} instead or throw Exception
-     */
-    @Deprecated()
-    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg,
-        Exception ex, boolean xmlstyle) throws IOException, TransformerException, SAXException {
-        LOGGER.error(getClass().getName() + ": Error " + error + " occured. The following message was given: " + msg,
-            ex);
-
-        String rootname = "mcr_error";
-        String style = getProperty(request, "XSL.Style");
-        if (style == null || !style.equals("xml")) {
-            style = "default";
-        }
-        Element root = new Element(rootname);
-        root.setAttribute("HttpError", Integer.toString(error)).setText(msg);
-
-        Document errorDoc = new Document(root, new DocType(rootname));
-
-        while (ex != null) {
-            Element exception = new Element("exception");
-            exception.setAttribute("type", ex.getClass().getName());
-            Element trace = new Element("trace");
-            Element message = new Element("message");
-            trace.setText(MCRException.getStackTraceAsString(ex));
-            message.setText(ex.getMessage());
-            exception.addContent(message).addContent(trace);
-            root.addContent(exception);
-
-            if (ex instanceof MCRException) {
-                if (ex.getCause() instanceof Exception) {
-                    ex = (Exception) ex.getCause();
-                }
-            } else {
-                ex = null;
-            }
-        }
-
-        request.setAttribute("XSL.Style", style);
-
-        final String requestAttr = "MCRServlet.generateErrorPage";
-        if (!response.isCommitted() && request.getAttribute(requestAttr) == null) {
-            response.setStatus(error);
-            request.setAttribute(requestAttr, msg);
-            LAYOUT_SERVICE.doLayout(request, response, new MCRJDOMContent(errorDoc));
-            return;
-        } else {
-            if (request.getAttribute(requestAttr) != null) {
-                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"
-                    + request.getAttribute(requestAttr));
-            } else {
-                LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n"
-                    + msg);
-            }
-        }
-    }
-
-    /**
      * This method builds a URL that can be used to redirect the client browser to another page, thereby including http
      * request parameters. The request parameters will be encoded as http get request.
      * 
@@ -566,22 +501,6 @@ public class MCRServlet extends HttpServlet {
         }
         LOGGER.debug("Sending redirect to " + redirectURL.toString());
         return redirectURL.toString();
-    }
-
-    protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg,
-        MCRActiveLinkException activeLinks) throws IOException, TransformerException, SAXException {
-        StringBuilder msgBuf = new StringBuilder(msg);
-        msgBuf
-            .append(
-                "\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
-        Map<String, Collection<String>> links = activeLinks.getActiveLinks();
-        for (Map.Entry<String, Collection<String>> entry : links.entrySet()) {
-            for (String source : entry.getValue()) {
-                msgBuf.append('\n').append(source).append("==>").append(entry.getKey());
-            }
-        }
-        generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msgBuf.toString(),
-            activeLinks, false);
     }
 
     /**

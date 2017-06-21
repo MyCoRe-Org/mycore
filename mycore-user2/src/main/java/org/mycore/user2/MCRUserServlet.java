@@ -210,28 +210,6 @@ public class MCRUserServlet extends MCRServlet {
         return !MCRUserManager.exists(userName, realmID);
     }
 
-    /**
-     * Invoked by editor form user-editor.xml to check for a valid
-     * login user name and realm combination.
-     */
-    @Deprecated
-    public static boolean checkUserName(Element u) {
-        String userName = u.getAttributeValue("name");
-
-        String realmID = MCRRealmFactory.getLocalRealm().getID();
-        if (u.getChild("realm") != null) {
-            realmID = u.getChild("realm").getAttributeValue("id");
-        }
-
-        // Check for required fields is done in the editor form itself, not here
-        if ((userName == null) || (realmID == null)) {
-            return true;
-        }
-
-        // In all other cases, combination of userName and realm must not exist
-        return !MCRUserManager.exists(userName, realmID);
-    }
-
     private void saveCurrentUser(HttpServletRequest req, HttpServletResponse res) throws IOException {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         if (!checkUserIsNotNull(res, currentUser, null)) {

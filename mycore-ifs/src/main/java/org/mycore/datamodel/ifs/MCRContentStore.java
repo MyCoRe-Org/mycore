@@ -98,7 +98,7 @@ public abstract class MCRContentStore {
      *            the ContentInputStream where the file content is read from
      * @return an ID that indentifies the place where the content was stored
      */
-    public String storeContent(MCRFileReader file, MCRContentInputStream source) throws MCRPersistenceException {
+    public String storeContent(MCRFile file, MCRContentInputStream source) throws MCRPersistenceException {
         try {
             return doStoreContent(file, source);
         } catch (Exception exc) {
@@ -116,7 +116,7 @@ public abstract class MCRContentStore {
     /**
      * checks md5 sum
      */
-    public boolean isValid(MCRFileReader file) throws IOException {
+    public boolean isValid(MCRFile file) throws IOException {
         if (!exists(file)) {
             return false;
         }
@@ -127,7 +127,7 @@ public abstract class MCRContentStore {
     /**
      * Checks if the content of the file is accessible.
      */
-    protected abstract boolean exists(MCRFileReader file);
+    protected abstract boolean exists(MCRFile file);
 
     /**
      * Stores the content of an MCRFile by reading from an
@@ -140,7 +140,7 @@ public abstract class MCRContentStore {
      *            the ContentInputStream where the file content is read from
      * @return an ID that indentifies the place where the content was stored
      */
-    protected abstract String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception;
+    protected abstract String doStoreContent(MCRFile file, MCRContentInputStream source) throws Exception;
 
     /**
      * Deletes the content of an MCRFile object that is stored under the given
@@ -182,7 +182,7 @@ public abstract class MCRContentStore {
      *            the MCRFile thats content should be retrieved
      * @since 2.2
      */
-    protected abstract MCRContent doRetrieveMCRContent(MCRFileReader file) throws IOException;
+    protected abstract MCRContent doRetrieveMCRContent(MCRFile file) throws IOException;
 
     /**
      * Retrieves the content of an MCRFile as an InputStream.
@@ -190,7 +190,7 @@ public abstract class MCRContentStore {
      * @param file
      *            the MCRFile thats content should be retrieved
      */
-    public InputStream retrieveContent(MCRFileReader file) throws MCRException {
+    public InputStream retrieveContent(MCRFile file) throws MCRException {
         try {
             return doRetrieveMCRContent(file).getInputStream();
         } catch (Exception exc) {
@@ -208,7 +208,7 @@ public abstract class MCRContentStore {
     /**
      * Returns the local java.io.File that really stores the content of the MCRFile 
      */
-    public File getLocalFile(MCRFileReader reader) throws IOException {
+    public File getLocalFile(MCRFile reader) throws IOException {
         return getLocalFile(reader.getStorageID());
     }
 
@@ -230,7 +230,7 @@ public abstract class MCRContentStore {
     /**
      * Constructs a new unique ID for storing content
      */
-    protected static synchronized String buildNextID(MCRFileReader file) {
+    protected static synchronized String buildNextID(MCRFile file) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(buildNextTimestamp());

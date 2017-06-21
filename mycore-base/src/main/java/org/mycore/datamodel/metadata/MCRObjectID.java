@@ -163,17 +163,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     }
 
     /**
-     * Returns the next free MCRObjectID based on the given type string.
-     * If you use this method <code>MCR.SWF.Project.ID</code> or <code>MCR.SWF.Project.ID.$type</code> must be set.
-     * @see MCRObjectID#getNextFreeId(String)
-     * @deprecated use {@link org.mycore.datamodel.metadata.MCRObjectID#getNextFreeId(java.lang.String, java.lang.String)} instead
-     */
-    public static synchronized MCRObjectID getNextFreeIdByType(String type) {
-        String prefix = CONFIG.getString("MCR.SWF.Project.ID." + type, CONFIG.getString("MCR.SWF.Project.ID"));
-        return MCRObjectID.getNextFreeId(prefix + "_" + type);
-    }
-
-    /**
      * Returns a MCRObjectID from a given base ID string. Same as
      * {@link #getNextFreeId(String)} but the additional parameter acts as a
      * lower limit for integer part of the ID.

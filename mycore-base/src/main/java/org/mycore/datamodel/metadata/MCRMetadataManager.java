@@ -687,18 +687,6 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * @deprecated use {@link #retrieveMCRObject(MCRObjectID)} with {@link MCRObjectID#getInstance(String)} instead.
-     * @return a {@link MCRObject} if there is an object with the id given or <code>null</code> otherwise
-     */
-    @Deprecated
-    public static MCRObject retrieveMCRObject(final String id) throws MCRPersistenceException {
-        if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
-            return null;
-        }
-        return retrieveMCRObject(MCRObjectID.getInstance(id));
-    }
-
-    /**
      * Retrieves instance of {@link MCRObject} or {@link MCRDerivate} depending on {@link MCRObjectID#getTypeId()}
      * 
      * @param id

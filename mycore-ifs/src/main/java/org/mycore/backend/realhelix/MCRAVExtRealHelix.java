@@ -36,7 +36,6 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileReader;
 
 /**
  * This class implements the AudioVideoExtender functions for Real Server 8 and
@@ -65,7 +64,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
     }
 
     @Override
-    public void init(MCRFileReader file) throws MCRPersistenceException {
+    public void init(MCRFile file) throws MCRPersistenceException {
         super.init(file);
 
         MCRConfiguration config = MCRConfiguration.instance();

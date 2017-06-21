@@ -23,7 +23,6 @@
 package org.mycore.common.fo;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -61,7 +60,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.xml.sax.SAXException;
@@ -152,12 +150,6 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         transformerFactory.setURIResolver(MCRURIResolver.instance());
         transformerFactory.setErrorListener(MCRErrorListener.getInstance());
         return transformerFactory;
-    }
-
-    @Override
-    @Deprecated
-    public final void transform(InputStream in_stream, OutputStream out) throws TransformerException, IOException {
-        transform(new MCRStreamContent(in_stream), out);
     }
 
     @Override

@@ -52,11 +52,6 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
 
     private static MCRJPAAccessStore ACCESS_STORE;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mycore.common.MCRHibTestCase#setUp()
-     */
     @Override
     @Before
     public void setUp() throws Exception {

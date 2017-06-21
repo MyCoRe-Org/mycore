@@ -33,8 +33,6 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.mycore.datamodel.ifs.MCRFileReader;
-import org.mycore.datamodel.ifs.MCROldFile;
 
 /**
  * Get informations about an PostScript file and implements thumbnail support. 
@@ -104,25 +102,7 @@ public class MCRMediaPDFParser extends MCRMediaParser {
      * 
      * @return boolean if true
      */
-    public boolean isFileSupported(MCROldFile file) {
-        return isFileSupported(toFile(file));
-    }
-
-    /**
-     * Checks if given file is supported.
-     * 
-     * @return boolean if true
-     */
     public boolean isFileSupported(org.mycore.datamodel.ifs.MCRFile file) {
-        return isFileSupported(toFile(file));
-    }
-
-    /**
-     * Checks if given file is supported.
-     * 
-     * @return boolean if true
-     */
-    public boolean isFileSupported(MCRFileReader file) {
         return isFileSupported(toFile(file));
     }
 
@@ -178,15 +158,7 @@ public class MCRMediaPDFParser extends MCRMediaParser {
         return media;
     }
 
-    public synchronized MCRMediaObject parse(MCROldFile file) throws Exception {
-        return parse(toFile(file));
-    }
-
     public synchronized MCRMediaObject parse(org.mycore.datamodel.ifs.MCRFile file) throws Exception {
-        return parse(toFile(file));
-    }
-
-    public synchronized MCRMediaObject parse(MCRFileReader file) throws Exception {
         return parse(toFile(file));
     }
 }

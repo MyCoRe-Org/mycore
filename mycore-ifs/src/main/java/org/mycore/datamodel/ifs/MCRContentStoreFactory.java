@@ -220,7 +220,7 @@ public class MCRContentStoreFactory {
      *             if the MCRAudioVideoExtender implementation class could not
      *             be loaded
      */
-    static MCRAudioVideoExtender buildExtender(MCRFileReader file) {
+    static MCRAudioVideoExtender buildExtender(MCRFile file) {
         if (file == null || !providesAudioVideoExtender(file.getStoreID())) {
             return null;
         }
