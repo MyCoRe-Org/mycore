@@ -34,12 +34,8 @@ import java.util.stream.StreamSupport;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Attribute;
 import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRObjectMerger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -163,85 +159,6 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                 }
             } else {
                 meta_list.add(newelm);
-            }
-        }
-    }
-
-    /**
-     * This method adds MCRMetaElement's from a given MCRObjectMetadata to
-     * this data set if there are any differences between the data sets.
-     * 
-     * @param input
-     *            the MCRObjectMetadata, that should merged into this data set
-     *            
-     * @deprecated use {@link MCRObjectMerger#mergeMetadata(MCRObject, boolean)} instead
-     */
-    public final void mergeMetadata(MCRObjectMetadata input) {
-
-        for (MCRMetaElement metaElement : input) {
-            int pos = -1;
-            for (int j = 0; j < size(); j++) {
-                if (meta_list.get(j)
-                    .getTag()
-                    .equals(metaElement.getTag())) {
-                    pos = j;
-                }
-            }
-            if (pos != -1) {
-                for (int j = 0; j < metaElement.size(); j++) {
-                    boolean found = false;
-                    for (MCRMetaInterface mcrMetaInterface : meta_list.get(pos)) {
-                        Element xml = mcrMetaInterface.createXML();
-                        Element xmlNEW = metaElement.getElement(j)
-                            .createXML();
-                        List<Element> childrenXML = xml.getChildren();
-                        if (childrenXML.size() > 0 && xmlNEW.getChildren()
-                            .size() > 0) {
-                            int i = 0;
-                            for (Element element : childrenXML) {
-                                Element elementNew = xmlNEW.getChild(element.getName());
-
-                                if (elementNew != null && element != null) {
-                                    if (element.getText()
-                                        .equals(elementNew.getText())) {
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (i == childrenXML.size()) {
-                                found = true;
-                            }
-                        } else {
-                            if (xml.getText()
-                                .equals(xmlNEW.getText())) {
-                                found = true;
-                            } else if (!found) {
-                                int i = 0;
-                                List<Attribute> attributes = xml.getAttributes();
-                                for (Attribute attribute : attributes) {
-                                    Attribute attr = xmlNEW.getAttribute(attribute.getName());
-                                    if ((attr != null) && attr.equals(attribute)) {
-                                        i++;
-                                    }
-                                }
-                                if (i == attributes.size()) {
-                                    found = true;
-                                }
-
-                            }
-                        }
-                    }
-                    MCRMetaInterface obj = metaElement.getElement(j);
-                    if (!found) {
-                        meta_list.get(pos)
-                            .addMetaObject(obj);
-                    } else if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Found equal tags: \n\r"
-                            + new XMLOutputter(Format.getPrettyFormat()).outputString(obj.createXML()));
-                    }
-                }
-            } else {
-                meta_list.add(metaElement);
             }
         }
     }

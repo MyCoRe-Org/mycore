@@ -61,10 +61,6 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRCategLinkServiceImplTest.class);
 
-    /*
-     * (non-Javadoc)
-     * @see org.mycore.common.MCRHibTestCase#setUp()
-     */
     @Override
     @Before
     public void setUp() throws Exception {

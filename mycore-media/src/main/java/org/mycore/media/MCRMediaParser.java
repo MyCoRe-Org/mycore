@@ -31,8 +31,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.ifs.MCRFileReader;
-import org.mycore.datamodel.ifs.MCROldFile;
 
 /**
  * Get technical metadata from supported file. 
@@ -87,25 +85,7 @@ public class MCRMediaParser {
      * 
      * @return boolean if true
      */
-    public boolean isFileSupported(MCROldFile file) {
-        return parsers.stream().anyMatch(parser -> parser.isValid() && parser.isFileSupported(file));
-    }
-
-    /**
-     * Checks if given file is supported.
-     * 
-     * @return boolean if true
-     */
     public boolean isFileSupported(org.mycore.datamodel.ifs.MCRFile file) {
-        return parsers.stream().anyMatch(parser -> parser.isValid() && parser.isFileSupported(file));
-    }
-
-    /**
-     * Checks if given file is supported.
-     * 
-     * @return boolean if true
-     */
-    public boolean isFileSupported(MCRFileReader file) {
         return parsers.stream().anyMatch(parser -> parser.isValid() && parser.isFileSupported(file));
     }
 
@@ -117,31 +97,6 @@ public class MCRMediaParser {
      * @see MCRMediaObject#clone()
      */
     public synchronized MCRMediaObject parse(File file) throws Exception {
-        MCRMediaObject media = null;
-
-        for (MCRMediaParser parser : parsers) {
-            if (parser.isValid() && parser.isFileSupported(file)) {
-                try {
-                    media = parser.parse(file);
-                    if (media != null)
-                        break;
-                } catch (Exception ex) {
-                    LOGGER.warn(ex);
-                }
-            }
-        }
-
-        return media;
-    }
-
-    /**
-     * Parse the given file and store metadata in related Object.
-     * 
-     * @return MCRMediaObject
-     *              can be held any MCRMediaObject
-     * @see MCRMediaObject#clone()
-     */
-    public synchronized MCRMediaObject parse(MCROldFile file) throws Exception {
         MCRMediaObject media = null;
 
         for (MCRMediaParser parser : parsers) {
@@ -184,44 +139,7 @@ public class MCRMediaParser {
         return media;
     }
 
-    /**
-     * Parse the given file and store metadata in related Object.
-     * 
-     * @return MCRMediaObject
-     *              can be held any MCRMediaObject
-     * @see MCRMediaObject#clone()
-     */
-    public synchronized MCRMediaObject parse(MCRFileReader file) throws Exception {
-        MCRMediaObject media = null;
-
-        for (MCRMediaParser parser : parsers) {
-            if (parser.isValid() && parser.isFileSupported(file)) {
-                try {
-                    media = parser.parse(file);
-                    if (media != null)
-                        break;
-                } catch (Exception ex) {
-                    LOGGER.warn(ex);
-                }
-            }
-        }
-
-        return media;
-    }
-
-    protected File toFile(MCROldFile file) {
-        String storeURI = config.getString("MCR.IFS.ContentStore." + file.getStoreID() + ".URI");
-
-        return new File(storeURI + "/" + file.getStorageID());
-    }
-
     protected File toFile(org.mycore.datamodel.ifs.MCRFile file) {
-        String storeURI = config.getString("MCR.IFS.ContentStore." + file.getStoreID() + ".URI");
-
-        return new File(storeURI + "/" + file.getStorageID());
-    }
-
-    protected File toFile(MCRFileReader file) {
         String storeURI = config.getString("MCR.IFS.ContentStore." + file.getStoreID() + ".URI");
 
         return new File(storeURI + "/" + file.getStorageID());

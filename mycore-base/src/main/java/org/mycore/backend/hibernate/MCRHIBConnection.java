@@ -23,21 +23,15 @@
 
 package org.mycore.backend.hibernate;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.MessageFormat;
 
 import javax.persistence.EntityManager;
-import javax.persistence.metamodel.EntityType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
 import org.hibernate.query.Query;
-import org.hibernate.stat.Statistics;
-import org.jdom2.Element;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
@@ -97,54 +91,6 @@ public class MCRHIBConnection {
 
     public SessionFactory getSessionFactory() {
         return MCREntityManagerProvider.getEntityManagerFactory().unwrap(SessionFactory.class);
-    }
-
-    @Deprecated
-    public Metadata getMetadata() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * This method checks existance of mapping for given sql-tablename
-     * 
-     * @param tablename
-     *            sql-table name as string
-     * @return boolean
-     */
-    @Deprecated
-    public boolean containsMapping(String tablename) {
-        return MCREntityManagerProvider
-            .getEntityManagerFactory()
-            .getMetamodel()
-            .getEntities()
-            .stream()
-            .map(EntityType::getJavaType)
-            .map(Class::getName)
-            .filter(tablename::equals)
-            .findFirst()
-            .isPresent();
-    }
-
-    /**
-     * helper mehtod: translates fieldtypes into hibernate types
-     * 
-     * @param type
-     *            typename as string
-     * @return hibernate type
-     */
-    @Deprecated
-    public org.hibernate.type.Type getHibType(String type) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Deprecated
-    public void handleStatistics(Statistics stats) throws FileNotFoundException, IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Deprecated
-    public Element addStringArray(Element base, String tagName, String attrName, String[] values) {
-        throw new UnsupportedOperationException();
     }
 
     /**

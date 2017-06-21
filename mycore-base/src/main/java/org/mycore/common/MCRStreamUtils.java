@@ -24,19 +24,6 @@ import com.google.common.collect.Iterators;
 public class MCRStreamUtils {
 
     /**
-     * Short circuit for calling <code>flatten(node, subNodeSupplier, parallel, t -&gt; true)</code>
-     * @param node node that holds kind-of subtree.
-     * @param subNodeSupplier a function that delivers subtree items of next level
-     * @param parallel if the returned Stream should be parallel
-     * @see #flatten(Object, Function, boolean, Predicate)
-     * @since 2015.12
-     * @deprecated use {@link #flatten(Object, Function, Function)} instead
-     */
-    public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodeSupplier, boolean parallel) {
-        return flatten(node, subNodeSupplier, parallel ? Collection::parallelStream : Collection::stream);
-    }
-
-    /**
      * Short circuit for calling <code>flatten(node, subNodeSupplier, subNodeSupplier, t -&gt; true)</code>
      * @param node node that holds kind-of subtree.
      * @param subNodeSupplier a function that delivers subtree items of next level
@@ -48,24 +35,6 @@ public class MCRStreamUtils {
         Function<Collection<T>, Stream<T>> streamProvider) {
         return Stream.concat(Stream.of(node), subNodeSupplier.andThen(streamProvider).apply(node).flatMap(
             subNode -> flatten(subNode, subNodeSupplier, streamProvider)));
-    }
-
-    /**
-     * Example:
-     * <pre>
-     *   MCRCategory foo = MCRCategoryDAOFactory.getInstance().getCategory(MCRCategoryID.rootID("foo"), -1);
-     *   Stream&lt;MCRCategory&gt; parentCategories = flatten(foo, MCRCategory::getChildren, true, MCRCategory::hasChildren);
-     * </pre>
-     * @param node first node the stream is made of
-     * @param subNodeSupplier a function that delivers subtree items of next level
-     * @param parallel if the returned Stream should be parallel
-     * @param filter a predicate that filters the element of the next level
-     * @since 2015.12
-     * @deprecated use {@link #flatten(Object, Function, Function, Predicate)} instead
-     */
-    public static <T> Stream<T> flatten(T node, Function<T, Collection<T>> subNodeSupplier, boolean parallel,
-        Predicate<T> filter) {
-        return flatten(node, subNodeSupplier, parallel ? Collection::parallelStream : Collection::stream, filter);
     }
 
     /**

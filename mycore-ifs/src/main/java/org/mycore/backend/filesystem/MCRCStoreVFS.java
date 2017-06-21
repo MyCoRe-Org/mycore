@@ -48,7 +48,6 @@ import org.mycore.common.content.MCRVFSContent;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileReader;
 
 /**
  * This class implements the MCRContentStore interface to store the content of
@@ -87,7 +86,7 @@ public class MCRCStoreVFS extends MCRContentStore {
     private static final Logger LOGGER = LogManager.getLogger(MCRCStoreVFS.class);
 
     @Override
-    protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
+    protected String doStoreContent(MCRFile file, MCRContentInputStream source) throws Exception {
         StringBuilder storageId = new StringBuilder();
 
         String[] slots = buildSlotPath();
@@ -121,12 +120,10 @@ public class MCRCStoreVFS extends MCRContentStore {
         }
     }
 
-    protected MCRContent doRetrieveMCRContent(MCRFileReader file) throws IOException {
+    protected MCRContent doRetrieveMCRContent(MCRFile file) throws IOException {
         FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
         MCRVFSContent content = new MCRVFSContent(targetObject);
-        if (file instanceof MCRFile) {
-            content.setName(((MCRFile) file).getName());
-        }
+        content.setName(file.getName());
         return content;
     }
 
@@ -185,7 +182,7 @@ public class MCRCStoreVFS extends MCRContentStore {
     }
 
     @Override
-    protected boolean exists(MCRFileReader file) {
+    protected boolean exists(MCRFile file) {
         try {
             FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
             return targetObject.exists();

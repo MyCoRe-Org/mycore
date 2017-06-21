@@ -23,7 +23,6 @@
 package org.mycore.common.fo;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.xml.transform.TransformerException;
@@ -39,13 +38,5 @@ import org.mycore.common.content.MCRContent;
 
 public interface MCRFoFormatterInterface {
 
-    /**
-     * @deprecated use {@link #transform(MCRContent, OutputStream)}
-     */
-    @Deprecated
-    public void transform(InputStream fo_stream, OutputStream out) throws TransformerException, IOException;
-
-    default public void transform(MCRContent input, OutputStream out) throws TransformerException, IOException {
-        transform(input.getInputStream(), out);
-    }
+    void transform(MCRContent input, OutputStream out) throws TransformerException, IOException;
 }

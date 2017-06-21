@@ -38,7 +38,6 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
-import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 
@@ -139,7 +138,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     }
 
     @Override
-    protected boolean exists(MCRFileReader fr) {
+    protected boolean exists(org.mycore.datamodel.ifs.MCRFile fr) {
         int slotID = getSlotID(fr.getOwnerID());
         String base = getBase(fr.getOwnerID());
         MCRFileStore store = getStore(base);
@@ -166,7 +165,8 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     }
 
     @Override
-    protected String doStoreContent(MCRFileReader fr, MCRContentInputStream source) throws Exception {
+    protected String doStoreContent(org.mycore.datamodel.ifs.MCRFile fr, MCRContentInputStream source)
+        throws Exception {
         int slotID = getSlotID(fr.getOwnerID());
         String base = getBase(fr.getOwnerID());
         MCRFileStore store = getStore(base);
@@ -247,7 +247,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     }
 
     @Override
-    protected MCRContent doRetrieveMCRContent(MCRFileReader fr) throws IOException {
+    protected MCRContent doRetrieveMCRContent(org.mycore.datamodel.ifs.MCRFile fr) throws IOException {
         String storageID = fr.getStorageID();
         MCRFile file = getFile(storageID);
         return file.getContent();

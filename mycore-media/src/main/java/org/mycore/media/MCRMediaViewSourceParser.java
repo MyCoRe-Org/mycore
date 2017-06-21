@@ -39,8 +39,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.datamodel.ifs.MCRFileReader;
-import org.mycore.datamodel.ifs.MCROldFile;
 
 /**
  * Parse the output of the Helix ViewSource HTML page and create the 
@@ -118,44 +116,16 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
      * 
      * @return boolean if true
      */
-    public boolean isFileSupported(MCROldFile file) {
-        return isFileSupported(toFile(file));
-    }
-
-    /**
-     * Checks if given file is supported.
-     * 
-     * @return boolean if true
-     */
     public boolean isFileSupported(org.mycore.datamodel.ifs.MCRFile file) {
-        return isFileSupported(toFile(file));
-    }
-
-    /**
-     * Checks if given file is supported.
-     * 
-     * @return boolean if true
-     */
-    public boolean isFileSupported(MCRFileReader file) {
         return isFileSupported(toFile(file));
     }
 
     public synchronized MCRMediaObject parse(File file) throws Exception {
         throw new Exception("File is'n supported by ViewSource Parser");
     }
-
-    public synchronized MCRMediaObject parse(MCROldFile file) throws Exception {
-        return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
-    }
-
     public synchronized MCRMediaObject parse(org.mycore.datamodel.ifs.MCRFile file) throws Exception {
         return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
     }
-
-    public synchronized MCRMediaObject parse(MCRFileReader file) throws Exception {
-        return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
-    }
-
     private MCRMediaObject setFileInfo(MCRMediaObject media, File file) {
         media.fileName = file.getName();
         String path = file.getAbsolutePath();
@@ -446,23 +416,6 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     /**
      * Builds ViewSource URL from configuration.
      * 
-     * @param MCROldFile file
-     * @return String
-     * @throws Exception
-     */
-    private String buildViewSourceURL(MCROldFile file) throws Exception {
-        String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
-        String baseMetadata = config.getString(prefix + "ViewSourceBaseURL", null);
-
-        return baseMetadata == null ? null : baseMetadata + file.getStorageID();
-    }
-
-    /**
-     * Builds ViewSource URL from configuration.
-     * 
-     * @param MCROldFile file
-     * @return String
-     * @throws Exception
      */
     private String buildViewSourceURL(org.mycore.datamodel.ifs.MCRFile file) throws Exception {
         String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
@@ -471,17 +424,4 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
         return baseMetadata == null ? null : baseMetadata + file.getStorageID();
     }
 
-    /**
-     * Builds ViewSource URL from configuration.
-     * 
-     * @param MCRFileReader file
-     * @return String
-     * @throws Exception
-     */
-    private String buildViewSourceURL(MCRFileReader file) throws Exception {
-        String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
-        String baseMetadata = config.getString(prefix + "ViewSourceBaseURL");
-
-        return baseMetadata == null ? null : baseMetadata + file.getStorageID();
-    }
 }

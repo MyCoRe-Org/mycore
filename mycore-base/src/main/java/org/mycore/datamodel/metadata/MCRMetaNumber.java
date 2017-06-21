@@ -165,33 +165,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     }
 
     /**
-     * This is the constructor. <br>
-     * The subtag element was set to the value of <em>subtag</em>.
-     * If the value of <em>subtag</em>  is null or empty a MCRException will be thrown.
-     * The dimension element was set to the value of <em>dimension</em>, if it is null,
-     * an empty string was set to the dimension element.
-     * The measurement element was set to the value of <em>measurement</em>, if it is null,
-     * an empty string was set to the measurement element.
-     * The number <em>number</em> was convert to the number element, if it is null a MCRException will be thrown.
-     * @param subtag       the name of the subtag
-     * @param inherted     a value &gt;= 0
-     * @param dimension    the optional dimension string
-     * @param measurement  the optional measurement string
-     * @param number       the number string
-     * @exception MCRException if the subtag value is null or empty or if
-     *   the number string is not in a number format
-     */
-    @Deprecated
-    public MCRMetaNumber(String subtag, int inherted, String dimension, String measurement, double number)
-        throws MCRException {
-        super(subtag, null, null, inherted);
-        loadProperties();
-        setDimension(dimension);
-        setMeasurement(measurement);
-        setNumber(number);
-    }
-
-    /**
      * This method set the dimension, if it is null, an empty string was set to
      * the dimension element.
      *
@@ -253,17 +226,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     }
 
     /**
-     * This method set the number.
-     *
-     * @param number
-     *            the number value as double datatype
-     */
-    @Deprecated
-    public final void setNumber(double number) {
-        this.number = new BigDecimal(number);
-    }
-
-    /**
      * This method set the number, if it is null a MCRException will be throw.
      *
      * @param number
@@ -294,16 +256,6 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      */
     public final String getMeasurement() {
         return measurement;
-    }
-
-    /**
-     * This method get the number element.
-     *
-     * @return the number converted to a double
-     */
-    @Deprecated
-    public final double getNumber() {
-        return number.doubleValue();
     }
 
     /**
