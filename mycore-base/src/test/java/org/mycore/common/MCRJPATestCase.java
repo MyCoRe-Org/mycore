@@ -26,7 +26,7 @@ import org.mycore.backend.jpa.MCRJPABootstrapper;
 
 public class MCRJPATestCase extends MCRTestCase {
 
-    protected EntityManager entityManager;
+    protected Optional<EntityManager> entityManager;
 
     protected static void printResultSet(ResultSet resultSet, PrintStream out) throws SQLException {
         ResultSetMetaData metaData = resultSet.getMetaData();
@@ -69,11 +69,12 @@ public class MCRJPATestCase extends MCRTestCase {
             .checkEntityManagerFactoryConfiguration(MCREntityManagerProvider.getEntityManagerFactory());
         try {
             LogManager.getLogger().debug("Prepare hibernate test", new RuntimeException());
-            entityManager = MCREntityManagerProvider.getCurrentEntityManager();
+            entityManager = Optional.of(MCREntityManagerProvider.getCurrentEntityManager());
             beginTransaction();
-            entityManager.clear();
+            entityManager.get().clear();
         } catch (RuntimeException e) {
             LogManager.getLogger().error("Error while setting up JPA JUnit test.", e);
+            entityManager = Optional.empty();
             throw e;
         }
     }
@@ -125,40 +126,44 @@ public class MCRJPATestCase extends MCRTestCase {
         try {
             endTransaction();
         } finally {
-            entityManager.close();
-            dropSchema();
+            if (entityManager.isPresent()) {
+                entityManager.get().close();
+                dropSchema();
+            }
             super.tearDown();
             entityManager = null;
         }
     }
 
     protected void beginTransaction() {
-        entityManager.getTransaction().begin();
+        entityManager.ifPresent(em -> em.getTransaction().begin());
     }
 
     protected void endTransaction() {
-        EntityTransaction tx = entityManager.getTransaction();
-        if (tx != null && tx.isActive()) {
-            if (tx.getRollbackOnly()) {
-                tx.rollback();
-            } else {
-                try {
-                    tx.commit();
-                } catch (RollbackException e) {
-                    if (tx.isActive()) {
-                        tx.rollback();
+        entityManager.ifPresent(em -> {
+            EntityTransaction tx = em.getTransaction();
+            if (tx != null && tx.isActive()) {
+                if (tx.getRollbackOnly()) {
+                    tx.rollback();
+                } else {
+                    try {
+                        tx.commit();
+                    } catch (RollbackException e) {
+                        if (tx.isActive()) {
+                            tx.rollback();
+                        }
+                        throw e;
                     }
-                    throw e;
                 }
             }
-        }
+        });
     }
 
     protected void startNewTransaction() {
         endTransaction();
         beginTransaction();
         // clear from cache
-        entityManager.clear();
+        entityManager.ifPresent(EntityManager::clear);
     }
 
 }
