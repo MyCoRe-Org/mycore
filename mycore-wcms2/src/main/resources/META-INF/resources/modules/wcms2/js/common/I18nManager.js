@@ -54,7 +54,7 @@ var I18nManager = (function() {
 				return;
 			}
 			var xhrArgs = {
-				url : webApplicationBaseURL + "servlets/MCRLocaleServlet/"+currentLang+"/" + prefix + "*",
+				url : webApplicationBaseURL + "rsc/locale/translate/"+currentLang+"/" + prefix + "*",
 				sync : true,
 				handleAs : "json",
 				load : function(data) {
@@ -133,7 +133,7 @@ var I18nManager = (function() {
 
 		this.get18nTextFromServer = function(/*String*/ lang, /*String*/ label, /*Object*/ callbackData, /*function*/ onSuccess, /*function*/ onError) {
 			var xhrArgs = {
-				url : webApplicationBaseURL + "servlets/MCRLocaleServlet/"+lang+"/" + label,
+				url : webApplicationBaseURL + "rsc/locale/translate/"+lang+"/" + label,
 				load : function(data) {
 					// add to cache
 					var langMap = cache.get(lang);
