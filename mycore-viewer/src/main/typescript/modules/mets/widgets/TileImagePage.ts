@@ -347,7 +347,7 @@ var json = {
     "properties" : {
         "derivateURL" : "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRFileNodeServlet/HisBest_derivate_00016280/",
         "metsURL" : "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRMETSServlet/HisBest_derivate_00016280",
-        "i18nURL" : "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRLocaleServlet/{lang}/component.iview2.*",
+        "i18nURL" : "http://archive.thulb.uni-jena.de/hisbest/rsc/locale/translate/{lang}/component.iview2.*",
         "derivate" : "HisBest_derivate_00016280",
         "filePath" : "/2_8_30.tif",
         "mobile" : false,

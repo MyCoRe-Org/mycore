@@ -308,7 +308,7 @@ var ACLEditor = function(){
 			accessTableInstance = accessTable;
 			ruleListInstance = ruleList;
 			var lang = $("#mycore-acl-editor2").attr("lang");
-			jQuery.getJSON("../../servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
+			jQuery.getJSON("../../rsc/locale/translate/" + lang + "/ACLE.*", function(data) {
 				i18nKeys = data;
 				replacei18n();
 				getAccess();

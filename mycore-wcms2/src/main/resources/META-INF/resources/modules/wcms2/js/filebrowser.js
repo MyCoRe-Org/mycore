@@ -137,7 +137,7 @@ var WCMS2FileBrowser = function(){
 			currentPath = qpara["href"] != undefined ? qpara["href"] : "";
 			type = qpara["type"] != undefined ? qpara["type"] : "files";
 			baseHref = qpara["basehref"] != undefined ? qpara["basehref"] : "";
-			jQuery.getJSON("../../servlets/MCRLocaleServlet/" + qpara["langCode"] + "/component.wcms.navigation.fileBrowser.*", function(data) { 
+			jQuery.getJSON("../../rsc/locale/translate/" + qpara["langCode"] + "/component.wcms.navigation.fileBrowser.*", function(data) {
 				i18nKeys = data;
 				$("#folder-label").html(geti18n("component.wcms.navigation.fileBrowser.folder"));
 				$("#drag-and-drop-info").append(geti18n("component.wcms.navigation.fileBrowser.dragDropInfo"));
