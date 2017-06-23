@@ -109,13 +109,15 @@
 
   <xed:template id="passwords">
     <mcruser:template name="passwordInput" xpath="password" id="password" i18n="component.user2.admin.password" i18n.error="component.user2.admin.inputhints.password"
-      required="true" matches="[\S]*" maxlength="16" />
+      required="true" matches="[\S]*" />
     <mcruser:template name="passwordInput" xpath="password2" id="password2" i18n="component.user2.admin.passwordRepeat" i18n.error="component.user2.admin.inputhints.password"
-      required="true" matches="[\S]*" maxlength="16" />
+      required="true" matches="[\S]*" />
 
-    <xed:validate xpath="user/password" display="global" test="(../realm/@id != 'local') or ((string-length(.) &gt; 0) and (. = ../password2 ))"
+    <xed:validate xpath="user/password" display="global"
+      test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (string-length(.) &lt; 17) and (. = ../password2 ) and (. != ../@name))"
       i18n="component.user2.admin.inputhints.passwordLocalUsers" />
-    <xed:validate xpath="user/password2" display="global" test="(../realm/@id != 'local') or ((string-length(.) &gt; 0) and (../password = . ))" />
+    <xed:validate xpath="user/password2" display="global"
+      test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and  (string-length(.) &lt; 17) and (../password = . ) and (. != ../@name))" />
   </xed:template>
 
   <xed:template id="passwordHint">
