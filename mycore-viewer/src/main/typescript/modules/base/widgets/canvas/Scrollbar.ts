@@ -5,7 +5,7 @@ namespace mycore.viewer.widgets.canvas {
             this.initElements();
             let body = jQuery(document.body);
 
-            let moveHandler = (e)=> {
+            let moveHandler = (e) => {
                 if (this._mouseDown != -1) {
                     let val = (this._horizontal ? (e.clientX - this._scrollbarElement.offset().left) : (e.clientY - this._scrollbarElement.offset().top)) - this._mouseDown;
                     let realSize = (this._horizontal ? this._scrollbarElement.width() : this._scrollbarElement.height()) - 30;
@@ -26,14 +26,13 @@ namespace mycore.viewer.widgets.canvas {
                     interv = -1;
                     e.preventDefault();
                 }
-                body.unbind('mousemove',moveHandler);
-
+                body.unbind("mousemove",moveHandler);
             };
 
             this._slider.mousedown((e)=> {
                 this._mouseDown = this._horizontal ? (e.clientX - this._slider.offset().left) : (e.clientY - this._slider.offset().top);
-                body.bind('mousemove',moveHandler);
-                body.bind('mouseup', upHandler)
+                body.bind("mousemove",moveHandler);
+                body.bind("mouseup", upHandler);
                 e.preventDefault();
             });
 

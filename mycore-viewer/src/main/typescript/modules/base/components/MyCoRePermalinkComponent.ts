@@ -10,6 +10,7 @@
 /// <reference path="events/RequestStateEvent.ts" />
 /// <reference path="events/RestoreStateEvent.ts" />
 /// <reference path="events/ImageChangedEvent.ts" />
+/// <reference path="events/UpdateURLEvent.ts" />
 /// <reference path="events/WaitForEvent.ts" />
 /// <reference path="events/LanguageModelLoadedEvent.ts" />
 /// <reference path="events/RequestPermalinkEvent.ts" />
@@ -86,19 +87,23 @@ namespace mycore.viewer.components {
             }
 
             if (e.type == events.ImageChangedEvent.TYPE) {
-                var ice = <events.ImageChangedEvent>e;
+                let ice = <events.ImageChangedEvent>e;
                 if (typeof ice.image != "undefined") {
-                    var updateHistory = Utils.getVar(this._settings, "permalink.updateHistory", true);
-                    let state = new ViewerParameterMap();
-                    this.trigger(new events.RequestStateEvent(this,state,false));
-                    if (updateHistory) {
-                        if (this._settings.doctype == "mets") {
-                            window.history.replaceState({}, "", this.buildPermalink(state));
-                        } else {
-                            window.history.replaceState({}, "", this.buildPermalink(state));
-                        }
-                    }
+                    this.updateHistory();
                 }
+            }
+
+            if(e.type == events.UpdateURLEvent.TYPE) {
+                this.updateHistory();
+            }
+        }
+
+        private updateHistory() {
+            let updateHistory = Utils.getVar(this._settings, "permalink.updateHistory", true);
+            let state = new ViewerParameterMap();
+            this.trigger(new events.RequestStateEvent(this, state, false));
+            if (updateHistory) {
+                window.history.replaceState({}, "", this.buildPermalink(state));
             }
         }
 
@@ -132,6 +137,7 @@ namespace mycore.viewer.components {
                 handles.push(events.LanguageModelLoadedEvent.TYPE);
                 handles.push(events.RequestPermalinkEvent.TYPE);
                 handles.push(events.ImageChangedEvent.TYPE);
+                handles.push(events.UpdateURLEvent.TYPE);
             } else {
                 handles.push(events.ProvideToolbarModelEvent.TYPE);
             }

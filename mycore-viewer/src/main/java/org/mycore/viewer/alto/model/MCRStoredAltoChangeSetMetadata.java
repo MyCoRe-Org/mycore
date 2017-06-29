@@ -1,6 +1,7 @@
 package org.mycore.viewer.alto.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -12,10 +13,12 @@ import javax.persistence.MappedSuperclass;
 public class MCRStoredAltoChangeSetMetadata {
 
     public MCRStoredAltoChangeSetMetadata() {
+        this.pid = UUID.randomUUID().toString();
     }
 
     public MCRStoredAltoChangeSetMetadata(String sessionID, String derivateID, String objectTitle, Date created,
         Date applied, String user) {
+        this();
         this.sessionID = sessionID;
         this.derivateID = derivateID;
         this.objectTitle = objectTitle;
@@ -39,8 +42,7 @@ public class MCRStoredAltoChangeSetMetadata {
     private Date applied;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int pid;
+    private String pid;
 
     private String user;
 
@@ -68,11 +70,11 @@ public class MCRStoredAltoChangeSetMetadata {
         this.derivateID = derivateID;
     }
 
-    public int getPid() {
+    public String getPid() {
         return pid;
     }
 
-    public void setPid(int pid) {
+    public void setPid(String pid) {
         this.pid = pid;
     }
 

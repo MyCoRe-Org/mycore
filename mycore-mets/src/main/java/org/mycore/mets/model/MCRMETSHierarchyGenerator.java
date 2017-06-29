@@ -289,8 +289,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     private void createLogicalStruct(MCRObject parentObject, LogicalDiv parentLogicalDiv) {
         // run through all children
         List<MCRObject> children = getChildren(parentObject);
-        for (int i = 0; i < children.size(); i++) {
-            MCRObject childObject = children.get(i);
+        children.forEach(childObject -> {
             // create new logical sub div
             String id = childObject.getId().toString();
             LogicalDiv logicalChildDiv = new LogicalDiv(id, getType(childObject), getLabel(childObject));
@@ -300,19 +299,17 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             Optional<String> linkedFileOptional = getLinkedFile(childObject);
             linkedFileOptional.flatMap(linkedFile -> getFileId(linkedFile)).ifPresent(fileId -> {
                 PhysicalSubDiv physicalDiv = getPhysicalDiv(fileId);
-                if (physicalDiv != null) {
-                    String physicalDivId = physicalDiv.getId();
-                    List<String> logChildDivIDs = this.structLinkMap.get(physicalDivId);
-                    if (logChildDivIDs == null) {
-                        logChildDivIDs = new ArrayList<>();
-                    }
-                    logChildDivIDs.add(logicalChildDiv.getId());
-                    this.structLinkMap.put(physicalDivId, logChildDivIDs);
+                if (physicalDiv == null) {
+                    return;
                 }
+                String physicalDivId = physicalDiv.getId();
+                List<String> logChildDivIDs = this.structLinkMap.getOrDefault(physicalDivId, new ArrayList<>());
+                logChildDivIDs.add(logicalChildDiv.getId());
+                this.structLinkMap.put(physicalDivId, logChildDivIDs);
             });
             // do recursive call for children
             createLogicalStruct(childObject, logicalChildDiv);
-        }
+        });
     }
 
     /**

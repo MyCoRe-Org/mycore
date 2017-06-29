@@ -35,7 +35,7 @@ public class MCRViewerAltoEditorConfiguration extends MCRViewerConfiguration {
 
             if (parameterMap.containsKey("altoChangeID")
                 && (altoChangeIDS = parameterMap.get("altoChangeID")).length > 0) {
-                Integer altoChangeID = Integer.valueOf(altoChangeIDS[0], 10);
+                String altoChangeID = altoChangeIDS[0];
                 MCRStoredChangeSet mcrStoredChangeSet = changeSetStore.get(altoChangeID);
                 if (isReviewer || mcrStoredChangeSet.getSessionID().equals(MCRSessionMgr.getCurrentSessionID())) {
                     this.setProperty("altoChangePID", altoChangeID);

@@ -4,4 +4,6 @@
 /// <reference path="components/model/MyCoReBasicToolbarModel.ts" />
 /// <reference path="MyCoReViewer.ts" />
 /// <reference path="widgets/modal/ViewerErrorModal.ts" />
+/// <reference path="widgets/modal/ViewerInfoModal.ts" />
+/// <reference path="widgets/modal/ViewerConfirmModal.ts" />
 /// <reference path="components/events/PageLoadedEvent.ts" />

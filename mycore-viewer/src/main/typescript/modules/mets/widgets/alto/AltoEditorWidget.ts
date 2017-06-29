@@ -181,7 +181,7 @@ namespace mycore.viewer.widgets.alto {
         <div class="btn-group btn-group-xs button-group-container">
             <button type="button" class="btn btn-default changeWord">${this.getLabel("altoWidget.changeWord")}</button>
         </div>
-    </div>   
+    </div>
     <h3 class="small-heading">${this.getLabel("altoWidget.changesHeading")}</h3>
     <div class="table-responsive">
         <table class="table table-condensed">

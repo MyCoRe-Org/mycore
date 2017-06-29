@@ -70,7 +70,6 @@ namespace mycore.viewer.components {
             return typeof this._settings.altoEditorPostURL !== "undefined" && this._settings.altoEditorPostURL != null;
         }
 
-
         public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
             if (e.type == events.StructureModelLoadedEvent.TYPE) {
                 let structureModelLodedEvent = <events.StructureModelLoadedEvent>e;
@@ -107,28 +106,16 @@ namespace mycore.viewer.components {
                 }
             }
 
-
             if (e.type == events.PageLoadedEvent.TYPE) {
                 let ple = < events.PageLoadedEvent>e;
 
                 let altoContent = (<TileImagePage>ple.abstractPage).getHTMLContent();
                 if (altoContent.value != null) {
-                    let structureImage = this._structureModel.imageHrefImageMap.get(ple.abstractPage.id);
-                    let altoHref = structureImage.additionalHrefs.get("AltoHref");
-                    this.altoIDImageMap.set(altoContent.value.getAttribute("data-id"), structureImage);
-                    this.syncChanges(altoContent.value, altoHref);
-                    this.imageHrefAltoContentMap.set(structureImage.href, altoContent.value);
-                    this.imageHrefAltoHrefMap.set(structureImage.href, altoHref);
-
+                    this.updateHTML(ple.abstractPage.id, altoContent.value);
                 } else {
                     altoContent.addObserver({
                         propertyChanged : (old: ViewerProperty<HTMLElement>, _new: ViewerProperty<HTMLElement>) => {
-                            let structureImage = this._structureModel.imageHrefImageMap.get(ple.abstractPage.id);
-                            let altoHref = structureImage.additionalHrefs.get("AltoHref");
-                            this.altoIDImageMap.set(_new.value.getAttribute("data-id"), structureImage);
-                            this.syncChanges(_new.value, altoHref);
-                            this.imageHrefAltoContentMap.set(structureImage.href, _new.value);
-                            this.imageHrefAltoHrefMap.set(structureImage.href, altoHref);
+                            this.updateHTML(ple.abstractPage.id, _new.value);
                         }
                     });
                 }
@@ -142,10 +129,33 @@ namespace mycore.viewer.components {
                     }
                 }
             }
+
+            if (e.type == events.RequestStateEvent.TYPE) {
+                var requestStateEvent = (<events.RequestStateEvent>e);
+                var state = requestStateEvent.stateMap;
+                if("altoChangePID" in this._settings && this._settings.altoChangePID != null) {
+                    state.set("altoChangeID", this._settings.altoChangePID);
+                }
+            }
+
         }
 
         private openEditor() {
             this.trigger(new ShowContentEvent(this, this.container, ShowContentEvent.DIRECTION_WEST, 400, this.containerTitle));
+        }
+
+        private updateHTML(pageId:string, element:HTMLElement) {
+            let structureImage = this._structureModel.imageHrefImageMap.get(pageId);
+            let altoHref = structureImage.additionalHrefs.get("AltoHref");
+            this.altoIDImageMap.set(element.getAttribute("data-id"), structureImage);
+            this.imageHrefAltoContentMap.set(structureImage.href, element);
+            this.imageHrefAltoHrefMap.set(structureImage.href, altoHref);
+            this.syncChanges(element, altoHref);
+            if(this.isEditing()) {
+                this.applyConfidenceLevel(element);
+            } else {
+                this.removeConfidenceLevel(element);
+            }
         }
 
         public mouseClick(position: Position2D, ev: JQueryMouseEventObject) {
@@ -318,7 +328,8 @@ namespace mycore.viewer.components {
                 widgets.toolbar.events.DropdownButtonPressedEvent.TYPE,
                 events.ImageChangedEvent.TYPE,
                 events.PageLoadedEvent.TYPE,
-                events.ShowContentEvent.TYPE
+                events.ShowContentEvent.TYPE,
+                events.RequestStateEvent.TYPE
             ] : [];
         }
 
@@ -326,11 +337,17 @@ namespace mycore.viewer.components {
             let button = this.editorWidget.changeWordButton;
             if (enable) {
                 button.addClass("active");
+                this.imageHrefAltoContentMap.values.forEach(html => {
+                    this.applyConfidenceLevel(html);
+                });
             } else {
                 button.removeClass("active");
                 if (this.currentEditWord != null) {
                     this.endEdit(this.currentEditWord);
                 }
+                this.imageHrefAltoContentMap.values.forEach(html => {
+                    this.removeConfidenceLevel(html);
+                });
             }
             this.trigger(new events.TextEditEvent(this, enable));
             this.trigger(new events.RedrawEvent(this));
@@ -376,45 +393,90 @@ namespace mycore.viewer.components {
 
             let submitSuccess = (result: { pid: string }) => {
                 this._settings.altoChangePID = result.pid;
+                let title = "altoChanges.save.successful.title";
+                let msg = "altoChanges.save.successful.message";
+                new mycore.viewer.widgets.modal.ViewerInfoModal(this._settings.mobile, title, msg)
+                  .updateI18n(this._languageModel)
+                  .show();
             };
 
             let applySuccess = () => {
+                this._settings.altoChangePID = null;
+                this.trigger(new events.UpdateURLEvent(this));
                 window.location.reload(true);
             };
 
+            let errorSaveCallback = (jqXHR:any) => {
+                console.log(jqXHR);
+                let img = this._settings.webApplicationBaseURL + "/modules/iview2/img/sad-emotion-egg.jpg";
+                let title = "altoChanges.save.failed.title";
+                let msg = "altoChanges.save.failed.message";
+                new mycore.viewer.widgets.modal.ViewerErrorModal(this._settings.mobile, title, msg, img)
+                  .updateI18n(this._languageModel)
+                  .show();
+            };
+
+            let errorDeleteCallback = (jqXHR:any) => {
+                console.log(jqXHR);
+                let img = this._settings.webApplicationBaseURL + "/modules/iview2/img/sad-emotion-egg.jpg";
+                let title = "altoChanges.delete.failed.title";
+                let msg = "altoChanges.delete.failed.message";
+                new mycore.viewer.widgets.modal.ViewerErrorModal(this._settings.mobile, title, msg, img)
+                  .updateI18n(this._languageModel)
+                  .show();
+            };
+
             this.editorWidget.addSubmitClickHandler(() => {
-                this.submitChanges(submitSuccess);
+                this.submitChanges(submitSuccess, errorSaveCallback);
             });
 
             this.editorWidget.addApplyClickHandler(() => {
-                this.submitChanges((result: { pid: string }) => {
-                    submitSuccess(result);
-                    this.applyChanges(applySuccess);
-                });
+                let title = "altoChanges.applyChanges.title";
+                let msg = "altoChanges.applyChanges.message";
+                new mycore.viewer.widgets.modal.ViewerConfirmModal(this._settings.mobile, title, msg, (confirm) => {
+                    if(!confirm) {
+                        return;
+                    }
+                    this.submitChanges((result: { pid: string }) => {
+                        this.applyChanges(applySuccess, errorSaveCallback);
+                    }, errorSaveCallback);
+                }).updateI18n(this._languageModel).show();
             });
 
             this.editorWidget.addDeleteClickHandler(() => {
-                if (this._settings.altoChangePID) {
-                    let requestURL = this._settings.altoEditorPostURL;
-                    requestURL += "/delete/" + this._settings.altoChangePID;
+                let title = "altoChanges.removeChanges.title";
+                let msg = "altoChanges.removeChanges.message";
+                new mycore.viewer.widgets.modal.ViewerConfirmModal(this._settings.mobile, title, msg, (confirm) => {
+                    if (this._settings.altoChangePID) {
+                        let requestURL = this._settings.altoEditorPostURL;
+                        requestURL += "/delete/" + this._settings.altoChangePID;
 
-                    jQuery.ajax(requestURL, {
-                        contentType : "application/json",
-                        type : "POST",
-                        success : () => {
-                            this._settings.altoChangePID = null;
-                        }
+                        jQuery.ajax(requestURL, {
+                            contentType : "application/json",
+                            type : "POST",
+                            success : () => {
+                                this._settings.altoChangePID = null;
+                                this.trigger(new events.UpdateURLEvent(this));
+                            },
+                            error: errorDeleteCallback
+                        });
+                    }
+                    this.editorWidget.getChanges().forEach((file, change) => {
+                        this.removeChange(change);
                     });
-                }
-                this.editorWidget.getChanges().forEach((file, change) => {
-                    this.removeChange(change);
-                })
+                }).updateI18n(this._languageModel).show();
             });
 
             this.editorWidget.addChangeRemoveClickHandler((change) => {
-                this.removeChange(change);
+                let title = "altoChanges.removeChange.title";
+                let msg = "altoChanges.removeChange.message";
+                new mycore.viewer.widgets.modal.ViewerConfirmModal(this._settings.mobile, title, msg, (confirm) => {
+                    if (!confirm) {
+                        return;
+                    }
+                    this.removeChange(change);
+                }).updateI18n(this._languageModel).show();
             });
-
 
             this.trigger(new events.AddCanvasPageLayerEvent(this, 2, this.highlightWordLayer));
             this.trigger(new events.RequestDesktopInputEvent(this, new EditAltoInputListener(this)));
@@ -450,18 +512,18 @@ namespace mycore.viewer.components {
             // if they are not in the map then they are not changed :D
         }
 
-        private applyChanges(callback) {
+        private applyChanges(successCallback, errorCallback) {
             let requestURL = this._settings.altoEditorPostURL;
             requestURL += "/apply/" + this._settings.altoChangePID;
 
             jQuery.ajax(requestURL, {
                 contentType : "application/json",
-                type : "POST",
-                success : callback
-            });
+                type : "POST"
+            }).done(successCallback)
+              .fail(errorCallback);
         }
 
-        private submitChanges(success: (result: { pid: string }) => any) {
+        private submitChanges(successCallback: (result: { pid: string }) => any, errorCallback) {
             let changeSet = {
                 "wordChanges" : this.editorWidget.getChanges().values,
                 "derivateID" : this._settings.derivate
@@ -474,11 +536,11 @@ namespace mycore.viewer.components {
             }
 
             jQuery.ajax(requestURL, {
-                data : this.prepareData(changeSet),
-                contentType : "application/json",
-                type : "POST",
-                success : success
-            });
+                data: this.prepareData(changeSet),
+                contentType: "application/json",
+                type: "POST"
+            }).done(successCallback)
+              .fail(errorCallback);
         }
 
         private prepareData(changeSet: { wordChanges: Array<mycore.viewer.widgets.alto.AltoChange> }) {
@@ -536,6 +598,21 @@ namespace mycore.viewer.components {
 
             });
         }
+
+        private applyConfidenceLevel(altoContent: HTMLElement) {
+            jQuery(altoContent).find("[data-wc]:not([data-wc='1'])").each((i, e) => {
+                let element = jQuery(e);
+                let wc:number = parseFloat(element.attr("data-wc"));
+                if(wc < 0.9) {
+                    element.addClass('unconfident');
+                }
+            });
+        }
+
+        private removeConfidenceLevel(altoContent: HTMLElement) {
+            jQuery(altoContent).find(".unconfident").removeClass("unconfident");
+        }
+
     }
 
     export class EditAltoInputListener extends DesktopInputAdapter {

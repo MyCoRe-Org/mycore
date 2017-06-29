@@ -19,7 +19,7 @@ public class MCRJPAAltoChangeSetStore implements MCRAltoChangeSetStore {
     private MCRDerivateTitleResolver titleResolver = MCRInjectorConfig.injector()
         .getInstance(MCRDerivateTitleResolver.class);
 
-    @Override public MCRStoredChangeSet get(int pid) {
+    @Override public MCRStoredChangeSet get(String pid) {
         return MCREntityManagerProvider
             .getCurrentEntityManager()
             .createNamedQuery("Get.ALTOCS.ByPID", MCRDBStoredChangeSet.class)
@@ -41,7 +41,7 @@ public class MCRJPAAltoChangeSetStore implements MCRAltoChangeSetStore {
     }
 
     @Override
-    public MCRStoredChangeSet updateChangeSet(int pid, MCRAltoChangeSet changeSet) {
+    public MCRStoredChangeSet updateChangeSet(String pid, MCRAltoChangeSet changeSet) {
         MCRStoredChangeSet storedChangeSet = get(pid);
         storedChangeSet.setChangeSet(changeSet);
         return storedChangeSet;
@@ -114,7 +114,7 @@ public class MCRJPAAltoChangeSetStore implements MCRAltoChangeSetStore {
     }
 
     @Override
-    public void delete(int pid) {
+    public void delete(String pid) {
         MCREntityManagerProvider.getCurrentEntityManager()
             .createNamedQuery("Delete.ALTOCS.byPID")
             .setParameter("pid", pid)

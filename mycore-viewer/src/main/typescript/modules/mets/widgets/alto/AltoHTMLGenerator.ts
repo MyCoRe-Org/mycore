@@ -116,16 +116,17 @@ namespace mycore.viewer.widgets.alto {
             return maxSize;
         }
 
-        private getLineAsElement(line: mycore.viewer.widgets.alto.AltoElement) {
+        private getLineAsElement(line:mycore.viewer.widgets.alto.AltoElement) {
             let span = document.createElement("word");
-            return this.getWordsArray(line).map(word=>{
+            return this.getWordsArray(line).map(word => {
                 span.innerText = word.getContent();
                 return `<span data-vpos="${word.getVPos()}"
- data-hpos="${word.getHPos()}"
- data-word="${word.getContent()}"
- data-width="${word.getWidth()}"
- data-height="${word.getHeight()}"
- >${span.innerHTML}</span>`
+                            data-hpos="${word.getHPos()}"
+                            data-word="${word.getContent()}"
+                            data-width="${word.getWidth()}"
+                            data-height="${word.getHeight()}"
+                            data-wc="${word.getWordConfidence()}"
+                        >${span.innerHTML}</span>`
             }).join(" ")
         }
     }

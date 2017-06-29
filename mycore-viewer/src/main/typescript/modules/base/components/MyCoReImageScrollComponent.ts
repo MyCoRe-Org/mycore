@@ -20,6 +20,7 @@
 /// <reference path="events/AddCanvasPageLayerEvent.ts" />
 /// <reference path="events/TextEditEvent.ts" />
 /// <reference path="events/RedrawEvent.ts" />
+/// <reference path="events/UpdateURLEvent.ts" />
 /// <reference path="../MyCoReViewerSettings.ts" />
 /// <reference path="../widgets/events/ViewerEvent.ts" />
 /// <reference path="model/StructureImage.ts" />

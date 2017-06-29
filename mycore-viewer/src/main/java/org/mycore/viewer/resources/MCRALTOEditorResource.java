@@ -48,7 +48,7 @@ public class MCRALTOEditorResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/update/{pid}")
-    public MCRAltoChangePID updateChangeSet(MCRAltoChangeSet changeSet, @PathParam("pid") Integer pid)
+    public MCRAltoChangePID updateChangeSet(MCRAltoChangeSet changeSet, @PathParam("pid") String pid)
         throws UnsupportedEncodingException {
 
         String currentSessionID = MCRSessionMgr.getCurrentSessionID();
@@ -67,7 +67,7 @@ public class MCRALTOEditorResource {
 
     @POST
     @Path("/apply/{pid}")
-    public String applyChangeSet(@PathParam("pid") Integer pid) {
+    public String applyChangeSet(@PathParam("pid") String pid) {
         MCRStoredChangeSet storedChangeSet = changeSetStore.get(pid);
         MCRJerseyUtil.checkPermission(storedChangeSet.getDerivateID(), MCRALTOUtil.REVIEW_ALTO_PERMISSION);
 
@@ -86,7 +86,7 @@ public class MCRALTOEditorResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes()
     @Path("/delete/{pid}")
-    public int deleteChangeSet(@PathParam("pid") Integer pid) {
+    public String deleteChangeSet(@PathParam("pid") String pid) {
         String currentSessionID = MCRSessionMgr.getCurrentSessionID();
         MCRStoredChangeSet storedChangeSet = changeSetStore.get(pid);
         if (currentSessionID != null && !currentSessionID.equals(storedChangeSet.getSessionID())) {

@@ -28,13 +28,13 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
 
     private Map<String, List<MCRStoredChangeSet>> sessionIDChangeSet = new HashMap<>();
 
-    private Map<Integer, MCRStoredChangeSet> idChangeSet = new HashMap<>();
+    private Map<String, MCRStoredChangeSet> idChangeSet = new HashMap<>();
 
     public MCRMemoryChangeSetStore() {
     }
 
     @Override
-    public MCRStoredChangeSet get(int pid) {
+    public MCRStoredChangeSet get(String pid) {
         return this.idChangeSet.get(pid);
     }
 
@@ -51,7 +51,6 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
         mcrStoredChangeSet.setChangeSet(changeSet);
         mcrStoredChangeSet.setSessionID(MCRSessionMgr.getCurrentSessionID());
         mcrStoredChangeSet.setDerivateID(derivateID);
-        mcrStoredChangeSet.setPid(new Random().nextInt());
 
         return storeChangeSet(mcrStoredChangeSet);
     }
@@ -64,11 +63,9 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
     }
 
     @Override
-    public MCRStoredChangeSet updateChangeSet(int pid, MCRAltoChangeSet changeSet) {
+    public MCRStoredChangeSet updateChangeSet(String pid, MCRAltoChangeSet changeSet) {
         MCRStoredChangeSet storedChangeSet = this.get(pid);
         this.delete(pid);
-
-
         return this.storeChangeSet(storedChangeSet);
     }
 
@@ -142,7 +139,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
     }
 
     @Override
-    public void delete(int pid) {
+    public void delete(String pid) {
         MCRStoredChangeSet mcrStoredChangeSet = idChangeSet.get(pid);
         derivateChangeSet.get(mcrStoredChangeSet.getDerivateID()).remove(mcrStoredChangeSet);
         sessionIDChangeSet.get(mcrStoredChangeSet.getSessionID()).remove(mcrStoredChangeSet);

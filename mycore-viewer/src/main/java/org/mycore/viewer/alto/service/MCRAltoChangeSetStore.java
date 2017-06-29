@@ -7,9 +7,9 @@ import org.mycore.viewer.alto.model.MCRStoredChangeSet;
 
 public interface MCRAltoChangeSetStore {
 
-    MCRStoredChangeSet get(int pid);
+    MCRStoredChangeSet get(String pid);
     MCRStoredChangeSet storeChangeSet(MCRAltoChangeSet changeSet);
-    MCRStoredChangeSet updateChangeSet(int pid, MCRAltoChangeSet changeSet);
+    MCRStoredChangeSet updateChangeSet(String pid, MCRAltoChangeSet changeSet);
 
     List<MCRStoredChangeSet> list();
     List<MCRStoredChangeSet> listBySessionID(String sessionID);
@@ -19,5 +19,5 @@ public interface MCRAltoChangeSetStore {
     List<MCRStoredChangeSet> listByDerivate(long start, long count, String derivateID);
 
     long count();
-    void delete(int pid);
+    void delete(String pid);
 }
