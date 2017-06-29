@@ -1,55 +1,83 @@
 package org.mycore.solr.index.handlers.stream;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRContent;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.cs.MCRSolrBulkXMLStream;
-import org.mycore.solr.index.cs.MCRSolrContentStream;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class index a {@link MCRSolrBulkXMLStream}. The stream contains a list of xml elements (mycore objects)
  * which are indexed together. If one element couldn't be created (mycore server side), a fallback mechanism is implemented
  * to index in single threads.
- * 
+ *
  * @author Matthias Eichner
  */
-public class MCRSolrBulkXMLIndexHandler extends MCRSolrDefaultIndexHandler {
+public class MCRSolrBulkXMLIndexHandler extends MCRSolrObjectStreamIndexHandler {
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrBulkXMLIndexHandler.class);
+
+    private Map<MCRObjectID, MCRContent> contentMap;
 
     protected List<MCRSolrIndexHandler> fallBackList;
 
-    private int docs;
-
-    public MCRSolrBulkXMLIndexHandler(MCRSolrBulkXMLStream stream) {
-        this(stream, MCRSolrClientFactory.getSolrClient());
+    public MCRSolrBulkXMLIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
+        this(contentMap, MCRSolrClientFactory.getSolrClient());
     }
 
-    public MCRSolrBulkXMLIndexHandler(MCRSolrBulkXMLStream stream, SolrClient solrClient) {
-        super(stream, solrClient);
-        this.docs = stream.getList().size();
+    public MCRSolrBulkXMLIndexHandler(Map<MCRObjectID, MCRContent> contentMap, SolrClient solrClient) {
+        super(solrClient);
+        this.contentMap = contentMap;
         this.fallBackList = new ArrayList<>();
+    }
+
+    public MCRSolrBulkXMLStream getStream() {
+        MCRSolrBulkXMLStream contentStream = new MCRSolrBulkXMLStream("MCRSolrObjs");
+        List<Element> elementList = contentStream.getList();
+        // filter and reassign content map (reassign for toString() method)
+        contentMap = contentMap.entrySet().stream().filter(entry -> {
+            MCRObjectID id = entry.getKey();
+            boolean exists = MCRMetadataManager.exists(id);
+            LOGGER.info(exists ?
+                "Submitting data of \"" + id + "\" for indexing" :
+                "Cannot submit \"" + id + "\" cause it does not exists anymore.");
+            return exists;
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        contentMap.forEach((id, content) -> {
+            try {
+                Document mcrObjXML = content.asXML();
+                elementList.add(mcrObjXML.getRootElement().detach());
+            } catch (Exception e) {
+                LOGGER.error("Cannot submit \"" + id + "\" cause content couldn't be parsed.", e);
+            }
+        });
+        return contentStream;
     }
 
     @Override
     public void index() throws IOException, SolrServerException {
         try {
             super.index();
-        } catch (RuntimeException exc) {
+        } catch (Exception exc) {
             // some index stuff failed on mycore side, try to index items in single threads
-            List<Element> elementList = ((MCRSolrBulkXMLStream) getStream()).getList();
-            for (Element e : elementList) {
-                e = e.detach();
-                MCRSolrContentStream stream = new MCRSolrContentStream("element", new MCRJDOMContent(e));
-                MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(stream);
+            contentMap.forEach((id, content) -> {
+                MCRSolrIndexHandler indexHandler = new MCRSolrSingleObjectStreamIndexHandler(id, content);
                 indexHandler.setCommitWithin(getCommitWithin());
                 this.fallBackList.add(indexHandler);
-            }
+            });
         }
     }
 
@@ -60,12 +88,12 @@ public class MCRSolrBulkXMLIndexHandler extends MCRSolrDefaultIndexHandler {
 
     @Override
     public int getDocuments() {
-        return docs;
+        return contentMap.size();
     }
 
     @Override
     public String toString() {
-        return "bulk index " + docs + " documents";
+        return "bulk index " + contentMap.size() + " documents";
     }
 
 }

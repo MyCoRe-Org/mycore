@@ -17,11 +17,11 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
     protected int commitWithin;
 
     public MCRSolrAbstractIndexHandler() {
-        this(MCRSolrClientFactory.getSolrClient());
+        this(null);
     }
 
     public MCRSolrAbstractIndexHandler(SolrClient solrClient) {
-        this.solrClient = solrClient;
+        this.solrClient = solrClient != null ? solrClient : MCRSolrClientFactory.getSolrClient();
         this.commitWithin = -1;
     }
 
