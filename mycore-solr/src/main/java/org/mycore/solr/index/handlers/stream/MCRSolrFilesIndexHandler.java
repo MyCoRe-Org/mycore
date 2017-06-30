@@ -47,15 +47,18 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
      * @param solrClient where to index
      */
     public MCRSolrFilesIndexHandler(String mcrID, SolrClient solrClient) {
+        super(solrClient);
         this.mcrID = mcrID;
-        this.solrClient = solrClient;
         this.subHandlerList = new ArrayList<>();
-        this.commitWithin = -1;
     }
 
     @Override
     public void index() throws IOException, SolrServerException {
         MCRObjectID mcrID = MCRObjectID.getInstance(getID());
+        if(!MCRMetadataManager.exists(mcrID)) {
+            LOGGER.warn("Unable to index '" + mcrID + "' cause it doesn't exists anymore!");
+            return;
+        }
         if (mcrID.getTypeId().equals("derivate")) {
             indexDerivate(mcrID);
         } else {

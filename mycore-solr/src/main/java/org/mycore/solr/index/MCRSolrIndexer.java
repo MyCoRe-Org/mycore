@@ -285,8 +285,8 @@ public class MCRSolrIndexer {
         LOGGER.info("Sending " + totalCount + " objects to solr for reindexing");
 
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
-        HashMap<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
         MCRSolrIndexStatistic statistic = null;
+        HashMap<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
         int i = 0;
         for (String id : list) {
             i++;
@@ -302,7 +302,7 @@ public class MCRSolrIndexer {
                     indexHandler.setSolrServer(solrClient);
                     statistic = indexHandler.getStatistic();
                     submitIndexHandler(indexHandler);
-                    contentMap.clear();
+                    contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error creating index thread for object " + id, ex);

@@ -117,7 +117,7 @@ You need to pass the following options as JSON object to the MyCoReViewer#Constr
 
 `derivate:string` the id of the derivate which contains all the files.
 
-`i18nURL:string` the url of the language provider. The viewer expects a JSON object which contains language as keys and the translated text as value. {lang} can be a placeholder for the language to load. (e.g. http://archive.thulb.uni-jena.de/hisbest/servlets/MCRLocaleServlet/{lang}/component.iview2.*)
+`i18nURL:string` the url of the language provider. The viewer expects a JSON object which contains language as keys and the translated text as value. {lang} can be a placeholder for the language to load. (e.g. http://archive.thulb.uni-jena.de/hisbest/rsc/locale/translate/{lang}/component.iview2.*)
 
 `lang:string` a shorthand for the language e.g. de or en
 
