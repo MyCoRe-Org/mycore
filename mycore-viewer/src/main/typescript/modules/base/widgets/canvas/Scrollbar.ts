@@ -3,10 +3,36 @@ namespace mycore.viewer.widgets.canvas {
 
         constructor(private _horizontal:boolean) {
             this.initElements();
+            let body = jQuery(document.body);
 
+            let moveHandler = (e) => {
+                if (this._mouseDown != -1) {
+                    let val = (this._horizontal ? (e.clientX - this._scrollbarElement.offset().left) : (e.clientY - this._scrollbarElement.offset().top)) - this._mouseDown;
+                    let realSize = (this._horizontal ? this._scrollbarElement.width() : this._scrollbarElement.height()) - 30;
+                    let relation = realSize / this._areaSize;
+                    this._position = (val) / relation;
+                    this.update();
+                    if (this.scrollHandler != null) {
+                        this.scrollHandler();
+                    }
+                    e.preventDefault();
+                }
+            };
+
+            let upHandler = (e)=> {
+                this._mouseDown = -1;
+                if (interv != -1) {
+                    window.clearInterval(interv);
+                    interv = -1;
+                    e.preventDefault();
+                }
+                body.unbind("mousemove",moveHandler);
+            };
 
             this._slider.mousedown((e)=> {
                 this._mouseDown = this._horizontal ? (e.clientX - this._slider.offset().left) : (e.clientY - this._slider.offset().top);
+                body.bind("mousemove",moveHandler);
+                body.bind("mouseup", upHandler);
                 e.preventDefault();
             });
 
@@ -14,10 +40,10 @@ namespace mycore.viewer.widgets.canvas {
                 if(jQuery(e.target).hasClass("slider")){
                     return;
                 }
-                var val = (this._horizontal ? (e.clientX - this._scrollbarElement.offset().left) : (e.clientY - this._scrollbarElement.offset().top));
-                var realSize = (this._horizontal ? this._scrollbarElement.width() : this._scrollbarElement.height()) - 30;
-                var relation = realSize / this._areaSize;
-                var sliderSize = Math.min(Math.max(20, this._viewSize * relation), realSize);
+                let val = (this._horizontal ? (e.clientX - this._scrollbarElement.offset().left) : (e.clientY - this._scrollbarElement.offset().top));
+                let realSize = (this._horizontal ? this._scrollbarElement.width() : this._scrollbarElement.height()) - 30;
+                let relation = realSize / this._areaSize;
+                let sliderSize = Math.min(Math.max(20, this._viewSize * relation), realSize);
                 this._position = (val - (sliderSize / 2)) / relation;
                 this.update();
                 if (this.scrollHandler != null) {
@@ -25,7 +51,7 @@ namespace mycore.viewer.widgets.canvas {
                 }
             });
 
-            var interv = -1;
+            let interv = -1;
             this._startButton.mousedown((e)=> {
                 this._position -= 200;
                 this.scrollHandler();
@@ -49,28 +75,7 @@ namespace mycore.viewer.widgets.canvas {
             });
 
 
-            jQuery(document.body).mousemove((e)=> {
-                if (this._mouseDown != -1) {
-                    var val = (this._horizontal ? (e.clientX - this._scrollbarElement.offset().left) : (e.clientY - this._scrollbarElement.offset().top)) - this._mouseDown;
-                    var realSize = (this._horizontal ? this._scrollbarElement.width() : this._scrollbarElement.height()) - 30;
-                    var relation = realSize / this._areaSize;
-                    this._position = (val) / relation;
-                    this.update();
-                    if (this.scrollHandler != null) {
-                        this.scrollHandler();
-                    }
-                    e.preventDefault();
-                }
-            });
 
-            jQuery(document.body).mouseup((e)=> {
-                this._mouseDown = -1;
-                if (interv != -1) {
-                    window.clearInterval(interv);
-                    interv = -1;
-                    e.preventDefault();
-                }
-            });
         }
 
         public clearRunning() {

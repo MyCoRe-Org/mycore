@@ -8,11 +8,11 @@ namespace mycore.viewer.widgets.canvas {
             htmlElement.appendChild(this.htmlContainer);
         }
 
-        private _registeredCache:MyCoReMap<model.AbstractPage, boolean> = new MyCoReMap<model.AbstractPage,boolean>();
         private _addedPages:Array<model.AbstractPage> = new Array<model.AbstractPage>();
         public htmlContainer:HTMLElement;
         private _pageElementCache:MyCoReMap<model.AbstractPage, HTMLElement> = new MyCoReMap<model.AbstractPage, HTMLElement>();
         private _idPageMap = new MyCoReMap<string, model.AbstractPage>();
+        private _addedContentMap = new MyCoReMap<model.AbstractPage, ViewerProperty<HTMLElement>>();
 
         public update() {
             var pagesInViewport = this._area.getPagesInViewport(this._vp);
@@ -25,10 +25,22 @@ namespace mycore.viewer.widgets.canvas {
                     this.addPage(page);
                 }
 
-                if (!this._registeredCache.has(page)) {
-                    if("registerHTMLPage" in page){
-                        page.registerHTMLPage(<HTMLElement>this._pageElementCache.get(page));
-                        this._registeredCache.set(page, true);
+                if(!this._addedContentMap.has(page)){
+                    if("getHTMLContent" in page){
+                        let content = (<any>page).getHTMLContent();
+                        this._addedContentMap.set(page, content);
+                        let observer = {
+                            propertyChanged : (_old: ViewerProperty<HTMLElement>, _new: ViewerProperty<HTMLElement>) => {
+                                if (_new.value != null) {
+                                    let htmlElement = this._pageElementCache.get(page);
+                                    let root = htmlElement.querySelector("div div");
+                                    root.innerHTML = "";
+                                    root.appendChild(_new.value);
+                                }
+                            }
+                        };
+                        content.addObserver(observer);
+                        observer.propertyChanged(null, content);
                     }
                 }
 
@@ -59,13 +71,13 @@ namespace mycore.viewer.widgets.canvas {
             var realSize = size.scale(1 / pai.scale);
 
             pe.style.cssText =
-                "transform-origin : 0% 0%;" +
-                "position : absolute;" +
-                "left : " + Math.round(scaledPagePos.x) + "px;" +
-                "top : " + Math.round(scaledPagePos.y) + "px;" +
-                "width : " + realSize.width + "px;" +
-                "height : " + realSize.height + "px;" +
-                "transform : " + "scale(" + (pai.scale * this._vp.scale / dpr) + ");";
+                `
+                position: absolute;
+                transform-origin : 0% 0%;
+                width : ${realSize.width}px;
+                height : ${realSize.height}px;
+                transform : translate(${Math.round(scaledPagePos.x)}px,${Math.round(scaledPagePos.y)}px) scale(${pai.scale * this._vp.scale / dpr});
+                `;
 
 
             var childrenElement = <HTMLElement>pe.children[0];
@@ -73,7 +85,6 @@ namespace mycore.viewer.widgets.canvas {
                 "width: " + realSize.width + "px;" +
                 "height: " + realSize.height + "px;"+
                 "background-color : transparent;";
-
 
         }
 

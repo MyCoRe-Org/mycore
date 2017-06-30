@@ -43,6 +43,7 @@ namespace mycore.viewer.components {
                 (_self) => _self._textPresent
             ],
             (_self:MyCoReSearchComponent)=> {
+                this.trigger(new events.AddCanvasPageLayerEvent(this, 1, this._searchResultCanvasPageLayer));
                 let searchLabel = _self._languageModel.getTranslation("sidebar.search");
                 this._toolbarTextInput.placeHolder = _self._languageModel.getTranslation("search.placeHolder");
                 _self._sidebarLabel.text(searchLabel);
@@ -171,7 +172,6 @@ namespace mycore.viewer.components {
             this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
             this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
             this.trigger(new events.WaitForEvent(this, events.RestoreStateEvent.TYPE));
-            this.trigger(new events.AddCanvasPageLayerEvent(this, 1, this._searchResultCanvasPageLayer));
         }
 
         private updateContainerSize() {

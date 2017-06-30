@@ -12,6 +12,7 @@ namespace mycore.viewer {
         derivateURL: string;
         onClose:()=>void;
         adminMail:string;
+        leftShowOnStart:string;
 
         static normalize(settings: MyCoReViewerSettings): MyCoReViewerSettings {
             var parameter = ViewerParameterMap.fromCurrentUrl();

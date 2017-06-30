@@ -8,6 +8,7 @@ namespace mycore.viewer.components {
 
     import RequestAltoModelEvent = mycore.viewer.components.events.RequestAltoModelEvent;
     import AltoHTMLGenerator = mycore.viewer.widgets.alto.AltoHTMLGenerator;
+    import PageLoadedEvent = mycore.viewer.components.events.PageLoadedEvent;
 
     export class MyCoReMetsPageProviderComponent extends ViewerComponent {
 
@@ -24,14 +25,39 @@ namespace mycore.viewer.components {
         private _imageInformationMap:MyCoReMap<string, widgets.image.XMLImageInformation> = new MyCoReMap<string, widgets.image.XMLImageInformation>();
         private _imagePageMap:MyCoReMap<string, widgets.canvas.TileImagePage> = new MyCoReMap<string, widgets.canvas.TileImagePage>();
         private _altoHTMLGenerator = new AltoHTMLGenerator();
+        private _imageHTMLMap:MyCoReMap<string,HTMLElement> = new MyCoReMap<string, HTMLElement>();
+        private _imageCallbackMap = new MyCoReMap<string, Array<(page: widgets.canvas.TileImagePage) => void>>();
 
         private getPage(image:string, resolve:(page:widgets.canvas.TileImagePage) => void) {
             if (this._imagePageMap.has(image)) {
-                resolve(this.createPageFromMetadata(image, this._imageInformationMap.get(image)));
+                resolve(this._imagePageMap.get(image));
             } else {
-                this.getPageMetadata(image, (metadata) => {
-                    resolve(this.createPageFromMetadata(image, metadata));
-                });
+                if (this._imageCallbackMap.has(image)) {
+                    this._imageCallbackMap.get(image).push(resolve);
+                } else {
+                    let initialArray = new Array();
+                    initialArray.push(resolve);
+                    this._imageCallbackMap.set(image, initialArray);
+                    this.getPageMetadata(image, (metadata) => {
+                        let imagePage = this.createPageFromMetadata(image, metadata);
+                        if (!this._imageHTMLMap.has(image)) {
+                            this.trigger(new RequestAltoModelEvent(this, image, (page, altoHref, altoModel) => {
+                                if (!this._imageHTMLMap.has(image)) {
+                                    let htmlElement = this._altoHTMLGenerator.generateHtml(altoModel, altoHref);
+                                    imagePage.getHTMLContent().value = htmlElement;
+                                    this._imageHTMLMap.set(image, htmlElement);
+                                }
+                            }));
+                        }
+                        let resolveList = this._imageCallbackMap.get(image);
+                        let pop;
+                        while (pop = resolveList.pop()) {
+                            pop(imagePage);
+                        }
+                        this._imagePageMap.set(image, imagePage);
+                        this.trigger(new PageLoadedEvent(this,image,imagePage));
+                    });
+                }
             }
         }
 
@@ -74,34 +100,12 @@ namespace mycore.viewer.components {
 
         public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
             if (e.type == events.RequestPageEvent.TYPE) {
-                var rpe = <events.RequestPageEvent> e;
-
-                var pageAltoSynchronize = Utils.synchronize<{
-                    page:widgets.canvas.TileImagePage; 
-                    altoModel:widgets.alto.AltoFile;
-                }>(
-                    [
-                        (synchronizeObj)=>synchronizeObj.page != null,
-                        (synchronizeObj)=>synchronizeObj.altoModel != null,
-                    ],
-                    (synchronizeObj)=> {
-                        var htmlElement = this._altoHTMLGenerator.generateHtml(synchronizeObj.altoModel);
-                        synchronizeObj.page.setAltoContent(htmlElement);
-                    }
-                );
-
-                var synchronizeObj = {page : null, altoModel : null};
+                let rpe = <events.RequestPageEvent> e;
 
                 this.getPage(rpe._pageId, (page:widgets.canvas.TileImagePage) => {
-                    synchronizeObj.page = page;
-                    pageAltoSynchronize(synchronizeObj);
                     rpe._onResolve(rpe._pageId, page);
                 });
 
-                this.trigger(new RequestAltoModelEvent(this, rpe._pageId, (page, altoHref,altoModel)=>{
-                    synchronizeObj.altoModel = altoModel;
-                    pageAltoSynchronize(synchronizeObj);
-                } ));
 
             }
 

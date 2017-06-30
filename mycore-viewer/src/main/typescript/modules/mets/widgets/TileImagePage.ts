@@ -27,8 +27,7 @@ namespace mycore.viewer.widgets.canvas {
         private _imgPreviewLoaded: boolean = false;
         private _imgNotPreviewLoaded: boolean = false;
 
-        private _altoContent:HTMLElement;
-        private _rootElem:HTMLElement;
+        private htmlContent: ViewerProperty<HTMLElement> = new ViewerProperty<HTMLElement>(this, "htmlContent");
 
 
         public get size(): Size2D {
@@ -42,24 +41,24 @@ namespace mycore.viewer.widgets.canvas {
                 rect = new Rect(rect.pos.max(0, 0), rect.size);
             }
 
-            var zoomLevel = Math.min(this.getZoomLevel(scale), this.maxZoomLevel());
-            var zoomLevelScale = this.scaleForLevel(zoomLevel);
+            let zoomLevel = Math.min(this.getZoomLevel(scale), this.maxZoomLevel());
+            let zoomLevelScale = this.scaleForLevel(zoomLevel);
 
-            var diff = scale / zoomLevelScale;
+            let diff = scale / zoomLevelScale;
 
-            var tileSizeInZoomLevel = TileImagePage.TILE_SIZE / zoomLevelScale;
+            let tileSizeInZoomLevel = TileImagePage.TILE_SIZE / zoomLevelScale;
 
-            var startX = Math.floor(rect.pos.x / tileSizeInZoomLevel);
-            var startY = Math.floor(rect.pos.y / tileSizeInZoomLevel);
-            var endX = Math.ceil(Math.min(rect.pos.x + rect.size.width, this.size.width) / tileSizeInZoomLevel);
-            var endY = Math.ceil(Math.min(rect.pos.y + rect.size.height, this.size.height) / tileSizeInZoomLevel);
+            let startX = Math.floor(rect.pos.x / tileSizeInZoomLevel);
+            let startY = Math.floor(rect.pos.y / tileSizeInZoomLevel);
+            let endX = Math.ceil(Math.min(rect.pos.x + rect.size.width, this.size.width) / tileSizeInZoomLevel);
+            let endY = Math.ceil(Math.min(rect.pos.y + rect.size.height, this.size.height) / tileSizeInZoomLevel);
 
             this._updateBackbuffer(startX, startY, endX, endY, zoomLevel, overview);
 
             ctx.save();
             {
-                var xBase = (startX * tileSizeInZoomLevel - rect.pos.x) * scale;
-                var yBase = (startY * tileSizeInZoomLevel - rect.pos.y) * scale;
+                let xBase = (startX * tileSizeInZoomLevel - rect.pos.x) * scale;
+                let yBase = (startY * tileSizeInZoomLevel - rect.pos.y) * scale;
                 ctx.translate(xBase, yBase);
                 ctx.scale(diff, diff);
                 if (overview) {
@@ -73,25 +72,11 @@ namespace mycore.viewer.widgets.canvas {
         }
 
 
-        public setAltoContent(value:HTMLElement) {
-            if (value != this._altoContent) {
-                this._altoContent = value;
-                this.updateHTML();
-            }
-        }
-
-        public registerHTMLPage(elem:HTMLElement) {
-            this._rootElem = elem;
-            this.updateHTML();
+        public getHTMLContent(){
+            return this.htmlContent;
         }
 
         private updateHTML() {
-            if (this._altoContent != null && this._rootElem != null) {
-                while (this._rootElem.children.length > 0) {
-                    this._rootElem.removeChild(this._rootElem.children.item(0));
-                }
-                this._rootElem.appendChild(this._altoContent);
-            }
             if (typeof this.refreshCallback != "undefined" && this.refreshCallback != null) {
                 this.refreshCallback();
             }
@@ -337,34 +322,3 @@ namespace mycore.viewer.widgets.canvas {
 
 
 }
-
-
-var json = {
-    "resources" : {
-        "script" : [ "http://archive.thulb.uni-jena.de/hisbest/modules/iview2/js/iview-client-base.js", "http://archive.thulb.uni-jena.de/hisbest/modules/iview2/js/iview-client-desktop.js", "http://archive.thulb.uni-jena.de/hisbest/modules/iview2/js/iview-client-mets.js", "http://archive.thulb.uni-jena.de/hisbest/modules/iview2/js/iview-client-logo.js", "http://archive.thulb.uni-jena.de/hisbest/modules/iview2/js/iview-client-metadata.js" ],
-        "css" : [ "http://archive.thulb.uni-jena.de/hisbest/modules/iview2/css/default.css", "http://archive.thulb.uni-jena.de/hisbest/css/urmelLogo.css" ]
-    },
-    "properties" : {
-        "derivateURL" : "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRFileNodeServlet/HisBest_derivate_00016280/",
-        "metsURL" : "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRMETSServlet/HisBest_derivate_00016280",
-        "i18nURL" : "http://archive.thulb.uni-jena.de/hisbest/rsc/locale/translate/{lang}/component.iview2.*",
-        "derivate" : "HisBest_derivate_00016280",
-        "filePath" : "/2_8_30.tif",
-        "mobile" : false,
-        "tileProviderPath" : "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRTileServlet/",
-        "imageXmlPath" : "http://archive.thulb.uni-jena.de/hisbest/servlets/MCRTileServlet/",
-        "pdfCreatorURI" : "http://wrackdm17.thulb.uni-jena.de/mets-printer/pdf",
-        "text.enabled" : "false",
-        "logoURL" : "http://archive.thulb.uni-jena.de/hisbest/images/Urmel_Logo_leicht_grau.svg",
-        "doctype" : "mets",
-        "webApplicationBaseURL" : "http://archive.thulb.uni-jena.de/hisbest/",
-        "metadataURL" : "http://archive.thulb.uni-jena.de/hisbest/receive/HisBest_cbu_00029645?XSL.Transformer\u003dmycoreobject-viewer",
-        "pdfCreatorStyle" : "pdf",
-        "objId" : "HisBest_cbu_00029645",
-        "lang" : "de"
-    }
-};
-
-// http://www.../serlvet/{derivate}/path/image.tif/z/x/y.jpg
-
-// http://www.../servlet/tiles?derivate=[derivate]&path=..

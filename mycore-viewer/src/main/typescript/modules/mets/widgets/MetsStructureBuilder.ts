@@ -178,27 +178,30 @@ namespace mycore.viewer.widgets.mets {
 
         private parseArea(parent:model.StructureChapter, area:Element) {
             // create blocklist if not exist
-            var blockList:Array<{fileId:string;fromId:string;toId:string}>;
+            let blockList:Array<{fileId:string;fromId:string;toId:string}>;
             if (!parent.additional.has("blocklist")) {
                 blockList = new Array<{fileId:string;fromId:string;toId:string}>();
                 parent.additional.set("blocklist", blockList);
             } else {
                 blockList = parent.additional.get("blocklist");
             }
-
-            var beType = area.getAttribute("BETYPE");
-            if (beType == "IDREF") {
-                var href = this.getAttributeNs(this.getFirstElementChild(this._idFileMap.get(area.getAttribute("FILEID"))), "xlink", "href");
-                blockList.push({
-                    fileId : href,
-                    fromId : area.getAttribute("BEGIN"),
-                    toId : area.getAttribute("END")
-                });
-            } else {
-                throw `unknown beType found! ${beType}`;
+            let fileID = area.getAttribute("FILEID");
+            if(fileID == null) {
+                throw `@FILEID of mets:area is required but not set!`;
             }
-
-
+            let href:string = this.getAttributeNs(this.getFirstElementChild(this._idFileMap.get(fileID)), "xlink", "href");
+            if(href == null) {
+                throw `couldn't find href of @FILEID in mets:area! ${fileID}`;
+            }
+            let blockEntry:any = {
+                fileId: href
+            };
+            let beType = area.getAttribute("BETYPE");
+            if (beType == "IDREF") {
+                blockEntry.fromId = area.getAttribute("BEGIN");
+                blockEntry.toId = area.getAttribute("END");
+            }
+            blockList.push(blockEntry);
         }
 
         private getIdFileMap(fileGrpChildren: Array<Node>): MyCoReMap<string, Element> {

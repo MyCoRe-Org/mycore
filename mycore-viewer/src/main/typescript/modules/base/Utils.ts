@@ -14,6 +14,16 @@ function addViewerComponent(component:any) {
     VIEWER_COMPONENTS.push(component);
 }
 
+function viewerClearTextSelection(){
+    if (window.getSelection) {
+        if (window.getSelection().empty) {  // Chrome
+            window.getSelection().empty();
+        } else if (window.getSelection().removeAllRanges) {  // Firefox
+            window.getSelection().removeAllRanges();
+        }
+    }
+}
+
 function addIviewComponent(component:any) {
     console.warn("addIviewComponent shouldnt be used anymore!");
     VIEWER_COMPONENTS.push(component);
@@ -456,23 +466,24 @@ class MyCoReMap<K, V> {
 
     constructor(arr?:any) {
         if (typeof arr != "undefined") {
-            for (var key in arr) {
+            for (let key in arr) {
                 this.set(<any>key, arr[key]);
             }
         }
     }
 
-    private arr = {};
-    private keyArray:Array<K> = [];
+    private keyMap:{} = {};
+    private valueMap:{} = {};
     private keyToHashFunction:(key:K) => void = MyCoReMap.BASE_KEY_TO_HASH_FUNCTION;
 
     public set(key:K, value:V) {
-        this.arr[this.getHash(key)] = value;
-        this.keyArray.push(key);
+        let hash:string = this.getHash(key);
+        this.keyMap[hash] = key;
+        this.valueMap[hash] = value;
     }
 
     public get(key:K):V {
-        return this.arr[this.getHash(key)];
+        return this.valueMap[this.getHash(key)];
     }
 
     public setKeyToHashFunction(keyToHashFunction:(key:K) => void) {
@@ -486,13 +497,17 @@ class MyCoReMap<K, V> {
     }
 
     public get keys():Array<K> {
-        return this.keyArray.slice();
+        let keys:Array<K> = [];
+        for(let hash in this.keyMap) {
+            keys.push(this.keyMap[hash]);
+        }
+        return keys;
     }
 
     public get values():Array<V> {
-        var values:Array<V> = new Array();
-        for (var i in this.arr) {
-            values.push(this.arr[i]);
+        let values:Array<V> = [];
+        for (let hash in this.valueMap) {
+            values.push(this.valueMap[hash]);
         }
         return values;
     }
@@ -501,54 +516,49 @@ class MyCoReMap<K, V> {
         if (typeof key == "undefined" || key == null) {
             return false;
         }
-        var elem = this.arr[this.getHash(key)];
-        return typeof elem != "undefined" && elem != null;
+        let value = this.valueMap[this.getHash(key)];
+        return typeof value != "undefined" && value != null;
     }
 
     public forEach(call:(key:K, value:V) => void) {
-        for (var key of this.keyArray) {
+        this.keys.forEach((key:K) => {
             call(key, this.get(key));
-        }
+        });
     }
 
     public filter(call:(key:K, value:V) => boolean):MyCoReMap<K, V> {
-        var newMap:MyCoReMap<K, V> = new MyCoReMap<K, V>();
-        for (var key of this.keyArray) {
-            var value:V = this.get(key);
+        let newMap:MyCoReMap<K, V> = new MyCoReMap<K, V>();
+        this.forEach((key:K, value:V) => {
             if(call(key, value)) {
                 newMap.set(key, value);
             }
-        }
+        });
         return newMap;
     }
 
     public copy():MyCoReMap<K, V> {
-        var copy = new MyCoReMap<K, V>();
-        for (var key of this.keyArray) {
-            copy.set(key, this.get(key));
-        }
+        let copy = new MyCoReMap<K, V>();
+        this.forEach((key:K, value:V) => {
+            copy.set(key, value);
+        });
         return copy;
     }
 
     public remove(key:K) {
-        delete this.arr[this.getHash(key)];
-        var index = this.keyArray.indexOf(key);
-        if(index >= 0) {
-            this.keyArray.splice(index, 1);
-        }
+        let hash:string = this.getHash(key);
+        delete this.keyMap[hash];
+        delete this.valueMap[hash];
     }
 
     public clear() {
-        var keys = this.keyArray.slice();
-        for (var key of keys) {
-            this.remove(key);
-        }
+        this.keyMap = {};
+        this.valueMap = {};
     }
 
     public mergeIn(...maps:MyCoReMap<K, V>[]) {
-        var that = this;
-        for (var mapIndex in maps) {
-            var currentMap = maps[mapIndex];
+        let that:MyCoReMap<K, V> = this;
+        for (let mapIndex in maps) {
+            let currentMap = maps[mapIndex];
             currentMap.forEach((k, v) => {
                 that.set(<any>k, v);
             });
@@ -556,7 +566,7 @@ class MyCoReMap<K, V> {
     }
 
     public isEmpty():boolean {
-        return Object.keys(this.arr).length <= 0;
+        return Object.keys(this.keyMap).length <= 0;
     }
 
     private getHash(key:K):string {

@@ -246,10 +246,44 @@
     min-height: 300px;
   }
 
+  .altoSelectable .textContainer {
+    z-index: 5;
+    * {
+      z-index: 5;
+    }
+  }
+
+  .altoTop .textContainer {
+    z-index: 5;
+
+    * {
+      z-index: 5;
+    }
+  }
+
   .textContainer {
     z-index: 3;
     * {
       z-index: 3;
+    }
+
+    text-align: left;
+
+    .altoLine span {
+      cursor: text;
+    }
+
+    span[contenteditable=true] {
+      background-color: lightgreen;
+      border: 3px darkgreen solid;
+    }
+
+    .unconfident {
+      background-color: mistyrose;
+    }
+
+    .edited {
+      background-color: lightblue;
     }
 
     .line {
@@ -280,4 +314,33 @@
       color: transparent;
     }
   }
+
+  .alto-editor-widget {
+    th[data-sort] {
+      cursor: pointer;
+    }
+
+    .btn-toolbar.action {
+      padding-top: 20px;
+    }
+
+    .glyphicon-remove {
+      color: red;
+      cursor: pointer;
+    }
+  }
+
+  .grabbable {
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+  }
+
+  .grab {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+  }
+
 }

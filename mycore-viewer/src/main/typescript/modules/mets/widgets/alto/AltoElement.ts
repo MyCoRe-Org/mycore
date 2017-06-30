@@ -17,7 +17,8 @@ namespace mycore.viewer.widgets.alto {
                     private _width: number,
                     private _height: number,
                     private _hpos: number,
-                    private _vpos: number
+                    private _vpos: number,
+                    private _wc: number
         ){
         }
 
@@ -43,6 +44,10 @@ namespace mycore.viewer.widgets.alto {
 
         public getWidth(): number {
             return this._width;
+        }
+
+        public getWordConfidence():number {
+            return this._wc;
         }
 
         public getChildren(): Array<AltoElement> {
@@ -82,5 +87,6 @@ namespace mycore.viewer.widgets.alto {
       
             return this._vpos;
         }
+
     }
 }

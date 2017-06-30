@@ -59,15 +59,16 @@ namespace mycore.viewer.widgets.alto {
 
         //erstellt ein neues Alto-Element mit Mindestanforderungen
         private createAltoElement(src:Element, type:AltoElementType, parent:AltoElement):AltoElement {
-            var width:number  = parseFloat(src.getAttribute("WIDTH"));
-            var height:number = parseFloat(src.getAttribute("HEIGHT"));
-            var hpos:number   = parseFloat(src.getAttribute("HPOS"));
-            var vpos:number   = parseFloat(src.getAttribute("VPOS"));
-            var id:string     = src.getAttribute("ID");
-            var styleID:string  = src.getAttribute("STYLEREFS");
-            var altoElement:AltoElement = new AltoElement(parent, type, id, width, height, hpos, vpos);
+            let width:number  = parseFloat(src.getAttribute("WIDTH"));
+            let height:number = parseFloat(src.getAttribute("HEIGHT"));
+            let hpos:number   = parseFloat(src.getAttribute("HPOS"));
+            let vpos:number   = parseFloat(src.getAttribute("VPOS"));
+            let wc:number   = parseFloat(src.getAttribute("WC"));
+            let id:string     = src.getAttribute("ID");
+            let styleID:string  = src.getAttribute("STYLEREFS");
+            let altoElement:AltoElement = new AltoElement(parent, type, id, width, height, hpos, vpos, wc);
             if(styleID != null) {
-                var style:AltoStyle = this._allStyles[styleID];
+                let style:AltoStyle = this._allStyles[styleID];
                 if(style != null) {
                     altoElement.setAltoStyle(style);
                 }

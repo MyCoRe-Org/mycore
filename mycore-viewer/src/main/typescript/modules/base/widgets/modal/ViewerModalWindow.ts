@@ -2,9 +2,10 @@
 /// <reference path="../../definitions/jquery.d.ts" />
 
 namespace mycore.viewer.widgets.modal {
+    import LanguageModel = mycore.viewer.model.LanguageModel;
     export class IviewModalWindow {
         constructor(private _mobile:boolean, _title:string, parent:HTMLElement = document.body) {
-            var that = this;
+            let that = this;
 
             this._wrapper = jQuery("<div></div>");
             this._wrapper.addClass("modal fade bs-modal-sm");
@@ -26,7 +27,7 @@ namespace mycore.viewer.widgets.modal {
             this._content.addClass("modal-content");
             this._content.appendTo(this._box);
 
-            this._header = jQuery("<div><h4 class=\"modal-title\">" + _title + "</h4></div>");
+            this._header = jQuery("<div><h4 class='modal-title' data-i18n='" + _title + "'>" + _title + "</h4></div>");
             this._header.addClass("modal-header");
             this._header.appendTo(this._content);
 
@@ -38,12 +39,11 @@ namespace mycore.viewer.widgets.modal {
             this._footer.addClass("modal-footer");
             this._footer.appendTo(this._content);
 
-            this._close = jQuery("<a>Close</a>");
+            this._close = jQuery("<a data-i18n='modal.close'>Close</a>");
             this._close.attr("type", "button");
             this._close.addClass("btn btn-default");
             this._close.appendTo(this._footer);
 
-            var that = this;
             this._close.click(()=> {
                 that.hide();
             });
@@ -120,5 +120,11 @@ namespace mycore.viewer.widgets.modal {
         public set title(title:string) {
             this._header.find(".modal-title").text(title);
         }
+
+        public updateI18n(languageModel:LanguageModel):IviewModalWindow {
+            languageModel.translate(this._wrapper);
+            return this;
+        }
+
     }
 }
