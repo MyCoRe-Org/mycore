@@ -23,23 +23,15 @@
 
 package org.mycore.solr.index.handlers;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
-import org.mycore.solr.index.cs.MCRSolrBulkXMLStream;
-import org.mycore.solr.index.cs.MCRSolrContentStream;
 import org.mycore.solr.index.handlers.stream.MCRSolrBulkXMLIndexHandler;
-import org.mycore.solr.index.handlers.stream.MCRSolrDefaultIndexHandler;
-import org.xml.sax.SAXException;
+import org.mycore.solr.index.handlers.stream.MCRSolrSingleObjectStreamIndexHandler;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -54,27 +46,12 @@ public class MCRSolrContentStreamHandlerFactory extends MCRSolrIndexHandlerFacto
      */
     @Override
     public MCRSolrIndexHandler getIndexHandler(MCRContent content, MCRObjectID id) {
-        MCRSolrContentStream contentStream = new MCRSolrContentStream(id.toString(), content);
-        MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream);
-        return indexHandler;
+        return new MCRSolrSingleObjectStreamIndexHandler(id, content);
     }
 
     @Override
     public MCRSolrIndexHandler getIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
-        MCRSolrBulkXMLStream contentStream = new MCRSolrBulkXMLStream("MCRSolrObjs");
-        List<Element> elementList = contentStream.getList();
-        for (Map.Entry<MCRObjectID, MCRContent> entry : contentMap.entrySet()) {
-            LOGGER.info("Submitting data of \"" + entry.getKey() + "\" for indexing");
-            Document mcrObjXML;
-            try {
-                mcrObjXML = entry.getValue().asXML();
-                elementList.add(mcrObjXML.getRootElement().detach());
-            } catch (JDOMException | IOException | SAXException e) {
-                LOGGER.error("Error while parsing content for id: " + entry.getKey(), e);
-            }
-        }
-        MCRSolrBulkXMLIndexHandler indexHandler = new MCRSolrBulkXMLIndexHandler(contentStream);
-        return indexHandler;
+        return new MCRSolrBulkXMLIndexHandler(contentMap);
     }
 
 }

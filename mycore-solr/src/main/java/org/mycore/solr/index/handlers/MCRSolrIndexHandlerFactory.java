@@ -112,7 +112,7 @@ public abstract class MCRSolrIndexHandlerFactory {
         long start = System.currentTimeMillis();
         if (sendContent) {
             /* extract metadata with tika */
-            indexHandler = new MCRSolrFileIndexHandler(new MCRSolrPathContentStream(file, attrs), solrClient);
+            indexHandler = new MCRSolrFileIndexHandler(file, attrs, solrClient);
         } else {
             SolrInputDocument doc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
             indexHandler = new MCRSolrInputDocumentHandler(doc, solrClient);
