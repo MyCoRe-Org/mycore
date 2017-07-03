@@ -14,6 +14,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
@@ -67,19 +68,12 @@ public class MCRALTOEditorResource {
 
     @POST
     @Path("/apply/{pid}")
-    public String applyChangeSet(@PathParam("pid") String pid) {
+    public Response applyChangeSet(@PathParam("pid") String pid) {
         MCRStoredChangeSet storedChangeSet = changeSetStore.get(pid);
         MCRJerseyUtil.checkPermission(storedChangeSet.getDerivateID(), MCRALTOUtil.REVIEW_ALTO_PERMISSION);
-
-        try {
-            changeApplier.applyChange(storedChangeSet.getChangeSet());
-        } catch (Throwable e) {
-            throw e;
-        }
-
+        changeApplier.applyChange(storedChangeSet.getChangeSet());
         storedChangeSet.setApplied(new Date());
-
-        return "";
+        return Response.ok().build();
     }
 
     @POST
@@ -92,7 +86,6 @@ public class MCRALTOEditorResource {
         if (currentSessionID != null && !currentSessionID.equals(storedChangeSet.getSessionID())) {
             MCRJerseyUtil.checkPermission(storedChangeSet.getDerivateID(), MCRALTOUtil.REVIEW_ALTO_PERMISSION);
         }
-
         changeSetStore.delete(pid);
         return pid;
     }

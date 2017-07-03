@@ -42,6 +42,10 @@ namespace mycore.viewer.components {
             }
         }
 
+        public get isEnabled(): boolean {
+            return this._model != null && this._model._textContentPresent;
+        }
+
         public getPageLayout(): widgets.canvas.PageLayout {
             return this.pageLayout;
         }
@@ -112,6 +116,9 @@ namespace mycore.viewer.components {
             if (e.type == events.MetsLoadedEvent.TYPE) {
                 let mle = <events.MetsLoadedEvent> e;
                 this._model = mle.mets.model;
+                if(!this.isEnabled) {
+                    return;
+                }
                 this._chapterAreaContainer = new ChapterAreaContainer(this._model);
                 if (this.selectedChapter != null) {
                     this.setChapter(this.selectedChapter, false, true);

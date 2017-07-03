@@ -622,7 +622,7 @@ namespace mycore.viewer.components {
         }
 
         public isAltoSelectable() {
-            return this._selectionSwitchButton.active;
+            return this._selectionSwitchButton != null && this._selectionSwitchButton.active;
         }
 
         private setAltoSelectable(selectable: boolean) {
