@@ -7,7 +7,7 @@ namespace mycore.viewer.widgets.modal {
             super(_mobile, errorTitle, parent);
             this.modalHeader.children("h4").addClass("text-danger");
             let img = imageUrl != null ? `<img class='thumbnail error-image' src='${imageUrl}' />` : "";
-            this.modalBody.append(`<div class='error-image-holder'> ${img} <span>${errorText}</span></div>`)
+            this.modalBody.append(`<div class='error-image-holder'> ${img} <span data-i18n='" + text + "'>${errorText}</span></div>`)
         }
     }
 

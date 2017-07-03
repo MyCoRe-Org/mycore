@@ -43,8 +43,6 @@ public class MCRDefaultAltoChangeApplier implements MCRAltoChangeApplier {
             list.add(change);
         });
 
-        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-
         fileChangeMap.keySet().forEach(file -> {
             LOGGER.info("Open file {} to apply changes!", file);
             MCRPath altoFilePath = MCRPath.getPath(derivateID, file);
@@ -54,38 +52,44 @@ public class MCRDefaultAltoChangeApplier implements MCRAltoChangeApplier {
                 throw new MCRException(new IOException("Alto-File " + altoFilePath.toString() + " does not exist"));
             }
 
-            Document altoDocument;
-
-            try (InputStream inputStream = Files.newInputStream(altoFilePath, StandardOpenOption.READ)) {
-                altoDocument = new SAXBuilder().build(inputStream);
-            } catch (JDOMException | IOException e) {
-                throw new MCRException(e);
-            }
-
+            Document altoDocument = readALTO(altoFilePath);
             List<MCRAltoWordChange> wordChangesInThisFile = fileChangeMap.get(file);
             wordChangesInThisFile.stream().forEach(wordChange -> {
                 String xpath = String
                     .format(Locale.ROOT, "//alto:String[number(@HPOS)=number('%d') and number(@VPOS)=number('%d')]",
                         wordChange.getHpos(), wordChange.getVpos());
-                List<Element> wordToChange = XPathFactory.instance().compile(xpath, Filters.element(),
-                    null, MCRConstants.ALTO_NAMESPACE).evaluate(altoDocument);
+                List<Element> wordToChange = XPathFactory.instance()
+                    .compile(xpath, Filters.element(), null, MCRConstants.ALTO_NAMESPACE).evaluate(altoDocument);
 
                 if (wordToChange.size() != 1) {
                     LOGGER.warn("Found {} words to change.", wordToChange.size());
                 }
-
-                wordToChange.forEach(word -> word.setAttribute("CONTENT", wordChange.getTo()));
+                wordToChange.forEach(word -> {
+                    word.setAttribute("CONTENT", wordChange.getTo());
+                    word.setAttribute("WC", "1");
+                });
             });
-
-            try (OutputStream outputStream = Files
-                .newOutputStream(altoFilePath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
-                    StandardOpenOption.WRITE)) {
-                xmlOutputter.output(altoDocument, outputStream);
-            } catch (IOException e) {
-                throw new MCRException(e);
-            }
-
+            storeALTO(altoFilePath, altoDocument);
         });
+    }
+
+    private void storeALTO(MCRPath altoFilePath, Document altoDocument) {
+        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+        try (OutputStream outputStream = Files
+            .newOutputStream(altoFilePath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.WRITE)) {
+            xmlOutputter.output(altoDocument, outputStream);
+        } catch (IOException e) {
+            throw new MCRException(e);
+        }
+    }
+
+    private Document readALTO(MCRPath altoFilePath) {
+        try (InputStream inputStream = Files.newInputStream(altoFilePath, StandardOpenOption.READ)) {
+            return new SAXBuilder().build(inputStream);
+        } catch (JDOMException | IOException e) {
+            throw new MCRException(e);
+        }
     }
 
 }

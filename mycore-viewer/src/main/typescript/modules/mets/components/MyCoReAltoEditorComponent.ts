@@ -438,6 +438,7 @@ namespace mycore.viewer.components {
                         return;
                     }
                     this.submitChanges((result: { pid: string }) => {
+                        this._settings.altoChangePID = result.pid;
                         this.applyChanges(applySuccess, errorSaveCallback);
                     }, errorSaveCallback);
                 }).updateI18n(this._languageModel).show();
