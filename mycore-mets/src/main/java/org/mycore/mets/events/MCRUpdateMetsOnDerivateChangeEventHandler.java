@@ -53,25 +53,8 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
         }
         // don't update if derivate or mycore object is marked for deletion
         MCRObjectID mcrDerivateId = MCRObjectID.getInstance(derivateId);
-        if (isMarkedForDeletion(MCRMetadataManager.retrieveMCRDerivate(mcrDerivateId))) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Checks if the derivate or the corresponding mycore object is
-     * marked for deletion.
-     * 
-     * @return true if one of them is marked for deletion
-     */
-    protected boolean isMarkedForDeletion(MCRDerivate derivate) {
-        MCRMarkManager markManager = MCRMarkManager.instance();
-        if (markManager.isMarkedForDeletion(derivate.getId()) ||
-            markManager.isMarkedForDeletion(derivate.getOwnerID())) {
-            return true;
-        }
-        return false;
+        MCRDerivate mcrDerivate = MCRMetadataManager.retrieveMCRDerivate(mcrDerivateId);
+        return !MCRMarkManager.instance().isMarkedForDeletion(mcrDerivate);
     }
 
     /* (non-Javadoc)
@@ -105,19 +88,7 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        if (isMarkedForDeletion(der)) {
-            return;
-        }
-        try {
-            Map<String, String> urnFileMap = der.getUrnMap();
-            if (urnFileMap.size() > 0) {
-                MCRMetsSave.updateMetsOnUrnGenerate(der.getId(), urnFileMap);
-            } else {
-                LOGGER.debug("There are no URN to insert");
-            }
-        } catch (Exception e) {
-            LOGGER.error("Read derivate XML cause error", e);
-        }
+        MCRMetsSave.updateMetsOnUrnGenerate(der);
     }
 
 }

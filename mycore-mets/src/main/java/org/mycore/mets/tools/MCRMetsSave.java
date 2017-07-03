@@ -2,6 +2,7 @@ package org.mycore.mets.tools;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.file.FileVisitResult;
@@ -36,7 +37,9 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.ifs2.MCRDirectory;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -454,7 +457,7 @@ public class MCRMetsSave {
      * @param file
      *            a handle for the file to add to the mets.xml
      */
-    public static void updateMetsOnFileDelete(MCRPath file) throws Exception {
+    public static void updateMetsOnFileDelete(MCRPath file) throws JDOMException, SAXException, IOException {
         MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwner());
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
@@ -468,19 +471,39 @@ public class MCRMetsSave {
     }
 
     /**
+     * Inserts the given URNs into the mets document.
+     *
+     * @param derivate The {@link MCRDerivate} which contains the mets file
+     */
+    public static void updateMetsOnUrnGenerate(MCRDerivate derivate) {
+        if (MCRMarkManager.instance().isMarkedForDeletion(derivate)) {
+            return;
+        }
+        try {
+            Map<String, String> urnFileMap = derivate.getUrnMap();
+            if (urnFileMap.size() > 0) {
+                updateMetsOnUrnGenerate(derivate.getId(), urnFileMap);
+            } else {
+                LOGGER.debug("There are no URN to insert");
+            }
+        } catch (Exception e) {
+            LOGGER.error("Read derivate XML cause error", e);
+        }
+    }
+
+    /**
      * Inserts the given URNs into the Mets document.
      * @param derivateID The {@link MCRObjectID} of the Derivate wich contains the METs file
-     * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
+     * @param fileUrnMap a {@link Map} which contains the file as key and the urn as  as value
      */
     public static void updateMetsOnUrnGenerate(MCRObjectID derivateID, Map<String, String> fileUrnMap)
-        throws Exception {
+        throws JDOMException, SAXException, IOException {
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
             LOGGER.info(MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivateID));
             return;
         }
         LOGGER.info(MessageFormat.format("Update {0} URNS in Mets.xml", fileUrnMap.size()));
-
         Mets metsObject = new Mets(mets);
         updateURNsInMetsDocument(metsObject, fileUrnMap);
         saveMets(metsObject.asDocument(), derivateID);
@@ -491,7 +514,8 @@ public class MCRMetsSave {
      * @param mets the {@link Mets} object were the URNs should be inserted.
      * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
      */
-    public static void updateURNsInMetsDocument(Mets mets, Map<String, String> fileUrnMap) throws Exception {
+    public static void updateURNsInMetsDocument(Mets mets, Map<String, String> fileUrnMap)
+        throws UnsupportedEncodingException {
         // put all files of the mets in a list
         List<FileGrp> fileGroups = mets.getFileSec().getFileGroups();
         List<org.mycore.mets.model.files.File> files = new ArrayList<org.mycore.mets.model.files.File>();
