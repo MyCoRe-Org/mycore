@@ -43,6 +43,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 
 /**
@@ -59,7 +60,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     synchronized protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        if (this.useNestedDocuments()) {
+        if (MCRSolrUtils.useNestedDocuments()) {
             solrDelete(obj.getId());
         }
         addObject(evt, obj);
@@ -67,7 +68,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        if (this.useNestedDocuments()) {
+        if (MCRSolrUtils.useNestedDocuments()) {
             solrDelete(obj.getId());
         }
         addObject(evt, obj);
@@ -85,7 +86,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate derivate) {
-        if (this.useNestedDocuments()) {
+        if (MCRSolrUtils.useNestedDocuments()) {
             solrDelete(derivate.getId());
         }
         addObject(evt, derivate);
@@ -93,7 +94,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate derivate) {
-        if (this.useNestedDocuments()) {
+        if (MCRSolrUtils.useNestedDocuments()) {
             solrDelete(derivate.getId());
         }
         addObject(evt, derivate);
@@ -198,16 +199,6 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                 LOGGER.debug("Deleted file " + file + ". Response:" + updateResponse);
             }
         });
-    }
-
-    /**
-     * Checks if the application uses nested documents. If so, each reindex requires
-     * an extra deletion. Using nested documents slows the solr index performance.
-     * 
-     * @return true if nested documents are used, otherwise false
-     */
-    protected boolean useNestedDocuments() {
-        return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
     }
 
     /**
