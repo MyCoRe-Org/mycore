@@ -140,7 +140,19 @@ public class MCRSolrIndexer {
         });
     }
 
+    /**
+     * Deletes nested orphaned nested documents.
+     *
+     * https://issues.apache.org/jira/browse/SOLR-6357
+     *
+     * @return the response or null if {@link MCRSolrUtils#useNestedDocuments()} returns false
+     * @throws SolrServerException solr server exception
+     * @throws IOException io exception
+     */
     public static UpdateResponse deleteOrphanedNestedDocuments() throws SolrServerException, IOException {
+        if(!MCRSolrUtils.useNestedDocuments()) {
+            return null;
+        }
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         return solrClient.deleteByQuery("-({!join from=id to=_root_}_root_:*) +_root_:*", 0);
     }
@@ -162,7 +174,7 @@ public class MCRSolrIndexer {
             LOGGER.debug("Deleting \"" + Arrays.asList(solrIDs) + "\" from solr");
             UpdateRequest req = new UpdateRequest();
             //delete all documents rooted at this id
-            if (useNestedDocuments()) {
+            if (MCRSolrUtils.useNestedDocuments()) {
                 StringBuilder deleteQuery = new StringBuilder("_root_:(");
                 for (String solrID : solrIDs) {
                     deleteQuery.append('"');
@@ -209,7 +221,7 @@ public class MCRSolrIndexer {
             StringBuilder deleteQuery = new StringBuilder();
             deleteQuery.append("id:").append(id).append(" ");
             deleteQuery.append("derivateID:").append(id);
-            if (useNestedDocuments()) {
+            if (MCRSolrUtils.useNestedDocuments()) {
                 deleteQuery.append(" ").append("_root_:").append(id);
             }
             req.deleteByQuery(deleteQuery.toString());
@@ -223,16 +235,6 @@ public class MCRSolrIndexer {
         operations.addDocument(1);
         operations.addTime(end - start);
         return updateResponse;
-    }
-
-    /**
-     * Checks if the application uses nested documents. Using nested documents requires
-     * additional queries and slows performance.
-     * 
-     * @return true if nested documents are used, otherwise false
-     */
-    protected static boolean useNestedDocuments() {
-        return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
     }
 
     /**

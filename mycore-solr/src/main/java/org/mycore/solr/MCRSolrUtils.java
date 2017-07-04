@@ -23,6 +23,8 @@
 
 package org.mycore.solr;
 
+import org.mycore.common.config.MCRConfiguration;
+
 import java.util.regex.Pattern;
 
 /**
@@ -47,6 +49,16 @@ public class MCRSolrUtils {
             return null;
         }
         return PATTERN_RESTRICTED.matcher(value).replaceAll("\\\\$1");
+    }
+
+    /**
+     * Checks if the application uses nested documents. If so, each reindex requires
+     * an extra deletion. Using nested documents slows the solr index performance.
+     *
+     * @return true if nested documents are used, otherwise false
+     */
+    public static boolean useNestedDocuments() {
+        return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
     }
 
 }
