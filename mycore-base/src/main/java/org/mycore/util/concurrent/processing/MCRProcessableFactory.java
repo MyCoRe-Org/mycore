@@ -10,6 +10,7 @@ import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProgressable;
 import org.mycore.common.processing.MCRProgressableListener;
 import org.mycore.util.concurrent.MCRDecorator;
+import org.mycore.util.concurrent.MCRRunnableComperator;
 
 /**
  * Factory and utility methods for {@link MCRProcessableExecutor}.
@@ -77,6 +78,16 @@ public abstract class MCRProcessableFactory {
     public static MCRProcessableExecutor newPool(ExecutorService delegate, MCRProcessableCollection collection) {
         MCRProcessableExecutor threadPool = new MCRProcessableThreadPoolExecutorHelper(delegate, collection);
         return threadPool;
+    }
+
+    /**
+     * Creates new PriorityBlockingQueue for runnables. Uses the {@link MCRRunnableComperator}
+     * for comparision.
+     *
+     * @return a new priority blocking queue
+     */
+    public static PriorityBlockingQueue<Runnable> newPriorityBlockingQueue() {
+        return new PriorityBlockingQueue<>(11, new MCRRunnableComperator());
     }
 
     /**

@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
+import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
 public class MCRPrioritySupplierTest {
 
@@ -22,7 +23,7 @@ public class MCRPrioritySupplierTest {
     @Test
     public void priortiy() throws Exception {
         ThreadPoolExecutor es = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-            new PriorityBlockingQueue<Runnable>(11, new MCRRunnableComperator()));
+            MCRProcessableFactory.newPriorityBlockingQueue());
 
         TaskConsumer callback = new TaskConsumer();
 
