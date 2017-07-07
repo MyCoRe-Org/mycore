@@ -1,5 +1,6 @@
 package org.mycore.util.concurrent.processing;
 
+import java.util.Comparator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -14,7 +15,7 @@ import org.mycore.util.concurrent.MCRRunnableComperator;
 
 /**
  * Factory and utility methods for {@link MCRProcessableExecutor}.
- * 
+ *
  * @author Matthias Eichner
  */
 public abstract class MCRProcessableFactory {
@@ -25,7 +26,7 @@ public abstract class MCRProcessableFactory {
      * It also takes care if the task implements the
      * {@link MCRProgressable} interface by calling the runnable
      * implementation.
-     * 
+     *
      * @param task the task to run
      * @return a callable object
      * @throws NullPointerException if task null
@@ -34,22 +35,22 @@ public abstract class MCRProcessableFactory {
         if (task == null) {
             throw new NullPointerException();
         }
-        return new RunnableProgressableAdapter<Object>(task);
+        return new RunnableProgressableAdapter<>(task);
     }
 
     /**
      * Creates a new {@link MCRProcessableExecutor}.
-     * 
+     *
      * <p>
      * Be aware that you should shutdown the delegate with the {@link MCRShutdownHandler}
      * by yourself. This method will not do this for you!
      * </p>
-     * 
+     *
      * <p><b>
      * If you like to have priority support you have to use a thread pool with a
-     * {@link PriorityBlockingQueue}! 
+     * {@link PriorityBlockingQueue}!
      * </b></p>
-     * 
+     *
      * @param delegate the thread pool delegate
      * @return a newly created thread pool
      */
@@ -60,17 +61,17 @@ public abstract class MCRProcessableFactory {
     /**
      * Creates a new {@link MCRProcessableExecutor}. Each task submitted will be
      * automatically added to the given collection and removed if complete.
-     * 
+     *
      * <p>
      * Be aware that you should shutdown the delegate with the {@link MCRShutdownHandler}
      * by yourself. This method will not do this for you!
      * </p>
-     * 
+     *
      * <p><b>
      * If you like to have priority support you have to use a thread pool with a
-     * {@link PriorityBlockingQueue}! 
+     * {@link PriorityBlockingQueue}!
      * </b></p>
-     * 
+     *
      * @param delegate the thread pool delegate
      * @param collection the collection which will be linked with the pool
      * @return a newly created thread pool
@@ -87,7 +88,7 @@ public abstract class MCRProcessableFactory {
      * @return a new priority blocking queue
      */
     public static PriorityBlockingQueue<Runnable> newPriorityBlockingQueue() {
-        return new PriorityBlockingQueue<>(11, new MCRRunnableComperator());
+        return new PriorityBlockingQueue<>(11, Comparator.nullsLast(new MCRRunnableComperator()));
     }
 
     /**
@@ -124,6 +125,7 @@ public abstract class MCRProcessableFactory {
             return supplier;
         }
 
+        @Override
         public ExecutorService getExecutor() {
             return this.executor;
         }
@@ -134,13 +136,14 @@ public abstract class MCRProcessableFactory {
      * A callable that runs given task and returns given result
      */
     private static final class RunnableProgressableAdapter<T>
-        implements Callable<T>, MCRListenableProgressable, MCRDecorator<Runnable> {
+    implements Callable<T>, MCRListenableProgressable, MCRDecorator<Runnable> {
         final Runnable task;
 
         RunnableProgressableAdapter(Runnable task) {
             this.task = task;
         }
 
+        @Override
         public T call() {
             task.run();
             return null;
@@ -181,6 +184,7 @@ public abstract class MCRProcessableFactory {
             return task;
         }
 
+        @Override
         public String toString() {
             return task.toString();
         }
