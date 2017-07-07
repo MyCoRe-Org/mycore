@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -26,6 +26,7 @@ package org.mycore.services.mbeans;
 import java.lang.management.ManagementFactory;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import javax.management.InstanceNotFoundException;
@@ -42,11 +43,12 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
 public class MCRJMXBridge implements Closeable {
 
-    static final WeakReference<MCRJMXBridge> SINGLETON = new WeakReference<MCRJMXBridge>(new MCRJMXBridge());
+    static final WeakReference<MCRJMXBridge> SINGLETON = new WeakReference<>(new MCRJMXBridge());
 
     private static final Logger LOGGER = LogManager.getLogger(MCRJMXBridge.class);
 
-    private static java.util.List<WeakReference<ObjectName>> ONAME_LIST = new ArrayList<WeakReference<ObjectName>>();
+    private static java.util.List<WeakReference<ObjectName>> ONAME_LIST = Collections
+        .synchronizedList(new ArrayList<WeakReference<ObjectName>>());
 
     private static boolean shutdown;
 
@@ -71,7 +73,7 @@ public class MCRJMXBridge implements Closeable {
                 unregister(type, component);
             }
             mbs.registerMBean(mbean, name);
-            ONAME_LIST.add(new WeakReference<ObjectName>(name));
+            ONAME_LIST.add(new WeakReference<>(name));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,9 +98,9 @@ public class MCRJMXBridge implements Closeable {
             }
             // As WeakReference does not overwrite Object.equals():
             ONAME_LIST.stream()
-                .filter(wr -> name.equals(wr.get()))
-                .findFirst()
-                .ifPresent(ONAME_LIST::remove);
+            .filter(wr -> name.equals(wr.get()))
+            .findFirst()
+            .ifPresent(ONAME_LIST::remove);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,14 +110,16 @@ public class MCRJMXBridge implements Closeable {
     private static ObjectName getObjectName(String type, String component) throws MalformedObjectNameException {
         return new ObjectName(
             MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ')
-                + ":type="
-                + type + ",component=" + component);
+            + ":type="
+            + type + ",component=" + component);
     }
 
+    @Override
     public void prepareClose() {
         shutdown = true;
     }
 
+    @Override
     public void close() {
         LOGGER.debug("Shutting down " + MCRJMXBridge.class.getSimpleName());
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
