@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.access.strategies.MCRDerivateIDStrategy;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration;
@@ -366,7 +367,14 @@ public class MCRAccessManager {
 
     private static Supplier<Boolean> getWrappedFixedUserCallable(MCRUserInformation user,
         Supplier<Boolean> checkSuplier) {
-        MCRFixedUserCallable<Boolean> mcrFixedUserCallable = new MCRFixedUserCallable<>(checkSuplier::get, user);
+        Supplier<Boolean> check = () -> {
+            try {
+                return checkSuplier.get();
+            } finally {
+                MCREntityManagerProvider.getCurrentEntityManager().clear();
+            }
+        };
+        MCRFixedUserCallable<Boolean> mcrFixedUserCallable = new MCRFixedUserCallable<>(check::get, user);
         return () -> {
             try {
                 return mcrFixedUserCallable.call();
