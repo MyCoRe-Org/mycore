@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
@@ -72,7 +72,8 @@ public class MCRSolrIndexer {
         MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
 
         int poolSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.ThreadCount", 4);
-        final ExecutorService threadPool = Executors.newFixedThreadPool(poolSize,
+        final ExecutorService threadPool = new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS,
+            MCRProcessableFactory.newPriorityBlockingQueue(),
             new ThreadFactoryBuilder().setNameFormat("SOLR-Indexer-#%d").build());
         SOLR_COLLECTION = new MCRProcessableDefaultCollection("Solr Indexer");
         SOLR_COLLECTION.setProperty("pool size (threads)", poolSize);
@@ -369,13 +370,25 @@ public class MCRSolrIndexer {
      *            index handler to submit
      */
     public static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
-        MCRFixedUserCallable<List<MCRSolrIndexHandler>> indexTask = new MCRFixedUserCallable<>(
-            new MCRSolrIndexTask(indexHandler), MCRSystemUserInformation.getSystemUserInstance());
-        MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = SOLR_EXECUTOR.submit(indexTask);
-        supplier.getFuture().whenCompleteAsync(afterIndex(), SOLR_EXECUTOR.getExecutor());
+        submitIndexHandler(indexHandler, 0);
     }
 
-    private static BiConsumer<? super List<MCRSolrIndexHandler>, ? super Throwable> afterIndex() {
+    /**
+     * Submits a index handler to the executor service (execute as a thread) with the given priority.
+     *
+     * @param indexHandler
+     *            index handler to submit
+     * @param priority
+     *            higher priority means earlier execution
+     */
+    public static void submitIndexHandler(MCRSolrIndexHandler indexHandler, int priority) {
+        MCRFixedUserCallable<List<MCRSolrIndexHandler>> indexTask = new MCRFixedUserCallable<>(
+            new MCRSolrIndexTask(indexHandler), MCRSystemUserInformation.getSystemUserInstance());
+        MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = SOLR_EXECUTOR.submit(indexTask, priority);
+        supplier.getFuture().whenCompleteAsync(afterIndex(priority), SOLR_EXECUTOR.getExecutor());
+    }
+
+    private static BiConsumer<? super List<MCRSolrIndexHandler>, ? super Throwable> afterIndex(final int priority) {
         return (handlerList, exc) -> {
             if (exc != null) {
                 LOGGER.error("Error while submitting index handler.", exc);
@@ -384,8 +397,9 @@ public class MCRSolrIndexer {
             if (handlerList == null || handlerList.isEmpty()) {
                 return;
             }
+            int newPriority = priority + 1;
             for (MCRSolrIndexHandler handler : handlerList) {
-                submitIndexHandler(handler);
+                submitIndexHandler(handler, newPriority);
             }
         };
     }
