@@ -39,13 +39,7 @@ public class MCRRunnableComperator implements Comparator<Runnable> {
     }
 
     private boolean isComparable(Runnable o1, Runnable o2) {
-        if (!(o1 instanceof Comparable)) {
-            return false;
-        }
-        if (!(o2 instanceof Comparable)) {
-            return false;
-        }
-        return true;
+        return o1 instanceof Comparable && o2 instanceof Comparable;
     }
 
     @SuppressWarnings({ "rawtypes" })

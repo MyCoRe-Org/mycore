@@ -1,9 +1,10 @@
 package org.mycore.util.concurrent;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -12,34 +13,33 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
+import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
 public class MCRPrioritySupplierTest {
 
     private static Logger LOGGER = LogManager.getLogger(MCRPrioritySupplierTest.class);
 
-    static int EXCPECTED[] = { 1, 2, 10, 5, 4, 3 };
+    static int EXCPECTED[] = { 1, 10, 5, 4, 3, 2 };
 
     @Test
     public void priortiy() throws Exception {
         ThreadPoolExecutor es = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-            new PriorityBlockingQueue<Runnable>(11, new MCRRunnableComperator()));
+            MCRProcessableFactory.newPriorityBlockingQueue());
 
         TaskConsumer callback = new TaskConsumer();
 
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<Integer>(new Task(1), 1), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<Integer>(new Task(2), 1), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<Integer>(new Task(3), 1), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<Integer>(new Task(4), 1), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<Integer>(new Task(5), 1), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<Integer>(new Task(10), 10), es).thenAccept(callback);
+        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(1), 1), es).thenAccept(callback);
+        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(2), 2), es).thenAccept(callback);
+        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(3), 3), es).thenAccept(callback);
+        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(4), 4), es).thenAccept(callback);
+        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(5), 5), es).thenAccept(callback);
+        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(10), 10), es).thenAccept(callback);
 
         es.awaitTermination(1, TimeUnit.SECONDS);
 
         assertEquals("all threads should be executed after termination", 6, TaskConsumer.COUNTER);
-        for (int i = 0; i < 6; i++) {
-            assertEquals("threads should be executed in order -> 1, 2, 10, 5, 4, 3", EXCPECTED[i],
-                TaskConsumer.ORDER[i]);
-        }
+        assertArrayEquals("threads should be executed in order: " + Arrays.toString(EXCPECTED), EXCPECTED,
+            TaskConsumer.ORDER);
     }
 
     private static class TaskConsumer implements Consumer<Integer> {

@@ -846,10 +846,6 @@
                   <report>aggregate</report>
                   <report>test-aggregate</report>
                 </reports>
-                <configuration>
-                  <!-- FIX for remote-adapter -->
-                  <additionalparam>-Xdoclint:all -Xdoclint:-syntax -Xdoclint:-reference</additionalparam>
-                </configuration>
               </reportSet>
             </reportSets>
           </plugin>
@@ -1421,11 +1417,6 @@
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
         <version>1.11</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mycore.iview2</groupId>
-        <artifactId>remote-adapter</artifactId>
-        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
