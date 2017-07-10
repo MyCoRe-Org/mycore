@@ -88,7 +88,8 @@ public abstract class MCRProcessableFactory {
      * @return a new priority blocking queue
      */
     public static PriorityBlockingQueue<Runnable> newPriorityBlockingQueue() {
-        return new PriorityBlockingQueue<>(11, Comparator.nullsLast(new MCRRunnableComperator()));
+        int initialCapacity = 11; //taken from java.util.concurrent.PriorityBlockingQueue.DEFAULT_INITIAL_CAPACITY
+        return new PriorityBlockingQueue<>(initialCapacity, Comparator.nullsLast(new MCRRunnableComperator()));
     }
 
     /**
