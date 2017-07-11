@@ -258,16 +258,16 @@ class Rect {
     }
 
     public getIntersection(r2:Rect):Rect {
-        var r1 = this;
-        var xmin = Math.max(r1.pos.x, r2.pos.x);
-        var xmax1 = r1.pos.x + r1.size.width;
-        var xmax2 = r2.pos.x + r2.size.width;
-        var xmax = Math.min(xmax1, xmax2);
+        let r1 = this;
+        let xmin = Math.max(r1.pos.x, r2.pos.x);
+        let xmax1 = r1.pos.x + r1.size.width;
+        let xmax2 = r2.pos.x + r2.size.width;
+        let xmax = Math.min(xmax1, xmax2);
         if (xmax > xmin) {
-            var ymin = Math.max(r1.pos.y, r2.pos.y);
-            var ymax1 = r1.pos.y + r1.size.height;
-            var ymax2 = r2.pos.y + r2.size.height;
-            var ymax = Math.min(ymax1, ymax2);
+            let ymin = Math.max(r1.pos.y, r2.pos.y);
+            let ymax1 = r1.pos.y + r1.size.height;
+            let ymax2 = r2.pos.y + r2.size.height;
+            let ymax = Math.min(ymax1, ymax2);
             if (ymax > ymin) {
                 return new Rect(new Position2D(xmin, ymin), new Size2D(xmax - xmin, ymax - ymin));
             }
@@ -279,20 +279,25 @@ class Rect {
         return p.x < this.pos.x + this.size.width && p.x > this.pos.x && p.y < this.pos.y + this.size.height && p.y > this.pos.y;
     }
 
+    public intersectsArea(a:Rect):boolean {
+        return this.intersects(a.pos) ||
+            this.intersects(new Position2D(a.getX() + a.getWidth(), a.getY() + a.getHeight()));
+    }
+
     public rotate(deg:number) {
         return new Rect(this.pos.rotate(deg), this.size.getRotated(deg));
     }
 
 
     public flipX():Rect {
-        var x = this.pos.x + this.size.width;
-        var width = -this.size.width;
+        let x = this.pos.x + this.size.width;
+        let width = -this.size.width;
         return new Rect(new Position2D(x, this.pos.y), new Size2D(width, this.size.height));
     }
 
     public flipY():Rect {
-        var y = this.pos.y + this.size.height;
-        var height = -this.size.height;
+        let y = this.pos.y + this.size.height;
+        let height = -this.size.height;
         return new Rect(new Position2D(this.pos.x, y), new Size2D(this.size.width, height));
     }
 
@@ -314,6 +319,19 @@ class Rect {
         }
     }
 
+    /**
+     * Checks if the given rect is fully contained in this rectangle.
+     *
+     * @param rect the rect to check
+     * @returns {boolean} true if the give rectangle is fully inside this rectangle
+     */
+    public contains(rect:Rect) {
+        return rect.getX() >= this.getX() &&
+          rect.getY() >= this.getY() &&
+          rect.getX() + rect.getWidth() <= this.getX() + this.getWidth() &&
+          rect.getY() + rect.getHeight() <= this.getY() + this.getHeight();
+    }
+
     public getMiddlePoint():Position2D {
         return new Position2D(this.pos.x + (this.size.width / 2), this.pos.y + (this.size.height / 2));
     }
@@ -323,9 +341,9 @@ class Rect {
     }
 
     public getRotated(deg:number):Rect {
-        var midPos = this.getMiddlePoint();
-        var rotatedSize = this.size.getRotated(deg);
-        var newUpperLeft = new Position2D(midPos.x - (rotatedSize.width / 2), midPos.y - (rotatedSize.height / 2));
+        let midPos = this.getMiddlePoint();
+        let rotatedSize = this.size.getRotated(deg);
+        let newUpperLeft = new Position2D(midPos.x - (rotatedSize.width / 2), midPos.y - (rotatedSize.height / 2));
         return new Rect(newUpperLeft, rotatedSize);
     }
 
@@ -333,14 +351,14 @@ class Rect {
      * Tries to maximize the bounds.
      */
     public maximize(x:number, y:number, width:number, height:number):Rect {
-        var right1:number = this.pos.x + this.size.width;
-        var right2:number = x + width;
-        var bottom1:number = this.pos.y + this.size.height;
-        var bottom2:number = y + height;
-        var newX:number = x < this.pos.x ? x : this.pos.x;
-        var newY:number = y < this.pos.y ? y : this.pos.y;
-        var newWidth:number = Math.max(right1, right2) - newX;
-        var newHeight:number = Math.max(bottom1, bottom2) - newY;
+        let right1:number = this.pos.x + this.size.width;
+        let right2:number = x + width;
+        let bottom1:number = this.pos.y + this.size.height;
+        let bottom2:number = y + height;
+        let newX:number = x < this.pos.x ? x : this.pos.x;
+        let newY:number = y < this.pos.y ? y : this.pos.y;
+        let newWidth:number = Math.max(right1, right2) - newX;
+        let newHeight:number = Math.max(bottom1, bottom2) - newY;
         return Rect.fromXYWH(newX, newY, newWidth, newHeight);
     }
 
@@ -349,11 +367,25 @@ class Rect {
      * This is like adding a padding.
      */
     public increase(pixel:number):Rect {
-        var x = this.pos.x - pixel;
-        var y = this.pos.y - pixel;
-        var width = this.size.width + (2 * pixel);
-        var height = this.size.height + (2 * pixel);
+        let x = this.pos.x - pixel;
+        let y = this.pos.y - pixel;
+        let width = this.size.width + (2 * pixel);
+        let height = this.size.height + (2 * pixel);
         return Rect.fromXYWH(x, y, width, height);
+    }
+
+    public difference(rect:Rect):Array<Rect> {
+        /*let intersectionRect:Rect = this.getIntersection(rect);
+        if(intersectionRect == null) {
+            return [];
+        }
+        let newRect1 = Rect.fromXYWH();*/
+
+        let diffs:Array<Rect> = Rect.diff(this, rect);
+        diffs = diffs
+          .filter(rect => rect.getWidth() != 0 && rect.getHeight() != 0)
+          .filter(rect => this.contains(rect));
+        return diffs;
     }
 
     public copy():Rect {
@@ -369,8 +401,8 @@ class Rect {
     }
 
     public static getBounding(...n:Rect[]):Rect {
-        var max = Math.pow(2, 31);
-        var top = max, left = max, bottom = -max, right = -max;
+        let max = Math.pow(2, 31);
+        let top = max, left = max, bottom = -max, right = -max;
 
         n.forEach((nthRect)=> {
             top = Math.min(top, nthRect.pos.y);
@@ -382,13 +414,56 @@ class Rect {
         return Rect.fromULLR(new Position2D(left, top), new Position2D(right, bottom));
     }
 
+    /**
+     * Finds the difference between two intersecting rectangles
+     * https://stackoverflow.com/questions/5144615/difference-xor-between-two-rectangles-as-rectangles
+     *
+     * X = intersection, 0-7 = possible difference areas
+     *
+     * e +-+-+-+
+     * . |0|1|2|
+     * f +-+-+-+
+     * . |3|X|4|
+     * g +-+-+-+
+     * . |5|6|7|
+     * h +-+-+-+
+     * . a b c d
+     *
+     * @param r
+     * @param s
+     * @return An array of rectangle areas that are covered by either r or s, but
+     *         not both
+     */
+    public static diff(r:Rect, s:Rect ):Array<Rect> {
+        let a:number = Math.min( r.getX(), s.getX() );
+        let b:number = Math.max( r.getX(), s.getX() );
+        let c:number = Math.min( r.getX() + r.getWidth(), s.getX() + s.getWidth() );
+        let d:number = Math.max( r.getX() + r.getWidth(), s.getX() + s.getWidth() );
+
+        let e:number = Math.min( r.getY(), s.getY() );
+        let f:number = Math.max( r.getY(), s.getY() );
+        let g:number = Math.min( r.getY() + r.getHeight(), s.getY() + s.getHeight() );
+        let h:number = Math.max( r.getY() + r.getHeight(), s.getY() + s.getHeight() );
+
+        let result:Array<Rect> = [];
+        result[ 0 ] = Rect.fromULLR(new Position2D(a, e), new Position2D(b, f));
+        result[ 1 ] = Rect.fromULLR(new Position2D(b, e), new Position2D(c, f));
+        result[ 2 ] = Rect.fromULLR(new Position2D(c, e), new Position2D(d, f));
+        result[ 3 ] = Rect.fromULLR(new Position2D(a, f), new Position2D(b, g));
+        result[ 4 ] = Rect.fromULLR(new Position2D(c, f), new Position2D(d, g));
+        result[ 5 ] = Rect.fromULLR(new Position2D(a, g), new Position2D(b, h));
+        result[ 6 ] = Rect.fromULLR(new Position2D(b, g), new Position2D(c, h));
+        result[ 7 ] = Rect.fromULLR(new Position2D(c, g), new Position2D(d, h));
+        return result;
+    }
+
 }
 
 class Utils {
     public static LOG_HALF = Math.log(1 / 2);
 
     public static canvasToImage(canvas:HTMLCanvasElement):HTMLImageElement {
-        var image = document.createElement("img");
+        let image = document.createElement("img");
         image.src = canvas.toDataURL();
         return image;
     }

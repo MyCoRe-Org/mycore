@@ -287,10 +287,19 @@ namespace mycore.viewer.components {
             }
             this._loadedPages[ pageId ] = true;
             this.pageChapterMap.hasThen(pageId, (chapterIds: Array<string>) => {
+                // calculate areas for each chapter
                 chapterIds.map(chapterId => this.chapters.get(chapterId)).forEach(chapter => {
                     chapter.addPage(pageId, alto, this.getBlocklistOfChapterAndAltoHref(chapter.chapterId, altoHref));
                 });
+                // fix area intersections (has to be after the calculation!)
+                chapterIds.map(chapterId => this.chapters.get(chapterId)).forEach((chapter, i, chapters) => {
+                    // check following chapters
+                    for(let j = i + 1; j < chapters.length; j++) {
+                        chapter.fixIntersections(pageId, chapters[j]);
+                    }
+                });
             });
+
         }
     }
 
@@ -306,6 +315,23 @@ namespace mycore.viewer.components {
             let altoBlocks: Array<widgets.alto.AltoElement> = this.getAltoBlocks(altoFile, metsBlocklist);
             let areas: Array<Rect> = this.getAreas(altoFile, altoBlocks);
             this.pages.set(pageId, areas);
+        }
+
+        public fixIntersections(pageId:string, other:ChapterArea) {
+            let thisAreas = this.pages.get(pageId);
+            let otherAreas = other.pages.get(pageId);
+            for(let thisArea of thisAreas) {
+                for(let otherArea of otherAreas) {
+                    if(!thisArea.intersectsArea(otherArea)) {
+                        continue;
+                    }
+                    thisAreas = thisAreas.filter(item => item !== thisArea);
+                    thisArea.difference(otherArea).forEach(area => thisAreas.push(area));
+                    this.pages.set(pageId, thisAreas);
+                    this.fixIntersections(pageId, other);
+                    return;
+                }
+            }
         }
 
         private getAltoBlocks(altoFile: widgets.alto.AltoFile,
@@ -328,24 +354,24 @@ namespace mycore.viewer.components {
         }
 
         private getAreas(altoFile: widgets.alto.AltoFile, blocks: Array<widgets.alto.AltoElement>): Array<Rect> {
-            var areas: Array<Rect> = [];
-            var area: Rect = null;
-            var maxBottom: number = null;
-            var maxRight: number = null;
+            let areas: Array<Rect> = [];
+            let area: Rect = null;
+            let maxBottom: number = null;
+            let maxRight: number = null;
             // added at the end to create nicer wider areas
-            var padding: number = Math.ceil(altoFile.pageHeight * 0.004);
+            let padding: number = Math.ceil(altoFile.pageHeight * 0.004);
             // sometimes the blocks are not perfectly placed, use this
             // to be a bit more generous
-            var blockFaultiness: number = Math.ceil(altoFile.pageHeight * 0.005);
+            let blockFaultiness: number = Math.ceil(altoFile.pageHeight * 0.005);
 
             blocks.forEach(block => {
-                var blockX: number = block.getBlockHPos();
-                var blockY: number = block.getBlockVPos();
-                var blockW: number = block.getWidth();
-                var blockH: number = block.getHeight();
+                let blockX: number = block.getBlockHPos();
+                let blockY: number = block.getBlockVPos();
+                let blockW: number = block.getWidth();
+                let blockH: number = block.getHeight();
                 // new area
                 if (area == null) {
-                    newArea()
+                    newArea();
                     return;
                 }
                 // check if next block should be assigned to the current area
