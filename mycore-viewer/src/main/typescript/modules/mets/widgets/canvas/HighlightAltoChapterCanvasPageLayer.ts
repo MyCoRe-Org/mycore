@@ -7,11 +7,11 @@ namespace mycore.viewer.widgets.canvas {
      */
     export class HighlightAltoChapterCanvasPageLayer implements widgets.canvas.CanvasPageLayer {
 
-        public selectedChapter: components.ChapterArea = null;
-        public highlightedChapter: components.ChapterArea = null;
+        public selectedChapter: components.AltoChapter = null;
+        public highlightedChapter: components.AltoChapter = null;
         public fadeAnimation:widgets.canvas.InterpolationAnimation = null;
 
-        private chaptersToClear: MyCoReMap<string, components.ChapterArea> = new MyCoReMap<string, components.ChapterArea>();
+        private chaptersToClear: MyCoReMap<string, components.AltoChapter> = new MyCoReMap<string, components.AltoChapter>();
         private enabled: boolean = true;
 
         public isEnabled() {
@@ -91,7 +91,7 @@ namespace mycore.viewer.widgets.canvas {
          * @returns true if the file is linked but has no blocks
          */
         private isLinkedWithoutBlocks(fileID:string):boolean {
-            return !this.chaptersToClear.filter((id:string, area:components.ChapterArea) => {
+            return !this.chaptersToClear.filter((id:string, area:components.AltoChapter) => {
                 let rects:Array<Rect> = area.pages.get(fileID);
                 if (rects != null && rects.length === 0) {
                     return true;
