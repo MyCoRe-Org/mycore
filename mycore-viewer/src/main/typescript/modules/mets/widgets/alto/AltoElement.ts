@@ -7,7 +7,7 @@ namespace mycore.viewer.widgets.alto {
         //diese Klasse stellt ein Grundelement von ALTO dar mit den Minimalanforderungen
 
         //Attribute der Elemente (die hier genannten MÜSSEN vorliegen)
-        private _children:Array<AltoElement> = new Array<AltoElement>();
+        private _children:Array<AltoElement> = [];
         private _content:string = null;
         private _style:AltoStyle = null;
 
@@ -79,13 +79,15 @@ namespace mycore.viewer.widgets.alto {
         }
         
         public getBlockHPos():number {
-
             return this._hpos;
         }
 
         public getBlockVPos():number {
-      
             return this._vpos;
+        }
+
+        public asRect():Rect {
+            return Rect.fromXYWH(this.getHPos(), this.getVPos(), this.getWidth(), this.getHeight());
         }
 
     }
