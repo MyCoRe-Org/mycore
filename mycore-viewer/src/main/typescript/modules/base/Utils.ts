@@ -279,15 +279,16 @@ class Rect {
         return p.x < this.pos.x + this.size.width && p.x > this.pos.x && p.y < this.pos.y + this.size.height && p.y > this.pos.y;
     }
 
-    public intersectsArea(a:Rect):boolean {
-        return this.intersects(a.pos) ||
-            this.intersects(new Position2D(a.getX() + a.getWidth(), a.getY() + a.getHeight()));
+    public intersectsArea(other:Rect):boolean {
+        return (this.getX() <= (other.getX() + other.getWidth()) &&
+        other.getX() <= (this.getX() + this.getWidth()) &&
+        this.getY() <= (other.getY() + other.getHeight()) &&
+        other.getY() <= (this.getY() + this.getHeight()));
     }
 
     public rotate(deg:number) {
         return new Rect(this.pos.rotate(deg), this.size.getRotated(deg));
     }
-
 
     public flipX():Rect {
         let x = this.pos.x + this.size.width;
@@ -363,6 +364,13 @@ class Rect {
     }
 
     /**
+     * Tries to maximize the bounds.
+     */
+    public maximizeRect(other:Rect):Rect {
+        return this.maximize(other.getX(), other.getY(), other.getWidth(), other.getHeight());
+    }
+
+    /**
      * Increase the rect with the given number of pixel's on all sides.
      * This is like adding a padding.
      */
@@ -375,12 +383,6 @@ class Rect {
     }
 
     public difference(rect:Rect):Array<Rect> {
-        /*let intersectionRect:Rect = this.getIntersection(rect);
-        if(intersectionRect == null) {
-            return [];
-        }
-        let newRect1 = Rect.fromXYWH();*/
-
         let diffs:Array<Rect> = Rect.diff(this, rect);
         diffs = diffs
           .filter(rect => rect.getWidth() != 0 && rect.getHeight() != 0)
@@ -446,14 +448,14 @@ class Rect {
         let h:number = Math.max( r.getY() + r.getHeight(), s.getY() + s.getHeight() );
 
         let result:Array<Rect> = [];
-        result[ 0 ] = Rect.fromULLR(new Position2D(a, e), new Position2D(b, f));
-        result[ 1 ] = Rect.fromULLR(new Position2D(b, e), new Position2D(c, f));
-        result[ 2 ] = Rect.fromULLR(new Position2D(c, e), new Position2D(d, f));
-        result[ 3 ] = Rect.fromULLR(new Position2D(a, f), new Position2D(b, g));
-        result[ 4 ] = Rect.fromULLR(new Position2D(c, f), new Position2D(d, g));
-        result[ 5 ] = Rect.fromULLR(new Position2D(a, g), new Position2D(b, h));
-        result[ 6 ] = Rect.fromULLR(new Position2D(b, g), new Position2D(c, h));
-        result[ 7 ] = Rect.fromULLR(new Position2D(c, g), new Position2D(d, h));
+        result[ 0 ] = Rect.fromULLR(new Position2D(a, e), new Position2D(b - 1, f - 1));
+        result[ 1 ] = Rect.fromULLR(new Position2D(b, e), new Position2D(c, f - 1));
+        result[ 2 ] = Rect.fromULLR(new Position2D(c + 1, e), new Position2D(d, f - 1));
+        result[ 3 ] = Rect.fromULLR(new Position2D(a, f), new Position2D(b - 1, g));
+        result[ 4 ] = Rect.fromULLR(new Position2D(c + 1, f), new Position2D(d, g));
+        result[ 5 ] = Rect.fromULLR(new Position2D(a, g + 1), new Position2D(b - 1, h));
+        result[ 6 ] = Rect.fromULLR(new Position2D(b, g + 1), new Position2D(c, h));
+        result[ 7 ] = Rect.fromULLR(new Position2D(c + 1, g + 1), new Position2D(d, h));
         return result;
     }
 
