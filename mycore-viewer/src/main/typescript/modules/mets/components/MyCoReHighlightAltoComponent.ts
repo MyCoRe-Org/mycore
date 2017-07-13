@@ -290,6 +290,8 @@ namespace mycore.viewer.components {
                 });
                 // fix stuff, needs to be done after all chapters are added
                 chapterIds.map(chapterId => this.chapters.get(chapterId)).forEach((chapter, i, chapters) => {
+                    // maximize
+                    chapter.maximizeAreas(pageId);
                     // fix area intersections of chapters on the same page
                     for (let j = 0; j < chapters.length; j++) {
                         if (i == j) {
@@ -317,8 +319,15 @@ namespace mycore.viewer.components {
 
         public addPage(pageId:string, altoFile:widgets.alto.AltoFile, metsAreas:Array<MetsArea>) {
             let altoBlocks:Array<widgets.alto.AltoElement> = this.getAltoBlocks(altoFile, metsAreas);
-            this.pages.set(pageId, [this.getAreaRect(altoFile, altoBlocks)]);
+            this.pages.set(pageId, this.getAreaRects(altoFile, altoBlocks));
             this.metsAreas.set(pageId, metsAreas);
+        }
+
+        public maximizeAreas(pageId:string) {
+            let newArea = this.pages.get(pageId).reduce((a, b) => {
+               return a.maximizeRect(b);
+            });
+            this.pages.set(pageId, [newArea]);
         }
 
         /**
@@ -389,22 +398,15 @@ namespace mycore.viewer.components {
             return blocks;
         }
 
-        private getAreaRect(altoFile:widgets.alto.AltoFile, blocks:Array<widgets.alto.AltoElement>):Rect {
-            let area:Rect = null;
-            blocks.forEach(block => {
-                let blockX:number = block.getBlockHPos();
-                let blockY:number = block.getBlockVPos();
-                let blockW:number = block.getWidth();
-                let blockH:number = block.getHeight();
-                if (area == null) {
-                    area = Rect.fromXYWH(blockX, blockY, blockW, blockH);
-                    return;
-                }
-                area = area.maximize(blockX, blockY, blockW, blockH);
-            });
-            // add a padding
-            return area.increase(Math.ceil(altoFile.pageHeight * 0.004));
+        private getAreaRects(altoFile: widgets.alto.AltoFile, blocks: Array<widgets.alto.AltoElement>): Array<Rect> {
+            let padding: number = Math.ceil(altoFile.pageHeight * 0.004);
+            return blocks.map(block => {
+                return Rect
+                    .fromXYWH(block.getBlockHPos(), block.getBlockVPos(), block.getWidth(), block.getHeight())
+                    .increase(padding);
+            })
         }
+
     }
 
     export class MetsArea {
