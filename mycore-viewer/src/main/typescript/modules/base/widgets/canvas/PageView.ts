@@ -7,7 +7,7 @@ namespace mycore.viewer.widgets.canvas {
         public markCanvas:HTMLCanvasElement = null;
 
         constructor(public drawImage:boolean = true, public drawHTML:boolean = true) {
-            let drawFilter = drawImage && drawHTML ? "grayscale() contrast(1000%)" : null;
+            let drawFilter = drawImage && drawHTML ? "grayscale(1) contrast(1000%)" : null;
             this.drawCanvas = PageView.createCanvas(1, drawFilter);
             this.markCanvas = PageView.createCanvas(4);
 
