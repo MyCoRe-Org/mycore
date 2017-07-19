@@ -109,7 +109,9 @@ namespace mycore.viewer.widgets.alto {
                 let line = block.getChildren()[0];
                 return getLineHeight(line, line.getHeight());
             }
-            let maxSize:number = 9999;
+            let maxSize:number = block.getChildren().reduce((acc, line) => {
+                return Math.max(acc, line.getHeight());
+            }, 0);
             block.getChildren().forEach(line => {
                 maxSize = getLineHeight(line, maxSize);
             });
