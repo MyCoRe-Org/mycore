@@ -70,6 +70,7 @@ import org.mycore.urn.services.MCRURNManager;
  * @author shermann
  * @author Robert Stephan
  */
+@Deprecated
 public class MCRURNEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRURNEventHandler.class);

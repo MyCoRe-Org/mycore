@@ -47,6 +47,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRURNResolver extends MCRServlet {
 
     private final static Logger LOGGER = LogManager.getLogger(MCRURNResolver.class);

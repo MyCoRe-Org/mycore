@@ -12,6 +12,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.urn.services.MCRURN;
 import org.mycore.urn.services.MCRURNManager;
 
+@Deprecated
 public class MCRURNGeneratorTest extends MCRJPATestCase {
     @Test
     public void testChecksum() {

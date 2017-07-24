@@ -65,6 +65,7 @@ import org.mycore.urn.hibernate.MCRURN;
  * @author Frank Lützenkirchen
  * @author Robert Stephan
  */
+@Deprecated
 public class MCRURNManager {
 
     /** The MCRURNStore implementation to use */
