@@ -24,6 +24,6 @@
 /**
  * Classes for managing urn:nbn:de URIs.
  * @author Thomas Scheffler (yagee)
- *
  */
+@java.lang.Deprecated
 package org.mycore.urn;

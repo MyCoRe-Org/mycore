@@ -58,6 +58,7 @@ import org.mycore.common.config.MCRConfiguration;
  *
  * @author Frank Lützenkirchen
  */
+@Deprecated
 public class MCRNISSBuilderDateCounter implements MCRNISSBuilder {
 
     private String lastDate;

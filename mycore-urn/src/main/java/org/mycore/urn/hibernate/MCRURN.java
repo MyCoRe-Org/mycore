@@ -37,6 +37,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "MCRURN")
+@Deprecated
 public class MCRURN {
     @EmbeddedId
     private MCRURNPK key;

@@ -18,6 +18,7 @@ import org.mycore.urn.hibernate.MCRURN;
  * @author shermann
  *
  */
+@Deprecated
 public class EpicurLite {
 
     private final MCRURN urn;

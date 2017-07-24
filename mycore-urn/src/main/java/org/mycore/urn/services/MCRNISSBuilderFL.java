@@ -34,6 +34,7 @@ import java.util.GregorianCalendar;
  * 
  * @author Frank Lützenkirchen
  */
+@Deprecated
 public class MCRNISSBuilderFL implements MCRNISSBuilder {
     private String last;
 
