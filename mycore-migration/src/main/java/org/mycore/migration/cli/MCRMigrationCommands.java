@@ -56,7 +56,6 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRDNBURNParser;
-import org.mycore.urn.hibernate.MCRURN;
 import org.xml.sax.SAXException;
 
 /**
@@ -249,10 +248,11 @@ public class MCRMigrationCommands {
     }
 
     @MCRCommand(help = "migrate urn with serveID {service ID}", syntax = "migrate urn with serveID {0}")
+    @Deprecated
     public static void migrateURN(String serviceID) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
 
-        entityManager.createQuery("select u from MCRURN u", MCRURN.class)
+        entityManager.createQuery("select u from MCRURN u", org.mycore.urn.hibernate.MCRURN.class)
             .getResultList()
             .stream()
             .flatMap(mcrurn -> toMCRPI(mcrurn, serviceID))
@@ -263,7 +263,8 @@ public class MCRMigrationCommands {
         transaction.commit();
     }
 
-    private static Stream<MCRPI> toMCRPI(MCRURN mcrurn, String serviceID) {
+    @Deprecated
+    private static Stream<MCRPI> toMCRPI(org.mycore.urn.hibernate.MCRURN mcrurn, String serviceID) {
         String derivID = mcrurn.getId();
         String additional = Optional
             .ofNullable(mcrurn.getPath())
@@ -286,7 +287,8 @@ public class MCRMigrationCommands {
             .orElse(Stream.of(mcrpi));
     }
 
-    private static Optional<MCRDNBURN> parse(MCRURN urn) {
+    @Deprecated
+    private static Optional<MCRDNBURN> parse(org.mycore.urn.hibernate.MCRURN urn) {
         return new MCRDNBURNParser().parse(urn.getURN());
     }
 

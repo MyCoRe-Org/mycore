@@ -13,6 +13,7 @@ import org.mycore.urn.services.MCRURNManager;
  * Adds URNS to SOLR Index
  * Changeable in property <code>MCR.Module-solr.Indexer.File.AccumulatorList</code>
  */
+@Deprecated
 public class MCRSolrFileIndexURNAccumulator implements MCRSolrFileIndexAccumulator {
     @Override
     public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)

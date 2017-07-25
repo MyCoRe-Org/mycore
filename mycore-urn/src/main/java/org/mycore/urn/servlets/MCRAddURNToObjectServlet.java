@@ -32,6 +32,7 @@ import org.mycore.urn.services.MCRURNManager;
  *
  * @author shermann
  */
+@Deprecated
 public class MCRAddURNToObjectServlet extends MCRServlet {
     private static final Logger LOGGER = LogManager.getLogger(MCRAddURNToObjectServlet.class);
 
