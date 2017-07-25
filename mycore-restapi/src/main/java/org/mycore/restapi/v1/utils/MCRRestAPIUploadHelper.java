@@ -268,6 +268,9 @@ public class MCRRestAPIUploadHelper {
                                     Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
                                 }
                                 path = formParamPath.replace("\\", "/").replace("../", "");
+                                while(path.startsWith("/")){
+                                    path = path.substring(1);
+                                }
 
                                 MCRDirectory difs = MCRDirectory.getRootDirectory(derID.toString());
                                 if (difs == null) {
