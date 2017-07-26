@@ -61,7 +61,7 @@ import org.xml.sax.SAXException;
 /**
  * @author Thomas Scheffler (yagee)
  */
-@MCRCommandGroup(name = "MyCoRe migration 2015.0x")
+@MCRCommandGroup(name = "MyCoRe migration")
 public class MCRMigrationCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
