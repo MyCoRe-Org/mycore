@@ -36,6 +36,7 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-urn</artifactId>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>
