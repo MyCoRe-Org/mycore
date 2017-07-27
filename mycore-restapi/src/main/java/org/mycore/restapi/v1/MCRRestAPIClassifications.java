@@ -89,7 +89,6 @@ public class MCRRestAPIClassifications {
      *     Possible values are: json | xml (required)
      */
     @GET
-    @Path("/")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     public Response listClassifications(@Context UriInfo info,
         @QueryParam("format") @DefaultValue("json") String format) {
