@@ -123,8 +123,11 @@ public class MCRRestAPIObjectsHelper {
                             //  <derivate display="true">
 
                             eDer = eDer.getChild("mycorederivate").getChild("derivate");
-                            eDer.addContent(listDerivateContent(mcrObj,
-                                MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID)), info));
+                            Document docContents = listDerivateContentAsXML(
+                                MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID)), "/", -1, info);
+                            if (docContents.hasRootElement()) {
+                                eDer.addContent(docContents.getRootElement().detach());
+                            }
                         } catch (MCRException e) {
                             eDer.addContent(new Comment("Error: Derivate not found."));
                         } catch (IOException e) {
@@ -159,7 +162,10 @@ public class MCRRestAPIObjectsHelper {
             MCRDerivate derObj = retrieveMCRDerivate(mcrObj, pathParamDerID);
 
             Document doc = derObj.createXML();
-            doc.getRootElement().addContent(listDerivateContent(mcrObj, derObj, info));
+            Document docContent = listDerivateContentAsXML(derObj, "/", -1, info);
+            if (docContent != null && docContent.hasRootElement()) {
+                doc.getRootElement().addContent(docContent.getRootElement().detach());
+            }
 
             StringWriter sw = new StringWriter();
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
@@ -173,41 +179,6 @@ public class MCRRestAPIObjectsHelper {
 
         // return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, "Unexepected program flow termination.",
         //       "Please contact a developer!").createHttpResponse();
-    }
-
-    private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj, UriInfo info) throws IOException {
-        return listDerivateContent(mcrObj, derObj, "", info);
-    }
-
-    private static Element listDerivateContent(MCRObject mcrObj, MCRDerivate derObj, String deriPath, UriInfo info)
-        throws IOException {
-        Element eContents = new Element("contents");
-        eContents.setAttribute("mycoreobject", mcrObj.getId().toString());
-        eContents.setAttribute("derivate", derObj.getId().toString());
-        if (!deriPath.endsWith("/")) {
-            deriPath += "/";
-        }
-        MCRPath p = MCRPath.getPath(derObj.getId().toString(), deriPath);
-        if (p != null) {
-            eContents.addContent(MCRPathXML.getDirectoryXML(p).getRootElement().detach());
-        }
-
-        String baseURL = MCRJerseyUtil.getBaseURL(info)
-            + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
-        baseURL = baseURL.replace("${mcrid}", mcrObj.getId().toString()).replace("${derid}", derObj.getId().toString());
-        XPathExpression<Element> xp = XPathFactory.instance().compile(".//child[@type='file']", Filters.element());
-        for (Element e : xp.evaluate(eContents)) {
-            String uri = e.getChildText("uri");
-            if (uri != null) {
-                int pos = uri.lastIndexOf(":/");
-                String path = uri.substring(pos + 2);
-                while (path.startsWith("/")) {
-                    path = path.substring(1);
-                }
-                e.setAttribute("href", baseURL + path);
-            }
-        }
-        return eContents;
     }
 
     private static String listDerivateContentAsJson(MCRDerivate derObj, String path, int depth, UriInfo info)
@@ -225,6 +196,74 @@ public class MCRRestAPIObjectsHelper {
             writer.close();
         }
         return sw.toString();
+    }
+
+    private static Document listDerivateContentAsXML(MCRDerivate derObj, String path, int depth, UriInfo info)
+        throws IOException {
+        Document doc = new Document();
+
+        MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
+        root = MCRPath.toMCRPath(root.resolve(path));
+        if (depth == -1) {
+            depth = Integer.MAX_VALUE;
+        }
+        if (root != null) {
+            Element eContents = new Element("contents");
+            eContents.setAttribute("mycoreobject", derObj.getOwnerID().toString());
+            eContents.setAttribute("mycorederivate", derObj.getId().toString());
+            doc.addContent(eContents);
+            if (!path.endsWith("/")) {
+                path += "/";
+            }
+            MCRPath p = MCRPath.getPath(derObj.getId().toString(), path);
+            if (p != null && Files.exists(p)) {
+                Element eRoot = MCRPathXML.getDirectoryXML(p).getRootElement();
+                eContents.addContent(eRoot.detach());
+                createXMLForSubdirectories(p, eRoot, 1, depth);
+            }
+
+            //add href Attributes
+            String baseURL = MCRJerseyUtil.getBaseURL(info)
+                + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
+            baseURL = baseURL.replace("${mcrid}", derObj.getOwnerID().toString()).replace("${derid}",
+                derObj.getId().toString());
+            XPathExpression<Element> xp = XPathFactory.instance().compile(".//child[@type='file']", Filters.element());
+            for (Element e : xp.evaluate(eContents)) {
+                String uri = e.getChildText("uri");
+                if (uri != null) {
+                    int pos = uri.lastIndexOf(":/");
+                    String subPath = uri.substring(pos + 2);
+                    while (subPath.startsWith("/")) {
+                        subPath = path.substring(1);
+                    }
+                    e.setAttribute("href", baseURL + subPath);
+                }
+            }
+        }
+        return doc;
+    }
+
+    private static void createXMLForSubdirectories(MCRPath mcrPath, Element currentElement, int currentDepth,
+        int maxDepth) {
+        if (currentDepth < maxDepth) {
+            XPathExpression<Element> xp = XPathFactory.instance().compile("./children/child[@type='directory']",
+                Filters.element());
+            for (Element e : xp.evaluate(currentElement)) {
+                String name = e.getChildTextNormalize("name");
+                try {
+                    MCRPath pChild = (MCRPath) mcrPath.resolve(name);
+                    Document doc = MCRPathXML.getDirectoryXML(pChild);
+                    Element eChildren = doc.getRootElement().getChild("children");
+                    if (eChildren != null) {
+                        e.addContent(eChildren.detach());
+                        createXMLForSubdirectories(pChild, e, currentDepth + 1, maxDepth);
+                    }
+                } catch (IOException ex) {
+                    //ignore
+                }
+
+            }
+        }
     }
 
     /**
@@ -574,7 +613,7 @@ public class MCRRestAPIObjectsHelper {
             }
             switch (format) {
                 case MCRRestAPIObjects.FORMAT_XML:
-                    Document docOut = new Document(listDerivateContent(mcrObj, derObj, path, info));
+                    Document docOut = listDerivateContentAsXML(derObj, path, depth, info);
                     try (StringWriter sw = new StringWriter()) {
                         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
                         xout.output(docOut, sw);
