@@ -225,8 +225,9 @@ public class MCRRestAPIObjects {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadDerivate(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrObjID") String mcrObjID, @FormDataParam("label") String label) {
-        return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label);
+        @PathParam("mcrObjID") String mcrObjID, @FormDataParam("label") String label,
+        @DefaultValue("false") @FormDataParam("overwriteOnExistingLabel") boolean overwrite) {
+        return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label, overwrite);
     }
 
     @POST
