@@ -163,7 +163,7 @@ public class MCRRestAPIUploadHelper {
     }
 
     public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
-        String formParamlabel) {
+        String formParamlabel, boolean overwriteOnExistingLabel) {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         try {
             if (MCRRestAPIUtil.checkWriteAccessForIP(request)) {
@@ -180,10 +180,12 @@ public class MCRRestAPIUploadHelper {
 
                     MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjID);
                     MCRObjectID derID = null;
-                    for (MCRMetaLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                        if (formParamlabel.equals(derLink.getXLinkLabel())
-                            || formParamlabel.equals(derLink.getXLinkTitle())) {
-                            derID = derLink.getXLinkHrefID();
+                    if (overwriteOnExistingLabel) {
+                        for (MCRMetaLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                            if (formParamlabel.equals(derLink.getXLinkLabel())
+                                || formParamlabel.equals(derLink.getXLinkTitle())) {
+                                derID = derLink.getXLinkHrefID();
+                            }
                         }
                     }
 
