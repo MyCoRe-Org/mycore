@@ -73,7 +73,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     /**
      * Returns the owner of this derivate link. In most cases this is
      * the derivate id itself.
-     * 
+     *
      * @return the owner of this derivate link.
      */
     public String getOwner() {
@@ -87,7 +87,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     /**
      * Returns the URI decoded path of this derivate link. Use {@link #getRawPath()}
      * if you want the URI encoded path.
-     * 
+     *
      * @return path of this derivate link
      * @throws URISyntaxException the path couldn't be decoded
      */
@@ -99,7 +99,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
      * Returns the raw path of this derivate link. Be aware that
      * this path is URI encoded. Use {@link #getPath()} if you want
      * the URI decoded path.
-     * 
+     *
      * @return URI encoded path
      */
     public String getRawPath() {
@@ -112,7 +112,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
 
     /**
      * Returns the {@link MCRPath} to this derivate link.
-     * 
+     *
      * @return path to this derivate link
      * @throws URISyntaxException the path part of this derivate link couldn't be decoded because
      *           its an invalid URI
@@ -129,16 +129,22 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
      * <li>the inherited value is lower than zero</li>
      * <li>the linked files is null or does not exist</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaDerivateLink is invalid
      */
     public void validate() throws MCRException {
         super.validate();
         try {
             MCRPath linkedFile = getLinkedFile();
-            if (linkedFile == null || !Files.exists(linkedFile)) {
-                throw new MCRException(getSubTag() + ": File not found: " + super.href);
+
+            if (linkedFile == null) {
+                throw new MCRException(getSubTag() + ": linked file is null");
             }
+
+            if (!Files.exists(linkedFile)) {
+                LOGGER.warn(getSubTag() + ": File not found: " + super.href);
+            }
+
         } catch (Exception exc) {
             throw new MCRException(getSubTag() + ": Error while getting linked file " + super.href, exc);
         }
