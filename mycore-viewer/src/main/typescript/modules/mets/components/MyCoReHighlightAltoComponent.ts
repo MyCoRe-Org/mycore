@@ -292,6 +292,9 @@ namespace mycore.viewer.components {
                 chapterIds.map(chapterId => this.chapters.get(chapterId)).forEach((chapter, i, chapters) => {
                     // maximize
                     let maximizedRect = chapter.maximize(pageId);
+                    if(maximizedRect == null) {
+                        return;
+                    }
                     chapter.boundingBoxMap.set(pageId, [maximizedRect]);
 
                     for (let j = 0; j < chapters.length; j++) {
@@ -334,7 +337,11 @@ namespace mycore.viewer.components {
         }
 
         public maximize(pageId:string):Rect {
-            return this.boundingBoxMap.get(pageId).reduce((a, b) => {
+            let boundingBox = this.boundingBoxMap.get(pageId);
+            if(boundingBox == null || boundingBox.length == 0) {
+                return null;
+            }
+            return boundingBox.reduce((a, b) => {
                return a.maximizeRect(b);
             });
         }
