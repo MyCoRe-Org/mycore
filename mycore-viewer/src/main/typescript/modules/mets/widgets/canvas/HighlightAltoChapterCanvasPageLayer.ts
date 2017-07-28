@@ -55,7 +55,7 @@ namespace mycore.viewer.widgets.canvas {
             }
 
             if(highlighted && selected) {
-                this.drawRects(ctx, id, this.highlightedChapter.pages, "rgba(0,0,0,0.2)");
+                this.drawRects(ctx, id, this.highlightedChapter.boundingBoxMap, "rgba(0,0,0,0.2)");
             }
         }
 
@@ -65,7 +65,7 @@ namespace mycore.viewer.widgets.canvas {
          * @returns true if a chapter is selected
          */
         private isChapterSelected():boolean {
-            return this.selectedChapter != null && !this.selectedChapter.pages.isEmpty();
+            return this.selectedChapter != null && !this.selectedChapter.boundingBoxMap.isEmpty();
         }
 
         /**
@@ -74,7 +74,7 @@ namespace mycore.viewer.widgets.canvas {
          * @returns true if highlighted false otherwise
          */
         private isHighlighted():boolean {
-            let highlighted:boolean = this.highlightedChapter != null && !this.highlightedChapter.pages.isEmpty();
+            let highlighted:boolean = this.highlightedChapter != null && !this.highlightedChapter.boundingBoxMap.isEmpty();
             if(highlighted && this.isChapterSelected()) {
                 return this.highlightedChapter.chapterId !== this.selectedChapter.chapterId;
             }
@@ -92,11 +92,8 @@ namespace mycore.viewer.widgets.canvas {
          */
         private isLinkedWithoutBlocks(fileID:string):boolean {
             return !this.chaptersToClear.filter((id:string, area:components.AltoChapter) => {
-                let rects:Array<Rect> = area.pages.get(fileID);
-                if (rects != null && rects.length === 0) {
-                    return true;
-                }
-                return false;
+                let rects:Array<Rect> = area.boundingBoxMap.get(fileID);
+                return rects != null && rects.length === 0;
             }).isEmpty();
         }
 
@@ -117,9 +114,19 @@ namespace mycore.viewer.widgets.canvas {
             ctx.save();
             {
                 this.chaptersToClear.values.forEach(chapterArea => {
-                    chapterArea.pages.hasThen( id, rects => {
+                    chapterArea.boundingBoxMap.hasThen( id, rects => {
                         rects.forEach(rect => {
                             ctx.clearRect( rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight() );
+
+                            /*
+                            Add some strokes around the blocks for testing purpose
+                            ctx.strokeStyle = "rgba(1,0,0,0.8)";
+                            ctx.lineWidth = 5;
+                            ctx.beginPath();
+                            ctx.rect( rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight() );
+                            ctx.closePath();
+                            ctx.stroke();
+                            */
                         });
                     });
                 });
