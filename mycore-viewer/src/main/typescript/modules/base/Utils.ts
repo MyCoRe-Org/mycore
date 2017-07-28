@@ -280,10 +280,10 @@ class Rect {
     }
 
     public intersectsArea(other:Rect):boolean {
-        return (this.getX() <= (other.getX() + other.getWidth()) &&
-        other.getX() <= (this.getX() + this.getWidth()) &&
-        this.getY() <= (other.getY() + other.getHeight()) &&
-        other.getY() <= (this.getY() + this.getHeight()));
+        return (this.getX() < (other.getX() + other.getWidth()) &&
+        other.getX() < (this.getX() + this.getWidth()) &&
+        this.getY() < (other.getY() + other.getHeight()) &&
+        other.getY() < (this.getY() + this.getHeight()));
     }
 
     public rotate(deg:number) {
@@ -448,14 +448,14 @@ class Rect {
         let h:number = Math.max( r.getY() + r.getHeight(), s.getY() + s.getHeight() );
 
         let result:Array<Rect> = [];
-        result[ 0 ] = Rect.fromULLR(new Position2D(a, e), new Position2D(b - 1, f - 1));
-        result[ 1 ] = Rect.fromULLR(new Position2D(b, e), new Position2D(c, f - 1));
-        result[ 2 ] = Rect.fromULLR(new Position2D(c + 1, e), new Position2D(d, f - 1));
-        result[ 3 ] = Rect.fromULLR(new Position2D(a, f), new Position2D(b - 1, g));
-        result[ 4 ] = Rect.fromULLR(new Position2D(c + 1, f), new Position2D(d, g));
-        result[ 5 ] = Rect.fromULLR(new Position2D(a, g + 1), new Position2D(b - 1, h));
-        result[ 6 ] = Rect.fromULLR(new Position2D(b, g + 1), new Position2D(c, h));
-        result[ 7 ] = Rect.fromULLR(new Position2D(c + 1, g + 1), new Position2D(d, h));
+        result[ 0 ] = Rect.fromULLR(new Position2D(a, e), new Position2D(b, f));
+        result[ 1 ] = Rect.fromULLR(new Position2D(b, e), new Position2D(c, f));
+        result[ 2 ] = Rect.fromULLR(new Position2D(c, e), new Position2D(d, f));
+        result[ 3 ] = Rect.fromULLR(new Position2D(a, f), new Position2D(b, g));
+        result[ 4 ] = Rect.fromULLR(new Position2D(c, f), new Position2D(d, g));
+        result[ 5 ] = Rect.fromULLR(new Position2D(a, g), new Position2D(b, h));
+        result[ 6 ] = Rect.fromULLR(new Position2D(b, g), new Position2D(c, h));
+        result[ 7 ] = Rect.fromULLR(new Position2D(c, g), new Position2D(d, h));
         return result;
     }
 

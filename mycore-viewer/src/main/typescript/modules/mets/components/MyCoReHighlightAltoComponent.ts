@@ -189,7 +189,7 @@ namespace mycore.viewer.components {
             }
             for (let chapterId of chapterIdsOnPage) {
                 let altoChapter:AltoChapter = chapters.get(chapterId);
-                let rectsOfChapter:Array<Rect> = altoChapter.pages.get(pageHitInfo.id);
+                let rectsOfChapter:Array<Rect> = altoChapter.boundingBoxMap.get(pageHitInfo.id);
                 if (rectsOfChapter == null) {
                     continue;
                 }
@@ -291,12 +291,17 @@ namespace mycore.viewer.components {
                 // fix stuff, needs to be done after all chapters are added
                 chapterIds.map(chapterId => this.chapters.get(chapterId)).forEach((chapter, i, chapters) => {
                     // maximize
-                    chapter.maximizeAreas(pageId);
-                    // fix area intersections of chapters on the same page
+                    let maximizedRect = chapter.maximize(pageId);
+                    chapter.boundingBoxMap.set(pageId, [maximizedRect]);
+
                     for (let j = 0; j < chapters.length; j++) {
                         if (i == j) {
                             continue;
                         }
+                        // try to remove bounding box
+                        let otherBoundingBox = chapters[j].maximize(pageId);
+                        chapter.fixBoundingBox(pageId, otherBoundingBox);
+                        // fix area intersections of chapters on the same page
                         chapter.fixIntersections(pageId, chapters[j]);
                     }
                     // remove areas which does not contain any content
@@ -308,26 +313,61 @@ namespace mycore.viewer.components {
 
     export class AltoChapter {
 
-        public pages:MyCoReMap<string, Array<Rect>>;
+        public boundingBoxMap:MyCoReMap<string, Array<Rect>>;
+
+        public altoRectMap:MyCoReMap<string, Array<Rect>>;
 
         public metsAreas:MyCoReMap<string, Array<MetsArea>>;
 
         constructor(public chapterId:string) {
-            this.pages = new MyCoReMap<string, Array<Rect>>();
+            this.boundingBoxMap = new MyCoReMap<string, Array<Rect>>();
+            this.altoRectMap = new MyCoReMap<string, Array<Rect>>();
             this.metsAreas = new MyCoReMap<string, Array<MetsArea>>();
         }
 
         public addPage(pageId:string, altoFile:widgets.alto.AltoFile, metsAreas:Array<MetsArea>) {
             let altoBlocks:Array<widgets.alto.AltoElement> = this.getAltoBlocks(altoFile, metsAreas);
-            this.pages.set(pageId, this.getAreaRects(altoFile, altoBlocks));
+            let areaRects = this.getAreaRects(altoFile, altoBlocks);
+            this.altoRectMap.set(pageId, areaRects);
+            this.boundingBoxMap.set(pageId, areaRects);
             this.metsAreas.set(pageId, metsAreas);
         }
 
-        public maximizeAreas(pageId:string) {
-            let newArea = this.pages.get(pageId).reduce((a, b) => {
+        public maximize(pageId:string):Rect {
+            return this.boundingBoxMap.get(pageId).reduce((a, b) => {
                return a.maximizeRect(b);
             });
-            this.pages.set(pageId, [newArea]);
+        }
+
+        public fixBoundingBox(pageId:string, rect:Rect):boolean {
+            let thisBoundingBox = this.boundingBoxMap.get(pageId);
+            for (let thisBBRect of thisBoundingBox) {
+                if(!thisBBRect.intersectsArea(rect) || this.intersectText(pageId, rect)) {
+                    continue;
+                }
+                thisBoundingBox = thisBoundingBox.filter(rect => rect !== thisBBRect);
+                thisBBRect.difference(rect).forEach(rect => thisBoundingBox.push(rect));
+                this.boundingBoxMap.set(pageId, thisBoundingBox);
+                this.fixBoundingBox(pageId, rect);
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Checks if the alto blocks are intersected by the given rect.
+         *
+         * @param pageId id of the page
+         * @param rect the rect
+         */
+        public intersectText(pageId:string, rect:Rect):boolean {
+            let rects = this.altoRectMap.get(pageId);
+            for(let altoRect of rects) {
+                if(altoRect.intersectsArea(rect)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /**
@@ -337,16 +377,16 @@ namespace mycore.viewer.components {
          * @param other the other chapter area
          */
         public fixIntersections(pageId:string, other:AltoChapter) {
-            let thisAreas = this.pages.get(pageId);
-            let otherAreas = other.pages.get(pageId);
+            let thisAreas = this.boundingBoxMap.get(pageId);
+            let otherAreas = other.boundingBoxMap.get(pageId);
             for (let thisArea of thisAreas) {
                 for (let otherArea of otherAreas) {
                     if (!thisArea.intersectsArea(otherArea)) {
                         continue;
                     }
-                    thisAreas = thisAreas.filter(item => item !== thisArea);
-                    thisArea.difference(otherArea).forEach(area => thisAreas.push(area));
-                    this.pages.set(pageId, thisAreas);
+                    thisAreas = thisAreas.filter(rect => rect !== thisArea);
+                    thisArea.difference(otherArea).forEach(rect => thisAreas.push(rect));
+                    this.boundingBoxMap.set(pageId, thisAreas);
                     this.fixIntersections(pageId, other);
                     return;
                 }
@@ -360,10 +400,10 @@ namespace mycore.viewer.components {
          * @param alto the alto file
          */
         public fixEmptyAreas(pageId:string, alto:widgets.alto.AltoFile) {
-            let thisAreas = this.pages.get(pageId);
+            let thisAreas = this.boundingBoxMap.get(pageId);
             let thisMetsAreas = this.metsAreas.get(pageId);
-            let textBlockIds = alto.getBlocks().map(block => block.getId());
-            let textAreas:Array<Rect> = alto.getBlocks()
+            let textBlockIds = alto.allElements.map(block => block.getId());
+            let textAreas:Array<Rect> = alto.allElements
                 .filter(block => {
                     return thisMetsAreas.some(metsArea => metsArea.contains(textBlockIds, block.getId()));
                 })
@@ -376,7 +416,7 @@ namespace mycore.viewer.components {
                 }
                 return false;
             });
-            this.pages.set(pageId, thisAreas);
+            this.boundingBoxMap.set(pageId, thisAreas);
         }
 
         private getAltoBlocks(altoFile:widgets.alto.AltoFile,
@@ -404,7 +444,7 @@ namespace mycore.viewer.components {
                 return Rect
                     .fromXYWH(block.getBlockHPos(), block.getBlockVPos(), block.getWidth(), block.getHeight())
                     .increase(padding);
-            })
+            });
         }
 
     }
