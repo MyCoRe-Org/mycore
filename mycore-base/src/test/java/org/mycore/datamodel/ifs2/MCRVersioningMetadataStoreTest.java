@@ -1,5 +1,5 @@
 /*
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -28,12 +28,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.net.URI;
 import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
@@ -41,7 +46,7 @@ import org.mycore.common.content.MCRJDOMContent;
 
 /**
  * JUnit test for MCRVersioningMetadataStore
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
@@ -226,5 +231,41 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         v1.restore();
         assertFalse(vm.isDeleted());
         assertEquals(root.getName(), vm.getMetadata().asXML().getRootElement().getName());
+    }
+
+    @Test
+    public void verifyRevPropsFail() throws Exception {
+        getVersStore().verify();
+        deletedVersions();
+        getVersStore().verify();
+        File baseDIR = new File(URI.create(getVersStore().repURL.toString()));
+        File revProp = new File(baseDIR.toURI().resolve("db/revprops/0/2"));
+        assertTrue("is not a file " + revProp, revProp.isFile());
+        revProp.setWritable(true);
+        new PrintWriter(revProp).close();
+        revProp.setWritable(false);
+        try {
+            getVersStore().verify();
+        } catch (MCRPersistenceException e) {
+            return;
+        }
+        fail("Verify finished without error");
+    }
+
+    @Test
+    public void verifyRevFail() throws Exception {
+        getVersStore().verify();
+        deletedVersions();
+        getVersStore().verify();
+        File baseDIR = new File(URI.create(getVersStore().repURL.toString()));
+        File revProp = new File(baseDIR.toURI().resolve("db/revs/0/2"));
+        assertTrue("is not a file " + revProp, revProp.isFile());
+        new PrintWriter(revProp).close();
+        try {
+            getVersStore().verify();
+        } catch (MCRPersistenceException e) {
+            return;
+        }
+        fail("Verify finished without error");
     }
 }

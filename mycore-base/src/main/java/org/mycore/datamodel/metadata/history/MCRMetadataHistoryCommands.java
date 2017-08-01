@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.datamodel.metadata.history;
 
@@ -100,6 +100,10 @@ public class MCRMetadataHistoryCommands {
         help = "build metadata history of all objects with base id {0}")
     public static List<String> buildHistory(String baseId) {
         MCRMetadataStore store = MCRXMLMetadataManager.instance().getStore(baseId);
+        if (store instanceof MCRVersioningMetadataStore) {
+            LogManager.getLogger().info("Verify SVN history of " + baseId);
+            ((MCRVersioningMetadataStore) store).verify();
+        }
         ExecutorService executorService = Executors.newWorkStealingPool();
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
         int maxId = store.getHighestStoredID();
@@ -108,7 +112,7 @@ public class MCRMetadataHistoryCommands {
             .parallel()
             .mapToObj(i -> MCRObjectID.formatID(baseId, i))
             .map(MCRObjectID::getInstance)
-            .map(id -> new MCRTransactionableCallable<Object>(Executors.callable(() -> {
+            .map(id -> new MCRTransactionableCallable<>(Executors.callable(() -> {
                 EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
                 getHistoryItems(id).sequential().forEach(em::persist);
                 completed.decrementAndGet();
