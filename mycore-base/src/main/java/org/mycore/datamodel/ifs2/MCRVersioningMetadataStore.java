@@ -1,5 +1,5 @@
 /*
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -33,26 +33,33 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
+import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
+import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.auth.SVNAuthentication;
 import org.tmatesoft.svn.core.auth.SVNUserNameAuthentication;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.tmatesoft.svn.core.wc.SVNEvent;
+import org.tmatesoft.svn.core.wc.admin.ISVNAdminEventHandler;
+import org.tmatesoft.svn.core.wc.admin.SVNAdminClient;
+import org.tmatesoft.svn.core.wc.admin.SVNAdminEvent;
 
 /**
  * Stores metadata objects both in a local filesystem structure and in a
  * Subversion repository. Changes can be tracked and restored. To enable
  * versioning, configure the repository URL, for example
- * 
+ *
  * MCR.IFS2.Store.DocPortal_document.SVNRepositoryURL=file:///foo/svnroot/
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRVersioningMetadataStore extends MCRMetadataStore {
@@ -110,10 +117,10 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     /**
      * When metadata is saved, this results in SVN commit. If the property
      * MCR.IFS2.SyncLastModifiedOnSVNCommit=true (which is default), the
-     * last modified date of the metadata file in the store will be set to the exactly 
+     * last modified date of the metadata file in the store will be set to the exactly
      * same timestamp as the SVN commit. Due to permission restrictions on Linux systems,
      * this may fail, so you can disable that behaviour.
-     * 
+     *
      * @return true, if last modified of file should be same as timestamp of SVN commit
      */
     public static boolean shouldSyncLastModifiedOnSVNCommit() {
@@ -123,7 +130,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     /**
      * Returns the SVN repository used to manage metadata versions in this
      * store.
-     * 
+     *
      * @return the SVN repository used to manage metadata versions in this
      *         store.
      */
@@ -140,12 +147,63 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     /**
      * Returns the URL of the SVN repository used to manage metadata versions in
      * this store.
-     * 
+     *
      * @return the URL of the SVN repository used to manage metadata versions in
      *         this store.
      */
     SVNURL getRepositoryURL() {
         return repURL;
+    }
+
+    /**
+     * Checks to local SVN repository for errors
+     * @throws MCRPersistenceException if 'svn verify' fails
+     */
+    public void verify() throws MCRPersistenceException {
+        String replURLStr = repURL.toString();
+        if (!repURL.getProtocol().equals("file")) {
+            LOGGER.warn("Cannot verify non local SVN repository '{}'.", replURLStr);
+            return;
+        }
+        try {
+            SVNRepository repository = getRepository();
+            long latestRevision = repository.getLatestRevision();
+            if (latestRevision == 0) {
+                LOGGER.warn("Cannot verify SVN repository '{}' with no revisions.", replURLStr);
+            }
+            ISVNAuthenticationManager authenticationManager = repository.getAuthenticationManager();
+            SVNAdminClient adminClient = new SVNAdminClient(authenticationManager, null);
+            File repositoryRoot = new File(URI.create(replURLStr));
+            adminClient.setEventHandler(new ISVNAdminEventHandler() {
+                //if more than batchSize revisions print progress
+                int batchSize = 100;
+
+                @Override
+                public void checkCancelled() throws SVNCancelException {
+                }
+
+                @Override
+                public void handleEvent(SVNEvent event, double progress) throws SVNException {
+                }
+
+                @Override
+                public void handleAdminEvent(SVNAdminEvent event, double progress) throws SVNException {
+                    if (event.getMessage() != null) {
+                        if (event.getRevision() % batchSize != 0 || event.getRevision() == 0) {
+                            LOGGER.debug(event::getMessage);
+                        } else {
+                            LOGGER.info("{} ({}% done)", event.getMessage(),
+                                (int) (event.getRevision() * 100.0 / latestRevision));
+                        }
+                    }
+                }
+            });
+            adminClient.doVerify(repositoryRoot);
+            LOGGER.info("Verified SVN repository '{}'.", replURLStr);
+        } catch (Exception e) {
+            throw new MCRPersistenceException("SVN repository contains errors and could not be verified: " + replURLStr,
+                e);
+        }
     }
 
     @Override
@@ -162,7 +220,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      * Returns the metadata stored under the given ID, or null. Note that this
      * metadata may not exist currently in the store, it may be a deleted
      * version, which can be restored then.
-     * 
+     *
      * @param id
      *            the ID of the XML document
      * @return the metadata stored under that ID, or null when there is no such
@@ -196,4 +254,5 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     protected MCRVersionedMetadata buildMetadataObject(FileObject fo, int id) {
         return new MCRVersionedMetadata(this, fo, id, super.forceDocType);
     }
+
 }
