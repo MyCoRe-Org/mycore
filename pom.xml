@@ -218,10 +218,6 @@
                 <packages>org.mycore.user*</packages>
               </group>
               <group>
-                <title>MyCoRe Component: BuildTools</title>
-                <packages>org.mycore.buildtools*</packages>
-              </group>
-              <group>
                 <title>MyCoRe Component: IView 2</title>
                 <packages>org.mycore.iview2*</packages>
               </group>
@@ -769,10 +765,6 @@
                   <packages>org.mycore.user*</packages>
                 </group>
                 <group>
-                  <title>MyCoRe Component: BuildTools</title>
-                  <packages>org.mycore.buildtools*</packages>
-                </group>
-                <group>
                   <title>MyCoRe Component: IView 2</title>
                   <packages>org.mycore.iview2*</packages>
                 </group>
@@ -1175,21 +1167,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-core-api-module</artifactId>
-        <version>1.6.3</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jdom</groupId>
-            <artifactId>jdom2</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>org.glassfish.hk2</groupId>
         <artifactId>guice-bridge</artifactId>
         <version>${hk2.version}</version>
@@ -1260,17 +1237,6 @@
         <groupId>org.mycore</groupId>
         <artifactId>mycore-base</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mycore</groupId>
-        <artifactId>mycore-buildtools</artifactId>
-        <version>${project.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-core-api-module</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
@@ -1537,12 +1503,6 @@
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <version>3.1.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.ant</groupId>
-        <artifactId>ant</artifactId>
-        <version>1.10.1</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -2103,7 +2063,6 @@
   <modules>
     <module>mycore-base</module>
     <module>mycore-acl-editor2</module>
-    <module>mycore-buildtools</module>
     <module>mycore-classbrowser</module>
     <module>mycore-classeditor</module>
     <module>mycore-indexing</module>
