@@ -94,7 +94,7 @@ public class MCROAISetManager {
 
     public MCROAISetManager() {
         this.setConfigurationMap = Collections.synchronizedMap(new HashMap<>());
-        this.cachedSetList = new OAIDataList<MCRSet>();
+        this.cachedSetList = new OAIDataList<>();
         this.classLastModified = Long.MIN_VALUE;
     }
 
@@ -151,7 +151,7 @@ public class MCROAISetManager {
 
     /**
      * Returns a list of OAI-PMH sets defined by MyCoRe.
-     * 
+     *
      * @return list of oai sets
      */
     @SuppressWarnings("unchecked")
@@ -187,7 +187,7 @@ public class MCROAISetManager {
 
     /**
      * Returns the {@link MCROAISetConfiguration} for the given set id.
-     * 
+     *
      * @param <Q> value of the configuration
      * @param <R> Result collection type
      * @param <K> Key value type for a single hit
@@ -200,7 +200,7 @@ public class MCROAISetManager {
     }
 
     protected OAIDataList<MCRSet> createSetList() {
-        OAIDataList<MCRSet> setList = new OAIDataList<MCRSet>();
+        OAIDataList<MCRSet> setList = new OAIDataList<>();
         synchronized (this.setConfigurationMap) {
             for (MCROAISetConfiguration<?, ?, ?> conf : this.setConfigurationMap.values()) {
                 MCROAISetHandler<?, ?, ?> handler = conf.getHandler();
@@ -208,7 +208,11 @@ public class MCROAISetManager {
                 synchronized (setMap) {
                     setMap.clear();
                     Element resolved = MCRURIResolver.instance().resolve(conf.getURI());
-                    for (Element setElement : (List<Element>) (resolved.getChildren("set", OAIConstants.NS_OAI))) {
+                    if (resolved == null) {
+                        throw new MCRException(
+                            "Could not resolve set URI " + conf.getURI() + " for set " + conf.getId() + ".");
+                    }
+                    for (Element setElement : resolved.getChildren("set", OAIConstants.NS_OAI)) {
                         MCRSet set = createSet(conf.getId(), setElement);
                         setMap.put(set.getSpec(), set);
                         if (!contains(set.getSpec(), setList)) {
