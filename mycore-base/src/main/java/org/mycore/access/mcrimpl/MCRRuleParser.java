@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -30,7 +30,6 @@ import java.util.Locale;
 
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;
@@ -115,14 +114,10 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     }
 
     private MCRCondition<MCRAccessData> getIPClause(String value) {
-        try {
-            MCRIPCondition ipCond = MCRConfiguration.instance().getInstanceOf("MCR.RuleParser.ip");
-            ipCond.set(value);
-            return ipCond;
-        } catch (MCRConfigurationException e) {
-            return new MCRIPClause(value);
-        }
-
+        MCRIPCondition ipCond = MCRConfiguration.instance().getInstanceOf("MCR.RuleParser.ip",
+            MCRIPClause.class.getName());
+        ipCond.set(value);
+        return ipCond;
     }
 
     protected MCRCondition<?> parseString(String s) {
