@@ -263,7 +263,7 @@ public class MCRRestAPIObjectsHelper {
     }
 
     /**
-     * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
+     * @see org.mycore.restapi.v1.MCRRestAPIObjects#listObjects(UriInfo, HttpServletRequest, String, String, String)
      */
     public static Response listObjects(UriInfo info, String format, String filter, String sort)
         throws MCRRestAPIException {
@@ -455,7 +455,7 @@ public class MCRRestAPIObjectsHelper {
     }
 
     /**
-     * @see MCRRestAPIObjects#listDerivates(UriInfo, String, String, String)
+     * @see org.mycore.restapi.v1.MCRRestAPIObjects#listDerivates(UriInfo, HttpServletRequest, String, String, String)
      */
     public static Response listDerivates(UriInfo info, String mcrIDString, String format, String sort)
         throws MCRRestAPIException {
