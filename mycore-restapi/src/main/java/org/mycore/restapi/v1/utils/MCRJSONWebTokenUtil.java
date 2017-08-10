@@ -65,6 +65,8 @@ import com.nimbusds.jwt.SignedJWT;
  * Utility functions for handling JSON Web Tokens.
  * 
  * @author Robert Stephan
+ * 
+ * @version $Revision: $ $Date: $
  *
  */
 public class MCRJSONWebTokenUtil {
@@ -85,10 +87,11 @@ public class MCRJSONWebTokenUtil {
         }
     }
 
-    /** username and password, combined by ":"
+    /** 
+     * retrieves username and password from JSON web tocken 
      * 
-     * @param token
-     * @return
+     * @param token - the serialized JSON web token from login
+     * @returns username and password - combined by ":"
      */
     public static String retrieveUsernamePasswordFromLoginToken(String token) {
         JWEObject jweObject;
@@ -115,6 +118,12 @@ public class MCRJSONWebTokenUtil {
         return null;
     }
 
+    /**
+     * retrieves the client public key from Login Token
+     * 
+     * @param token - the serialized JSON Web Token from login
+     * @return the public key as JWK object
+     */
     public static JWK retrievePublicKeyFromLoginToken(String token) {
         JWK result = null;
         JWEObject jweObject;
@@ -139,6 +148,12 @@ public class MCRJSONWebTokenUtil {
         return null;
     }
 
+    /**
+     * retrieves the client public key from Authentication Token
+     * 
+     * @param signedJWT - the authentication token
+     * @return the public key as JWK object
+     */
     public static JWK retrievePublicKeyFromAuthenticationToken(SignedJWT signedJWT) {
         JWK result = null;
         try {
@@ -154,6 +169,12 @@ public class MCRJSONWebTokenUtil {
         return null;
     }
 
+    /**
+     * retrieves the username from Authentication Token
+     * 
+     * @param signedJWT - the authentication token
+     * @return the user name
+     */
     public static String retrieveUsernameFromAuthenticationToken(SignedJWT signedJWT) {
         try {
             // Extract payload
@@ -170,9 +191,33 @@ public class MCRJSONWebTokenUtil {
         return MCRSystemUserInformation.getGuestInstance().getUserID();
     }
 
-    public static String createEmptyJWTwithPublicKey(String webAppBaseURL) {
+    /**
+     * retrieves the username from Authentication Token
+     * 
+     * @param request the HTTPServletRequest object
+     * 
+     * @return the user name
+     * @throws MCRRestAPIException
+     */
+    public static String retrieveUsernameFromAuthenticationToken(HttpServletRequest request)
+        throws MCRRestAPIException {
+        try {
+            SignedJWT signedJWT = retrieveAuthenticationToken(request);
+            return MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT);
+        } catch (Exception e) {
+            return MCRSystemUserInformation.getGuestInstance().getUserID();
+        }
+    }
 
-        String jwt = null;
+    /**
+     * creates an empty JSON Web Token
+     * 
+     * @param webAppBaseURL - the base url of the application
+     * 
+     * @return the JSON WebToken
+     */
+    public static SignedJWT createEmptyJWTwithPublicKey(String webAppBaseURL) {
+
         ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
         JWTClaimsSet claims = new JWTClaimsSet.Builder().issuer(webAppBaseURL).jwtID(UUID.randomUUID().toString())
             .issueTime(Date.from(currentTime.toInstant())).build();
@@ -182,17 +227,24 @@ public class MCRJSONWebTokenUtil {
         SignedJWT signedJWT = new SignedJWT(jwsHeader, claims);
         try {
             signedJWT.sign(new RSASSASigner(RSA_KEYS.getPrivate()));
-            jwt = signedJWT.serialize();
         } catch (JOSEException e) {
             LOGGER.error(e);
         }
-
-        System.out.println("JWT: " + jwt);
-        return jwt;
+        return signedJWT;
 
     }
 
-    public static SignedJWT createJWT(String user, List<String> roles, String webAppBaseURL, JWK clientPubKey) {
+    /**
+     * creates a JSON Web Token with user id, roles and client public key
+     * 
+     * @param user - the user that should be returned
+     * @param roles - the roles that should be returned
+     * @param webAppBaseURL - the base url of the application
+     * @param clientPublicKey -  the client public key as JSON Web Key
+     * 
+     * @return the JSON WebToken
+     */
+    public static SignedJWT createJWT(String user, List<String> roles, String webAppBaseURL, JWK clientPublicKey) {
         ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
         JWTClaimsSet claims = new JWTClaimsSet.Builder().issuer(webAppBaseURL).jwtID(UUID.randomUUID().toString())
             .expirationTime(Date.from(currentTime.plusMinutes(EXPIRATION_TIME_MINUTES).toInstant()))
@@ -201,7 +253,7 @@ public class MCRJSONWebTokenUtil {
             // additional claims/attributes about the subject can be added
             // claims.setClaim("email", "mail@example.com");
             // multi-valued claims work too and will end up as a JSON array
-            .claim("roles", roles).claim("sub_jwk", clientPubKey).build();
+            .claim("roles", roles).claim("sub_jwk", clientPublicKey).build();
 
         String keyID = UUID.randomUUID().toString();
         JWK jwk = new RSAKey.Builder((RSAPublicKey) RSA_KEYS.getPublic()).keyID(keyID).build();
@@ -217,11 +269,21 @@ public class MCRJSONWebTokenUtil {
         return signedJWT;
     }
 
+    /**
+     * creates a JSON Web Token with user id, roles and client public key
+     * 
+     * @param user - the user that should be returned
+     * @param roles - the roles that should be returned
+     * @param webAppBaseURL - the base url of the application
+     * @param clientPublicKey -  the client public key as JSON Web Key
+     * 
+     * @return the JSON WebToken
+     */
     public static SignedJWT createJWT(SignedJWT oldJWT) {
         String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(oldJWT);
         JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(oldJWT);
         if (submittedUser != null && clientPubKey != null) {
-            return MCRJSONWebTokenUtil.createJWT(submittedUser, Arrays.asList("rest-api"), MCRFrontendUtil.getBaseURL(),
+            return MCRJSONWebTokenUtil.createJWT(submittedUser, Arrays.asList("restapi"), MCRFrontendUtil.getBaseURL(),
                 clientPubKey);
         }
         return null;
@@ -231,7 +293,7 @@ public class MCRJSONWebTokenUtil {
      * returns the access token from Request Header "Authorization"
      * if the token is invalid an MCRRestAPIException is thrown
      * 
-     * @param request
+     * @param request - the HTTPServletRequest object
      * @return the JSON Web Token
      * @throws MCRRestAPIException
      */
@@ -273,15 +335,5 @@ public class MCRJSONWebTokenUtil {
         throw new MCRRestAPIException(Status.UNAUTHORIZED, new MCRRestAPIError(
             MCRRestAPIError.CODE_INVALID_AUTHENCATION, "Authentication Token is missing.",
             "Please login via /auth/login and provide the authentication token as HTTP Request Header 'Authorization"));
-    }
-
-    public static String retrieveUsernameFromAuthenticationToken(HttpServletRequest request)
-        throws MCRRestAPIException {
-        try {
-            SignedJWT signedJWT = retrieveAuthenticationToken(request);
-            return MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT);
-        } catch (Exception e) {
-            return MCRSystemUserInformation.getGuestInstance().getUserID();
-        }
     }
 }

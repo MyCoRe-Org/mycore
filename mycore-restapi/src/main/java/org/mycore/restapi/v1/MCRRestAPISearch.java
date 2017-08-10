@@ -71,8 +71,9 @@ public class MCRRestAPISearch {
     /**
      * see http://wiki.apache.org/solr/CommonQueryParameters for syntax of parameters
      * 
-     * @param info - a Jersey Context Object for URI
-     *      
+     * @param info - the injected Jersey URIInfo object
+     * @param request - the injected HTTPServletRequest object
+     * 
      * @param query
      *      the Query in SOLR Query syntax
      * @param sort
@@ -82,7 +83,20 @@ public class MCRRestAPISearch {
      * @param start
      *      the start parameter (number) - syntax as defined by SOLR      
      * @param rows
-     *      the rows parameter (number) - syntax as defined by SOLR              
+     *      the rows parameter (number) - syntax as defined by SOLR
+     * @param fq
+     *      the filter query parameter - syntax as defined by SOLR
+     * @param fl
+     *      the list of fields to be returned - syntax as defined by SOLR
+     * @param facet
+     *      the facet parameter (true to return facets)  - syntax as defined by SOLR
+     * @param facetFields
+     *      the list of facetFields to be returned - syntax as defined by SOLR
+     * @param jsonWrf
+     *      the name of the JSONP callback function - syntax as defined by SOLR 
+     *      
+     * @return a Jersey Response Object
+     * @throws MCRRestAPIException    
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",

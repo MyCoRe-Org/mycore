@@ -87,10 +87,15 @@ public class MCRRestAPIClassifications {
 
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
+   
     /**
-     *
-     * @param info - a Jersey Context Object for URI
-     *     Possible values are: json | xml (required)
+     * lists all available classifications as XML or JSON
+     * 
+     * @param info - the URIInfo object
+     * @param request - the HTTPServletRequest object
+     * @param format - the output format ('xml' or 'json)
+     * @return a Jersey Response Object
+     * @throws MCRRestAPIException
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
@@ -164,8 +169,10 @@ public class MCRRestAPIClassifications {
      *      - 'opened' - (together with 'jstree') - all nodes will be opened
      *      - 'disabled' - (together with 'jstree') - all nodes will be disabled
      *      - 'selected' - (together with 'jstree') - all nodes will be selected
-     * @param callback used for JSONP - wrap json result into a Javascript function named by callback parameter
+     * @param request - the HTTPServletRequestObject
+     * @param callback - used in JSONP to wrap json result into a Javascript function named by callback parameter
      * @return a Jersey Response object
+     * @throws MCRRestAPIException
      */
     @GET
     //@Path("/id/{value}{format:(\\.[^/]+?)?}")  -> working, but returns empty string instead of default value

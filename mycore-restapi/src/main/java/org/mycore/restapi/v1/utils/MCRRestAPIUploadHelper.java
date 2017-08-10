@@ -97,11 +97,19 @@ public class MCRRestAPIUploadHelper {
         }
     }
 
-    /**
-     * uploads a mycore mobject    
-     * based upon:    
-     * http://puspendu.wordpress.com/2012/08/23/restful-webservice-file-upload-with-jersey/
-     */
+ /**
+  *
+  * uploads a MyCoRe Object    
+  * based upon:    
+  * http://puspendu.wordpress.com/2012/08/23/restful-webservice-file-upload-with-jersey/
+  * 
+  * @param info - the Jersey UriInfo object
+  * @param request - the HTTPServletRequest object 
+  * @param uploadedInputStream - the inputstream from HTTP Post request
+  * @param fileDetails - the file information from HTTP Post request
+  * @return a Jersey Response object
+  * @throws MCRRestAPIException
+  */
     public static Response uploadObject(UriInfo info, HttpServletRequest request, InputStream uploadedInputStream,
         FormDataContentDisposition fileDetails) throws MCRRestAPIException {
 
@@ -152,13 +160,23 @@ public class MCRRestAPIUploadHelper {
         }
     }
 
-    public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
-        String formParamlabel, boolean overwriteOnExistingLabel) throws MCRRestAPIException {
+    /**
+     * creates or updates a MyCoRe derivate
+     * @param info - the Jersey UriInfo object
+     * @param request - the HTTPServletRequest object 
+     * @param mcrObjID - the MyCoRe Object ID
+     * @param label - the label of the new derivate
+     * @param overwriteOnExistingLabel, if true an existing MyCoRe derivate with the given label will be returned 
+     * @return a Jersey Response object
+     * @throws MCRRestAPIException
+     */
+    public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID,
+        String label, boolean overwriteOnExistingLabel) throws MCRRestAPIException {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
         SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
         //  File fXML = null;
-        MCRObjectID mcrObjID = MCRObjectID.getInstance(pathParamMcrObjID);
+        MCRObjectID mcrObjIDObj = MCRObjectID.getInstance(mcrObjID);
 
         try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
             MCRSession session = MCRServlet.getSession(request);
@@ -167,30 +185,30 @@ public class MCRRestAPIUploadHelper {
                 .getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT));
             session.setUserInformation(apiUser);
 
-            MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjID);
+            MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjIDObj);
             MCRObjectID derID = null;
             if (overwriteOnExistingLabel) {
                 for (MCRMetaLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                    if (formParamlabel.equals(derLink.getXLinkLabel())
-                        || formParamlabel.equals(derLink.getXLinkTitle())) {
+                    if (label.equals(derLink.getXLinkLabel())
+                        || label.equals(derLink.getXLinkTitle())) {
                         derID = derLink.getXLinkHrefID();
                     }
                 }
             }
 
             if (derID == null) {
-                derID = MCRObjectID.getNextFreeId(mcrObjID.getProjectId() + "_derivate");
+                derID = MCRObjectID.getNextFreeId(mcrObjIDObj.getProjectId() + "_derivate");
                 MCRDerivate mcrDerivate = new MCRDerivate();
-                mcrDerivate.setLabel(formParamlabel);
+                mcrDerivate.setLabel(label);
                 mcrDerivate.setId(derID);
                 mcrDerivate.setSchema("datamodel-derivate.xsd");
-                mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjID, null, null));
+                mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
                 mcrDerivate.getDerivate()
                     .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
 
                 MCRMetadataManager.create(mcrDerivate);
-                MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjID,
-                    new MCRMetaLinkID("derobject", derID, null, formParamlabel));
+                MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
+                    new MCRMetaLinkID("derobject", derID, null, label));
             }
 
             response = Response
@@ -205,6 +223,22 @@ public class MCRRestAPIUploadHelper {
         return response;
     }
 
+    /**
+     * uploads a file into a given derivate
+     * @param info - the Jersey UriInfo object
+     * @param request - the HTTPServletRequest object 
+     * @param pathParamMcrObjID - a MyCoRe Object ID
+     * @param pathParamMcrDerID - a MyCoRe Derivate ID
+     * @param uploadedInputStream - the inputstream from HTTP Post request
+     * @param fileDetails - the file information from HTTP Post request
+     * @param formParamPath - the path of the file inside the derivate
+     * @param formParamMaindoc - true, if this file should be marked as maindoc
+     * @param formParamUnzip - true, if the upload is zip file that should be unzipped inside the derivate
+     * @param formParamMD5 - the MD5 sum of the uploaded file 
+     * @param formParamSize - the size of the uploaded file
+     * @return a Jersey Response object
+     * @throws MCRRestAPIException
+     */
     public static Response uploadFile(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID, InputStream uploadedInputStream, FormDataContentDisposition fileDetails,
         String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5, Long formParamSize)
@@ -325,6 +359,15 @@ public class MCRRestAPIUploadHelper {
 
     }
 
+    /**
+     * deletes all files inside a given derivate
+     * @param info - the Jersey UriInfo object
+     * @param request - the HTTPServletRequest object 
+     * @param pathParamMcrObjID - the MyCoRe Object ID
+     * @param pathParamMcrDerID - the MyCoRe Derivate ID
+     * @return a Jersey Response Object
+     * @throws MCRRestAPIException
+     */
     public static Response deleteAllFiles(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) throws MCRRestAPIException {
 
@@ -380,6 +423,15 @@ public class MCRRestAPIUploadHelper {
         return response;
     }
 
+    /**
+     * deletes a whole derivate
+     * @param info - the Jersey UriInfo object
+     * @param request - the HTTPServletRequest object 
+     * @param pathParamMcrObjID - the MyCoRe Object ID
+     * @param pathParamMcrDerID - the MyCoRe Derivate ID
+     * @return a Jersey Response Object
+     * @throws MCRRestAPIException
+     */
     public static Response deleteDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) throws MCRRestAPIException {
 
@@ -422,6 +474,11 @@ public class MCRRestAPIUploadHelper {
         return response;
     }
 
+    /**
+     * serializes a map of Strings into a compact JSON structure
+     * @param data a sorted Map of Strings 
+     * @return a compact JSON
+     */
     public static String generateMessagesFromProperties(SortedMap<String, String> data) {
         StringWriter sw = new StringWriter();
         sw.append("{");
@@ -438,6 +495,13 @@ public class MCRRestAPIUploadHelper {
         return result;
     }
 
+    /**
+     * verifies a set of Properties against a signature and and a public key
+     * @param data - the data a sorted Map of Strings
+     * @param base64Signature - the signature
+     * @param jwk -the public key
+     * @return true, if the properties match the signature
+     */
     public static boolean verifyPropertiesWithSignature(SortedMap<String, String> data, String base64Signature,
         JWK jwk) {
         try {

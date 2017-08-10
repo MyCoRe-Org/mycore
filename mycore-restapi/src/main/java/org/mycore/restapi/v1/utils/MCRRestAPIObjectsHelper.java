@@ -263,7 +263,18 @@ public class MCRRestAPIObjectsHelper {
     }
 
     /**
+     * returns a list of objects
+     * @param info - the injected Jersey URIInfo object
+     * 
+     * @param format - the output format ('xml'|'json')
+     * @param filter - a filter criteria
+     * @param sort - the sort criteria
+     * 
+     * @return a Jersey response object
+     * @throws MCRRestAPIException    
+     * 
      * @see org.mycore.restapi.v1.MCRRestAPIObjects#listObjects(UriInfo, HttpServletRequest, String, String, String)
+     * 
      */
     public static Response listObjects(UriInfo info, String format, String filter, String sort)
         throws MCRRestAPIException {
@@ -455,9 +466,20 @@ public class MCRRestAPIObjectsHelper {
     }
 
     /**
+     * returns a list of derivate objects
+     * @param info - the injected Jersey URIInfo object
+     *
+     * @ param mcrObjID - the MyCoRe Object ID
+     * @param format - the output format ('xml'|'json')
+     * @param sort - the sort criteria
+     * 
+     * @return a Jersey response object
+     * @throws MCRRestAPIException    
+     * 
+     * 
      * @see org.mycore.restapi.v1.MCRRestAPIObjects#listDerivates(UriInfo, HttpServletRequest, String, String, String)
      */
-    public static Response listDerivates(UriInfo info, String mcrIDString, String format, String sort)
+    public static Response listDerivates(UriInfo info, String mcrObjID, String format, String sort)
         throws MCRRestAPIException {
         List<MCRRestAPIError> errors = new ArrayList<>();
 
@@ -485,7 +507,7 @@ public class MCRRestAPIObjectsHelper {
 
         //Parameters are checked - continue to retrieve data
 
-        List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrIDString).getStructure().getDerivates().stream()
+        List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrObjID).getStructure().getDerivates().stream()
             .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> {
                 return new MCRObjectIDDate() {
                     long lastModified;
@@ -580,16 +602,28 @@ public class MCRRestAPIObjectsHelper {
                 "Please contact a developer!"));
     }
 
-    public static Response listContents(Request request, String mcrIDString, String derIDString, String format,
-        String path, int depth, UriInfo info) throws MCRRestAPIException {
+    /**
+     * lists derivate content (file listing)
+     * @param info - the Jersey UriInfo Object
+     * @param request - the HTTPServletRequest object
+     * @param mcrObjID - the MyCoRe Object ID
+     * @param mcrDerID - the MyCoRe Derivate ID
+     * @param format - the output format ('xml'|'json')
+     * @param path - the sub path of a directory inside the derivate
+     * @param depth - the level of subdirectories to be returned
+     * @return a Jersey Response object
+     * @throws MCRRestAPIException
+     */
+    public static Response listContents(UriInfo info, Request request, String mcrObjID, String mcrDerID, String format,
+        String path, int depth) throws MCRRestAPIException {
 
         if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
             throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
                 new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The syntax of format parameter is wrong.",
                     "Allowed values for format are 'json' or 'xml'."));
         }
-        MCRObject mcrObj = retrieveMCRObject(mcrIDString);
-        MCRDerivate derObj = retrieveMCRDerivate(mcrObj, derIDString);
+        MCRObject mcrObj = retrieveMCRObject(mcrObjID);
+        MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
 
         try {
             MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
@@ -627,10 +661,20 @@ public class MCRRestAPIObjectsHelper {
         }
     }
 
-    public static String retrieveMaindocURL(String mcrIDString, String derIDString, UriInfo info) throws IOException {
+    /**
+     * returns the URL of the main document of a derivate
+     * 
+     * @param info - the Jersey UriInfo object
+     * @param mcrObjID - the MyCoRe Object ID
+     * @param mcrDerID - the MyCoRe Derivate ID
+     * 
+     * @return the Resolving URL for the main document of the derivate
+     * @throws IOException
+     */
+    public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID) throws IOException {
         try {
-            MCRObject mcrObj = retrieveMCRObject(mcrIDString);
-            MCRDerivate derObj = retrieveMCRDerivate(mcrObj, derIDString);
+            MCRObject mcrObj = retrieveMCRObject(mcrObjID);
+            MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
             String maindoc = derObj.getDerivate().getInternals().getMainDoc();
 
             String baseURL = MCRJerseyUtil.getBaseURL(info)
@@ -822,6 +866,13 @@ public class MCRRestAPIObjectsHelper {
         }
         return MCRMetadataManager.retrieveMCRDerivate(derID);
     }
+    
+    /**
+     * checks if the given path is a directory and contains children
+     * 
+     * @param p - the path to check
+     * @return true, if there are children
+     */
 
     public static boolean hasChildren(Path p) {
         try {

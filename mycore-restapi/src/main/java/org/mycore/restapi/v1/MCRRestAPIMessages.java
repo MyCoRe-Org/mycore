@@ -73,13 +73,22 @@ public class MCRRestAPIMessages {
     public static final String FORMAT_PROPERTY = "property";
 
     /**
+     * lists all message properties for a given language
      * 
-     * @param info - a Jersey Context Object for URI
+     * @param info - the injected Jersey Context Object for URI
+     * 
+     * @param request - the injected HTTPServletRequest object
+     * 
+     * @param lang - the language in which the messages should be returned (default: 'de')
      *      
      * @param format
      * 		Possible values are: props (default) | json | xml
      * @param filter
      * 		';'-separated list of message key prefixes
+     * 
+     * @return a Jersey Response object
+     * 
+     * @throws MCRRestAPIException
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
@@ -135,9 +144,14 @@ public class MCRRestAPIMessages {
     /**
      * returns a single messages entry.
      * 
-     * @param info - a Jersey Context Object for URI
+     * @param info - the injected Jersey context object for URI
+     * @param request - the injected HTTPServletRequest object
+     * @param key - the message key
+     * @param lang - the language
      * @param format 
      *     Possible values are: props (default) | json | xml (required)
+     * @return a Jersey Response Object
+     * @throws MCRRestAPIException    
      */
     @GET
     @Path("/{value}")
