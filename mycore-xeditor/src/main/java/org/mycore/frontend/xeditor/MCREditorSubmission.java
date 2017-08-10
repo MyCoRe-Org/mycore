@@ -10,6 +10,7 @@ import java.util.Set;
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXPathBuilder;
 
 public class MCREditorSubmission {
@@ -34,8 +35,9 @@ public class MCREditorSubmission {
     }
 
     public void mark2checkResubmission(MCRBinding binding) {
-        for (Object node : binding.getBoundNodes())
+        for (Object node : binding.getBoundNodes()) {
             xPaths2CheckResubmission.add(MCRXPathBuilder.buildXPath(node));
+        }
     }
 
     public String getXPaths2CheckResubmission() {
@@ -50,14 +52,17 @@ public class MCREditorSubmission {
     public void setXPaths2CheckResubmission(String xPaths) throws JDOMException {
         xPaths2CheckResubmission.clear();
         String rootXPath = MCRXPathBuilder.buildXPath(session.getEditedXML().getRootElement()) + "/";
-        if (xPaths != null)
-            for (String xPath : xPaths.split(" "))
+        if (xPaths != null) {
+            for (String xPath : xPaths.split(" ")) {
                 xPaths2CheckResubmission.add(rootXPath + xPath);
+            }
+        }
     }
 
     private void removeXPaths2CheckResubmission(MCRBinding binding) {
-        for (Object node : binding.getBoundNodes())
+        for (Object node : binding.getBoundNodes()) {
             xPaths2CheckResubmission.remove(MCRXPathBuilder.buildXPath(node));
+        }
     }
 
     public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
@@ -78,14 +83,15 @@ public class MCREditorSubmission {
 
     public void setSubmittedValues(Map<String, String[]> values) throws JaxenException, JDOMException {
         String[] xPaths2Check = values.get(PREFIX_CHECK_RESUBMISSION);
-        if ((xPaths2Check != null) && (xPaths2Check.length > 0))
+        if ((xPaths2Check != null) && (xPaths2Check.length > 0)) {
             setXPaths2CheckResubmission(xPaths2Check[0]);
+        }
 
         xPath2DefaultValue.clear();
 
         Map<MCRBinding, String[]> valuesToSet = new HashMap<MCRBinding, String[]>();
 
-        for (String paramName : values.keySet())
+        for (String paramName : values.keySet()) {
             if (paramName.startsWith("/")) {
                 MCRBinding binding = new MCRBinding(paramName, true, session.getRootBinding());
                 valuesToSet.put(binding, values.get(paramName));
@@ -95,12 +101,14 @@ public class MCREditorSubmission {
                 MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
                 boolean noSuchNode = binding.getBoundNodes().isEmpty();
                 binding.detach();
-                if (noSuchNode)
+                if (noSuchNode) {
                     continue;
+                }
 
                 String defaultValue = values.get(paramName)[0];
                 markDefaultValue(xPath, defaultValue);
             }
+        }
 
         for (MCRBinding binding : valuesToSet.keySet()) {
             setSubmittedValues(binding, valuesToSet.get(binding));
@@ -115,12 +123,14 @@ public class MCREditorSubmission {
     private void setSubmittedValues(MCRBinding binding, String[] values) throws JDOMException, JaxenException {
         List<Object> boundNodes = binding.getBoundNodes();
 
-        while (boundNodes.size() < values.length)
+        while (boundNodes.size() < values.length) {
             binding.cloneBoundElement(boundNodes.size() - 1);
+        }
 
         for (int i = 0; i < values.length; i++) {
             String value = values[i] == null ? "" : values[i].trim();
             value = MCRXMLFunctions.normalizeUnicode(value);
+            value = MCRXMLHelper.removeIllegalChars(value);
             binding.setValue(i, value);
         }
 
