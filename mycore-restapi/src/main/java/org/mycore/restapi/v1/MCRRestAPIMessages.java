@@ -28,6 +28,7 @@ import java.io.StringWriter;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -46,6 +47,9 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.jersey.MCRStaticContent;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.stream.JsonWriter;
@@ -80,10 +84,10 @@ public class MCRRestAPIMessages {
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1" })
-    public Response listMessages(@Context UriInfo info, @QueryParam("lang") @DefaultValue("de") String lang,
+    public Response listMessages(@Context UriInfo info, @Context HttpServletRequest request, @QueryParam("lang") @DefaultValue("de") String lang,
         @QueryParam("format") @DefaultValue("property") String format,
-        @QueryParam("filter") @DefaultValue("") String filter) {
-
+        @QueryParam("filter") @DefaultValue("") String filter) throws MCRRestAPIException{
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/messages");
         Locale locale = Locale.forLanguageTag(lang);
         String[] check = filter.split(";");
 
@@ -138,10 +142,10 @@ public class MCRRestAPIMessages {
     @Path("/{value}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=UTF-8" })
-    public Response getMessage(@Context UriInfo info, @PathParam("value") String key,
+    public Response getMessage(@Context UriInfo info, @Context HttpServletRequest request, @PathParam("value") String key,
         @QueryParam("lang") @DefaultValue("de") String lang,
-        @QueryParam("format") @DefaultValue("text") String format) {
-
+        @QueryParam("format") @DefaultValue("text") String format) throws MCRRestAPIException{
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/messages");
         Locale locale = Locale.forLanguageTag(lang);
         String result = MCRTranslation.translate(key, locale);
         try {

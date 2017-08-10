@@ -47,8 +47,11 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRRestAPIObjectsHelper;
 import org.mycore.restapi.v1.utils.MCRRestAPIUploadHelper;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 
 /**
  * REST API methods to retrieve objects and derivates.
@@ -91,9 +94,10 @@ public class MCRRestAPIObjects {
 
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response listObjects(@Context UriInfo info, @QueryParam("format") @DefaultValue("xml") String format,
-        @QueryParam("filter") String filter, @QueryParam("sort") @DefaultValue("ID:asc") String sort) {
-
+    public Response listObjects(@Context UriInfo info, @Context HttpServletRequest request,
+        @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") String filter,
+        @QueryParam("sort") @DefaultValue("ID:asc") String sort) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
         return MCRRestAPIObjectsHelper.listObjects(info, format, filter, sort);
     }
 
@@ -113,10 +117,10 @@ public class MCRRestAPIObjects {
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @Path("/{mcrid}/derivates")
-    public Response listDerivates(@Context UriInfo info, @PathParam("mcrid") String mcrID,
-        @QueryParam("format") @DefaultValue("xml") String format,
-        @QueryParam("sort") @DefaultValue("ID:asc") String sort) {
-
+    public Response listDerivates(@Context UriInfo info, @Context HttpServletRequest request,
+        @PathParam("mcrid") String mcrID, @QueryParam("format") @DefaultValue("xml") String format,
+        @QueryParam("sort") @DefaultValue("ID:asc") String sort) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
         return MCRRestAPIObjectsHelper.listDerivates(info, mcrID, format, sort);
     }
 
@@ -133,10 +137,10 @@ public class MCRRestAPIObjects {
     @GET
     @Produces(MediaType.TEXT_XML)
     @Path("/{value}")
-    public Response returnMCRObject(@Context UriInfo info, @PathParam("value") String id,
-        @QueryParam("style") String style) {
+    public Response returnMCRObject(@Context UriInfo info, @Context HttpServletRequest request,
+        @PathParam("value") String id, @QueryParam("style") String style) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
         return MCRRestAPIObjectsHelper.showMCRObject(id, style, info);
-
     }
 
     /**
@@ -152,14 +156,11 @@ public class MCRRestAPIObjects {
     @GET
     @Produces(MediaType.TEXT_XML)
     @Path("/{mcrid}/derivates/{derid}")
-    public Response returnDerivate(@Context UriInfo info, @PathParam("mcrid") String mcrid,
-        @PathParam("derid") String derid, @QueryParam("style") String style) {
-        try {
-            return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info);
-        } catch (IOException e) {
-            return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
-                "Unable to display derivate content", e.getMessage()).createHttpResponse();
-        }
+    public Response returnDerivate(@Context UriInfo info, @Context HttpServletRequest request,
+        @PathParam("mcrid") String mcrid, @PathParam("derid") String derid, @QueryParam("style") String style)
+        throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
+        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info);
     }
 
     /** returns a list of derivates for a given MyCoRe Object 
@@ -175,15 +176,12 @@ public class MCRRestAPIObjects {
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @Path("/{mcrid}/derivates/{derid}/contents{path:(/.*)*}")
-    public Response listContents(@Context UriInfo info, @Context Request request, @PathParam("mcrid") String mcrID,
-        @PathParam("derid") String derID, @PathParam("path") @DefaultValue("/") String path,
-        @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("depth") @DefaultValue("-1") int depth) {
-        try {
-            return MCRRestAPIObjectsHelper.listContents(request, mcrID, derID, format, path, depth, info);
-        } catch (IOException e) {
-            return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
-                "A problem occurred while fetching the data", e.getMessage()).createHttpResponse();
-        }
+    public Response listContents(@Context UriInfo info, @Context HttpServletRequest httpRequest,
+        @Context Request request, @PathParam("mcrid") String mcrID, @PathParam("derid") String derID,
+        @PathParam("path") @DefaultValue("/") String path, @QueryParam("format") @DefaultValue("xml") String format,
+        @QueryParam("depth") @DefaultValue("-1") int depth) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(httpRequest, MCRRestAPIACLPermission.WRITE, "/v1/objects");
+        return MCRRestAPIObjectsHelper.listContents(request, mcrID, derID, format, path, depth, info);
     }
 
     /** redirects to the maindoc of the given derivate 
@@ -193,21 +191,22 @@ public class MCRRestAPIObjects {
     */
     @GET
     @Path("/{mcrid}/derivates/{derid}/open")
-    public Response listContents(@Context UriInfo info, @Context Request request, @PathParam("mcrid") String mcrID,
-        @PathParam("derid") String derID) {
+    public Response listContents(@Context UriInfo info, @Context HttpServletRequest request,
+        @PathParam("mcrid") String mcrID, @PathParam("derid") String derID) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
         try {
             String url = MCRRestAPIObjectsHelper.retrieveMaindocURL(mcrID, derID, info);
             if (url != null) {
                 return Response.seeOther(new URI(url)).build();
             }
         } catch (IOException | URISyntaxException e) {
-            return MCRRestAPIError
-                .create(Response.Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
-                    "A problem occurred while opening maindoc from derivate " + derID, e.getMessage())
-                .createHttpResponse();
+            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
+                    "A problem occurred while opening maindoc from derivate " + derID, e.getMessage()));
         }
-        return MCRRestAPIError.create(Response.Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
-            "A problem occurred while opening maindoc from derivate " + derID, "").createHttpResponse();
+        throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+            new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
+                "A problem occurred while opening maindoc from derivate " + derID, ""));
     }
 
     //Upload API
@@ -216,7 +215,8 @@ public class MCRRestAPIObjects {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadObject(@Context UriInfo info, @Context HttpServletRequest request,
         @FormDataParam("file") InputStream uploadedInputStream,
-        @FormDataParam("file") FormDataContentDisposition fileDetails) {
+        @FormDataParam("file") FormDataContentDisposition fileDetails) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.WRITE, "/v1/objects");
         return MCRRestAPIUploadHelper.uploadObject(info, request, uploadedInputStream, fileDetails);
     }
 
@@ -226,7 +226,9 @@ public class MCRRestAPIObjects {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadDerivate(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam("mcrObjID") String mcrObjID, @FormDataParam("label") String label,
-        @DefaultValue("false") @FormDataParam("overwriteOnExistingLabel") boolean overwrite) {
+        @DefaultValue("false") @FormDataParam("overwriteOnExistingLabel") boolean overwrite)
+        throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.WRITE, "/v1/objects");
         return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label, overwrite);
     }
 
@@ -240,7 +242,8 @@ public class MCRRestAPIObjects {
         @FormDataParam("file") FormDataContentDisposition fileDetails, @FormDataParam("path") String path,
         @DefaultValue("false") @FormDataParam("maindoc") boolean maindoc,
         @DefaultValue("false") @FormDataParam("unzip") boolean unzip, @FormDataParam("md5") String md5,
-        @FormDataParam("size") Long size) {
+        @FormDataParam("size") Long size) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.WRITE, "/v1/objects");
         return MCRRestAPIUploadHelper.uploadFile(info, request, mcrObjID, mcrDerID, uploadedInputStream, fileDetails,
             path, maindoc, unzip, md5, size);
     }
@@ -248,14 +251,16 @@ public class MCRRestAPIObjects {
     @DELETE
     @Path("/{mcrObjID}/derivates/{mcrDerID}/contents")
     public Response deleteFiles(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrObjID") String mcrObjID, @PathParam("mcrDerID") String mcrDerID) {
+        @PathParam("mcrObjID") String mcrObjID, @PathParam("mcrDerID") String mcrDerID) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.WRITE, "/v1/objects");
         return MCRRestAPIUploadHelper.deleteAllFiles(info, request, mcrObjID, mcrDerID);
     }
 
     @DELETE
     @Path("/{mcrObjID}/derivates/{mcrDerID}")
     public Response deleteDerivate(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrObjID") String mcrObjID, @PathParam("mcrDerID") String mcrDerID) {
+        @PathParam("mcrObjID") String mcrObjID, @PathParam("mcrDerID") String mcrDerID) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.WRITE, "/v1/objects");
         return MCRRestAPIUploadHelper.deleteDerivate(info, request, mcrObjID, mcrDerID);
     }
 }

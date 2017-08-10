@@ -43,6 +43,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
@@ -159,7 +160,6 @@ public class MCRJSONWebTokenUtil {
 
             RSAKey serverPublicKey = RSAKey.parse(signedJWT.getHeader().getJWK().toJSONObject());
             if (signedJWT.verify(new RSASSAVerifier(serverPublicKey))) {
-
                 //Token is valid
                 String username = signedJWT.getJWTClaimsSet().getSubject();
                 return username;
@@ -167,8 +167,7 @@ public class MCRJSONWebTokenUtil {
         } catch (ParseException | JOSEException e) {
             LOGGER.error(e);
         }
-
-        return null;
+        return MCRSystemUserInformation.getGuestInstance().getUserID();
     }
 
     public static String createEmptyJWTwithPublicKey(String webAppBaseURL) {
@@ -254,25 +253,35 @@ public class MCRJSONWebTokenUtil {
                         DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
                             .withLocale(Locale.GERMANY).withZone(ZoneId.systemDefault());
 
-                        throw new MCRRestAPIException(
-                            MCRRestAPIError.create(Status.UNAUTHORIZED, MCRRestAPIError.CODE_INVALID_AUTHENCATION,
+                        throw new MCRRestAPIException(Status.UNAUTHORIZED,
+                            new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_AUTHENCATION,
                                 "The Authentication Token expired at " + formatter.format(expires.toInstant()),
                                 "Please log-in again."));
                     }
 
                 } else {
-                    throw new MCRRestAPIException(
-                        MCRRestAPIError.create(Status.UNAUTHORIZED, MCRRestAPIError.CODE_INVALID_AUTHENCATION,
+                    throw new MCRRestAPIException(Status.UNAUTHORIZED,
+                        new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_AUTHENCATION,
                             "The signature of the Authentication Token could not be verified.", null));
                 }
             } catch (ParseException | JOSEException e) {
                 LOGGER.error(e);
-                throw new MCRRestAPIException(MCRRestAPIError.create(Status.UNAUTHORIZED,
+                throw new MCRRestAPIException(Status.UNAUTHORIZED, new MCRRestAPIError(
                     MCRRestAPIError.CODE_INVALID_AUTHENCATION, "Authentication is invalid.", e.getMessage()));
             }
         }
-        throw new MCRRestAPIException(MCRRestAPIError.create(Status.UNAUTHORIZED,
+        throw new MCRRestAPIException(Status.UNAUTHORIZED, new MCRRestAPIError(
             MCRRestAPIError.CODE_INVALID_AUTHENCATION, "Authentication Token is missing.",
             "Please login via /auth/login and provide the authentication token as HTTP Request Header 'Authorization"));
+    }
+
+    public static String retrieveUsernameFromAuthenticationToken(HttpServletRequest request)
+        throws MCRRestAPIException {
+        try {
+            SignedJWT signedJWT = retrieveAuthenticationToken(request);
+            return MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT);
+        } catch (Exception e) {
+            return MCRSystemUserInformation.getGuestInstance().getUserID();
+        }
     }
 }

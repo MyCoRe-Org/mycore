@@ -167,7 +167,8 @@ public class MCRRestAPIAuthentication {
 
     @POST
     @Path("/renew")
-    public Response renew(@DefaultValue("") String data, @Context HttpServletRequest request) {
+    public Response renew(@DefaultValue("") String data, @Context HttpServletRequest request)
+        throws MCRRestAPIException {
         try {
             SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
             SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(signedJWT);
@@ -178,20 +179,19 @@ public class MCRRestAPIAuthentication {
                 msg.append("\n    \"access_token\": \"" + jwt.serialize() + "\",");
                 msg.append("\n    \"token_type\": \"Bearer\",");
                 msg.append("\n    \"data\": \"" + data + "\",");
-
                 msg.append("\n}");
 
                 return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
                     .header("Authorization", "Bearer " + jwt.serialize()).build();
             }
         } catch (MCRRestAPIException rae) {
-            return MCRRestAPIError.createHttpResponseFromErrorList(rae.getErrors());
+            throw rae;
         } catch (Exception e) {
             LOGGER.error(e);
-            return MCRRestAPIError.create(Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
-                "Session cannot be renewed!", e.getMessage()).createHttpResponse();
+            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Session cannot be renewed!", e.getMessage()));
         }
-        return MCRRestAPIError.create(Status.FORBIDDEN, MCRRestAPIError.CODE_INVALID_AUTHENCATION, "Permission denied",
-            "Please provide a valid JWT Token for the session.").createHttpResponse();
+        throw new MCRRestAPIException(Status.FORBIDDEN, new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_AUTHENCATION,
+            "Permission denied", "Please provide a valid JWT Token for the session."));
     }
 }

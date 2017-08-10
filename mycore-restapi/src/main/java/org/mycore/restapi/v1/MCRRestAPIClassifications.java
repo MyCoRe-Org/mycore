@@ -25,6 +25,7 @@ package org.mycore.restapi.v1;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -59,6 +60,9 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 
@@ -90,8 +94,9 @@ public class MCRRestAPIClassifications {
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response listClassifications(@Context UriInfo info,
-        @QueryParam("format") @DefaultValue("json") String format) {
+    public Response listClassifications(@Context UriInfo info, @Context HttpServletRequest request,
+        @QueryParam("format") @DefaultValue("json") String format) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/classifications");
         if (FORMAT_XML.equals(format)) {
             StringWriter sw = new StringWriter();
 
@@ -166,10 +171,11 @@ public class MCRRestAPIClassifications {
     //@Path("/id/{value}{format:(\\.[^/]+?)?}")  -> working, but returns empty string instead of default value
     @Path("/{classID}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response showObject(@PathParam("classID") String classID,
+    public Response showObject(@Context HttpServletRequest request, @PathParam("classID") String classID,
         @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") @DefaultValue("") String filter,
-        @QueryParam("style") @DefaultValue("") String style,
-        @QueryParam("callback") @DefaultValue("") String callback) {
+        @QueryParam("style") @DefaultValue("") String style, @QueryParam("callback") @DefaultValue("") String callback)
+        throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/classifications");
         String rootCateg = null;
         String lang = null;
         boolean filterNonEmpty = false;
@@ -198,8 +204,9 @@ public class MCRRestAPIClassifications {
         try {
             MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
             if (cl == null) {
-                return MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_NOT_FOUND,
-                    "Classification not found.", "There is no classification with the given ID.").createHttpResponse();
+                throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
+                    new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
+                        "There is no classification with the given ID."));
             }
             Document docClass = MCRCategoryTransformer.getMetaDataDocument(cl, false);
             Element eRoot = docClass.getRootElement();
@@ -210,9 +217,9 @@ public class MCRRestAPIClassifications {
                 if (e != null) {
                     eRoot = e;
                 } else {
-                    return MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_NOT_FOUND,
-                        "Category not found.", "The classfication does not contain a category with the given ID.")
-                        .createHttpResponse();
+                    throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
+                        new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Category not found.",
+                            "The classfication does not contain a category with the given ID."));
                 }
             }
             if (filterNonEmpty) {

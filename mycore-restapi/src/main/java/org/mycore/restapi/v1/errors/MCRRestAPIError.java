@@ -24,9 +24,6 @@ package org.mycore.restapi.v1.errors;
 
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -54,7 +51,7 @@ public class MCRRestAPIError {
 
     public static final String CODE_INVALID_AUTHENCATION = "INVALID_AUTHENTICATION";
 
-    Response.Status status = Response.Status.BAD_REQUEST;
+    public static final String CODE_INVALID_DATA = "INVALID_DATA";
 
     String code = "";
 
@@ -62,20 +59,14 @@ public class MCRRestAPIError {
 
     String detail = null;
 
-    public MCRRestAPIError(Response.Status status, String code, String title, String detail) {
-        this.status = status;
+    public MCRRestAPIError(String code, String title, String detail) {
         this.code = code;
         this.title = title;
         this.detail = detail;
     }
 
-    public static MCRRestAPIError create(Response.Status status, String code, String title, String detail) {
-        return new MCRRestAPIError(status, code, title, detail);
-    }
-
     public JsonObject toJsonObject() {
         JsonObject error = new JsonObject();
-        error.addProperty("status", String.valueOf(status.getStatusCode()));
         error.addProperty("code", code);
         error.addProperty("title", title);
         if (detail != null) {
@@ -94,10 +85,6 @@ public class MCRRestAPIError {
         return gson.toJson(errorMsg);
     }
 
-    public Response createHttpResponse() {
-        return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE).entity(toJSONString()).build();
-    }
-
     public static String convertErrorListToJSONString(List<MCRRestAPIError> errors) {
         JsonArray jaErrors = new JsonArray();
         for (MCRRestAPIError e : errors) {
@@ -110,32 +97,4 @@ public class MCRRestAPIError {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(errorMsg);
     }
-
-    public Response.Status getStatus() {
-        return status;
-    }
-
-    public static Response createHttpResponseFromErrorList(Response.Status status, List<MCRRestAPIError> errors) {
-        if (errors.size() == 0) {
-            return Response.ok().build();
-        } else {
-            return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE)
-                .entity(convertErrorListToJSONString(errors)).build();
-        }
-    }
-
-    /**
-     * takes the status from the first error object
-     * @param errors
-     * @return
-     */
-    public static Response createHttpResponseFromErrorList(List<MCRRestAPIError> errors) {
-        if (errors.size() == 0) {
-            return Response.ok().build();
-        } else {
-            return Response.status(errors.get(0).getStatus()).type(MediaType.APPLICATION_JSON_TYPE)
-                .entity(convertErrorListToJSONString(errors)).build();
-        }
-    }
-
 }

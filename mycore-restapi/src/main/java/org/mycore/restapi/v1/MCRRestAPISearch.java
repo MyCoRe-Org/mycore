@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -44,6 +45,9 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.jersey.MCRStaticContent;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.solr.MCRSolrConstants;
 
 /**
@@ -83,13 +87,13 @@ public class MCRRestAPISearch {
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1", MediaType.TEXT_PLAIN + ";charset=UTF-8" })
-    public Response search(@Context UriInfo info, @QueryParam("q") String query, @QueryParam("sort") String sort,
-        @QueryParam("wt") @DefaultValue("xml") String wt, @QueryParam("start") String start,
-        @QueryParam("rows") String rows, @QueryParam("fq") String fq, @QueryParam("fl") String fl,
-        @QueryParam("facet") String facet,
-        @QueryParam("facet.field") List<String> facetFields,
-        @QueryParam("json.wrf") String jsonWrf) {
-
+    public Response search(@Context UriInfo info, @Context HttpServletRequest request, @QueryParam("q") String query,
+        @QueryParam("sort") String sort, @QueryParam("wt") @DefaultValue("xml") String wt,
+        @QueryParam("start") String start, @QueryParam("rows") String rows, @QueryParam("fq") String fq,
+        @QueryParam("fl") String fl, @QueryParam("facet") String facet,
+        @QueryParam("facet.field") List<String> facetFields, @QueryParam("json.wrf") String jsonWrf)
+        throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/search");
         StringBuffer url = new StringBuffer(MCRSolrConstants.SERVER_URL);
         url.append("/select?");
 
@@ -132,16 +136,16 @@ public class MCRRestAPISearch {
                 String text = scanner.useDelimiter("\\A").next();
 
                 switch (wt) {
-                    case FORMAT_XML:
-                        return Response.ok(text).type("application/xml; charset=UTF-8").build();
-                    //break;
-                    case FORMAT_JSON:
-                        return Response.ok(text).type("application/json; charset=UTF-8").build();
-                    //break;
-                    case FORMAT_CSV:
-                        return Response.ok(text).type("text/comma-separated-values; charset=UTF-8").build();
-                    default:
-                        return Response.ok(text).type("text").build();
+                case FORMAT_XML:
+                    return Response.ok(text).type("application/xml; charset=UTF-8").build();
+                //break;
+                case FORMAT_JSON:
+                    return Response.ok(text).type("application/json; charset=UTF-8").build();
+                //break;
+                case FORMAT_CSV:
+                    return Response.ok(text).type("text/comma-separated-values; charset=UTF-8").build();
+                default:
+                    return Response.ok(text).type("text").build();
                 }
             }
         } catch (IOException e) {

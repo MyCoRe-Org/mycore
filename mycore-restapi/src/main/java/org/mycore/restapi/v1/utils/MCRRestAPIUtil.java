@@ -22,13 +22,16 @@
  */
 package org.mycore.restapi.v1.utils;
 
-import java.util.StringTokenizer;
-import java.util.regex.Pattern;
+import java.net.UnknownHostException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response.Status;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.access.mcrimpl.MCRAccessControlSystem;
+import org.mycore.access.mcrimpl.MCRAccessRule;
+import org.mycore.access.mcrimpl.MCRIPAddress;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 
@@ -39,38 +42,56 @@ import org.mycore.restapi.v1.errors.MCRRestAPIException;
  */
 public class MCRRestAPIUtil {
 
-    private static Pattern ALLOWED_WRITE_IP_PATTERN = Pattern
-        .compile(MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.Write.IPs.Pattern"));
-
     /**
-     * checks wether the IP of the client is an allowed IP for Upload
-     * @param request
-     * @return
+     * The REST API access permissions (read, write)
      */
-    public static boolean checkWriteAccessForIP(HttpServletRequest request) throws MCRRestAPIException {
-        String clientIP = getClientIpAddress(request);
-        if (ALLOWED_WRITE_IP_PATTERN.matcher(clientIP).matches()) {
-            return true;
-        } else {
-            throw new MCRRestAPIException(MCRRestAPIError.create(Status.FORBIDDEN, MCRRestAPIError.CODE_ACCESS_DENIED,
-                "The client IP " + clientIP + " is not allowed to write to the Rest API", null));
+    public enum MCRRestAPIACLPermission {
+        READ {
+            public String toString() {
+                return "read";
+            }
+        },
+
+        WRITE {
+            public String toString() {
+                return "write";
+            }
         }
     }
 
     /**
-     * returns the client IP-Address from HTTP request
+     * checks if the given REST API operation is allowed
+     * @param request - the HTTP request
+     * @param permission "read" or "write"
+     * @param path - the REST API path, e.g. /v1/messages
      * 
-     * @param request
-     * @return
+     * @throws MCRRestAPIException if access is restricted
      */
-    public static String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
-        if (xForwardedForHeader == null) {
-            return request.getRemoteAddr();
-        } else {
-            // see https://en.wikipedia.org/wiki/X-Forwarded-For
-            // the header may contain a list of IPs, we only need the client (first IP)
-            return new StringTokenizer(xForwardedForHeader, ",").nextToken().trim();
+    public static void checkRestAPIAccess(HttpServletRequest request, MCRRestAPIACLPermission permission, String path)
+        throws MCRRestAPIException {
+        try {
+            String userID = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(request);
+            MCRIPAddress theIP = new MCRIPAddress(MCRFrontendUtil.getRemoteAddr(request));
+            String thePath = path.startsWith("/") ? path : "/" + path;
+
+            boolean hasAPIAccess = ((MCRAccessControlSystem) MCRAccessControlSystem.instance()).checkAccess("restapi:/",
+                permission.toString(), userID, theIP);
+            if (hasAPIAccess) {
+                MCRAccessRule rule = (MCRAccessRule) MCRAccessControlSystem.instance()
+                    .getAccessRule("restapi:" + thePath, permission.toString());
+                if (rule != null) {
+                    if (rule.checkAccess(userID, new Date(), theIP)) {
+                        return;
+                    }
+                } else {
+                    return;
+                }
+            }
+        } catch (UnknownHostException e) {
+            // ignore
         }
+        throw new MCRRestAPIException(Status.FORBIDDEN,
+            new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
+                "Check access right '" + permission.toString() + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
     }
 }
