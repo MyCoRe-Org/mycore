@@ -84,7 +84,8 @@ public class MCRRestAPIMessages {
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1" })
-    public Response listMessages(@Context UriInfo info, @Context HttpServletRequest request, @QueryParam("lang") @DefaultValue("de") String lang,
+    public Response listMessages(@Context UriInfo info, @Context HttpServletRequest request,
+        @QueryParam("lang") @DefaultValue("de") String lang,
         @QueryParam("format") @DefaultValue("property") String format,
         @QueryParam("filter") @DefaultValue("") String filter) throws MCRRestAPIException{
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/messages");
@@ -142,7 +143,8 @@ public class MCRRestAPIMessages {
     @Path("/{value}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=UTF-8" })
-    public Response getMessage(@Context UriInfo info, @Context HttpServletRequest request, @PathParam("value") String key,
+    public Response getMessage(@Context UriInfo info, @Context HttpServletRequest request, 
+        @PathParam("value") String key,
         @QueryParam("lang") @DefaultValue("de") String lang,
         @QueryParam("format") @DefaultValue("text") String format) throws MCRRestAPIException{
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/messages");
