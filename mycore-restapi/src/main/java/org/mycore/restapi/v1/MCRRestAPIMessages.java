@@ -48,6 +48,7 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.services.i18n.MCRTranslation;
@@ -105,7 +106,8 @@ public class MCRRestAPIMessages {
         for (String prefix : check) {
             data.putAll(MCRTranslation.translatePrefix(prefix, locale));
         }
-
+        String authHeader = MCRJSONWebTokenUtil
+            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         try {
             if (FORMAT_PROPERTY.equals(format)) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -133,7 +135,7 @@ public class MCRRestAPIMessages {
                 writer.endObject();
                 writer.close();
 
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").header("Authorization", authHeader).build();
             }
         } catch (IOException e) {
             //toDo
@@ -164,9 +166,11 @@ public class MCRRestAPIMessages {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/messages");
         Locale locale = Locale.forLanguageTag(lang);
         String result = MCRTranslation.translate(key, locale);
+        String authHeader = MCRJSONWebTokenUtil
+            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         try {
             if (FORMAT_PROPERTY.equals(format)) {
-                return Response.ok(key + "=" + result).type("text/plain; charset=ISO-8859-1").build();
+                return Response.ok(key + "=" + result).type("text/plain; charset=ISO-8859-1").header("Authorization", authHeader).build();
             }
             if (FORMAT_XML.equals(format)) {
                 Document doc = new Document();
@@ -177,7 +181,7 @@ public class MCRRestAPIMessages {
                 StringWriter sw = new StringWriter();
                 XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
                 outputter.output(doc, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").header("Authorization", authHeader).build();
             }
             if (FORMAT_JSON.equals(format)) {
                 StringWriter sw = new StringWriter();
@@ -188,10 +192,10 @@ public class MCRRestAPIMessages {
                 writer.value(result);
                 writer.endObject();
                 writer.close();
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").header("Authorization", authHeader).build();
             }
             //text only
-            return Response.ok(result).type("text/plain; charset=UTF-8").build();
+            return Response.ok(result).type("text/plain; charset=UTF-8").header("Authorization", authHeader).build();
         } catch (IOException e) {
             //toDo
         }

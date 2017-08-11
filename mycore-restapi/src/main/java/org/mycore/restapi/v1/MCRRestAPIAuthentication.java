@@ -169,19 +169,19 @@ public class MCRRestAPIAuthentication {
     public Response renew(@DefaultValue("") String data, @Context HttpServletRequest request)
         throws MCRRestAPIException {
         try {
-            SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
-            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(signedJWT);
-            if (jwt != null) {
+            String authHeader = MCRJSONWebTokenUtil
+                .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
+            if (authHeader != null) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("{");
                 msg.append("\n    \"executed\":true,");
-                msg.append("\n    \"access_token\": \"" + jwt.serialize() + "\",");
+                msg.append("\n    \"access_token\": \"" + authHeader.replace("Bearer ", "") + "\",");
                 msg.append("\n    \"token_type\": \"Bearer\",");
                 msg.append("\n    \"data\": \"" + data + "\",");
                 msg.append("\n}");
 
                 return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-                    .header("Authorization", "Bearer " + jwt.serialize()).build();
+                    .header("Authorization",authHeader).build();
             }
         } catch (MCRRestAPIException rae) {
             throw rae;

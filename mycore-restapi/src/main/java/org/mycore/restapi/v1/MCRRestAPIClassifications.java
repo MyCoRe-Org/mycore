@@ -61,6 +61,7 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.solr.MCRSolrClientFactory;
@@ -87,7 +88,6 @@ public class MCRRestAPIClassifications {
 
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
-   
     /**
      * lists all available classifications as XML or JSON
      * 
@@ -102,6 +102,8 @@ public class MCRRestAPIClassifications {
     public Response listClassifications(@Context UriInfo info, @Context HttpServletRequest request,
         @QueryParam("format") @DefaultValue("json") String format) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/classifications");
+        
+        String authHeader = MCRJSONWebTokenUtil.createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         if (FORMAT_XML.equals(format)) {
             StringWriter sw = new StringWriter();
 
@@ -116,7 +118,8 @@ public class MCRRestAPIClassifications {
             }
             try {
                 xout.output(docOut, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
+                    .header("Authorization", authHeader).build();
             } catch (IOException e) {
                 //ToDo
             }
@@ -142,7 +145,8 @@ public class MCRRestAPIClassifications {
 
                 writer.close();
 
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
+                    .header("Authorization", authHeader).build();
             } catch (IOException e) {
                 //toDo
             }
@@ -240,6 +244,8 @@ public class MCRRestAPIClassifications {
                 eRoot.removeChildren("category");
             }
 
+            String authHeader = MCRJSONWebTokenUtil
+                .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
             if (FORMAT_JSON.equals(format)) {
                 String json = writeJSON(eRoot, lang, style);
                 //eventually: allow Cross Site Requests: .header("Access-Control-Allow-Origin", "*")
@@ -247,13 +253,15 @@ public class MCRRestAPIClassifications {
                     return Response.ok(callback + "(" + json + ")").type("application/javascript; charset=UTF-8")
                         .build();
                 } else {
-                    return Response.ok(json).type("application/json; charset=UTF-8").build();
+                    return Response.ok(json).type("application/json; charset=UTF-8").header("Authorization", authHeader)
+                        .build();
                 }
             }
 
             if (FORMAT_XML.equals(format)) {
                 String xml = writeXML(eRoot, lang);
-                return Response.ok(xml).type("application/xml; charset=UTF-8").build();
+                return Response.ok(xml).type("application/xml; charset=UTF-8").header("Authorization", authHeader)
+                    .build();
             }
         } catch (Exception e) {
             LogManager.getLogger(this.getClass()).error("Error outputting classification", e);

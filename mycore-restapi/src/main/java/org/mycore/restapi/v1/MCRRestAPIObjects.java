@@ -102,7 +102,7 @@ public class MCRRestAPIObjects {
         @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") String filter,
         @QueryParam("sort") @DefaultValue("ID:asc") String sort) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
-        return MCRRestAPIObjectsHelper.listObjects(info, format, filter, sort);
+        return MCRRestAPIObjectsHelper.listObjects(info, request, format, filter, sort);
     }
 
     /** 
@@ -134,7 +134,7 @@ public class MCRRestAPIObjects {
         @PathParam("mcrid") String mcrid, @QueryParam("format") @DefaultValue("xml") String format,
         @QueryParam("sort") @DefaultValue("ID:asc") String sort) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
-        return MCRRestAPIObjectsHelper.listDerivates(info, mcrid, format, sort);
+        return MCRRestAPIObjectsHelper.listDerivates(info, request, mcrid, format, sort);
     }
 
     /**
@@ -161,7 +161,7 @@ public class MCRRestAPIObjects {
     public Response returnMCRObject(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam("mcrid") String id, @QueryParam("style") String style) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
-        return MCRRestAPIObjectsHelper.showMCRObject(id, style, info);
+        return MCRRestAPIObjectsHelper.showMCRObject(id, style, info, request);
     }
 
     /**
@@ -189,7 +189,7 @@ public class MCRRestAPIObjects {
         @PathParam("mcrid") String mcrid, @PathParam("derid") String derid, @QueryParam("style") String style)
         throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
-        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info);
+        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, request);
     }
 
     /** returns a list of derivates for a given MyCoRe Object 
@@ -223,7 +223,7 @@ public class MCRRestAPIObjects {
         @PathParam("path") @DefaultValue("/") String path, @QueryParam("format") @DefaultValue("xml") String format,
         @QueryParam("depth") @DefaultValue("-1") int depth) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(httpRequest, MCRRestAPIACLPermission.WRITE, "/v1/objects");
-        return MCRRestAPIObjectsHelper.listContents(info, request, mcrid, derid, format, path, depth);
+        return MCRRestAPIObjectsHelper.listContents(info, httpRequest, request, mcrid, derid, format, path, depth);
     }
 
     /**

@@ -276,7 +276,10 @@ public class MCRJSONWebTokenUtil {
      * 
      * @return the new JSON WebToken
      */
-    public static SignedJWT createJWT(SignedJWT oldJWT) {
+    private static SignedJWT createJWT(SignedJWT oldJWT) {
+        if (oldJWT == null) {
+            return null;
+        }
         String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(oldJWT);
         JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(oldJWT);
         if (submittedUser != null && clientPubKey != null) {
@@ -287,11 +290,26 @@ public class MCRJSONWebTokenUtil {
     }
 
     /**
+     * returns a fresh JSON Web Token as String to be used in HTTP Header 'Authorization"
+     * @param oldJWT the given JSON Web Token
+     * @return the new JSON Web Token as String with prefix 'Bearer '
+     */
+    public static String createJWTAuthorizationHeader(SignedJWT oldJWT) {
+        if (oldJWT != null) {
+            SignedJWT newJWT = createJWT(oldJWT);
+            if (newJWT != null) {
+                return "Bearer " + newJWT.serialize();
+            }
+        }
+        return null;
+    }
+
+    /**
      * returns the access token from Request Header "Authorization"
      * if the token is invalid an MCRRestAPIException is thrown
      * 
      * @param request - the HTTPServletRequest object
-     * @return the JSON Web Token
+     * @return the JSON Web Token or null, if not provided in request
      * @throws MCRRestAPIException
      */
     public static SignedJWT retrieveAuthenticationToken(HttpServletRequest request) throws MCRRestAPIException {
@@ -328,9 +346,8 @@ public class MCRJSONWebTokenUtil {
                 throw new MCRRestAPIException(Status.UNAUTHORIZED, new MCRRestAPIError(
                     MCRRestAPIError.CODE_INVALID_AUTHENCATION, "Authentication is invalid.", e.getMessage()));
             }
+        } else {
+            return null;
         }
-        throw new MCRRestAPIException(Status.UNAUTHORIZED, new MCRRestAPIError(
-            MCRRestAPIError.CODE_INVALID_AUTHENCATION, "Authentication Token is missing.",
-            "Please login via /auth/login and provide the authentication token as HTTP Request Header 'Authorization"));
     }
 }

@@ -46,6 +46,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.solr.MCRSolrConstants;
@@ -145,21 +146,24 @@ public class MCRRestAPISearch {
         } catch (UnsupportedEncodingException e) {
             LOGGER.error(e);
         }
+        
+        String authHeader = MCRJSONWebTokenUtil
+            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         try (InputStream is = new URL(url.toString()).openStream()) {
             try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
                 String text = scanner.useDelimiter("\\A").next();
 
                 switch (wt) {
                 case FORMAT_XML:
-                    return Response.ok(text).type("application/xml; charset=UTF-8").build();
+                    return Response.ok(text).type("application/xml; charset=UTF-8").header("Authorization", authHeader).build();
                 //break;
                 case FORMAT_JSON:
-                    return Response.ok(text).type("application/json; charset=UTF-8").build();
+                    return Response.ok(text).type("application/json; charset=UTF-8").header("Authorization", authHeader).build();
                 //break;
                 case FORMAT_CSV:
-                    return Response.ok(text).type("text/comma-separated-values; charset=UTF-8").build();
+                    return Response.ok(text).type("text/comma-separated-values; charset=UTF-8").header("Authorization", authHeader).build();
                 default:
-                    return Response.ok(text).type("text").build();
+                    return Response.ok(text).type("text").header("Authorization", authHeader).build();
                 }
             }
         } catch (IOException e) {

@@ -143,7 +143,7 @@ public class MCRRestAPIUploadHelper {
 
             return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
                 .type("application/xml; charset=UTF-8")
-                .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize()).build();
+                .header("Authorization", MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
 
         } catch (Exception e) {
             LOGGER.error("Unable to Upload file: " + String.valueOf(fXML), e);
@@ -215,7 +215,7 @@ public class MCRRestAPIUploadHelper {
                 .created(info.getBaseUriBuilder()
                     .path("v1/objects/" + mcrObjID.toString() + "/derivates/" + derID.toString()).build())
                 .type("application/xml; charset=UTF-8")
-                .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize()).build();
+                .header("Authorization", MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
             session.setUserInformation(currentUser);
         } catch (Exception e) {
             LOGGER.error("Exeption while uploading derivate", e);
@@ -347,16 +347,13 @@ public class MCRRestAPIUploadHelper {
                             .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
                             .build())
                         .type("application/xml; charset=UTF-8")
-                        .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize())
+                        .header("Authorization", MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
                         .build();
-
                 }
             }
-
         }
         throw new MCRRestAPIException(Status.FORBIDDEN, new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_DATA,
             "File upload failed.", "The submitted data could not be validated."));
-
     }
 
     /**
@@ -414,7 +411,7 @@ public class MCRRestAPIUploadHelper {
                         .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
                         .build())
                     .type("application/xml; charset=UTF-8")
-                    .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize()).build();
+                    .header("Authorization", MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
             }
         } else {
             throw new MCRRestAPIException(Status.FORBIDDEN, new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_DATA,
@@ -469,7 +466,7 @@ public class MCRRestAPIUploadHelper {
             response = Response
                 .created(info.getBaseUriBuilder().path("v1/objects/" + objID.toString() + "/derivates").build())
                 .type("application/xml; charset=UTF-8")
-                .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWT(signedJWT).serialize()).build();
+                .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
         }
         return response;
     }
