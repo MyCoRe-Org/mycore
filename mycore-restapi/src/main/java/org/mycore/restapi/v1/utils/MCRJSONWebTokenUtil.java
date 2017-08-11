@@ -91,7 +91,7 @@ public class MCRJSONWebTokenUtil {
      * retrieves username and password from JSON web tocken 
      * 
      * @param token - the serialized JSON web token from login
-     * @returns username and password - combined by ":"
+     * @return username and password (combined by ":")
      */
     public static String retrieveUsernamePasswordFromLoginToken(String token) {
         JWEObject jweObject;
@@ -272,12 +272,9 @@ public class MCRJSONWebTokenUtil {
     /**
      * creates a JSON Web Token with user id, roles and client public key
      * 
-     * @param user - the user that should be returned
-     * @param roles - the roles that should be returned
-     * @param webAppBaseURL - the base url of the application
-     * @param clientPublicKey -  the client public key as JSON Web Key
+     * @param oldJWT - the given JSON Web Token
      * 
-     * @return the JSON WebToken
+     * @return the new JSON WebToken
      */
     public static SignedJWT createJWT(SignedJWT oldJWT) {
         String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(oldJWT);

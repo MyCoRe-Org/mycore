@@ -131,10 +131,10 @@ public class MCRRestAPIObjects {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @Path("/{mcrid}/derivates")
     public Response listDerivates(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrid") String mcrID, @QueryParam("format") @DefaultValue("xml") String format,
+        @PathParam("mcrid") String mcrid, @QueryParam("format") @DefaultValue("xml") String format,
         @QueryParam("sort") @DefaultValue("ID:asc") String sort) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
-        return MCRRestAPIObjectsHelper.listDerivates(info, mcrID, format, sort);
+        return MCRRestAPIObjectsHelper.listDerivates(info, mcrid, format, sort);
     }
 
     /**
@@ -219,7 +219,7 @@ public class MCRRestAPIObjects {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @Path("/{mcrid}/derivates/{derid}/contents{path:(/.*)*}")
     public Response listContents(@Context UriInfo info, @Context HttpServletRequest httpRequest,
-        @Context Request request, @PathParam("mcrid") String mcrID, @PathParam("derid") String derID,
+        @Context Request request, @PathParam("mcrid") String mcrid, @PathParam("derid") String derid,
         @PathParam("path") @DefaultValue("/") String path, @QueryParam("format") @DefaultValue("xml") String format,
         @QueryParam("depth") @DefaultValue("-1") int depth) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(httpRequest, MCRRestAPIACLPermission.WRITE, "/v1/objects");
@@ -297,7 +297,7 @@ public class MCRRestAPIObjects {
      * @param mcrObjID - a MyCoRe Object ID
      * 
      * @param label - the label of the new derivate
-     * @param overWriteOnExistingLabel - if true, an existing derivate is going to be returned
+     * @param overwrite - if true, return an existing derivate (with same label)
      * 
      * @return a Jersey Response object
      * @throws MCRRestAPIException
@@ -318,19 +318,21 @@ public class MCRRestAPIObjects {
 
     /**
      * upload a file into a given derivate
-     *  
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
      * 
      * @param mcrObjID - a MyCoRe Object ID
      * @param mcrDerID - a MyCoRe Derivate ID
      * 
-     * @param label - the label of the new derivate
-     * @param overWriteOnExistingLabel - if true, an existing derivate is going to be returned
-     * 
+     * @param uploadedInputStream - the inputstream from HTTP Post
+     * @param fileDetails - file information from HTTP Post
+     * @param path - the target path inside the derivate
+     * @param maindoc - true, if the file should be set as maindoc
+     * @param unzip - true, if the file is a zip file, that should be extracted
+     * @param md5 - the md5 sum of the uploaded file
+     * @param size - the size of the uploaded file
      * @return a Jersey Response object
      * @throws MCRRestAPIException
-     * 
      */
     @POST
     @Path("/{mcrObjID}/derivates/{mcrDerID}/contents")
