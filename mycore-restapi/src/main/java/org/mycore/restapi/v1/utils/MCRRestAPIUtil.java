@@ -31,9 +31,12 @@ import javax.ws.rs.core.Response.Status;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRIPAddress;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.user2.MCRUserManager;
 
 /**
  * This class contains some generic utility functions for the REST API
@@ -69,8 +72,14 @@ public class MCRRestAPIUtil {
      */
     public static void checkRestAPIAccess(HttpServletRequest request, MCRRestAPIACLPermission permission, String path)
         throws MCRRestAPIException {
+        //save the current user and set REST API user into session, 
+        //because ACL System can only validate the current user in session.
+        MCRUserInformation oldUser = MCRSessionMgr.getCurrentSession().getUserInformation();
         try {
             String userID = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(request);
+            if(userID!=null) {
+                MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(userID));
+            }
             MCRIPAddress theIP = new MCRIPAddress(MCRFrontendUtil.getRemoteAddr(request));
             String thePath = path.startsWith("/") ? path : "/" + path;
 
@@ -89,6 +98,9 @@ public class MCRRestAPIUtil {
             }
         } catch (UnknownHostException e) {
             // ignore
+        }
+        finally {
+            MCRSessionMgr.getCurrentSession().setUserInformation(oldUser);
         }
         throw new MCRRestAPIException(Status.FORBIDDEN,
             new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
