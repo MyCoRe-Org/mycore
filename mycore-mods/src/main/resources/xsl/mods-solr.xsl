@@ -100,9 +100,9 @@
         </xsl:for-each>
       </field>
     </xsl:for-each>
-    <xsl:for-each select="mods:genre[text()]">
+    <xsl:for-each select="mods:genre[@type='intern']">
       <field name="mods.genre">
-        <xsl:value-of select="text()" />
+        <xsl:value-of select="substring-after(@valueURI,'#')" />
       </field>
     </xsl:for-each>
     <xsl:for-each select="mods:identifier">
@@ -129,7 +129,7 @@
             <xsl:otherwise>
               <xsl:value-of select="."/>
             </xsl:otherwise>
-          </xsl:choose> 
+          </xsl:choose>
         </xsl:variable>
         <xsl:if test="not (string(number($yearIssued)) = 'NaN')">
           <field name="mods.yearIssued">

@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -24,18 +24,26 @@
 package org.mycore.access.mcrimpl;
 
 import org.jdom2.Element;
-import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCRIPCondition;
 import org.mycore.parsers.bool.MCRParseException;
 
 /**
  * Implementation of a (ip xy) clause
- * 
+ *
  * @author Matthias Kramm
  */
-public class MCRIPClause implements MCRCondition<MCRAccessData> {
+public class MCRIPClause implements MCRIPCondition {
     private MCRIPAddress ip;
 
+    public MCRIPClause() {
+    };
+
     public MCRIPClause(String ip) throws MCRParseException {
+        set(ip);
+    }
+
+    @Override
+    public void set(String ip) throws MCRParseException {
         try {
             this.ip = new MCRIPAddress(ip);
         } catch (java.net.UnknownHostException e) {
@@ -43,6 +51,7 @@ public class MCRIPClause implements MCRCondition<MCRAccessData> {
         }
     }
 
+    @Override
     public boolean evaluate(MCRAccessData data) {
         return data.getIp() != null && ip.contains(data.getIp());
     }
@@ -52,6 +61,7 @@ public class MCRIPClause implements MCRCondition<MCRAccessData> {
         return "ip " + ip.toString() + " ";
     }
 
+    @Override
     public Element toXML() {
         Element cond = new Element("condition");
         cond.setAttribute("field", "ip");
