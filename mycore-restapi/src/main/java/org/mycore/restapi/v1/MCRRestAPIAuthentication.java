@@ -62,8 +62,9 @@ import com.nimbusds.jwt.SignedJWT;
 @MCRStaticContent
 public class MCRRestAPIAuthentication {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIAuthentication.class);
-    
+
     private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+    private static final String HEADER_PREFIX_BEARER = "Bearer ";
 
     /**
      * @return the server public key as Java Web Token
@@ -78,7 +79,7 @@ public class MCRRestAPIAuthentication {
         msg.append("\n}");
 
         return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-            .header(HEADER_NAME_AUTHORIZATION, "Bearer " + jwt.serialize()).build();
+            .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
     }
 
     /**
@@ -111,7 +112,7 @@ public class MCRRestAPIAuthentication {
             userPwd = new String(Base64.getDecoder().decode(encodedAuth), StandardCharsets.ISO_8859_1);
 
         }
-        if (authorization.startsWith("Bearer ")) {
+        if (authorization.startsWith(HEADER_PREFIX_BEARER)) {
             userPwd = MCRJSONWebTokenUtil.retrieveUsernamePasswordFromLoginToken(authorization.substring(7).trim());
             clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromLoginToken(authorization.substring(7).trim());
         }
@@ -134,7 +135,7 @@ public class MCRRestAPIAuthentication {
                 msg.append("\n}");
 
                 return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, "Bearer " + jwt.serialize()).build();
+                    .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
             }
         }
 
@@ -177,13 +178,13 @@ public class MCRRestAPIAuthentication {
                 StringBuffer msg = new StringBuffer();
                 msg.append("{");
                 msg.append("\n    \"executed\":true,");
-                msg.append("\n    \"access_token\": \"" + authHeader.replace("Bearer ", "") + "\",");
+                msg.append("\n    \"access_token\": \"" + authHeader.replace(HEADER_PREFIX_BEARER, "") + "\",");
                 msg.append("\n    \"token_type\": \"Bearer\",");
                 msg.append("\n    \"data\": \"" + data + "\",");
                 msg.append("\n}");
 
                 return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION,authHeader).build();
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
         } catch (MCRRestAPIException rae) {
             throw rae;

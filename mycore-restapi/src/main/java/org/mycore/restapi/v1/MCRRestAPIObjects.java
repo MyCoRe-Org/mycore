@@ -115,7 +115,7 @@ public class MCRRestAPIObjects {
      * 
      * Allowed Prefixes are "mcr" or application specific search keys
      * "mcr" is the default prefix for MyCoRe IDs.
-
+    
      * @param sort - sortfield and sortorder combined by ':'
      *     * sortfield = ID | lastModified
      *     * sortorder = asc | desc 
@@ -147,7 +147,7 @@ public class MCRRestAPIObjects {
      * 
      * Allowed Prefixes are "mcr" or application specific search keys
      * "mcr" is the default prefix for MyCoRe IDs.
-
+    
      * 
      * @param style allowed values are "derivatedetails"
      * derivate details will be integrated into the output.
@@ -310,7 +310,7 @@ public class MCRRestAPIObjects {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadDerivate(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam("mcrObjID") String mcrObjID, @FormDataParam("label") String label,
-        @FormDataParam("overwriteOnExistingLabel")@DefaultValue("false")  boolean overwrite)
+        @FormDataParam("overwriteOnExistingLabel") @DefaultValue("false") boolean overwrite)
         throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.WRITE, "/v1/objects");
         return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label, overwrite);
@@ -342,15 +342,14 @@ public class MCRRestAPIObjects {
         @PathParam("mcrObjID") String mcrObjID, @PathParam("mcrDerID") String mcrDerID,
         @FormDataParam("file") InputStream uploadedInputStream,
         @FormDataParam("file") FormDataContentDisposition fileDetails, @FormDataParam("path") String path,
-        @FormDataParam("maindoc")@DefaultValue("false")  boolean maindoc,
-        @FormDataParam("unzip")@DefaultValue("false")  boolean unzip, @FormDataParam("md5") String md5,
+        @FormDataParam("maindoc") @DefaultValue("false") boolean maindoc,
+        @FormDataParam("unzip") @DefaultValue("false") boolean unzip, @FormDataParam("md5") String md5,
         @FormDataParam("size") Long size) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.WRITE, "/v1/objects");
         return MCRRestAPIUploadHelper.uploadFile(info, request, mcrObjID, mcrDerID, uploadedInputStream, fileDetails,
             path, maindoc, unzip, md5, size);
     }
-    
-    
+
     /**
      * delete all file from a given derivate
      *  

@@ -67,6 +67,9 @@ import com.google.gson.stream.JsonWriter;
 @Path("/v1/messages")
 @MCRStaticContent
 public class MCRRestAPIMessages {
+
+    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
     public static final String FORMAT_JSON = "json";
 
     public static final String FORMAT_XML = "xml";
@@ -97,7 +100,7 @@ public class MCRRestAPIMessages {
     public Response listMessages(@Context UriInfo info, @Context HttpServletRequest request,
         @QueryParam("lang") @DefaultValue("de") String lang,
         @QueryParam("format") @DefaultValue("property") String format,
-        @QueryParam("filter") @DefaultValue("") String filter) throws MCRRestAPIException{
+        @QueryParam("filter") @DefaultValue("") String filter) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/messages");
         Locale locale = Locale.forLanguageTag(lang);
         String[] check = filter.split(";");
@@ -135,7 +138,8 @@ public class MCRRestAPIMessages {
                 writer.endObject();
                 writer.close();
 
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").header("Authorization", authHeader).build();
+                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
         } catch (IOException e) {
             //toDo
@@ -159,10 +163,9 @@ public class MCRRestAPIMessages {
     @Path("/{value}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=UTF-8" })
-    public Response getMessage(@Context UriInfo info, @Context HttpServletRequest request, 
-        @PathParam("value") String key,
-        @QueryParam("lang") @DefaultValue("de") String lang,
-        @QueryParam("format") @DefaultValue("text") String format) throws MCRRestAPIException{
+    public Response getMessage(@Context UriInfo info, @Context HttpServletRequest request,
+        @PathParam("value") String key, @QueryParam("lang") @DefaultValue("de") String lang,
+        @QueryParam("format") @DefaultValue("text") String format) throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/messages");
         Locale locale = Locale.forLanguageTag(lang);
         String result = MCRTranslation.translate(key, locale);
@@ -170,7 +173,8 @@ public class MCRRestAPIMessages {
             .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         try {
             if (FORMAT_PROPERTY.equals(format)) {
-                return Response.ok(key + "=" + result).type("text/plain; charset=ISO-8859-1").header("Authorization", authHeader).build();
+                return Response.ok(key + "=" + result).type("text/plain; charset=ISO-8859-1")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
             if (FORMAT_XML.equals(format)) {
                 Document doc = new Document();
@@ -181,7 +185,8 @@ public class MCRRestAPIMessages {
                 StringWriter sw = new StringWriter();
                 XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
                 outputter.output(doc, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").header("Authorization", authHeader).build();
+                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
             if (FORMAT_JSON.equals(format)) {
                 StringWriter sw = new StringWriter();
@@ -192,10 +197,12 @@ public class MCRRestAPIMessages {
                 writer.value(result);
                 writer.endObject();
                 writer.close();
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").header("Authorization", authHeader).build();
+                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
             //text only
-            return Response.ok(result).type("text/plain; charset=UTF-8").header("Authorization", authHeader).build();
+            return Response.ok(result).type("text/plain; charset=UTF-8").header(HEADER_NAME_AUTHORIZATION, authHeader)
+                .build();
         } catch (IOException e) {
             //toDo
         }
