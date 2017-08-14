@@ -82,7 +82,7 @@ import com.nimbusds.jwt.SignedJWT;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
-    
+
     private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
 
     public static final String FORMAT_XML = "xml";
@@ -213,8 +213,7 @@ public class MCRRestAPIUploadHelper {
             }
 
             response = Response
-                .created(info.getBaseUriBuilder()
-                    .path("v1/objects/" + mcrObjID + "/derivates/" + derID).build())
+                .created(info.getBaseUriBuilder().path("v1/objects/" + mcrObjID + "/derivates/" + derID).build())
                 .type("application/xml; charset=UTF-8")
                 .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
             session.setUserInformation(currentUser);
@@ -348,7 +347,8 @@ public class MCRRestAPIUploadHelper {
                             .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
                             .build())
                         .type("application/xml; charset=UTF-8")
-                        .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
+                        .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
+                        .build();
                 }
             }
         }
@@ -411,7 +411,8 @@ public class MCRRestAPIUploadHelper {
                         .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
                         .build())
                     .type("application/xml; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
+                    .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
+                    .build();
             }
         } else {
             throw new MCRRestAPIException(Status.FORBIDDEN, new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_DATA,
@@ -465,8 +466,8 @@ public class MCRRestAPIUploadHelper {
             session.setUserInformation(currentUser);
             response = Response
                 .created(info.getBaseUriBuilder().path("v1/objects/" + objID.toString() + "/derivates").build())
-                .type("application/xml; charset=UTF-8")
-                .header(HEADER_NAME_AUTHORIZATION, "Bearer " + MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
+                .type("application/xml; charset=UTF-8").header(HEADER_NAME_AUTHORIZATION,
+                    "Bearer " + MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
                 .build();
         }
         return response;

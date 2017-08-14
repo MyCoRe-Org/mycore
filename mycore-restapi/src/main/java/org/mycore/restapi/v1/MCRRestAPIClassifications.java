@@ -81,7 +81,7 @@ import com.google.gson.stream.JsonWriter;
 public class MCRRestAPIClassifications {
 
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
-    
+
     private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
 
     public static final String FORMAT_JSON = "json";
@@ -256,15 +256,15 @@ public class MCRRestAPIClassifications {
                     return Response.ok(callback + "(" + json + ")").type("application/javascript; charset=UTF-8")
                         .build();
                 } else {
-                    return Response.ok(json).type("application/json; charset=UTF-8").header(HEADER_NAME_AUTHORIZATION, authHeader)
-                        .build();
+                    return Response.ok(json).type("application/json; charset=UTF-8")
+                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
                 }
             }
 
             if (FORMAT_XML.equals(format)) {
                 String xml = writeXML(eRoot, lang);
-                return Response.ok(xml).type("application/xml; charset=UTF-8").header(HEADER_NAME_AUTHORIZATION, authHeader)
-                    .build();
+                return Response.ok(xml).type("application/xml; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
         } catch (Exception e) {
             LogManager.getLogger(this.getClass()).error("Error outputting classification", e);

@@ -78,7 +78,8 @@ public class MCRRestAPIObjects {
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
      * 
-     * @param filter - parameter with filters as colon-separated key-value-pairs, pair separator is semicolon, allowed values are
+     * @param filter - parameter with filters as colon-separated key-value-pairs, 
+     *                 pair separator is semicolon, allowed values are
      *     * project - the MyCoRe ProjectID - first Part of a MyCoRe ID
      *     * type - the MyCoRe ObjectType - middle Part of a MyCoRe ID 
      *     * lastModifiedBefore - last modified date in UTC is lesser than or equals to given value 
