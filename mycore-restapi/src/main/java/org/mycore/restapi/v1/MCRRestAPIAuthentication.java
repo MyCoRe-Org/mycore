@@ -62,6 +62,8 @@ import com.nimbusds.jwt.SignedJWT;
 @MCRStaticContent
 public class MCRRestAPIAuthentication {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIAuthentication.class);
+    
+    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
 
     /**
      * @return the server public key as Java Web Token
@@ -76,7 +78,7 @@ public class MCRRestAPIAuthentication {
         msg.append("\n}");
 
         return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-            .header("Authorization", "Bearer " + jwt.serialize()).build();
+            .header(HEADER_NAME_AUTHORIZATION, "Bearer " + jwt.serialize()).build();
     }
 
     /**
@@ -132,7 +134,7 @@ public class MCRRestAPIAuthentication {
                 msg.append("\n}");
 
                 return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-                    .header("Authorization", "Bearer " + jwt.serialize()).build();
+                    .header(HEADER_NAME_AUTHORIZATION, "Bearer " + jwt.serialize()).build();
             }
         }
 
@@ -181,7 +183,7 @@ public class MCRRestAPIAuthentication {
                 msg.append("\n}");
 
                 return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-                    .header("Authorization",authHeader).build();
+                    .header(HEADER_NAME_AUTHORIZATION,authHeader).build();
             }
         } catch (MCRRestAPIException rae) {
             throw rae;

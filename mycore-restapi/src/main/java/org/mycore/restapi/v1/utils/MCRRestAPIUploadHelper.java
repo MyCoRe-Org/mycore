@@ -97,19 +97,19 @@ public class MCRRestAPIUploadHelper {
         }
     }
 
- /**
-  *
-  * uploads a MyCoRe Object    
-  * based upon:    
-  * http://puspendu.wordpress.com/2012/08/23/restful-webservice-file-upload-with-jersey/
-  * 
-  * @param info - the Jersey UriInfo object
-  * @param request - the HTTPServletRequest object 
-  * @param uploadedInputStream - the inputstream from HTTP Post request
-  * @param fileDetails - the file information from HTTP Post request
-  * @return a Jersey Response object
-  * @throws MCRRestAPIException
-  */
+    /**
+     *
+     * uploads a MyCoRe Object
+     * based upon:
+     * http://puspendu.wordpress.com/2012/08/23/restful-webservice-file-upload-with-jersey/
+     * 
+     * @param info - the Jersey UriInfo object
+     * @param request - the HTTPServletRequest object 
+     * @param uploadedInputStream - the inputstream from HTTP Post request
+     * @param fileDetails - the file information from HTTP Post request
+     * @return a Jersey Response object
+     * @throws MCRRestAPIException
+     */
     public static Response uploadObject(UriInfo info, HttpServletRequest request, InputStream uploadedInputStream,
         FormDataContentDisposition fileDetails) throws MCRRestAPIException {
 
@@ -170,8 +170,8 @@ public class MCRRestAPIUploadHelper {
      * @return a Jersey Response object
      * @throws MCRRestAPIException
      */
-    public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID,
-        String label, boolean overwriteOnExistingLabel) throws MCRRestAPIException {
+    public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID, String label,
+        boolean overwriteOnExistingLabel) throws MCRRestAPIException {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
         SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
@@ -189,8 +189,7 @@ public class MCRRestAPIUploadHelper {
             MCRObjectID derID = null;
             if (overwriteOnExistingLabel) {
                 for (MCRMetaLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                    if (label.equals(derLink.getXLinkLabel())
-                        || label.equals(derLink.getXLinkTitle())) {
+                    if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
                         derID = derLink.getXLinkHrefID();
                     }
                 }
@@ -213,7 +212,7 @@ public class MCRRestAPIUploadHelper {
 
             response = Response
                 .created(info.getBaseUriBuilder()
-                    .path("v1/objects/" + mcrObjID.toString() + "/derivates/" + derID.toString()).build())
+                    .path("v1/objects/" + mcrObjID + "/derivates/" + derID).build())
                 .type("application/xml; charset=UTF-8")
                 .header("Authorization", MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
             session.setUserInformation(currentUser);
@@ -347,8 +346,7 @@ public class MCRRestAPIUploadHelper {
                             .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
                             .build())
                         .type("application/xml; charset=UTF-8")
-                        .header("Authorization", MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
-                        .build();
+                        .header("Authorization", MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
                 }
             }
         }
@@ -466,7 +464,8 @@ public class MCRRestAPIUploadHelper {
             response = Response
                 .created(info.getBaseUriBuilder().path("v1/objects/" + objID.toString() + "/derivates").build())
                 .type("application/xml; charset=UTF-8")
-                .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
+                .header("Authorization", "Bearer " + MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
+                .build();
         }
         return response;
     }

@@ -63,6 +63,8 @@ import org.mycore.solr.MCRSolrConstants;
 public class MCRRestAPISearch {
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 
+    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
     public static final String FORMAT_JSON = "json";
 
     public static final String FORMAT_XML = "xml";
@@ -146,7 +148,7 @@ public class MCRRestAPISearch {
         } catch (UnsupportedEncodingException e) {
             LOGGER.error(e);
         }
-        
+
         String authHeader = MCRJSONWebTokenUtil
             .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         try (InputStream is = new URL(url.toString()).openStream()) {
@@ -155,15 +157,18 @@ public class MCRRestAPISearch {
 
                 switch (wt) {
                 case FORMAT_XML:
-                    return Response.ok(text).type("application/xml; charset=UTF-8").header("Authorization", authHeader).build();
+                    return Response.ok(text).type("application/xml; charset=UTF-8")
+                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
                 //break;
                 case FORMAT_JSON:
-                    return Response.ok(text).type("application/json; charset=UTF-8").header("Authorization", authHeader).build();
+                    return Response.ok(text).type("application/json; charset=UTF-8")
+                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
                 //break;
                 case FORMAT_CSV:
-                    return Response.ok(text).type("text/comma-separated-values; charset=UTF-8").header("Authorization", authHeader).build();
+                    return Response.ok(text).type("text/comma-separated-values; charset=UTF-8")
+                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
                 default:
-                    return Response.ok(text).type("text").header("Authorization", authHeader).build();
+                    return Response.ok(text).type("text").header(HEADER_NAME_AUTHORIZATION, authHeader).build();
                 }
             }
         } catch (IOException e) {

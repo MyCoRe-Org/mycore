@@ -77,7 +77,7 @@ public class MCRRestAPIUtil {
         MCRUserInformation oldUser = MCRSessionMgr.getCurrentSession().getUserInformation();
         try {
             String userID = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(request);
-            if(userID!=null) {
+            if (userID != null) {
                 MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(userID));
             }
             MCRIPAddress theIP = new MCRIPAddress(MCRFrontendUtil.getRemoteAddr(request));
@@ -98,8 +98,7 @@ public class MCRRestAPIUtil {
             }
         } catch (UnknownHostException e) {
             // ignore
-        }
-        finally {
+        } finally {
             MCRSessionMgr.getCurrentSession().setUserInformation(oldUser);
         }
         throw new MCRRestAPIException(Status.FORBIDDEN,
