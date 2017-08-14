@@ -24,10 +24,7 @@
 package org.mycore.common.xml;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.TransformerException;
@@ -377,11 +374,11 @@ public class MCRXMLHelper {
             return null;
         }
 
-        public static JsonPrimitive serializeText(Text text) {
+        static JsonPrimitive serializeText(Text text) {
             return new JsonPrimitive(text.getText());
         }
 
-        public static JsonObject serializeElement(Element element) {
+        static JsonObject serializeElement(Element element) {
             JsonObject json = new JsonObject();
 
             // text
@@ -396,50 +393,52 @@ public class MCRXMLHelper {
             });
 
             // namespaces
-            element.getNamespacesIntroduced().forEach(ns -> {
-                json.addProperty(getName(ns), ns.getURI().toString());
+            element.getAdditionalNamespaces().forEach(ns -> {
+                json.addProperty(getName(ns), ns.getURI());
             });
 
             // children
-            element.getChildren().stream().map(e -> new Pair<>(e.getNamespace(), e.getName())).distinct()
-                .forEach(pair -> {
-                    String name = getName(pair.y, pair.x);
-                    List<Element> children = element.getChildren(pair.y, pair.x);
-                    if (children.size() == 1) {
-                        json.add(name, serializeElement(children.get(0)));
-                    } else if (children.size() >= 2) {
-                        JsonArray arr = new JsonArray();
-                        children.forEach(child -> {
-                            arr.add(serialize(child));
-                        });
-                        json.add(name, arr);
-                    } else {
-                        throw new MCRException(
+            // - build child map of <name,namespace> pair with their respective elements
+            Map<Pair<String, Namespace>, List<Element>> childContentMap = new HashMap<>();
+            for(Element child : element.getChildren()) {
+                Pair key = new Pair<String, Namespace>(child.getName(), child.getNamespace());
+                List<Element> contentList = childContentMap.computeIfAbsent(key, k -> new ArrayList<>());
+                contentList.add(child);
+            }
+            // - run through the map and serialize
+            for(Map.Entry<Pair<String, Namespace>, List<Element>> entry: childContentMap.entrySet()) {
+                Pair<String, Namespace> key = entry.getKey();
+                List<Element> contentList = entry.getValue();
+                String name = getName(key.x, key.y);
+                if(entry.getValue().size() == 1) {
+                    json.add(name, serializeElement(contentList.get(0)));
+                } else if (contentList.size() >= 2) {
+                    JsonArray arr = new JsonArray();
+                    contentList.forEach(child -> {
+                        arr.add(serialize(child));
+                    });
+                    json.add(name, arr);
+                } else {
+                    throw new MCRException(
                             "Unexcpected error while parsing children of element '" + element.getName() + "'");
-                    }
-                });
+                }
+            }
             return json;
         }
 
         private static String getName(Namespace ns) {
-            StringBuffer buffer = new StringBuffer("_");
-            buffer.append("xmlns:")
-                .append(getCononicalizedPrefix(ns));
-            return buffer.toString();
+            return "_xmlns:" + getCononicalizedPrefix(ns);
         }
 
         private static String getName(Attribute attribute) {
-            StringBuffer buffer = new StringBuffer("_");
-            buffer.append(getName(attribute.getName(), attribute.getNamespace()));
-            return buffer.toString();
+            return "_" + getName(attribute.getName(), attribute.getNamespace());
         }
 
         private static String getName(String name, Namespace namespace) {
-            StringBuffer buffer = new StringBuffer();
             if (namespace != null && !namespace.getURI().equals("")) {
-                buffer.append(getCononicalizedPrefix(namespace)).append(":");
+                return getCononicalizedPrefix(namespace) + ":" + name;
             }
-            return buffer.append(name).toString();
+            return name;
         }
 
         private static String getCononicalizedPrefix(Namespace namespace) {
@@ -457,20 +456,24 @@ public class MCRXMLHelper {
 
             public final Y y;
 
-            public Pair(X x, Y y) {
+            Pair(X x, Y y) {
                 this.x = x;
                 this.y = y;
             }
 
-            @SuppressWarnings("rawtypes")
             @Override
-            public boolean equals(Object obj) {
-                if (obj == null && !(obj instanceof Pair)) {
-                    return false;
-                }
-                return Objects.equals(this.x, ((Pair) obj).x) && Objects.equals(this.y, ((Pair) obj).y);
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                Pair<?, ?> pair = (Pair<?, ?>) o;
+                return Objects.equals(x, pair.x) &&
+                        Objects.equals(y, pair.y);
             }
 
+            @Override
+            public int hashCode() {
+                return Objects.hash(x, y);
+            }
         }
 
     }
