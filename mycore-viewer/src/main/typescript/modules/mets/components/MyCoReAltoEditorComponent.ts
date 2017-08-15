@@ -77,9 +77,14 @@ namespace mycore.viewer.components {
                 this._structureImages = this._structureModel.imageList;
                 for (let imageIndex in this._structureImages) {
                     let image = this._structureImages[ imageIndex ];
-                    this._altoPresent = this._altoPresent || image.additionalHrefs.has("AltoHref");
+                    let altoHref = image.additionalHrefs.get("AltoHref");
+                    this._altoPresent = this._altoPresent || altoHref != null;
                     if (this._altoPresent) {
-                        this.altoHrefImageHrefMap.set(image.additionalHrefs.get("AltoHref"), image.href);
+                        if(altoHref == null) {
+                            console.warn("there is no alto.xml for " + image.href);
+                            continue;
+                        }
+                        this.altoHrefImageHrefMap.set(altoHref, image.href);
                     }
                 }
                 this.everythingLoadedSynchronize(this);
