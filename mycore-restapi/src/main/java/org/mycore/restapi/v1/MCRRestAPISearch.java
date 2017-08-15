@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -44,6 +45,10 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.jersey.MCRStaticContent;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.solr.MCRSolrConstants;
 
 /**
@@ -58,6 +63,8 @@ import org.mycore.solr.MCRSolrConstants;
 public class MCRRestAPISearch {
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 
+    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
     public static final String FORMAT_JSON = "json";
 
     public static final String FORMAT_XML = "xml";
@@ -67,8 +74,9 @@ public class MCRRestAPISearch {
     /**
      * see http://wiki.apache.org/solr/CommonQueryParameters for syntax of parameters
      * 
-     * @param info - a Jersey Context Object for URI
-     *      
+     * @param info - the injected Jersey URIInfo object
+     * @param request - the injected HTTPServletRequest object
+     * 
      * @param query
      *      the Query in SOLR Query syntax
      * @param sort
@@ -78,18 +86,31 @@ public class MCRRestAPISearch {
      * @param start
      *      the start parameter (number) - syntax as defined by SOLR      
      * @param rows
-     *      the rows parameter (number) - syntax as defined by SOLR              
+     *      the rows parameter (number) - syntax as defined by SOLR
+     * @param fq
+     *      the filter query parameter - syntax as defined by SOLR
+     * @param fl
+     *      the list of fields to be returned - syntax as defined by SOLR
+     * @param facet
+     *      the facet parameter (true to return facets)  - syntax as defined by SOLR
+     * @param facetFields
+     *      the list of facetFields to be returned - syntax as defined by SOLR
+     * @param jsonWrf
+     *      the name of the JSONP callback function - syntax as defined by SOLR 
+     *      
+     * @return a Jersey Response Object
+     * @throws MCRRestAPIException    
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1", MediaType.TEXT_PLAIN + ";charset=UTF-8" })
-    public Response search(@Context UriInfo info, @QueryParam("q") String query, @QueryParam("sort") String sort,
-        @QueryParam("wt") @DefaultValue("xml") String wt, @QueryParam("start") String start,
-        @QueryParam("rows") String rows, @QueryParam("fq") String fq, @QueryParam("fl") String fl,
-        @QueryParam("facet") String facet,
-        @QueryParam("facet.field") List<String> facetFields,
-        @QueryParam("json.wrf") String jsonWrf) {
-
+    public Response search(@Context UriInfo info, @Context HttpServletRequest request, @QueryParam("q") String query,
+        @QueryParam("sort") String sort, @QueryParam("wt") @DefaultValue("xml") String wt,
+        @QueryParam("start") String start, @QueryParam("rows") String rows, @QueryParam("fq") String fq,
+        @QueryParam("fl") String fl, @QueryParam("facet") String facet,
+        @QueryParam("facet.field") List<String> facetFields, @QueryParam("json.wrf") String jsonWrf)
+        throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/search");
         StringBuffer url = new StringBuffer(MCRSolrConstants.SERVER_URL);
         url.append("/select?");
 
@@ -127,21 +148,27 @@ public class MCRRestAPISearch {
         } catch (UnsupportedEncodingException e) {
             LOGGER.error(e);
         }
+
+        String authHeader = MCRJSONWebTokenUtil
+            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         try (InputStream is = new URL(url.toString()).openStream()) {
             try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
                 String text = scanner.useDelimiter("\\A").next();
 
                 switch (wt) {
-                    case FORMAT_XML:
-                        return Response.ok(text).type("application/xml; charset=UTF-8").build();
-                    //break;
-                    case FORMAT_JSON:
-                        return Response.ok(text).type("application/json; charset=UTF-8").build();
-                    //break;
-                    case FORMAT_CSV:
-                        return Response.ok(text).type("text/comma-separated-values; charset=UTF-8").build();
-                    default:
-                        return Response.ok(text).type("text").build();
+                case FORMAT_XML:
+                    return Response.ok(text).type("application/xml; charset=UTF-8")
+                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                //break;
+                case FORMAT_JSON:
+                    return Response.ok(text).type("application/json; charset=UTF-8")
+                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                //break;
+                case FORMAT_CSV:
+                    return Response.ok(text).type("text/comma-separated-values; charset=UTF-8")
+                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                default:
+                    return Response.ok(text).type("text").header(HEADER_NAME_AUTHORIZATION, authHeader).build();
                 }
             }
         } catch (IOException e) {

@@ -63,21 +63,23 @@ import com.nimbusds.jwt.SignedJWT;
 public class MCRRestAPIAuthentication {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIAuthentication.class);
 
+    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+    private static final String HEADER_PREFIX_BEARER = "Bearer ";
+
     /**
-     * return the server public key as Java Web Token
-     * 
+     * @return the server public key as Java Web Token
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     public Response initAuthorization() {
-        String jwt = MCRJSONWebTokenUtil.createEmptyJWTwithPublicKey("http:/localhost:8080");
+        SignedJWT jwt = MCRJSONWebTokenUtil.createEmptyJWTwithPublicKey("http:/localhost:8080");
         StringBuffer msg = new StringBuffer();
         msg.append("{");
         msg.append("\n    \"access_token\": \"" + jwt + "\",");
         msg.append("\n}");
 
         return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-            .header("Authorization", "Bearer " + jwt).build();
+            .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
     }
 
     /**
@@ -94,8 +96,8 @@ public class MCRRestAPIAuthentication {
      * Returning the JWT (Java Web Token to the client is not properly specified). We use the "Authorization" Header in
      * the response, which is unusual but not strictly forbidden.
      * 
-     * @param authorization
-     * @return
+     * @param authorization - content HTTP Header Authorization
+     * @return response message as JSON
      */
     @POST
     @Produces({ MediaType.APPLICATION_JSON + ";charset=UTF-8" })
@@ -110,7 +112,7 @@ public class MCRRestAPIAuthentication {
             userPwd = new String(Base64.getDecoder().decode(encodedAuth), StandardCharsets.ISO_8859_1);
 
         }
-        if (authorization.startsWith("Bearer ")) {
+        if (authorization.startsWith(HEADER_PREFIX_BEARER)) {
             userPwd = MCRJSONWebTokenUtil.retrieveUsernamePasswordFromLoginToken(authorization.substring(7).trim());
             clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromLoginToken(authorization.substring(7).trim());
         }
@@ -122,7 +124,7 @@ public class MCRRestAPIAuthentication {
         }
         //validate username and password
         if (username != null && password != null && MCRUserManager.checkPassword(username, password) != null) {
-            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("rest-api"),
+            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("restapi"),
                 MCRFrontendUtil.getBaseURL(), clientPubKey);
             if (jwt != null) {
                 StringBuffer msg = new StringBuffer();
@@ -133,7 +135,7 @@ public class MCRRestAPIAuthentication {
                 msg.append("\n}");
 
                 return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-                    .header("Authorization", "Bearer " + jwt.serialize()).build();
+                    .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
             }
         }
 
@@ -167,31 +169,31 @@ public class MCRRestAPIAuthentication {
 
     @POST
     @Path("/renew")
-    public Response renew(@DefaultValue("") String data, @Context HttpServletRequest request) {
+    public Response renew(@DefaultValue("") String data, @Context HttpServletRequest request)
+        throws MCRRestAPIException {
         try {
-            SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
-            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(signedJWT);
-            if (jwt != null) {
+            String authHeader = MCRJSONWebTokenUtil
+                .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
+            if (authHeader != null) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("{");
                 msg.append("\n    \"executed\":true,");
-                msg.append("\n    \"access_token\": \"" + jwt.serialize() + "\",");
+                msg.append("\n    \"access_token\": \"" + authHeader.replace(HEADER_PREFIX_BEARER, "") + "\",");
                 msg.append("\n    \"token_type\": \"Bearer\",");
                 msg.append("\n    \"data\": \"" + data + "\",");
-
                 msg.append("\n}");
 
                 return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
-                    .header("Authorization", "Bearer " + jwt.serialize()).build();
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
         } catch (MCRRestAPIException rae) {
-            return MCRRestAPIError.createHttpResponseFromErrorList(rae.getErrors());
+            throw rae;
         } catch (Exception e) {
             LOGGER.error(e);
-            return MCRRestAPIError.create(Status.INTERNAL_SERVER_ERROR, MCRRestAPIError.CODE_INTERNAL_ERROR,
-                "Session cannot be renewed!", e.getMessage()).createHttpResponse();
+            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Session cannot be renewed!", e.getMessage()));
         }
-        return MCRRestAPIError.create(Status.FORBIDDEN, MCRRestAPIError.CODE_INVALID_AUTHENCATION, "Permission denied",
-            "Please provide a valid JWT Token for the session.").createHttpResponse();
+        throw new MCRRestAPIException(Status.FORBIDDEN, new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_AUTHENCATION,
+            "Permission denied", "Please provide a valid JWT Token for the session."));
     }
 }

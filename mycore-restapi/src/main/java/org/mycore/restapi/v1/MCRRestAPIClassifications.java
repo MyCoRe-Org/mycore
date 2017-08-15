@@ -25,6 +25,7 @@ package org.mycore.restapi.v1;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -59,6 +60,10 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 
@@ -77,6 +82,8 @@ public class MCRRestAPIClassifications {
 
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
 
+    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
     public static final String FORMAT_JSON = "json";
 
     public static final String FORMAT_XML = "xml";
@@ -84,14 +91,22 @@ public class MCRRestAPIClassifications {
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
     /**
-     *
-     * @param info - a Jersey Context Object for URI
-     *     Possible values are: json | xml (required)
+     * lists all available classifications as XML or JSON
+     * 
+     * @param info - the URIInfo object
+     * @param request - the HTTPServletRequest object
+     * @param format - the output format ('xml' or 'json)
+     * @return a Jersey Response Object
+     * @throws MCRRestAPIException
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response listClassifications(@Context UriInfo info,
-        @QueryParam("format") @DefaultValue("json") String format) {
+    public Response listClassifications(@Context UriInfo info, @Context HttpServletRequest request,
+        @QueryParam("format") @DefaultValue("json") String format) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/classifications");
+
+        String authHeader = MCRJSONWebTokenUtil
+            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         if (FORMAT_XML.equals(format)) {
             StringWriter sw = new StringWriter();
 
@@ -106,7 +121,8 @@ public class MCRRestAPIClassifications {
             }
             try {
                 xout.output(docOut, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             } catch (IOException e) {
                 //ToDo
             }
@@ -132,7 +148,8 @@ public class MCRRestAPIClassifications {
 
                 writer.close();
 
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             } catch (IOException e) {
                 //toDo
             }
@@ -159,17 +176,20 @@ public class MCRRestAPIClassifications {
      *      - 'opened' - (together with 'jstree') - all nodes will be opened
      *      - 'disabled' - (together with 'jstree') - all nodes will be disabled
      *      - 'selected' - (together with 'jstree') - all nodes will be selected
-     * @param callback used for JSONP - wrap json result into a Javascript function named by callback parameter
+     * @param request - the HTTPServletRequestObject
+     * @param callback - used in JSONP to wrap json result into a Javascript function named by callback parameter
      * @return a Jersey Response object
+     * @throws MCRRestAPIException
      */
     @GET
     //@Path("/id/{value}{format:(\\.[^/]+?)?}")  -> working, but returns empty string instead of default value
     @Path("/{classID}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response showObject(@PathParam("classID") String classID,
+    public Response showObject(@Context HttpServletRequest request, @PathParam("classID") String classID,
         @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") @DefaultValue("") String filter,
-        @QueryParam("style") @DefaultValue("") String style,
-        @QueryParam("callback") @DefaultValue("") String callback) {
+        @QueryParam("style") @DefaultValue("") String style, @QueryParam("callback") @DefaultValue("") String callback)
+        throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/classifications");
         String rootCateg = null;
         String lang = null;
         boolean filterNonEmpty = false;
@@ -198,8 +218,9 @@ public class MCRRestAPIClassifications {
         try {
             MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
             if (cl == null) {
-                return MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_NOT_FOUND,
-                    "Classification not found.", "There is no classification with the given ID.").createHttpResponse();
+                throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
+                    new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
+                        "There is no classification with the given ID."));
             }
             Document docClass = MCRCategoryTransformer.getMetaDataDocument(cl, false);
             Element eRoot = docClass.getRootElement();
@@ -210,9 +231,9 @@ public class MCRRestAPIClassifications {
                 if (e != null) {
                     eRoot = e;
                 } else {
-                    return MCRRestAPIError.create(Response.Status.BAD_REQUEST, MCRRestAPIError.CODE_NOT_FOUND,
-                        "Category not found.", "The classfication does not contain a category with the given ID.")
-                        .createHttpResponse();
+                    throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
+                        new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Category not found.",
+                            "The classfication does not contain a category with the given ID."));
                 }
             }
             if (filterNonEmpty) {
@@ -226,6 +247,8 @@ public class MCRRestAPIClassifications {
                 eRoot.removeChildren("category");
             }
 
+            String authHeader = MCRJSONWebTokenUtil
+                .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
             if (FORMAT_JSON.equals(format)) {
                 String json = writeJSON(eRoot, lang, style);
                 //eventually: allow Cross Site Requests: .header("Access-Control-Allow-Origin", "*")
@@ -233,13 +256,15 @@ public class MCRRestAPIClassifications {
                     return Response.ok(callback + "(" + json + ")").type("application/javascript; charset=UTF-8")
                         .build();
                 } else {
-                    return Response.ok(json).type("application/json; charset=UTF-8").build();
+                    return Response.ok(json).type("application/json; charset=UTF-8")
+                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
                 }
             }
 
             if (FORMAT_XML.equals(format)) {
                 String xml = writeXML(eRoot, lang);
-                return Response.ok(xml).type("application/xml; charset=UTF-8").build();
+                return Response.ok(xml).type("application/xml; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
         } catch (Exception e) {
             LogManager.getLogger(this.getClass()).error("Error outputting classification", e);
