@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -24,7 +24,13 @@
 package org.mycore.common.xml;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.TransformerException;
@@ -63,7 +69,7 @@ import com.google.gson.JsonPrimitive;
 /**
  * This class provides some static utility methods to deal with XML/DOM
  * elements, nodes etc.
- * 
+ *
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
@@ -75,7 +81,7 @@ public class MCRXMLHelper {
     /**
      * Removes characters that are illegal in XML text nodes or attribute
      * values.
-     * 
+     *
      * @param text
      *            the String that should be used in XML elements or attributes
      * @return the String with all illegal characters removed
@@ -131,7 +137,7 @@ public class MCRXMLHelper {
 
     /**
      * @see JDOMtoGSONSerializer
-     * 
+     *
      * @param content the jdom element to serialize
      * @return a gson element
      */
@@ -141,7 +147,7 @@ public class MCRXMLHelper {
 
     /**
      * @see JDOMtoGSONSerializer#serializeElement(Element)
-     * 
+     *
      * @param element the jdom element to serialize
      * @return a gson object
      */
@@ -151,10 +157,10 @@ public class MCRXMLHelper {
 
     /**
      * checks whether two documents are equal.
-     * 
+     *
      * This test performs a deep check across all child components of a
      * Document.
-     * 
+     *
      * @param d1
      *            first Document to compare
      * @param d2
@@ -173,10 +179,10 @@ public class MCRXMLHelper {
 
     /**
      * checks whether two elements are equal.
-     * 
+     *
      * This test performs a deep check across all child components of a
      * element.
-     * 
+     *
      * @param e1
      *            first Element to compare
      * @param e2
@@ -266,7 +272,7 @@ public class MCRXMLHelper {
                 }
                 return false;
             }
-            HashSet<String> orig = new HashSet<String>(aList1.size());
+            HashSet<String> orig = new HashSet<>(aList1.size());
             for (Attribute attr : aList1) {
                 orig.add(attr.toString());
             }
@@ -327,14 +333,14 @@ public class MCRXMLHelper {
      * for attributes and the dollar sign ($) for text nodes. The colon sign (:) is used for
      * namespaces (you have to use square brackets in javascript for accessing those).
      * </p>
-     * 
+     *
      * <ul>
      *   <li><b>_version</b> -> version attribute</li>
      *   <li><b>$text</b> -> text node</li>
      *   <li><b>_xmlns:mods</b> -> mods namespace</li>
      *   <li><b>_mods:title</b> -> title attribute with mods namespace</li>
      * </ul>
-     * 
+     *
      * <b>Example</b>
      * <pre>
      * {
@@ -352,7 +358,7 @@ public class MCRXMLHelper {
      *   <li><b>get the text of the title</b> -> mods["mods:titleInfo"]["mods:title"].$text -> "hello xml serializer"</li>
      * </ul>
      * <b>BE AWARE THAT MIXED CONTENT IS NOT SUPPORTED!</b>
-     * 
+     *
      * @author Matthias Eichner
      */
     private static class JDOMtoGSONSerializer {
@@ -360,7 +366,7 @@ public class MCRXMLHelper {
         /**
          * This method is capable of serializing Elements and Text nodes.
          * Return null otherwise.
-         * 
+         *
          * @param content the content to serialize
          * @return the serialized content, or null if the type is not supported
          */
@@ -401,7 +407,7 @@ public class MCRXMLHelper {
             // - build child map of <name,namespace> pair with their respective elements
             Map<Pair<String, Namespace>, List<Element>> childContentMap = new HashMap<>();
             for(Element child : element.getChildren()) {
-                Pair key = new Pair<String, Namespace>(child.getName(), child.getNamespace());
+                Pair key = new Pair<>(child.getName(), child.getNamespace());
                 List<Element> contentList = childContentMap.computeIfAbsent(key, k -> new ArrayList<>());
                 contentList.add(child);
             }
@@ -463,8 +469,12 @@ public class MCRXMLHelper {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
                 Pair<?, ?> pair = (Pair<?, ?>) o;
                 return Objects.equals(x, pair.x) &&
                         Objects.equals(y, pair.y);
