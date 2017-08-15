@@ -118,6 +118,7 @@ public class MCRXMLHelperTest extends MCRTestCase {
         JsonObject deLabel = json.getAsJsonArray("label").get(0).getAsJsonObject();
         assertEquals("de", deLabel.getAsJsonPrimitive("_xml:lang").getAsString());
         assertEquals("Staaten", deLabel.getAsJsonPrimitive("_text").getAsString());
+        assertEquals(2, json.getAsJsonObject("categories").getAsJsonArray("category").size());
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -24,9 +24,12 @@
 package org.mycore.common.xml;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.XMLConstants;
@@ -66,7 +69,7 @@ import com.google.gson.JsonPrimitive;
 /**
  * This class provides some static utility methods to deal with XML/DOM
  * elements, nodes etc.
- * 
+ *
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
@@ -78,7 +81,7 @@ public class MCRXMLHelper {
     /**
      * Removes characters that are illegal in XML text nodes or attribute
      * values.
-     * 
+     *
      * @param text
      *            the String that should be used in XML elements or attributes
      * @return the String with all illegal characters removed
@@ -134,7 +137,7 @@ public class MCRXMLHelper {
 
     /**
      * @see JDOMtoGSONSerializer
-     * 
+     *
      * @param content the jdom element to serialize
      * @return a gson element
      */
@@ -144,7 +147,7 @@ public class MCRXMLHelper {
 
     /**
      * @see JDOMtoGSONSerializer#serializeElement(Element)
-     * 
+     *
      * @param element the jdom element to serialize
      * @return a gson object
      */
@@ -154,10 +157,10 @@ public class MCRXMLHelper {
 
     /**
      * checks whether two documents are equal.
-     * 
+     *
      * This test performs a deep check across all child components of a
      * Document.
-     * 
+     *
      * @param d1
      *            first Document to compare
      * @param d2
@@ -176,10 +179,10 @@ public class MCRXMLHelper {
 
     /**
      * checks whether two elements are equal.
-     * 
+     *
      * This test performs a deep check across all child components of a
      * element.
-     * 
+     *
      * @param e1
      *            first Element to compare
      * @param e2
@@ -269,7 +272,7 @@ public class MCRXMLHelper {
                 }
                 return false;
             }
-            HashSet<String> orig = new HashSet<String>(aList1.size());
+            HashSet<String> orig = new HashSet<>(aList1.size());
             for (Attribute attr : aList1) {
                 orig.add(attr.toString());
             }
@@ -330,14 +333,14 @@ public class MCRXMLHelper {
      * for attributes and the dollar sign ($) for text nodes. The colon sign (:) is used for
      * namespaces (you have to use square brackets in javascript for accessing those).
      * </p>
-     * 
+     *
      * <ul>
      *   <li><b>_version</b> -> version attribute</li>
      *   <li><b>$text</b> -> text node</li>
      *   <li><b>_xmlns:mods</b> -> mods namespace</li>
      *   <li><b>_mods:title</b> -> title attribute with mods namespace</li>
      * </ul>
-     * 
+     *
      * <b>Example</b>
      * <pre>
      * {
@@ -355,7 +358,7 @@ public class MCRXMLHelper {
      *   <li><b>get the text of the title</b> -> mods["mods:titleInfo"]["mods:title"].$text -> "hello xml serializer"</li>
      * </ul>
      * <b>BE AWARE THAT MIXED CONTENT IS NOT SUPPORTED!</b>
-     * 
+     *
      * @author Matthias Eichner
      */
     private static class JDOMtoGSONSerializer {
@@ -363,7 +366,7 @@ public class MCRXMLHelper {
         /**
          * This method is capable of serializing Elements and Text nodes.
          * Return null otherwise.
-         * 
+         *
          * @param content the content to serialize
          * @return the serialized content, or null if the type is not supported
          */
@@ -377,11 +380,11 @@ public class MCRXMLHelper {
             return null;
         }
 
-        public static JsonPrimitive serializeText(Text text) {
+        static JsonPrimitive serializeText(Text text) {
             return new JsonPrimitive(text.getText());
         }
 
-        public static JsonObject serializeElement(Element element) {
+        static JsonObject serializeElement(Element element) {
             JsonObject json = new JsonObject();
 
             // text
@@ -396,50 +399,52 @@ public class MCRXMLHelper {
             });
 
             // namespaces
-            element.getNamespacesIntroduced().forEach(ns -> {
-                json.addProperty(getName(ns), ns.getURI().toString());
+            element.getAdditionalNamespaces().forEach(ns -> {
+                json.addProperty(getName(ns), ns.getURI());
             });
 
             // children
-            element.getChildren().stream().map(e -> new Pair<>(e.getNamespace(), e.getName())).distinct()
-                .forEach(pair -> {
-                    String name = getName(pair.y, pair.x);
-                    List<Element> children = element.getChildren(pair.y, pair.x);
-                    if (children.size() == 1) {
-                        json.add(name, serializeElement(children.get(0)));
-                    } else if (children.size() >= 2) {
-                        JsonArray arr = new JsonArray();
-                        children.forEach(child -> {
-                            arr.add(serialize(child));
-                        });
-                        json.add(name, arr);
-                    } else {
-                        throw new MCRException(
+            // - build child map of <name,namespace> pair with their respective elements
+            Map<Pair<String, Namespace>, List<Element>> childContentMap = new HashMap<>();
+            for(Element child : element.getChildren()) {
+                Pair key = new Pair<>(child.getName(), child.getNamespace());
+                List<Element> contentList = childContentMap.computeIfAbsent(key, k -> new ArrayList<>());
+                contentList.add(child);
+            }
+            // - run through the map and serialize
+            for(Map.Entry<Pair<String, Namespace>, List<Element>> entry: childContentMap.entrySet()) {
+                Pair<String, Namespace> key = entry.getKey();
+                List<Element> contentList = entry.getValue();
+                String name = getName(key.x, key.y);
+                if(entry.getValue().size() == 1) {
+                    json.add(name, serializeElement(contentList.get(0)));
+                } else if (contentList.size() >= 2) {
+                    JsonArray arr = new JsonArray();
+                    contentList.forEach(child -> {
+                        arr.add(serialize(child));
+                    });
+                    json.add(name, arr);
+                } else {
+                    throw new MCRException(
                             "Unexcpected error while parsing children of element '" + element.getName() + "'");
-                    }
-                });
+                }
+            }
             return json;
         }
 
         private static String getName(Namespace ns) {
-            StringBuffer buffer = new StringBuffer("_");
-            buffer.append("xmlns:")
-                .append(getCononicalizedPrefix(ns));
-            return buffer.toString();
+            return "_xmlns:" + getCononicalizedPrefix(ns);
         }
 
         private static String getName(Attribute attribute) {
-            StringBuffer buffer = new StringBuffer("_");
-            buffer.append(getName(attribute.getName(), attribute.getNamespace()));
-            return buffer.toString();
+            return "_" + getName(attribute.getName(), attribute.getNamespace());
         }
 
         private static String getName(String name, Namespace namespace) {
-            StringBuffer buffer = new StringBuffer();
             if (namespace != null && !namespace.getURI().equals("")) {
-                buffer.append(getCononicalizedPrefix(namespace)).append(":");
+                return getCononicalizedPrefix(namespace) + ":" + name;
             }
-            return buffer.append(name).toString();
+            return name;
         }
 
         private static String getCononicalizedPrefix(Namespace namespace) {
@@ -457,20 +462,28 @@ public class MCRXMLHelper {
 
             public final Y y;
 
-            public Pair(X x, Y y) {
+            Pair(X x, Y y) {
                 this.x = x;
                 this.y = y;
             }
 
-            @SuppressWarnings("rawtypes")
             @Override
-            public boolean equals(Object obj) {
-                if (obj == null && !(obj instanceof Pair)) {
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
                     return false;
                 }
-                return Objects.equals(this.x, ((Pair) obj).x) && Objects.equals(this.y, ((Pair) obj).y);
+                Pair<?, ?> pair = (Pair<?, ?>) o;
+                return Objects.equals(x, pair.x) &&
+                        Objects.equals(y, pair.y);
             }
 
+            @Override
+            public int hashCode() {
+                return Objects.hash(x, y);
+            }
         }
 
     }
