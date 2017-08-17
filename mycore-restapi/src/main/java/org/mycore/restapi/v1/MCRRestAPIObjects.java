@@ -313,7 +313,7 @@ public class MCRRestAPIObjects {
         @PathParam("mcrObjID") String mcrObjID, @FormDataParam("label") String label,
         @FormDataParam("overwriteOnExistingLabel") @DefaultValue("false") boolean overwrite)
         throws MCRRestAPIException {
-        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.WRITE, "/v1/objects");
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/objects");
         return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label, overwrite);
     }
 
