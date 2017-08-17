@@ -223,7 +223,7 @@ public class MCRRestAPIObjects {
         @Context Request request, @PathParam("mcrid") String mcrid, @PathParam("derid") String derid,
         @PathParam("path") @DefaultValue("/") String path, @QueryParam("format") @DefaultValue("xml") String format,
         @QueryParam("depth") @DefaultValue("-1") int depth) throws MCRRestAPIException {
-        MCRRestAPIUtil.checkRestAPIAccess(httpRequest, MCRRestAPIACLPermission.WRITE, "/v1/objects");
+        MCRRestAPIUtil.checkRestAPIAccess(httpRequest, MCRRestAPIACLPermission.READ, "/v1/objects");
         return MCRRestAPIObjectsHelper.listContents(info, httpRequest, request, mcrid, derid, format, path, depth);
     }
 
