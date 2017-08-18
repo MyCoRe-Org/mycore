@@ -53,6 +53,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRSuppressWarning;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -99,8 +100,9 @@ public class MCRIView2Tools {
             // verify support
             if (nameOfMainFile != null && !nameOfMainFile.equals("")) {
                 MCRPath mainFile = MCRPath.getPath(derivateID, '/' + nameOfMainFile);
-                if (mainFile != null && isFileSupported(mainFile))
+                if (mainFile != null && isFileSupported(mainFile)) {
                     return mainFile.getRoot().relativize(mainFile).toString();
+                }
             }
         } catch (Exception e) {
             LOGGER.warn("Could not get main file of derivate.", e);
@@ -127,6 +129,7 @@ public class MCRIView2Tools {
      * @return if content type is in property <code>MCR.Module-iview2.SupportedContentTypes</code>
      * @see MCRContentTypes#probeContentType(Path)
      */
+    @MCRSuppressWarning("saxon")
     public static boolean isFileSupported(Path file) throws IOException {
         return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
     }
@@ -172,6 +175,7 @@ public class MCRIView2Tools {
      * @throws JDOMException
      *             if image properties could not be parsed.
      */
+    @MCRSuppressWarning("saxon")
     public static BufferedImage getZoomLevel(Path iviewFile, int zoomLevel) throws IOException, JDOMException {
         ImageReader reader = getTileImageReader();
         try (FileSystem zipFileSystem = getFileSystem(iviewFile)) {
@@ -202,6 +206,7 @@ public class MCRIView2Tools {
      * @throws JDOMException
      *             if image properties could not be parsed.
      */
+    @MCRSuppressWarning("saxon")
     public static BufferedImage getZoomLevel(final Path iviewFileRoot, final MCRTiledPictureProps imageProperties,
         final ImageReader reader, final int zoomLevel) throws IOException, JDOMException {
         if (zoomLevel == 0) {
@@ -235,6 +240,7 @@ public class MCRIView2Tools {
         }
     }
 
+    @MCRSuppressWarning("saxon")
     public static FileSystem getFileSystem(Path iviewFile) throws IOException {
         URI uri = URI.create("jar:" + iviewFile.toUri().toString());
         try {
@@ -264,6 +270,7 @@ public class MCRIView2Tools {
         return ImageIO.getImageReadersByMIMEType("image/jpeg").next();
     }
 
+    @MCRSuppressWarning("saxon")
     public static BufferedImage readTile(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
@@ -285,6 +292,7 @@ public class MCRIView2Tools {
         }
     }
 
+    @MCRSuppressWarning("saxon")
     public static int getImageType(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);

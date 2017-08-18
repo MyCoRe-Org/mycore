@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF">
+  <appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%C{1}.%M %m %ex%n"/>
+    </Console>
+  </appenders>
+  <loggers>
+    <root level="info">
+      <appender-ref ref="Console"/>
+    </root>
+    <logger name="org.mycore.saxon" level="info" />
+  </loggers>
+</configuration>

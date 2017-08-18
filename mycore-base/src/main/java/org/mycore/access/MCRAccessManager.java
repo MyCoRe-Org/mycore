@@ -36,6 +36,7 @@ import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.access.strategies.MCRDerivateIDStrategy;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSuppressWarning;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -91,6 +92,7 @@ public class MCRAccessManager {
      *             if an error was occurred
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
+    @MCRSuppressWarning("saxon")
     public static void addRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
         throws MCRException {
         getAccessImpl().addRule(id.toString(), permission, rule, description);
@@ -111,6 +113,7 @@ public class MCRAccessManager {
      *             if an error was occurred
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
+    @MCRSuppressWarning("saxon")
     public static void addRule(String id, String permission, org.jdom2.Element rule, String description)
         throws MCRException {
         getAccessImpl().addRule(id, permission, rule, description);
@@ -127,6 +130,7 @@ public class MCRAccessManager {
      *             if an error was occurred
      * @see MCRAccessInterface#removeRule(String, String)
      */
+    @MCRSuppressWarning("saxon")
     public static void removeRule(MCRObjectID id, String permission) throws MCRException {
         getAccessImpl().removeRule(id.toString(), permission);
     }
@@ -155,6 +159,7 @@ public class MCRAccessManager {
      *             if an error was occurred
      * @see MCRAccessInterface#removeRule(String)
      */
+    @MCRSuppressWarning("saxon")
     public static void removeAllRules(MCRObjectID id) throws MCRException {
         getAccessImpl().removeAllRules(id.toString());
     }
@@ -174,6 +179,7 @@ public class MCRAccessManager {
      *             if an error was occurred
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
+    @MCRSuppressWarning("saxon")
     public static void updateRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
         throws MCRException {
         getAccessImpl().updateRule(id.toString(), permission, rule, description);
@@ -194,6 +200,7 @@ public class MCRAccessManager {
      *             if an error was occurred
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
+    @MCRSuppressWarning("saxon")
     public static void updateRule(String id, String permission, org.jdom2.Element rule, String description)
         throws MCRException {
         getAccessImpl().updateRule(id, permission, rule, description);
@@ -209,6 +216,7 @@ public class MCRAccessManager {
      * @return true if the access is allowed otherwise it return
      * @see MCRAccessInterface#checkPermission(String, String)
      */
+    @MCRSuppressWarning("saxon")
     public static boolean checkPermission(MCRObjectID id, String permission) {
         return checkPermission(id.toString(), permission);
     }
@@ -312,6 +320,7 @@ public class MCRAccessManager {
      *            the MCRObjectID of the object
      * @return a <code>List</code> of all for <code>id</code> defined permissions
      */
+    @MCRSuppressWarning("saxon")
     public static Collection<String> getPermissionsForID(MCRObjectID id) {
         return getAccessImpl().getPermissionsForID(id.toString());
     }
@@ -356,10 +365,12 @@ public class MCRAccessManager {
         return getAccessImpl().hasRule(id, permission);
     }
 
+    @MCRSuppressWarning("saxon")
     public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier) {
         return checkPermission(user, checkSuplier, EXECUTOR_SERVICE);
     }
 
+    @MCRSuppressWarning("saxon")
     public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier,
         ExecutorService es) {
         return CompletableFuture.supplyAsync(getWrappedFixedUserCallable(user, checkSuplier), es);

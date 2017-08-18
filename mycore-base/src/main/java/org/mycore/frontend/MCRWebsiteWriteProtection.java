@@ -14,6 +14,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.DOMOutputter;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSuppressWarning;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 
@@ -39,7 +40,7 @@ public final class MCRWebsiteWriteProtection {
     /**
      * Checks if website protection is currently active.
      * If current user is super user this method always returns false.
-     * 
+     *
      * @return true if write access is currently active, false if not
      */
     public static boolean isActive() {
@@ -64,7 +65,7 @@ public final class MCRWebsiteWriteProtection {
             return new DOMOutputter().output(new Document());
         } else {
             Element messageElem = config.getChild("message");
-            Document message = new Document((Element) messageElem.clone());
+            Document message = new Document(messageElem.clone());
             return new DOMOutputter().output(message);
         }
     }
@@ -158,6 +159,7 @@ public final class MCRWebsiteWriteProtection {
         setConfiguration(config);
     }
 
+    @MCRSuppressWarning("saxon")
     public static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response,
         String baseURL) throws IOException {
         if (MCRWebsiteWriteProtection.isActive()) {
@@ -171,7 +173,7 @@ public final class MCRWebsiteWriteProtection {
 
     /**
      * Verifies if the cache of configuration is valid.
-     * 
+     *
      * @return true if valid, false if note
      */
     private static boolean cacheValid() {

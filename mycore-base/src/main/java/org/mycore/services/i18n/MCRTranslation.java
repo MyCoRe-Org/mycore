@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -50,6 +50,7 @@ import javax.xml.parsers.DocumentBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSuppressWarning;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.xml.MCRDOMUtils;
@@ -59,7 +60,7 @@ import org.w3c.dom.Element;
 /**
  * provides services for internationalization in mycore application. You have to provide a property file named
  * messages.properties in your classpath for this class to work.
- * 
+ *
  * @author Radi Radichev
  * @author Thomas Scheffler (yagee)
  */
@@ -88,7 +89,7 @@ public class MCRTranslation {
     /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.
-     * 
+     *
      * @param label property key
      * @return translated String
      */
@@ -99,7 +100,7 @@ public class MCRTranslation {
 
     /**
      * Checks whether there is a value for the given label and current locale.
-     * 
+     *
      * @param label property key
      * @return <code>true</code> if there is a value, <code>false</code> otherwise
      */
@@ -117,7 +118,7 @@ public class MCRTranslation {
     /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.
-     * 
+     *
      * @param label property key
      * @param baseName
      *            a fully qualified class name
@@ -131,19 +132,20 @@ public class MCRTranslation {
 
     /**
      * provides translation for the given label (property key).
-     * 
+     *
      * @param label property key
      * @param locale
      *            target locale of translation
      * @return translated String
      */
+    @MCRSuppressWarning("saxon")
     public static String translate(String label, Locale locale) {
         return translate(label, locale, MESSAGES_BUNDLE);
     }
 
     /**
      * provides translation for the given label (property key).
-     * 
+     *
      * @param label property key
      * @param locale
      *            target locale of translation
@@ -151,6 +153,7 @@ public class MCRTranslation {
      *            a fully qualified class name
      * @return translated String
      */
+    @MCRSuppressWarning("saxon")
     public static String translate(String label, Locale locale, String baseName) {
         LOGGER.debug("Translation for current locale: " + locale.getLanguage());
         ResourceBundle message;
@@ -190,7 +193,7 @@ public class MCRTranslation {
     /**
      * Returns a map of label/value pairs which match with the given prefix. The current locale that is needed for
      * translation is gathered by the language of the current MCRSession.
-     * 
+     *
      * @param prefix
      *            label starts with
      * @return map of labels with translated values
@@ -202,16 +205,17 @@ public class MCRTranslation {
 
     /**
      * Returns a map of label/value pairs which match with the given prefix.
-     * 
+     *
      * @param prefix
      *            label starts with
      * @param locale
      *            target locale of translation
      * @return map of labels with translated values
      */
+    @MCRSuppressWarning("saxon")
     public static Map<String, String> translatePrefix(String prefix, Locale locale) {
         LOGGER.debug("Translation for locale: " + locale.getLanguage());
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         ResourceBundle message = getResourceBundle(MESSAGES_BUNDLE, locale);
         Enumeration<String> keys = message.getKeys();
         while (keys.hasMoreElements()) {
@@ -226,12 +230,13 @@ public class MCRTranslation {
     /**
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.
-     * 
+     *
      * @param label property key
      * @param arguments
      *            Objects that are inserted instead of placeholders in the property values
      * @return translated String
      */
+    @MCRSuppressWarning("saxon")
     public static String translate(String label, Object... arguments) {
         Locale currentLocale = getCurrentLocale();
         String msgFormat = translate(label);
@@ -246,7 +251,7 @@ public class MCRTranslation {
      * gathered by the language of the current MCRSession. Be aware that any occurence of ';' and '\' in
      * <code>argument</code> has to be masked by '\'. You can use ';' to build an array of arguments: "foo;bar" would
      * result in {"foo","bar"} (the array)
-     * 
+     *
      * @param label property key
      * @param argument
      *            String that is inserted instead of placeholders in the property values
@@ -296,7 +301,7 @@ public class MCRTranslation {
     }
 
     static String[] getStringArray(String masked) {
-        List<String> a = new LinkedList<String>();
+        List<String> a = new LinkedList<>();
         boolean mask = false;
         StringBuilder buf = new StringBuilder();
         if (masked == null) {
@@ -377,11 +382,11 @@ public class MCRTranslation {
             // just load all languages by available messages_*.properties
             return loadLanguagesByMessagesBundle();
         }
-        return new HashSet<String>(Arrays.asList(languagesString.trim().split(",")));
+        return new HashSet<>(Arrays.asList(languagesString.trim().split(",")));
     }
 
     static Set<String> loadLanguagesByMessagesBundle() {
-        Set<String> languages = new HashSet<String>();
+        Set<String> languages = new HashSet<>();
         for (Locale locale : Locale.getAvailableLocales()) {
             try {
                 if (!locale.getLanguage().equals("")) {
@@ -395,6 +400,7 @@ public class MCRTranslation {
         return languages;
     }
 
+    @MCRSuppressWarning("saxon")
     public static ResourceBundle getResourceBundle(String baseName, Locale locale) {
         return baseName.contains(".") ? ResourceBundle.getBundle(baseName, locale)
             : ResourceBundle.getBundle("stacked:" + baseName, locale, CONTROL);
