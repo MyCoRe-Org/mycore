@@ -19,49 +19,23 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-
 package org.mycore.restapi.v1.errors;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 
 /**
- * exception that can be thrown during rest api requests
+ * maps a REST API exception to a proper response with message as JSON output
  * 
  * @author Robert Stephan
  * 
  * @version $Revision: $ $Date: $
+ *
  */
-public class MCRRestAPIException extends Exception {
-
-    private static final long serialVersionUID = 1L;
-
-    private List<MCRRestAPIError> errors = new ArrayList<>();
-
-    //default is 501 - internal server error, override if necessary
-    private Status status = Status.INTERNAL_SERVER_ERROR;
-
-    public MCRRestAPIException(Status status, MCRRestAPIError error) {
-        this.status = status;
-        errors.add(error);
-    }
-
-    public MCRRestAPIException(Status status, List<MCRRestAPIError> errors) {
-        this.status = status;
-        this.errors.addAll(errors);
-    }
-
-    public List<MCRRestAPIError> getErrors() {
-        return errors;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
+public class MCRRestAPIExceptionMapper implements ExceptionMapper<MCRRestAPIException> {
+    public Response toResponse(MCRRestAPIException ex) {
+        return Response.status(ex.getStatus()).entity(MCRRestAPIError.convertErrorListToJSONString(ex.getErrors()))
+            .type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 }

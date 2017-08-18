@@ -242,12 +242,13 @@ public class MCRMODSWrapper {
             Iterator<Map.Entry<String, String>> attributeIterator = attributes.entrySet().iterator();
             while (attributeIterator.hasNext()) {
                 Map.Entry<String, String> attribute = attributeIterator.next();
-                xPath.append("@" + attribute.getKey() + "='" + attribute.getValue() + "']");
+                xPath.append("@" + attribute.getKey() + "='" + attribute.getValue() + "'");
 
                 if (attributeIterator.hasNext()) {
                     xPath.append(" and ");
                 }
             }
+            xPath.append(']');
         }
         Element element = getElement(xPath.toString());
 

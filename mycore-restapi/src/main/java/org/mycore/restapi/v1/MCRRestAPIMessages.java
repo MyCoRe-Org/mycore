@@ -28,6 +28,7 @@ import java.io.StringWriter;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -46,6 +47,10 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.jersey.MCRStaticContent;
+import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.stream.JsonWriter;
@@ -62,6 +67,9 @@ import com.google.gson.stream.JsonWriter;
 @Path("/v1/messages")
 @MCRStaticContent
 public class MCRRestAPIMessages {
+
+    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
     public static final String FORMAT_JSON = "json";
 
     public static final String FORMAT_XML = "xml";
@@ -69,21 +77,31 @@ public class MCRRestAPIMessages {
     public static final String FORMAT_PROPERTY = "property";
 
     /**
+     * lists all message properties for a given language
      * 
-     * @param info - a Jersey Context Object for URI
+     * @param info - the injected Jersey Context Object for URI
+     * 
+     * @param request - the injected HTTPServletRequest object
+     * 
+     * @param lang - the language in which the messages should be returned (default: 'de')
      *      
      * @param format
      * 		Possible values are: props (default) | json | xml
      * @param filter
      * 		';'-separated list of message key prefixes
+     * 
+     * @return a Jersey Response object
+     * 
+     * @throws MCRRestAPIException
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1" })
-    public Response listMessages(@Context UriInfo info, @QueryParam("lang") @DefaultValue("de") String lang,
+    public Response listMessages(@Context UriInfo info, @Context HttpServletRequest request,
+        @QueryParam("lang") @DefaultValue("de") String lang,
         @QueryParam("format") @DefaultValue("property") String format,
-        @QueryParam("filter") @DefaultValue("") String filter) {
-
+        @QueryParam("filter") @DefaultValue("") String filter) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/messages");
         Locale locale = Locale.forLanguageTag(lang);
         String[] check = filter.split(";");
 
@@ -91,7 +109,8 @@ public class MCRRestAPIMessages {
         for (String prefix : check) {
             data.putAll(MCRTranslation.translatePrefix(prefix, locale));
         }
-
+        String authHeader = MCRJSONWebTokenUtil
+            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         try {
             if (FORMAT_PROPERTY.equals(format)) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -119,7 +138,8 @@ public class MCRRestAPIMessages {
                 writer.endObject();
                 writer.close();
 
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
         } catch (IOException e) {
             //toDo
@@ -130,23 +150,31 @@ public class MCRRestAPIMessages {
     /**
      * returns a single messages entry.
      * 
-     * @param info - a Jersey Context Object for URI
+     * @param info - the injected Jersey context object for URI
+     * @param request - the injected HTTPServletRequest object
+     * @param key - the message key
+     * @param lang - the language
      * @param format 
      *     Possible values are: props (default) | json | xml (required)
+     * @return a Jersey Response Object
+     * @throws MCRRestAPIException    
      */
     @GET
     @Path("/{value}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=UTF-8" })
-    public Response getMessage(@Context UriInfo info, @PathParam("value") String key,
-        @QueryParam("lang") @DefaultValue("de") String lang,
-        @QueryParam("format") @DefaultValue("text") String format) {
-
+    public Response getMessage(@Context UriInfo info, @Context HttpServletRequest request,
+        @PathParam("value") String key, @QueryParam("lang") @DefaultValue("de") String lang,
+        @QueryParam("format") @DefaultValue("text") String format) throws MCRRestAPIException {
+        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/messages");
         Locale locale = Locale.forLanguageTag(lang);
         String result = MCRTranslation.translate(key, locale);
+        String authHeader = MCRJSONWebTokenUtil
+            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         try {
             if (FORMAT_PROPERTY.equals(format)) {
-                return Response.ok(key + "=" + result).type("text/plain; charset=ISO-8859-1").build();
+                return Response.ok(key + "=" + result).type("text/plain; charset=ISO-8859-1")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
             if (FORMAT_XML.equals(format)) {
                 Document doc = new Document();
@@ -157,7 +185,8 @@ public class MCRRestAPIMessages {
                 StringWriter sw = new StringWriter();
                 XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
                 outputter.output(doc, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
             if (FORMAT_JSON.equals(format)) {
                 StringWriter sw = new StringWriter();
@@ -168,10 +197,12 @@ public class MCRRestAPIMessages {
                 writer.value(result);
                 writer.endObject();
                 writer.close();
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8").build();
+                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
             //text only
-            return Response.ok(result).type("text/plain; charset=UTF-8").build();
+            return Response.ok(result).type("text/plain; charset=UTF-8").header(HEADER_NAME_AUTHORIZATION, authHeader)
+                .build();
         } catch (IOException e) {
             //toDo
         }
