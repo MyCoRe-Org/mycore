@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jdom2.Document;
@@ -38,6 +39,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
@@ -94,6 +96,35 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         assertNull(wrapper.getServiceFlag("name"));
         wrapper.setServiceFlag("name", "value");
         assertEquals("value", wrapper.getServiceFlag("name"));
+    }
+
+    @Test
+    public void setElement() throws SAXParseException, IOException {
+        Element mods = loadMODSDocument().detachRootElement();
+        MCRMODSWrapper wrapper = new MCRMODSWrapper();
+        wrapper.setID("JUnit", 4711);
+        wrapper.setMODS(mods);
+
+        Map<String, String> attrMap = new HashMap<>();
+        attrMap.put("authorityURI",
+            "http://mycore.de/classifications/mir_filetype.xml");
+        attrMap.put("displayLabel", "mir_filetype");
+        attrMap.put("valueURI",
+            "http://mycore.de/classifications/mir_filetype.xml#excel");
+
+        wrapper.setElement("classification", "", attrMap);
+        Document mcrObjXml = wrapper.getMCRObject().createXML();
+
+        String checkXpathString = "//mods:mods/mods:classification["
+            + "@authorityURI='http://mycore.de/classifications/mir_filetype.xml' and "
+            + "@displayLabel='mir_filetype' and "
+            + "@valueURI='http://mycore.de/classifications/mir_filetype.xml#excel'"
+            + "]";
+
+        XPathExpression<Element> xpathCheck = XPathFactory.instance().compile(checkXpathString, Filters.element(),
+            null, MCRConstants.MODS_NAMESPACE);
+
+        Assert.assertTrue(xpathCheck.evaluate(mcrObjXml).size() > 0);
     }
 
     @Test
