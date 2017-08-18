@@ -248,7 +248,7 @@ public class MCRMODSWrapper {
                     xPath.append(" and ");
                 }
             }
-            xPath.append("]");
+            xPath.append(']');
         }
         Element element = getElement(xPath.toString());
 

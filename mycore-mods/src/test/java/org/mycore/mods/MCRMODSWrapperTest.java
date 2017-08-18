@@ -39,7 +39,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
@@ -124,7 +123,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         XPathExpression<Element> xpathCheck = XPathFactory.instance().compile(checkXpathString, Filters.element(),
             null, MCRConstants.MODS_NAMESPACE);
 
-        Assert.assertTrue(xpathCheck.evaluate(mcrObjXml).size() > 0);
+        assertTrue(xpathCheck.evaluate(mcrObjXml).size() > 0);
     }
 
     @Test
