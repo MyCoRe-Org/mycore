@@ -136,10 +136,9 @@ namespace mycore.viewer.components {
             }
 
             if (e.type == events.RequestStateEvent.TYPE) {
-                var requestStateEvent = (<events.RequestStateEvent>e);
-                var state = requestStateEvent.stateMap;
+                let requestStateEvent = (<events.RequestStateEvent>e);
                 if("altoChangePID" in this._settings && this._settings.altoChangePID != null) {
-                    state.set("altoChangeID", this._settings.altoChangePID);
+                    requestStateEvent.stateMap.set("altoChangeID", this._settings.altoChangePID);
                 }
             }
 
@@ -164,7 +163,6 @@ namespace mycore.viewer.components {
         }
 
         public mouseClick(position: Position2D, ev: JQueryMouseEventObject) {
-
             if (this.isEditing()) {
                 let element = <HTMLElement>ev.target;
                 let vpos = parseInt(element.getAttribute("data-vpos")),
@@ -258,15 +256,11 @@ namespace mycore.viewer.components {
             if (this.currentEditWord == element) {
                 this.abortEdit(element);
             }
-
-            let word = element.getAttribute("data-word");
-            element.innerText = word;
+            element.innerText = element.getAttribute("data-word");
 
             if (element.classList.contains("edited")) {
                 element.classList.remove("edited");
             }
-
-
         }
 
         private applyEdit(element: HTMLElement, altoID: string, order: number) {
@@ -338,7 +332,11 @@ namespace mycore.viewer.components {
             ] : [];
         }
 
-        private toggleEditWord(enable: boolean = !this.editorWidget.changeWordButton.hasClass("active")) {
+        private toggleEditWord(enable: boolean = null) {
+            if(this.editorWidget == null) {
+                return;
+            }
+            enable = enable == null ? !this.editorWidget.changeWordButton.hasClass("active") : enable;
             let button = this.editorWidget.changeWordButton;
             if (enable) {
                 button.addClass("active");
@@ -359,9 +357,8 @@ namespace mycore.viewer.components {
         }
 
         public isEditing() {
-            return this.editorWidget.changeWordButton.hasClass("active");
+            return this.editorWidget != null && this.editorWidget.changeWordButton.hasClass("active");
         }
-
 
         private completeLoaded() {
             this._altoDropdownChildItem = {
