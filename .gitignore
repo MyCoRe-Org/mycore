@@ -1,5 +1,8 @@
-# May still exist when switching from LTS 2017
+# removed components in earlier versions
+/mycore-swf/
+/mycore-session-listing/
 /mycore-complete/
+/mycore-buildtools/
 
 .class
 
