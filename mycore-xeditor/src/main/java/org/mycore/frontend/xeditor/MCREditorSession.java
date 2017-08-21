@@ -42,6 +42,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.Verifier;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
@@ -76,7 +77,11 @@ public class MCREditorSession {
 
     private MCRXMLCleaner cleaner = new MCRXMLCleaner();
 
-    private MCRXEditorPostProcessor postProcessor = new MCRXEditorPostProcessor();
+    private MCRXEditorPostProcessor postProcessor = getDefaultRepeaterImplementation();
+
+    private static MCRPostProcessorXSL getDefaultRepeaterImplementation() {
+        return MCRConfiguration.instance().getInstanceOf("MCR.XEditor.DefaultPostProcessor");
+    }
 
     public MCREditorSession(Map<String, String[]> requestParameters, MCRParameterCollector collector) {
         this.requestParameters.putAll(requestParameters); // make a copy, the original may be re-used by servlet container
@@ -221,5 +226,9 @@ public class MCREditorSession {
 
     public MCRXEditorPostProcessor getPostProcessor() {
         return postProcessor;
+    }
+
+    protected void setPostProcessor(MCRXEditorPostProcessor postProcessor) {
+        this.postProcessor = postProcessor;
     }
 }
