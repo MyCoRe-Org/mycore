@@ -262,7 +262,7 @@ public class MCRXMLFunctions {
         return getISODate(date, isoFormat);
     }
 
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static String getISODate(Date date, String isoFormat) {
         MCRISO8601Date mcrdate = new MCRISO8601Date();
         mcrdate.setDate(date);

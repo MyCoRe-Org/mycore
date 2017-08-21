@@ -138,7 +138,7 @@ public class MCRTranslation {
      *            target locale of translation
      * @return translated String
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static String translate(String label, Locale locale) {
         return translate(label, locale, MESSAGES_BUNDLE);
     }
@@ -153,7 +153,7 @@ public class MCRTranslation {
      *            a fully qualified class name
      * @return translated String
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static String translate(String label, Locale locale, String baseName) {
         LOGGER.debug("Translation for current locale: " + locale.getLanguage());
         ResourceBundle message;
@@ -212,7 +212,7 @@ public class MCRTranslation {
      *            target locale of translation
      * @return map of labels with translated values
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static Map<String, String> translatePrefix(String prefix, Locale locale) {
         LOGGER.debug("Translation for locale: " + locale.getLanguage());
         HashMap<String, String> map = new HashMap<>();
@@ -236,7 +236,7 @@ public class MCRTranslation {
      *            Objects that are inserted instead of placeholders in the property values
      * @return translated String
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static String translate(String label, Object... arguments) {
         Locale currentLocale = getCurrentLocale();
         String msgFormat = translate(label);
@@ -400,7 +400,7 @@ public class MCRTranslation {
         return languages;
     }
 
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static ResourceBundle getResourceBundle(String baseName, Locale locale) {
         return baseName.contains(".") ? ResourceBundle.getBundle(baseName, locale)
             : ResourceBundle.getBundle("stacked:" + baseName, locale, CONTROL);

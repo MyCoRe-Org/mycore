@@ -64,7 +64,7 @@ public class MCRStaticMethodFnDefinition extends ExtensionFunctionDefinition {
                 e);
         }
         if (Stream.of(methods).map(Method::getReturnType).anyMatch(firstMethod.getReturnType()::isAssignableFrom)) {
-            JPConverter jpConverter = MCRSaxonUtils.getObjectConverter(firstMethod.getReturnType(), config);
+            JPConverter jpConverter = MCRSaxonUtils.getObjectConverter(firstMethod.getReturnType(), this.config);
             objectConverter = Optional
                 .ofNullable(jpConverter);
             returnType = objectConverter.map(c -> SequenceType.makeSequenceType(c.getItemType(), c.getCardinality()));

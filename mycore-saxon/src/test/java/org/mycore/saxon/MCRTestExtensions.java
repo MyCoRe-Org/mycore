@@ -28,7 +28,7 @@ public final class MCRTestExtensions {
     private MCRTestExtensions() {
     }
 
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static boolean isDate(Date d) {
         return true;
     }

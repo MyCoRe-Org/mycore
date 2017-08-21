@@ -33,7 +33,7 @@ class MCRExtensionFunctionDefinitionWrapper extends ExtensionFunctionDefinition 
     /**
      *
      */
-    public MCRExtensionFunctionDefinitionWrapper(ExtensionFunction f) {
+    MCRExtensionFunctionDefinitionWrapper(ExtensionFunction f) {
         this.f = f;
         this.resultType = f.getResultType().getUnderlyingSequenceType();
         argumentTypes = Stream.of(f.getArgumentTypes())

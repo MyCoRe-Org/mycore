@@ -144,14 +144,14 @@ public class MCRTransformerFactoryImpl extends TransformerFactoryImpl {
         boolean paramCompatible = Stream.of(m.getParameterTypes())
             .map(MCRSaxonUtils::getSequenceType)
             .map(Optional::isPresent)
-            .allMatch(t -> t == true);
+            .allMatch(t -> t);
         boolean compatible = paramCompatible
             && MCRSaxonUtils.getObjectConverter(m.getReturnType(), getConfiguration()) != null;
         if (!compatible) {
             if (m.isAnnotationPresent(MCRSuppressWarning.class)) {
                 MCRSuppressWarning suppressWarning = m.getAnnotation(MCRSuppressWarning.class);
                 if (Stream.of(suppressWarning.value())
-                    .filter("saxon"::equals)
+                    .filter(MCRSuppressWarning.SAXON::equals)
                     .findAny()
                     .isPresent()) {
                     return false;

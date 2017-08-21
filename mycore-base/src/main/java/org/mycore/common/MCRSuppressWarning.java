@@ -20,6 +20,7 @@ import java.lang.annotation.Target;
  *
  */
 public @interface MCRSuppressWarning {
+    public static final String SAXON = "saxon";
     /**
      * The set of warnings that are to be suppressed by a reflection call of the
      * annotated element.

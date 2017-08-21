@@ -129,7 +129,7 @@ public class MCRIView2Tools {
      * @return if content type is in property <code>MCR.Module-iview2.SupportedContentTypes</code>
      * @see MCRContentTypes#probeContentType(Path)
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static boolean isFileSupported(Path file) throws IOException {
         return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
     }
@@ -175,7 +175,7 @@ public class MCRIView2Tools {
      * @throws JDOMException
      *             if image properties could not be parsed.
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static BufferedImage getZoomLevel(Path iviewFile, int zoomLevel) throws IOException, JDOMException {
         ImageReader reader = getTileImageReader();
         try (FileSystem zipFileSystem = getFileSystem(iviewFile)) {
@@ -206,7 +206,7 @@ public class MCRIView2Tools {
      * @throws JDOMException
      *             if image properties could not be parsed.
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static BufferedImage getZoomLevel(final Path iviewFileRoot, final MCRTiledPictureProps imageProperties,
         final ImageReader reader, final int zoomLevel) throws IOException, JDOMException {
         if (zoomLevel == 0) {
@@ -240,7 +240,7 @@ public class MCRIView2Tools {
         }
     }
 
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static FileSystem getFileSystem(Path iviewFile) throws IOException {
         URI uri = URI.create("jar:" + iviewFile.toUri().toString());
         try {
@@ -270,7 +270,7 @@ public class MCRIView2Tools {
         return ImageIO.getImageReadersByMIMEType("image/jpeg").next();
     }
 
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static BufferedImage readTile(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
@@ -292,7 +292,7 @@ public class MCRIView2Tools {
         }
     }
 
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static int getImageType(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);

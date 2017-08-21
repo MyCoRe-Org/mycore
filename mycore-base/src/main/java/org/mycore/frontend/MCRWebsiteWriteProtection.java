@@ -159,7 +159,7 @@ public final class MCRWebsiteWriteProtection {
         setConfiguration(config);
     }
 
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response,
         String baseURL) throws IOException {
         if (MCRWebsiteWriteProtection.isActive()) {

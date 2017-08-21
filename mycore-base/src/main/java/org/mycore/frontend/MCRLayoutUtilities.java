@@ -204,7 +204,7 @@ public class MCRLayoutUtilities {
      * @return Label as String, like "labelRoot &gt; labelChild &gt;
      *         labelChildOfChild"
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static String getAncestorLabels(Element item) {
         String label = "";
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage().trim();
@@ -316,7 +316,7 @@ public class MCRLayoutUtilities {
      * @param access
      *            initial value
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static boolean itemAccess(String permission, Element item, boolean access) {
         String objID = getWebpageACLID(item);
         if (MCRAccessManager.hasRule(objID, permission)) {
@@ -335,7 +335,7 @@ public class MCRLayoutUtilities {
      *            initial value
      * @param userID a user id
      */
-    @MCRSuppressWarning("saxon")
+    @MCRSuppressWarning(MCRSuppressWarning.SAXON)
     public static boolean itemAccess(String permission, Element item, boolean access, String userID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
         String objID = getWebpageACLID(item);

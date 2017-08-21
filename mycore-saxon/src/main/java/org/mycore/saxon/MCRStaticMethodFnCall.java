@@ -127,7 +127,7 @@ public class MCRStaticMethodFnCall extends ExtensionFunctionCall {
 
         Object[] params;
 
-        public InvokableMethod(Method m, Object[] params) {
+        InvokableMethod(Method m, Object[] params) {
             this.m = m;
             this.params = params;
         }
