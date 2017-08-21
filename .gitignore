@@ -1,3 +1,7 @@
+# removed components in earlier versions
+/mycore-swf/
+/mycore-session-listing/
+
 .class
 
 # Mobile Tools for Java (J2ME)
