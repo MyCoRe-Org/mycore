@@ -69,6 +69,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
+import org.mycore.frontend.MCRDerivateUtil;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXException;
@@ -901,6 +902,20 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         derivate.getDerivate().getInternals().setMainDoc(cleanPath);
         MCRMetadataManager.updateMCRDerivateXML(derivate);
         LOGGER.info("The main file of {} is now '{}'!", derivateIDString, cleanPath);
+    }
+
+    @MCRCommand(syntax = "rename files from derivate {0} with {1} to {2}",
+        help = "TODO please add help text")
+    public static void renameFiles(String derivate, String pattern, String newName)
+        throws IOException {
+        MCRDerivateUtil.renameFiles(derivate, pattern, newName);
+    }
+
+    @MCRCommand(syntax = "test rename file {0} with {1} to {2}",
+        help = "TODO please add help text")
+    public static void testRenameFile(String filename, String pattern, String newName)
+        throws IOException {
+        MCRDerivateUtil.testRenameFile(filename, pattern, newName);
     }
 
 }
