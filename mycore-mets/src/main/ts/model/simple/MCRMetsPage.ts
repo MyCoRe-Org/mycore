@@ -7,7 +7,7 @@ namespace org.mycore.mets.model.simple {
                     public orderLabel: string,
                     public contentIds: string,
                     public hidden: boolean,
-                    public fileList: Array<MCRMetsFile> = new Array<MCRMetsFile>()) {
+                    public fileList: Array<MCRMetsFile> = []) {
         }
 
         public static copy(page: MCRMetsPage) {
