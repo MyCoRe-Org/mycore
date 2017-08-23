@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class MCRMetsPage {
-    private String id = UUID.randomUUID().toString();
+    private String id;
 
     private String orderLabel;
 
@@ -15,10 +15,15 @@ public class MCRMetsPage {
 
     private List<MCRMetsFile> fileList;
 
-    public MCRMetsPage(String orderLabel, String contentIds) {
+    public MCRMetsPage(String id, String orderLabel, String contentIds) {
         this();
+        this.id = id;
         this.orderLabel = orderLabel;
         this.contentIds = contentIds;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getId() {

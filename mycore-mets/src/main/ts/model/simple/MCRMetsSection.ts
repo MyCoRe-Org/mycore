@@ -5,10 +5,10 @@ namespace org.mycore.mets.model.simple {
         constructor(public id: string,
                     public type: string,
                     public label: string,
-                    public metsSectionList: Array<MCRMetsSection> = new Array<MCRMetsSection>(),
+                    public metsSectionList: Array<MCRMetsSection> = [],
                     public parent: MCRMetsSection = null,
-                    public linkedPages: Array<MCRMetsPage> = new Array<MCRMetsPage>(),
-                    public altoLinks: Array<MCRMetsAltoLink> = new Array<MCRMetsAltoLink>()) {
+                    public linkedPages: Array<MCRMetsPage> = [],
+                    public altoLinks: Array<MCRMetsAltoLink> = []) {
         }
 
         public static createRandomId() {

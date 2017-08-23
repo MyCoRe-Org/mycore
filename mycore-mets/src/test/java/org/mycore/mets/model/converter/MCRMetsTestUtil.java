@@ -95,17 +95,17 @@ public class MCRMetsTestUtil {
     }
 
     private static void buildSimpleModelPages(MCRMetsSimpleModel metsSimpleModel) {
-        MCRMetsPage metsPage1 = new MCRMetsPage("1", "URN:special-urn1");
-        metsPage1.getFileList().add(new MCRMetsFile("1.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
-        metsPage1.getFileList().add(new MCRMetsFile("1.xml", "text/xml", MCRMetsFileUse.ALTO));
+        MCRMetsPage metsPage1 = new MCRMetsPage("1_P", "1", "URN:special-urn1");
+        metsPage1.getFileList().add(new MCRMetsFile("1_M","1.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
+        metsPage1.getFileList().add(new MCRMetsFile("1_A", "1.xml", "text/xml", MCRMetsFileUse.ALTO));
 
-        MCRMetsPage metsPage2 = new MCRMetsPage("2", "URN:special-urn2");
-        metsPage2.getFileList().add(new MCRMetsFile("2.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
-        metsPage2.getFileList().add(new MCRMetsFile("2.xml", "text/xml", MCRMetsFileUse.ALTO));
+        MCRMetsPage metsPage2 = new MCRMetsPage("2_P", "2", "URN:special-urn2");
+        metsPage2.getFileList().add(new MCRMetsFile("2_M", "2.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
+        metsPage2.getFileList().add(new MCRMetsFile("2_A","2.xml", "text/xml", MCRMetsFileUse.ALTO));
 
-        MCRMetsPage metsPage3 = new MCRMetsPage("3", "URN:special-urn3");
-        metsPage3.getFileList().add(new MCRMetsFile("3.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
-        metsPage3.getFileList().add(new MCRMetsFile("3.xml", "text/xml", MCRMetsFileUse.ALTO));
+        MCRMetsPage metsPage3 = new MCRMetsPage("3_P","3", "URN:special-urn3");
+        metsPage3.getFileList().add(new MCRMetsFile("3_M","3.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
+        metsPage3.getFileList().add(new MCRMetsFile("3_A","3.xml", "text/xml", MCRMetsFileUse.ALTO));
 
         metsSimpleModel.getMetsPageList().add(metsPage1);
         metsSimpleModel.getMetsPageList().add(metsPage2);
@@ -113,11 +113,11 @@ public class MCRMetsTestUtil {
     }
 
     private static void builSimpleModelSections(MCRMetsSimpleModel metsSimpleModel) {
-        MCRMetsSection rootSection = new MCRMetsSection("testRootType", "testRootLabel", null);
+        MCRMetsSection rootSection = new MCRMetsSection("root","testRootType", "testRootLabel", null);
         metsSimpleModel.setRootSection(rootSection);
 
-        MCRMetsSection subSection1 = new MCRMetsSection("subSection", "subSection1Label", rootSection);
-        MCRMetsSection subSection2 = new MCRMetsSection("subSection", "subSection2Label", rootSection);
+        MCRMetsSection subSection1 = new MCRMetsSection("sub1", "subSection", "subSection1Label", rootSection);
+        MCRMetsSection subSection2 = new MCRMetsSection("sub2", "subSection", "subSection2Label", rootSection);
 
         rootSection.addSection(subSection1);
         rootSection.addSection(subSection2);

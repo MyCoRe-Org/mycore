@@ -60,17 +60,17 @@ public class MCRXMLSimpleModelConverterTest {
         int i = 0;
         while (hrefIterator.hasNext()) {
             i++;
-            MCRMetsFile MCRMetsFile = hrefIterator.next();
+            MCRMetsFile mcrMetsFile = hrefIterator.next();
             String expectedFileName = String.format(FILE_NAME_MATCH_PATTERN, i);
 
-            String message = String.format("href %s should match %s", MCRMetsFile.getHref(), expectedFileName);
-            Assert.assertEquals(message, MCRMetsFile.getHref(), expectedFileName);
+            String message = String.format("href %s should match %s", mcrMetsFile.getHref(), expectedFileName);
+            Assert.assertEquals(message, mcrMetsFile.getHref(), expectedFileName);
 
-            message = String.format("MimeType %s should match %s", MCRMetsFile.getMimeType(), ALL_FILE_MIMETYPE);
-            Assert.assertEquals(message, MCRMetsFile.getMimeType(), ALL_FILE_MIMETYPE);
+            message = String.format("MimeType %s should match %s", mcrMetsFile.getMimeType(), ALL_FILE_MIMETYPE);
+            Assert.assertEquals(message, mcrMetsFile.getMimeType(), ALL_FILE_MIMETYPE);
 
-            message = String.format("File-Use %s should match %s", MCRMetsFile.getUse(), MASTER);
-            Assert.assertEquals(message, MCRMetsFile.getUse(), MASTER);
+            message = String.format("File-Use %s should match %s", mcrMetsFile.getUse(), MASTER);
+            Assert.assertEquals(message, mcrMetsFile.getUse(), MASTER);
         }
     }
 
@@ -79,6 +79,8 @@ public class MCRXMLSimpleModelConverterTest {
         MCRMetsSection rootSection = metsSimpleModel.getRootSection();
         Assert.assertEquals("The rootSection label should be " + ROOT_SECTION_LABEL, rootSection.getLabel(),
             ROOT_SECTION_LABEL);
+
+        Assert.assertEquals("log_ArchNachl_derivate_00000011", rootSection.getId());
 
         List<MCRMetsSection> metsSectionList = rootSection.getMetsSectionList();
 

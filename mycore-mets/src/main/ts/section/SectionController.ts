@@ -112,8 +112,6 @@ namespace org.mycore.mets.controller {
                 parent : this.section,
                 addedSection : newCreatedSection
             });
-
-
         }
 
         public inputClicked(clickEvent: JQueryMouseEventObject) {

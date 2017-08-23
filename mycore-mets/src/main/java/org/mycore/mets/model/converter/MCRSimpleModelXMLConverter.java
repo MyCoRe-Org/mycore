@@ -76,11 +76,8 @@ public class MCRSimpleModelXMLConverter {
         structMap.setDivContainer(
             new PhysicalDiv(PHYSICAL_ID_PREFIX + UUID.randomUUID().toString(), PhysicalDiv.TYPE_PHYS_SEQ));
 
-        for (int order = 0; order < pageList.size(); order++) {
-            MCRMetsPage page = pageList.get(order);
-
-            String id = PHYSICAL_ID_PREFIX + UUID.randomUUID().toString();
-
+        for (MCRMetsPage page : pageList) {
+            String id = page.getId();
             PhysicalSubDiv physicalSubDiv = new PhysicalSubDiv(id, DEFAULT_PHYSICAL_TYPE);
             String orderLabel = page.getOrderLabel();
             if (orderLabel != null) {
@@ -96,9 +93,10 @@ public class MCRSimpleModelXMLConverter {
 
             page.getFileList().forEach((simpleFile) -> {
                 String href = simpleFile.getHref();
-                MCRMetsFileUse use = simpleFile.getUse();
+                String fileID = simpleFile.getId();
                 String mimeType = simpleFile.getMimeType();
-                String fileID = use.toString().toLowerCase(Locale.ROOT) + "_" + simpleFile.getId();
+                MCRMetsFileUse use = simpleFile.getUse();
+
                 idToNewIDMap.put(simpleFile.getId(), fileID);
                 File file = new File(fileID, mimeType);
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
@@ -118,7 +116,7 @@ public class MCRSimpleModelXMLConverter {
         MCRMetsSection rootSection = msm.getRootSection();
         String type = rootSection.getType();
         String label = rootSection.getLabel();
-        String id = LOGICAL_ID_PREFIX + UUID.randomUUID().toString();
+        String id = rootSection.getId();
         LogicalDiv logicalDiv = new LogicalDiv(id, type, label);
         sectionIdMap.put(rootSection, id);
 
@@ -130,7 +128,7 @@ public class MCRSimpleModelXMLConverter {
 
     private static void buildLogicalSubDiv(MCRMetsSection metsSection, LogicalDiv parent,
         Map<MCRMetsSection, String> sectionIdMap, Map<String, String> idToNewIDMap) {
-        String id = LOGICAL_ID_PREFIX + UUID.randomUUID().toString();
+        String id = metsSection.getId();
         LogicalDiv logicalSubDiv = new LogicalDiv(id, metsSection.getType(), metsSection.getLabel());
 
         if (metsSection.getAltoLinks().size() > 0) {

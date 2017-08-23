@@ -64,14 +64,12 @@ namespace org.mycore.mets.model.simple {
                     section.altoLinks.push(al);
                 });
             }
-
-
             return section;
         }
 
 
         public static toJson(model: MCRMetsSimpleModel) {
-            let sectionIdPageMap = new Array();
+            let sectionIdPageMap = [];
             let addIdsToSectionMap = (section: MCRMetsSection) => {
                 section.metsSectionList.forEach(addIdsToSectionMap);
                 section.linkedPages.forEach((lp: MCRMetsPage) => {

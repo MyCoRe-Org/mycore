@@ -68,6 +68,7 @@ public class MCRXMLSimpleModelConverter {
         MCRMetsSection parent, Map<String, MCRMetsFile> idFileMap) {
         MCRMetsSection metsSection = new MCRMetsSection();
 
+        metsSection.setId(current.getId());
         metsSection.setLabel(current.getLabel());
         metsSection.setType(current.getType());
         metsSection.setParent(parent);
@@ -114,6 +115,7 @@ public class MCRXMLSimpleModelConverter {
             .map((physicalSubDiv) -> {
                 // Convert PhysicalSubDiv to MetsPage
                 MCRMetsPage metsPage = new MCRMetsPage();
+                metsPage.setId(physicalSubDiv.getId());
                 metsPage.setOrderLabel(physicalSubDiv.getOrderLabel());
                 metsPage.setContentIds(physicalSubDiv.getContentids());
 
@@ -159,7 +161,8 @@ public class MCRXMLSimpleModelConverter {
         String fileGroupUse = fileGroup.getUse();
         fileGroup.getFileList().forEach(file -> {
             MCRMetsFileUse use = Enum.valueOf(MCRMetsFileUse.class, fileGroupUse);
-            idPageMap.put(file.getId(), new MCRMetsFile(file.getFLocat().getHref(), file.getMimeType(), use));
+            idPageMap.put(file.getId(), new MCRMetsFile(file.getId(),
+                    file.getFLocat().getHref(), file.getMimeType(), use));
         });
     }
 
