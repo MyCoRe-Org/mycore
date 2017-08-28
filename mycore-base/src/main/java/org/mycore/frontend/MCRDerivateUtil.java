@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class MCRDerivateUtil {
 
@@ -36,6 +37,10 @@ public class MCRDerivateUtil {
                         LOGGER.info("The file " + file + " can't be renamed to " + newName + ". To many groups!");
                         return FileVisitResult.CONTINUE;
                     }
+                    catch (IllegalArgumentException e) {
+                        LOGGER.info("The new name '" + newName + "' contains illegal characters!");
+                        return FileVisitResult.CONTINUE;
+                    }
                     Files.move(file, file.resolveSibling(newFilename));
                     LOGGER.info("The file " + file + " was renamed to " + newFilename);
                     resultMap.put(file.getFileName().toString(), newFilename);
@@ -48,16 +53,22 @@ public class MCRDerivateUtil {
 
     public static String testRenameFile(String filename, String pattern, String newName)
         throws IOException {
-        Pattern patternObj = Pattern.compile(pattern);
-        Matcher matcher = patternObj.matcher(filename);
-        String newFilename;
+        String newFilename = "";
         try {
+            Pattern patternObj = Pattern.compile(pattern);
+            Matcher matcher = patternObj.matcher(filename);
             newFilename = matcher.replaceAll(newName);
             LOGGER.info("The file " + filename + " will be renamed to " + newFilename);
+        }
+        catch (PatternSyntaxException e) {
+            LOGGER.info("The pattern '" + pattern + "' contains errors!");
         }
         catch (IndexOutOfBoundsException e) {
             LOGGER.info("The file " + filename + " can't be renamed to " + newName + ". To many groups!");
         }
-        return newName;
+        catch (IllegalArgumentException e) {
+            LOGGER.info("The new name '" + newName + "' contains illegal characters!");
+        }
+        return newFilename;
     }
 }
