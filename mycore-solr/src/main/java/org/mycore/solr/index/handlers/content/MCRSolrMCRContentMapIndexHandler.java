@@ -150,4 +150,9 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
         return contentMap.size();
     }
 
+    @Override
+    public String toString() {
+        return "bulk index " + contentMap.size() + " documents";
+    }
+
 }

@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -77,6 +78,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.common.content.MCRSourceContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -154,6 +156,15 @@ public class MCRXMLFunctions {
 
     private static class MCRCategLinkServiceHolder {
         public static final MCRCategLinkService instance = MCRCategLinkServiceFactory.getInstance();
+    }
+
+    public static Node document(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+        MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
+        if (sourceContent == null) {
+            throw new TransformerException("Could not load document: " + uri);
+        }
+        DOMOutputter out = new DOMOutputter();
+        return out.output(sourceContent.asXML());
     }
 
     /**
@@ -287,14 +298,16 @@ public class MCRXMLFunctions {
             return "";
         }
         boolean use_last_value = false;
-        if (field_name.equals("bis"))
+        if (field_name.equals("bis")) {
             use_last_value = true;
+        }
         try {
             Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date_value, use_last_value, calendar_name);
             GregorianCalendar g_calendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
             formatted_date = MCRCalendar.getCalendarDateToFormattedString(g_calendar, "yyyy-MM-dd") + "T00:00:00.000Z";
-            if (g_calendar.get(GregorianCalendar.ERA) == GregorianCalendar.BC)
+            if (g_calendar.get(GregorianCalendar.ERA) == GregorianCalendar.BC) {
                 formatted_date = "-" + formatted_date;
+            }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
                 e.printStackTrace();
@@ -474,7 +487,7 @@ public class MCRXMLFunctions {
 
     /**
      * Checks if the given object has derivates that are all accessible to guest user.
-     * 
+     *
      * Normally this implies that all derivates are readable by everyone. Only non-hidden
      * derivates are taken into account. So if an object only contains hidden
      * @param objId MCRObjectID as String
@@ -556,8 +569,9 @@ public class MCRXMLFunctions {
      *         objects, <code>false</code> otherwise
      */
     private static boolean isAllowedObject(String givenType) {
-        if (givenType == null)
+        if (givenType == null) {
             return false;
+        }
 
         String propertyName = "MCR.URN.Enabled.Objects";
         String propertyValue = MCRConfiguration.instance().getString(propertyName, null);
@@ -602,7 +616,7 @@ public class MCRXMLFunctions {
     /**
      * Returns a list of link targets of a given MCR object type. The structure
      * is <em>link</em>. If no links are found an empty NodeList is returned.
-     * 
+     *
      * @param mcrid
      *            MCRObjectID as String as the link source
      * @param destinationType
@@ -721,7 +735,7 @@ public class MCRXMLFunctions {
                 // LOGGER.debug("NodeList is a document.");
                 Node child = doc.item(0).getFirstChild();
                 if (child != null) {
-                    Node node = (Node) doc.item(0).getFirstChild();
+                    Node node = doc.item(0).getFirstChild();
                     Node imp = document.importNode(node, true);
                     document.appendChild(imp);
                 } else {
@@ -973,7 +987,7 @@ public class MCRXMLFunctions {
 
     /**
      * Strippes HTML tags from string.
-     * 
+     *
      * @param s string to strip HTML tags of
      * @return the plain text without tags
      */

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -33,16 +33,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.QueryHint;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.QueryHints;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryLink;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @version $Revision$ $Date$
  * @since 2.0
  */
@@ -103,7 +105,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
         + "    AND cattree.id.rootID=:rootID"
         + "    AND cat.id.rootID=:rootID"
         + "    AND cat.id.ID=:categID"
-        + "    AND cattree.left BETWEEN cat.left AND cat.right"),
+            + "    AND cattree.left BETWEEN cat.left AND cat.right",
+        hints = { @QueryHint(name = QueryHints.READ_ONLY, value = "true") }),
     @NamedQuery(name = "MCRCategoryLink.linkedClassifications",
         query = "SELECT distinct node.id.rootID from MCRCategoryImpl as node, MCRCategoryLinkImpl as link where node.internalID=link.category")
 })
@@ -129,6 +132,7 @@ class MCRCategoryLinkImpl implements MCRCategoryLink {
         this.objectReference = objectReference;
     }
 
+    @Override
     public MCRCategory getCategory() {
         return category;
     }
@@ -137,6 +141,7 @@ class MCRCategoryLinkImpl implements MCRCategoryLink {
         this.category = category;
     }
 
+    @Override
     public MCRCategLinkReference getObjectReference() {
         return objectReference;
     }

@@ -39,6 +39,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.tmatesoft.svn.core.SVNCancelException;
+import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
@@ -46,6 +47,7 @@ import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.auth.SVNAuthentication;
 import org.tmatesoft.svn.core.auth.SVNUserNameAuthentication;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
+import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNEvent;
@@ -228,11 +230,11 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      */
     @Override
     public MCRVersionedMetadata retrieve(int id) throws IOException {
-        if (exists(id)) {
-            return (MCRVersionedMetadata) super.retrieve(id);
-        } else {
-            return new MCRVersionedMetadata(this, getSlot(id), id, super.forceDocType);
+        MCRVersionedMetadata metadata = (MCRVersionedMetadata) super.retrieve(id);
+        if (metadata != null) {
+            return metadata;
         }
+        return new MCRVersionedMetadata(this, getSlot(id), id, super.forceDocType, true);
     }
 
     /**
@@ -246,13 +248,28 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
     @Override
     public void delete(int id) throws IOException {
-        MCRVersionedMetadata vm = retrieve(id);
-        vm.delete();
+        String commitMsg = "Deleted metadata object " + getID() + "_" + id + " in store";
+        // Commit to SVN
+        SVNCommitInfo info;
+        try {
+            SVNRepository repository = getRepository();
+            ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
+            editor.openRoot(-1);
+            editor.deleteEntry("/" + getSlotPath(id), -1);
+            editor.closeDir();
+
+            info = editor.closeEdit();
+            LOGGER.info("SVN commit of delete finished, new revision " + info.getNewRevision());
+        } catch (SVNException e) {
+            LOGGER.error("Error while deleting " + id + " in SVN ", e);
+        } finally {
+            super.delete(id);
+        }
     }
 
     @Override
     protected MCRVersionedMetadata buildMetadataObject(FileObject fo, int id) {
-        return new MCRVersionedMetadata(this, fo, id, super.forceDocType);
+        return new MCRVersionedMetadata(this, fo, id, super.forceDocType, false);
     }
 
 }

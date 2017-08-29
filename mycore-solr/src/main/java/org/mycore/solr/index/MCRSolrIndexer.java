@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.solr.index;
 
@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -64,6 +65,8 @@ public class MCRSolrIndexer {
 
     final static MCRProcessableExecutor SOLR_EXECUTOR;
 
+    final static ExecutorService SOLR_SUB_EXECUTOR;
+
     final static MCRProcessableDefaultCollection SOLR_COLLECTION;
 
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
@@ -83,6 +86,10 @@ public class MCRSolrIndexer {
         registry.register(SOLR_COLLECTION);
         SOLR_EXECUTOR = MCRProcessableFactory.newPool(threadPool, SOLR_COLLECTION);
 
+        int poolSize2 = Math.max(1, poolSize / 2);
+        SOLR_SUB_EXECUTOR = new ThreadPoolExecutor(poolSize2, poolSize2, 0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(), new ThreadFactoryBuilder().setNameFormat("SOLR-Sub-Handler-#%d").build());
+
         MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
 
             @Override
@@ -98,6 +105,35 @@ public class MCRSolrIndexer {
             @Override
             public void close() {
                 waitForShutdown(SOLR_EXECUTOR.getExecutor());
+            }
+
+            private void waitForShutdown(ExecutorService service) {
+                if (!service.isTerminated()) {
+                    try {
+                        LOGGER.info("Waiting for shutdown of SOLR Indexer.");
+                        service.awaitTermination(10, TimeUnit.MINUTES);
+                        LOGGER.info("SOLR Indexer was shut down.");
+                    } catch (InterruptedException e) {
+                        LOGGER.warn("Error while waiting for shutdown.", e);
+                    }
+                }
+            }
+        });
+        MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
+
+            @Override
+            public void prepareClose() {
+                SOLR_SUB_EXECUTOR.shutdown();
+            }
+
+            @Override
+            public int getPriority() {
+                return Integer.MIN_VALUE + 5;
+            }
+
+            @Override
+            public void close() {
+                waitForShutdown(SOLR_SUB_EXECUTOR);
             }
 
             private void waitForShutdown(ExecutorService service) {
@@ -160,7 +196,7 @@ public class MCRSolrIndexer {
 
     /**
      * Deletes a list of documents by unique ID. Also removes any nested document of that ID.
-     * 
+     *
      * @param solrIDs
      *            the list of solr document IDs to delete
      */
@@ -205,7 +241,7 @@ public class MCRSolrIndexer {
 
     /**
      * Convenient method to delete a derivate and all its files at once.
-     * 
+     *
      * @param id the derivate id
      * @return the solr response
      */
@@ -254,7 +290,7 @@ public class MCRSolrIndexer {
 
     /**
      * Rebuilds solr's metadata index only for objects of the given type.
-     * 
+     *
      * @param type
      *            of the objects to index
      */
@@ -269,7 +305,7 @@ public class MCRSolrIndexer {
 
     /**
      * Rebuilds solr's metadata index.
-     * 
+     *
      * @param list
      *            list of identifiers of the objects to index
      * @param solrClient
@@ -332,7 +368,7 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds the content index for the given mycore objects. You can mix derivates and mcrobjects here. For each
      * mcrobject all its derivates are indexed.
-     * 
+     *
      * @param list
      *            containing mycore object id's
      */
@@ -367,7 +403,7 @@ public class MCRSolrIndexer {
 
     /**
      * Submits a index handler to the executor service (execute as a thread) with the given priority.
-     * 
+     *
      * @param indexHandler
      *            index handler to submit
      */
@@ -387,7 +423,7 @@ public class MCRSolrIndexer {
         MCRFixedUserCallable<List<MCRSolrIndexHandler>> indexTask = new MCRFixedUserCallable<>(
             new MCRSolrIndexTask(indexHandler), MCRSystemUserInformation.getSystemUserInstance());
         MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = SOLR_EXECUTOR.submit(indexTask, priority);
-        supplier.getFuture().whenCompleteAsync(afterIndex(priority), SOLR_EXECUTOR.getExecutor());
+        supplier.getFuture().whenCompleteAsync(afterIndex(priority), SOLR_SUB_EXECUTOR);
     }
 
     private static BiConsumer<? super List<MCRSolrIndexHandler>, ? super Throwable> afterIndex(final int priority) {
