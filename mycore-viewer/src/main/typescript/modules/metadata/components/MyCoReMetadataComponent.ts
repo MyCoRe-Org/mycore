@@ -33,9 +33,11 @@ namespace mycore.viewer.components {
                     url : metsURL,
                     success : (response) => {
                         var htmlElement = <any>singleSelectShim(<any>response, xpath, XMLUtil.NS_MAP);
-                        if (htmlElement != null && "xml" in htmlElement) {
-                            // htmlElement is IXMLDOMElement
-                            htmlElement = jQuery((<any>htmlElement).xml);
+                        if (htmlElement != null) {
+                            if("xml" in htmlElement){
+                                // htmlElement is IXMLDOMElement
+                                htmlElement = jQuery((<any>htmlElement).xml);
+                            }
                             this._container.append(htmlElement);
                         } else {
                             this._container.remove();
