@@ -128,7 +128,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
-            MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId().toString()));
+            MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId().toString()), MCRSolrIndexer.HIGH_PRIORITY);
         });
     }
 
@@ -155,7 +155,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                 MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(content,
                     objectOrDerivate.getId());
                 indexHandler.setCommitWithin(1000);
-                MCRSolrIndexer.submitIndexHandler(indexHandler);
+                MCRSolrIndexer.submitIndexHandler(indexHandler, MCRSolrIndexer.HIGH_PRIORITY);
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString()
                         + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
@@ -182,7 +182,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             try {
                 MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
-                    MCRSolrClientFactory.getSolrClient()));
+                    MCRSolrClientFactory.getSolrClient()), MCRSolrIndexer.HIGH_PRIORITY);
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread for file " + path.toString(), ex);
             }

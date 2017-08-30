@@ -57,6 +57,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 public class MCRSolrIndexer {
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexer.class);
 
+    public static final int LOW_PRIORITY = 0;
+
+    public static final int HIGH_PRIORITY = 10;
+
     /**
      * Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is
      * 100.
@@ -299,6 +303,12 @@ public class MCRSolrIndexer {
         rebuildMetadataIndex(identfiersOfType);
     }
 
+    /**
+     * Rebuilds solr's metadata index for the given list.
+     *
+     * @param list
+     *            list of mycore object identifiers
+     */
     public static void rebuildMetadataIndex(List<String> list) {
         rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrClient());
     }
@@ -370,16 +380,49 @@ public class MCRSolrIndexer {
      * mcrobject all its derivates are indexed.
      *
      * @param list
-     *            containing mycore object id's
+     *            list of mycore object id's
      */
     public static void rebuildContentIndex(List<String> list) {
         rebuildContentIndex(MCRSolrClientFactory.getSolrClient(), list);
     }
 
     /**
+     * Rebuilds the content index for the given mycore objects. You can mix derivates and mcrobjects here. For each
+     * mcrobject all its derivates are indexed.
+     *
+     * @param list
+     *            list of mycore object id's
+     *            list of mycore object id's
+     * @param priority
+     *            higher priority means earlier execution
+     */
+    public static void rebuildContentIndex(List<String> list, int priority) {
+        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(), list, priority);
+    }
+
+    /**
      * Rebuilds solr's content index.
+     *
+     * @param solrClient
+     *            solr client connection
+     * @param list
+     *            list of mycore object id's
      */
     public static void rebuildContentIndex(SolrClient solrClient, List<String> list) {
+        rebuildContentIndex(solrClient, list, LOW_PRIORITY);
+    }
+
+    /**
+     * Rebuilds solr's content index.
+     *
+     * @param solrClient
+     *            solr client connection
+     * @param list
+     *            list of mycore object id's
+     * @param priority
+     *            higher priority means earlier execution
+     */
+    public static void rebuildContentIndex(SolrClient solrClient, List<String> list, int priority) {
         LOGGER.info("Re-building Content Index");
 
         if (list.isEmpty()) {
@@ -387,16 +430,14 @@ public class MCRSolrIndexer {
             return;
         }
         long tStart = System.currentTimeMillis();
-
         int totalCount = list.size();
         LOGGER.info("Sending content of " + totalCount + " derivates to solr for reindexing");
 
         for (String id : list) {
             MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrClient);
             indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-            submitIndexHandler(indexHandler);
+            submitIndexHandler(indexHandler, priority);
         }
-
         long tStop = System.currentTimeMillis();
         MCRSolrIndexStatisticCollector.fileTransfer.addTime(tStop - tStart);
     }
@@ -408,7 +449,7 @@ public class MCRSolrIndexer {
      *            index handler to submit
      */
     public static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
-        submitIndexHandler(indexHandler, 0);
+        submitIndexHandler(indexHandler, LOW_PRIORITY);
     }
 
     /**
