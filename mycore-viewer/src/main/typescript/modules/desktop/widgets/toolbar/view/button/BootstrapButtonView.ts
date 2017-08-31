@@ -25,7 +25,7 @@ namespace mycore.viewer.widgets.toolbar {
 
         public updateButtonLabel(label: string): void { 
             this._buttonLabel.text(label);
-            if(label.length>0){
+            if (label.length > 0) {
                 this._icon.addClass("textpresent");
             } else {
                 this._icon.removeClass("textpresent");
