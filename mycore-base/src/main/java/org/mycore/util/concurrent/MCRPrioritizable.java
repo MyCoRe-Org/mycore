@@ -12,9 +12,9 @@ public interface MCRPrioritizable extends Comparable<MCRPrioritizable> {
     /**
      * Returns the priority.
      */
-    public int getPriority();
+    int getPriority();
 
-    public Instant getCreated();
+    Instant getCreated();
 
     @Override
     default int compareTo(MCRPrioritizable o) {

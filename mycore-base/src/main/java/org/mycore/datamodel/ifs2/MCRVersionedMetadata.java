@@ -62,40 +62,6 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
  */
 public class MCRVersionedMetadata extends MCRStoredMetadata {
 
-    private static final class LastRevisionFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-    }
-
-    private static final class LastRevisionLogHandler implements ISVNLogEntryHandler {
-        private final String path;
-
-        long lastRevision = -1;
-
-        private boolean deleted;
-
-        private LastRevisionLogHandler(String path, boolean deleted) {
-            this.path = path;
-            this.deleted = deleted;
-        }
-
-        @Override
-        public void handleLogEntry(SVNLogEntry logEntry) throws SVNException {
-            SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
-            if (svnLogEntryPath != null) {
-                char type = svnLogEntryPath.getType();
-                if (deleted || type != SVNLogEntryPath.TYPE_DELETED) {
-                    lastRevision = logEntry.getRevision();
-                    //no other way to stop svnkit from logging
-                    throw new LastRevisionFoundException();
-                }
-            }
-        }
-
-        public long getLastRevision() {
-            return lastRevision;
-        }
-    }
-
     /**
      * The logger
      */
@@ -361,7 +327,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         try {
             repository.log(new String[] { dir }, repository.getLatestRevision(), 0, true, true, limit, false, null,
                 lastRevisionLogHandler);
-        } catch (LastRevisionFoundException e) {
+        } catch (LastRevisionFoundException ignored) {
         }
         return lastRevisionLogHandler.getLastRevision();
     }
@@ -402,4 +368,39 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         }
         return entry.getRevision() <= getRevision();
     }
+
+    private static final class LastRevisionFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+    }
+
+    private static final class LastRevisionLogHandler implements ISVNLogEntryHandler {
+        private final String path;
+
+        long lastRevision = -1;
+
+        private boolean deleted;
+
+        private LastRevisionLogHandler(String path, boolean deleted) {
+            this.path = path;
+            this.deleted = deleted;
+        }
+
+        @Override
+        public void handleLogEntry(SVNLogEntry logEntry) throws SVNException {
+            SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
+            if (svnLogEntryPath != null) {
+                char type = svnLogEntryPath.getType();
+                if (deleted || type != SVNLogEntryPath.TYPE_DELETED) {
+                    lastRevision = logEntry.getRevision();
+                    //no other way to stop svnkit from logging
+                    throw new LastRevisionFoundException();
+                }
+            }
+        }
+
+        long getLastRevision() {
+            return lastRevision;
+        }
+    }
+
 }

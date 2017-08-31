@@ -114,7 +114,7 @@ import com.ibm.icu.util.GregorianCalendar;
  * @author Ren\u00E9 Adler (eagle)
  */
 public class MCRXMLFunctions {
-    static MCRConfiguration CONFIG = MCRConfiguration.instance();
+    private static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static final String HOST_PREFIX = "MCR.remoteaccess_";
 
@@ -292,13 +292,13 @@ public class MCRXMLFunctions {
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
     public static String getISODateFromMCRHistoryDate(String date_value, String field_name, String calendar_name)
-        throws ParseException {
+            throws ParseException {
         String formatted_date = "";
         if (field_name == null || field_name.trim().length() == 0) {
             return "";
         }
         boolean use_last_value = false;
-        if (field_name.equals("bis")) {
+        if ("bis".equals(field_name)) {
             use_last_value = true;
         }
         try {
@@ -309,11 +309,12 @@ public class MCRXMLFunctions {
                 formatted_date = "-" + formatted_date;
             }
         } catch (Exception e) {
+            String errorMsg = "Error while converting date string : " + date_value + " - " + use_last_value +
+                    " - " + calendar_name;
             if (LOGGER.isDebugEnabled()) {
-                e.printStackTrace();
+                LOGGER.debug(errorMsg, e);
             }
-            LOGGER.warn(
-                "Error while converting date string :" + date_value + " - " + use_last_value + " - " + calendar_name);
+            LOGGER.warn(errorMsg);
             return "";
         }
         return formatted_date;
@@ -744,7 +745,7 @@ public class MCRXMLFunctions {
             }
             n = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error while getting tree by path " + path, e);
         } finally {
             MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
         }

@@ -23,15 +23,10 @@
 
 package org.mycore.solr.index;
 
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
@@ -45,6 +40,10 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
+
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -128,7 +127,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
-            MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId().toString()), MCRSolrIndexer.HIGH_PRIORITY);
+            MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId().toString()),
+                    MCRSolrIndexer.HIGH_PRIORITY);
         });
     }
 
@@ -145,8 +145,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             long tStart = System.currentTimeMillis();
             try {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER
-                        .debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing");
+                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() +
+                            "\" for indexing");
                 }
                 MCRContent content = (MCRContent) evt.get("content");
                 if (content == null) {
