@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -30,6 +30,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -37,6 +39,11 @@ import javax.persistence.UniqueConstraint;
 @Table(
     uniqueConstraints = { @UniqueConstraint(columnNames = { "pid", "name" }, name = "mcrfsnodes_pid_name_idx") },
     indexes = { @Index(columnList = "pid, owner", name = "mcrfsnodes_pid_owner_idx") })
+@NamedQueries({
+    @NamedQuery(name = "MCRFSNODES.getChildren", query = "from MCRFSNODES where pid=:pid"),
+    @NamedQuery(name = "MCRFSNODES.getChild", query = "from MCRFSNODES where pid=:pid and name=:name"),
+    @NamedQuery(name = "MCRFSNODES.getRootID", query = "select id from MCRFSNODES where pid is null and owner=:owner"),
+})
 public class MCRFSNODES {
     private String id;
 

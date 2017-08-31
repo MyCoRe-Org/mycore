@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.spi.FileTypeDetector;
 
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +49,7 @@ public class MCRFileTypeDetector extends FileTypeDetector {
     private String defaultMimeType;
 
     /**
-     * 
+     *
      */
     public MCRFileTypeDetector() {
         defaultMimeType = MCRFileContentTypeFactory.getDefaultType().getMimeType();
@@ -59,7 +60,7 @@ public class MCRFileTypeDetector extends FileTypeDetector {
      */
     @Override
     public String probeContentType(Path path) throws IOException {
-        LOGGER.debug("Probing content type of: " + path);
+        LOGGER.debug(() -> "Probing content type of: " + path);
         if (!(path.getFileSystem() instanceof MCRIFSFileSystem)) {
             return null;
         }
@@ -72,11 +73,18 @@ public class MCRFileTypeDetector extends FileTypeDetector {
         }
         MCRFile file = (MCRFile) resolvePath;
         String mimeType = file.getContentType().getMimeType();
-        LOGGER.debug("IFS mime-type: " + mimeType);
+        LOGGER.debug(() -> "IFS mime-type: " + mimeType);
         if (defaultMimeType.equals(mimeType)) {
+            Path dummy = Paths.get(path.getFileName().toString());
+            String dummyType = Files.probeContentType(dummy);
+            if (dummyType != null) {
+                LOGGER.debug(() -> "System mime-type #1: " + dummyType);
+                return dummyType;
+
+            }
             String systemMimeType = Files.probeContentType(file.getLocalFile().toPath());
             if (systemMimeType != null) {
-                LOGGER.debug("System mime-type: " + systemMimeType);
+                LOGGER.debug(() -> "System mime-type #2: " + systemMimeType);
                 return systemMimeType;
             }
         }

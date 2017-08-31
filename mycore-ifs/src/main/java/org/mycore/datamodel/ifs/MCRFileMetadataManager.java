@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -37,7 +37,7 @@ import org.mycore.common.config.MCRConfiguration;
  * most recently used. It creates the MCRFileMetadataStore instance as
  * configured in the MyCoRe properties and hides its usage from the other
  * classes.
- * 
+ *
  * Configuration properties:
  * <ul>
  * <li><b>MCR.IFS.FileMetadataStore.Class: </b> The class that implements the
@@ -47,10 +47,10 @@ import org.mycore.common.config.MCRConfiguration;
  * holding the most recently used MCRFilesystemNodes expressed as maximum number
  * of node objects in the cache.</li>
  * </ul>
- * 
+ *
  * @see MCRFilesystemNode
  * @see MCRFileMetadataStore
- * 
+ *
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
@@ -69,7 +69,7 @@ public class MCRFileMetadataManager {
     }
 
     /** Cache containing the most recently used MCRFilesystemNode objects * */
-    private MCRCache cache;
+    private MCRCache<String, MCRFilesystemNode> cache;
 
     /** The store that holds all saved MCRFilesystemNode metadata * */
     private MCRFileMetadataStore store;
@@ -83,7 +83,7 @@ public class MCRFileMetadataManager {
 
         // The cache size for the MCRFilesystemNode cache
         int size = config.getInt("MCR.IFS.FileMetadataStore.CacheSize", 500);
-        cache = new MCRCache(size, "IFS FileSystemNodes");
+        cache = new MCRCache<>(size, "IFS FileSystemNodes");
     }
 
     /**
@@ -144,7 +144,7 @@ public class MCRFileMetadataManager {
     /**
      * Creates or updates the data of the MCRFilesystemNode in the persistent
      * MCRFileMetadataStore.
-     * 
+     *
      * @param node
      *            the MCRFilesystemNode to store
      */
@@ -156,14 +156,14 @@ public class MCRFileMetadataManager {
     /**
      * Retrieves the MCRFilesystemNode with the given ID from the persistent
      * MCRFileMetadataStore.
-     * 
+     *
      * @param ID
      *            the unique ID of the MCRFilesystemNode
      * @return the MCRFilesystemNode with that ID, or null if no such node
      *         exists.
      */
     MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
-        MCRFilesystemNode n = (MCRFilesystemNode) cache.get(ID);
+        MCRFilesystemNode n = cache.get(ID);
         return n != null ? n : store.retrieveNode(ID);
     }
 
@@ -171,7 +171,7 @@ public class MCRFileMetadataManager {
      * Retrieves the first MCRFilesystemNode found in the persistent
      * MCRFileMetadataStore, that has the given owner ID. This is assumed to be
      * a root node.
-     * 
+     *
      * @param ownerID
      *            the ID of the owner of the MCRFilesystemNode to be retrieved
      * @return the MCRFilesystemNode with that owner, or null if no such node
@@ -185,7 +185,7 @@ public class MCRFileMetadataManager {
 
     /**
      * Retrieves a child node of a given MCRDirectory node.
-     * 
+     *
      * @param parentID
      *            the ID of the parent MCRDirectory
      * @param name
@@ -207,7 +207,7 @@ public class MCRFileMetadataManager {
         GregorianCalendar date, String storeID, String storageID, String fctID, String md5, int numchdd, int numchdf,
         int numchtd,
         int numchtf) throws MCRPersistenceException {
-        MCRFilesystemNode n = (MCRFilesystemNode) cache.get(ID);
+        MCRFilesystemNode n = cache.get(ID);
 
         if (n != null) {
             return n;
@@ -227,7 +227,7 @@ public class MCRFileMetadataManager {
     /**
      * Retrieves a list of all child MCRFilesystemNodes of a given
      * MCRDirectory.
-     * 
+     *
      * @param ID
      *            the ID of the parent MCRDirectory
      * @return a List of all children of that MCRDirectory
@@ -238,7 +238,7 @@ public class MCRFileMetadataManager {
 
     /**
      * Deletes a MCRFilesystemNode in the persistent MCRFileMetadataStore.
-     * 
+     *
      * @param ID
      *            the ID of the node to delete from the store
      */

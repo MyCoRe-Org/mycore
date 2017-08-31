@@ -42,6 +42,7 @@ import java.nio.file.attribute.FileAttributeView;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,13 +59,15 @@ import org.mycore.datamodel.niofs.MCRPath;
 /**
  * A {@link SecureDirectoryStream} on internal file system. This implementation uses IFS directly. Do use this class but
  * stick to the interface.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
-    static Logger LOGGER = LogManager.getLogger(MCRDirectoryStream.class);
+    static Logger LOGGER = LogManager.getLogger();
 
     private MCRDirectory dir;
+
+    private MCRPath path;
 
     private Iterator<Path> iterator;
 
@@ -72,8 +75,9 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
      * @throws IOException
      *             if 'path' is not from {@link MCRIFSFileSystem}
      */
-    public MCRDirectoryStream(MCRDirectory dir) throws IOException {
+    public MCRDirectoryStream(MCRDirectory dir, MCRPath path) throws IOException {
         this.dir = Objects.requireNonNull(dir, "'dir' may not be null");
+        this.path = Optional.of(path).orElseGet(dir::toPath);
     }
 
     @Override
@@ -124,7 +128,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
         if (childByPath == null || childByPath instanceof MCRFile) {
             throw new NoSuchFileException(dir.toString(), path.toString(), "Does not exist or is a file.");
         }
-        return new MCRDirectoryStream((MCRDirectory) childByPath);
+        return new MCRDirectoryStream((MCRDirectory) childByPath, MCRPath.toMCRPath(path.resolve(mcrPath)));
     }
 
     @Override
@@ -147,8 +151,8 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
             }
         }
         MCRFileSystemProvider provider = (MCRFileSystemProvider) mcrPath.getFileSystem().provider();
-        MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(dir, mcrPath, create, createNew);
-        return provider.newByteChannel(mcrFile.toPath(), fileOpenOptions, attrs);
+        MCRFileSystemUtils.getMCRFile(dir, mcrPath, create, createNew);
+        return provider.newByteChannel(this.path.resolve(mcrPath), fileOpenOptions, attrs);
     }
 
     @Override
@@ -163,7 +167,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
 
     /**
      * Deletes {@link MCRFilesystemNode} if it exists.
-     * 
+     *
      * @param path
      *            relative or absolute
      * @throws IOException
@@ -219,7 +223,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
         if (c == MCRMD5AttributeView.class) {
             return (V) new MD5FileAttributeViewImpl(this, path);
         }
-        return (V) null;
+        return null;
     }
 
     private static class MCRDirectoryIterator implements Iterator<Path> {
@@ -244,9 +248,8 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
 
         @Override
         public boolean hasNext() {
-            LOGGER.debug("hasNext() called: " + pos);
-            MCRDirectory dir = mcrDirectoryStream.dir;
-            if (dir == null) {
+            LOGGER.debug(() -> "hasNext() called: " + pos);
+            if (mcrDirectoryStream.dir == null) {
                 return false; //stream closed
             }
             int nextPos = pos + 1;
@@ -261,8 +264,8 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
 
         private MCRPath getPath(MCRFilesystemNode[] children, int index) {
             try {
-                MCRPath path = children[index].toPath();
-                LOGGER.debug("getting path at index " + index + ": " + path);
+                MCRPath path = MCRPath.toMCRPath(mcrDirectoryStream.path.resolve(children[index].getName()));
+                LOGGER.debug(() -> "getting path at index " + index + ": " + path);
                 return path;
             } catch (RuntimeException e) {
                 throw new DirectoryIteratorException(new IOException(e));
@@ -271,15 +274,13 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
 
         @Override
         public Path next() {
-            LOGGER.debug("next() called: " + pos);
+            LOGGER.debug(() -> "next() called: " + pos);
             pos++;
             if (hasNextCalled) {
                 hasNextCalled = false;
                 return nextPath;
             }
-            MCRDirectory dir = mcrDirectoryStream.dir;
             mcrDirectoryStream.checkClosed();
-            MCRFilesystemNode[] children = dir.getChildren();
             if (pos >= children.length) {
                 throw new NoSuchElementException();
             }
@@ -307,6 +308,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
             this.fileName = path;
         }
 
+        @Override
         protected MCRFilesystemNode resolveNode() throws IOException {
             MCRDirectory parent = mcrDirectoryStream.dir;
             mcrDirectoryStream.checkClosed();

@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -51,7 +52,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 
 /**
  * This class implements the MCRFileMetadataStore.
- * 
+ *
  */
 public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     // LOGGER
@@ -64,6 +65,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     public MCRHIBFileMetadataStore() throws MCRPersistenceException {
     }
 
+    @Override
     public void storeNode(MCRFilesystemNode node) throws MCRPersistenceException {
 
         String ID = node.getID();
@@ -107,7 +109,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         }
 
         Session session = getSession();
-        MCRFSNODES fs = (MCRFSNODES) session.get(MCRFSNODES.class, ID);
+        MCRFSNODES fs = session.get(MCRFSNODES.class, ID);
         if (fs == null) {
             fs = new MCRFSNODES();
             fs.setId(ID);
@@ -132,63 +134,54 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         }
     }
 
+    @Override
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<String> query = cb.createQuery(String.class);
-        Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
+        TypedQuery<String> rootQuery = em.createNamedQuery("MCRFSNODES.getRootID", String.class);
+        rootQuery.setParameter("owner", ownerID);
         try {
-            return em.createQuery(query
-                .select(nodes.get(MCRFSNODES_.id))
-                .where(
-                    cb.isNull(nodes.get(MCRFSNODES_.pid)),
-                    cb.equal(nodes.get(MCRFSNODES_.owner), ownerID)))
-                .getSingleResult();
+            return rootQuery.getSingleResult();
         } catch (NoResultException e) {
             LOGGER.warn("There is no fsnode with OWNER = " + ownerID);
             return null;
         }
     }
 
+    @Override
     public MCRFilesystemNode retrieveChild(String parentID, String name) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
-        Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
+        TypedQuery<MCRFSNODES> childQuery = em.createNamedQuery("MCRFSNODES.getChild", MCRFSNODES.class);
+        childQuery.setParameter("pid", parentID);
+        childQuery.setParameter("name", name);
         try {
-            MCRFSNODES node = em.createQuery(query
-                .where(
-                    cb.equal(nodes.get(MCRFSNODES_.pid), parentID),
-                    cb.equal(nodes.get(MCRFSNODES_.name), name)))
-                .getSingleResult();
+            MCRFSNODES node = childQuery.getSingleResult();
             return buildNode(node);
         } catch (NoResultException e) {
             return null;
         }
     }
 
+    @Override
     public List<MCRFilesystemNode> retrieveChildren(String parentID) throws MCRPersistenceException {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
-        Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
-        return em.createQuery(query
-            .where(
-                cb.equal(nodes.get(MCRFSNODES_.pid), parentID)))
-            .getResultList()
+        TypedQuery<MCRFSNODES> childQuery = em.createNamedQuery("MCRFSNODES.getChildren", MCRFSNODES.class);
+        childQuery.setParameter("pid", parentID);
+        return childQuery.getResultList()
             .stream()
             .map(this::buildNode)
             .collect(Collectors.toList());
     }
 
+    @Override
     public void deleteNode(String ID) throws MCRPersistenceException {
         Session session = getSession();
         session.delete(session.get(MCRFSNODES.class, ID));
     }
 
+    @Override
     public MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
         Session session = getSession();
-        MCRFSNODES node = (MCRFSNODES) session.get(MCRFSNODES.class, ID);
+        MCRFSNODES node = session.get(MCRFSNODES.class, ID);
         if (node == null) {
             LOGGER.warn("There is no FSNODE with ID = " + ID);
             return null;

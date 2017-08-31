@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Wed, 18 Dec 2013) $
  *
  * This file is part of ** M y C o R e **
@@ -27,9 +27,12 @@ import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SecureDirectoryStream;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
@@ -37,6 +40,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -96,8 +100,35 @@ public class MCRPathXML {
         SortedMap<MCRPath, MCRFileAttributes<?>> directories = new TreeMap<>();
         SortedMap<MCRPath, MCRFileAttributes<?>> files = new TreeMap<>();
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(path)) {
+            LOGGER.debug(() -> "Opened DirectoryStream for " + path);
+            Function<Path, MCRFileAttributes<?>> attrResolver = p -> {
+                try {
+                    return Files.readAttributes(p, MCRFileAttributes.class);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            };
+            if (dirStream instanceof SecureDirectoryStream) {
+                //fast path
+                LOGGER.debug(() -> "Using SecureDirectoryStream code path for " + path);
+                attrResolver = p -> {
+                    try {
+                        BasicFileAttributeView attributeView = ((SecureDirectoryStream<Path>) dirStream)
+                            .getFileAttributeView(p.getFileName(), BasicFileAttributeView.class);
+                        return (MCRFileAttributes<?>) attributeView.readAttributes();
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                };
+
+            }
             for (Path child : dirStream) {
-                MCRFileAttributes<?> childAttrs = Files.readAttributes(child, MCRFileAttributes.class);
+                MCRFileAttributes<?> childAttrs;
+                try {
+                    childAttrs = attrResolver.apply(child);
+                } catch (UncheckedIOException e) {
+                    throw e.getCause();
+                }
                 if (childAttrs.isDirectory()) {
                     directories.put(MCRPath.toMCRPath(child), childAttrs);
                 } else {
@@ -142,7 +173,7 @@ public class MCRPathXML {
 
     /**
      * Returns metadata of the file retrievable by 'path' in XML form.
-     * 
+     *
      * @param path
      *            Path to File
      * @param attrs

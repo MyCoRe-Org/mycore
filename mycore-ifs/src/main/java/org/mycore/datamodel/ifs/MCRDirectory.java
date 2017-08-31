@@ -18,12 +18,17 @@ package org.mycore.datamodel.ifs;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
@@ -34,14 +39,14 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Represents a directory node with its metadata and content.
- * 
+ *
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date: 2010-11-08 15:05:28 +0100 (Mon, 08 Nov
  *          2010) $
  */
 public class MCRDirectory extends MCRFilesystemNode {
     /** The child nodes in this directory * */
-    private List<MCRFilesystemNode> children;
+    private ConcurrentMap<String, MCRFilesystemNode> children;
 
     /** The number of direct subdirectories here */
     private int numChildDirsHere = 0;
@@ -70,7 +75,7 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Creates a new, empty MCRDirectory with the given name in the parent
      * MCRDirectory.
-     * 
+     *
      * @param name
      *            the name of the new MCRDirectory
      * @param parent
@@ -85,7 +90,7 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Creates a new, empty MCRDirectory with the given name in the parent
      * MCRDirectory.
-     * 
+     *
      * @param name
      *            the name of the new MCRDirectory
      * @param parent
@@ -115,7 +120,7 @@ public class MCRDirectory extends MCRFilesystemNode {
 
     /**
      * Returns the MCRDirectory with the given ID.
-     * 
+     *
      * @param ID
      *            the unique ID of the MCRDirectory to return
      * @return the MCRDirectory with the given ID, or null if no such directory
@@ -128,7 +133,7 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Returns the root MCRDirectory that has no parent and is logically owned
      * by the object with the given ID.
-     * 
+     *
      * @param ownerID
      *            the ID of the logical owner of that directory
      * @return the root MCRDirectory stored for that owner ID, or null if no
@@ -140,7 +145,7 @@ public class MCRDirectory extends MCRFilesystemNode {
 
     /**
      * Adds a child node to this directory.
-     * 
+     *
      * @param child
      *            the new child
      */
@@ -153,7 +158,7 @@ public class MCRDirectory extends MCRFilesystemNode {
             }
 
             if (children != null) {
-                children.add(child);
+                children.put(child.getName(), child);
             }
         }
 
@@ -171,7 +176,7 @@ public class MCRDirectory extends MCRFilesystemNode {
 
     /**
      * Removes a child node from this directory
-     * 
+     *
      * @param child
      *            the child to be removed from this directory
      */
@@ -184,7 +189,7 @@ public class MCRDirectory extends MCRFilesystemNode {
             }
 
             if (children != null) {
-                children.remove(child);
+                children.remove(child.getName());
             }
         }
 
@@ -203,18 +208,22 @@ public class MCRDirectory extends MCRFilesystemNode {
 
     /**
      * Returns all direct child nodes in this directory.
-     * 
+     *
      * @return a possibly empty array of MCRFilesystemNode objects
      */
     public MCRFilesystemNode[] getChildren() {
         ensureNotDeleted();
 
         if (children == null) {
-            children = manager.retrieveChildren(ID);
+            children = manager.retrieveChildren(ID).stream()
+                .collect(Collectors.toMap(MCRFilesystemNode::getName, f -> f, (u, v) -> {
+                    throw new IllegalStateException(String.format(Locale.ROOT, "Duplicate key %s", u));
+                }, ConcurrentHashMap::new));
         }
 
-        MCRFilesystemNode[] out = new MCRFilesystemNode[children.size()];
-        return children.toArray(out);
+        return children.values()
+            .stream()
+            .toArray(i -> new MCRFilesystemNode[children.size()]);
     }
 
     /**
@@ -224,7 +233,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      * {@link MCRDirectory#SORT_BY_NAME},
      * {@link MCRDirectory#SORT_BY_NAME_IGNORECASE} or
      * {@link MCRDirectory#SORT_BY_DATE}
-     * 
+     *
      * @param sortOrder
      *            the Comparator to be used to sort the children
      * @return a possibly empty array of MCRFilesystemNode objects
@@ -232,17 +241,16 @@ public class MCRDirectory extends MCRFilesystemNode {
     public MCRFilesystemNode[] getChildren(Comparator<MCRFilesystemNode> sortOrder) {
         ensureNotDeleted();
 
-        MCRFilesystemNode[] array = getChildren();
-        if (sortOrder != null) {
-            Arrays.sort(array, sortOrder);
-        }
-        return array;
+        return children.values()
+            .stream()
+            .sorted(sortOrder)
+            .toArray(i -> new MCRFilesystemNode[children.size()]);
     }
 
     /**
      * Returns true, if this directory contains a direct child with the given
      * filename.
-     * 
+     *
      * @param name
      *            the name of the child file or directory
      */
@@ -255,26 +263,10 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /**
-     * Returns the direct child of this directory at the given position in the
-     * natural order of the children
-     * 
-     * @param index
-     *            the index of the child in the list of children
-     */
-    public MCRFilesystemNode getChild(int index) {
-        ensureNotDeleted();
-
-        if (children == null) {
-            return getChildren()[index];
-        }
-        return children.get(index);
-    }
-
-    /**
      * Returns the child node with the given filename. This method also accepts
      * the aliases "." for the current directory or ".." for the parent
      * directory.
-     * 
+     *
      * @param name
      *            the name of the child file or directory
      */
@@ -286,7 +278,9 @@ public class MCRDirectory extends MCRFilesystemNode {
         } else if (name.equals("..")) {
             return hasParent() ? getParent() : null;
         } else {
-            return manager.retrieveChild(ID, name);
+            return Optional.ofNullable(children)
+                .map(m -> m.get(name))
+                .orElseGet(() -> manager.retrieveChild(ID, name));
         }
     }
 
@@ -297,7 +291,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      * relative path is given, the path may contain the aliases "." for the
      * current directory or ".." for the parent directory, and the node will be
      * located relative to this directory.
-     * 
+     *
      * @param path
      *            the absolute path (starting with a "/") or path relative to
      *            this directory, possibly containing "." or ".." aliases
@@ -351,7 +345,7 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     @Override
-    protected BasicFileAttributes getBasicFileAttributes() {
+    public MCRFileAttributes<String> getBasicFileAttributes() {
         return MCRFileAttributes
             .directory(getID(), getSize(), FileTime.fromMillis(getLastModified().getTimeInMillis()));
     }
@@ -378,7 +372,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      * Returns the number of child nodes in this directory. The additional
      * parameters control what type of nodes will be counted and if only direct
      * children or all children will be counted.
-     * 
+     *
      * @param nodetype
      *            one of the constants FILES, DIRECTORIES, or NODES for both
      *            types
@@ -430,9 +424,7 @@ public class MCRDirectory extends MCRFilesystemNode {
     public void delete() throws MCRPersistenceException {
         ensureNotDeleted();
 
-        for (int i = getNumChildren(NODES, HERE) - 1; i >= 0; i--) {
-            getChild(i).delete();
-        }
+        Stream.of(getChildren()).forEach(MCRFilesystemNode::delete);
         BasicFileAttributes attrs = getBasicFileAttributes();
         MCRPath path = toPath();
         super.delete();
@@ -488,14 +480,14 @@ public class MCRDirectory extends MCRFilesystemNode {
      * this directory, sorting them to ascending order and writing this list
      * line by line as UTF-8 encoded bytes. This method can be used to digitally
      * sign the content of a directory in the future
-     * 
+     *
      * @return the fingerprint that changes when any content of a file in this
      *         directory changes
      */
     public byte[] buildFingerprint() {
         ensureNotDeleted();
 
-        List<String> list = new Vector<String>();
+        List<String> list = new Vector<>();
         collectMD5Lines(list);
         Collections.sort(list);
 

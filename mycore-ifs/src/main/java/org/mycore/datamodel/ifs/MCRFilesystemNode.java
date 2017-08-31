@@ -10,7 +10,7 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.io.UncheckedIOException;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.Normalizer;
@@ -31,12 +31,13 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.ifs1.MCRFileSystemProvider;
 
 /**
  * Represents a stored file or directory node with its metadata and content.
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Stefan Freitag
  * @version $Revision$ $Date$
@@ -164,7 +165,7 @@ public abstract class MCRFilesystemNode {
 
     /**
      * Changed method because of problems with update of files.
-     * 
+     *
      */
     protected void checkName(String name, boolean doExistCheck) {
         name = Normalizer.normalize(name, Normalizer.Form.NFC);
@@ -192,7 +193,7 @@ public abstract class MCRFilesystemNode {
 
     /**
      * Returns the ID of the owner (the derivate id) of this node.
-     * 
+     *
      * @return the ID of the owner of this node (derivate id)
      */
     public String getOwnerID() {
@@ -279,13 +280,17 @@ public abstract class MCRFilesystemNode {
         MCREvent event = new MCREvent(MCREvent.PATH_TYPE, MCREvent.UPDATE_EVENT);
         event.put(MCRFileEventHandlerBase.FILE_TYPE, this); //to support old events
         event.put(MCREvent.PATH_KEY, toPath());
-        event.put(MCREvent.FILEATTR_KEY, getBasicFileAttributes());
+        try {
+            event.put(MCREvent.FILEATTR_KEY, getBasicFileAttributes());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         MCREventManager.instance().handleEvent(event);
     }
 
     /**
      * Returns the name of this node
-     * 
+     *
      * @return the name of this node
      */
     public String getName() {
@@ -296,7 +301,7 @@ public abstract class MCRFilesystemNode {
 
     /**
      * Sets the label of this node
-     * 
+     *
      * @param label
      *            the label (may be null)
      */
@@ -318,7 +323,7 @@ public abstract class MCRFilesystemNode {
 
     /**
      * Returns the label of this node
-     * 
+     *
      * @return the label of this node, or null
      */
     public String getLabel() {
@@ -329,7 +334,7 @@ public abstract class MCRFilesystemNode {
 
     /**
      * Returns an absolute path that is build like this: {@link #getOwnerID()}+{@link #getAbsolutePath()}.
-     * 
+     *
      * If this node is a file that has no parent directory, this method returns the same as {@link #getName()}.
      */
     public String getPath() {
@@ -363,7 +368,7 @@ public abstract class MCRFilesystemNode {
         return MCRAbstractFileSystem.getPath(ownerID, getAbsolutePath(), MCRFileSystemProvider.getMCRIFSFileSystem());
     }
 
-    protected abstract BasicFileAttributes getBasicFileAttributes();
+    public abstract MCRFileAttributes<String> getBasicFileAttributes() throws IOException;
 
     /**
      * Returns the node size as number of bytes
@@ -430,7 +435,7 @@ public abstract class MCRFilesystemNode {
      * Stores additional XML data for this node. The name of the data element is
      * used as unique key for storing data. If data with this name already
      * exists, it is overwritten.
-     * 
+     *
      * @param data
      *            the additional XML data to be saved
      * @throws IOException
@@ -453,13 +458,13 @@ public abstract class MCRFilesystemNode {
         if (child != null) {
             child.detach();
         }
-        doc.getRootElement().addContent((Element) data.clone());
+        doc.getRootElement().addContent(data.clone());
         dataFile.setContentFrom(doc);
     }
 
     /**
      * Removes additional XML data from this node.
-     * 
+     *
      * @param dataName
      *            the name of the additional XML data element to be removed
      * @throws IOException
@@ -496,7 +501,7 @@ public abstract class MCRFilesystemNode {
 
     /**
      * Gets additional XML data stored for this node, if any.
-     * 
+     *
      * @param dataName
      *            the name of the additional XML data element to be retrieved
      * @return the additional XML data elemet that was stored, or null
@@ -516,7 +521,7 @@ public abstract class MCRFilesystemNode {
 
     /**
      * Gets all additional XML data stored for this node, if any.
-     * 
+     *
      * @return the additional XML data document that was stored, or null
      * @throws IOException
      *             if the XML data can not be retrieved
@@ -576,12 +581,12 @@ public abstract class MCRFilesystemNode {
 
     /**
      * Returns a list of {@link MCRFile}s in the hierarchy (both up and down) of this node.
-     * 
+     *
      * @return list of {@link MCRFile}
      */
     public MCRFile[] getFiles() {
         MCRFilesystemNode rootNode = MCRFilesystemNode.getRootNode(this.getOwnerID());
-        List<MCRFile> fList = new ArrayList<MCRFile>();
+        List<MCRFile> fList = new ArrayList<>();
         if (rootNode instanceof MCRDirectory) {
             processNode(rootNode, fList);
         }
