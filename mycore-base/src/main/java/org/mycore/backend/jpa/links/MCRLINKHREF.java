@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -27,16 +27,35 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 /**
  * This class implement the data sructure of the MCRLinkHref table.
- * 
+ *
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 @Entity
+@Table(indexes = {
+    @Index(name = "MCRLINKHREF.from", columnList = "MCRFROM, MCRTYPE"),
+    @Index(name = "MCRLINKHREF.to", columnList = "MCRTO, MCRTYPE"),
+})
+@NamedQueries({
+    @NamedQuery(name = "MCRLINKHREF.getDestinations",
+        query = "SELECT key.mcrto FROM MCRLINKHREF WHERE key.mcrfrom=:from"),
+    @NamedQuery(name = "MCRLINKHREF.getDestinationsWithType",
+        query = "SELECT key.mcrto FROM MCRLINKHREF WHERE key.mcrfrom=:from AND key.mcrtype=:type"),
+    @NamedQuery(name = "MCRLINKHREF.getSources", query = "SELECT key.mcrfrom FROM MCRLINKHREF WHERE key.mcrto=:to"),
+    @NamedQuery(name = "MCRLINKHREF.getSourcesWithType",
+        query = "SELECT key.mcrfrom FROM MCRLINKHREF WHERE key.mcrto=:to AND key.mcrtype=:type"),
+    @NamedQuery(name = "MCRLINKHREF.group",
+        query = "SELECT count(key.mcrfrom), key.mcrto FROM MCRLINKHREF WHERE key.mcrto like :like GROUP BY key.mcrto")
+})
 public class MCRLINKHREF {
     private MCRLINKHREFPK key;
 
@@ -52,7 +71,7 @@ public class MCRLINKHREF {
 
     /**
      * The constructor of the class MCRLINKHREF
-     * 
+     *
      * @param from
      *            The link source
      * @param to
@@ -75,7 +94,7 @@ public class MCRLINKHREF {
 
     /**
      * This method returns the primary key.
-     * 
+     *
      * @return returns the primary key as class MCRLINKHREFPK.
      */
     @EmbeddedId
@@ -85,7 +104,7 @@ public class MCRLINKHREF {
 
     /**
      * This method set the primary key.
-     * 
+     *
      * @param key
      *            the primary key as instance of the class MCRLINKHREFPK
      */
@@ -95,7 +114,7 @@ public class MCRLINKHREF {
 
     /**
      * Get the from value.
-     * 
+     *
      * @return the from value as a String.
      */
     @Transient
@@ -105,7 +124,7 @@ public class MCRLINKHREF {
 
     /**
      * Set the from value.
-     * 
+     *
      * @param mcrfrom
      *            the from value as a string
      */
@@ -115,7 +134,7 @@ public class MCRLINKHREF {
 
     /**
      * Get the to value.
-     * 
+     *
      * @return the to value as a String.
      */
     @Transient
@@ -125,7 +144,7 @@ public class MCRLINKHREF {
 
     /**
      * Set the to value.
-     * 
+     *
      * @param mcrto
      *            the to value as a string
      */
@@ -135,7 +154,7 @@ public class MCRLINKHREF {
 
     /**
      * Get the type value.
-     * 
+     *
      * @return the type value as a String.
      */
     @Transient
@@ -145,7 +164,7 @@ public class MCRLINKHREF {
 
     /**
      * Set the type value.
-     * 
+     *
      * @param mcrtype
      *            the type value as a string
      */
@@ -155,7 +174,7 @@ public class MCRLINKHREF {
 
     /**
      * Get the attribute value.
-     * 
+     *
      * @return the attr value as a String.
      */
     @Basic
@@ -166,7 +185,7 @@ public class MCRLINKHREF {
 
     /**
      * Set the attr value.
-     * 
+     *
      * @param mcrattr
      *            the attr value as a string
      */

@@ -1,5 +1,5 @@
 /*
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.logging.log4j.LogManager;
@@ -56,44 +57,10 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
  * Represents an XML metadata document that is stored in a local filesystem
  * store and in parallel in a Subversion repository to track and restore
  * changes.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRVersionedMetadata extends MCRStoredMetadata {
-
-    private static final class LastRevisionFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-    }
-
-    private static final class LastRevisionLogHandler implements ISVNLogEntryHandler {
-        private final String path;
-
-        long lastRevision = -1;
-
-        private boolean deleted;
-
-        private LastRevisionLogHandler(String path, boolean deleted) {
-            this.path = path;
-            this.deleted = deleted;
-        }
-
-        @Override
-        public void handleLogEntry(SVNLogEntry logEntry) throws SVNException {
-            SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
-            if (svnLogEntryPath != null) {
-                char type = svnLogEntryPath.getType();
-                if (deleted || type != SVNLogEntryPath.TYPE_DELETED) {
-                    lastRevision = logEntry.getRevision();
-                    //no other way to stop svnkit from logging
-                    throw new LastRevisionFoundException();
-                }
-            }
-        }
-
-        public long getLastRevision() {
-            return lastRevision;
-        }
-    }
 
     /**
      * The logger
@@ -104,12 +71,12 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * The revision number of the metadata version that is currently in the
      * local filesystem store.
      */
-    protected Optional<Long> revision;
+    protected Supplier<Optional<Long>> revision;
 
     /**
      * Creates a new metadata object both in the local store and in the SVN
      * repository
-     * 
+     *
      * @param store
      *            the store this object is stored in
      * @param fo
@@ -117,16 +84,19 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * @param id
      *            the id of the metadata object
      */
-    MCRVersionedMetadata(MCRMetadataStore store, FileObject fo, int id, String docType) {
+    MCRVersionedMetadata(MCRMetadataStore store, FileObject fo, int id, String docType, boolean deleted) {
         super(store, fo, id, docType);
+        super.deleted = deleted;
+        revision = () -> {
         try {
             // 1. current revision, 2. deleted revision, empty()
-            revision = Optional.ofNullable(Optional.ofNullable(getStore().getRepository().info(getFilePath(), -1))
+                return Optional.ofNullable(Optional.ofNullable(getStore().getRepository().info(getFilePath(), -1))
                 .map(SVNDirEntry::getRevision).orElseGet(this::getLastRevision));
         } catch (SVNException e) {
             LOGGER.error("Could not get last revision of " + getStore().getID() + "_" + id, e);
-            revision = Optional.empty();
-        }
+                return Optional.empty();
+            }
+        };
     }
 
     @Override
@@ -137,7 +107,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     /**
      * Stores a new metadata object first in the SVN repository, then
      * additionally in the local store.
-     * 
+     *
      * @param xml
      *            the metadata document to store
      * @throws JDOMException thrown by {@link MCRStoredMetadata#create(MCRContent)}
@@ -151,14 +121,14 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     /**
      * Updates this metadata object, first in the SVN repository and then in the
      * local store
-     * 
+     *
      * @param xml
      *            the new version of the document metadata
      * @throws JDOMException thrown by {@link MCRStoredMetadata#create(MCRContent)}
      */
     @Override
     public void update(MCRContent xml) throws IOException, JDOMException {
-        if (isDeleted()) {
+        if (isDeleted() || isDeletedInRepository()) {
             create(xml);
         } else {
             super.update(xml);
@@ -221,7 +191,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         } catch (SVNException e) {
             throw new IOException(e);
         }
-        revision = Optional.of(info.getNewRevision());
+        revision = () -> Optional.of(info.getNewRevision());
         LOGGER.info("SVN commit of " + mode + " finished, new revision " + getRevision());
 
         if (MCRVersioningMetadataStore.shouldSyncLastModifiedOnSVNCommit()) {
@@ -242,33 +212,13 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         if (!store.exists(id)) {
             throw new IOException("Does not exist: " + store.getID() + "_" + id);
         }
-        String commitMsg = "Deleted metadata object " + store.getID() + "_" + id + " in store";
-
-        // Commit to SVN
-        SVNCommitInfo info;
-        try {
-            SVNRepository repository = getStore().getRepository();
-            ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
-            editor.openRoot(-1);
-            editor.deleteEntry(getFilePath(), -1);
-            editor.closeDir();
-
-            info = editor.closeEdit();
-            revision = Optional.of(info.getNewRevision());
-            LOGGER.info("SVN commit of delete finished, new revision " + getRevision());
-        } catch (SVNException e) {
-            LOGGER.error("Error while deleting " + id + " in SVN ", e);
-        } finally {
-            super.delete();
-        }
+        getStore().delete(getID());
+        deleted = true;
     }
 
-    public boolean isDeleted() throws IOException {
-        return super.isDeleted() || isDeletedInRepository();
-    }
-
-    private boolean isDeletedInRepository() throws IOException {
-        return getRevision() >= 0 && getRevision(getRevision()).getType() == MCRMetadataVersion.DELETED;
+    public boolean isDeletedInRepository() throws IOException {
+        long rev = getRevision();
+        return rev >= 0 && getRevision(rev).getType() == MCRMetadataVersion.DELETED;
     }
 
     /**
@@ -278,7 +228,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     public void update() throws Exception {
         SVNRepository repository = getStore().getRepository();
         MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream();
-        revision = Optional.of(repository.getFile(getFilePath(), -1, null, baos));
+        long rev = repository.getFile(getFilePath(), -1, null, baos);
+        revision = () -> Optional.of(rev);
         baos.close();
         new MCRByteContent(baos.getBuffer(), 0, baos.size(), this.getLastModified().getTime()).sendTo(fo);
     }
@@ -286,13 +237,13 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     /**
      * Lists all versions of this metadata object available in the subversion
      * repository
-     * 
+     *
      * @return all stored versions of this metadata object
      */
     @SuppressWarnings("unchecked")
     public List<MCRMetadataVersion> listVersions() throws IOException {
         try {
-            List<MCRMetadataVersion> versions = new ArrayList<MCRMetadataVersion>();
+            List<MCRMetadataVersion> versions = new ArrayList<>();
             SVNRepository repository = getStore().getRepository();
             String path = getFilePath();
             String dir = getDirectory();
@@ -376,7 +327,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         try {
             repository.log(new String[] { dir }, repository.getLatestRevision(), 0, true, true, limit, false, null,
                 lastRevisionLogHandler);
-        } catch (LastRevisionFoundException e) {
+        } catch (LastRevisionFoundException ignored) {
         }
         return lastRevisionLogHandler.getLastRevision();
     }
@@ -394,17 +345,17 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     /**
      * Returns the revision number of the version currently stored in the local
      * filesystem store.
-     * 
+     *
      * @return the revision number of the local version
      */
     public long getRevision() {
-        return revision.orElse(-1l);
+        return revision.get().orElse(-1l);
     }
 
     /**
      * Checks if the version in the local store is up to date with the latest
      * version in SVN repository
-     * 
+     *
      * @return true, if the local version in store is the latest version
      */
     public boolean isUpToDate() throws IOException {
@@ -417,4 +368,39 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         }
         return entry.getRevision() <= getRevision();
     }
+
+    private static final class LastRevisionFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+    }
+
+    private static final class LastRevisionLogHandler implements ISVNLogEntryHandler {
+        private final String path;
+
+        long lastRevision = -1;
+
+        private boolean deleted;
+
+        private LastRevisionLogHandler(String path, boolean deleted) {
+            this.path = path;
+            this.deleted = deleted;
+        }
+
+        @Override
+        public void handleLogEntry(SVNLogEntry logEntry) throws SVNException {
+            SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
+            if (svnLogEntryPath != null) {
+                char type = svnLogEntryPath.getType();
+                if (deleted || type != SVNLogEntryPath.TYPE_DELETED) {
+                    lastRevision = logEntry.getRevision();
+                    //no other way to stop svnkit from logging
+                    throw new LastRevisionFoundException();
+                }
+            }
+        }
+
+        long getLastRevision() {
+            return lastRevision;
+        }
+    }
+
 }

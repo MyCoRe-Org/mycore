@@ -215,7 +215,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         assertFalse(getVersStore().exists(vm.getID()));
 
         vm = getVersStore().retrieve(vm.getID());
-        assertTrue(vm.isDeleted());
+        assertTrue(vm.isDeletedInRepository());
         List<MCRMetadataVersion> versions = vm.listVersions();
         MCRMetadataVersion v1 = versions.get(0);
         MCRMetadataVersion v2 = versions.get(1);
@@ -229,7 +229,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         assertTrue(cannotRestoreDeleted);
 
         v1.restore();
-        assertFalse(vm.isDeleted());
+        assertFalse(vm.isDeletedInRepository());
         assertEquals(root.getName(), vm.getMetadata().asXML().getRootElement().getName());
     }
 

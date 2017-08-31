@@ -25,6 +25,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.content.MCRByteContent;
+import org.mycore.datamodel.ifs2.MCRStoredMetadata;
+import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.xml.sax.SAXException;
@@ -88,12 +90,14 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
     @Test
     public void delete() throws IOException {
-        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
+        MCRStoredMetadata metadata = getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);
+        assertFalse(MyCoRe_document_00000001.id + " should not have been deleted", metadata.isDeleted());
+        assertTrue(MyCoRe_document_00000001.id + " should exist", getStore().exists(MyCoRe_document_00000001.id));
         try {
             getStore().delete(MCR_document_00000001.id);
         } catch (IOException e) {
-            //is expected as MCR_document_00000001 does not exist 
+            //is expected as MCR_document_00000001 does not exist
         }
         assertTrue(MyCoRe_document_00000001.id + " should not have been deleted",
             getStore().exists(MyCoRe_document_00000001.id));
@@ -121,6 +125,9 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         getStore().create(MyCoRe_document_00000001.id,
             new MCRByteContent(MyCoRe_document_00000001.blob, MCR_document_00000001.lastModified.getTime()),
             MyCoRe_document_00000001.lastModified);
+        MCRVersionedMetadata data = getStore().getVersionedMetaData(MyCoRe_document_00000001.id);
+        assertFalse(data.isDeleted());
+        assertFalse(data.isDeletedInRepository());
         Document doc = getStore().retrieveXML(MyCoRe_document_00000001.id);
         assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(), doc.getRootElement()
             .getAttributeValue("id"));

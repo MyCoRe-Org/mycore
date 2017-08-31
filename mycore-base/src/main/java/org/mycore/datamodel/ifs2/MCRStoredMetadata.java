@@ -1,5 +1,5 @@
 /*
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Represents an XML metadata document that is stored in MCRMetadataStore.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRStoredMetadata {
@@ -52,11 +52,11 @@ public class MCRStoredMetadata {
 
     private String docType;
 
-    private boolean deleted;
+    protected boolean deleted;
 
     /**
      * Creates a new stored metadata object
-     * 
+     *
      * @param store
      *            the store this document is stored in
      * @param fo
@@ -76,10 +76,10 @@ public class MCRStoredMetadata {
 
     /**
      * Creates a new local file to save XML to
-     * 
+     *
      * @param xml
      *            the XML to save to a new file
-     * @throws JDOMException if content is not XML and corresponding {@link MCRMetadataStore} forces MCRContent to be XML 
+     * @throws JDOMException if content is not XML and corresponding {@link MCRMetadataStore} forces MCRContent to be XML
      */
     void create(MCRContent xml) throws IOException, JDOMException {
         if (store.shouldForceXML()) {
@@ -95,10 +95,10 @@ public class MCRStoredMetadata {
 
     /**
      * Updates the stored XML document
-     * 
+     *
      * @param xml
      *            the XML document to be stored
-     * @throws JDOMException if content is not XML and corresponding {@link MCRMetadataStore} forces MCRContent to be XML 
+     * @throws JDOMException if content is not XML and corresponding {@link MCRMetadataStore} forces MCRContent to be XML
      */
     public void update(MCRContent xml) throws IOException, JDOMException {
         if (isDeleted()) {
@@ -117,7 +117,7 @@ public class MCRStoredMetadata {
 
     /**
      * Returns the stored XML document
-     * 
+     *
      * @return the stored XML document
      */
     public MCRContent getMetadata() throws IOException {
@@ -126,7 +126,7 @@ public class MCRStoredMetadata {
 
     /**
      * Returns the ID of this metadata document
-     * 
+     *
      * @return the ID of this metadata document
      */
     public int getID() {
@@ -135,7 +135,7 @@ public class MCRStoredMetadata {
 
     /**
      * Returns the store this metadata document is stored in
-     * 
+     *
      * @return the store this metadata document is stored in
      */
     public MCRMetadataStore getStore() {
@@ -144,7 +144,7 @@ public class MCRStoredMetadata {
 
     /**
      * Returns the date this metadata document was last modified
-     * 
+     *
      * @return the date this metadata document was last modified
      */
     public Date getLastModified() throws IOException {
@@ -159,7 +159,7 @@ public class MCRStoredMetadata {
 
     /**
      * Sets the date this metadata document was last modified
-     * 
+     *
      * @param date
      *            the date this metadata document was last modified
      */
@@ -177,7 +177,7 @@ public class MCRStoredMetadata {
     /**
      * Deletes the metadata document. This object is invalid afterwards, do not
      * use it any more.
-     * 
+     *
      */
     public void delete() throws IOException {
         if (!deleted) {

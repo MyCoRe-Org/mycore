@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -41,6 +41,7 @@ import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.annotations.QueryHints;
 import org.hibernate.query.Query;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -58,9 +59,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryLink;
 
 /**
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @version $Revision$ $Date$
  * @since 2.0
  */
@@ -74,7 +75,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategoryLink.";
 
-    private static MCRCache<MCRCategoryID, MCRCategory> categCache = new MCRCache<MCRCategoryID, MCRCategory>(
+    private static MCRCache<MCRCategoryID, MCRCategory> categCache = new MCRCache<>(
         MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
         "MCRCategLinkService category cache");
 
@@ -84,10 +85,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         HIB_CONNECTION_INSTANCE = MCRHIBConnection.instance();
     }
 
+    @Override
     public Map<MCRCategoryID, Number> countLinks(MCRCategory parent, boolean childrenOnly) {
         return countLinksForType(parent, null, childrenOnly);
     }
 
+    @Override
     public Map<MCRCategoryID, Number> countLinksForType(MCRCategory parent, String type, boolean childrenOnly) {
         boolean restrictedByType = type != null;
         String queryName;
@@ -96,14 +99,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         } else {
             queryName = restrictedByType ? "NumberByTypePerClassID" : "NumberPerClassID";
         }
-        Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
+        Map<MCRCategoryID, Number> countLinks = new HashMap<>();
         Collection<MCRCategoryID> ids = childrenOnly ? getAllChildIDs(parent) : getAllCategIDs(parent);
         for (MCRCategoryID id : ids) {
             // initialize all categIDs with link count of zero
             countLinks.put(id, 0);
         }
         //have to use rootID here if childrenOnly=false
-        //old classification browser/editor could not determine links correctly otherwise 
+        //old classification browser/editor could not determine links correctly otherwise
         if (!childrenOnly) {
             parent = parent.getRoot();
         } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
@@ -115,6 +118,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + queryName);
         // query can take long time, please cache result
         q.setCacheable(true);
+        q.setReadOnly(true);
         q.setParameter("classID", classID);
         if (childrenOnly) {
             q.setParameter("parentID", ((MCRCategoryImpl) parent).getInternalID());
@@ -133,6 +137,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return countLinks;
     }
 
+    @Override
     public void deleteLink(MCRCategLinkReference reference) {
         Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectID");
         q.setParameter("id", reference.getObjectID());
@@ -141,13 +146,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         LOGGER.debug("Number of Links deleted: " + deleted);
     }
 
+    @Override
     public void deleteLinks(final Collection<MCRCategLinkReference> ids) {
         if (ids.isEmpty()) {
             return;
         }
-        HashMap<String, Collection<String>> typeMap = new HashMap<String, Collection<String>>();
+        HashMap<String, Collection<String>> typeMap = new HashMap<>();
         //prepare
-        Collection<String> objectIds = new LinkedList<String>();
+        Collection<String> objectIds = new LinkedList<>();
         String currentType = ids.iterator().next().getType();
         typeMap.put(currentType, objectIds);
         //collect per type
@@ -156,7 +162,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 currentType = ref.getType();
                 objectIds = typeMap.get(ref.getType());
                 if (objectIds == null) {
-                    objectIds = new LinkedList<String>();
+                    objectIds = new LinkedList<>();
                     typeMap.put(ref.getType(), objectIds);
                 }
             }
@@ -173,32 +179,39 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         LOGGER.debug("Number of Links deleted: " + deleted);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategory(MCRCategoryID id) {
         Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategory");
         q.setCacheable(true);
         q.setParameter("id", id);
+        q.setReadOnly(true);
         return (Collection<String>) q.getResultList();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
         Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategoryAndType");
         q.setCacheable(true);
         q.setParameter("id", id);
         q.setParameter("type", type);
+        q.setReadOnly(true);
         return (Collection<String>) q.getResultList();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Collection<MCRCategoryID> getLinksFromReference(MCRCategLinkReference reference) {
         Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "categoriesByObjectID");
         q.setCacheable(true);
         q.setParameter("id", reference.getObjectID());
         q.setParameter("type", reference.getType());
+        q.setReadOnly(true);
         return (Collection<MCRCategoryID>) q.getResultList();
     }
 
+    @Override
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         categories
@@ -238,6 +251,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return categ;
     }
 
+    @Override
     public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
         if (category == null) {
             return hasLinksForClassifications();
@@ -249,7 +263,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             //Category does not exist, so it has no links
             return getNoLinksMap(category);
         }
-        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>();
+        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<>();
         final BitSet linkedInternalIds = getLinkedInternalIds();
         storeHasLinkValues(boolMap, linkedInternalIds, rootImpl);
         return boolMap;
@@ -267,13 +281,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         };
         Query<?> linkedClassifications = MCRHIBConnection.instance()
             .getNamedQuery(NAMED_QUERY_NAMESPACE + "linkedClassifications");
+        linkedClassifications.setReadOnly(true);
         ((List<String>) linkedClassifications.getResultList()).stream().map(MCRCategoryID::rootID)
             .forEach(id -> boolMap.put(id, true));
         return boolMap;
     }
 
     private Map<MCRCategoryID, Boolean> getNoLinksMap(MCRCategory category) {
-        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>();
+        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<>();
         for (MCRCategoryID categID : getAllCategIDs(category)) {
             boolMap.put(categID, false);
         }
@@ -342,6 +357,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public boolean isInCategory(MCRCategLinkReference reference, MCRCategoryID id) {
         Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "CategoryAndObjectID");
         q.setCacheable(true);
+        q.setReadOnly(true);
         q.setParameter("rootID", id.getRootID());
         q.setParameter("categID", id.getID());
         q.setParameter("objectID", reference.getObjectID());
@@ -360,6 +376,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             .createQuery(
                 query.select(objectReferencePath)
                     .where(cb.equal(objectReferencePath.get(MCRCategLinkReference_.type), type)))
+            .setHint(QueryHints.READ_ONLY, "true")
             .getResultList();
     }
 
@@ -374,6 +391,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 query
                     .distinct(true)
                     .select(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type)))
+            .setHint(QueryHints.READ_ONLY, "true")
             .getResultList();
     }
 
@@ -388,6 +406,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 query
                     .where(
                         cb.equal(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type), type)))
+            .setHint(QueryHints.READ_ONLY, "true")
             .getResultList();
     }
 

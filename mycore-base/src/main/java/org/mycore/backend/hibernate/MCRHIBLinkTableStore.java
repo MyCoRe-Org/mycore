@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -26,10 +26,10 @@ package org.mycore.backend.hibernate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +43,7 @@ import org.mycore.datamodel.common.MCRLinkTableInterface;
 
 /**
  * This class implements the MCRLinkTableInterface.
- * 
+ *
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
  */
@@ -65,7 +65,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
 
     /**
      * The method create a new item in the datastore.
-     * 
+     *
      * @param from
      *            a string with the link ID MCRFROM
      * @param to
@@ -75,6 +75,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      * @param attr
      *            a string with the link ID MCRATTR
      */
+    @Override
     public final void create(String from, String to, String type, String attr) {
         if (from == null || (from = from.trim()).length() == 0) {
             throw new MCRPersistenceException("The from value is null or empty.");
@@ -113,7 +114,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
 
     /**
      * The method removes a item for the from ID from the datastore.
-     * 
+     *
      * @param from
      *            a string with the link ID MCRFROM
      * @param to
@@ -121,6 +122,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      * @param type
      *            a string with the link ID MCRTYPE
      */
+    @Override
     public final void delete(String from, String to, String type) {
         if (from == null || (from = from.trim()).length() == 0) {
             throw new MCRPersistenceException("The from value is null or empty.");
@@ -144,7 +146,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     /**
      * The method count the number of references with '%from%' and 'to' and
      * optional 'type' and optional 'restriction%' values of the table.
-     * 
+     *
      * @param fromtype
      *            a substing in the from ID as String, it can be null
      * @param to
@@ -155,6 +157,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      *            a first part of the to ID as String, it can be null
      * @return the number of references
      */
+    @Override
     public final int countTo(String fromtype, String to, String type, String restriction) {
         Session session = getSession();
         Number returns;
@@ -180,32 +183,33 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
 
     /**
      * The method returns a Map of all counted distinct references
-     * 
+     *
      * @return
-     * 
+     *
      * the result-map of (key,value)-pairs can be visualized as<br>
      * select count(mcrfrom) as value, mcrto as key from
      * mcrlinkclass|mcrlinkhref where mcrto like mcrtoPrefix + '%' group by
      * mcrto;
-     * 
+     *
      */
-    @SuppressWarnings("unchecked")
+    @Override
     public Map<String, Number> getCountedMapOfMCRTO(String mcrtoPrefix) {
-        Map<String, Number> map = new HashMap<String, Number>();
-        Session session = getSession();
-        String query = "select count(key.mcrfrom), key.mcrto from " + classname + " where MCRTO like '" + mcrtoPrefix
-            + "%' group by key.mcrto";
-        LOGGER.debug("HQL-Statement: " + query);
-        for (Object[] row : (List<Object[]>) session.createQuery(query).list()) {
-            map.put((String) row[1], (Number) row[0]);
-        }
+        Map<String, Number> map = new HashMap<>();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<Object[]> groupQuery = em.createNamedQuery("MCRLINKHREF.group", Object[].class);
+        groupQuery.setParameter("like", mcrtoPrefix + '%');
+        groupQuery.getResultList()
+            .stream()
+            .forEach(row -> {
+                map.put((String) row[1], (Number) row[0]);
+            });
         return map;
     }
 
     /**
      * Returns a List of all link sources of <code>to</code> and a special
      * <code>type</code>
-     * 
+     *
      * @param to
      *            Destination-ID
      * @param type
@@ -213,23 +217,22 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      *            child, classid, parent, reference and derivate.
      * @return List of Strings (Source-IDs)
      */
-    @SuppressWarnings("unchecked")
+    @Override
     public Collection<String> getSourcesOf(String to, String type) {
-        Session session = getSession();
-        StringBuilder querySB = new StringBuilder("select key.mcrfrom from ").append(classname).append(" where MCRTO='")
-            .append(to).append("'");
-        if (type != null && type.trim().length() > 0) {
-            querySB.append(" and MCRTYPE = '").append(type).append("'");
+        boolean withType = type != null && type.trim().length() != 0;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<String> toQuery = em.createNamedQuery(
+            withType ? "MCRLINKHREF.getSourcesWithType" : "MCRLINKHREF.getSources", String.class);
+        toQuery.setParameter("to", to);
+        if (withType) {
+            toQuery.setParameter("type", type);
         }
-        String query = querySB.toString();
-        LOGGER.debug("HQL-Statement: " + query);
-        List<String> returns = session.createQuery(query).list();
-        return returns;
+        return toQuery.getResultList();
     }
 
     /**
      * Returns a List of all link destinations of <code>destination</code>
-     * 
+     *
      * @param source
      *            source-ID
      * @param type
@@ -237,18 +240,17 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      *            child, classid, parent, reference and derivate.
      * @return List of Strings (Destination-IDs)
      */
-    @SuppressWarnings("unchecked")
+    @Override
     public Collection<String> getDestinationsOf(String source, String type) {
-        Session session = getSession();
-        StringBuilder querySB = new StringBuilder("select key.mcrto from ").append(classname).append(" where MCRFROM='")
-            .append(source).append("'");
-        if (type != null && type.trim().length() != 0) {
-            querySB.append(" and MCRTYPE = '").append(type).append("'");
+        boolean withType = type != null && type.trim().length() != 0;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<String> toQuery = em.createNamedQuery(
+            withType ? "MCRLINKHREF.getDestinationsWithType" : "MCRLINKHREF.getDestinations", String.class);
+        toQuery.setParameter("from", source);
+        if (withType) {
+            toQuery.setParameter("type", type);
         }
-        String query = querySB.toString();
-        LOGGER.debug("HQL-Statement: " + query);
-        List<String> returns = session.createQuery(query).list();
-        return returns;
+        return toQuery.getResultList();
     }
 
 }

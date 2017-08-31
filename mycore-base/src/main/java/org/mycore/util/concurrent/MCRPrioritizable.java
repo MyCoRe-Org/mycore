@@ -1,5 +1,7 @@
 package org.mycore.util.concurrent;
 
+import java.time.Instant;
+
 /**
  * Objects can implement this interface if they are capable of being prioritized.
  *
@@ -10,14 +12,19 @@ public interface MCRPrioritizable extends Comparable<MCRPrioritizable> {
     /**
      * Returns the priority.
      */
-    public Integer getPriority();
+    int getPriority();
+
+    Instant getCreated();
 
     @Override
     default int compareTo(MCRPrioritizable o) {
         if (o == null) {
             return -1;
         }
-        return o.getPriority().compareTo(getPriority());
+        if (o.getPriority() == getPriority()) {
+            return getCreated().compareTo(o.getCreated());
+        }
+        return Integer.compare(o.getPriority(), getPriority());
     }
 
 }

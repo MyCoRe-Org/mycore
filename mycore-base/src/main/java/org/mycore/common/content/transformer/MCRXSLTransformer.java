@@ -431,6 +431,13 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                             el.getExceptionThrown());
                     }
                     throw e;
+                } finally {
+                    try {
+                        transformerHandler.getTransformer().clearParameters();
+                        transformerHandler.getTransformer().reset();
+                    } catch (UnsupportedOperationException e) {
+                        //expected and safely ignored
+                    }
                 }
 
             }
