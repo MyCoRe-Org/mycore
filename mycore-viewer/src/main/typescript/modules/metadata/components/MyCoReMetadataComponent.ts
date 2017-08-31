@@ -36,7 +36,7 @@ namespace mycore.viewer.components {
                         if (htmlElement != null) {
                             if("xml" in htmlElement){
                                 // htmlElement is IXMLDOMElement
-                                htmlElement = jQuery((<any>htmlElement).xml);
+                                htmlElement = jQuery((<any> htmlElement).xml);
                             }
                             this._container.append(htmlElement);
                         } else {
