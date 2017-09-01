@@ -2,11 +2,8 @@ package org.mycore.datamodel.niofs.ifs1;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributeView;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.text.MessageFormat;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,27 +20,7 @@ abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
     }
 
     static MCRFileAttributes<String> readAttributes(MCRFilesystemNode node) throws IOException {
-        if (node instanceof MCRFile) {
-            MCRFile file = (MCRFile) node;
-            Path localFilePath = file.getLocalFile().toPath();
-            BasicFileAttributes localFileAttributes = Files.readAttributes(localFilePath, BasicFileAttributes.class);
-            FileTime creationTime = localFileAttributes.creationTime(); //unavailable in IFS1
-            FileTime lastModified = FileTime.fromMillis(file.getLastModified().getTimeInMillis());
-            if (lastModified.compareTo(creationTime) < 0) {
-                LOGGER.debug("lastModified time is before creation time: " + node.toPath().toString());
-            }
-            FileTime lastAccessTime = localFileAttributes.lastAccessTime(); //unavailable in IFS1
-            if (localFileAttributes.size() != file.getSize()) {
-                LOGGER.error(MessageFormat.format(
-                    "File size mismatch detected for {0}. Local file should be {1} bytes long but is {2} bytes long.",
-                    node.getPath(),
-                    file.getSize(), localFileAttributes.size()));
-            }
-            return MCRFileAttributes.file(file.getID(), file.getSize(), file.getMD5(), creationTime, lastModified,
-                lastAccessTime);
-        }
-        return MCRFileAttributes.directory(node.getID(), node.getSize(),
-            FileTime.fromMillis(node.getLastModified().getTimeInMillis()));
+        return node.getBasicFileAttributes();
     }
 
     @Override

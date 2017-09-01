@@ -60,11 +60,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -74,7 +76,11 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -92,8 +98,35 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     private static final Set<? extends CopyOption> SUPPORTED_COPY_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING));
 
+    private static LoadingCache<MCRPath, String> nodeCache = CacheBuilder.newBuilder()
+        .maximumSize(MCRConfiguration.instance().getInt("MCR.IFS.FileMetadataStore.CacheSize", 500))
+        .weakValues()
+        .build(new CacheLoader<MCRPath, String>() {
+
+            @Override
+            public String load(MCRPath path) throws Exception {
+                if (path.getNameCount() == 0) {
+                    return Optional.ofNullable(doResolvePath(path))
+                        .map(MCRFilesystemNode::getID)
+                        .orElseThrow(() -> new NoSuchFileException(path.toString(), null, "derivate does not exist"));
+                }
+                //recursive call
+                String fileOrDir = path.getFileName().toString();
+                MCRDirectory parentDir = Optional.ofNullable(resolvePath(path.getParent()))
+                    .map(MCRDirectory.class::cast)
+                    .orElseThrow(() -> new NoSuchFileException(path.getParent().toString(), fileOrDir,
+                        "parent directory does not exist"));
+
+                return Optional.ofNullable(parentDir.getChild(fileOrDir))
+                    .map(MCRFilesystemNode::getID)
+                    .orElseThrow(
+                        () -> new NoSuchFileException(path.getParent().toString(), fileOrDir, "file does not exist"));
+            }
+
+        });
+
     /**
-     * 
+     *
      */
     public MCRFileSystemProvider() {
         //TODO: One filesystem enough?
@@ -192,6 +225,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (root == null) {
             throw new NoSuchFileException(ifsPath.toString(), null, "Could not get root directory.");
         }
+        root.getChildren();//warm-up cache
         return root;
     }
 
@@ -203,7 +237,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRFilesystemNode node = resolvePath(mcrPath);
         if (node instanceof MCRDirectory) {
-            return new MCRDirectoryStream((MCRDirectory) node);
+            return new MCRDirectoryStream((MCRDirectory) node, mcrPath);
         }
         throw new NotDirectoryException(dir.toString());
     }
@@ -259,11 +293,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @Override
     public void delete(Path path) throws IOException {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
-        MCRDirectory parentDir = getParentDirectory(mcrPath);
-        MCRFilesystemNode child = parentDir.getChild(mcrPath.getFileName().toString());
-        if (child == null) {
-            throw new NoSuchFileException(mcrPath.toString(), null, null);
-        }
+        MCRFilesystemNode child = resolvePath(mcrPath);
         if (child instanceof MCRDirectory) {
             if (((MCRDirectory) child).hasChildren()) {
                 throw new DirectoryNotEmptyException(mcrPath.toString());
@@ -294,7 +324,9 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (parentNode instanceof MCRFile) {
             throw new NotDirectoryException(parentNode.toPath().toString());
         }
-        return (MCRDirectory) parentNode;
+        MCRDirectory parentDir = (MCRDirectory) parentNode;
+        parentDir.getChildren();//warm-up cache
+        return parentDir;
     }
 
     /* (non-Javadoc)
@@ -310,9 +342,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         boolean createNew = !copyOptions.contains(StandardCopyOption.REPLACE_EXISTING);
         MCRPath src = MCRFileSystemUtils.checkPathAbsolute(source);
         MCRPath tgt = MCRFileSystemUtils.checkPathAbsolute(target);
-        MCRDirectory srcRootDirectory = getRootDirectory(src);
-        MCRPath srcAbsolutePath = getAbsolutePathFromRootComponent(src);
-        MCRFilesystemNode srcNode = srcRootDirectory.getChildByPath(srcAbsolutePath.toString());
+        MCRFilesystemNode srcNode = resolvePath(src);
         //checkParent of target;
         if (tgt.getNameCount() == 0 && srcNode instanceof MCRDirectory) {
             MCRDirectory tgtDir = MCRDirectory.getRootDirectory(tgt.getOwner());
@@ -326,7 +356,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             }
             return; //created new root component
         }
-        MCRDirectory tgtParentDir = getParentDirectory(tgt);
+        MCRDirectory tgtParentDir = (MCRDirectory) resolvePath(tgt.getParent());
         if (srcNode instanceof MCRFile) {
             MCRFile srcFile = (MCRFile) srcNode;
             MCRFile targetFile = MCRFileSystemUtils.getMCRFile(tgt, true, createNew);
@@ -419,11 +449,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     public FileStore getFileStore(Path path) throws IOException {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         if (mcrPath.getNameCount() > 0) {
-            MCRDirectory parentDirectory = getParentDirectory(mcrPath);
-            MCRFilesystemNode node = parentDirectory.getChild(mcrPath.getFileName().toString());
-            if (node == null) {
-                throw new NoSuchFileException(mcrPath.toString());
-            }
+            MCRFilesystemNode node = resolvePath(mcrPath);
             if (node instanceof MCRFile) {
                 MCRFile file = (MCRFile) node;
                 String storeID = file.getStoreID();
@@ -439,17 +465,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
-        if (mcrPath.getNameCount() == 0) {
-            //handle root component
-            MCRDirectory rootDirectory = MCRDirectory.getRootDirectory(mcrPath.getOwner());
-            if (rootDirectory == null) {
-                throw new NoSuchFileException(mcrPath.toString());
-            }
-            checkDirectory(rootDirectory, modes);
-            return;
-        }
-        MCRDirectory parent = getParentDirectory(mcrPath);
-        MCRFilesystemNode node = parent.getChild(mcrPath.getFileName().toString());
+        MCRFilesystemNode node = resolvePath(mcrPath);
         if (node == null) {
             throw new NoSuchFileException(mcrPath.toString());
         }
@@ -505,7 +521,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (c == MCRMD5AttributeView.class) {
             return (V) new MD5FileAttributeViewImpl(mcrPath);
         }
-        return (V) null;
+        return null;
     }
 
     /* (non-Javadoc)
@@ -522,7 +538,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (c == BasicFileAttributes.class || c == MCRFileAttributes.class) {
             return (A) MCRBasicFileAttributeViewImpl.readAttributes(node);
         }
-        return (A) null;
+        return null;
     }
 
     /* (non-Javadoc)
@@ -530,7 +546,6 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
-        // TODO Auto-generated method stub
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         String[] s = splitAttrName(attributes);
         if (s[0].length() == 0) {
@@ -569,8 +584,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException("setAttributes is not implemented yet.");
     }
 
     public static MCRIFSFileSystem getMCRIFSFileSystem() {
@@ -580,12 +594,38 @@ public class MCRFileSystemProvider extends FileSystemProvider {
 
     static MCRFilesystemNode resolvePath(MCRPath path) throws NoSuchFileException, NotDirectoryException,
         IOException {
+        try {
+            String ifsid = nodeCache.getUnchecked(path);
+            MCRFilesystemNode node = MCRFilesystemNode.getNode(ifsid);
+            if (node != null) {
+                return node;
+            }
+            nodeCache.invalidate(path);
+            return resolvePath(path);
+        } catch (UncheckedExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof NoSuchFileException) {
+                throw (NoSuchFileException) cause;
+            }
+            if (cause instanceof NotDirectoryException) {
+                throw (NotDirectoryException) cause;
+            }
+            if (cause instanceof IOException) {
+                throw (IOException) cause;
+            }
+            throw e;
+        }
+    }
+
+    private static MCRFilesystemNode doResolvePath(MCRPath path) throws NoSuchFileException, NotDirectoryException,
+        IOException {
         if (path.getNameCount() == 0) {
             //root components
             MCRDirectory rootDirectory = MCRDirectory.getRootDirectory(path.getOwner());
             if (rootDirectory == null) {
                 throw new NoSuchFileException(path.toString());
-            }
+        }
+            rootDirectory.getChildren(); //prepare cache
             return rootDirectory;
         }
         MCRDirectory parent = getParentDirectory(path);
@@ -597,7 +637,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
         if (child == null) {
             throw new NoSuchFileException(parent.toPath().toString(), path.toString(), null);
-        }
+    }
         return child;
     }
 
@@ -633,6 +673,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             }
         }
 
+        @Override
         protected MCRFilesystemNode resolveNode() throws IOException {
             return resolvePath(this.path);
         }

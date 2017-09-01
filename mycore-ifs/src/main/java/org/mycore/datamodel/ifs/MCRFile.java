@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Represents a stored file with its metadata and content.
- * 
+ *
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
@@ -91,7 +91,7 @@ public class MCRFile extends MCRFilesystemNode {
     /**
      * Creates a new and empty root MCRFile with the given filename, belonging to the given ownerID. The file is assumed to be a standalone "root file" that has
      * no parent directory.
-     * 
+     *
      * @param name
      *            the filename of the new MCRFile
      * @param ownerID
@@ -106,7 +106,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Creates a new, empty MCRFile with the given filename in the parent MCRDirectory.
-     * 
+     *
      * @param name
      *            the filename of the new MCRFile
      * @param parent
@@ -120,13 +120,13 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Creates a new, empty MCRFile with the given filename in the parent MCRDirectory.
-     * 
+     *
      * @param name
      *            the filename of the new MCRFile
      * @param parent
      *            the parent directory that will contain the new child
      * @param doExistCheck
-     *              checks if file with that Name already exists 
+     *              checks if file with that Name already exists
      * @throws MCRUsageException
      *             if that directory already contains a child with that name
      */
@@ -153,7 +153,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Returns the MCRFile with the given ID.
-     * 
+     *
      * @param ID
      *            the unique ID of the MCRFile to return
      * @return the MCRFile with the given ID, or null if no such file exists
@@ -164,7 +164,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Returns the root MCRFile that has no parent and is logically owned by the object with the given ID.
-     * 
+     *
      * @param ownerID
      *            the ID of the logical owner of that file
      * @return the root MCRFile stored for that owner ID, or null if no such file exists
@@ -188,7 +188,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Returns the file extension of this file's name
-     * 
+     *
      * @return the file extension, or an empty string if the file has no extension
      */
     public String getExtension() {
@@ -233,7 +233,7 @@ public class MCRFile extends MCRFilesystemNode {
     /**
      * Returns the local java.io.File representing this stored file. Be careful
      * to use this only for reading data, do never modify directly!
-     * 
+     *
      * @return the file in the local filesystem representing this file
      */
     public File getLocalFile() throws IOException {
@@ -246,7 +246,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Opens a file, returning a seekable byte channel to access the file.
-     * See 
+     * See
      * @throws  IllegalArgumentException
      *          if the set contains an invalid combination of options
      * @throws  UnsupportedOperationException
@@ -269,7 +269,7 @@ public class MCRFile extends MCRFilesystemNode {
         FileChannel fileChannel = FileChannel.open(localFile.toPath(), options);
         boolean write = options.contains(StandardOpenOption.WRITE) || options.contains(StandardOpenOption.APPEND);
         boolean read = options.contains(StandardOpenOption.READ) || !write;
-        return new MCRFileChannel(this, (FileChannel) fileChannel, write);
+        return new MCRFileChannel(this, fileChannel, write);
     }
 
     /**
@@ -284,7 +284,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Returns the MCRContentStore instance that holds the content of this file
-     * 
+     *
      * @return the MCRContentStore instance that holds the content of this file, or null if no content is stored
      */
     protected MCRContentStore getContentStore() {
@@ -297,7 +297,7 @@ public class MCRFile extends MCRFilesystemNode {
     /**
      * Reads the content of this file from a java.lang.String and stores its text as bytes, encoded in the default encoding of the platform where this is
      * running.
-     * 
+     *
      * @param source
      *            the String that is the file's content
      */
@@ -311,7 +311,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Reads the content of this file from a java.lang.String and stores its text as bytes, encoded in the encoding given, in an MCRContentStore.
-     * 
+     *
      * @param source
      *            the String that is the file's content
      * @param encoding
@@ -329,7 +329,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Reads the content of this file from a source file in the local filesystem and stores it in an MCRContentStore.
-     * 
+     *
      * @param source
      *            the file in the local host's filesystem thats content should be imported
      */
@@ -353,7 +353,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Reads the content of this file from a byte array and stores it in an MCRContentStore.
-     * 
+     *
      * @param source
      *            the file's content
      */
@@ -365,7 +365,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Sets the content of this file from a JDOM xml document.
-     * 
+     *
      * @param xml
      *            the JDOM xml document that should be stored as file content
      */
@@ -384,7 +384,7 @@ public class MCRFile extends MCRFilesystemNode {
     /**
      * Reads the content of this file from the source InputStream and stores it in an MCRContentStore. InputStream does NOT get closed at end of process, this
      * must be done by invoking code if required/appropriate.
-     * 
+     *
      * @param source
      *            the source for the file's content bytes
      */
@@ -424,7 +424,11 @@ public class MCRFile extends MCRFilesystemNode {
 
         if (changed) {
             if (storeContentChange) {
-                adjustMetadata(FileTime.fromMillis(System.currentTimeMillis()), new_md5, new_size);
+                try {
+                    adjustMetadata(FileTime.fromMillis(System.currentTimeMillis()), new_md5, new_size);
+                } catch (IOException e) {
+                    throw new MCRPersistenceException("Error while updating file metadata", e);
+                }
             } else {
                 this.md5 = new_md5;
             }
@@ -433,11 +437,11 @@ public class MCRFile extends MCRFilesystemNode {
         return new_size - old_size;
     }
 
-    public void storeContentChange(long sizeDiff) {
+    public void storeContentChange(long sizeDiff) throws IOException {
         adjustMetadata(FileTime.fromMillis(System.currentTimeMillis()), md5, size + sizeDiff);
     }
 
-    public synchronized void adjustMetadata(FileTime lastModified, String md5, long newSize) {
+    public synchronized void adjustMetadata(FileTime lastModified, String md5, long newSize) throws IOException {
         long sizeDiff = newSize - getSize();
         if (sizeDiff == 0 && this.md5.equals(md5) && lastModified == null) {
             return;
@@ -472,7 +476,13 @@ public class MCRFile extends MCRFilesystemNode {
         ensureNotDeleted();
 
         if (storageID.length() != 0) {
-            BasicFileAttributes attrs = getBasicFileAttributes();
+            BasicFileAttributes attrs;
+            try {
+                attrs = getBasicFileAttributes();
+            } catch (IOException e) {
+                attrs = MCRFileAttributes.file(getID(), getSize(), getMD5(),
+                    FileTime.from(getLastModified().toInstant()));
+            }
             getContentStore().deleteContent(storageID);
 
             // Call event handlers to update indexed content
@@ -506,7 +516,7 @@ public class MCRFile extends MCRFilesystemNode {
     /**
      * Gets an InputStream to read the content of this file from the underlying store. It is important that you close() the stream when you are finished reading
      * content from it.
-     * 
+     *
      * @return an InputStream to read the file's content from
      */
     public InputStream getContentAsInputStream() throws IOException {
@@ -515,7 +525,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Writes the content of this file to a target output stream.
-     * 
+     *
      * @param target
      *            the output stream to write the content to
      */
@@ -533,7 +543,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Writes the content of this file to a file on the local filesystem
-     * 
+     *
      * @param target
      *            the local file to write the content to
      */
@@ -543,7 +553,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Gets the content of this file as a byte array
-     * 
+     *
      * @return the content of this file as a byte array
      */
     public byte[] getContentAsByteArray() throws MCRPersistenceException {
@@ -556,7 +566,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Gets the content of this file as a string, using the default encoding of the system environment
-     * 
+     *
      * @return the file's content as a String
      */
     public String getContentAsString() throws MCRPersistenceException {
@@ -565,7 +575,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Gets the content of this file as a string, using the given encoding
-     * 
+     *
      * @param encoding
      *            the character encoding to use
      * @return the file's content as a String
@@ -626,7 +636,7 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * checks if the file still exists in the underlying content store and the md5 sum still matches. 
+     * checks if the file still exists in the underlying content store and the md5 sum still matches.
      * @return true if it passes md5 sum check, else false
      * @throws IOException if file exist but is not readable.
      */
@@ -687,7 +697,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     /**
      * Gets the {@link MCRObjectID} for the {@link MCRObject} where this file is related to (the owner id of the derivate).
-     * 
+     *
      * @return the {@link MCRObjectID}
      */
     public MCRObjectID getMCRObjectID() {
@@ -695,12 +705,12 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * Returns a handle to a {@link MCRFile} given by the derivate id and the full path to the file. 
-     * 
+     * Returns a handle to a {@link MCRFile} given by the derivate id and the full path to the file.
+     *
      * @param derivateID the id of the derivate containing the file
      * @param path the path to the file
-     * 
-     * @return a {@link MCRFile} or null if there is no such file under the given path within the derivate 
+     *
+     * @return a {@link MCRFile} or null if there is no such file under the given path within the derivate
      */
     public static MCRFile getMCRFile(MCRObjectID derivateID, String path) {
         MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivateID.toString());
@@ -729,9 +739,8 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     @Override
-    protected BasicFileAttributes getBasicFileAttributes() {
-        return MCRFileAttributes.file(getID(), getSize(), getMD5(),
-            FileTime.fromMillis(getLastModified().getTimeInMillis()));
+    public MCRFileAttributes<String> getBasicFileAttributes() throws IOException {
+        return MCRFileAttributes.file(getID(), getSize(), getMD5(), FileTime.from(getLastModified().toInstant()));
     }
 
 }
