@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -105,12 +106,21 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             @Override
             public String load(MCRPath path) throws Exception {
                 if (path.getNameCount() == 0) {
-                    return doResolvePath(path).getID();
+                    return Optional.ofNullable(doResolvePath(path))
+                        .map(MCRFilesystemNode::getID)
+                        .orElseThrow(() -> new NoSuchFileException(path.toString(), null, "derivate does not exist"));
                 }
                 //recursive call
                 String fileOrDir = path.getFileName().toString();
-                MCRDirectory parentDir = (MCRDirectory) resolvePath(path.getParent());
-                return parentDir.getChild(fileOrDir).getID();
+                MCRDirectory parentDir = Optional.ofNullable(resolvePath(path.getParent()))
+                    .map(MCRDirectory.class::cast)
+                    .orElseThrow(() -> new NoSuchFileException(path.getParent().toString(), fileOrDir,
+                        "parent directory does not exist"));
+
+                return Optional.ofNullable(parentDir.getChild(fileOrDir))
+                    .map(MCRFilesystemNode::getID)
+                    .orElseThrow(
+                        () -> new NoSuchFileException(path.getParent().toString(), fileOrDir, "file does not exist"));
             }
 
         });

@@ -21,7 +21,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -29,7 +28,6 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
@@ -38,7 +36,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -90,8 +87,6 @@ public class MCRFile extends MCRFilesystemNode {
 
     /** Is true if this file is a new MCRFile and not retrieved from store * */
     private boolean isNew;
-
-    private BasicFileAttributes localFileAttr;
 
     /**
      * Creates a new and empty root MCRFile with the given filename, belonging to the given ownerID. The file is assumed to be a standalone "root file" that has
@@ -460,7 +455,6 @@ public class MCRFile extends MCRFilesystemNode {
         if (hasParent()) {
             getParent().sizeOfChildChanged(sizeDiff);
         }
-        localFileAttr = null;
 
         // If file content has changed, call event handlers to index content
         String type = isNew() ? MCREvent.CREATE_EVENT : MCREvent.UPDATE_EVENT;
@@ -510,7 +504,6 @@ public class MCRFile extends MCRFilesystemNode {
         storageID = null;
         storeID = null;
         avExtender = null;
-        localFileAttr = null;
     }
 
     /**
@@ -747,27 +740,7 @@ public class MCRFile extends MCRFilesystemNode {
 
     @Override
     public MCRFileAttributes<String> getBasicFileAttributes() throws IOException {
-        if (true) {
-            return MCRFileAttributes.file(getID(), getSize(), getMD5(), FileTime.from(getLastModified().toInstant()));
-        }
-        Path localFilePath = getLocalFile().toPath();
-        if (localFileAttr == null) {
-            localFileAttr = Files.readAttributes(localFilePath, BasicFileAttributes.class);
-        }
-        FileTime creationTime = localFileAttr.creationTime(); //unavailable in IFS1
-        FileTime lastModified = FileTime.fromMillis(getLastModified().getTimeInMillis());
-        if (lastModified.compareTo(creationTime) < 0) {
-            LogManager.getLogger().debug(() -> "lastModified time is before creation time: " + toPath());
-        }
-        FileTime lastAccessTime = localFileAttr.lastAccessTime(); //unavailable in IFS1
-        if (localFileAttr.size() != getSize()) {
-            LogManager.getLogger().error(MessageFormat.format(
-                "File size mismatch detected for {0}. Local file should be {1} bytes long but is {2} bytes long.",
-                getPath(),
-                getSize(), localFileAttr.size()));
-        }
-        return MCRFileAttributes.file(getID(), getSize(), getMD5(), creationTime, lastModified,
-            lastAccessTime);
+        return MCRFileAttributes.file(getID(), getSize(), getMD5(), FileTime.from(getLastModified().toInstant()));
     }
 
 }
