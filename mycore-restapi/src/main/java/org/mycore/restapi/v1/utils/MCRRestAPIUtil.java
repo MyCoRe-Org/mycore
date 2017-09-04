@@ -81,8 +81,7 @@ public class MCRRestAPIUtil {
             if (userID != null) {
             	if(MCRSystemUserInformation.getGuestInstance().getUserID().equals(userID)) {
             		MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
-            	}
-            	else {
+            	} else {
             		MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(userID));
             	}
             }
