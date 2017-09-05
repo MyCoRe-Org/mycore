@@ -274,7 +274,9 @@ public class MCRRestAPIUploadHelper {
                 MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
                 MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
-                if (MCRAccessManager.getAccessImpl().checkPermission(derID.toString(), PERMISSION_WRITE)) {
+                MCRAccessManager.invalidPermissionCache(derID.toString(), PERMISSION_WRITE);
+                if (MCRAccessManager.checkPermission(derID.toString(), PERMISSION_WRITE)) {
+                	
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
                     java.nio.file.Path derDir = null;
@@ -391,9 +393,9 @@ public class MCRRestAPIUploadHelper {
                 MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
                 MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
-                //MCRAccessManager.checkPermission
-                //(uses CACHE, which seems to be dirty from other calls and cannot be deleted)????
-                if (MCRAccessManager.getAccessImpl().checkPermission(derID.toString(), PERMISSION_WRITE)) {
+                //MCRAccessManager.checkPermission uses CACHE, which seems to be dirty from other calls
+                MCRAccessManager.invalidPermissionCache(derID.toString(), PERMISSION_WRITE);
+                if (MCRAccessManager.checkPermission(derID.toString(), PERMISSION_WRITE)) {
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
                     final MCRPath rootPath = MCRPath.getPath(der.getId().toString(), "/");
@@ -453,8 +455,9 @@ public class MCRRestAPIUploadHelper {
             MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
             MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
-            //MCRAccessManager.checkPermission(uses CACHE, which seems to be dirty from other calls and cannot be deleted)????
-            if (MCRAccessManager.getAccessImpl().checkPermission(derID.toString(), PERMISSION_DELETE)) {
+            //MCRAccessManager.checkPermission() uses CACHE, which seems to be dirty from other calls????
+            MCRAccessManager.invalidPermissionCache(derID.toString(), PERMISSION_DELETE);
+            if (MCRAccessManager.checkPermission(derID.toString(), PERMISSION_DELETE)) {
                 try {
                     MCRMetadataManager.deleteMCRDerivate(derID);
                 } catch (MCRPersistenceException pe) {
