@@ -1,25 +1,5 @@
 package org.mycore.mets.model;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.stream.StreamSupport;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -48,6 +28,26 @@ import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
+import org.mycore.mets.tools.MCRMetsSave;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.stream.StreamSupport;
 
 /**
  * This class generates a METS xml file for the METS-Editor. In difference to the default
@@ -114,21 +114,21 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     /**
      * Does the mets creation.
      * 
-     * @param dir
-     * @param ignoreNodes
-     * @return
-     * @throws IOException
+     * @param path path to the derivate
+     * @param ignoreNodes nodes which should be ignored for the generation.
+     * @return the new created mets
+     * @throws IOException files of the path couldn't be read
      */
-    protected Mets createMets(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
+    protected Mets createMets(MCRPath path, Set<MCRPath> ignoreNodes) throws IOException {
         LOGGER.info("create mets for derivate " + this.mcrDer.getId().toString() + "...");
 
-        this.structLinkMap = new HashMap<String, List<String>>();
+        this.structLinkMap = new HashMap<>();
 
         // create mets sections
         this.metsHdr = createMetsHdr();
         this.amdSection = createAmdSection();
         this.dmdSection = createDmdSection();
-        this.fileSection = createFileSection(dir, ignoreNodes);
+        this.fileSection = createFileSection(path, ignoreNodes);
         this.physicalStructMap = createPhysicalStruct();
         this.logicalStructMap = createLogicalStruct();
         this.structLink = createStructLink();
@@ -182,21 +182,21 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * This method runs recursive through the directories
      * and add each file to the file section.
      * 
-     * @param dir the root directoy
+     * @param path the root directoy
      * @param ignoreNodes nodes to ignored
      * @return generated file secion.
      */
-    protected FileSec createFileSection(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
+    protected FileSec createFileSection(MCRPath path, Set<MCRPath> ignoreNodes) throws IOException {
         FileSec fsec = new FileSec();
         FileGrp fgroup = new FileGrp(FileGrp.USE_MASTER);
         fsec.addFileGrp(fgroup);
-        addFolder(fgroup, dir, ignoreNodes);
+        addFolder(fgroup, path, ignoreNodes);
         return fsec;
     }
 
-    private void addFolder(final FileGrp fgroup, MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
+    private void addFolder(final FileGrp fgroup, MCRPath derivatePath, Set<MCRPath> ignoreNodes) throws IOException {
         SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>(), directories = new TreeMap<>();
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(derivatePath)) {
             for (Path child : dirStream) {
                 MCRPath path = MCRPath.toMCRPath(child);
                 if (ignoreNodes.contains(path)) {
@@ -214,18 +214,17 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             }
         }
         for (Map.Entry<MCRPath, BasicFileAttributes> file : files.entrySet()) {
-            final UUID uuid = UUID.randomUUID();
-            final String fileID = File.PREFIX_MASTER + uuid.toString();
+            final String fileID = File.PREFIX_MASTER + MCRMetsSave.getFileBase(file.getKey());
             final String mimeType = MCRContentTypes.probeContentType(file.getKey());
             File metsFile = new File(fileID, mimeType);
             // set fLocat
+            String path = file.getKey().getOwnerRelativePath().substring(1);
             try {
-                final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1),
-                    true);
+                final String href = MCRXMLFunctions.encodeURIPath(path,true);
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
                 metsFile.setFLocat(fLocat);
             } catch (URISyntaxException uriSyntaxException) {
-                LOGGER.error("invalid href", uriSyntaxException);
+                LOGGER.error("invalid href " + path, uriSyntaxException);
             }
             fgroup.addFile(metsFile);
         }
@@ -271,12 +270,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         // run through all children
         createLogicalStruct(this.rootObj, logicalDiv);
         // remove not linked logical divs
-        Iterator<LogicalDiv> it = logicalDiv.getChildren().iterator();
-        while (it.hasNext()) {
-            LogicalDiv child = it.next();
-            if (!validateLogicalStruct(logicalDiv, child))
-                it.remove();
-        }
+        logicalDiv.getChildren().removeIf(child -> !validateLogicalStruct(child));
         return lstr;
     }
 
@@ -284,7 +278,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * Creates the logical structure recursive. 
      * 
      * @param parentObject mycore object
-     * @param parentLogicalDiv
+     * @param parentLogicalDiv parent div
      */
     private void createLogicalStruct(MCRObject parentObject, LogicalDiv parentLogicalDiv) {
         // run through all children
@@ -297,7 +291,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             parentLogicalDiv.add(logicalChildDiv);
             // check if a derivate link exists and get the linked file
             Optional<String> linkedFileOptional = getLinkedFile(childObject);
-            linkedFileOptional.flatMap(linkedFile -> getFileId(linkedFile)).ifPresent(fileId -> {
+            linkedFileOptional.flatMap(this::getFileId).ifPresent(fileId -> {
                 PhysicalSubDiv physicalDiv = getPhysicalDiv(fileId);
                 if (physicalDiv == null) {
                     return;
@@ -325,11 +319,10 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * Its important to remove not linked logical divs without children to
      * get a valid logical structure.
      * 
-     * @param parent
-     * @param logicalDiv
-     * @return
+     * @param logicalDiv the logical div to check
+     * @return true if the logical struct is valid otherwise false
      */
-    private boolean validateLogicalStruct(LogicalDiv parent, LogicalDiv logicalDiv) {
+    private boolean validateLogicalStruct(LogicalDiv logicalDiv) {
         // has link
         String logicalDivId = logicalDiv.getId();
         for (List<String> logivalDivIDs : structLinkMap.values()) {
@@ -341,8 +334,9 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         Iterator<LogicalDiv> it = logicalDiv.getChildren().iterator();
         while (it.hasNext()) {
             LogicalDiv child = it.next();
-            if (validateLogicalStruct(logicalDiv, child))
+            if (validateLogicalStruct(child)) {
                 return true;
+            }
             // nothing -> delete it
             it.remove();
         }
@@ -390,7 +384,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * Returns a physical sub div by the given fileId.
      * 
      * @param fileId id of a file element in fileGrp
-     * @return
+     * @return finds a physical div by the given file id
      */
     private PhysicalSubDiv getPhysicalDiv(String fileId) {
         if (fileId == null) {

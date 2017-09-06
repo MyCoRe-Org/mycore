@@ -119,22 +119,8 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                     .asDocument();
                 MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivateID));
                 LOGGER.debug("Stop MCRMETSGenerator for derivate " + derivateID);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                LOGGER.error("Can't create mets file for derivate "
-                    + derivateID);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                LOGGER.error("Can't create mets file for derivate "
-                    + derivateID);
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-                LOGGER.error("Can't create mets file for derivate "
-                    + derivateID);
-            } catch (IOException e) {
-                e.printStackTrace();
-                LOGGER.error("Can't create mets file for derivate "
-                    + derivateID);
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | IOException e) {
+                LOGGER.error("Can't create mets file for derivate " + derivateID);
             }
         }
     }
