@@ -171,7 +171,7 @@ public class MCRRSSFeedImporter {
     }
 
     private MCRObject handleFeedEntry(SyndEntry entry, String projectID)
-        throws MCRPersistenceException, MCRAccessException {
+            throws MCRPersistenceException, MCRAccessException {
         String publicationID = getPublicationID(entry);
         if (publicationID == null) {
             return null;
@@ -231,7 +231,7 @@ public class MCRRSSFeedImporter {
 
     /** If mods:genre was not mapped by conversion/import function, ignore this publication and do not import */
     private static boolean shouldIgnore(Element publication) {
-        return publication.getDescendants(new ElementFilter("genre", MCRConstants.MODS_NAMESPACE)).hasNext();
+        return !publication.getDescendants(new ElementFilter("genre", MCRConstants.MODS_NAMESPACE)).hasNext();
     }
 
     private MCRObject buildMCRObject(Element publicationXML, String projectID) {
