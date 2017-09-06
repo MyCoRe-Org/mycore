@@ -5,21 +5,12 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +25,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -43,8 +35,10 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.mets.misc.StructLinkGenerator;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
+import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
@@ -163,8 +157,10 @@ public class MCRMetsSave {
     }
 
     /**
-     * @param derivateID
-     * @return
+     * Returns the mets.xml as JDOM document for the given derivate or null.
+     *
+     * @param derivateID the derivate identifier
+     * @return the mets.xml as JDOM document
      * @throws JDOMException
      * @throws IOException
      * @throws SAXException 
@@ -195,8 +191,6 @@ public class MCRMetsSave {
      */
     private static Document updateOnFileAdd(Document mets, MCRPath file) {
         try {
-            UUID uuid = UUID.randomUUID();
-
             // check for file existance (if a derivate with mets.xml is uploaded
             String relPath = MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath().substring(1));
 
@@ -220,7 +214,7 @@ public class MCRMetsSave {
             LOGGER.warn(MessageFormat.format("Content Type is : {0}", contentType));
             String fileGrpUSE = getFileGroupUse(file);
 
-            String fileId = MessageFormat.format("{0}_{1}", fileGrpUSE.toLowerCase(Locale.ROOT), uuid);
+            String fileId = MessageFormat.format("{0}_{1}", fileGrpUSE.toLowerCase(Locale.ROOT), getFileBase(relPath));
             org.mycore.mets.model.files.File fileAsMetsFile = new org.mycore.mets.model.files.File(fileId, contentType);
 
             FLocat fLocat = new FLocat(LOCTYPE.URL, relPath);
@@ -372,10 +366,10 @@ public class MCRMetsSave {
     /**
      * Decides in which file group the file should be inserted
      *
-     * @param file
+     * @param file the to check
      * @return the id of the filegGroup
      */
-    private static String getFileGroupUse(MCRPath file) {
+    public static String getFileGroupUse(MCRPath file) {
         String filePath = file.getOwnerRelativePath();
         String teiFolder = "/" + TEI_FOLDER_PREFIX;
         String altoFolder = "/" + ALTO_FOLDER_PREFIX;
@@ -661,8 +655,6 @@ public class MCRMetsSave {
         if (parent.getParent() == logicalDiv) {
             //the parent the log div container itself, thus we quit here and remove the log div
             logicalDiv.remove((LogicalDiv) parent);
-
-            return;
         } else {
             handleParents((LogicalDiv) parent, mets);
         }
@@ -717,4 +709,130 @@ public class MCRMetsSave {
         return complete.get();
     }
 
+    /**
+     * Call this method to update the mets.xml if files of the derivate have changed. Files will be added or removed from the
+     * mets:fileSec and mets:StructMap[@type=PHYSICAL]. The mets:structLink part will be rebuild after.
+     *
+     * <p>This method takes care of the group assignment. For example: image files will be added to the MASTER
+     * group and ALTO files to the ALTO group. It will also bundle files with the same name e.g. sample1.tiff and
+     * alto/sample1.xml to the same physical struct map div.</p>
+     *
+     * <p><b>Important:</b> This method does not update the mets.xml in the derivate, the given java mets object will be.</p>
+     *
+     * @param mets the mets to update
+     * @param derivatePath path to the derivate -> required for looking up new files
+     * @throws IOException derivate couldn't be read
+     */
+    public static void updateFiles(Mets mets, final MCRPath derivatePath) throws IOException {
+        List<String> metsFiles = mets.getFileSec().getFileGroups().stream().flatMap(g -> g.getFileList().stream()).map(File::getFLocat)
+                                     .map(FLocat::getHref).collect(Collectors.toList());
+        List<String> derivateFiles = Files.walk(derivatePath).filter(MCRStreamUtils.not(Files::isDirectory)).map(MCRPath::toMCRPath)
+                                          .map(MCRPath::getOwnerRelativePath)
+                                          .map(path -> path.substring(1))
+                                          .filter(href -> !"mets.xml".equals(href))
+                                          .collect(Collectors.toList());
+
+        ArrayList<String> removedFiles = new ArrayList<>(metsFiles);
+        removedFiles.removeAll(derivateFiles);
+        ArrayList<String> addedFiles = new ArrayList<>(derivateFiles);
+        Collections.sort(addedFiles);
+        addedFiles.removeAll(metsFiles);
+
+        // remove files
+        PhysicalDiv physicalDiv = mets.getPhysicalStructMap().getDivContainer();
+        removedFiles.forEach(href -> {
+            File file = null;
+            // remove from fileSec
+            for (FileGrp grp : mets.getFileSec().getFileGroups()) {
+                file = grp.getFileByHref(href);
+                if (file != null) {
+                    grp.removeFile(file);
+                    break;
+                }
+            }
+            if (file == null) {
+                return;
+            }
+            // remove from physical
+            PhysicalSubDiv physicalSubDiv = physicalDiv.byFileId(file.getId());
+            physicalSubDiv.remove(physicalSubDiv.getFptr(file.getId()));
+            if(physicalSubDiv.getChildren().isEmpty()) {
+                physicalDiv.remove(physicalSubDiv);
+            }
+        });
+        // add files
+        addedFiles.forEach(href -> {
+            MCRPath filePath = (MCRPath) derivatePath.resolve(href);
+            String fileBase = getFileBase(href);
+            try {
+                String fileGroupUse = MCRMetsSave.getFileGroupUse(filePath);
+                // build file
+                String mimeType = MCRContentTypes.probeContentType(filePath);
+                String fileId = fileGroupUse.toLowerCase(Locale.ROOT) + "_" + fileBase;
+                File file = new File(fileId, mimeType);
+                file.setFLocat(new FLocat(LOCTYPE.URL, href));
+
+                // fileSec
+                FileGrp fileGroup = mets.getFileSec().getFileGroup(fileGroupUse);
+                if (fileGroup == null) {
+                    fileGroup = new FileGrp(fileGroupUse);
+                    mets.getFileSec().addFileGrp(fileGroup);
+                }
+                fileGroup.addFile(file);
+
+                // structMap physical
+                String existingFileID = mets.getFileSec().getFileGroups().stream().filter(grp -> !grp.getUse().equals(fileGroupUse))
+                                           .flatMap(grp -> grp.getFileList().stream())
+                                           .filter(brotherFile -> fileBase.equals(getFileBase(brotherFile.getFLocat().getHref())))
+                                           .map(File::getId).findAny().orElse(null);
+                if(existingFileID != null) {
+                    // there is a file (e.g. img or alto) which the same file base -> add the file to this mets:div
+                    PhysicalSubDiv physicalSubDiv = physicalDiv.byFileId(existingFileID);
+                    physicalSubDiv.add(new Fptr(file.getId()));
+                } else {
+                    // there is no mets:div with this file
+                    PhysicalSubDiv subDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileBase, PhysicalSubDiv.TYPE_PAGE);
+                    subDiv.add(new Fptr(file.getId()));
+                    physicalDiv.add(subDiv);
+                }
+            } catch (Exception exc) {
+                LOGGER.error("Unable to add file " + href + " to mets.xml of " + derivatePath.getOwner(), exc);
+            }
+        });
+        // rebuild struct link
+        StructLinkGenerator structLinkGenerator = new StructLinkGenerator();
+        structLinkGenerator.setFailEasy(false);
+        mets.setStructLink(structLinkGenerator.generate(mets));
+    }
+
+    /**
+     * Returns the name without any path information or file extension. Useable to create mets ID's.
+     *
+     * <ul>
+     *     <li>abc123.jpg -> abc123</li>
+     *     <li>alto/abc123.xml -> abc123</li>
+     * </ul>
+     *
+     * @param href the href to get the file base name
+     * @return the href shortcut
+     */
+    public static String getFileBase(String href) {
+        String fileName = Paths.get(href).getFileName().toString();
+        return fileName.substring(0, fileName.lastIndexOf("."));
+    }
+
+    /**
+     * Returns the name without any path information or file extension. Useable to create mets ID's.
+     *
+     * <ul>
+     *     <li>abc123.jpg -> abc123</li>
+     *     <li>alto/abc123.xml -> abc123</li>
+     * </ul>
+     *
+     * @param path the href to get the file base name
+     * @return the href shortcut
+     */
+    public static String getFileBase(MCRPath path) {
+        return getFileBase(path.getOwnerRelativePath().substring(1));
+    }
 }

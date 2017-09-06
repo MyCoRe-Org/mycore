@@ -85,13 +85,24 @@ public class MCRStreamUtils {
      * It should be noted that for ordered parallel stream this solution does not guarantee
      * which object will be extracted (unlike normal distinct()).
      * 
-     * @see <a href="http://stackoverflow.com/questions/23699371/java-8-distinct-by-property">stackoverflow</a>
+     * @see <a href="https://stackoverflow.com/questions/23699371/java-8-distinct-by-property">stackoverflow</a>
      * @param keyExtractor a compare function
      * @return a predicate
      */
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Map<Object, Boolean> seen = new ConcurrentHashMap<>();
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
+    /**
+     * Negates a predicate.
+     *
+     * @see <a href="https://stackoverflow.com/questions/28235764/how-can-i-negate-a-lambda-predicate">stackoverflow</a>
+     * @param predicate the predicate to negate
+     * @return the negated predicate
+     */
+    public static<T> Predicate<T> not(Predicate<T> predicate) {
+        return t -> !predicate.test(t);
     }
 
 }
