@@ -1,17 +1,5 @@
 package org.mycore.mets.tools;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
@@ -49,6 +37,29 @@ import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * Class is responsible for saving a mets document to a derivate. It also can
@@ -358,8 +369,8 @@ public class MCRMetsSave {
     private static Element getPhysicalStructmap(Document mets) {
         XPathExpression<Element> xpath;
         xpath = XPathFactory.instance().compile(
-            "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']", Filters.element(), null,
-            MCRConstants.METS_NAMESPACE);
+            "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']", Filters.element(),
+                null, MCRConstants.METS_NAMESPACE);
         return xpath.evaluateFirst(mets);
     }
 
@@ -391,8 +402,9 @@ public class MCRMetsSave {
     /**
      * Searches a file in a group, which matches a filename.
      *
-     * @param mets            the mets file to search
-     * @param path            the path to the alto file (e.g. "alto/alto_file.xml" when searching in DEFAULT_FILE_GROUP_USE or "image_file.jpg" when searchin in ALTO_FILE_GROUP_USE)
+     * @param mets the mets file to search
+     * @param path the path to the alto file (e.g. "alto/alto_file.xml" when searching in DEFAULT_FILE_GROUP_USE or
+     *             "image_file.jpg" when searchin in ALTO_FILE_GROUP_USE)
      * @param searchFileGroup
      * @return the id of the matching file or null if there is no matching file
      */
@@ -494,7 +506,8 @@ public class MCRMetsSave {
         throws JDOMException, SAXException, IOException {
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
-            LOGGER.info(MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivateID));
+            LOGGER.info(
+                    MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivateID));
             return;
         }
         LOGGER.info(MessageFormat.format("Update {0} URNS in Mets.xml", fileUrnMap.size()));
@@ -710,26 +723,26 @@ public class MCRMetsSave {
     }
 
     /**
-     * Call this method to update the mets.xml if files of the derivate have changed. Files will be added or removed from the
-     * mets:fileSec and mets:StructMap[@type=PHYSICAL]. The mets:structLink part will be rebuild after.
+     * Call this method to update the mets.xml if files of the derivate have changed. Files will be added or removed
+     * from the mets:fileSec and mets:StructMap[@type=PHYSICAL]. The mets:structLink part will be rebuild after.
      *
      * <p>This method takes care of the group assignment. For example: image files will be added to the MASTER
      * group and ALTO files to the ALTO group. It will also bundle files with the same name e.g. sample1.tiff and
      * alto/sample1.xml to the same physical struct map div.</p>
      *
-     * <p><b>Important:</b> This method does not update the mets.xml in the derivate, the given java mets object will be.</p>
+     * <p><b>Important:</b> This method does not update the mets.xml in the derivate, the given java mets object will
+     * be.</p>
      *
      * @param mets the mets to update
-     * @param derivatePath path to the derivate -> required for looking up new files
+     * @param derivatePath path to the derivate -&gt; required for looking up new files
      * @throws IOException derivate couldn't be read
      */
     public static void updateFiles(Mets mets, final MCRPath derivatePath) throws IOException {
-        List<String> metsFiles = mets.getFileSec().getFileGroups().stream().flatMap(g -> g.getFileList().stream()).map(File::getFLocat)
-                                     .map(FLocat::getHref).collect(Collectors.toList());
-        List<String> derivateFiles = Files.walk(derivatePath).filter(MCRStreamUtils.not(Files::isDirectory)).map(MCRPath::toMCRPath)
-                                          .map(MCRPath::getOwnerRelativePath)
-                                          .map(path -> path.substring(1))
-                                          .filter(href -> !"mets.xml".equals(href))
+        List<String> metsFiles = mets.getFileSec().getFileGroups().stream().flatMap(g -> g.getFileList().stream())
+                                     .map(File::getFLocat).map(FLocat::getHref).collect(Collectors.toList());
+        List<String> derivateFiles = Files.walk(derivatePath).filter(MCRStreamUtils.not(Files::isDirectory))
+                                          .map(MCRPath::toMCRPath).map(MCRPath::getOwnerRelativePath)
+                                          .map(path -> path.substring(1)).filter(href -> !"mets.xml".equals(href))
                                           .collect(Collectors.toList());
 
         ArrayList<String> removedFiles = new ArrayList<>(metsFiles);
@@ -781,17 +794,19 @@ public class MCRMetsSave {
                 fileGroup.addFile(file);
 
                 // structMap physical
-                String existingFileID = mets.getFileSec().getFileGroups().stream().filter(grp -> !grp.getUse().equals(fileGroupUse))
-                                           .flatMap(grp -> grp.getFileList().stream())
-                                           .filter(brotherFile -> fileBase.equals(getFileBase(brotherFile.getFLocat().getHref())))
-                                           .map(File::getId).findAny().orElse(null);
+                String existingFileID = mets.getFileSec().getFileGroups().stream()
+                                            .filter(grp -> !grp.getUse().equals(fileGroupUse))
+                                            .flatMap(grp -> grp.getFileList().stream()).filter(brotherFile -> fileBase
+                                .equals(getFileBase(brotherFile.getFLocat().getHref()))).map(File::getId).findAny()
+                                            .orElse(null);
                 if(existingFileID != null) {
                     // there is a file (e.g. img or alto) which the same file base -> add the file to this mets:div
                     PhysicalSubDiv physicalSubDiv = physicalDiv.byFileId(existingFileID);
                     physicalSubDiv.add(new Fptr(file.getId()));
                 } else {
                     // there is no mets:div with this file
-                    PhysicalSubDiv subDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileBase, PhysicalSubDiv.TYPE_PAGE);
+                    PhysicalSubDiv subDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileBase,
+                            PhysicalSubDiv.TYPE_PAGE);
                     subDiv.add(new Fptr(file.getId()));
                     physicalDiv.add(subDiv);
                 }
@@ -809,8 +824,8 @@ public class MCRMetsSave {
      * Returns the name without any path information or file extension. Useable to create mets ID's.
      *
      * <ul>
-     *     <li>abc123.jpg -> abc123</li>
-     *     <li>alto/abc123.xml -> abc123</li>
+     *     <li>abc123.jpg -&gt; abc123</li>
+     *     <li>alto/abc123.xml -&gt; abc123</li>
      * </ul>
      *
      * @param href the href to get the file base name
@@ -825,8 +840,8 @@ public class MCRMetsSave {
      * Returns the name without any path information or file extension. Useable to create mets ID's.
      *
      * <ul>
-     *     <li>abc123.jpg -> abc123</li>
-     *     <li>alto/abc123.xml -> abc123</li>
+     *     <li>abc123.jpg -&gt; abc123</li>
+     *     <li>alto/abc123.xml -&gt; abc123</li>
      * </ul>
      *
      * @param path the href to get the file base name

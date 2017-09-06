@@ -19,14 +19,6 @@
 
 package org.mycore.mets.model;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
@@ -53,6 +45,21 @@ import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
 import org.mycore.mets.tools.MCRMetsSave;
 import org.mycore.services.i18n.MCRTranslation;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -254,12 +261,13 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
     }
 
     private FileUse getFileUse(final String href) {
-        if (href.startsWith("tei/" + TRANSLATION))
+        if (href.startsWith("tei/" + TRANSLATION)) {
             return FileUse.TRANSLATION;
-        if (href.startsWith("tei/" + TRANSCRIPTION))
+        } else if (href.startsWith("tei/" + TRANSCRIPTION)) {
             return FileUse.TRANSCRIPTION;
-        if (href.startsWith("alto/"))
+        } else if (href.startsWith("alto/")) {
             return FileUse.ALTO;
+        }
         return FileUse.MASTER;
     }
 

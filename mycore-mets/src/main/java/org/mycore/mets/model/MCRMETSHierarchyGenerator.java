@@ -1,24 +1,5 @@
 package org.mycore.mets.model;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.stream.StreamSupport;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -48,6 +29,25 @@ import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
 import org.mycore.mets.tools.MCRMetsSave;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.stream.StreamSupport;
 
 /**
  * This class generates a METS xml file for the METS-Editor. In difference to the default
@@ -334,8 +334,9 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         Iterator<LogicalDiv> it = logicalDiv.getChildren().iterator();
         while (it.hasNext()) {
             LogicalDiv child = it.next();
-            if (validateLogicalStruct(child))
+            if (validateLogicalStruct(child)) {
                 return true;
+            }
             // nothing -> delete it
             it.remove();
         }
