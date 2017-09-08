@@ -36,6 +36,7 @@ import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
+import org.mycore.mets.model.struct.StructLink;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -751,8 +752,12 @@ public class MCRMetsSave {
         Collections.sort(addedFiles);
         addedFiles.removeAll(metsFiles);
 
+        StructLink structLink = mets.getStructLink();
+        PhysicalStructMap physicalStructMap = mets.getPhysicalStructMap();
+        List<String> unlinkedLogicalIds = new ArrayList<>();
+
         // remove files
-        PhysicalDiv physicalDiv = mets.getPhysicalStructMap().getDivContainer();
+        PhysicalDiv physicalDiv = physicalStructMap.getDivContainer();
         removedFiles.forEach(href -> {
             File file = null;
             // remove from fileSec
@@ -772,7 +777,34 @@ public class MCRMetsSave {
             if(physicalSubDiv.getChildren().isEmpty()) {
                 physicalDiv.remove(physicalSubDiv);
             }
+            // remove from struct link
+            structLink.getSmLinkByTo(physicalSubDiv.getId()).forEach(smLink -> {
+                structLink.removeSmLink(smLink);
+                if(structLink.getSmLinkByFrom(smLink.getFrom()).isEmpty()) {
+                    unlinkedLogicalIds.add(smLink.getFrom());
+                }
+            });
         });
+
+        // fix unlinked logical divs
+        if(!unlinkedLogicalIds.isEmpty()) {
+            // get first physical div
+            List<PhysicalSubDiv> physicalChildren = physicalStructMap.getDivContainer().getChildren();
+            String firstPhysicalID = physicalChildren.isEmpty() ?
+                    physicalStructMap.getDivContainer().getId() :
+                    physicalChildren.get(0).getId();
+
+            // a logical div is not linked anymore -> link with first physical div
+            unlinkedLogicalIds.forEach(from -> {
+                structLink.addSmLink(new SmLink(from, firstPhysicalID));
+            });
+        }
+
+        // get last logical div
+        LogicalDiv divContainer = mets.getLogicalStructMap().getDivContainer();
+        List<LogicalDiv> descendants = divContainer.getDescendants();
+        LogicalDiv lastLogicalDiv = descendants.isEmpty() ? divContainer : descendants.get(descendants.size() - 1);
+
         // add files
         addedFiles.forEach(href -> {
             MCRPath filePath = (MCRPath) derivatePath.resolve(href);
@@ -799,25 +831,24 @@ public class MCRMetsSave {
                                             .flatMap(grp -> grp.getFileList().stream()).filter(brotherFile -> fileBase
                                 .equals(getFileBase(brotherFile.getFLocat().getHref()))).map(File::getId).findAny()
                                             .orElse(null);
+                PhysicalSubDiv physicalSubDiv;
                 if(existingFileID != null) {
                     // there is a file (e.g. img or alto) which the same file base -> add the file to this mets:div
-                    PhysicalSubDiv physicalSubDiv = physicalDiv.byFileId(existingFileID);
+                    physicalSubDiv = physicalDiv.byFileId(existingFileID);
                     physicalSubDiv.add(new Fptr(file.getId()));
                 } else {
                     // there is no mets:div with this file
-                    PhysicalSubDiv subDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileBase,
+                    physicalSubDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileBase,
                             PhysicalSubDiv.TYPE_PAGE);
-                    subDiv.add(new Fptr(file.getId()));
-                    physicalDiv.add(subDiv);
+                    physicalSubDiv.add(new Fptr(file.getId()));
+                    physicalDiv.add(physicalSubDiv);
                 }
+                // add to struct link
+                structLink.addSmLink(new SmLink(lastLogicalDiv.getId(), physicalSubDiv.getId()));
             } catch (Exception exc) {
                 LOGGER.error("Unable to add file " + href + " to mets.xml of " + derivatePath.getOwner(), exc);
             }
         });
-        // rebuild struct link
-        StructLinkGenerator structLinkGenerator = new StructLinkGenerator();
-        structLinkGenerator.setFailEasy(false);
-        mets.setStructLink(structLinkGenerator.generate(mets));
     }
 
     /**
