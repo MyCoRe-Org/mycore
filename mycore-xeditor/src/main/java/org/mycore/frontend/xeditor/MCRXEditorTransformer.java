@@ -24,6 +24,7 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,6 +58,8 @@ import org.mycore.frontend.xeditor.target.MCRInsertTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
 import org.mycore.frontend.xeditor.validation.MCRValidator;
+import org.w3c.dom.Attr;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -65,15 +68,23 @@ import org.xml.sax.SAXException;
  */
 public class MCRXEditorTransformer {
 
+    public int anchorID = 0;
+
     private MCREditorSession editorSession;
 
     private MCRBinding currentBinding;
 
     private MCRParameterCollector transformationParameters;
 
+    private boolean withinSelectElement = false;
+
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
         this.transformationParameters = transformationParameters;
+    }
+
+    public static MCRXEditorTransformer getTransformer(String key) {
+        return MCRXEditorTransformerStore.getAndRemoveTransformer(key);
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
@@ -98,10 +109,6 @@ public class MCRXEditorTransformer {
         }
     }
 
-    public static MCRXEditorTransformer getTransformer(String key) {
-        return MCRXEditorTransformerStore.getAndRemoveTransformer(key);
-    }
-
     public void addNamespace(String prefix, String uri) {
         MCRConstants.registerNamespace(Namespace.getNamespace(prefix, uri));
     }
@@ -114,9 +121,29 @@ public class MCRXEditorTransformer {
         editorSession.setCancelURL(cancelURL);
     }
 
-    public void setPostProcessorXSL(String stylesheet) {
-        editorSession.getPostProcessor().setStylesheet(stylesheet);
+    public void initializePostprocessor(Node postProcessorNode) {
+        NamedNodeMap attributes = postProcessorNode.getAttributes();
+        int attributesLength = attributes.getLength();
+        HashMap<String, String> attributeMap = new HashMap<>();
+        for(int i = 0; i < attributesLength; i++){
+            Attr item = (Attr) attributes.item(i); // this should be save because we called getAttributes earlier
+            String attrName = item.getName();
+            String attrValue = item.getValue();
+            attributeMap.put(attrName, attrValue);
+        }
+
+        editorSession.getPostProcessor().setAttributes(attributeMap);
     }
+
+    public void setPostProcessor(String clazz) {
+        try {
+            MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) Class.forName(clazz).newInstance());
+            editorSession.setPostProcessor(instance);
+        } catch (InstantiationException|IllegalAccessException|ClassNotFoundException e) {
+            throw new MCRException("Could not initialize Post-Processor with class" + clazz, e);
+        }
+    }
+
 
     public String replaceParameters(String uri) {
         return getXPathEvaluator().replaceXPaths(uri, false);
@@ -177,8 +204,6 @@ public class MCRXEditorTransformer {
         editorSession.getSubmission().mark2checkResubmission(currentBinding);
         return currentBinding.hasValue(value);
     }
-
-    private boolean withinSelectElement = false;
 
     public void toggleWithinSelectElement() {
         withinSelectElement = !withinSelectElement;
@@ -250,8 +275,6 @@ public class MCRXEditorTransformer {
     public String getInsertParameter() throws JaxenException {
         return MCRInsertTarget.getInsertParameter(getCurrentRepeat());
     }
-
-    public int anchorID = 0;
 
     public int nextAnchorID() {
         return ++anchorID;

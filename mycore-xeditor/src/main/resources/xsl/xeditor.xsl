@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
-  xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer" xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
-  exclude-result-prefixes="xsl xed xalan transformer includer i18n">
+                xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+                xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer"
+                xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
+                exclude-result-prefixes="xsl xed xalan transformer includer i18n">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -35,14 +36,14 @@
       <xsl:attribute name="action">
         <xsl:value-of select="concat($ServletsBaseURL,'XEditor',$HttpSession)" />
       </xsl:attribute>
-      
+
       <!-- method="post" is default, may be overwritten by xed:form/@method -->
-      <xsl:if test="not(@method)"> 
+      <xsl:if test="not(@method)">
         <xsl:attribute name="method">
           <xsl:text>post</xsl:text>
         </xsl:attribute>
       </xsl:if>
-      
+
       <xsl:apply-templates select="node()" mode="xeditor" />
       <xsl:call-template name="passAdditionalParameters" />
     </form>
@@ -81,7 +82,10 @@
   <!-- ========== <xed:post-processor xsl="" /> ========== -->
 
   <xsl:template match="xed:post-processor" mode="xeditor">
-    <xsl:value-of select="transformer:setPostProcessorXSL($transformer,@xsl)" />
+    <xsl:if test="@class">
+      <xsl:value-of select="transformer:setPostProcessor($transformer,@class)" />
+    </xsl:if>
+    <xsl:value-of select="transformer:initializePostprocessor($transformer,.)" />
   </xsl:template>
 
   <!-- ========== <xed:include uri="" ref="" static="true|false" /> ========== -->
@@ -90,7 +94,7 @@
     <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
     <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
     <xsl:apply-templates select="includer:resolve($includer,$uri,@static)/descendant::*[@id=$ref]"
-      mode="included" />
+                         mode="included" />
   </xsl:template>
 
   <xsl:template match="xed:include[@uri and not(@ref)]" mode="xeditor">
@@ -159,11 +163,11 @@
   <xsl:template match="*" mode="add-attributes" />
 
   <xsl:template match="*" mode="add-content" />
-       
+
   <!-- ========== <input|button xed:target="" xed:href="" /> ========== -->
 
   <xsl:template match="input[contains('submit image',@type)][@xed:target]|button[@type='submit'][@xed:target]"
-    mode="add-attributes">
+                mode="add-attributes">
     <xsl:attribute name="name">
       <xsl:value-of select="concat('_xed_submit_',@xed:target)" />
       <xsl:choose>
@@ -176,7 +180,7 @@
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-  
+
   <!-- ========== <input /> ========== -->
 
   <xsl:template
@@ -246,14 +250,14 @@
     </xsl:for-each>
     <xsl:value-of select="transformer:unbind($transformer)" />
   </xsl:template>
-  
+
   <!-- ========== <xed:controls /> ========== -->
 
   <xsl:template match="xed:controls" mode="xeditor">
     <xsl:variable name="pos" select="transformer:getRepeatPosition($transformer)" />
     <xsl:variable name="num" select="transformer:getNumRepeats($transformer)" />
     <xsl:variable name="max" select="transformer:getMaxRepeats($transformer)" />
-    
+
     <xsl:variable name="controls">
       <xsl:if test="string-length(.) = 0">
         insert remove up down
@@ -288,10 +292,11 @@
               </xsl:choose>
               <xsl:text>|rep-</xsl:text>
               <xsl:choose>
-                <xsl:when test="(. = 'remove') and ($pos &gt; 1)"> <!-- redirect to anchor of preceding, since this one will be removed -->
+                <xsl:when
+                  test="(. = 'remove') and ($pos &gt; 1)"> <!-- redirect to anchor of preceding, since this one will be removed -->
                   <xsl:value-of select="transformer:previousAnchorID($transformer)" />
                 </xsl:when>
-                <xsl:otherwise> 
+                <xsl:otherwise>
                   <xsl:value-of select="transformer:getAnchorID($transformer)" />
                 </xsl:otherwise>
               </xsl:choose>
@@ -367,7 +372,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- ========== <xed:output i18n="" value="" /> ========== -->
 
   <xsl:template match="xed:output[not(@value) and not(@i18n)]" mode="xeditor">
