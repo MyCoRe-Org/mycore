@@ -77,10 +77,10 @@ public class MCREditorSession {
 
     private MCRXMLCleaner cleaner = new MCRXMLCleaner();
 
-    private MCRXEditorPostProcessor postProcessor = getDefaultRepeaterImplementation();
+    private MCRXEditorPostProcessor postProcessor = getDefaultPostProcessorImplementation();
 
-    private static MCRPostProcessorXSL getDefaultRepeaterImplementation() {
-        return MCRConfiguration.instance().getInstanceOf("MCR.XEditor.DefaultPostProcessor");
+    private static MCRPostProcessorXSL getDefaultPostProcessorImplementation() {
+        return MCRConfiguration.instance().getInstanceOf("MCR.XEditor.PostProcessor.Default");
     }
 
     public MCREditorSession(Map<String, String[]> requestParameters, MCRParameterCollector collector) {
