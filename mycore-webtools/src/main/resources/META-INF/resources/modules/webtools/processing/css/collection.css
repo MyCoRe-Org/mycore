@@ -6,7 +6,7 @@ h1 {
 	text-transform: uppercase;
 }
 
-h1 a {
+a {
 	color: #337ab7;
 	font-size: 0.8rem;
 }
@@ -31,6 +31,17 @@ h1 a {
 	color: #555;
 }
 
-.propertiesModal .propertyKey {
-	width: 18%;
+.properties-header {
+	font-weight: bold;
+	border-bottom: 1px solid #f3f3f3;
+	margin-bottom: 6px;
+}
+
+.properties-content {
+	margin-bottom: 3px;
+}
+
+.properties-content .propertyKey {
+	font-weight: bold;
+	color: #337ab7;
 }

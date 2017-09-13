@@ -13,7 +13,22 @@ export class CollectionComponent {
 
     @Input() model: Collection;
 
+    private _showAllProcessables: boolean;
+
     constructor( private html: HtmlService ) {
+        this._showAllProcessables = false;
+    }
+
+    get showAllProcessables() {
+        return this._showAllProcessables;
+    }
+
+    showProcessables() {
+        this._showAllProcessables = true;
+    }
+
+    hideProcessables() {
+        this._showAllProcessables = false;
     }
 
 }

@@ -12,13 +12,13 @@ public interface MCRListenableProgressable extends MCRProgressable {
      * 
      * @param listener the listener to add
      */
-    public void addProgressListener(MCRProgressableListener listener);
+    void addProgressListener(MCRProgressableListener listener);
 
     /**
      * Removes a {@link MCRProgressableListener} from this {@link MCRProgressable}.
      * 
      * @param listener the listener to remove
      */
-    public void removeProgressListener(MCRProgressableListener listener);
+    void removeProgressListener(MCRProgressableListener listener);
 
 }

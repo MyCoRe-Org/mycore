@@ -13,3 +13,12 @@
 .json-string-row {
 	margin-left: 4px;
 }
+
+.json-string-object-property-name {
+    font-weight: bold;
+    color: #337ab7;
+}
+
+.json-string-object-property-value {
+    color: olivedrab;
+}

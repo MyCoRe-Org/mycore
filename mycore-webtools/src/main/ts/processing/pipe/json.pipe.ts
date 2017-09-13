@@ -7,72 +7,78 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class JsonStringPipe implements PipeTransform {
 
     transform( data: any ): any {
-        return this.toHTML( data );
+        return JsonStringPipe.toHTML( data );
     }
 
-    toHTML( json: any ): string {
+    static toHTML( json: any ): string {
         if ( json === undefined ) {
-            return this.formatNull( 'undefined' );
+            return JsonStringPipe.formatNull( 'undefined' );
         }
         if ( json === null ) {
-            return this.formatNull( 'null' );
+            return JsonStringPipe.formatNull( 'null' );
         }
-        var t: string = typeof json;
+        let t: string = typeof json;
         if ( t === 'boolean' || t === 'number' || t === 'string' || t === 'symbol' ) {
-            return this.formatPrimitve( json );
+            return JsonStringPipe.formatPrimitve( json );
         }
         if ( t === 'function' ) {
-            return this.formatFunction( json );
+            return JsonStringPipe.formatFunction( json );
         }
-        var s: string = Object.prototype.toString.call( json );
+        let s: string = Object.prototype.toString.call( json );
         if ( s === '[object Date]' ) {
-            return this.formatDate( json );
+            return JsonStringPipe.formatDate( json );
         }
         if ( s === '[object Object]' ) {
-            return this.formatObject( json );
+            return JsonStringPipe.formatObject( json );
         }
         if ( s === '[object Array]' ) {
-            return this.formatArray( json );
+            return JsonStringPipe.formatArray( json );
         }
         return `unknown json ` + t + ` ` + s;
     }
 
-    formatNull( nullOrUndefined: any ): string {
+    static formatNull( nullOrUndefined: any ): string {
         return `<div class='json-string-null'>` + nullOrUndefined + `</div>`;
     }
 
-    formatPrimitve( primitive: any ): string {
+    static formatPrimitve( primitive: any ): string {
         return `<div class='json-string-primitive'>` + primitive + `</div>`;
     }
 
-    formatFunction( func: Function ): string {
+    static formatFunction( func: Function ): string {
         return `<div class='json-string-function'>` + func.name + `</div>`;
     }
 
-    formatDate( date: Date ): string {
+    static formatDate( date: Date ): string {
         return `<div class='json-string-date'>` + date.toString() + `</div>`;
     }
 
-    formatObject( json: any ): string {
-        var html = `<div class='json-string-object'>{`;
-        for ( var key in json ) {
+    static formatObject( json: any ): string {
+        let html = `<div class='json-string-object'>{`;
+        for ( let key in json ) {
+            if(!json.hasOwnProperty(key)) {
+                continue;
+            }
             html += `<div class='json-string-row json-string-object-row'>`;
             html += `<div class='json-string-object-property-name'>` + key + `</div>`;
-            html += `<div class='json-string-object-property-value'>` + this.toHTML( json[key] ) + `</div>`;
+            html += `<div class='json-string-object-property-value'>` + JsonStringPipe.toHTML( json[key] ) + `</div>`;
             html += `}</div>`;
         }
         html += `</div>`;
         return html;
     }
 
-    formatArray( array: Array<any> ): string {
-        var html = `<div class='json-string-array'>[`;
-        for ( var i = 0, len = array.length; i < len; i++ ) {
+    static formatArray( array: Array<any> ): string {
+        let html = `<div class='json-string-array'>[`;
+        let length = array.length <= 10 ? array.length : 10;
+        for ( let i = 0, len = length; i < len; i++ ) {
             html += `<div class='json-string-row json-string-array-entry'>` + this.toHTML( array[i] ) + `</div>`;
+        }
+        if(array.length > 10) {
+            html += `<div class='json-string-row'>` + (array.length - 10) + ` more...</div>`;
         }
         html += `]</div>`;
         return html;
     }
-
 
 }

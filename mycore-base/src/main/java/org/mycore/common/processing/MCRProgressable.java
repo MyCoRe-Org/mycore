@@ -13,13 +13,13 @@ public interface MCRProgressable {
      * 
      * @return the progress between 0-100 or null
      */
-    public Integer getProgress();
+    Integer getProgress();
 
     /**
      * Returns a human readable text indicating the state of the progress.
      * 
      * @return progress text
      */
-    public String getProgressText();
+    String getProgressText();
 
 }

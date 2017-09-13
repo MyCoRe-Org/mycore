@@ -46,8 +46,21 @@ export class Collection {
      */
     propertyKeys: Array<string> = [];
 
+    /**
+     * Returns the first processables of this collection
+     *
+     * @param {number} amount the amount to return
+     * @returns {Array<Processable>} array of processables
+     */
+    public getProcessables(amount: number): Array<Processable> {
+        if (amount >= this.processables.length) {
+            return this.processables;
+        }
+        return this.processables.slice(0, amount);
+    }
+
     public getProcessable( id: number ): Processable {
-        for ( var processable of this.processables ) {
+        for (let processable of this.processables) {
             if ( processable.id == id ) {
                 return processable;
             }
@@ -56,7 +69,7 @@ export class Collection {
     }
 
     public removeProcessable( id: number ): Processable {
-        var oldProcessable: Processable = null;
+        let oldProcessable: Processable = null;
         this.processables = this.processables.filter( p => {
             if ( p.id == id ) {
                 oldProcessable = p;
@@ -67,7 +80,7 @@ export class Collection {
     }
 
     public setProperty(name: string, value: any): void {
-        var updateKeys: boolean = name in this.properties;
+        let updateKeys: boolean = name in this.properties;
         this.properties[name] = value;
         if(updateKeys) {
             this.updatePropertyKeys();
