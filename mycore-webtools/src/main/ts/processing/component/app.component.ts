@@ -45,7 +45,7 @@ export class AppComponent {
     }
 
     handleMessage( data: any ) {
-        var dataType = data.type;
+        let dataType = data.type;
 
         if ( dataType == "error" ) {
             this.errorCode = parseInt( data.error );
@@ -56,15 +56,15 @@ export class AppComponent {
             this.registry = new Registry();
         }
         if ( dataType == "addCollection" ) {
-            var collection: Collection = new Collection();
+            let collection: Collection = new Collection();
             this.mixin( data, collection );
             collection.updatePropertyKeys();
             this.registry.collections.push( collection );
         }
         if ( dataType == "addProcessable" ) {
-            var processable: Processable = new Processable();
+            let processable: Processable = new Processable();
             this.mixin( data, processable );
-            var collection = this.registry.getCollection( data.collectionId );
+            let collection = this.registry.getCollection( data.collectionId );
             if ( collection == null ) {
                 console.log( "Unable to find collection with id " + data.collectionId );
                 return;
@@ -72,7 +72,7 @@ export class AppComponent {
             collection.processables.push( processable );
         }
         if ( dataType == "updateProcessable" ) {
-            var processable: Processable = this.registry.getProcessable( data.id );
+            let processable: Processable = this.registry.getProcessable( data.id );
             if ( processable == null ) {
                 console.log( "Unable to find processable with id " + data.id );
                 return;
@@ -80,13 +80,13 @@ export class AppComponent {
             this.mixin( data, processable );
         }
         if ( dataType == "removeProcessable" ) {
-            var oldProcessable: Processable = this.registry.removeProcessable( data.id );
+            let oldProcessable: Processable = this.registry.removeProcessable( data.id );
             if ( oldProcessable == null ) {
                 console.log( "Unable to remove processable with id " + data.id + " cause its not in any collection." );
             }
         }
         if( dataType == "updateCollectionProperty") {
-            var collection: Collection = this.registry.getCollection(data.id);
+            let collection: Collection = this.registry.getCollection(data.id);
             if(collection == null) {
                 console.log("Unable to find collection with id " + data.id);
                 return;
@@ -96,7 +96,7 @@ export class AppComponent {
     }
 
     mixin( source: any, target: any ) {
-        for ( var prop in source ) {
+        for ( let prop in source ) {
             if ( source.hasOwnProperty( prop ) ) {
                 target[prop] = source[prop];
             }
