@@ -36,7 +36,7 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
     @Override
     public void setAttributes(Map<String, String> attributeMap) {
-        this.stylesheet = attributeMap.get("stylesheet");
+        this.stylesheet = attributeMap.get("xsl");
     }
 }
 
