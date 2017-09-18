@@ -86,7 +86,8 @@ public interface MCRCategory {
     public abstract Set<MCRLabel> getLabels();
 
     /**
-     * @return the label in the current language (if available), default language (if available) or any other language  
+     * @return the label in the current language (if available), default language (if available), any language in
+     * MCR.Metadata.Languages(if available), any other language that does not start with x- or any other language
      */
     public abstract Optional<MCRLabel> getCurrentLabel();
 

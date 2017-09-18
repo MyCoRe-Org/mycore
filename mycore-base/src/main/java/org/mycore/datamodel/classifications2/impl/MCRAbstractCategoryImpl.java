@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -41,27 +42,34 @@ import org.mycore.util.concurrent.MCRReadWriteGuard;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @version $Revision$ $Date$
  * @since 2.0
  */
 public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
+    protected final MCRReadWriteGuard childGuard = new MCRReadWriteGuard();
+
     protected MCRCategory root;
 
     protected MCRCategory parent;
-
-    private MCRCategoryID id;
-
-    private URI URI;
 
     protected Set<MCRLabel> labels;
 
     protected List<MCRCategory> children;
 
-    protected final MCRReadWriteGuard childGuard = new MCRReadWriteGuard();
+    private MCRCategoryID id;
+
+    private URI URI;
 
     private String defaultLang;
+
+    private static HashSet<String> LANGUAGES;
+
+    {
+        LANGUAGES = new HashSet<>(MCRConfiguration.instance().getStrings("MCR.Metadata.Languages",
+            Collections.emptyList()));
+    }
 
     public MCRAbstractCategoryImpl() {
         super();
@@ -89,6 +97,10 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return id;
     }
 
+    public void setId(MCRCategoryID id) {
+        this.id = id;
+    }
+
     public Set<MCRLabel> getLabels() {
         return labels;
     }
@@ -107,6 +119,10 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return URI;
     }
 
+    public void setURI(URI uri) {
+        URI = uri;
+    }
+
     public boolean hasChildren() {
         return childGuard
             .read(() -> Optional.ofNullable(children).map(c -> !c.isEmpty()))
@@ -119,14 +135,6 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     public final boolean isClassification() {
         return getId().isRootID();
-    }
-
-    public void setId(MCRCategoryID id) {
-        this.id = id;
-    }
-
-    public void setURI(URI uri) {
-        URI = uri;
     }
 
     public MCRCategory getParent() {
@@ -145,7 +153,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     /**
-     * 
+     *
      */
     void detachFromParent() {
         if (parent != null) {
@@ -159,10 +167,13 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         if (labels.isEmpty()) {
             return Optional.empty();
         }
+
         return Optional.of(
             getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage())
-                .orElse(getLabel(defaultLang)
-                    .orElse(labels.iterator().next())));
+                .orElseGet(() -> getLabel(defaultLang)
+                    .orElseGet(() -> labels.stream().filter(l -> LANGUAGES.contains(l.getLang())).findFirst()
+                        .orElseGet(() -> labels.stream().filter(l -> !l.getLang().startsWith("x-")).findFirst()
+                            .orElseGet(() -> labels.iterator().next())))));
     }
 
     public Optional<MCRLabel> getLabel(String lang) {
