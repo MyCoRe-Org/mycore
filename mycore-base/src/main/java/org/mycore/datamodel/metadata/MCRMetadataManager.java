@@ -385,8 +385,7 @@ public final class MCRMetadataManager {
                 deleteDerivate(id.toString());
                 LOGGER.info("IFS entries for MCRDerivate " + id.toString() + " are deleted.");
             } catch (final Exception e) {
-                throw new MCRPersistenceException("Error while delete for ID " + id.toString() + " from IFS with ID "
-                    + mcrDerivate.getDerivate().getInternals().getIFSID(), e);
+                throw new MCRPersistenceException("Error while delete MCRDerivate " + id.toString() + " in IFS", e);
             }
         }
 
