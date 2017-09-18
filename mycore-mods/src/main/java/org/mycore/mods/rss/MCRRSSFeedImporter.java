@@ -129,10 +129,10 @@ public class MCRRSSFeedImporter {
         field2queryID = config.getString(prefix + "Field2QueryID");
         xsl2BuildNotificationMail = config.getString(prefix + "XSL2BuildNotificationMail", null);
 
-        getPattern2FinedID(prefix);
+        getPattern2FindID(prefix);
     }
 
-    private void getPattern2FinedID(String prefix) {
+    private void getPattern2FindID(String prefix) {
         String patternProperty = prefix + "Pattern2FindID";
         try {
             String pattern = MCRConfiguration.instance().getString(patternProperty);
@@ -171,7 +171,7 @@ public class MCRRSSFeedImporter {
     }
 
     private MCRObject handleFeedEntry(SyndEntry entry, String projectID)
-        throws MCRPersistenceException, MCRAccessException {
+            throws MCRPersistenceException, MCRAccessException {
         String publicationID = getPublicationID(entry);
         if (publicationID == null) {
             return null;
@@ -231,7 +231,7 @@ public class MCRRSSFeedImporter {
 
     /** If mods:genre was not mapped by conversion/import function, ignore this publication and do not import */
     private static boolean shouldIgnore(Element publication) {
-        return publication.getDescendants(new ElementFilter("genre", MCRConstants.MODS_NAMESPACE)).hasNext();
+        return !publication.getDescendants(new ElementFilter("genre", MCRConstants.MODS_NAMESPACE)).hasNext();
     }
 
     private MCRObject buildMCRObject(Element publicationXML, String projectID) {

@@ -131,7 +131,7 @@ namespace mycore.viewer.model {
             this._imageOverviewDropdownChild.label = model.getTranslation("toolbar.openThumbnailPanel");
             this._chapterOverviewDropdownChild.label = model.getTranslation("toolbar.openChapter");
 
-            this._sidebarControllDropdownButton.children = this._dropdownChildren;
+            this._sidebarControllDropdownButton.children = this._sidebarControllDropdownButton.children;
         }
 
 

@@ -336,11 +336,11 @@ public class MCRRestAPIObjects {
      * @throws MCRRestAPIException
      */
     @POST
-    @Path("/{mcrObjID}/derivates/{mcrDerID}/contents")
+    @Path("/{mcrid}/derivates/{derid}/contents{path:(/.*)*}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadFile(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrObjID") String mcrObjID, @PathParam("mcrDerID") String mcrDerID,
+        @PathParam("mcrid") String mcrObjID, @PathParam("derid") String mcrDerID,
         @FormDataParam("file") InputStream uploadedInputStream,
         @FormDataParam("file") FormDataContentDisposition fileDetails, @FormDataParam("path") String path,
         @FormDataParam("maindoc") @DefaultValue("false") boolean maindoc,

@@ -47,7 +47,7 @@ namespace mycore.viewer.widgets.toolbar {
 
 
                     if("icon" in current){
-                        var icon = jQuery(`<span class="glyphicon glyphicon-${current.icon} dropdown-icon"></span>`);
+                        var icon = jQuery(`<i class="glyphicon glyphicon-${current.icon} dropdown-icon"></i>`);
                         anchor.prepend(icon);
                     }
                     newChild.append(anchor);

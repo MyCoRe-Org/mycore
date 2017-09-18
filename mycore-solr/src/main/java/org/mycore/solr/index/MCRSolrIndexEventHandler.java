@@ -23,6 +23,11 @@
 
 package org.mycore.solr.index;
 
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
+import java.util.Optional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.response.UpdateResponse;
@@ -40,10 +45,6 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
-
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -127,7 +128,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
-            MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId().toString()),
+            MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
                     MCRSolrIndexer.HIGH_PRIORITY);
         });
     }
@@ -203,26 +204,25 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     /**
      * Returns the derivate identifier for the given path.
-     * 
+     *
      * @param path the path
      * @return the derivate identifier
      */
-    protected MCRObjectID getDerivateId(Path path) {
+    protected Optional<MCRObjectID> getDerivateId(Path path) {
         MCRPath mcrPath = MCRPath.toMCRPath(path);
-        return MCRObjectID.getInstance(mcrPath.getOwner());
+        if (MCRObjectID.isValid(mcrPath.getOwner())) {
+            return Optional.of(MCRObjectID.getInstance(mcrPath.getOwner()));
+        }
+        return Optional.empty();
     }
 
     /**
      * Checks if the derivate is marked for deletion.
-     * 
-     * @param path
+     *
+     * @param path the path to check
      */
     protected boolean isMarkedForDeletion(Path path) {
-        MCRObjectID derivateId = getDerivateId(path);
-        if (MCRMarkManager.instance().isMarkedForDeletion(derivateId)) {
-            return true;
-        }
-        return false;
+        return getDerivateId(path).map(MCRMarkManager.instance()::isMarkedForDeletion).orElse(false);
     }
 
 }

@@ -350,6 +350,16 @@ public class MCRDirectory extends MCRFilesystemNode {
             .directory(getID(), getSize(), FileTime.fromMillis(getLastModified().getTimeInMillis()));
     }
 
+    @Override
+    /**
+     * Returns 0 as number of bytes for a directory
+     */
+    public long getSize() {
+        ensureNotDeleted();
+
+        return 0;
+    }
+
     /** Constant for choosing file nodes * */
     public final static int FILES = 1;
 

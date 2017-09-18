@@ -32,6 +32,7 @@ import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRIPAddress;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
@@ -78,7 +79,11 @@ public class MCRRestAPIUtil {
         try {
             String userID = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(request);
             if (userID != null) {
-                MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(userID));
+            	if(MCRSystemUserInformation.getGuestInstance().getUserID().equals(userID)) {
+            		MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
+            	} else {
+            		MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(userID));
+            	}
             }
             MCRIPAddress theIP = new MCRIPAddress(MCRFrontendUtil.getRemoteAddr(request));
             String thePath = path.startsWith("/") ? path : "/" + path;

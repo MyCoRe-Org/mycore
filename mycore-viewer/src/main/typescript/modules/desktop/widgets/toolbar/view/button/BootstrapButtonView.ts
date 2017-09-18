@@ -10,7 +10,7 @@ namespace mycore.viewer.widgets.toolbar {
             this._buttonLabel = jQuery("<span></span>");
             this._buttonLabel.appendTo(this._buttonElement);
 
-            this._icon = jQuery("<span></span>");
+            this._icon = jQuery("<i></i>");
             this._attached = false;
             this._lastIconClass = "";
             this._lastButtonClass = null;
@@ -24,7 +24,12 @@ namespace mycore.viewer.widgets.toolbar {
         private _lastButtonClass: string;
 
         public updateButtonLabel(label: string): void { 
-            this._buttonLabel.text(label); 
+            this._buttonLabel.text(label);
+            if (label.length > 0) {
+                this._icon.addClass("textpresent");
+            } else {
+                this._icon.removeClass("textpresent");
+            }
         }
         public updateButtonTooltip(tooltip: string): void {
             this._buttonElement.attr("title", tooltip);
