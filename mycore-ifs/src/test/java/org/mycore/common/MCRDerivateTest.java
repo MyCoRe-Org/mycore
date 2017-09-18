@@ -1,6 +1,5 @@
 package org.mycore.common;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
@@ -15,7 +14,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 import java.util.Map;
 
-@Ignore
 public class MCRDerivateTest extends MCRStoreTestCase {
 
     MCRObject root;
@@ -41,6 +39,7 @@ public class MCRDerivateTest extends MCRStoreTestCase {
         testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         testProperties.put("MCR.Access.Strategy.Class", AlwaysTrueStrategy.class.getName());
         testProperties.put("MCR.Metadata.Type.object", "true");
+        testProperties.put("MCR.Metadata.Type.derivate", "true");
         return testProperties;
     }
 
