@@ -67,24 +67,45 @@
     <!-- keep mods:name fields for legacy reasons -->
     <xsl:for-each select=".//mods:name">
       <field name="mods.name">
-        <xsl:for-each select="mods:displayForm | mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
-          <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
-        </xsl:for-each>
+        <xsl:choose>
+          <xsl:when test="mods:displayForm">
+            <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(mods:displayForm))" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
+              <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
       </field>
     </xsl:for-each>
     <xsl:for-each select="mods:name">
       <field name="mods.name.top">
-        <xsl:for-each select="mods:displayForm | mods:namePart[@type!='date'] | text()">
-          <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
-        </xsl:for-each>
+        <xsl:choose>
+          <xsl:when test="mods:displayForm">
+            <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(mods:displayForm))" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
+              <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
       </field>
     </xsl:for-each>
     <xsl:for-each
       select=".//mods:name[mods:role/mods:roleTerm[@authority='marcrelator' and (@type='text' and text()='author') or (@type='code' and text()='aut')]]">
       <field name="mods.author">
-        <xsl:for-each select="mods:displayForm | mods:namePart | text()">
-          <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
-        </xsl:for-each>
+        <xsl:choose>
+          <xsl:when test="mods:displayForm">
+            <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(mods:displayForm))" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
+              <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
       </field>
     </xsl:for-each>
     <xsl:for-each select=".//mods:originInfo[not(@eventType) or @eventType='publication']/mods:place/mods:placeTerm[not(@type='code')]">
@@ -95,9 +116,16 @@
     <xsl:for-each
       select=".//mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
       <field name="mods.publisher">
-        <xsl:for-each select="mods:displayForm | mods:namePart | text()">
-          <xsl:value-of select="concat(' ',.)" />
-        </xsl:for-each>
+        <xsl:choose>
+          <xsl:when test="mods:displayForm">
+            <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(mods:displayForm))" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
+              <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
       </field>
     </xsl:for-each>
     <xsl:for-each select="mods:genre[@type='intern']">
