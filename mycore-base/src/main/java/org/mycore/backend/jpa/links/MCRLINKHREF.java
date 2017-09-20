@@ -42,8 +42,8 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(indexes = {
-    @Index(name = "MCRLINKHREF.from", columnList = "MCRFROM, MCRTYPE"),
-    @Index(name = "MCRLINKHREF.to", columnList = "MCRTO, MCRTYPE"),
+    @Index(name = "LinkFrom", columnList = "MCRFROM, MCRTYPE"),
+    @Index(name = "LinkTo", columnList = "MCRTO, MCRTYPE"),
 })
 @NamedQueries({
     @NamedQuery(name = "MCRLINKHREF.getDestinations",
