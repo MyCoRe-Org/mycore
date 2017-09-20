@@ -2,7 +2,6 @@ package org.mycore.mets.model.converter;
 
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
