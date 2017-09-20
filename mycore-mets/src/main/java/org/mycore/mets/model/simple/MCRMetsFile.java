@@ -1,7 +1,5 @@
 package org.mycore.mets.model.simple;
 
-import java.util.UUID;
-
 public class MCRMetsFile {
 
     private String id;

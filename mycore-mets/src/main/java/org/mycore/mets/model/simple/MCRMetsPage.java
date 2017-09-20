@@ -2,7 +2,6 @@ package org.mycore.mets.model.simple;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class MCRMetsPage {
     private String id;

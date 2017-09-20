@@ -12,7 +12,7 @@ namespace org.mycore.mets.model.simple {
         }
 
         public static createRandomId() {
-            return "nnnnnn-nnnn-nnnn-nnnnnnnn".split("n").map((n) => {
+            return "log_nnnnnn-nnnn-nnnn-nnnnnnnn".split("n").map((n) => {
                 return n + Math.ceil(15 * Math.random()).toString(36);
             }).join("");
         }
