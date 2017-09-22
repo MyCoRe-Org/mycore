@@ -29,8 +29,8 @@ namespace mycore.viewer.widgets.solr {
         }
 
         public startRequest() {
-            var requestURL = this.buildRequestURL(this.query, this.count, this.start);
-            var ajaxSettings = {url: requestURL,
+            let requestURL = this.buildRequestURL(this.query, this.count, this.start);
+            let ajaxSettings = {url: requestURL,
                 async: true,
                 success: (response) => {
                     if (!this.isComplete) {
@@ -63,18 +63,15 @@ namespace mycore.viewer.widgets.solr {
         }
 
         private processResponse(response:any) {
-            var resp = this.solrResponseParser.parseResponse(response);
-            this._solrRequestResult = resp;
+            this._solrRequestResult = this.solrResponseParser.parseResponse(response);
             this._isComplete = true;
         }
 
         private buildSolrQuery(userInput:string) {
-            var query:string = "";
-            var wordArray = userInput.split(" ");
-            var lastPos = -1;
-            while((lastPos = wordArray.indexOf(" ")) != -1){
-                wordArray = wordArray.splice(lastPos);
-            }
+            let query:string = "";
+            let wordArray = userInput.split(" ");
+            let lastPos = -1;
+            wordArray = wordArray.filter(s => s !== "");
             wordArray.forEach((part:string, i)=> {
                 query += this.solrFieldName + ":" + part + (wordArray.length != (i + 1) ? " AND " : "");
             });
@@ -83,7 +80,7 @@ namespace mycore.viewer.widgets.solr {
 
 
         private buildRequestURL(userSearchQuery:string, count?:number, start?:number) {
-            var queryURL = ViewerFormatString(SolrSearchRequest.BASE_TEMPLATE, {
+            let queryURL = ViewerFormatString(SolrSearchRequest.BASE_TEMPLATE, {
                 solrHandlerURL: this.solrHandlerURL,
                 solrQuery: this.buildSolrQuery(userSearchQuery),
                 derivateID: this.derivateID
