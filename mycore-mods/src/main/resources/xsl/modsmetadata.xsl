@@ -75,7 +75,16 @@
   </xsl:template>
 
   <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued|mods:dateCaptured|mods:dateModified" mode="present">
-    <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name()))" />
+    <xsl:param name="label">
+      <xsl:choose>
+        <xsl:when test="(@point='start' or @point='end') and i18n:exists(concat('component.mods.metaData.dictionary.',local-name(), '.range'))">
+          <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name(), '.range'))"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name()))"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
     <xsl:if test="not(@point='end' and (preceding-sibling::*[name(current())=name()][@point='start']  or following-sibling::*[name(current())=name()][@point='start']))">
     <tr>
       <td valign="top" class="metaname">
