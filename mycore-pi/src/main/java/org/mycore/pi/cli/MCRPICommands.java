@@ -15,12 +15,14 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.pi.MCRPIRegistrationService;
 import org.mycore.pi.MCRPIRegistrationServiceManager;
 import org.mycore.pi.MCRPersistentIdentifier;
+import org.mycore.pi.MCRPersistentIdentifierEventHandler;
 import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
 import org.mycore.pi.backend.MCRPI;
@@ -112,6 +114,13 @@ public class MCRPICommands {
         MCRMetadataManager.update(mcrBase);
         LOGGER.info("{}:{} is now under control of {}", objectID, trimAdditional, serviceID);
 
+    }
+
+    @MCRCommand(syntax = "update all PI of object {}", help = "Triggers the update method of every Object!")
+    public static void updateObject(String objectIDString){
+        MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
+        MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
+        MCRPersistentIdentifierEventHandler.updateObject(object);
     }
 
 }
