@@ -134,14 +134,14 @@
         <xsl:when test="string-length($trimmedValue)&lt;11 and string(number(translate($trimmedValue,'-Xx','')))!='NaN'">
           <xsl:variable name="gndURL" select="concat('http://d-nb.info/gnd/',$trimmedValue,'/about/lds.rdf')"/>
           <!-- PND -->
-          <xsl:message>
+          <!-- xsl:message>
             <xsl:value-of select="concat($gndURL,' ',ex:date-time())"/>
-          </xsl:message>
+          </xsl:message-->
           <xsl:variable name="gndEntry" select="document($gndURL)" />
-          <xsl:message>
+          <!-- xsl:message>
             <xsl:value-of select="ex:date-time()"/>
             <xsl:value-of select="count($gndEntry/*)"/>
-          </xsl:message>
+          </xsl:message-->
           <xsl:variable name="gndType"  select="substring-after($gndEntry//rdf:type/@rdf:resource, '#')" />
           <xsl:attribute name="authorityURI">
             <xsl:value-of select="'http://d-nb.info/'" />

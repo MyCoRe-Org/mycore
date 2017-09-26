@@ -52,10 +52,6 @@
           </xsl:choose>
         </xsl:attribute>
       </xsl:if>
-      <xsl:message>
-        count:
-        <xsl:value-of select="count(*[not((local-name()='namePart'))])" />
-      </xsl:message>
       <nameOrPND>
         <xsl:choose>
           <xsl:when test="@authorityURI='http://d-nb.info/'">

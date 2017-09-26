@@ -9,7 +9,6 @@
   </xsl:template>
   <xsl:template match="doc">
     <xsl:variable name="objId" select="str[@name='returnId']" />
-    <xsl:message>objektId: <xsl:value-of select="$objId"/></xsl:message>
     <xsl:copy-of select="document(concat('mcrobject:',$objId))" />
   </xsl:template>
   <xsl:template match="str[@name='groupValue']">
