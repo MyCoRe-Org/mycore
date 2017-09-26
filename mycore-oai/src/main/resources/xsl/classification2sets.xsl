@@ -48,9 +48,6 @@
   </xsl:template>
 
   <xsl:template match="@description">
-    <xsl:message>
-      Description: <xsl:value-of select="." />
-    </xsl:message>
     <setDescription>
       <oai_dc:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
         <dc:description>

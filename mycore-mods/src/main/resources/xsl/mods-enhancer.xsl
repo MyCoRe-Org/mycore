@@ -37,9 +37,6 @@
       <xsl:apply-templates mode="mods2mods" />
       <xsl:if test="not(mods:relatedItem[@type='host']) and $mycoreobject/structure/parents/parent">
         <xsl:variable name="parentObject" select="document(concat('mcrobject:',$mycoreobject/structure/parents/parent/@xlink:href))" />
-        <xsl:message>
-          generate related item
-        </xsl:message>
         <mods:relatedItem type="host">
           <xsl:apply-templates select="$parentObject/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/*"
             mode="mods2mods" />
@@ -64,9 +61,6 @@
   </xsl:template>
 
   <xsl:template match="mods:genre[@type='intern']" mode="mods2mods">
-    <xsl:message>
-      found intern mods genre
-    </xsl:message>
     <xsl:choose>
       <xsl:when test="contains(@valueURI,'#journal')">
       <!-- additional journals data -->

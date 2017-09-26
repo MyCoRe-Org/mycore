@@ -19,12 +19,6 @@
     <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name($nodes[1])))" />
     <xsl:param name="sep" select="''" />
     <xsl:param name="property" select="''" />
-    <xsl:message>
-      <xsl:value-of select="concat('label: ',$label)" />
-    </xsl:message>
-    <xsl:message>
-      <xsl:value-of select="concat('nodes: ',count($nodes))" />
-    </xsl:message>
     <xsl:if test="$nodes">
       <tr>
         <td valign="top" class="metaname">
