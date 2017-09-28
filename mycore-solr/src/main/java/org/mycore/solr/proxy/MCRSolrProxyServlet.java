@@ -10,11 +10,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -77,7 +79,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     protected HttpHost solrHost;
 
-    private Map<String, MCRSolrQueryHandler> queryHandlerMap;
+    private Set<String> queryHandlerWhitelist;
 
     private PoolingHttpClientConnectionManager httpClientConnectionManager;
 
@@ -107,17 +109,12 @@ public class MCRSolrProxyServlet extends MCRServlet {
             return;
         }
         //end of redirects
-        //either we have a queryHandler specified by path here or use the default one
-        MCRSolrQueryHandler queryHandler = queryHandlerMap.get(queryHandlerPath);
-        if (queryHandler == null) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        if (!queryHandlerWhitelist.contains(queryHandlerPath)) {
+            // query handler path is not registered and therefore not allowed
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "No access to " + queryHandlerPath);
             return;
         }
-        if (queryHandler.isRestricted()) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "No access to " + queryHandler.toString());
-            return;
-        }
-        handleQuery(queryHandler, request, resp);
+        handleQuery(queryHandlerPath, request, resp);
     }
 
     /**
@@ -180,10 +177,10 @@ public class MCRSolrProxyServlet extends MCRServlet {
         resp.sendRedirect(resp.encodeRedirectURL(requestURL));
     }
 
-    private void handleQuery(MCRSolrQueryHandler queryHandler, HttpServletRequest request, HttpServletResponse resp)
+    private void handleQuery(String queryHandlerPath, HttpServletRequest request, HttpServletResponse resp)
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
-        HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandler, solrParameter);
+        HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter);
         try {
             LOGGER.info("Sending Request: " + solrHttpMethod.getURI());
             HttpResponse response = httpClient.execute(solrHost, solrHttpMethod);
@@ -225,29 +222,28 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     private void updateQueryHandlerMap(HttpServletResponse resp) throws IOException, SolrServerException {
-        Map<String, MCRSolrQueryHandler> handlerMap = MCRSolrProxyUtils.getQueryHandlerMap();
-        queryHandlerMap = handlerMap;
-        MCRSolrQueryHandler[] handler = handlerMap.values().toArray(new MCRSolrQueryHandler[handlerMap.size()]);
-        Arrays.sort(handler, MCRSolrQueryHandler.getPathComparator());
+        this.updateQueryHandlerMap();
         PrintWriter writer = resp.getWriter();
-        for (MCRSolrQueryHandler h : handler) {
-            writer.write(h.toString());
-            writer.append('\n');
-        }
+        queryHandlerWhitelist.forEach(handler -> writer.append(handler).append('\n'));
+    }
+
+    private void updateQueryHandlerMap() {
+        List<String> whitelistPropertyList = MCRConfiguration.instance().getStrings("MCR.Module-solr.Proxy.WhiteList",
+                Collections.singletonList("/select"));
+        this.queryHandlerWhitelist = new HashSet<>(whitelistPropertyList);
     }
 
     /**
      * Gets a HttpGet to make a request to the Solr-Server.
-     * 
-     * @param queryHandler
-     * @param parameterMap
+     *
+     * @param queryHandlerPath
+     *            The query handler path
+     * @param params
      *            Parameters to use with the Request
      * @return a method to make the request
      */
-    private static HttpGet getSolrHttpMethod(MCRSolrQueryHandler queryHandler, ModifiableSolrParams params) {
-        HttpGet httpGet = new HttpGet(
-            MessageFormat.format("{0}{1}{2}", SERVER_URL, queryHandler.getPath(), params.toQueryString()));
-        return httpGet;
+    private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params) {
+        return new HttpGet(MessageFormat.format("{0}{1}{2}", SERVER_URL, queryHandlerPath, params.toQueryString()));
     }
 
     private static ModifiableSolrParams getSolrQueryParameter(HttpServletRequest request) {
@@ -270,15 +266,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
         LOGGER.info("Initializing SOLR connection to \"" + SERVER_URL + "\"");
 
-        try {
-            queryHandlerMap = MCRSolrProxyUtils.getQueryHandlerMap();
-        } catch (SolrServerException | IOException e) {
-            LOGGER.error("Error while getting query handler from SOLR.", e);
-            MCRSolrQueryHandler standardHandler = MCRSolrProxyUtils.getStandardHandler(null);
-            LOGGER.info("Adding standard handler: " + standardHandler);
-            queryHandlerMap = new HashMap<String, MCRSolrQueryHandler>();
-            queryHandlerMap.put(standardHandler.getPath(), standardHandler);
-        }
+        this.updateQueryHandlerMap();
 
         solrHost = MCRHttpUtils.getHttpHost(SERVER_URL);
         if (solrHost == null) {
@@ -306,7 +294,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     private static ModifiableSolrParams toSolrParams(Map<String, String[]> parameters) {
         // to maintain order
-        LinkedHashMap<String, String[]> copy = new LinkedHashMap<String, String[]>(parameters);
+        LinkedHashMap<String, String[]> copy = new LinkedHashMap<>(parameters);
         ModifiableSolrParams solrParams = new ModifiableSolrParams(copy);
         if (!parameters.containsKey("version") && !parameters.containsKey("wt")) {
             solrParams.set("version", QUERY_XML_PROTOCOL_VERSION);
