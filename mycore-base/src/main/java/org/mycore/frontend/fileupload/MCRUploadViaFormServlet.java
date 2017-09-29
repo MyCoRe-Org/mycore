@@ -115,7 +115,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
 
     private void handleUploadedFile(MCRUploadHandler handler, Part file) throws IOException, Exception {
         String submitted = file.getSubmittedFileName();
-        if (submitted == null) {
+        if (submitted == null || "".equals(submitted)) {
             return;
         }
         try (InputStream in = file.getInputStream()) {
