@@ -1,9 +1,6 @@
 package org.mycore.pi;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -16,14 +13,14 @@ import org.junit.rules.TemporaryFolder;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRJPATestCase;
+import org.mycore.common.MCRStoreTestCase;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
+public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
 
     private static final String MOCK_SERVICE = "MockService";
 
@@ -144,14 +141,8 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
     @Override
     protected Map<String, String> getTestProperties() {
-        HashMap<String, String> configuration = new HashMap<>();
+        Map<String, String> configuration = super.getTestProperties();
 
-        configuration.put("MCR.Metadata.Store.BaseDir", baseDir.getRoot().getAbsolutePath());
-        try {
-            configuration.put("MCR.Metadata.Store.SVNBase", baseDir.newFolder("versions").toURI().toString());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
         configuration.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         configuration.put("MCR.Metadata.Type.mock", "true");
         configuration.put("MCR.Metadata.Type.unregisterd", "true");
