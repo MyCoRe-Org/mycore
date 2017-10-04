@@ -33,6 +33,7 @@ import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -95,7 +96,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         password = properties.get("Password");
         useTestPrefix = properties.containsKey(TEST_PREFIX) && Boolean.valueOf(properties.get(TEST_PREFIX));
         transformer = properties.get("Transformer");
-        this.registerURL = properties.get("RegisterBaseURL");
+        this.registerURL = properties.get("RegisterBaseURL").replaceFirst("\\/$", "");
         host = "mds.datacite.org";
     }
 
@@ -180,7 +181,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
 
         URI registeredURI;
         try {
-            registeredURI = new URI(this.registerURL + "/receive/" + obj.getId().toString());
+            registeredURI = getRegisteredURI(obj);
             dataciteClient.mintDOI(newDOI, registeredURI);
         } catch (URISyntaxException e) {
             throw new MCRException("Base-URL seems to be invalid!", e);
@@ -190,6 +191,10 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         dataciteClient.setMediaList(newDOI, entryList);
 
         return newDOI;
+    }
+
+    public URI getRegisteredURI(MCRBase obj) throws URISyntaxException {
+        return new URI(this.registerURL + "/receive/" + obj.getId().toString());
     }
 
     /**
@@ -270,8 +275,24 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         throws MCRPersistentIdentifierException {
         Document datacite = transformToDatacite(doi, obj);
         MCRDataciteClient dataciteClient = getDataciteClient();
-        dataciteClient.deleteMetadata(doi);
-        dataciteClient.storeMetadata(datacite);
+
+        try {
+            URI uri = dataciteClient.resolveDOI(doi);
+            URI registeredURI = getRegisteredURI(obj);
+            if (!uri.equals(registeredURI)) {
+                LOGGER.info("Sending new URL({}) to Datacite!", registeredURI);
+                dataciteClient.mintDOI(doi, registeredURI);
+            }
+        } catch (URISyntaxException e) {
+            throw new MCRPersistentIdentifierException("Error while updating URL!", e);
+        }
+
+        Document dataCiteMetadata = dataciteClient.resolveMetadata(doi);
+        if (!MCRXMLHelper.deepEqual(dataCiteMetadata, dataCiteMetadata)) {
+            LOGGER.info("Sending new Metadata of {} to Datacite!", obj.getId().toString());
+            dataciteClient.deleteMetadata(doi);
+            dataciteClient.storeMetadata(datacite);
+        }
     }
 
 }

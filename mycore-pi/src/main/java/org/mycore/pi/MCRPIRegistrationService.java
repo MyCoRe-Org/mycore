@@ -43,7 +43,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     public static final String GENERATOR_CONFIG_PREFIX = "MCR.PI.Generator.";
 
-    public static final String METADATA_MANAGER_CONFIG_PREFIX = "MCR.PI.Inscriber.";
+    public static final String METADATA_MANAGER_CONFIG_PREFIX = "MCR.PI.MetadataManager.";
 
     public static final String METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX = "MCR.PI.Inscriber.";
 
@@ -121,7 +121,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         className = configuration.getString(metadataManagerPropertyKey, null);
 
         if (className == null) {
-            metadataManagerPropertyKey = METADATA_MANAGER_DEPRECATED_PROPERTY_KEY + metadataManager;
+            metadataManagerPropertyKey = METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX + metadataManager;
             className = configuration.getString(metadataManagerPropertyKey, null);
             if (className == null) {
                 throw new MCRConfigurationException(

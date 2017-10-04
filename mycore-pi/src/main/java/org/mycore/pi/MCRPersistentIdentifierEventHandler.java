@@ -42,10 +42,15 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
                 MCRHIBConnection.instance().getSession().save(entry);
             });
 
+        handleObjectUpdated(evt, obj);
     }
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        updateObject(obj);
+    }
+
+    public static void updateObject(MCRObject obj) {
         detectServices(obj, (service, registrationInfo) -> {
             try {
                 service.onUpdate(getIdentifier(registrationInfo), obj, registrationInfo.getAdditional());
@@ -66,7 +71,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
         });
     }
 
-    private void detectServices(MCRObject obj, BiConsumer<MCRPIRegistrationService, MCRPIRegistrationInfo> r) {
+    private static void detectServices(MCRObject obj, BiConsumer<MCRPIRegistrationService, MCRPIRegistrationInfo> r) {
         MCRPIRegistrationServiceManager serviceManager = MCRPIRegistrationServiceManager.getInstance();
 
         List<MCRPIRegistrationInfo> registered = MCRPersistentIdentifierManager.getInstance().getRegistered(obj);
@@ -86,7 +91,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
         }
     }
 
-    private MCRPersistentIdentifier getIdentifier(MCRPIRegistrationInfo pi) {
+    private static MCRPersistentIdentifier getIdentifier(MCRPIRegistrationInfo pi) {
         MCRPersistentIdentifierManager identifierManager = MCRPersistentIdentifierManager.getInstance();
         MCRPersistentIdentifierParser<?> parser = identifierManager.getParserForType(pi.getType());
 
