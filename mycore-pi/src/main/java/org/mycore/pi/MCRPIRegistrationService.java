@@ -121,7 +121,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         className = configuration.getString(metadataManagerPropertyKey, null);
 
         if (className == null) {
-            metadataManagerPropertyKey = METADATA_MANAGER_DEPRECATED_PROPERTY_KEY + metadataManager;
+            metadataManagerPropertyKey = METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX + metadataManager;
             className = configuration.getString(metadataManagerPropertyKey, null);
             if (className == null) {
                 throw new MCRConfigurationException(
