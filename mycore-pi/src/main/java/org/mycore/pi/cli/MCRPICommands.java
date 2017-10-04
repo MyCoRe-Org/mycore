@@ -116,7 +116,7 @@ public class MCRPICommands {
 
     }
 
-    @MCRCommand(syntax = "update all PI of object {}", help = "Triggers the update method of every Object!")
+    @MCRCommand(syntax = "update all PI of object {0}", help = "Triggers the update method of every Object!")
     public static void updateObject(String objectIDString){
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
