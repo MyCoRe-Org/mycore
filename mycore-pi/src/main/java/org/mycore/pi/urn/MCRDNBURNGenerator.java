@@ -9,6 +9,9 @@ import org.mycore.pi.MCRPersistentIdentifierGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public abstract class MCRDNBURNGenerator extends MCRPersistentIdentifierGenerator<MCRDNBURN> {
+
+    private static final String URN_NBN_DE = "urn:nbn:de:";
+
     public MCRDNBURNGenerator(String generatorID) {
         super(generatorID);
     }
@@ -21,7 +24,18 @@ public abstract class MCRDNBURNGenerator extends MCRPersistentIdentifierGenerato
     }
 
     public MCRDNBURN generate(MCRObjectID mcrID, String additional) throws MCRPersistentIdentifierException {
-        return generate(getProperties().get("Namespace"), additional);
+        return generate(getNamespace(), additional);
+    }
+
+    public String getNamespace() {
+        String namespace = getProperties().get("Namespace").trim();
+
+        if(namespace.startsWith(URN_NBN_DE)){
+            namespace=namespace.substring(URN_NBN_DE.length());
+        }
+
+
+        return namespace;
     }
 
 }
