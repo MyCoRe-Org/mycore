@@ -111,7 +111,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             throw new MCRPersistentIdentifierException("There is more then one identifier with type DOI!");
         } else if (doiList.size() == 1) {
             Element doiElement = doiList.stream().findAny().get();
-            LOGGER.warn("Found existing DOI(" + doiElement.getTextTrim() + ") in Document will be replaced with"
+            LOGGER.warn("Found existing DOI(" + doiElement.getTextTrim() + ") in Document will be replaced with "
                 + doi.asString());
             doiElement.setText(doi.asString());
         } else {
@@ -273,7 +273,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     @Override
     public void update(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        Document datacite = transformToDatacite(doi, obj);
+        Document newDataciteMetadata = transformToDatacite(doi, obj);
         MCRDataciteClient dataciteClient = getDataciteClient();
 
         try {
@@ -287,11 +287,11 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             throw new MCRPersistentIdentifierException("Error while updating URL!", e);
         }
 
-        Document dataCiteMetadata = dataciteClient.resolveMetadata(doi);
-        if (!MCRXMLHelper.deepEqual(dataCiteMetadata, dataCiteMetadata)) {
+        Document oldDataciteMetadata = dataciteClient.resolveMetadata(doi);
+        if (!MCRXMLHelper.deepEqual(newDataciteMetadata, oldDataciteMetadata)) {
             LOGGER.info("Sending new Metadata of {} to Datacite!", obj.getId().toString());
             dataciteClient.deleteMetadata(doi);
-            dataciteClient.storeMetadata(datacite);
+            dataciteClient.storeMetadata(newDataciteMetadata);
         }
     }
 
