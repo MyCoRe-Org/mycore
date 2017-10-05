@@ -14,10 +14,8 @@
  **/
 package org.mycore.common.events;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +31,7 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
  * <code>addCloseable()</code> will be closed at shutdown time. Do not forget to remove any closeable via
  * <code>removeCloseable()</code> to remove any instances. For registering this hook for a web application see
  * <code>MCRServletContextListener</code>
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @see org.mycore.common.events.MCRShutdownThread
  * @see org.mycore.common.events.MCRServletContextListener
@@ -45,11 +43,11 @@ public class MCRShutdownHandler {
 
     /**
      * Object is cleanly closeable via <code>close()</code>-call.
-     * 
+     *
      * @author Thomas Scheffler (yagee)
      */
     @FunctionalInterface
-    public static interface Closeable {
+    public static interface Closeable extends Comparable<Closeable> {
         /**
          * prepare for closing this object that implements <code>Closeable</code>. This is the first part of the closing
          * process. As a object may need database access to close cleanly this method can be used to be ahead of
@@ -73,6 +71,11 @@ public class MCRShutdownHandler {
             return DEFAULT_PRIORITY;
         }
 
+        @Override
+        default int compareTo(Closeable other) {
+            return Integer.compare(other.getPriority(), getPriority());
+        }
+
         /**
          * The default priority
          */
@@ -81,9 +84,9 @@ public class MCRShutdownHandler {
 
     private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();
 
-    private static final Set<Closeable> requests = Collections.synchronizedSet(new HashSet<Closeable>());
+    private static final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
 
-    private static boolean shuttingDown = false;
+    private static volatile boolean SHUTTING_DOWN = false;
 
     boolean isWebAppRunning;
 
@@ -104,12 +107,14 @@ public class MCRShutdownHandler {
     }
 
     public void addCloseable(MCRShutdownHandler.Closeable c) {
+        Objects.requireNonNull(c);
         init();
         requests.add(c);
     }
 
     public void removeCloseable(MCRShutdownHandler.Closeable c) {
-        if (!shuttingDown) {
+        Objects.requireNonNull(c);
+        if (!SHUTTING_DOWN) {
             requests.remove(c);
         }
     }
@@ -125,11 +130,14 @@ public class MCRShutdownHandler {
         }
         final String system = cfgSystemName;
         System.out.println(system + " Shutting down system, please wait...\n");
-        logger.debug("requests: " + requests.toString());
-        synchronized (requests) {
-            shuttingDown = true;
-            Closeable[] closeables = requests.toArray(new Closeable[requests.size()]);
-            Arrays.sort(closeables, new MCRCloseableComparator());
+        SHUTTING_DOWN = true;
+        Closeable[] closeables;
+        do {
+            synchronized (requests) {
+                logger.debug(() -> "requests: " + requests.toString());
+                closeables = requests.stream().toArray(i -> new Closeable[i]);
+                requests.clear(); //during shut down more request may come in MCR-1726
+            }
             for (Closeable c : closeables) {
                 logger.debug("Prepare Closing: " + c.toString());
                 c.prepareClose();
@@ -138,9 +146,8 @@ public class MCRShutdownHandler {
             for (Closeable c : closeables) {
                 logger.debug("Closing: " + c.toString());
                 c.close();
-                requests.remove(c);
             }
-        }
+        } while (!requests.isEmpty());
         System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
         MCRSessionMgr.close();
         System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
