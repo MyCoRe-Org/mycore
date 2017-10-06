@@ -82,52 +82,55 @@ namespace mycore.viewer.components {
 
         private _search(str:string) {
             if(str==""){
-                var direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_EAST;
+                let direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_EAST;
                 this.trigger(new events.ShowContentEvent(this, this._container, direction, 0, this._sidebarLabel));
             }
 
             this._searchContainer.children().remove();
 
-            var textContents = new Array<model.TextElement>();
-            var wordMap = new MyCoReMap<model.TextElement, Array<string>>();
+            let textContents = [];
 
             this._searcher.search(str, (searchResults)=> {
-                searchResults.forEach((e)=> {
-                    textContents.push(e.obj);
-                    wordMap.set(e.obj, e.matchWords);
+                searchResults.forEach((results)=> {
+                    results.arr.forEach(p => textContents.push(p));
                 });
 
-                var lastClicked:JQuery = null;
-                searchResults.forEach((e) => {
-                    var result = jQuery("<li class='list-group-item'></li>");
-                    var link = jQuery("<a></a>").append(e.context.clone());
-                    result.append(link);
-
-                    this._searchContainer.append(result);
-                    if (this._imageHrefImageMap.has(e.obj.pageHref)) {
-                        var image = this._imageHrefImageMap.get(e.obj.pageHref);
-                        link.click(()=> {
-                            if(lastClicked!=null){
-                                lastClicked.removeClass("active");
-                            }
-                            lastClicked = result;
-                            result.addClass("active");
-                            var areaRect:Rect = Rect.fromXYWH(e.obj.pos.x, e.obj.pos.y, e.obj.size.width, e.obj.size.height);
-                            this._searchResultCanvasPageLayer.select(e.obj.pageHref, areaRect);
-                            this.trigger(new events.ImageSelectedEvent(this, image));
-                            this.trigger(new events.RedrawEvent(this));
-                        });
-                        var page = jQuery("<span class='childLabel'>" + (image.orderLabel || image.order) + "</span>");
-                        result.append(page);
-                    } else {
-                        console.log("Could not find page " + e.obj.pageHref);
+                let lastClicked:JQuery = null;
+                searchResults.forEach((results) => {
+                    if(results.arr.length <= 0) {
+                        return;
                     }
-
+                    let result = jQuery("<li class='list-group-item'></li>");
+                    let link = jQuery("<a></a>").append(results.context.clone());
+                    result.append(link);
+                    this._searchContainer.append(result);
+                    let altoTextContent = results.arr[0];
+                    if (!this._imageHrefImageMap.has(altoTextContent.pageHref)) {
+                        console.log("Could not find page " + altoTextContent.pageHref);
+                        return;
+                    }
+                    let image = this._imageHrefImageMap.get(altoTextContent.pageHref);
+                    link.click(() => {
+                        if (lastClicked != null) {
+                            lastClicked.removeClass("active");
+                            this._searchResultCanvasPageLayer.clearSelected();
+                        }
+                        lastClicked = result;
+                        result.addClass("active");
+                        results.arr.forEach(context => {
+                            let areaRect: Rect = Rect.fromXYWH(context.pos.x, context.pos.y, context.size.width, context.size.height);
+                            this._searchResultCanvasPageLayer.select(context.pageHref, areaRect);
+                        });
+                        this.trigger(new events.ImageSelectedEvent(this, image));
+                        this.trigger(new events.RedrawEvent(this));
+                    });
+                    let page = jQuery("<span class='childLabel'>" + (image.orderLabel || image.order) + "</span>");
+                    result.append(page);
                 });
             }, ()=> {
                 this._searchResultCanvasPageLayer.clear();
                 textContents.forEach(tc => {
-                    var areaRect:Rect = Rect.fromXYWH(tc.pos.x, tc.pos.y, tc.size.width, tc.size.height);
+                    let areaRect:Rect = Rect.fromXYWH(tc.pos.x, tc.pos.y, tc.size.width, tc.size.height);
                     this._searchResultCanvasPageLayer.add(tc.pageHref, areaRect);
                 });
                 this.trigger(new events.RedrawEvent(this));

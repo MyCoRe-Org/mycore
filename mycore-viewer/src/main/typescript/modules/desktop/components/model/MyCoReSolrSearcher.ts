@@ -1,9 +1,11 @@
 /// <reference path="../../widgets/solr/SolrSearchRequest.ts" />
 
 namespace mycore.viewer.model {
+    import HighlightPosition = mycore.viewer.widgets.solr.HighlightPosition;
+
     export class MyCoReSolrSearcher extends MyCoReViewerSearcher {
 
-        constructor(private solrHandlerURL:string, private solrFieldName:string, private derivateId:string) {
+        constructor(private solrHandlerURL:string, private derivateId:string) {
             super();
         }
 
@@ -16,71 +18,69 @@ namespace mycore.viewer.model {
             this.resolver = textContentResolver;
         }
 
-        public static CONTEXT_SIZE = 100;
         private static TEXT_HIGHLIGHT_CLASSNAME = "matched";
 
         private _altoHrefPageMap = new MyCoReMap<string, model.StructureImage>();
         private _currentRequest:widgets.solr.SolrSearchRequest = null;
         private static TEXT_HREF = "AltoHref";
 
-
-        public search(query:string, resultReporter:(objects:Array<ResultObject>)=>void, searchCompleteCallback:(maxResults?:number)=>void, count?:number, start?:number) {
+        public search(query: string, resultReporter: (objects: Array<ResultObject>) => void,
+                      searchCompleteCallback: () => void, count?: number, start?: number) {
             // first stop running request!
-            if(this._currentRequest != null && !this._currentRequest.isComplete){
+            if (this._currentRequest != null && !this._currentRequest.isComplete) {
                 this._currentRequest.abortRequest();
             }
 
-            if(query==""){
-                resultReporter((new Array()));
+            if (query == "") {
+                resultReporter(([]));
                 return;
             }
 
-            this._currentRequest = new widgets.solr.SolrSearchRequest(query, ()=> {
+            this._currentRequest = new widgets.solr.SolrSearchRequest(this.solrHandlerURL, this.derivateId, query, () => {
                 console.log(this._currentRequest.solrRequestResult);
                 resultReporter(this.extractSearchResults(query, this._currentRequest.solrRequestResult));
-                searchCompleteCallback(this._currentRequest.solrRequestResult.response.numFound);
-            }, this.solrHandlerURL, this.solrFieldName, this.derivateId, 10000, 0);
+                searchCompleteCallback();
+            });
 
             this._currentRequest.startRequest();
         }
 
-        public extractSearchResults(query:string, solrResult:widgets.solr.SolrRequestResult):Array<ResultObject> {
-            var results = new Array<ResultObject>();
-            solrResult.wordcoordinates.forEach((page)=> {
-                var pathParts = page.id.split("/");
+        public extractSearchResults(query: string, solrResult: Array<widgets.solr.HighlightPage>): Array<ResultObject> {
+            let results = [];
+            solrResult.forEach((page) => {
+                let pathParts = page.id.split("/");
                 pathParts.shift();
-                var path = pathParts.join("/");
-                var altoHref = path;
+                let altoHref = pathParts.join("/");
                 if (!this._altoHrefPageMap.has(altoHref)) {
                     console.error("solr results contains a alto file which is not found in alto!");
                     return;
                 }
 
-                var metsPage = this._altoHrefPageMap.get(altoHref);
-                page.hits.forEach((hit)=> {
-                    var contextInnerHTML = hit.hl.replace("<em>", "<em class='" + MyCoReSolrSearcher.TEXT_HIGHLIGHT_CLASSNAME + "'>");
-                    var payload = hit.payload[0];
-                    var context = document.createElement("div");
+                let metsPage = this._altoHrefPageMap.get(altoHref);
+                page.hits.forEach((hit) => {
+                    let contextInnerHTML = hit.hl.split("<em>")
+                        .join("<em class='" + MyCoReSolrSearcher.TEXT_HIGHLIGHT_CLASSNAME + "'>");
+                    let context = document.createElement("div");
                     context.innerHTML = contextInnerHTML;
-
-                    var result = new ResultObject(new SolrAltoTextContent(payload, metsPage.href), query.split(" "), jQuery(context));
+                    let matchWords: Array<string> = hit.positions.map(pos => pos.content);
+                    let altoTextContents = [];
+                    hit.positions.forEach(position => {
+                        altoTextContents.push(new SolrAltoTextContent(position, metsPage.href));
+                    });
+                    let result = new ResultObject(altoTextContents, matchWords, jQuery(context));
                     (<any>result).order = metsPage.order;
                     results.push(result);
                 });
             });
-
-            return results.sort((x, y)=>(<any>x).order - (<any>y).order);
+            return results.sort((x, y) => (<any>x).order - (<any>y).order);
         }
     }
 
     export class SolrAltoTextContent implements model.TextElement {
-        constructor(positionSTR:string, parentId:string) {
-            var parts = positionSTR.split("|");
-            var off = 0;
-
+        constructor(position:HighlightPosition, parentId:string) {
             this.angle = 0;
-            this.size = new Size2D(parseFloat(parts[off + 2]), parseFloat(parts[off + 3]));
-            this.pos = new Position2D(parseFloat(parts[off + 0]), parseFloat(parts[off + 1]));
+            this.size = new Size2D(position.width, position.height);
+            this.pos = new Position2D(position.xpos, position.vpos);
             this.fontFamily = "arial";
             this.fontSize = this.size.height;
             this.fromBottomLeft = false;

@@ -2,11 +2,11 @@ namespace mycore.viewer.widgets.canvas {
 
     export class SearchResultCanvasPageLayer implements widgets.canvas.CanvasPageLayer {
 
-        private selected: PageArea = null;
+        private selected: Array<PageArea> = [];
         private areas: MyCoReMap<string, Array<PageArea>> = new MyCoReMap<string, Array<PageArea>>();
 
         public select(page:string, rect:Rect) {
-            this.selected = new PageArea(page, rect);
+            this.selected.push(new PageArea(page, rect));
         }
 
         public add(page:string, rect:Rect) {
@@ -19,14 +19,20 @@ namespace mycore.viewer.widgets.canvas {
         }
 
         public clear():void {
-            this.selected = null;
+            this.selected = [];
             this.areas.clear();
         }
 
+        public clearSelected(): void {
+            this.selected = [];
+        }
+
         public draw(ctx:CanvasRenderingContext2D, id:string, pageSize:Size2D, drawOnHtml:boolean = false) {
-            if(this.selected != null && id === this.selected.page) {
-                this.drawWithPadding(ctx, [this.selected], pageSize);
-            }
+            this.selected.forEach(area => {
+                if (this.selected != null && id === area.page) {
+                    this.drawWithPadding(ctx, [area], pageSize);
+                }
+            });
             this.areas.hasThen(id, areas => {
                 this.drawWords(ctx, areas);
             });

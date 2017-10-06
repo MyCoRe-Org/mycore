@@ -1,23 +1,17 @@
-/// <reference path="SolrResponseParser.ts" />
 namespace mycore.viewer.widgets.solr {
     export class SolrSearchRequest {
 
-        constructor(public query:string,
-                    public requestCallback:(success:boolean)=>void,
-                    private solrHandlerURL:string,
-                    private solrFieldName:string,
+        constructor(private solrHandlerURL:string,
                     private derivateID:string,
-                    public count?:number,
-                    public start?:number) {
+                    public query:string,
+                    public requestCallback:(success:boolean) => void) {
         }
 
-        public static BASE_TEMPLATE = "{solrHandlerURL}?q={solrQuery}&wt=json&indent=true&fq=derivateID:{derivateID}";
-        public static COUNT_TEMPLATE = "&rows={count}&start={start}";
+        public static BASE_TEMPLATE = "{solrHandlerURL}/{derivateID}?q={query}";
 
-        private solrResponseParser = new widgets.solr.SolrResponseParser();
         private request:JQueryXHR = null;
 
-        private _solrRequestResult:SolrRequestResult = null;
+        private _solrRequestResult:Array<HighlightPage> = null;
         private _isComplete:boolean = false;
 
         public get solrRequestResult() {
@@ -29,7 +23,7 @@ namespace mycore.viewer.widgets.solr {
         }
 
         public startRequest() {
-            let requestURL = this.buildRequestURL(this.query, this.count, this.start);
+            let requestURL = this.buildRequestURL();
             let ajaxSettings = {url: requestURL,
                 async: true,
                 success: (response) => {
@@ -62,38 +56,36 @@ namespace mycore.viewer.widgets.solr {
             this.request.abort("request abort");
         }
 
-        private processResponse(response:any) {
-            this._solrRequestResult = this.solrResponseParser.parseResponse(response);
+        private processResponse(response:Array<HighlightPage>) {
             this._isComplete = true;
+            this._solrRequestResult = response;
         }
 
-        private buildSolrQuery(userInput:string) {
-            let query:string = "";
-            let wordArray = userInput.split(" ");
-            let lastPos = -1;
-            wordArray = wordArray.filter(s => s !== "");
-            wordArray.forEach((part:string, i)=> {
-                query += this.solrFieldName + ":" + part + (wordArray.length != (i + 1) ? " AND " : "");
-            });
-            return (query == "") ? this.solrFieldName + ":*" : query;
-        }
-
-
-        private buildRequestURL(userSearchQuery:string, count?:number, start?:number) {
-            let queryURL = ViewerFormatString(SolrSearchRequest.BASE_TEMPLATE, {
+        private buildRequestURL() {
+            return ViewerFormatString(SolrSearchRequest.BASE_TEMPLATE, {
                 solrHandlerURL: this.solrHandlerURL,
-                solrQuery: this.buildSolrQuery(userSearchQuery),
+                query: this.query,
                 derivateID: this.derivateID
             });
-
-            if (count != null && typeof count != "undefined" && start != null && typeof start != "undefined") {
-                queryURL += ViewerFormatString(SolrSearchRequest.COUNT_TEMPLATE, {
-                    count: count,
-                    start: start
-                });
-            }
-
-            return queryURL;
         }
     }
+
+    export interface HighlightPage {
+        id: string;
+        hits: Array<HighlightHit>;
+    }
+
+    export interface HighlightHit {
+        hl: string;
+        positions: Array<HighlightPosition>;
+    }
+
+    export interface HighlightPosition {
+        content: string;
+        xpos: number;
+        vpos: number;
+        width: number;
+        height: number;
+    }
+
 }
