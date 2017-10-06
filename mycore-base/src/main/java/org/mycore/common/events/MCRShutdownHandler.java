@@ -41,13 +41,92 @@ public class MCRShutdownHandler {
 
     private static final String PROPERTY_SYSTEM_NAME = "MCR.CommandLineInterface.SystemName";
 
+    private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();
+
+    private final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
+
+    private volatile boolean shuttingDown = false;
+
+    boolean isWebAppRunning;
+
+    ClassLoaderLeakPreventor leakPreventor;
+
+    private MCRShutdownHandler() {
+        isWebAppRunning = false;
+    }
+
+    private void init() {
+        if (!isWebAppRunning) {
+            MCRShutdownThread.getInstance();
+        }
+    }
+
+    public static MCRShutdownHandler getInstance() {
+        return SINGLETON;
+    }
+
+    public void addCloseable(MCRShutdownHandler.Closeable c) {
+        Objects.requireNonNull(c);
+        init();
+        requests.add(c);
+    }
+
+    public void removeCloseable(MCRShutdownHandler.Closeable c) {
+        Objects.requireNonNull(c);
+        if (!shuttingDown) {
+            requests.remove(c);
+        }
+    }
+
+    void shutDown() {
+        Logger logger = LogManager.getLogger(MCRShutdownHandler.class);
+        String cfgSystemName = "MyCoRe:";
+        try {
+            cfgSystemName = MCRConfiguration.instance().getString(PROPERTY_SYSTEM_NAME) + ":";
+        } catch (MCRConfigurationException e) {
+            //may occur early if there is an error starting mycore up or in JUnit tests
+            logger.warn("Error getting '" + PROPERTY_SYSTEM_NAME + "': " + e.getMessage());
+        }
+        final String system = cfgSystemName;
+        System.out.println(system + " Shutting down system, please wait...\n");
+        shuttingDown = true;
+        Closeable[] closeables;
+        do {
+            synchronized (requests) {
+                logger.debug(() -> "requests: " + requests.toString());
+                closeables = requests.stream().toArray(i -> new Closeable[i]);
+                requests.clear(); //during shut down more request may come in MCR-1726
+            }
+            for (Closeable c : closeables) {
+                logger.debug("Prepare Closing: " + c.toString());
+                c.prepareClose();
+            }
+
+            for (Closeable c : closeables) {
+                logger.debug("Closing: " + c.toString());
+                c.close();
+            }
+        } while (!requests.isEmpty());
+        System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
+        MCRSessionMgr.close();
+        System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
+        LogManager.shutdown();
+        SINGLETON = null;
+        // may be needed in webapp to release file handles correctly.
+        if (leakPreventor != null) {
+            ClassLoaderLeakPreventor myLeakPreventor = leakPreventor;
+            leakPreventor = null;
+            myLeakPreventor.contextDestroyed(null);
+        }
+    }
+
     /**
      * Object is cleanly closeable via <code>close()</code>-call.
      *
      * @author Thomas Scheffler (yagee)
      */
     @FunctionalInterface
-    public static interface Closeable extends Comparable<Closeable> {
+    public interface Closeable extends Comparable<Closeable> {
         /**
          * prepare for closing this object that implements <code>Closeable</code>. This is the first part of the closing
          * process. As a object may need database access to close cleanly this method can be used to be ahead of
@@ -80,85 +159,6 @@ public class MCRShutdownHandler {
          * The default priority
          */
         public static int DEFAULT_PRIORITY = 5;
-    }
-
-    private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();
-
-    private static final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
-
-    private static volatile boolean SHUTTING_DOWN = false;
-
-    boolean isWebAppRunning;
-
-    ClassLoaderLeakPreventor leakPreventor;
-
-    private MCRShutdownHandler() {
-        isWebAppRunning = false;
-    }
-
-    private void init() {
-        if (!isWebAppRunning) {
-            MCRShutdownThread.getInstance();
-        }
-    }
-
-    public static MCRShutdownHandler getInstance() {
-        return SINGLETON;
-    }
-
-    public void addCloseable(MCRShutdownHandler.Closeable c) {
-        Objects.requireNonNull(c);
-        init();
-        requests.add(c);
-    }
-
-    public void removeCloseable(MCRShutdownHandler.Closeable c) {
-        Objects.requireNonNull(c);
-        if (!SHUTTING_DOWN) {
-            requests.remove(c);
-        }
-    }
-
-    void shutDown() {
-        Logger logger = LogManager.getLogger(MCRShutdownHandler.class);
-        String cfgSystemName = "MyCoRe:";
-        try {
-            cfgSystemName = MCRConfiguration.instance().getString(PROPERTY_SYSTEM_NAME) + ":";
-        } catch (MCRConfigurationException e) {
-            //may occur early if there is an error starting mycore up or in JUnit tests
-            logger.warn("Error getting '" + PROPERTY_SYSTEM_NAME + "': " + e.getMessage());
-        }
-        final String system = cfgSystemName;
-        System.out.println(system + " Shutting down system, please wait...\n");
-        SHUTTING_DOWN = true;
-        Closeable[] closeables;
-        do {
-            synchronized (requests) {
-                logger.debug(() -> "requests: " + requests.toString());
-                closeables = requests.stream().toArray(i -> new Closeable[i]);
-                requests.clear(); //during shut down more request may come in MCR-1726
-            }
-            for (Closeable c : closeables) {
-                logger.debug("Prepare Closing: " + c.toString());
-                c.prepareClose();
-            }
-
-            for (Closeable c : closeables) {
-                logger.debug("Closing: " + c.toString());
-                c.close();
-            }
-        } while (!requests.isEmpty());
-        System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
-        MCRSessionMgr.close();
-        System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
-        LogManager.shutdown();
-        SINGLETON = null;
-        // may be needed in webapp to release file handles correctly.
-        if (leakPreventor != null) {
-            ClassLoaderLeakPreventor myLeakPreventor = leakPreventor;
-            leakPreventor = null;
-            myLeakPreventor.contextDestroyed(null);
-        }
     }
 
 }
