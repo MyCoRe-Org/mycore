@@ -17,6 +17,7 @@ import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.search.MCRSolrSearchUtils;
@@ -144,14 +145,15 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "create solr's metadata and content index on specific solr server",
         order = 120)
     public static void createIndex(String url) throws Exception {
-        SolrClient cuss = MCRSolrClientFactory.getConcurrentSolrClient();
-        SolrClient hss = MCRSolrClientFactory.getSolrClient();
-        MCRSolrIndexer.rebuildMetadataIndex(cuss);
-        MCRSolrIndexer.rebuildContentIndex(hss);
-        if (cuss instanceof ConcurrentUpdateSolrClient) {
-            ((ConcurrentUpdateSolrClient) cuss).blockUntilFinished();
+        MCRSolrCore core = new MCRSolrCore(url);
+        SolrClient concurrentSolrClient = core.getConcurrentClient();
+        SolrClient solrClient = core.getClient();
+        MCRSolrIndexer.rebuildMetadataIndex(concurrentSolrClient);
+        MCRSolrIndexer.rebuildContentIndex(solrClient);
+        if (concurrentSolrClient instanceof ConcurrentUpdateSolrClient) {
+            ((ConcurrentUpdateSolrClient) concurrentSolrClient).blockUntilFinished();
         }
-        hss.optimize();
+        solrClient.optimize();
     }
 
     @MCRCommand(
