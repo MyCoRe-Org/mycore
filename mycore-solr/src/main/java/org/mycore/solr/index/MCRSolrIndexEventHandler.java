@@ -168,15 +168,11 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     }
 
     synchronized protected void solrDelete(MCRObjectID id) {
-        MCRSessionMgr.getCurrentSession().onCommit(() -> {
-            MCRSolrIndexer.deleteById(id.toString());
-        });
+        MCRSessionMgr.getCurrentSession().onCommit(() -> MCRSolrIndexer.deleteById(id.toString()));
     }
 
     synchronized protected void deleteDerivate(MCRDerivate derivate) {
-        MCRSessionMgr.getCurrentSession().onCommit(() -> {
-            MCRSolrIndexer.deleteDerivate(derivate.getId().toString());
-        });
+        MCRSessionMgr.getCurrentSession().onCommit(() -> MCRSolrIndexer.deleteDerivate(derivate.getId().toString()));
     }
 
     synchronized protected void addFile(Path path, BasicFileAttributes attrs) {
