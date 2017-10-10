@@ -35,7 +35,7 @@ namespace mycore.viewer.model {
     }
 
     export class ResultObject {
-        constructor(public obj:model.TextElement, public matchWords:Array<string>, public context:JQuery) {
+        constructor(public arr:Array<model.TextElement>, public matchWords:Array<string>, public context:JQuery) {
         }
     }
 }

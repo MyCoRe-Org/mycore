@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -29,7 +30,7 @@ import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
  */
 public abstract class MCRJerseyUtil {
 
-    public static final String APPLICATION_JSON_UTF8 = "application/json;charset=utf-8";
+    public static final String APPLICATION_JSON_UTF8 = MediaType.APPLICATION_JSON + ";charset=utf-8";
 
     /**
      * Transforms a jdom document to a <code>MCRContent</code> via the <code>MCRLayoutService</code>.

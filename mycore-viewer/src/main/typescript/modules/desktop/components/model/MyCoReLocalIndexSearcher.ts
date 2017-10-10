@@ -16,9 +16,9 @@ namespace mycore.viewer.model {
         private static PDF_TEXT_HREF = "pdfText";
 
         private indexModel() {
-            var resolver = this.textContentResolver;
-            var processIndicator = this.processIndicator;
-            var count = 0;
+            let resolver = this.textContentResolver;
+            let processIndicator = this.processIndicator;
+            let count = 0;
             this.model.imageList.forEach((image, i)=> {
                 resolver(image.additionalHrefs.get(MyCoReLocalIndexSearcher.PDF_TEXT_HREF), (href, textContent)=> {
                     count++;
@@ -35,9 +35,9 @@ namespace mycore.viewer.model {
         }
 
         private clearDoubleResults(searchResults) {
-            var contextExists = {};
+            let contextExists = {};
             return searchResults.filter((el) => {
-                var key = (Utils.hash(el.context.text() + el.matchWords.join("")));
+                let key = (Utils.hash(el.context.text() + el.matchWords.join("")));
                 if (key in contextExists) {
                     return false;
                 } else {
@@ -48,7 +48,7 @@ namespace mycore.viewer.model {
         }
 
         public search(query:string, resultReporter:(objects:Array<ResultObject>)=>void, searchCompleteCallback:(maxResults?:number)=>void, count?:number, start?:number) {
-            var results = this._searchIndex.search(query).results;
+            let results = this._searchIndex.search(query).results;
             results = this.clearDoubleResults(results);
             resultReporter(results);
             searchCompleteCallback(results.length);

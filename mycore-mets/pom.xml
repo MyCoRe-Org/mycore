@@ -45,6 +45,10 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
@@ -61,6 +65,11 @@
       <artifactId>log4j-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>jdom2</artifactId>
     </dependency>
@@ -71,6 +80,11 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-iiif</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-solr</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
