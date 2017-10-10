@@ -1,16 +1,24 @@
 package org.mycore.oai;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.DefaultResumptionToken;
 import org.mycore.oai.pmh.Header;
@@ -18,6 +26,7 @@ import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.oai.pmh.OAIDataList;
 import org.mycore.oai.pmh.Record;
 import org.mycore.oai.set.MCRSet;
+import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
 /**
  * Search manager of the mycore OAI-PMH implementation. Creates a new
@@ -51,6 +60,10 @@ public class MCROAISearchManager {
 
     protected int partitionSize;
 
+    private ExecutorService executorService;
+
+    private boolean runListRecordsParallel;
+
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
         MAX_AGE = getConfig().getInt(prefix + "MaxAge", 30) * 60 * 1000;
@@ -59,6 +72,7 @@ public class MCROAISearchManager {
     public MCROAISearchManager() {
         this.resultMap = new ConcurrentHashMap<>();
         TimerTask tt = new TimerTask() {
+            @Override
             public void run() {
                 for (Map.Entry<String, MCROAISearcher> entry : resultMap.entrySet()) {
                     String searchId = entry.getKey();
@@ -71,6 +85,11 @@ public class MCROAISearchManager {
             }
         };
         new Timer().schedule(tt, new Date(System.currentTimeMillis() + MAX_AGE), MAX_AGE);
+        runListRecordsParallel = getConfig().getBoolean(MCROAIAdapter.PREFIX + "RunListRecordsParallel");
+        if (runListRecordsParallel) {
+            executorService = Executors.newWorkStealingPool();
+            MCRShutdownHandler.getInstance().addCloseable(executorService::shutdownNow);
+        }
     }
 
     public void init(MCROAIIdentify identify, MCROAIObjectManager objManager, MCROAISetManager setManager,
@@ -123,6 +142,13 @@ public class MCROAISearchManager {
     }
 
     protected OAIDataList<Record> getRecordList(MCROAISearcher searcher, MCROAIResult result) {
+        OAIDataList<Record> recordList = runListRecordsParallel ? getRecordListParallel(searcher, result)
+            : getRecordListSequential(searcher, result);
+        this.setResumptionToken(recordList, searcher, result);
+        return recordList;
+    }
+
+    private OAIDataList<Record> getRecordListSequential(MCROAISearcher searcher, MCROAIResult result) {
         OAIDataList<Record> recordList = new OAIDataList<>();
         result.list().forEach(header -> {
             Record record = this.objManager.getRecord(header, searcher.getMetadataFormat());
@@ -130,7 +156,30 @@ public class MCROAISearchManager {
                 recordList.add(record);
             }
         });
-        this.setResumptionToken(recordList, searcher, result);
+        return recordList;
+    }
+
+    private OAIDataList<Record> getRecordListParallel(MCROAISearcher searcher, MCROAIResult result) {
+        List<Header> headerList = result.list();
+        int listSize = headerList.size();
+        Record[] records = new Record[listSize];
+        @SuppressWarnings("rawtypes")
+        CompletableFuture[] futures = new CompletableFuture[listSize];
+        MetadataFormat metadataFormat = searcher.getMetadataFormat();
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        for (int i = 0; i < listSize; i++) {
+            Header header = headerList.get(i);
+            int resultIndex = i;
+            MCRTransactionableRunnable r = new MCRTransactionableRunnable(() -> {
+                Record record = this.objManager.getRecord(header, metadataFormat);
+                records[resultIndex] = record;
+            }, mcrSession);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(r, executorService);
+            futures[i] = future;
+        }
+        CompletableFuture.allOf(futures).join();
+        OAIDataList<Record> recordList = new OAIDataList<>();
+        recordList.addAll(Arrays.asList(records));
         return recordList;
     }
 
@@ -183,6 +232,15 @@ public class MCROAISearchManager {
         MCROAISearcher searcher = getConfig().<MCROAISearcher> getInstanceOf(className, defaultClass);
         searcher.init(identify, format, MAX_AGE, partitionSize, setManager, objectManager);
         return searcher;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (executorService != null && !executorService.isShutdown()) {
+            MCRShutdownHandler.getInstance().removeCloseable(executorService::shutdownNow);
+            executorService.shutdownNow();
+        }
+        super.finalize();
     }
 
 }
