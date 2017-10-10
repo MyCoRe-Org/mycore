@@ -67,7 +67,13 @@ public abstract class MCROAISearcher {
 
     public abstract MCROAIResult query(MCRSet set, Instant from, Instant until);
 
-    public abstract Instant getEarliestTimestamp();
+    /**
+     * Returns the earliest created/modified record time stamp. If the earliest time stamp cannot be retrieved an
+     * empty optional is returned.
+     *
+     * @return the earliest created/modified time stamp
+     */
+    public abstract Optional<Instant> getEarliestTimestamp();
 
     public boolean isExpired() {
         return System.currentTimeMillis() > runningExpirationTimer;

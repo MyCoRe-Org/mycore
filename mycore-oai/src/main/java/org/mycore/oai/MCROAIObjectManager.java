@@ -38,7 +38,6 @@ import org.mycore.oai.pmh.Header.Status;
 import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.Record;
-import org.mycore.oai.pmh.Set;
 import org.mycore.oai.pmh.SimpleMetadata;
 
 /**
@@ -93,14 +92,14 @@ public class MCROAIObjectManager {
         try {
             recordElement = getJDOMRecord(getMyCoReId(header.getId()), format);
         } catch (Exception exc) {
-            LOGGER.error("unable to get record " + header.getId() + " (" + format.getPrefix() + ")");
+            LOGGER.error("unable to get record " + header.getId() + " (" + format.getPrefix() + ")", exc);
             return null;
         }
         Record record = new Record(header);
         if (recordElement.getNamespace().equals(OAIConstants.NS_OAI)) {
             Element metadataElement = recordElement.getChild("metadata", OAIConstants.NS_OAI);
             if (metadataElement != null && !metadataElement.getChildren().isEmpty()) {
-                Element metadataChild = (Element) metadataElement.getChildren().get(0);
+                Element metadataChild = metadataElement.getChildren().get(0);
                 record.setMetadata(new SimpleMetadata(metadataChild.detach()));
             }
             Element aboutElement = recordElement.getChild("about", OAIConstants.NS_OAI);
@@ -165,10 +164,6 @@ public class MCROAIObjectManager {
         }
         return uri.replace("{id}", id).replace("{format}", metadataPrefix).replace("{objectType}", objectType).replace(
             ":{flag}", !exists ? ":deletedMcrObject" : "");
-    }
-
-    Set setToSet(Element setElement) {
-        return new Set(setElement.getText());
     }
 
     /**

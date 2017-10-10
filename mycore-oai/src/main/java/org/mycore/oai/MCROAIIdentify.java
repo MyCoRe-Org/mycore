@@ -30,7 +30,6 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.FriendsDescription;
@@ -83,8 +82,7 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     private Collection<String> getDescriptionURIs() {
         String descriptionConfig = getConfigPrefix() + "DescriptionURI";
-        Collection<String> descriptionURIs = MCRConfiguration.instance().getPropertiesMap(descriptionConfig).values();
-        return descriptionURIs;
+        return MCRConfiguration.instance().getPropertiesMap(descriptionConfig).values();
     }
 
     class CustomDescription implements Description {
@@ -129,23 +127,9 @@ public class MCROAIIdentify extends SimpleIdentify {
      * @return the create date of the oldest document within the repository
      */
     protected Instant calculateEarliestTimestamp() {
-        // default value
-        Instant datestamp = DateUtils.parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
-        try {
-            // existing items
-            datestamp = MCROAISearchManager.getSearcher(this, null, 1, null, null).getEarliestTimestamp();
-            // deleted items
-            if (DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
-                Instant earliestDeletedDate = MCRMetadataHistoryManager.getHistoryStart()
-                    .orElse(null);
-                if (earliestDeletedDate != null && earliestDeletedDate.isBefore(datestamp)) {
-                    datestamp = earliestDeletedDate;
-                }
-            }
-        } catch (Exception ex) {
-            LOGGER.warn("Error occured while examining create date of first created object. Use default value.", ex);
-        }
-        return datestamp;
+        MCROAISearcher searcher = MCROAISearchManager.getSearcher(this, null, 1, null, null);
+        return searcher.getEarliestTimestamp().orElse(DateUtils
+                .parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01")));
     }
 
 }

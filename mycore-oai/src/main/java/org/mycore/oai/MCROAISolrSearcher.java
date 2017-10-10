@@ -146,7 +146,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             query.set(restrictionField, restriction);
         }
         String[] requiredFields = Stream.concat(Stream.of("id", getModifiedField()), getRequiredFieldNames().stream())
-            .toArray(i -> new String[i]);
+            .toArray(String[]::new);
         query.setFields(requiredFields);
         // request handler
         query.setRequestHandler(getConfig().getString(configPrefix + "Search.RequestHandler", "/select"));
@@ -216,14 +216,14 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     }
 
     @Override
-    public Instant getEarliestTimestamp() {
+    public Optional<Instant> getEarliestTimestamp() {
         String sortBy = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.SortBy", "modified asc");
         String fieldName = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.FieldName", "modified");
         String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.add(CommonParams.SORT, sortBy);
         params.add(CommonParams.Q, restriction);
-        params.add(CommonParams.FQ, fieldName + ":*");
+        params.add(CommonParams.FQ, fieldName + ":[* TO *]");
         params.add(CommonParams.FL, fieldName);
         params.add(CommonParams.ROWS, "1");
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
@@ -232,12 +232,12 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             SolrDocumentList list = response.getResults();
             if (list.size() >= 1) {
                 Date date = (Date) list.get(0).getFieldValue(fieldName);
-                return date.toInstant();
+                return Optional.of(date.toInstant());
             }
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
         }
-        return null;
+        return Optional.empty();
     }
 
 }
