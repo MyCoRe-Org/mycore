@@ -69,8 +69,8 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
     }
 
     @Override
-    public Instant getEarliestTimestamp() {
-        return MCRMetadataHistoryManager.getHistoryStart().orElse(null);
+    public Optional<Instant> getEarliestTimestamp() {
+        return MCRMetadataHistoryManager.getHistoryStart();
     }
 
     public List<Header> getDeletedRecords() {
@@ -85,12 +85,7 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
      * @return the cursor as string
      */
     public String buildCursor(int from, int rows) {
-        StringBuilder b = new StringBuilder(CURSOR_PREFIX);
-        b.append(CURSOR_DELIMETER);
-        b.append(from);
-        b.append(CURSOR_DELIMETER);
-        b.append(rows);
-        return b.toString();
+        return CURSOR_PREFIX + CURSOR_DELIMETER + from + CURSOR_DELIMETER + rows;
     }
 
     /**

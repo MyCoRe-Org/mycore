@@ -69,12 +69,15 @@ public class MCROAICombinedSearcher extends MCROAISearcher {
     }
 
     @Override
-    public Instant getEarliestTimestamp() {
-        Instant solrTimestamp = this.solrSearcher.getEarliestTimestamp();
-        return deletedSearcher
-            .map(MCROAISearcher::getEarliestTimestamp)
-            .filter(solrTimestamp::isAfter)
-            .orElse(solrTimestamp);
+    public Optional<Instant> getEarliestTimestamp() {
+        Optional<Instant> solrTimestamp = this.solrSearcher.getEarliestTimestamp();
+        Optional<Instant> deletedTimestamp = deletedSearcher.flatMap(MCROAIDeletedSearcher::getEarliestTimestamp);
+        if (solrTimestamp.isPresent() && deletedTimestamp.isPresent()) {
+            Instant instant1 = solrTimestamp.get();
+            Instant instant2 = deletedTimestamp.get();
+            return Optional.of(instant1.isBefore(instant2) ? instant1 : instant2);
+        }
+        return solrTimestamp.map(Optional::of).orElse(deletedTimestamp);
     }
 
     private boolean isDeletedCursor(String cursor) {
