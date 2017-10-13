@@ -82,13 +82,14 @@ public class MCRAltoHighlightResource {
         p.set("q", buildQuery(query));
         p.add("fq", "derivateID:" + derivateId);
         p.set("fl", "id");
-        p.set("rows", 9999);
+        p.set("rows", Integer.MAX_VALUE - 1);
         p.set("hl", "on");
         p.set("hl.method", "unified");
         p.set("hl.fl", "alto_content,alto_words");
-        p.set("hl.snippets", 9999);
+        p.set("hl.snippets", Integer.MAX_VALUE - 1);
         p.set("hl.bs.type", "WORD");
         p.set("hl.fragsize", 70);
+        p.set("hl.maxAnalyzedChars", Integer.MAX_VALUE - 1);
         try {
             QueryResponse solrResponse = MCRSolrClientFactory.getSolrClient().query(p);
             JsonArray response = buildQueryResponse(solrResponse.getHighlighting());
