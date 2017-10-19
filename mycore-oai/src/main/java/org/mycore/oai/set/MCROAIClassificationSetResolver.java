@@ -3,6 +3,7 @@ package org.mycore.oai.set;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -53,13 +54,8 @@ class MCROAIClassificationSetResolver extends MCROAISetResolver<String, SolrDocu
             .filter(s -> s.startsWith(classPrefix))
             .map(s -> s.substring(classPrefix.length()))
             .map(s -> getSetId() + ":" + s)
-            .map(s -> {
-                Set set = getSetMap().get(s);
-                if (set == null) {
-                    throw new MCRException("Set " + s + " is undefined: " + getSetMap());
-                }
-                return set;
-            })
+            .map(getSetMap()::get)
+            .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
     }
