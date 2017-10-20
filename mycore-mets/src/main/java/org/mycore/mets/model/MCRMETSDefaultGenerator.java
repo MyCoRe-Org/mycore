@@ -21,6 +21,7 @@ package org.mycore.mets.model;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -67,7 +68,7 @@ import java.util.TreeMap;
  * @author Sebastian Hofmann
  * @author Sebastian Röher (basti890)
  */
-public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
+public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
     private static final String TRANSCRIPTION = "transcription";
 
@@ -88,32 +89,39 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         MASTER, ALTO, TRANSCRIPTION, TRANSLATION
     }
 
-    public Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
-        Mets mets = new Mets();
-        createMets(dir, ignoreNodes, mets);
+    @Override
+    public Mets generate() throws MCRException {
+        try {
+            Mets mets = createMets();
+            MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(getOwner()));
 
-        MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(dir.getOwner()));
+            mets.getLogicalStructMap().getDivContainer().setLabel(
+                    MCRTranslation.exists("MCR.Mets.LogicalStructMap.Default.Label") ?
+                            MCRTranslation.translate("MCR.Mets.LogicalStructMap.Default.Label") :
+                            owner.getId().toString());
 
-        mets.getLogicalStructMap().getDivContainer()
-            .setLabel(MCRTranslation.exists("MCR.Mets.LogicalStructMap.Default.Label")
-                ? MCRTranslation.translate("MCR.Mets.LogicalStructMap.Default.Label") : owner.getId().toString());
-
-        Map<String, String> urnFileMap = owner.getUrnMap();
-        if (urnFileMap.size() > 0) {
-            try {
-                MCRMetsSave.updateURNsInMetsDocument(mets, urnFileMap);
-            } catch (Exception e) {
-                LOGGER.error("error while adding urn´s to new Mets file", e);
+            Map<String, String> urnFileMap = owner.getUrnMap();
+            if (urnFileMap.size() > 0) {
+                try {
+                    MCRMetsSave.updateURNsInMetsDocument(mets, urnFileMap);
+                } catch (Exception e) {
+                    LOGGER.error("error while adding urn´s to new Mets file", e);
+                }
             }
+            return mets;
+        } catch (Exception ioExc) {
+            throw new MCRException("Unable to create mets.xml of " + getOwner(), ioExc);
         }
-        return mets;
     }
 
-    private void createMets(MCRPath dir, Set<MCRPath> ignoreNodes, Mets mets) throws IOException {
+    private Mets createMets() throws IOException {
+        Mets mets = new Mets();
+        String owner = getOwner();
+
         // add dmdsec
-        DmdSec dmdSec = new DmdSec("dmd_" + dir.getOwner());
+        DmdSec dmdSec = new DmdSec("dmd_" + owner);
         // add amdsec
-        AmdSec amdSec = new AmdSec("amd_" + dir.getOwner());
+        AmdSec amdSec = new AmdSec("amd_" + owner);
         // file sec
         FileSec fileSec = new FileSec();
         for (FileUse fileUse : FileUse.values()) {
@@ -123,22 +131,22 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
         // physical structure
         PhysicalStructMap physicalStructMap = new PhysicalStructMap();
-        PhysicalDiv physicalDiv = new PhysicalDiv("phys_" + dir.getOwner(), "physSequence");
+        PhysicalDiv physicalDiv = new PhysicalDiv("phys_" + owner, "physSequence");
         physicalStructMap.setDivContainer(physicalDiv);
 
         // logical structure
         MCRILogicalStructMapTypeProvider typeProvider = getTypeProvider();
         LogicalStructMap logicalStructMap = new LogicalStructMap();
 
-        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), typeProvider.getType(MCRObjectID
-            .getInstance(dir.getOwner())), dir.getOwner(), amdSec.getId(), dmdSec.getId());
+        LogicalDiv logicalDiv = new LogicalDiv("log_" + owner, typeProvider.getType(MCRObjectID.getInstance(owner)),
+                owner, amdSec.getId(), dmdSec.getId());
         logicalDiv.setDmdId(dmdSec.getId());
         logicalStructMap.setDivContainer(logicalDiv);
         // struct Link
         StructLink structLink = new StructLink();
 
         // create internal structure
-        structureMets(dir, ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, 0);
+        structureMets(getDerivatePath(), getIgnorePaths(), fileSec, physicalDiv, logicalDiv, structLink, 0);
         hrefIdMap.clear();
 
         // add to mets
@@ -148,6 +156,8 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         mets.addStructMap(physicalStructMap);
         mets.addStructMap(logicalStructMap);
         mets.setStructLink(structLink);
+
+        return mets;
     }
 
     private void structureMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileSec fileSec, PhysicalDiv physicalDiv,
