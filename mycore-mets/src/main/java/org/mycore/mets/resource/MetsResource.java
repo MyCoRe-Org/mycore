@@ -7,7 +7,6 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.HashSet;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -32,7 +31,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.mets.model.MCRMETSGenerator;
+import org.mycore.mets.model.MCRMETSGeneratorFactory;
 import org.mycore.mets.model.converter.MCRJSONSimpleModelConverter;
 import org.mycore.mets.model.converter.MCRSimpleModelJSONConverter;
 import org.mycore.mets.model.converter.MCRSimpleModelXMLConverter;
@@ -78,7 +77,7 @@ public class MetsResource {
     @Path("/editor/islocked/{derivateId}")
     public String isLocked(@PathParam("derivateId") String derivateId) {
         checkDerivateAccess(MCRObjectID.getInstance(derivateId), MCRAccessManager.PERMISSION_READ);
-        Boolean isLocked = Boolean.valueOf(MCRMetsLock.isLocked(derivateId));
+        Boolean isLocked = MCRMetsLock.isLocked(derivateId);
         return "{\"lock\": " + isLocked.toString() + " }";
     }
 
@@ -87,7 +86,7 @@ public class MetsResource {
     @Path("/editor/lock/{derivateId}")
     public String lock(@PathParam("derivateId") String derivateId) {
         checkDerivateAccess(MCRObjectID.getInstance(derivateId), MCRAccessManager.PERMISSION_WRITE);
-        Boolean isLockSuccessfully = Boolean.valueOf(MCRMetsLock.doLock(derivateId));
+        Boolean isLockSuccessfully = MCRMetsLock.doLock(derivateId);
         return "{\"success\": " + isLockSuccessfully.toString() + " }";
     }
 
@@ -174,25 +173,20 @@ public class MetsResource {
      * @throws WebApplicationException if something went wrong while generating or parsing the mets
      */
     private Document getMetsDocument(MCRPath metsPath) {
-        Document mets;
-
         if (!Files.exists(metsPath)) {
             try {
-                mets = MCRMETSGenerator.getGenerator().getMETS(metsPath.getParent(), new HashSet<MCRPath>())
-                    .asDocument();
+                return MCRMETSGeneratorFactory.create(metsPath.getParent()).generate().asDocument();
             } catch (Exception e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }
         } else {
             try (InputStream inputStream = Files.newInputStream(metsPath)) {
                 SAXBuilder builder = new SAXBuilder();
-                mets = builder.build(inputStream);
+                return builder.build(inputStream);
             } catch (JDOMException | IOException e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }
         }
-
-        return mets;
     }
 
     /**

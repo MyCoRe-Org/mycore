@@ -24,7 +24,6 @@ package org.mycore.mets.tools;
 
 import java.nio.file.Files;
 import java.util.Collection;
-import java.util.HashSet;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -42,7 +41,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.mets.model.MCRMETSGenerator;
+import org.mycore.mets.model.MCRMETSGeneratorFactory;
 
 /**
  * returns a structured METS document for any valid MyCoRe ID (object or
@@ -67,14 +66,13 @@ public class MCRMetsResolver implements URIResolver {
             id = derivateID;
         }
         MCRPath metsPath = MCRPath.getPath(id, "/mets.xml");
-        HashSet<MCRPath> ignoreNodes = new HashSet<>();
         try {
             if (Files.exists(metsPath)) {
                 //TODO: generate new METS Output
                 //ignoreNodes.add(metsFile);
                 return new MCRPathContent(metsPath).getSource();
             }
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(id, "/"), ignoreNodes).asDocument();
+            Document mets = MCRMETSGeneratorFactory.create(MCRPath.getPath(id, "/")).generate().asDocument();
             return new JDOMSource(mets);
         } catch (Exception e) {
             throw new TransformerException(e);

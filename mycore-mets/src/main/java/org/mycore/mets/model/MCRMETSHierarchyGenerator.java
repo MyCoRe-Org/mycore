@@ -2,6 +2,7 @@ package org.mycore.mets.model;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
@@ -54,11 +55,11 @@ import java.util.stream.StreamSupport;
  * implementation, the hierarchy of the MCRObjects and their derivate links are considered.
  * Starting from the root element, all children are hierarchically recorded in the logical
  * structure map of the METS file. If your application supports derivate links, the struct link
- * part links to this files.
+ * part links to those files.
  * 
  * @author Matthias Eichner
  */
-public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
+public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMETSHierarchyGenerator.class);
 
@@ -87,14 +88,18 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     private Map<String, List<String>> structLinkMap;
 
     @Override
-    public synchronized Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
+    public synchronized Mets generate() throws MCRException {
         long startTime = System.currentTimeMillis();
-        String derivateId = dir.getOwner();
+        String derivateId = getOwner();
         setup(derivateId);
-        Mets mets = createMets(dir, ignoreNodes);
-        LOGGER.info(
-            "mets creation for derivate " + derivateId + " took " + (System.currentTimeMillis() - startTime) + "ms!");
-        return mets;
+        try {
+            Mets mets = createMets();
+            LOGGER.info("mets creation for derivate " + derivateId + " took " + (System.currentTimeMillis() - startTime)
+                    + "ms!");
+            return mets;
+        } catch (Exception exc) {
+            throw new MCRException("Unable to create mets.xml of " + derivateId, exc);
+        }
     }
 
     /**
@@ -114,12 +119,10 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     /**
      * Does the mets creation.
      * 
-     * @param path path to the derivate
-     * @param ignoreNodes nodes which should be ignored for the generation.
      * @return the new created mets
      * @throws IOException files of the path couldn't be read
      */
-    protected Mets createMets(MCRPath path, Set<MCRPath> ignoreNodes) throws IOException {
+    protected Mets createMets() throws IOException {
         LOGGER.info("create mets for derivate " + this.mcrDer.getId().toString() + "...");
 
         this.structLinkMap = new HashMap<>();
@@ -128,7 +131,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         this.metsHdr = createMetsHdr();
         this.amdSection = createAmdSection();
         this.dmdSection = createDmdSection();
-        this.fileSection = createFileSection(path, ignoreNodes);
+        this.fileSection = createFileSection();
         this.physicalStructMap = createPhysicalStruct();
         this.logicalStructMap = createLogicalStruct();
         this.structLink = createStructLink();
@@ -182,15 +185,13 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * This method runs recursive through the directories
      * and add each file to the file section.
      * 
-     * @param path the root directoy
-     * @param ignoreNodes nodes to ignored
      * @return generated file secion.
      */
-    protected FileSec createFileSection(MCRPath path, Set<MCRPath> ignoreNodes) throws IOException {
+    protected FileSec createFileSection() throws IOException {
         FileSec fsec = new FileSec();
         FileGrp fgroup = new FileGrp(FileGrp.USE_MASTER);
         fsec.addFileGrp(fgroup);
-        addFolder(fgroup, path, ignoreNodes);
+        addFolder(fgroup, getDerivatePath(), getIgnorePaths());
         return fsec;
     }
 
@@ -250,12 +251,26 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             String fileId = file.getId();
             // add page
             PhysicalSubDiv page = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE);
+            getOrderLabel(file.getId()).ifPresent(page::setOrderLabel);
             physicalDiv.add(page);
             // add file pointer
             Fptr fptr = new Fptr(fileId);
             page.add(fptr);
         }
         return pstr;
+    }
+
+    /**
+     * Returns the order label for the given file.
+     *
+     * @param fileId of the mets:file in the mets:fileSec
+     * @return optional order label
+     */
+    protected Optional<String> getOrderLabel(String fileId) {
+        return getOldMets().map(oldMets -> {
+            PhysicalSubDiv subDiv = oldMets.getPhysicalStructMap().getDivContainer().byFileId(fileId);
+            return subDiv.getOrderLabel();
+        });
     }
 
     protected LogicalStructMap createLogicalStruct() {

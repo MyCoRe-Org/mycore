@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.MessageFormat;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -24,7 +23,7 @@ import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.mets.model.MCRMETSGenerator;
+import org.mycore.mets.model.MCRMETSGeneratorFactory;
 import org.mycore.mets.model.converter.MCRSimpleModelXMLConverter;
 import org.mycore.mets.model.converter.MCRXMLSimpleModelConverter;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
@@ -107,25 +106,22 @@ public class MCRMetsCommands extends MCRAbstractCommands {
         }
     }
 
-    @MCRCommand(syntax = "add mets files for derivate {0}", help = "", order = 20)
+    @MCRCommand(syntax = "add mets files for derivate {0}", order = 20)
     public static void addMetsFileForDerivate(String derivateID) {
         MCRPath metsFile = MCRPath.getPath(derivateID, "/mets.xml");
         if (!Files.exists(metsFile)) {
             try {
                 LOGGER.debug("Start MCRMETSGenerator for derivate " + derivateID);
-                HashSet<MCRPath> ignoreNodes = new HashSet<MCRPath>();
-                Document mets = MCRMETSGenerator.getGenerator()
-                    .getMETS(MCRPath.getPath(derivateID, "/"), ignoreNodes)
-                    .asDocument();
+                Document mets = MCRMETSGeneratorFactory.create(MCRPath.getPath(derivateID, "/")).generate().asDocument();
                 MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivateID));
                 LOGGER.debug("Stop MCRMETSGenerator for derivate " + derivateID);
-            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | IOException e) {
+            } catch (Exception e) {
                 LOGGER.error("Can't create mets file for derivate " + derivateID);
             }
         }
     }
 
-    @MCRCommand(syntax = "add mets files for project id {0}", help = "", order = 30)
+    @MCRCommand(syntax = "add mets files for project id {0}", order = 30)
     public static void addMetsFileForProjectID(String projectID) {
         MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
         List<String> dervate_list = manager.listIDsForBase(projectID + "_derivate");

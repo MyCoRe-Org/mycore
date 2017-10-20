@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.HashSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +50,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.mets.model.MCRMETSGenerator;
+import org.mycore.mets.model.MCRMETSGeneratorFactory;
 import org.mycore.mets.tools.MCRMetsSave;
 
 /**
@@ -138,17 +137,10 @@ public class MCRMETSServlet extends MCRServlet {
             content.setDocType("mets");
             return content;
         } else {
-            HashSet<MCRPath> ignoreNodes = new HashSet<MCRPath>();
-            if (metsExists) {
-                ignoreNodes.add(metsPath);
-            }
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(derivate, "/"), ignoreNodes)
-                .asDocument();
-
+            Document mets = MCRMETSGeneratorFactory.create(MCRPath.getPath(derivate, "/")).generate().asDocument();
             if (!metsExists && STORE_METS_ON_GENERATE) {
                 MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivate));
             }
-
             return new MCRJDOMContent(mets);
         }
     }
@@ -213,7 +205,7 @@ public class MCRMETSServlet extends MCRServlet {
             } catch (IOException e) {
                 LOGGER.warn("Error while retrieving last modified information from " + metsPath, e);
             }
-            return -1l;
+            return -1L;
         } finally {
             session.commitTransaction();
             MCRSessionMgr.releaseCurrentSession();

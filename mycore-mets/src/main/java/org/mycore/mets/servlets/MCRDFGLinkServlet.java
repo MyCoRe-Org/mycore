@@ -27,7 +27,6 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +47,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.mets.model.MCRMETSGenerator;
+import org.mycore.mets.model.MCRMETSGeneratorFactory;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
@@ -104,6 +103,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
             return;
         }
 
+        // TODO: this seems very very wrong
         if (filePath == "") {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
             filePath = derivate.getDerivate().getInternals().getMainDoc();
@@ -200,12 +200,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
             content.setDocType("mets");
             return content;
         } else {
-            HashSet<MCRPath> ignoreNodes = new HashSet<MCRPath>();
-            if (metsExists) {
-                ignoreNodes.add(metsFile);
-            }
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(metsFile.getParent(), ignoreNodes).asDocument();
-
+            Document mets = MCRMETSGeneratorFactory.create(metsFile.getParent()).generate().asDocument();
             return new MCRJDOMContent(mets);
         }
     }
