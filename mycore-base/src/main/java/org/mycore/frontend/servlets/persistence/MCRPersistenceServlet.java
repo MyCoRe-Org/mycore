@@ -80,12 +80,6 @@ abstract class MCRPersistenceServlet extends MCRServlet {
                 job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
                 return;
             }
-            if (ex instanceof SAXParseException) {
-                ArrayList<String> errorLog = new ArrayList<String>();
-                errorLog.add(MCRXMLParserErrorHandler.getSAXErrorMessage((SAXParseException) ex));
-                errorHandlerValid(job, errorLog);
-                return;
-            }
             if (ex instanceof MCRActiveLinkException) {
                 String msg = ((MCRActiveLinkException) ex)
                     .getActiveLinks()
@@ -125,62 +119,6 @@ abstract class MCRPersistenceServlet extends MCRServlet {
         }
         params.put("cancelUrl", MCRPersistenceHelper.getCancelUrl(request));
         response.sendRedirect(response.encodeRedirectURL(buildRedirectURL(base, params)));
-    }
-
-    /**
-     * handles validation errors (XML Schema) and present nice pages instead of stack traces.
-     * @throws IOException
-     * @throws SAXException
-     * @throws TransformerException
-     */
-    private void errorHandlerValid(MCRServletJob job, List<String> logtext) throws IOException, TransformerException,
-        SAXException {
-        // write to the log file
-        for (String aLogtext : logtext) {
-            LOGGER.error(aLogtext);
-        }
-
-        // prepare editor with error messages
-        String myfile = "editor_error_formular.xml";
-        //TODO: Access File directly
-        Element root = MCRURIResolver.instance().resolve("webapp:" + myfile);
-        List<Element> sectionlist = root.getChildren("section");
-
-        for (Element section : sectionlist) {
-            final String sectLang = section.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-            if (!sectLang.equals(MCRSessionMgr.getCurrentSession().getCurrentLanguage()) && !sectLang.equals("all")) {
-                continue;
-            }
-
-            Element p = new Element("p");
-            section.addContent(0, p);
-
-            Element center = new Element("center");
-
-            // the error message
-            Element table = new Element("table");
-            table.setAttribute("width", "80%");
-
-            for (String logMsg : logtext) {
-                Element tr = new Element("tr");
-                Element td = new Element("td");
-                Element el = new Element("pre");
-                el.setAttribute("style", "color:red;");
-                el.addContent(logMsg);
-                td.addContent(el);
-                tr.addContent(td);
-                table.addContent(tr);
-            }
-
-            center.addContent(table);
-            section.addContent(1, center);
-            p = new Element("p");
-            section.addContent(2, p);
-            break;
-        }
-
-        // restart editor
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(root));
     }
 
 }
