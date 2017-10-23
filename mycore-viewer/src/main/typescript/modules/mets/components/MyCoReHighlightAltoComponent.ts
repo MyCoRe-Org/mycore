@@ -292,11 +292,12 @@ namespace mycore.viewer.components {
                 chapterIds.map(chapterId => this.chapters.get(chapterId)).forEach((chapter, i, chapters) => {
                     // maximize
                     let maximizedRect = chapter.maximize(pageId);
-                    if(maximizedRect == null) {
+                    if (maximizedRect == null) {
                         return;
                     }
                     chapter.boundingBoxMap.set(pageId, [maximizedRect]);
 
+                    // intersect with other chapters
                     for (let j = 0; j < chapters.length; j++) {
                         if (i == j) {
                             continue;
@@ -307,6 +308,13 @@ namespace mycore.viewer.components {
                         // fix area intersections of chapters on the same page
                         chapter.fixIntersections(pageId, chapters[j]);
                     }
+
+                    // cut start and end
+                    let altoRects = chapter.altoRectMap.get(pageId);
+                    chapter.cutVerticalBoundingBox(pageId, altoRects[0].getY());
+                    chapter.cutVerticalBoundingBox(pageId,
+                        altoRects[altoRects.length - 1].getY() + altoRects[altoRects.length - 1].getHeight());
+
                     // remove areas which does not contain any content
                     chapter.fixEmptyAreas(pageId, alto);
                 });
@@ -349,7 +357,7 @@ namespace mycore.viewer.components {
         public fixBoundingBox(pageId:string, rect:Rect):boolean {
             let thisBoundingBox = this.boundingBoxMap.get(pageId);
             for (let thisBBRect of thisBoundingBox) {
-                if(!thisBBRect.intersectsArea(rect) || this.intersectText(pageId, rect)) {
+                if(!thisBBRect.intersectsArea(rect) || this.intersectsText(pageId, rect)) {
                     continue;
                 }
                 thisBoundingBox = thisBoundingBox.filter(rect => rect !== thisBBRect);
@@ -367,7 +375,7 @@ namespace mycore.viewer.components {
          * @param pageId id of the page
          * @param rect the rect
          */
-        public intersectText(pageId:string, rect:Rect):boolean {
+        public intersectsText(pageId:string, rect:Rect):boolean {
             let rects = this.altoRectMap.get(pageId);
             for(let altoRect of rects) {
                 if(altoRect.intersectsArea(rect)) {
@@ -397,6 +405,26 @@ namespace mycore.viewer.components {
                     this.fixIntersections(pageId, other);
                     return;
                 }
+            }
+        }
+
+        /**
+         * Cuts the bounding box on y.
+         *
+         * @param {string} pageId page to cut
+         * @param {number} y the vertical position to cut
+         */
+        public cutVerticalBoundingBox(pageId: string, y: number) {
+            let thisAreas = this.boundingBoxMap.get(pageId);
+            for (let thisArea of thisAreas) {
+                if (!thisArea.intersectsVertical(y)) {
+                    continue;
+                }
+                thisAreas = thisAreas.filter(rect => rect !== thisArea);
+                let cutY = y - thisArea.getY();
+                thisAreas.push(Rect.fromXYWH(thisArea.getX(), thisArea.getY(), thisArea.getWidth(), cutY));
+                thisAreas.push(Rect.fromXYWH(thisArea.getX(), thisArea.getY() + cutY + 1, thisArea.getWidth(), thisArea.getHeight() - (cutY + 1)));
+                this.boundingBoxMap.set(pageId, thisAreas);
             }
         }
 

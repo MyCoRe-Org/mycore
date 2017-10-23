@@ -119,7 +119,7 @@ namespace mycore.viewer.widgets.canvas {
                             ctx.clearRect( rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight() );
 
                             /*
-                            Add some strokes around the blocks for testing purpose
+                            // Add some strokes around the blocks for testing purpose
                             ctx.strokeStyle = "rgba(1,0,0,0.8)";
                             ctx.lineWidth = 5;
                             ctx.beginPath();
