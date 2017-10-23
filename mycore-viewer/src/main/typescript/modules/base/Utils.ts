@@ -276,7 +276,7 @@ class Rect {
     }
 
     public intersects(p:Position2D):boolean {
-        return p.x < this.pos.x + this.size.width && p.x > this.pos.x && p.y < this.pos.y + this.size.height && p.y > this.pos.y;
+        return this.intersectsHorizontal(p.x) && this.intersectsVertical(p.y);
     }
 
     public intersectsArea(other:Rect):boolean {
@@ -284,6 +284,14 @@ class Rect {
         other.getX() < (this.getX() + this.getWidth()) &&
         this.getY() < (other.getY() + other.getHeight()) &&
         other.getY() < (this.getY() + this.getHeight()));
+    }
+
+    public intersectsVertical(y:number):boolean {
+        return y < this.pos.y + this.size.height && y > this.pos.y;
+    }
+
+    public intersectsHorizontal(x:number):boolean {
+        return x < this.pos.x + this.size.width && x > this.pos.x;
     }
 
     public rotate(deg:number) {
