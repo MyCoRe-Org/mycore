@@ -44,6 +44,7 @@ public class MCRStoredAltoChangeSetMetadata {
     @Id
     private String pid;
 
+    @Column(nullable = false, name = "username")
     private String user;
 
     public String getSessionID() {
