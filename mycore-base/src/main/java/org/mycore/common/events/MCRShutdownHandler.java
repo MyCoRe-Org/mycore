@@ -75,20 +75,22 @@ public class MCRShutdownHandler {
     public void addCloseable(MCRShutdownHandler.Closeable c) {
         Objects.requireNonNull(c);
         init();
-        boolean isNotShuttingDown;
+        boolean hasShutDownLock;
         try {
-            isNotShuttingDown = shutdownLock.readLock().tryLock(ADD_CLOSEABLE_TIMEOUT, TimeUnit.SECONDS);
+            hasShutDownLock = shutdownLock.readLock().tryLock(ADD_CLOSEABLE_TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new MCRException("Could not aquire shutdown lock in time", e);
         }
-        if (isNotShuttingDown) {
-            try {
+        try {
+            if (hasShutDownLock && !shuttingDown) {
                 requests.add(c);
-            } finally {
+            } else {
+                throw new MCRException("Cannot register Closeable while shutting down application.");
+            }
+        } finally {
+            if (hasShutDownLock) {
                 shutdownLock.readLock().unlock();
             }
-        } else {
-            throw new MCRException("Cannot register closable while shutting down application.");
         }
     }
 
