@@ -173,8 +173,16 @@ public abstract class MCRObjectUtils {
      * @throws IOException An error occurred while retrieving the revision information. This is most
      *          likely due an svn error.
      * @throws MCRPersistenceException There is no such object with the given id and revision.
+     * @throws ClassCastException The returning type must be the same as the type of the restored object
      */
-    public static MCRObject restore(MCRObjectID mcrId, Long revision) throws IOException, MCRPersistenceException {
+    public static <T extends MCRBase> T restore(MCRObjectID mcrId, Long revision) throws IOException, MCRPersistenceException {
+        T mcrObj;
+        if (mcrId.getTypeId().equals("derivate")) {
+            mcrObj = (T) new MCRDerivate();
+        } else {
+            mcrObj = (T) new MCRObject();
+        }
+
         // get content
         MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
         MCRContent content = xmlMetadataManager.retrieveContent(mcrId, revision);
@@ -183,14 +191,15 @@ public abstract class MCRObjectUtils {
         }
         // store it
         try {
-            MCRObject mcrObj = new MCRObject(content.asXML());
+            mcrObj.setFromJDOM(content.asXML());
             if (MCRMetadataManager.exists(mcrId)) {
                 MCRMetadataManager.update(mcrObj);
             } else {
-                if (xmlMetadataManager.exists(mcrId)) {
-                    xmlMetadataManager.delete(mcrId);
+                if (mcrObj instanceof MCRObject) {
+                    MCRMetadataManager.create((MCRObject) mcrObj);
+                } else {
+                    MCRMetadataManager.create((MCRDerivate) mcrObj);
                 }
-                MCRMetadataManager.create(mcrObj);
             }
             return mcrObj;
         } catch (Exception exc) {
