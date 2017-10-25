@@ -204,7 +204,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     private static final String CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX = "check tiles of image {0} {1}";
 
-    @MCRCommand(syntax = "fix dead Entries", help = "Deletes entries for files which dont exist anymore!")
+    @MCRCommand(syntax = "fix dead tile jobs", help = "Deletes entries for files which dont exist anymore!")
     public static void fixDeadEntries() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<MCRTileJob> allTileJobQuery = em.createNamedQuery("MCRTileJob.all", MCRTileJob.class);
@@ -218,19 +218,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             .forEach(em::remove);
     }
 
-    @MCRCommand(syntax = "fix MCR-1717", help = "Fixes wrong entries in tile job table (see MCR-1717 comments)")
-    public static void fixMCR_1717() {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        TypedQuery<MCRTileJob> allTileJobQuery = em.createNamedQuery("MCRTileJob.all", MCRTileJob.class);
-        List<MCRTileJob> tiles = allTileJobQuery.getResultList();
-        tiles.stream()
-            .filter(tj -> !tj.getPath().startsWith("/"))
-            .peek(tj -> LOGGER.info("Fixing TileJob {}:{}", tj.getDerivate(), tj.getPath()))
-            .forEach(tj -> {
-                String newPath = "/" + tj.getPath();
-                tj.setPath(newPath);
-            });
-    }
 
     /**
      * checks and repairs tile of this derivate.
