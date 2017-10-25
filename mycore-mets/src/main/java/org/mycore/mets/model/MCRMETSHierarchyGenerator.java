@@ -269,6 +269,10 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
     protected Optional<String> getOrderLabel(String fileId) {
         return getOldMets().map(oldMets -> {
             PhysicalSubDiv subDiv = oldMets.getPhysicalStructMap().getDivContainer().byFileId(fileId);
+            if(subDiv == null) {
+                LOGGER.error("Unable to get @ORDERLABEL of physical div '" + fileId + "'.");
+                return null;
+            }
             return subDiv.getOrderLabel();
         });
     }
