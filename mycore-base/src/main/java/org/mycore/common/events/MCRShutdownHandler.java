@@ -16,9 +16,12 @@ package org.mycore.common.events;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -39,11 +42,15 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
  */
 public class MCRShutdownHandler {
 
+    private static final int ADD_CLOSEABLE_TIMEOUT = 10;
+
     private static final String PROPERTY_SYSTEM_NAME = "MCR.CommandLineInterface.SystemName";
 
     private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();
 
     private final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
+
+    private final ReentrantReadWriteLock shutdownLock = new ReentrantReadWriteLock();
 
     private volatile boolean shuttingDown = false;
 
@@ -68,7 +75,21 @@ public class MCRShutdownHandler {
     public void addCloseable(MCRShutdownHandler.Closeable c) {
         Objects.requireNonNull(c);
         init();
-        requests.add(c);
+        boolean isNotShuttingDown;
+        try {
+            isNotShuttingDown = shutdownLock.readLock().tryLock(ADD_CLOSEABLE_TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new MCRException("Could not aquire shutdown lock in time", e);
+        }
+        if (isNotShuttingDown) {
+            try {
+                requests.add(c);
+            } finally {
+                shutdownLock.readLock().unlock();
+            }
+        } else {
+            throw new MCRException("Cannot register closable while shutting down application.");
+        }
     }
 
     public void removeCloseable(MCRShutdownHandler.Closeable c) {
@@ -89,14 +110,12 @@ public class MCRShutdownHandler {
         }
         final String system = cfgSystemName;
         System.out.println(system + " Shutting down system, please wait...\n");
-        shuttingDown = true;
-        Closeable[] closeables;
-        do {
-            synchronized (requests) {
-                logger.debug(() -> "requests: " + requests.toString());
-                closeables = requests.stream().toArray(i -> new Closeable[i]);
-                requests.clear(); //during shut down more request may come in MCR-1726
-            }
+        shutdownLock.writeLock().lock();
+        try {
+            shuttingDown = true;
+            logger.debug(() -> "requests: " + requests.toString());
+            Closeable[] closeables = requests.stream().toArray(i -> new Closeable[i]);
+            requests.clear(); //during shut down more request may come in MCR-1726
             for (Closeable c : closeables) {
                 logger.debug("Prepare Closing: " + c.toString());
                 c.prepareClose();
@@ -106,12 +125,14 @@ public class MCRShutdownHandler {
                 logger.debug("Closing: " + c.toString());
                 c.close();
             }
-        } while (!requests.isEmpty());
-        System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
-        MCRSessionMgr.close();
-        System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
-        LogManager.shutdown();
-        SINGLETON = null;
+            System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
+            MCRSessionMgr.close();
+            System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
+            LogManager.shutdown();
+            SINGLETON = null;
+        } finally {
+            shutdownLock.writeLock().unlock();
+        }
         // may be needed in webapp to release file handles correctly.
         if (leakPreventor != null) {
             ClassLoaderLeakPreventor myLeakPreventor = leakPreventor;
