@@ -1,6 +1,7 @@
 package org.mycore.iview2.services;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 
@@ -20,7 +21,7 @@ import org.mycore.imagetiler.MCRTiledPictureProps;
 
 /**
  * A slave thread of {@link MCRImageTiler}
- * 
+ *
  * This class can be extended. Any extending class should provide and implementation for {@link #getMCRImage()}.
  * To get the extending class invoked, one need to define a MyCoRe property, which defaults to:
  * <code>MCR.Module-iview2.MCRTilingActionImpl=org.mycore.iview2.services.MCRTilingAction</code>
@@ -28,21 +29,26 @@ import org.mycore.imagetiler.MCRTiledPictureProps;
  *
  */
 public class MCRTilingAction implements Runnable {
+    private static Logger LOGGER = LogManager.getLogger(MCRTilingAction.class);
+
     protected MCRTileJob tileJob = null;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRTilingAction.class);
+    public MCRTilingAction(MCRTileJob image) {
+        this.tileJob = image;
+    }
 
     /**
      * takes a {@link MCRTileJob} and tiles the referenced {@link MCRImage} instance.
-     * 
+     *
      * Also this updates tileJob properties of {@link MCRTileJob} in the database.
      */
     public void run() {
         tileJob.setStart(new Date());
         MCRImage image;
+        Path tileDir = MCRIView2Tools.getTileDir();
         try {
             image = getMCRImage();
-            image.setTileDir(MCRIView2Tools.getTileDir());
+            image.setTileDir(tileDir);
         } catch (IOException e) {
             LOGGER.error("Error while retrieving image for job: " + tileJob, e);
             return;
@@ -79,7 +85,7 @@ public class MCRTilingAction implements Runnable {
                 tileJob.setZoomLevel(picProps.getZoomlevel());
             } catch (IOException e) {
                 LOGGER.error("IOException occured while tiling a queued picture", e);
-                return;
+                throw e;
             }
             transaction = session.beginTransaction();
             session.update(tileJob);
@@ -89,6 +95,12 @@ public class MCRTilingAction implements Runnable {
             if (transaction != null && transaction.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
                 transaction.rollback();
             }
+            try {
+                Files.deleteIfExists(MCRImage.getTiledFile(tileDir,tileJob.getDerivate(), tileJob.getPath()));
+            } catch (IOException e1) {
+                LOGGER.error("Could not delete tile file after error!", e);
+            }
+
         } finally {
             session.close();
             MCRSessionMgr.releaseCurrentSession();
@@ -102,12 +114,7 @@ public class MCRTilingAction implements Runnable {
      */
     protected MCRImage getMCRImage() throws IOException {
         MCRPath file = MCRPath.getPath(tileJob.getDerivate(), tileJob.getPath());
-        MCRImage imgTiler = MCRImage.getInstance(file, file.getOwner(), file.subpathComplete().toString());
-        return imgTiler;
-    }
-
-    public MCRTilingAction(MCRTileJob image) {
-        this.tileJob = image;
+        return MCRImage.getInstance(file, file.getOwner(), file.getOwnerRelativePath());
     }
 
     @Override

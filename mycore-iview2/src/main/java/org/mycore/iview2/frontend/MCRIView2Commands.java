@@ -45,10 +45,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.imageio.ImageReader;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.query.Query;
 import org.jdom2.JDOMException;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -194,11 +198,39 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         List<MCRPath> supportedFiles = getSupportedFiles(derivateRoot);
         return supportedFiles.stream()
             .map(image -> MessageFormat.format(batchCommandSyntax, derivateID,
-                image.subpathComplete().toString()))
+                image.getOwnerRelativePath()))
             .collect(Collectors.toList());
     }
 
     private static final String CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX = "check tiles of image {0} {1}";
+
+    @MCRCommand(syntax = "fix dead Entries", help = "Deletes entries for files which dont exist anymore!")
+    public static void fixDeadEntries() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRTileJob> allTileJobQuery = em.createNamedQuery("MCRTileJob.all", MCRTileJob.class);
+        List<MCRTileJob> tiles = allTileJobQuery.getResultList();
+        tiles.stream()
+            .filter(tj->{
+                MCRPath path = MCRPath.getPath(tj.getDerivate(), tj.getPath());
+                return !Files.exists(path);
+            })
+            .peek(tj->LOGGER.info("Delete TileJob {}:{}", tj.getDerivate(), tj.getPath()))
+            .forEach(em::remove);
+    }
+
+    @MCRCommand(syntax = "fix MCR-1717", help = "Fixes wrong entries in tile job table (see MCR-1717 comments)")
+    public static void fixMCR_1717() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRTileJob> allTileJobQuery = em.createNamedQuery("MCRTileJob.all", MCRTileJob.class);
+        List<MCRTileJob> tiles = allTileJobQuery.getResultList();
+        tiles.stream()
+            .filter(tj -> !tj.getPath().startsWith("/"))
+            .peek(tj -> LOGGER.info("Fixing TileJob {}:{}", tj.getDerivate(), tj.getPath()))
+            .forEach(tj -> {
+                String newPath = "/" + tj.getPath();
+                tj.setPath(newPath);
+            });
+    }
 
     /**
      * checks and repairs tile of this derivate.
@@ -324,7 +356,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         if (MCRIView2Tools.isFileSupported(file)) {
             MCRTileJob job = new MCRTileJob();
             job.setDerivate(file.getOwner());
-            job.setPath(file.subpathComplete().toString());
+            job.setPath(file.getOwnerRelativePath());
             MCRTilingQueue.getInstance().offer(job);
             LOGGER.info("Added to TilingQueue: " + file);
             startMasterTilingThread();
