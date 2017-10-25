@@ -125,7 +125,7 @@ public class MCRMigrationCommands {
     }
 
     @MCRCommand(syntax = "fix MCR-1717", help = "Fixes wrong entries in tile job table (see MCR-1717 comments)")
-    public static void fixMCR_1717() {
+    public static void fixMCR1717() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<MCRTileJob> allTileJobQuery = em.createNamedQuery("MCRTileJob.all", MCRTileJob.class);
         List<MCRTileJob> tiles = allTileJobQuery.getResultList();

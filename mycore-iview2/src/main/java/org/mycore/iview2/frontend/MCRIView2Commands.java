@@ -50,7 +50,6 @@ import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.query.Query;
 import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
