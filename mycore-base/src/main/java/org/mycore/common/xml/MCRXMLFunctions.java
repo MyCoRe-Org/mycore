@@ -67,6 +67,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.xerces.util.XMLChar;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.mycore.access.MCRAccessManager;
@@ -236,10 +237,9 @@ public class MCRXMLFunctions {
         String timeZone)
         throws ParseException {
         if (LOGGER.isDebugEnabled()) {
-            StringBuilder sb = new StringBuilder("isoDate=");
-            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
-                .append(", iso649Language=").append(iso639Language).append(", timeZone=").append(timeZone);
-            LOGGER.debug(sb.toString());
+            String sb = "isoDate=" + isoDate + ", simpleFormat=" + simpleFormat + ", isoFormat=" + isoFormat
+                    + ", iso649Language=" + iso639Language + ", timeZone=" + timeZone;
+            LOGGER.debug(sb);
         }
         Locale locale = new Locale(iso639Language);
         MCRISO8601Date mcrdate = new MCRISO8601Date();
@@ -293,7 +293,7 @@ public class MCRXMLFunctions {
      */
     public static String getISODateFromMCRHistoryDate(String date_value, String field_name, String calendar_name)
             throws ParseException {
-        String formatted_date = "";
+        String formatted_date;
         if (field_name == null || field_name.trim().length() == 0) {
             return "";
         }
@@ -332,14 +332,13 @@ public class MCRXMLFunctions {
      * @see SimpleDateFormat format description
      */
     public static String getCurrentDate(String format) {
-        SimpleDateFormat sdf = null;
+        SimpleDateFormat sdf;
         try {
             sdf = new SimpleDateFormat(format, Locale.ROOT);
         } catch (Exception i) {
             LOGGER.warn("Could not parse date format string, will use default \"yyyy-MM-dd\"", i);
             sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
         }
-
         return sdf.format(new Date());
     }
 
@@ -357,15 +356,12 @@ public class MCRXMLFunctions {
      * @param regex the regular expression to apply
      */
     public static String regexp(String source, String regex, String replace) {
-        String regexApplied = null;
         try {
-            regexApplied = source.replaceAll(regex, replace);
+            return source.replaceAll(regex, replace);
         } catch (Exception e) {
             LOGGER.warn("Could not apply regular expression. Returning source string (" + source + ").");
             return source;
         }
-
-        return regexApplied;
     }
 
     public static boolean classAvailable(String className) {
@@ -503,7 +499,7 @@ public class MCRXMLFunctions {
         CompletableFuture<Boolean> permission = MCRAccessManager.checkPermission(
             MCRSystemUserInformation.getGuestInstance(),
             () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ)
-                ? checkReadPermissionOfDerivates(mcrObjectID) : false);
+                    && checkReadPermissionOfDerivates(mcrObjectID));
         try {
             return permission.join();
         } catch (CancellationException | CompletionException e) {
@@ -993,15 +989,46 @@ public class MCRXMLFunctions {
      * @return the plain text without tags
      */
     public static String stripHtml(final String s) {
-        StringBuffer res = new StringBuffer(s);
-
+        StringBuilder res = new StringBuilder(s);
         Matcher m;
         while ((m = TAG_PATTERN.matcher(res.toString())).find()) {
             res.delete(m.start(), m.end());
             res.insert(m.start(), stripHtml(m.group(m.groupCount() - 1)));
         }
-
         return StringEscapeUtils.unescapeHtml(res.toString()).replaceAll(TAG_SELF_CLOSING, "");
+    }
+
+    /**
+     * Converts a string to valid NCName.
+     *
+     * @see <a href="https://www.w3.org/TR/1999/WD-xmlschema-2-19990924/#NCName">w3.org</a>
+     *
+     * @param name the string to convert
+     * @return a string which is a valid NCName
+     * @throws IllegalArgumentException if there is no way to convert the string to an NCName
+     */
+    public static String toNCName(String name) {
+        while (name.length() > 0 && !XMLChar.isNameStart(name.charAt(0))) {
+            name = name.substring(1);
+        }
+        name = toNCNameSecondPart(name);
+        if (name.length() == 0) {
+            throw new IllegalArgumentException("Unable to convert '" + name + "' to valid NCName.");
+        }
+        return name;
+    }
+
+    /**
+     * Converts a string to a valid second part (everything after the first character) of a NCName. This includes
+     * "a-Z A-Z 0-9 - . _".
+     *
+     * @see <a href="https://www.w3.org/TR/1999/WD-xmlschema-2-19990924/#NCName">w3.org</a>
+     *
+     * @param name the string to convert
+     * @return a valid NCName
+     */
+    public static String toNCNameSecondPart(String name) {
+        return name.replaceAll("[^\\w\\-\\.]*", "");
     }
 
 }

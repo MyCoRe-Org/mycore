@@ -1,5 +1,28 @@
 package org.mycore.mets.tools;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
@@ -23,7 +46,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.mets.misc.StructLinkGenerator;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
@@ -38,29 +60,6 @@ import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 /**
  * Class is responsible for saving a mets document to a derivate. It also can
@@ -556,7 +555,7 @@ public class MCRMetsSave {
      * @return
      */
     private static Document updateOnFileDelete(Document mets, MCRPath file) {
-        Mets modifiedMets = null;
+        Mets modifiedMets;
         try {
             modifiedMets = new Mets(mets);
             String href = file.getOwnerRelativePath().substring(1);
@@ -611,7 +610,7 @@ public class MCRMetsSave {
 
                             LogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
                                 logID);
-                            if (!(logicalDiv instanceof LogicalDiv)) {
+                            if (logicalDiv == null) {
                                 LOGGER.error("Could not find " + LogicalDiv.class.getSimpleName() + " with id "
                                     + logID);
                                 LOGGER.error("Mets document remains unchanged");
@@ -652,11 +651,11 @@ public class MCRMetsSave {
     }
 
     /**
-     * @param mets
+     *
      * @param logDiv
-     * @throws Exception
+     * @param mets
      */
-    private static void handleParents(LogicalDiv logDiv, Mets mets) throws Exception {
+    private static void handleParents(LogicalDiv logDiv, Mets mets) {
         LogicalDiv parent = logDiv.getParent();
 
         // there are files for the parent of the log div, thus nothing to do
@@ -795,9 +794,7 @@ public class MCRMetsSave {
                     physicalChildren.get(0).getId();
 
             // a logical div is not linked anymore -> link with first physical div
-            unlinkedLogicalIds.forEach(from -> {
-                structLink.addSmLink(new SmLink(from, firstPhysicalID));
-            });
+            unlinkedLogicalIds.forEach(from -> structLink.addSmLink(new SmLink(from, firstPhysicalID)));
         }
 
         // get last logical div
@@ -852,7 +849,7 @@ public class MCRMetsSave {
     }
 
     /**
-     * Returns the name without any path information or file extension. Useable to create mets ID's.
+     * Returns the name without any path information or file extension. Usable to create mets ID's.
      *
      * <ul>
      *     <li>abc123.jpg -&gt; abc123</li>
@@ -864,7 +861,8 @@ public class MCRMetsSave {
      */
     public static String getFileBase(String href) {
         String fileName = Paths.get(href).getFileName().toString();
-        return fileName.substring(0, fileName.lastIndexOf("."));
+        String fileBase = fileName.substring(0, fileName.lastIndexOf("."));
+        return MCRXMLFunctions.toNCNameSecondPart(fileBase);
     }
 
     /**
@@ -881,4 +879,5 @@ public class MCRMetsSave {
     public static String getFileBase(MCRPath path) {
         return getFileBase(path.getOwnerRelativePath().substring(1));
     }
+
 }
