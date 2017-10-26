@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -41,6 +41,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -67,7 +68,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 /**
  * Instances of this class collect information kept during a session like the currently active user, the preferred
  * language etc.
- * 
+ *
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
@@ -78,7 +79,7 @@ public class MCRSession implements Cloneable {
     private static final URI defaultURI = URI.create("");
 
     /** A map storing arbitrary session data * */
-    private Map<Object, Object> map = new Hashtable<Object, Object>();
+    private Map<Object, Object> map = new Hashtable<>();
 
     @SuppressWarnings("unchecked")
     private Map.Entry<Object, Object>[] emptyEntryArray = new Map.Entry[0];
@@ -126,7 +127,7 @@ public class MCRSession implements Cloneable {
 
     private Optional<URI> firstURI = Optional.empty();
 
-    private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<Throwable>();
+    private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<>();
 
     private ThreadLocal<Queue<Runnable>> onCommitTasks = ThreadLocal.withInitial(LinkedList::new);
 
@@ -213,7 +214,7 @@ public class MCRSession implements Cloneable {
     /**
      * Returns a list of all stored object keys within MCRSession. This method is not thread safe. I you need thread
      * safe access to all stored objects use {@link MCRSession#getMapEntries()} instead.
-     * 
+     *
      * @return Returns a list of all stored object keys within MCRSession as java.util.Ierator
      */
     public Iterator<Object> getObjectsKeyList() {
@@ -371,7 +372,7 @@ public class MCRSession implements Cloneable {
 
     /**
      * Activate this session. For internal use mainly by MCRSessionMgr.
-     * 
+     *
      * @see MCRSessionMgr#setCurrentSession(MCRSession)
      */
     void activate() {
@@ -391,7 +392,7 @@ public class MCRSession implements Cloneable {
 
     /**
      * Passivate this session. For internal use mainly by MCRSessionMgr.
-     * 
+     *
      * @see MCRSessionMgr#releaseCurrentSession()
      */
     void passivate() {
@@ -410,7 +411,7 @@ public class MCRSession implements Cloneable {
     /**
      * Fire MCRSessionEvents. This is a common method that fires all types of MCRSessionEvent. Mainly for internal use
      * of MCRSession and MCRSessionMgr.
-     * 
+     *
      * @param type
      *            type of event
      * @param concurrentAccessors
@@ -477,7 +478,7 @@ public class MCRSession implements Cloneable {
 
     /**
      * Is the transaction still alive?
-     * 
+     *
      * @return true if the transaction is still alive
      */
     public boolean isTransactionActive() {
@@ -524,7 +525,7 @@ public class MCRSession implements Cloneable {
 
     /**
      * Add a task which will be executed after {@link #commitTransaction()} was called.
-     * 
+     *
      * @param task thread witch will be executed after an commit
      */
     public void onCommit(Runnable task) {
@@ -534,29 +535,33 @@ public class MCRSession implements Cloneable {
     private synchronized void submitOnCommitTasks() {
         Queue<Runnable> runnables = onCommitTasks.get();
         onCommitTasks.remove();
-        runnables.stream()
+        CompletableFuture.allOf(runnables.stream()
             .map(r -> new MCRTransactionableRunnable(r, this))
-            .forEach(this::submitOrRunOnCommitTask);
+            .map(MCRSession::toCompletableFuture)
+            .toArray(CompletableFuture[]::new))
+            .join();
     }
 
-    private void submitOrRunOnCommitTask(MCRTransactionableRunnable task) {
+    private static CompletableFuture<? extends Object> toCompletableFuture(MCRTransactionableRunnable r) {
         try {
-            COMMIT_SERVICE.submit(task);
+            return CompletableFuture.runAsync(r, COMMIT_SERVICE);
         } catch (RuntimeException e) {
             LOGGER.error("Could not submit onCommit task. Running it locally.", e);
             try {
-                task.run();
+                r.run();
             } catch (RuntimeException e2) {
                 LOGGER.fatal("Argh! Could not run task either. This task is lost 😰", e2);
             }
+            return CompletableFuture.completedFuture(null);
         }
     }
 
     private boolean isTransitionAllowed(MCRUserInformation userSystemAdapter) {
         //allow if current user super user or not logged in
         if (MCRSystemUserInformation.getSuperUserInstance().equals(userInformation)
-            || MCRSystemUserInformation.getGuestInstance().equals(userInformation))
+            || MCRSystemUserInformation.getGuestInstance().equals(userInformation)) {
             return true;
+        }
         //allow if new user information has default rights of guest user
         //or userID equals old userID
         return MCRSystemUserInformation.getGuestInstance().equals(userSystemAdapter)
