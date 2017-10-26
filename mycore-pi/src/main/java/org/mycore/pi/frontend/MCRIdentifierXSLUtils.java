@@ -53,14 +53,14 @@ public class MCRIdentifierXSLUtils {
      *     <li>&lt;service id="service2" inscribed="true" permission="false"type="doi" /&gt;</li>
      *   </ul>
      *
-     * @param ObjectID the object
+     * @param objectID the object
      * @return a Nodelist
      * @throws JDOMException
      */
-    public static NodeList getPIServiceInformation(String ObjectID) throws JDOMException {
+    public static NodeList getPIServiceInformation(String objectID) throws JDOMException {
         Element e = new Element("list");
 
-        MCRBase obj = MCRMetadataManager.retrieve(MCRObjectID.getInstance(ObjectID));
+        MCRBase obj = MCRMetadataManager.retrieve(MCRObjectID.getInstance(objectID));
         MCRConfiguration.instance().getPropertiesMap("MCR.PI.Registration.")
             .keySet()
             .stream()
@@ -80,13 +80,13 @@ public class MCRIdentifierXSLUtils {
                         service.setAttribute("inscribed", "false");
                     }
                 } catch (MCRPersistentIdentifierException e1) {
-                    LOGGER.warn("Error happened while try to read PI from object: " + ObjectID, e1);
+                    LOGGER.warn("Error happened while try to read PI from object: " + objectID, e1);
                     service.setAttribute("inscribed", "false");
                 }
 
                 // rights
                 String permission = "register-" + rs.getRegistrationServiceID();
-                Boolean canRegister = MCRAccessManager.checkPermission(ObjectID, "writedb") &&
+                Boolean canRegister = MCRAccessManager.checkPermission(objectID, "writedb") &&
                     MCRAccessManager.checkPermission(obj.getId(), permission);
 
                 service.setAttribute("permission", canRegister.toString().toLowerCase(Locale.ROOT));
