@@ -3,6 +3,7 @@ package org.mycore.common.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -126,4 +127,32 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
             assertFalse("Should not contains html: " + stripped, MCRXMLFunctions.isHtml(stripped));
         }
     }
+
+    @Test
+    public void toNCName() {
+        assertEquals("master_12345", MCRXMLFunctions.toNCName("master_12345"));
+        assertEquals("master_12345", MCRXMLFunctions.toNCName("master _12345"));
+        assertEquals("master_12345", MCRXMLFunctions.toNCName("1 2 master _12345"));
+        assertEquals("master_1-234", MCRXMLFunctions.toNCName(".-master_!1-23ä4~§"));
+        try {
+            MCRXMLFunctions.toNCName("123");
+            fail("123 can never be an NCName");
+        } catch (IllegalArgumentException iae) {
+            // this exception is expected
+        }
+    }
+
+    public void toNCNameSecondPart() {
+        assertEquals("master_12345", MCRXMLFunctions.toNCNameSecondPart("master_12345"));
+        assertEquals("master_12345", MCRXMLFunctions.toNCNameSecondPart("master _12345"));
+        assertEquals("12master_12345", MCRXMLFunctions.toNCNameSecondPart("1 2 master _12345"));
+        assertEquals(".-master_1-234", MCRXMLFunctions.toNCNameSecondPart(".-master_!1-23ä4~§"));
+        try {
+            MCRXMLFunctions.toNCName("123");
+            fail("123 can never be an NCName");
+        } catch (IllegalArgumentException iae) {
+            // this exception is expected
+        }
+    }
+
 }
