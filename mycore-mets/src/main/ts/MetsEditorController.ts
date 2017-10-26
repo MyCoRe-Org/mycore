@@ -81,7 +81,11 @@ namespace org.mycore.mets.controller {
         }
 
         public close() {
-            this.$window.close();
+            if (this.$window.history.length > 1) {
+                this.$window.history.back();
+            } else {
+                this.$window.close();
+            }
         }
 
         public viewOptionClicked(option: string) {
