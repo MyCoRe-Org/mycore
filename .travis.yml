@@ -27,7 +27,7 @@ before_install:
             rm -rf geckodriver && \
             mkdir -p geckodriver/${GECKODRIVER_VERSION} && \
             wget https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz -O geckodriver/${GECKODRIVER_VERSION}/geckodriver.tar.gz && \
-            tar -xvf geckodriver/geckodriver.tar.gz -C geckodriver/${GECKODRIVER_VERSION} && \
+            tar -xvf geckodriver/${GECKODRIVER_VERSION}/geckodriver.tar.gz -C geckodriver/${GECKODRIVER_VERSION} && \
             rm geckodriver/${GECKODRIVER_VERSION}/geckodriver.tar.gz; \
         fi; \
         geckodriver --version
