@@ -25,7 +25,7 @@ before_install:
         export PATH=$PWD/geckodriver/${GECKODRIVER_VERSION}:$PATH && \
         if ! type geckodriver/${GECKODRIVER_VERSION} > /dev/null 2>&1; then \
             rm -rf geckodriver && \
-            mkdiri -p geckodriver/${GECKODRIVER_VERSION} && \
+            mkdir -p geckodriver/${GECKODRIVER_VERSION} && \
             wget https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz -O geckodriver/${GECKODRIVER_VERSION}/geckodriver.tar.gz && \
             tar -xvf geckodriver/geckodriver.tar.gz -C geckodriver/${GECKODRIVER_VERSION} && \
             rm geckodriver/${GECKODRIVER_VERSION}/geckodriver.tar.gz; \
