@@ -405,6 +405,7 @@ public class MCRSession implements Cloneable {
         if (!firstURI.isPresent()) {
             firstURI = Optional.of(defaultURI);
         }
+        onCommitTasks.remove();
         servletJob.remove();
     }
 
@@ -532,7 +533,7 @@ public class MCRSession implements Cloneable {
         this.onCommitTasks.get().offer(Objects.requireNonNull(task));
     }
 
-    private synchronized void submitOnCommitTasks() {
+    private void submitOnCommitTasks() {
         Queue<Runnable> runnables = onCommitTasks.get();
         onCommitTasks.remove();
         CompletableFuture.allOf(runnables.stream()
