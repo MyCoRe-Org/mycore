@@ -75,10 +75,10 @@ public abstract class MCRUploadHelper {
      * @throws MCRException
      *             if path contains reserved character
      */
-    static void checkPathName(String path) throws MCRException {
-        if (path.contains("../") || path.contains("..\\"))
+    public static void checkPathName(String path) throws MCRException {
+        if (path.contains("../") || path.contains("..\\")) {
             throw new MCRException("File path " + path + " may not contain \"../\".");
-
+        }
         splitPath(path).forEach(pathElement -> {
             checkNotEmpty(path, pathElement);
             checkOnlyDots(path, pathElement);
@@ -121,7 +121,7 @@ public abstract class MCRUploadHelper {
     private static void checkReservedNames(String pathElement) {
         if (pathElement.length() <= SAVE_LENGTH) {
             String lcPathElement = pathElement.toLowerCase(Locale.ROOT);
-            if (Stream.of(RESERVED_NAMES).filter(lcPathElement::equals).findAny().isPresent()) {
+            if (Stream.of(RESERVED_NAMES).anyMatch(lcPathElement::equals)) {
                 throw new MCRException("Path element " + pathElement + " is an illegal Windows file name.");
             }
         }
@@ -159,7 +159,6 @@ public abstract class MCRUploadHelper {
         LOGGER.debug("Committing transaction");
         if (tx != null) {
             tx.commit();
-            tx = null;
         } else {
             LOGGER.error("Cannot commit transaction. Transaction is null.");
         }
@@ -169,10 +168,10 @@ public abstract class MCRUploadHelper {
         LOGGER.debug("Rolling back transaction");
         if (tx != null) {
             tx.rollback();
-            tx = null;
         } else {
             LOGGER.error("Error while rolling back transaction. Transaction is null.");
         }
         throw e;
     }
+
 }
