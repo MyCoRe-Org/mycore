@@ -4,7 +4,7 @@ dist: trusty
 group: beta
 install: true
 addons:
-  firefox: "54.0"
+  firefox: "56.0"
   apt:
     packages:
     - google-chrome-stable
@@ -15,23 +15,20 @@ cache:
 env:
   global:
     - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
-    - GECKODRIVER_VERSION="0.17.0"
+    - GECKODRIVER_VERSION="0.19.0"
     - CHROMEDRIVER_VERSION=$(curl http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-    - XVFBARGS=":99 -ac -screen 0 1280x1024x24 -ac +extension GLX +extension RANDR +render -noreset"
     - FIREFOX_BIN=$(which firefox)
     - SELENIUM_BROWSER=firefox
 before_install:
-  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- $XVFBARGS"
-
   # geckodriver
   - |
-        export PATH=$PWD/geckodriver:$PATH && \
-        if ! type geckodriver > /dev/null 2>&1; then \
+        export PATH=$PWD/geckodriver/${GECKODRIVER_VERSION}:$PATH && \
+        if ! type geckodriver/${GECKODRIVER_VERSION} > /dev/null 2>&1; then \
             rm -rf geckodriver && \
-            mkdir geckodriver && \
-            wget https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz -O geckodriver/geckodriver.tar.gz && \
-            tar -xvf geckodriver/geckodriver.tar.gz -C geckodriver && \
-            rm geckodriver/geckodriver.tar.gz; \
+            mkdir -p geckodriver/${GECKODRIVER_VERSION} && \
+            wget https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz -O geckodriver/${GECKODRIVER_VERSION}/geckodriver.tar.gz && \
+            tar -xvf geckodriver/${GECKODRIVER_VERSION}/geckodriver.tar.gz -C geckodriver/${GECKODRIVER_VERSION} && \
+            rm geckodriver/${GECKODRIVER_VERSION}/geckodriver.tar.gz; \
         fi; \
         geckodriver --version
 
@@ -39,8 +36,6 @@ before_script:
   - wget http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip -d chromedriver
   - export PATH=$PATH:$PWD/chromedriver
-  - export DISPLAY=:99.0
-  - sleep 3
   - |
    echo "BUILD START: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 script:
