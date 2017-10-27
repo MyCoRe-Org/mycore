@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.fileupload;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Locale;
@@ -94,7 +93,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         return Optional.ofNullable(job.getRequest().getParameter("uploadId")).map(MCRUploadHandlerManager::getHandler);
     }
 
-    private void handleUploadedFiles(MCRUploadHandler handler, Collection<Part> files) throws Exception, IOException {
+    private void handleUploadedFiles(MCRUploadHandler handler, Collection<Part> files) throws Exception {
         int numFiles = (int) files.stream().map(Part::getSubmittedFileName).filter(Objects::nonNull).count();
         LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
         handler.startUpload(numFiles);
@@ -113,7 +112,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         session.beginTransaction();
     }
 
-    private void handleUploadedFile(MCRUploadHandler handler, Part file) throws IOException, Exception {
+    private void handleUploadedFile(MCRUploadHandler handler, Part file) throws Exception {
         String submitted = file.getSubmittedFileName();
         if (submitted == null || "".equals(submitted)) {
             return;
@@ -148,7 +147,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         }
     }
 
-    private void handleZipFile(MCRUploadHandler handler, InputStream in) throws IOException, Exception {
+    private void handleZipFile(MCRUploadHandler handler, InputStream in) throws Exception {
         ZipInputStream zis = new ZipInputStream(in);
         MCRNotClosingInputStream nis = new MCRNotClosingInputStream(zis);
         for (ZipEntry entry; (entry = zis.getNextEntry()) != null;) {
@@ -174,4 +173,5 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         }
         return path;
     }
+
 }
