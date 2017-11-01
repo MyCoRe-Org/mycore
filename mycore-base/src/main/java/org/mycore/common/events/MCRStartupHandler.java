@@ -33,6 +33,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
+import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * Initializes classes that implement {@link AutoExecutable} interface that are defined via
@@ -83,6 +84,8 @@ public class MCRStartupHandler {
             //reverse ordering: highest priority first
             .sorted((o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()))
             .forEachOrdered(autoExecutable -> startExecutable(servletContext, autoExecutable));
+        //initialize MCRURIResolver
+        MCRURIResolver.init(servletContext);
     }
 
     private static void startExecutable(ServletContext servletContext, AutoExecutable autoExecutable) {
