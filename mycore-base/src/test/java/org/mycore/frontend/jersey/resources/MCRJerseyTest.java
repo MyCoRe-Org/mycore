@@ -30,6 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.MCRTestCaseHelper;
+import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
 import org.mycore.frontend.jersey.MCRJerseyResourceConfig;
 
 /**
@@ -73,11 +74,6 @@ public abstract class MCRJerseyTest extends JerseyTest {
     }
 
     @Override
-    protected Application configure() {
-        return new MCRTestResourceConfig();
-    }
-
-    @Override
     protected void configureClient(ClientConfig config) {
         config.register(MultiPartFeature.class);
     }
@@ -87,15 +83,28 @@ public abstract class MCRJerseyTest extends JerseyTest {
         return new ExtendedGrizzlyTestContainerFactory();
     }
 
-    protected static class MCRTestResourceConfig extends MCRJerseyResourceConfig {
+    @Override
+    protected Application configure() {
+        return new MCRJerseyTestResourceConfig();
+    }
+
+    protected static class MCRJerseyTestResourceConfig extends ResourceConfig {
+
+        public MCRJerseyTestResourceConfig() {
+            new MCRJerseyTestConfiguration().configure(this);
+        }
+
+    }
+
+    protected static class MCRJerseyTestConfiguration extends MCRJerseyDefaultConfiguration {
 
         @Override
-        protected void setupResources() {
-            this.registerClasses(JERSEY_CLASSES);
+        protected void setupResources(ResourceConfig resourceConfig) {
+            resourceConfig.registerClasses(JERSEY_CLASSES);
         }
 
         @Override
-        protected void setupFeatures() {
+        protected void setupFeatures(ResourceConfig resourceConfig) {
             // no features
         }
 
