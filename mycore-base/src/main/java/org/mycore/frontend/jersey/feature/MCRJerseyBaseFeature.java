@@ -36,7 +36,7 @@ public abstract class MCRJerseyBaseFeature implements DynamicFeature {
      * @return a list of java package names
      */
     protected List<String> getPackages() {
-        String propertyString = MCRConfiguration.instance().getString("MCR.Jersey.resource.packages",
+        String propertyString = MCRConfiguration.instance().getString("MCR.Jersey.Resource.Packages",
             "org.mycore.frontend.jersey.resources");
         return Arrays.asList(propertyString.split(","));
     }
