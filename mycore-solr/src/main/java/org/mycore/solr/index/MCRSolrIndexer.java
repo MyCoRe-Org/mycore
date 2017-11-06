@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.solr.index;
 
@@ -87,38 +87,19 @@ public class MCRSolrIndexer {
 
             @Override
             public void prepareClose() {
-                SOLR_EXECUTOR.getExecutor().shutdown();
+                while (SOLR_COLLECTION.stream().findAny().isPresent()) {
+                    Thread.yield(); //wait for index handler
+                }
+                SOLR_EXECUTOR.submit(SOLR_EXECUTOR.getExecutor()::shutdown,
+                    Integer.MIN_VALUE)
+                    .getFuture()
+                    .join();
+                waitForShutdown(SOLR_EXECUTOR.getExecutor());
             }
 
             @Override
             public int getPriority() {
                 return Integer.MIN_VALUE + 6;
-            }
-
-            @Override
-            public void close() {
-                waitForShutdown(SOLR_EXECUTOR.getExecutor());
-            }
-
-            private void waitForShutdown(ExecutorService service) {
-                if (!service.isTerminated()) {
-                    try {
-                        service.awaitTermination(10, TimeUnit.MINUTES);
-                    } catch (InterruptedException e) {
-                        LOGGER.warn("Error while waiting for shutdown.", e);
-                    }
-                }
-            }
-        });
-        MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
-
-            @Override
-            public void prepareClose() {
-            }
-
-            @Override
-            public int getPriority() {
-                return Integer.MIN_VALUE + 4;
             }
 
             @Override
@@ -138,6 +119,16 @@ public class MCRSolrIndexer {
                     metadataStats, fileStats, operationsStats);
                 LOGGER.info(msg);
             }
+
+            private void waitForShutdown(ExecutorService service) {
+                if (!service.isTerminated()) {
+                    try {
+                        service.awaitTermination(10, TimeUnit.MINUTES);
+                    } catch (InterruptedException e) {
+                        LOGGER.warn("Error while waiting for shutdown.", e);
+                    }
+                }
+            }
         });
     }
 
@@ -148,7 +139,7 @@ public class MCRSolrIndexer {
 
     /**
      * Deletes a list of documents by unique ID. Also removes any nested document of that ID.
-     * 
+     *
      * @param solrIDs
      *            the list of solr document IDs to delete
      */
@@ -193,7 +184,7 @@ public class MCRSolrIndexer {
 
     /**
      * Convenient method to delete a derivate and all its files at once.
-     * 
+     *
      * @param id the derivate id
      * @return the solr response
      */
@@ -229,7 +220,7 @@ public class MCRSolrIndexer {
     /**
      * Checks if the application uses nested documents. Using nested documents requires
      * additional queries and slows performance.
-     * 
+     *
      * @return true if nested documents are used, otherwise false
      */
     protected static boolean useNestedDocuments() {
@@ -252,7 +243,7 @@ public class MCRSolrIndexer {
 
     /**
      * Rebuilds solr's metadata index only for objects of the given type.
-     * 
+     *
      * @param type
      *            of the objects to index
      */
@@ -267,7 +258,7 @@ public class MCRSolrIndexer {
 
     /**
      * Rebuilds solr's metadata index.
-     * 
+     *
      * @param list
      *            list of identifiers of the objects to index
      * @param solrClient
@@ -330,7 +321,7 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds the content index for the given mycore objects. You can mix derivates and mcrobjects here. For each
      * mcrobject all its derivates are indexed.
-     * 
+     *
      * @param list
      *            containing mycore object id's
      */
@@ -365,7 +356,7 @@ public class MCRSolrIndexer {
 
     /**
      * Submits a index handler to the executor service (execute as a thread) with the given priority.
-     * 
+     *
      * @param indexHandler
      *            index handler to submit
      */

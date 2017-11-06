@@ -14,10 +14,12 @@
  **/
 package org.mycore.common.events;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -112,21 +114,24 @@ public class MCRShutdownHandler {
         }
         final String system = cfgSystemName;
         System.out.println(system + " Shutting down system, please wait...\n");
+        logger.debug(() -> "requests: " + requests.toString());
+        Closeable[] closeables = requests.stream().toArray(i -> new Closeable[i]);
+        Stream.of(closeables)
+            .peek(c -> logger.debug("Prepare Closing (1): {}", c))
+            .forEach(Closeable::prepareClose);
         shutdownLock.writeLock().lock();
         try {
             shuttingDown = true;
-            logger.debug(() -> "requests: " + requests.toString());
-            Closeable[] closeables = requests.stream().toArray(i -> new Closeable[i]);
-            requests.clear(); //during shut down more request may come in MCR-1726
-            for (Closeable c : closeables) {
-                logger.debug("Prepare Closing: " + c.toString());
-                c.prepareClose();
-            }
+            //during shut down more request may come in MCR-1726
+            requests.stream()
+                .filter(c -> !Arrays.asList(closeables).contains(c))
+                .peek(c -> logger.debug("Prepare Closing (2): {}", c))
+                .forEach(Closeable::prepareClose);
 
-            for (Closeable c : closeables) {
-                logger.debug("Closing: " + c.toString());
-                c.close();
-            }
+            requests.stream()
+                .peek(c -> logger.debug("Closing: {}", c))
+                .forEach(Closeable::close);
+
             System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
             MCRSessionMgr.close();
             System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
