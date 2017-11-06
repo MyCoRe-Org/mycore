@@ -65,7 +65,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
 
     @Override
     public MCRSolrIndexStatistic getStatistic() {
-        return MCRSolrIndexStatisticCollector.documents;
+        return MCRSolrIndexStatisticCollector.DOCUMENTS;
     }
 
     /* (non-Javadoc)
