@@ -60,16 +60,13 @@ public class MCRTestMerger extends MCRTestCase {
         Element b = new MCRNodeBuilder().buildElement("mods:mods" + xPathB, null, null);
         Element e = new MCRNodeBuilder().buildElement("mods:mods" + xPathExpected, null, null);
 
-        MCRMerger ea = MCRMergerFactory.buildFrom(a);
-        MCRMerger eb = MCRMergerFactory.buildFrom(b);
-        ea.mergeFrom(eb);
-        Element r = ea.element;
+        MCRMergeTool.merge(a, b);
 
-        boolean asExpected = MCRXMLHelper.deepEqual(e, r);
+        boolean asExpected = MCRXMLHelper.deepEqual(e, a);
 
         if (!asExpected) {
             System.out.println("actual result:");
-            logXML(r);
+            logXML(a);
             System.out.println("expected result:");
             logXML(e);
         }
