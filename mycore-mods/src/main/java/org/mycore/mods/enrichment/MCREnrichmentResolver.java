@@ -43,6 +43,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.mods.MCRMODSSorter;
+import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.mods.merger.MCRMerger;
 import org.mycore.mods.merger.MCRMergerFactory;
 
@@ -54,8 +55,8 @@ public class MCREnrichmentResolver implements URIResolver {
     private static final Logger LOGGER = LogManager.getLogger(MCREnrichmentResolver.class);
 
     private static final XPathExpression<Element> xPath2RelatedItems = XPathFactory.instance().compile(
-        "mods:relatedItem[@type='host' or @type='series']", Filters.element(), null,
-        MCRConstants.getStandardNamespaces());
+            "mods:relatedItem[@type='host' or @type='series']", Filters.element(), null,
+            MCRConstants.getStandardNamespaces());
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -136,10 +137,7 @@ public class MCREnrichmentResolver implements URIResolver {
             resolved.setAttribute(mods.getAttribute("type").clone());
         }
 
-        MCRMerger a = MCRMergerFactory.buildFrom(mods);
-        MCRMerger b = MCRMergerFactory.buildFrom(resolved);
-        a.mergeFrom(b);
-
+        MCRMergeTool.merge(mods, resolved);
         MCRMODSSorter.sort(mods);
         debug(mods, "merged publication");
     }
