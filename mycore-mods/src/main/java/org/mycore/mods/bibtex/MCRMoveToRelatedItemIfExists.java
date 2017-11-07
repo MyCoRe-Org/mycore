@@ -44,8 +44,8 @@ class MCRMoveToRelatedItemIfExists extends MCRFieldTransformer {
 
     @Override
     void transformField(BibtexEntry entry, Element parent) {
-        parent = getRelatedItemIfExists(parent);
-        wrappedTransformer.transformField(entry, parent);
+        Element target = getRelatedItemIfExists(parent);
+        wrappedTransformer.transformField(entry, target);
     }
 
     Element getRelatedItemIfExists(Element parent) {

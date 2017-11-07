@@ -41,7 +41,7 @@ class MCRGenreTransformer {
 
     static void fixHostGenre(BibtexEntry entry, Element mods) {
         String type = entry.getEntryType().toLowerCase(Locale.ROOT);
-        if (type.equals("incollection") || type.equals("inproceedings") || type.equals("inbook")) {
+        if ("incollection".equals(type) || "inproceedings".equals(type) || "inbook".equals(type)) {
             type = type.substring(2);
 
             Element genre = getHostGenre(mods);

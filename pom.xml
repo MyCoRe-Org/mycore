@@ -1172,8 +1172,8 @@
         <version>3.2.1</version>
         <exclusions>
           <exclusion>
-            <artifactId>jtidy</artifactId>
             <groupId>jtidy</groupId>
+            <artifactId>jtidy</artifactId>
           </exclusion>
           <exclusion>
             <groupId>commons-logging</groupId>

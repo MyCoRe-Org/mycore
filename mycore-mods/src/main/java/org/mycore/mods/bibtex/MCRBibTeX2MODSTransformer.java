@@ -45,6 +45,9 @@ import bibtex.parser.ParseException;
  */
 public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
 
+    private final static Pattern MISSING_KEYS_PATTERN = Pattern
+            .compile("(@[a-zA-Z0-9]+\\s*\\{)(\\s*[a-zA-Z0-9]+\\s*\\=)");
+
     public MCRJDOMContent transform(MCRContent source) throws IOException {
         String input = source.asString();
         input = fixMissingEntryKeys(input);
@@ -52,8 +55,6 @@ public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
         Element collection = new MCRBibTeXFileTransformer().transform(bibtexFile);
         return new MCRJDOMContent(collection);
     }
-
-    private Pattern MISSING_KEYS_PATTERN = Pattern.compile("(@[a-zA-Z0-9]+\\s*\\{)(\\s*[a-zA-Z0-9]+\\s*\\=)");
 
     private String fixMissingEntryKeys(String input) {
         StringBuffer sb = new StringBuffer();
@@ -80,5 +81,4 @@ public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
         }
         return bibtexFile;
     }
-
 }

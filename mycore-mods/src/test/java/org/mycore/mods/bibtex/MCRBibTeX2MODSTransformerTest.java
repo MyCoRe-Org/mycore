@@ -38,7 +38,8 @@ public class MCRBibTeX2MODSTransformerTest extends MCRTestCase {
 
     @Test
     public void testField2XPathTransformation() throws Exception {
-        String src, res;
+        String src;
+        String res;
 
         src = "@article{Doe2015, title={MyCoRe in a nutshell}, author={Doe, John}}";
         res = "mods:mods[mods:genre='article']" + "[mods:titleInfo/mods:title='MyCoRe in a nutshell']"

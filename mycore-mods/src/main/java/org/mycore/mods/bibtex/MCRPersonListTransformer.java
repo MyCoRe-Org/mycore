@@ -49,5 +49,4 @@ class MCRPersonListTransformer extends MCRFieldTransformer {
             (person.isOthers() ? andOthers : personTransformer).buildField(person, parent);
         }
     }
-
 }
