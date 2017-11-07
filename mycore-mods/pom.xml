@@ -65,6 +65,10 @@
       <artifactId>solr-solrj</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.bibsonomy</groupId>
+      <artifactId>bibsonomy-bibtex-parser</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-hikaricp</artifactId>
     </dependency>
