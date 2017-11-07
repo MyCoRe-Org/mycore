@@ -93,7 +93,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     @Override
     public MCRSolrIndexStatistic getStatistic() {
-        return MCRSolrIndexStatisticCollector.fileTransfer;
+        return MCRSolrIndexStatisticCollector.FILE_TRANSFER;
     }
 
     @Override

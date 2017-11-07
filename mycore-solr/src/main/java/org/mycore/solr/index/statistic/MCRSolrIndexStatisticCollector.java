@@ -29,12 +29,12 @@ package org.mycore.solr.index.statistic;
  */
 public class MCRSolrIndexStatisticCollector {
 
-    public static MCRSolrIndexStatistic xml = new MCRSolrIndexStatistic("XML documents");
+    public static final MCRSolrIndexStatistic XML = new MCRSolrIndexStatistic("XML documents");
 
-    public static MCRSolrIndexStatistic documents = new MCRSolrIndexStatistic("Solr documents");
+    public static final MCRSolrIndexStatistic DOCUMENTS = new MCRSolrIndexStatistic("Solr documents");
 
-    public static MCRSolrIndexStatistic fileTransfer = new MCRSolrIndexStatistic("File transfers");
+    public static final MCRSolrIndexStatistic FILE_TRANSFER = new MCRSolrIndexStatistic("File transfers");
 
-    public static MCRSolrIndexStatistic operations = new MCRSolrIndexStatistic("Other Solr operations");
+    public static final MCRSolrIndexStatistic OPERATIONS = new MCRSolrIndexStatistic("Other Solr operations");
 
 }

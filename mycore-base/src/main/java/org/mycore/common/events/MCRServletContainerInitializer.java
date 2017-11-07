@@ -38,7 +38,6 @@ import javax.servlet.ServletException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.xml.MCRURIResolver;
 
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 
@@ -59,8 +58,6 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         shutdownHandler.leakPreventor = leakPreventor;
         MCRStartupHandler.startUp(ctx);
         //Make sure logging is configured
-        //initialize MCRURIResolver
-        MCRURIResolver.init(ctx);
         final Logger LOGGER = LogManager.getLogger();
         if (LOGGER.isDebugEnabled()) {
             try {
