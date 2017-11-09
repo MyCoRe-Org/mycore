@@ -1,0 +1,5 @@
+@article{Doe2015, title={MyCoRe},
+  author={Doe, John},
+  journal={Journal},
+  pages={34 -- 91}
+}

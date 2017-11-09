@@ -1,0 +1,4 @@
+@book{Doe2015, title={MyCoRe unleashed},
+  author={Doe, John},
+  rating={ugly}
+}

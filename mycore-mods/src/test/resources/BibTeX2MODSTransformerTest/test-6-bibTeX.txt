@@ -1,0 +1,3 @@
+@book{Doe2015, title={MyCoRe unleashed},
+  editor={Doe, John}
+}

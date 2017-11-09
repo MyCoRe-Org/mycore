@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:genre>inproceedings</mods:genre>
+  <mods:titleInfo>
+    <mods:title>MyCoRe in a nutshell</mods:title>
+  </mods:titleInfo>
+  <mods:name type="personal">
+    <mods:role>
+      <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+    </mods:role>
+    <mods:namePart type="family">Doe</mods:namePart>
+    <mods:namePart type="given">John</mods:namePart>
+  </mods:name>
+  <mods:relatedItem type="host">
+    <mods:genre>proceedings</mods:genre>
+    <mods:titleInfo>
+      <mods:title>Proceedings of the 5th MyCoRe User workshop</mods:title>
+    </mods:titleInfo>
+  </mods:relatedItem>
+</mods:mods>

@@ -1,0 +1,4 @@
+@book{Doe2015, title={Introduction},
+  author={Foo, Bar},
+  edition={4th}
+}

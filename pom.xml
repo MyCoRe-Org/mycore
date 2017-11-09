@@ -1167,6 +1167,21 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.bibsonomy</groupId>
+        <artifactId>bibsonomy-bibtex-parser</artifactId>
+        <version>3.2.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>jtidy</groupId>
+            <artifactId>jtidy</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>org.glassfish.hk2</groupId>
         <artifactId>guice-bridge</artifactId>
         <version>${hk2.version}</version>

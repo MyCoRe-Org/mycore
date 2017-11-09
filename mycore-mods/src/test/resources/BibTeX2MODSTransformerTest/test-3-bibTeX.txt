@@ -1,0 +1,4 @@
+@article{Doe2015, title={MyCoRe in a nutshell},
+  author={Doe, John},
+  journal={Journal of Advanced Repository Software}
+}

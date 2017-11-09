@@ -1,0 +1,6 @@
+@incollection{Doe2015, title={MyCoRe in a nutshell},
+  author={Doe, John},
+  booktitle={Advanced Repository Software},
+  series={LNCS},
+  issn={1234-5678}
+}

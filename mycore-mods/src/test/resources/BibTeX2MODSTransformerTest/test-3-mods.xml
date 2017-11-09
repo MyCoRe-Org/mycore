@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:genre>article</mods:genre>
+  <mods:titleInfo>
+    <mods:title>MyCoRe in a nutshell</mods:title>
+  </mods:titleInfo>
+  <mods:name type="personal">
+    <mods:role>
+      <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+    </mods:role>
+    <mods:namePart type="family">Doe</mods:namePart>
+    <mods:namePart type="given">John</mods:namePart>
+  </mods:name>
+  <mods:relatedItem type="host">
+    <mods:genre>journal</mods:genre>
+    <mods:titleInfo>
+      <mods:title>Journal of Advanced Repository Software</mods:title>
+    </mods:titleInfo>
+  </mods:relatedItem>
+</mods:mods>

@@ -1,0 +1,5 @@
+@incollection{Doe2015, title={Introduction},
+  author={Foo, Bar},
+  booktitle={MyCoRe unleashed},
+  editor={Doe, John}
+}
