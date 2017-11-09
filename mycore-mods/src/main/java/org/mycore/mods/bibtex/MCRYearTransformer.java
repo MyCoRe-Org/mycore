@@ -32,6 +32,8 @@ import bibtex.dom.BibtexString;
 
 class MCRYearTransformer extends MCRField2XPathTransformer {
 
+    private final static Pattern YEAR_PATTERN = Pattern.compile(".*(\\d{4}).*");
+
     MCRYearTransformer() {
         super("year", "mods:originInfo/mods:dateIssued[@encoding='w3cdtf']");
     }
@@ -46,8 +48,6 @@ class MCRYearTransformer extends MCRField2XPathTransformer {
             MCRMessageLogger.logMessage("Field year: No 4-digit year found: " + content, parent);
         }
     }
-
-    private final static Pattern YEAR_PATTERN = Pattern.compile(".*(\\d{4}).*");
 
     private String getFourDigitYear(String text) {
         Matcher m = YEAR_PATTERN.matcher(text);

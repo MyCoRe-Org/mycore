@@ -36,6 +36,8 @@ import bibtex.dom.BibtexEntry;
 
 class MCRFieldTransformer {
 
+    final static String AS_NEW_ELEMENT = "[999]";
+
     protected String field;
 
     MCRFieldTransformer(String field) {
@@ -46,41 +48,18 @@ class MCRFieldTransformer {
         return field;
     }
 
-    final static String AS_NEW_ELEMENT = "[999]";
-
     /** Converts german umlauts and other special LaTeX characters */
     protected String normalizeValue(String value) {
-        value = value.replaceAll("\\s+", " ").trim();
-
-        value = value.replace("{\\\"a}", "\u00e4");
-        value = value.replace("{\\\"o}", "\u00f6");
-        value = value.replace("{\\\"u}", "\u00fc");
-        value = value.replace("{\\\"A}", "\u00c4");
-        value = value.replace("{\\\"O}", "\u00d6");
-        value = value.replace("{\\\"U}", "\u00dc");
-        value = value.replace("{\\ss}", "\u00df");
-        value = value.replace("\\\"a", "\u00e4");
-        value = value.replace("\\\"o", "\u00f6");
-        value = value.replace("\\\"u", "\u00fc");
-        value = value.replace("\\\"A", "\u00c4");
-        value = value.replace("\\\"O", "\u00d6");
-        value = value.replace("\\\"U", "\u00dc");
-        value = value.replace("{\\'a}", "\u00e1");
-        value = value.replace("{\\'e}", "\u00e9");
-        value = value.replace("{\\'i}", "\u00ed");
-        value = value.replace("{\\'o}", "\u00f3");
-        value = value.replace("{\\'u}", "\u00fa");
-        value = value.replace("{\\`a}", "\u00e0");
-        value = value.replace("{\\`e}", "\u00e8");
-        value = value.replace("{\\`i}", "\u00ec");
-        value = value.replace("{\\`o}", "\u00f2");
-        value = value.replace("{\\`u}", "\u00f9");
-        value = value.replace("{\\'\\i}", "\u00ed");
-        value = value.replace("{\\`\\i}", "\u00ec");
-
-        value = value.replace("{", "").replace("}", "");
-        value = value.replace("---", "-").replace("--", "-");
-        return value;
+        return value.replaceAll("\\s+", " ").trim().replace("{\\\"a}", "\u00e4").replace("{\\\"o}", "\u00f6")
+                .replace("{\\\"u}", "\u00fc").replace("{\\\"A}", "\u00c4").replace("{\\\"O}", "\u00d6")
+                .replace("{\\\"U}", "\u00dc").replace("{\\ss}", "\u00df").replace("\\\"a", "\u00e4")
+                .replace("\\\"o", "\u00f6").replace("\\\"u", "\u00fc").replace("\\\"A", "\u00c4")
+                .replace("\\\"O", "\u00d6").replace("\\\"U", "\u00dc").replace("{\\'a}", "\u00e1")
+                .replace("{\\'e}", "\u00e9").replace("{\\'i}", "\u00ed").replace("{\\'o}", "\u00f3")
+                .replace("{\\'u}", "\u00fa").replace("{\\`a}", "\u00e0").replace("{\\`e}", "\u00e8")
+                .replace("{\\`i}", "\u00ec").replace("{\\`o}", "\u00f2").replace("{\\`u}", "\u00f9")
+                .replace("{\\'\\i}", "\u00ed").replace("{\\`\\i}", "\u00ec").replace("{", "").replace("}", "")
+                .replace("---", "-").replace("--", "-");
     }
 
     void transformField(BibtexEntry entry, Element parent) {
