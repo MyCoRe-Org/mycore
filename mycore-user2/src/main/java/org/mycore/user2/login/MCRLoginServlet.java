@@ -78,7 +78,7 @@ public class MCRLoginServlet extends MCRServlet {
 
     protected static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(HTTPS_ONLY_PROPERTY);
 
-    protected static Logger LOGGER = LogManager.getLogger();
+    private static Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void init() throws ServletException {
