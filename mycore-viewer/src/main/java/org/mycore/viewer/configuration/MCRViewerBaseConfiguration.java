@@ -1,9 +1,12 @@
 package org.mycore.viewer.configuration;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -71,6 +74,13 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         } else {
             if (this.isFramed(request)) {
                 addLocalScript("iview-client-frame.js", developerMode);
+            } else if (this.getEmbeddedParameter(request) != null) {
+                addLocalScript("iview-client-frame.js", developerMode);
+                try {
+                    setProperty("embedded", URLEncoder.encode(getEmbeddedParameter(request), "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    throw new MCRException(e);
+                }
             } else {
                 addLocalScript("iview-client-desktop.js", developerMode);
             }
@@ -78,6 +88,10 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
             addLocalCSS("default.css");
         }
         return this;
+    }
+
+    private String getEmbeddedParameter(HttpServletRequest request) {
+        return request.getParameter("embedded");
     }
 
     protected boolean isMobile(HttpServletRequest req) {
