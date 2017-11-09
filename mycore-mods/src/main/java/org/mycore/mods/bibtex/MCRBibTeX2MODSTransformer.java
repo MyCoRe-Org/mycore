@@ -39,7 +39,8 @@ import bibtex.parser.BibtexParser;
 import bibtex.parser.ParseException;
 
 /**
- * Transforms BibTeX source code to JDOM MODS elements
+ * Transforms BibTeX source code to JDOM MODS elements.
+ * Output is a mods:modsCollection.
  *
  * @author Frank L\u00FCtzenkirchen
  */
@@ -48,6 +49,7 @@ public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
     private final static Pattern MISSING_KEYS_PATTERN = Pattern
             .compile("(@[a-zA-Z0-9]+\\s*\\{)(\\s*[a-zA-Z0-9]+\\s*\\=)");
 
+    @Override
     public MCRJDOMContent transform(MCRContent source) throws IOException {
         String input = source.asString();
         input = fixMissingEntryKeys(input);

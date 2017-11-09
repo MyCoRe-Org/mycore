@@ -33,9 +33,14 @@ import bibtex.expansions.ExpansionException;
 import bibtex.expansions.MacroReferenceExpander;
 import bibtex.expansions.PersonListExpander;
 
+/**
+ * Transforms a BibTeX file to a JDOM mods:modsCollection.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRBibTeXFileTransformer {
 
-    Element collection = new Element("modsCollection", MCRConstants.MODS_NAMESPACE);
+    private Element collection = new Element("modsCollection", MCRConstants.MODS_NAMESPACE);
 
     Element transform(BibtexFile file) {
         expandReferences(file);

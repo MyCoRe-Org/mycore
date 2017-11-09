@@ -32,6 +32,11 @@ import bibtex.dom.BibtexAbstractValue;
 import bibtex.dom.BibtexEntry;
 import bibtex.dom.BibtexString;
 
+/**
+ * Transforms any BibTeX field that can not be mapped to MODS to a mods:extension/field element.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRUnsupportedFieldTransformer extends MCRFieldTransformer {
 
     Set<String> supportedFields = new HashSet<String>();

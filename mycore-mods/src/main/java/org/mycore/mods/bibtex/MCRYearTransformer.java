@@ -30,6 +30,11 @@ import org.jdom2.Element;
 import bibtex.dom.BibtexAbstractValue;
 import bibtex.dom.BibtexString;
 
+/**
+ * Transforms a BibTeX year field to a JDOM mods:dateIssued element.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRYearTransformer extends MCRField2XPathTransformer {
 
     private final static Pattern YEAR_PATTERN = Pattern.compile(".*(\\d{4}).*");

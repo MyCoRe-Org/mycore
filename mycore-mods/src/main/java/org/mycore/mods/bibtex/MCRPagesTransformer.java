@@ -28,6 +28,11 @@ import org.mycore.mods.MCRMODSPagesHelper;
 import bibtex.dom.BibtexAbstractValue;
 import bibtex.dom.BibtexString;
 
+/**
+ * Transforms a BibTeX pages field to a JDOM mods:extent element containing pages info.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRPagesTransformer extends MCRField2XPathTransformer {
 
     MCRPagesTransformer() {

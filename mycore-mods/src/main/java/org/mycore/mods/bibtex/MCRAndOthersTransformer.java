@@ -26,6 +26,11 @@ import org.jdom2.Element;
 
 import bibtex.dom.BibtexPerson;
 
+/**
+ * Transforms the BibTeX "and others" suffix in author/editor fields to a JDOM mods:etAl element.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRAndOthersTransformer extends MCRPersonTransformer {
 
     MCRAndOthersTransformer(String field, String role) {

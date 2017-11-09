@@ -34,6 +34,11 @@ import org.mycore.common.xml.MCRNodeBuilder;
 import bibtex.dom.BibtexAbstractValue;
 import bibtex.dom.BibtexEntry;
 
+/**
+ * Transforms a single BibTeX field to a MODS element.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRFieldTransformer {
 
     final static String AS_NEW_ELEMENT = "[999]";

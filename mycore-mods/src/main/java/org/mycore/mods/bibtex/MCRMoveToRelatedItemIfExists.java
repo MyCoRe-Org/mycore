@@ -30,6 +30,11 @@ import org.mycore.common.MCRConstants;
 
 import bibtex.dom.BibtexEntry;
 
+/**
+ * Some bibTeX fields must be moved "up" to the mods:relatedItem if a given XPath condition matches, e.g. "here is a host".
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRMoveToRelatedItemIfExists extends MCRFieldTransformer {
 
     private String xPathOfRelatedItem;

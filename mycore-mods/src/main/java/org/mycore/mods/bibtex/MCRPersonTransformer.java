@@ -26,6 +26,11 @@ import org.jdom2.Element;
 
 import bibtex.dom.BibtexPerson;
 
+/**
+ * Transforms a BibTeX person name to a JDOM mods:name element.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRPersonTransformer extends MCRFieldTransformer {
 
     protected String xPath;

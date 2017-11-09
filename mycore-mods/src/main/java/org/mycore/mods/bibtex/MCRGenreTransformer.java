@@ -32,6 +32,11 @@ import org.mycore.common.MCRConstants;
 
 import bibtex.dom.BibtexEntry;
 
+/**
+ * Transforms the BibTeX entry type to mods:genre element(s).
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRGenreTransformer {
 
     static void setGenre(BibtexEntry entry, Element mods) {

@@ -27,6 +27,11 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Comment;
 import org.jdom2.Element;
 
+/**
+ * Helper class to log messages during transformation and add those messages as comment nodes in the resulting MODS XML.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRMessageLogger {
 
     private final static Logger LOGGER = LogManager.getLogger(MCRMessageLogger.class);

@@ -27,6 +27,11 @@ import org.jdom2.Element;
 import bibtex.dom.BibtexAbstractValue;
 import bibtex.dom.BibtexString;
 
+/**
+ * Generic implementation that transforms a single BibTeX field to a given MODS structure expressed as XPath .
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRField2XPathTransformer extends MCRFieldTransformer {
 
     protected String xPath;

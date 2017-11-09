@@ -30,6 +30,11 @@ import bibtex.dom.BibtexAbstractValue;
 import bibtex.dom.BibtexPerson;
 import bibtex.dom.BibtexPersonList;
 
+/**
+ * Transforms a BibTeX field containing author/editor names to multiple JDOM mods:name elements.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRPersonListTransformer extends MCRFieldTransformer {
 
     private MCRPersonTransformer personTransformer;

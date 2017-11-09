@@ -30,6 +30,11 @@ import org.mycore.common.MCRConstants;
 
 import bibtex.dom.BibtexEntry;
 
+/**
+ * Transforms a single BibTeX entry to a JDOM mods:mods element.
+ *
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRBibTeXEntryTransformer {
 
     private final static String XPATH_HOST = "mods:relatedItem[@type='host']";
