@@ -1,0 +1,4 @@
+@inproceedings{Doe2015, title={MyCoRe in a nutshell},
+  author={Doe, John},
+  booktitle={Proceedings of the 5th MyCoRe User workshop}
+}

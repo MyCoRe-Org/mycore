@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:genre>incollection</mods:genre>
+  <mods:titleInfo>
+    <mods:title>Introduction</mods:title>
+  </mods:titleInfo>
+  <mods:name type="personal">
+    <mods:role>
+      <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+    </mods:role>
+    <mods:namePart type="family">Foo</mods:namePart>
+    <mods:namePart type="given">Bar</mods:namePart>
+  </mods:name>
+  <mods:relatedItem type="host">
+    <mods:genre>collection</mods:genre>
+    <mods:titleInfo>
+      <mods:title>MyCoRe unleashed</mods:title>
+    </mods:titleInfo>
+    <mods:originInfo>
+      <mods:edition>4th</mods:edition>
+    </mods:originInfo>
+  </mods:relatedItem>
+</mods:mods>
