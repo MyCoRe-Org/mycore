@@ -77,11 +77,10 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
         if (returnID == null) {
             //calculate redirect to title change form or add files form
             redirectToUpdateDerivate(request, response);
-            return;
-        } else
+        } else {
             response.sendRedirect(
-                response.encodeRedirectURL(
-                    MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
+                    response.encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
+        }
     }
 
     /**
@@ -112,7 +111,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
         try {
             MCRMetadataManager.update(obj);
             MCRMetadataManager.update(der);
-        } catch (MCRPersistenceException | MCRActiveLinkException e) {
+        } catch (MCRPersistenceException | MCRAccessException e) {
             throw new MCRPersistenceException("Can't store label of derivate " + derivateID
                 + " in derivate list of object " + objectID + ".", e);
         }
@@ -120,7 +119,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
     }
 
     /**
-     * redirects to either add files to derivate upload form or change derivate title form.
+     * Redirects to either add files to derivate upload form or change derivate title form.
      *
      * At least "id" HTTP parameter is required to succeed.
      * <dl>
@@ -131,7 +130,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
      * </dl>
      * If the "objectid" parameter is given, upload form is presented.
      * If not than the user is redirected to the title change form.
-     * @param job
+     *
      * @throws IOException
      * @throws ServletException 
      */

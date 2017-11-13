@@ -35,33 +35,34 @@ import com.google.gson.JsonObject;
  * @version $Revision$ $Date$
  */
 public interface MCRMetaInterface extends Cloneable {
+
     /**
      * This method get the inherited element.
      * 
      * @return the inherited flag as int
      */
-    public int getInherited();
+    int getInherited();
 
     /**
      * This method get the language element.
      * 
      * @return the language
      */
-    public String getLang();
+    String getLang();
 
     /**
      * This method get the subtag element.
      * 
      * @return the subtag
      */
-    public String getSubTag();
+    String getSubTag();
 
     /**
      * This method get the type element.
      * 
      * @return the type
      */
-    public String getType();
+    String getType();
 
     /**
      * This method set the inherited level. This can be 0 or an integer higher
@@ -70,17 +71,17 @@ public interface MCRMetaInterface extends Cloneable {
      * @param value
      *            the inherited level value, if it is &lt; 0, 0 is set
      */
-    public void setInherited(int value);
+    void setInherited(int value);
 
     /**
      * This method increments the inherited value with 1.
      */
-    public void incrementInherited();
+    void incrementInherited();
 
     /**
      * This method decrements the inherited value with 1.
      */
-    public void decrementInherited();
+    void decrementInherited();
 
     /**
      * This methode set the default language to the class.
@@ -88,7 +89,7 @@ public interface MCRMetaInterface extends Cloneable {
      * @param default_lang
      *            the default language
      */
-    public void setLang(String default_lang);
+    void setLang(String default_lang);
 
     /**
      * This method set the subtag element. If the value of <em>set_subtag</em>
@@ -99,7 +100,7 @@ public interface MCRMetaInterface extends Cloneable {
      * @exception MCRException
      *                if the set_subtag value is null or empty
      */
-    public void setSubTag(String set_subtag) throws MCRException;
+    void setSubTag(String set_subtag) throws MCRException;
 
     /**
      * This method set the type element. If the value of <em>set_type</em> is
@@ -108,7 +109,7 @@ public interface MCRMetaInterface extends Cloneable {
      * @param set_type
      *            the optional type
      */
-    public void setType(String set_type);
+    void setType(String set_type);
 
     /**
      * This method read the XML input stream part from a DOM part for the
@@ -117,7 +118,7 @@ public interface MCRMetaInterface extends Cloneable {
      * @param element
      *            a relevant JDOM element for the metadata
      */
-    public void setFromDOM(org.jdom2.Element element);
+    void setFromDOM(org.jdom2.Element element);
 
     /**
      * This method create a XML stream for a metadata part.
@@ -126,36 +127,37 @@ public interface MCRMetaInterface extends Cloneable {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the metadata part
      */
-    public org.jdom2.Element createXML() throws MCRException;
+    org.jdom2.Element createXML() throws MCRException;
 
     /**
      * This method creates a JSON representation of the metadata part.
      * 
      * @return a GSON object containing the json data of the metadata part 
      */
-    public JsonObject createJSON();
+    JsonObject createJSON();
 
     /**
      * This method check the validation of the content of this class.
      * 
      * @return a boolean value
      */
-    public boolean isValid();
+    boolean isValid();
 
     /**
      * Validates the content of this class.
      * 
      * @throws MCRException the content is invalid
      */
-    public void validate() throws MCRException;
+    void validate() throws MCRException;
 
     /**
      * This method make a clone of this class.
      */
-    public MCRMetaInterface clone();
+    MCRMetaInterface clone();
 
     /**
      * This method put debug data to the logger (for the debug mode).
      */
-    public void debug();
+    void debug();
+
 }

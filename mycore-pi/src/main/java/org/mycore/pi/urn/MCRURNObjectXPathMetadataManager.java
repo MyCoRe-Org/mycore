@@ -1,20 +1,16 @@
 package org.mycore.pi.urn;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Text;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRNodeBuilder;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -40,8 +36,8 @@ public class MCRURNObjectXPathMetadataManager extends MCRPersistentIdentifierMet
             nb.buildElement(xpath, identifier.asString(), xml);
             MCRBase object = new MCRObject(xml);
             MCRMetadataManager.update(object);
-        } catch (IOException | JaxenException | MCRAccessException | MCRActiveLinkException e) {
-            throw new MCRException("Error while inscribing URN to ", e);
+        } catch (Exception e) {
+            throw new MCRException("Error while inscribing URN to " + obj.getId().toString(), e);
 
         }
     }

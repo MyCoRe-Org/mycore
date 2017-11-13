@@ -71,15 +71,15 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        HashSet<MCRCategLinkReference> before = new HashSet<MCRCategLinkReference>();
+        HashSet<MCRCategLinkReference> before = new HashSet<>();
         before.addAll(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
 
         handleDerivateDeleted(evt, der);
         handleDerivateCreated(evt, der);
 
-        HashSet<MCRCategLinkReference> after = new HashSet<MCRCategLinkReference>();
+        HashSet<MCRCategLinkReference> after = new HashSet<>();
         after.addAll(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
-        HashSet<MCRCategLinkReference> combined = new HashSet<MCRCategLinkReference>(before);
+        HashSet<MCRCategLinkReference> combined = new HashSet<>(before);
         combined.addAll(after);
         for (MCRCategLinkReference ref : combined) {
             MCRObjectID derId = der.getId();
@@ -121,7 +121,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         if (objectDerivate.deleteFileMetaData('/' + path.subpath(0, path.getNameCount()).toString())) {
             try {
                 MCRMetadataManager.update(derivate);
-            } catch (IOException | MCRAccessException e) {
+            } catch (MCRPersistenceException | MCRAccessException e) {
                 throw new MCRPersistenceException("Could not update derivate: " + derivateID, e);
             }
         }

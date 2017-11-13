@@ -20,6 +20,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -228,9 +229,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
                 String name = fieldAttributes.getName();
 
                 return Stream.of("mcrRevision", "mycoreID", "id", "mcrVersion")
-                    .filter(field -> field.equals(name))
-                    .findFirst()
-                    .isPresent();
+                             .anyMatch(field -> field.equals(name));
             }
 
             @Override
@@ -267,7 +266,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         } else if (obj instanceof MCRDerivate) {
             try {
                 MCRMetadataManager.update((MCRDerivate) obj);
-            } catch (IOException e) {
+            } catch (MCRPersistenceException | MCRAccessException e) {
                 throw new MCRPersistentIdentifierException("Error while saving derivate!", e);
             }
         }
@@ -376,8 +375,8 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         addFlagToObject(obj, mcrpi);
         try {
             MCRMetadataManager.update(obj);
-        } catch (IOException | MCRAccessException | MCRActiveLinkException e) {
-            throw new MCRException("Could not update flags", e);
+        } catch (Exception e) {
+            throw new MCRException("Could not update flags of object " + id, e);
         }
     }
 }

@@ -45,7 +45,7 @@ public class MCRPICommands {
                 MCRPIRegistrationService.addFlagToObject(base, (MCRPI) registrationInfo);
                 try {
                     MCRMetadataManager.update(base);
-                } catch (IOException | MCRAccessException | MCRActiveLinkException e) {
+                } catch (Exception e) {
                     throw new MCRException(e);
                 }
             }
@@ -55,7 +55,7 @@ public class MCRPICommands {
     @MCRCommand(syntax = "migrate urn granular to service id {0}", help = "")
     public static void migrateURNGranularToServiceID(String serviceID) {
         Session session = MCRHIBConnection.instance().getSession();
-        MCRXMLMetadataManager.instance().listIDsOfType("derivate").stream().forEach(derivateID -> {
+        MCRXMLMetadataManager.instance().listIDsOfType("derivate").forEach(derivateID -> {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
 
             String urn = derivate.getDerivate().getURN();

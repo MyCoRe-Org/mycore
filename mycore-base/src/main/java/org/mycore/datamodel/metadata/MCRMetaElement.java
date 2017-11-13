@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,7 +82,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * for the element was set to <b>MCR.Metadata.DefaultLang</b>.
      */
     public MCRMetaElement() {
-        list = new ArrayList<MCRMetaInterface>();
+        list = new ArrayList<>();
         heritable = DEFAULT_HERITABLE;
         notinherit = DEFAULT_NOT_INHERIT;
     }
@@ -132,8 +133,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         if ((index < 0) || (index > list.size())) {
             return null;
         }
-
-        return (MCRMetaInterface) list.get(index);
+        return list.get(index);
     }
 
     /**
@@ -326,10 +326,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             setNotInherit(Boolean.valueOf(notInherit));
 
         List<Element> element_list = element.getChildren();
-        for (Element anElement_list : element_list) {
-            Element subtag = (Element) anElement_list;
+        for (Element subtag : element_list) {
             MCRMetaInterface obj;
-
             try {
                 obj = forName.newInstance();
                 obj.setFromDOM(subtag);
@@ -488,6 +486,15 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
                 aList.debug();
             }
         }
+    }
+
+    /**
+     * Streams the {@link MCRMetaInterface} of this element.
+     *
+     * @return stream of MCRMetaInterface's
+     */
+    public Stream<MCRMetaInterface> stream() {
+        return list.stream();
     }
 
     @Override

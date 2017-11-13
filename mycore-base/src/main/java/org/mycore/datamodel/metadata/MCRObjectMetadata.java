@@ -70,7 +70,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     public MCRObjectMetadata() throws MCRConfigurationException {
         herited_xml = MCRConfiguration.instance()
             .getBoolean("MCR.Metadata.HeritedForXML", true);
-        meta_list = new ArrayList<MCRMetaElement>();
+        meta_list = new ArrayList<>();
     }
 
     /**
@@ -89,29 +89,16 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * @return MCRObjectMetadata the heritable part of this MCRObjectMetadata
      */
     public final MCRObjectMetadata getHeritableMetadata() {
-        MCRObjectMetadata heritMeta = new MCRObjectMetadata();
-
-        for (int i = 0; i < size(); ++i) {
-            MCRMetaElement me = meta_list.get(i);
-
-            if (me.isHeritable()) {
-                MCRMetaElement nme = (MCRMetaElement) me.clone();
-
-                for (int j = 0; j < nme.size(); j++) {
-                    nme.getElement(j)
-                        .incrementInherited();
-                }
-
-                heritMeta.setMetadataElement(nme);
-            }
-        }
-
-        return heritMeta;
+        MCRObjectMetadata heritableMetadata = new MCRObjectMetadata();
+        stream().filter(MCRMetaElement::isHeritable).map(MCRMetaElement::clone).forEach(metaElement -> {
+            metaElement.stream().forEach(MCRMetaInterface::incrementInherited);
+            heritableMetadata.setMetadataElement(metaElement);
+        });
+        return heritableMetadata;
     }
 
     /**
      * <em>removeInheritedMetadata</em> removes all inherited metadata elements  
-     * TODO check necessary of <code>counter</code>
      */
     public final void removeInheritedMetadata() {
         Iterator<MCRMetaElement> elements = meta_list.iterator();
@@ -293,6 +280,15 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     }
 
     /**
+     * Streams the {@link MCRMetaElement}'s.
+     *
+     * @return stream of MCRMetaElement's
+     */
+    public final Stream<MCRMetaElement> stream() {
+        return meta_list.stream();
+    }
+
+    /**
      * Streams the {@link MCRMetaInterface}s of the given tag.
      * <pre>
      * {@code
@@ -344,9 +340,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * @return true if the types are equal
      */
     private Predicate<MCRMetaInterface> filterByType(String type) {
-        return (metaInterface) -> {
-            return type == null || type.equals(metaInterface.getType());
-        };
+        return (metaInterface) -> type == null || type.equals(metaInterface.getType());
     }
 
     /**
@@ -357,9 +351,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * @return true if the inherited values are equal
      */
     private Predicate<MCRMetaInterface> filterByInherited(Integer inherited) {
-        return (metaInterface) -> {
-            return metaInterface.getInherited() == inherited;
-        };
+        return (metaInterface) -> metaInterface.getInherited() == inherited;
     }
 
     /**
@@ -421,9 +413,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     public JsonObject createJSON() {
         JsonObject metadata = new JsonObject();
         StreamSupport.stream(spliterator(), true)
-            .forEach(metaElement -> {
-                metadata.add(metaElement.getTag(), metaElement.createJSON(herited_xml));
-            });
+            .forEach(metaElement -> metadata.add(metaElement.getTag(), metaElement.createJSON(herited_xml)));
         return metadata;
     }
 
