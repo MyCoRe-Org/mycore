@@ -290,8 +290,8 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         derivate.getDerivate().getOrCreateFileMetadata(mcrPath, urn);
         try {
             MCRMetadataManager.update(derivate);
-        } catch (MCRPersistenceException | MCRAccessException | IOException e) {
-            e.printStackTrace();
+        } catch (MCRPersistenceException | MCRAccessException e) {
+            LogManager.getLogger().error(e);
         }
     }
 }

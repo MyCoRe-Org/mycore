@@ -32,7 +32,6 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -70,6 +69,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
         }
         int numheritablemd = 0;
         int numheritablemdold;
+
         for (int i = 0; i < md.size(); i++) {
             final MCRMetaElement melm = md.getMetadataElement(i);
             if (melm.isHeritable()) {
@@ -96,10 +96,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
         numheritablemdold = (int) StreamSupport.stream(mdold.spliterator(), false)
             .filter(MCRMetaElement::isHeritable)
             .count();
-        if (numheritablemd != numheritablemdold) {
-            return true;
-        }
-        return false;
+        return numheritablemd != numheritablemdold;
     }
 
     /* (non-Javadoc)
@@ -110,12 +107,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
         for (MCRMetaLinkID childId : parent.getStructure().getChildren()) {
             LOGGER.debug("Update metadata from Child " + childId);
             final MCRObject child = MCRMetadataManager.retrieveMCRObject(childId.getXLinkHrefID());
-            try {
-                MCRMetadataManager.update(child);
-            } catch (MCRActiveLinkException e) {
-                // should never happen, as the object is unchanged
-                throw new MCRPersistenceException("Error while updating inherited metadata", e);
-            }
+            MCRMetadataManager.update(child);
         }
     }
 

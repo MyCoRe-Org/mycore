@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
@@ -63,8 +64,8 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
 
         try {
             MCRMetadataManager.update(obj);
-        } catch (IOException e) {
-            throw new MCRPersistentIdentifierException("Error while updating derivate!", e);
+        } catch (Exception e) {
+            throw new MCRPersistentIdentifierException("Error while updating derivate " + obj.getId(), e);
         }
 
         return newURN;
@@ -121,10 +122,8 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
         List<MCRPath> pathList = collectingFileVisitor
             .getPaths()
             .stream()
-            .filter(file -> !predicateList.stream()
-                .filter(p -> p.test(file.toString().split(":")[1]))
-                .findAny()
-                .isPresent())
+            .filter(file -> predicateList.stream()
+                                         .noneMatch(p -> p.test(file.toString().split(":")[1])))
             .map(p -> (MCRPath) p)
             .sorted()
             .collect(Collectors.toList());
@@ -159,7 +158,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
         List<String> ignoreFileNamesList = new ArrayList<>();
         String ignoreFileNames = getProperties().get("IgnoreFileNames");
         if (ignoreFileNames != null) {
-            Stream.of(ignoreFileNames.split(",")).forEach(ignoreFileNamesList::add);
+            ignoreFileNamesList.addAll(Arrays.asList(ignoreFileNames.split(",")));
         } else {
             ignoreFileNamesList.add("mets\\.xml"); // default value
         }

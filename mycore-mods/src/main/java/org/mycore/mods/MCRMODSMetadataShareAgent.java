@@ -36,7 +36,6 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -87,7 +86,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                     LOGGER.info("Saving: " + childIdRef);
                     try {
                         MCRMetadataManager.update(child);
-                    } catch (MCRActiveLinkException e) {
+                    } catch (MCRPersistenceException | MCRAccessException e) {
                         throw new MCRPersistenceException("Error while updating inherited metadata", e);
                     }
                 }
@@ -112,7 +111,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                         LOGGER.info("Saving: " + recipientId);
                         try {
                             MCRMetadataManager.update(recipient);
-                        } catch (MCRActiveLinkException e) {
+                        } catch (MCRPersistenceException | MCRAccessException e) {
                             throw new MCRPersistenceException("Error while updating shared metadata", e);
                         }
                     }

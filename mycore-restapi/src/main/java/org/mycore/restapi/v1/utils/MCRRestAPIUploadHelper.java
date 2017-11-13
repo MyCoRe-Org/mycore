@@ -337,7 +337,7 @@ public class MCRRestAPIUploadHelper {
 
                             MCRMetadataManager.update(der);
                             Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
-                        } catch (IOException | MCRAccessException e) {
+                        } catch (IOException | MCRPersistenceException | MCRAccessException e) {
                             LOGGER.error(e);
                             throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
                                 MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));

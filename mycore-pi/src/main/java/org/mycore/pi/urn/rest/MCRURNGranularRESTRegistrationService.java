@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -131,8 +132,8 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
 
         try {
             MCRMetadataManager.update(deriv);
-        } catch (IOException | MCRAccessException e) {
-            LOGGER.error("Error while updating derivate!", e);
+        } catch (MCRPersistenceException | MCRAccessException e) {
+            LOGGER.error("Error while updating derivate " + derivID, e);
         }
 
         EntityTransaction transaction = MCREntityManagerProvider
@@ -155,7 +156,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
             MCRDNBURN derivURN = getNewIdentifier(derivID, "");
             deriv.getDerivate().setURN(derivURN.asString());
 
-            persistURNStr(deriv, new Date()).accept(() -> derivURN.asString(), "");
+            persistURNStr(deriv, new Date()).accept(derivURN::asString, "");
 
             if (Boolean.valueOf(getProperties().getOrDefault("supportDfgViewerURN", "false"))) {
                 String suffix = "-dfg";
@@ -174,7 +175,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     }
 
     private BiConsumer<Supplier<String>, MCRPath> persistURN(MCRDerivate deriv) {
-        return (urnSup, path) -> persistURNStr(deriv, null).accept(urnSup, path.getOwnerRelativePath().toString());
+        return (urnSup, path) -> persistURNStr(deriv, null).accept(urnSup, path.getOwnerRelativePath());
     }
 
     private BiConsumer<Supplier<String>, String> persistURNStr(MCRDerivate deriv, Date registerDate) {
@@ -222,7 +223,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
         List<String> ignoreFileNamesList = new ArrayList<>();
         String ignoreFileNames = getProperties().get("IgnoreFileNames");
         if (ignoreFileNames != null) {
-            Stream.of(ignoreFileNames.split(",")).forEach(ignoreFileNamesList::add);
+            ignoreFileNamesList.addAll(Arrays.asList(ignoreFileNames.split(",")));
         } else {
             ignoreFileNamesList.add("mets\\.xml"); // default value
         }
@@ -262,11 +263,6 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
             this.counter = seed;
             this.urn = derivURN;
             this.setID = setID;
-        }
-
-        public BiFunction<MCRDNBURN, String, String> getURNFunction() {
-            int currentCount = counter++;
-            return (urn, setID) -> urn.toGranular(setID, getIndex(currentCount)).asString();
         }
 
         public Supplier<String> getURNSupplier() {
