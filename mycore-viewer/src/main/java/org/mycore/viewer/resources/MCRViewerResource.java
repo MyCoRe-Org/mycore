@@ -9,7 +9,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
@@ -54,7 +53,6 @@ public class MCRViewerResource {
     private static final String JSON_CONFIG_ELEMENT_NAME = "json";
 
     @GET
-    @Produces(MediaType.TEXT_HTML)
     @Path("{derivate}{path: (/[^?#]*)?}")
     public Response show(@Context HttpServletRequest request, @Context Request jaxReq,
         @Context ServletContext context, @Context ServletConfig config) throws Exception {
