@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRLoginServlet extends MCRServlet {
-    private static final String REALM_URL_PARAMETER = "realm";
+    protected static final String REALM_URL_PARAMETER = "realm";
 
     static final String HTTPS_ONLY_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly";
 
@@ -76,7 +76,7 @@ public class MCRLoginServlet extends MCRServlet {
 
     private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
 
-    static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(HTTPS_ONLY_PROPERTY);
+    protected static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(HTTPS_ONLY_PROPERTY);
 
     private static Logger LOGGER = LogManager.getLogger();
 
@@ -143,7 +143,7 @@ public class MCRLoginServlet extends MCRServlet {
             listRealms(req, res);
     }
 
-    static String getReturnURL(HttpServletRequest req) {
+    protected static String getReturnURL(HttpServletRequest req) {
         String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
         if (returnURL == null) {
             String referer = req.getHeader("Referer");
@@ -157,7 +157,7 @@ public class MCRLoginServlet extends MCRServlet {
         loginToRealm(req, res, realmID);
     }
 
-    private void presentLoginForm(MCRServletJob job)
+    protected void presentLoginForm(MCRServletJob job)
         throws IOException, TransformerException, SAXException, JAXBException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
