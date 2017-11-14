@@ -35,7 +35,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class MCRSolrIndexStatistic {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexStatistic.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     AtomicInteger documents;
 
@@ -50,13 +50,12 @@ public class MCRSolrIndexStatistic {
     }
 
     public long addTime(long time) {
+        LOGGER.debug("{}: adding {} ms", name, time);
         return accumulatedTime.addAndGet(time);
     }
 
     public int addDocument(int docs) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(name + ": adding " + docs + " documents");
-        }
+        LOGGER.debug("{}: adding {} documents", name, documents);
         return documents.addAndGet(docs);
     }
 
@@ -69,7 +68,7 @@ public class MCRSolrIndexStatistic {
     }
 
     /**
-     * resets statistic and returns average time in ms per document. 
+     * resets statistic and returns average time in ms per document.
      */
     public synchronized double reset() {
         synchronized (accumulatedTime) {

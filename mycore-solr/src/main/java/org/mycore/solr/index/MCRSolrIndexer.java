@@ -120,7 +120,14 @@ public class MCRSolrIndexer {
 
             @Override
             public void prepareClose() {
-                SOLR_EXECUTOR.getExecutor().shutdown();
+                while (SOLR_COLLECTION.stream().findAny().isPresent()) {
+                    Thread.yield(); //wait for index handler
+                }
+                SOLR_EXECUTOR.submit(SOLR_EXECUTOR.getExecutor()::shutdown,
+                    Integer.MIN_VALUE)
+                    .getFuture()
+                    .join();
+                waitForShutdown(SOLR_EXECUTOR.getExecutor());
             }
 
             @Override
@@ -130,7 +137,20 @@ public class MCRSolrIndexer {
 
             @Override
             public void close() {
-                waitForShutdown(SOLR_EXECUTOR.getExecutor());
+                String documentStats = MessageFormat.format("Solr documents: {0}, each: {1} ms.",
+                    MCRSolrIndexStatisticCollector.DOCUMENTS.getDocuments(),
+                    MCRSolrIndexStatisticCollector.DOCUMENTS.reset());
+                String metadataStats = MessageFormat.format("XML documents: {0}, each: {1} ms.",
+                    MCRSolrIndexStatisticCollector.XML.getDocuments(), MCRSolrIndexStatisticCollector.XML.reset());
+                String fileStats = MessageFormat.format("File transfers: {0}, each: {1} ms.",
+                    MCRSolrIndexStatisticCollector.FILE_TRANSFER.getDocuments(),
+                    MCRSolrIndexStatisticCollector.FILE_TRANSFER.reset());
+                String operationsStats = MessageFormat.format("Other index operations: {0}, each: {1} ms.",
+                    MCRSolrIndexStatisticCollector.OPERATIONS.getDocuments(),
+                    MCRSolrIndexStatisticCollector.OPERATIONS.reset());
+                String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}\n{3}", documentStats,
+                    metadataStats, fileStats, operationsStats);
+                LOGGER.info(msg);
             }
 
             private void waitForShutdown(ExecutorService service) {
@@ -170,35 +190,6 @@ public class MCRSolrIndexer {
                         LOGGER.warn("Error while waiting for shutdown.", e);
                     }
                 }
-            }
-        });
-        MCRShutdownHandler.getInstance().addCloseable(new Closeable() {
-
-            @Override
-            public void prepareClose() {
-            }
-
-            @Override
-            public int getPriority() {
-                return Integer.MIN_VALUE + 4;
-            }
-
-            @Override
-            public void close() {
-                String documentStats = MessageFormat.format("Solr documents: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.documents.getDocuments(),
-                    MCRSolrIndexStatisticCollector.documents.reset());
-                String metadataStats = MessageFormat.format("XML documents: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.xml.getDocuments(), MCRSolrIndexStatisticCollector.xml.reset());
-                String fileStats = MessageFormat.format("File transfers: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.fileTransfer.getDocuments(),
-                    MCRSolrIndexStatisticCollector.fileTransfer.reset());
-                String operationsStats = MessageFormat.format("Other index operations: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.operations.getDocuments(),
-                    MCRSolrIndexStatisticCollector.operations.reset());
-                String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}\n{3}", documentStats,
-                    metadataStats, fileStats, operationsStats);
-                LOGGER.info(msg);
             }
         });
     }
@@ -258,7 +249,7 @@ public class MCRSolrIndexer {
             LOGGER.error("Error deleting document from solr", e);
         }
         long end = System.currentTimeMillis();
-        MCRSolrIndexStatistic operations = MCRSolrIndexStatisticCollector.operations;
+        MCRSolrIndexStatistic operations = MCRSolrIndexStatisticCollector.OPERATIONS;
         operations.addDocument(1);
         operations.addTime(end - start);
         return updateResponse;
@@ -294,10 +285,20 @@ public class MCRSolrIndexer {
             LOGGER.error("Error deleting document from solr", e);
         }
         long end = System.currentTimeMillis();
-        MCRSolrIndexStatistic operations = MCRSolrIndexStatisticCollector.operations;
+        MCRSolrIndexStatistic operations = MCRSolrIndexStatisticCollector.OPERATIONS;
         operations.addDocument(1);
         operations.addTime(end - start);
         return updateResponse;
+    }
+
+    /**
+     * Checks if the application uses nested documents. Using nested documents requires
+     * additional queries and slows performance.
+     *
+     * @return true if nested documents are used, otherwise false
+     */
+    protected static boolean useNestedDocuments() {
+        return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
     }
 
     /**
@@ -461,7 +462,7 @@ public class MCRSolrIndexer {
             submitIndexHandler(indexHandler, priority);
         }
         long tStop = System.currentTimeMillis();
-        MCRSolrIndexStatisticCollector.fileTransfer.addTime(tStop - tStart);
+        MCRSolrIndexStatisticCollector.FILE_TRANSFER.addTime(tStop - tStart);
     }
 
     /**

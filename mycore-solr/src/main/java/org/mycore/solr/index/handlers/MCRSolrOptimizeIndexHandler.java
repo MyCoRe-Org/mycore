@@ -50,7 +50,7 @@ public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
 
     @Override
     public MCRSolrIndexStatistic getStatistic() {
-        return MCRSolrIndexStatisticCollector.operations;
+        return MCRSolrIndexStatisticCollector.OPERATIONS;
     }
 
     @Override

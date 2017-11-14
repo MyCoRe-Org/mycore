@@ -72,7 +72,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
      */
     @Override
     public MCRSolrIndexStatistic getStatistic() {
-        return MCRSolrIndexStatisticCollector.documents;
+        return MCRSolrIndexStatisticCollector.DOCUMENTS;
     }
 
     @Override

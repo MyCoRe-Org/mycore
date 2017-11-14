@@ -64,7 +64,7 @@ public abstract class MCRSolrObjectStreamIndexHandler extends MCRSolrAbstractStr
 
     @Override
     public MCRSolrIndexStatistic getStatistic() {
-        return MCRSolrIndexStatisticCollector.xml;
+        return MCRSolrIndexStatisticCollector.XML;
     }
 
 }

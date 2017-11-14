@@ -816,18 +816,22 @@ public class MCRXMLFunctions {
      * @return
      */
     public static String getDisplayName(String classificationId, String categoryId) {
-        MCRCategory category = null;
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-            category = dao.getCategory(categID, 0);
-        } catch (Exception e) {
-            LOGGER.warn("Could not determine display name for classification id " + classificationId
-                + " and category id " + categoryId);
+            MCRCategory
+                category = dao.getCategory(categID, 0);
+            return Optional.ofNullable(category)
+                .map(MCRCategory::getCurrentLabel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(MCRLabel::getText)
+                .orElse("");
+        } catch (Throwable e) {
+            LOGGER.error("Could not determine display name for classification id " + classificationId
+                + " and category id " + categoryId, e);
             return "";
         }
-
-        return category.getCurrentLabel().map(MCRLabel::getText).orElse("");
     }
 
     /**
@@ -841,12 +845,12 @@ public class MCRXMLFunctions {
             MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             category = dao.getCategory(categID, 0);
-        } catch (Exception e) {
-            LOGGER.warn("Could not determine state for classification id " + classificationId + " and category id "
-                + categoryId);
+        } catch (Throwable e) {
+            LOGGER.error("Could not determine state for classification id " + classificationId + " and category id "
+                + categoryId, e);
         }
 
-        return category == null ? false : true;
+        return category != null;
     }
 
     /**

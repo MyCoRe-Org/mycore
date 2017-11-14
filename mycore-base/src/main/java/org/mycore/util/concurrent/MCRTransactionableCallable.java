@@ -10,7 +10,7 @@ import org.mycore.common.MCRSessionMgr;
 
 /**
  * Encapsulates a {@link Callable} with a mycore session and a database transaction.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<Callable<V>> {
@@ -25,11 +25,11 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
      * Creates a new {@link Callable} encapsulating the {@link #call()} method with a new
      * {@link MCRSession} and a database transaction. Afterwards the transaction will
      * be committed and the session will be released and closed.
-     * 
+     *
      * <p>If you want to execute your callable in the context of an already existing
      * session use the {@link MCRTransactionableCallable#MCRTransactionableCallable(Callable, MCRSession)}
      * constructor instead.
-     * 
+     *
      * @param callable the callable to execute within a session and transaction
      */
     public MCRTransactionableCallable(Callable<V> callable) {
@@ -41,7 +41,7 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
      * a database transaction. The transaction will be created in the context of the
      * given session. Afterwards the transaction will be committed and the session
      * will be released (but not closed!).
-     * 
+     *
      * @param callable the callable to execute within a session and transaction
      * @param session the session to use
      */
@@ -58,8 +58,8 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
             this.session = MCRSessionMgr.getCurrentSession();
         }
         MCRSessionMgr.setCurrentSession(this.session);
-        session.beginTransaction();
         try {
+            session.beginTransaction();
             return this.callable.call();
         } finally {
             try {
