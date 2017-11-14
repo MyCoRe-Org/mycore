@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:genre>article</mods:genre>
+  <mods:titleInfo>
+    <mods:title>MyCoRe</mods:title>
+  </mods:titleInfo>
+  <mods:name type="personal">
+    <mods:role>
+      <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+    </mods:role>
+    <mods:namePart type="family">Doe</mods:namePart>
+    <mods:namePart type="given">John</mods:namePart>
+  </mods:name>
+  <mods:relatedItem type="host">
+    <mods:genre>journal</mods:genre>
+    <mods:titleInfo>
+      <mods:title>Advanced Idiot's Journal</mods:title>
+    </mods:titleInfo>
+    <mods:part>
+      <mods:extent unit="pages">
+        <mods:start>34</mods:start>
+        <mods:end>91</mods:end>
+      </mods:extent>
+    </mods:part>
+  </mods:relatedItem>
+</mods:mods>
