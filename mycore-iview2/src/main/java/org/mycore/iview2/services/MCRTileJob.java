@@ -26,6 +26,8 @@ import javax.persistence.UniqueConstraint;
     @Index(columnList = "derivate,status")
 })
 @NamedQueries({
+    @NamedQuery(name = "MCRTileJob.all",
+        query = "SELECT job FROM MCRTileJob as job"),
     @NamedQuery(name = "MCRTileJob.countByStateListByDerivate",
         query = "SELECT count(job) FROM MCRTileJob as job WHERE job.derivate= :derivateId AND job.status IN (:states)")
 })

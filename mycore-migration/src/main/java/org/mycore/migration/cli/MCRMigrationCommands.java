@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -53,6 +54,7 @@ import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.iview2.services.MCRTileJob;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRDNBURNParser;
@@ -120,6 +122,20 @@ public class MCRMigrationCommands {
                 MCRMetadataManager.update((MCRObject) obj);
             }
         }
+    }
+
+    @MCRCommand(syntax = "fix MCR-1717", help = "Fixes wrong entries in tile job table (see MCR-1717 comments)")
+    public static void fixMCR1717() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRTileJob> allTileJobQuery = em.createNamedQuery("MCRTileJob.all", MCRTileJob.class);
+        List<MCRTileJob> tiles = allTileJobQuery.getResultList();
+        tiles.stream()
+            .filter(tj -> !tj.getPath().startsWith("/"))
+            .peek(tj -> LOGGER.info("Fixing TileJob {}:{}", tj.getDerivate(), tj.getPath()))
+            .forEach(tj -> {
+                String newPath = "/" + tj.getPath();
+                tj.setPath(newPath);
+            });
     }
 
     @MCRCommand(syntax = "fix invalid derivate links {0} for {1}",
