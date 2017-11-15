@@ -1,0 +1,8 @@
+@string(AIJ="Advanced Idiot's Journal")
+@string(RQ="Repository Software Quarterly")
+
+@article{Doe2015, title={MyCoRe},
+  author={Doe, John},
+  journal=AIJ,
+  pages={34 -- 91}
+}
