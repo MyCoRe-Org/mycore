@@ -52,7 +52,7 @@ class MCRBibTeXFileTransformer {
                 BibtexEntry entry = (BibtexEntry) obj;
                 if (entry.getFields().isEmpty()) {
                     MCRMessageLogger.logMessage("Skipping entry of type " + entry.getEntryType() + ", has no fields",
-                            collection);
+                        collection);
                 } else {
                     collection.addContent(transformer.transform(entry));
                 }
@@ -63,7 +63,7 @@ class MCRBibTeXFileTransformer {
     }
 
     private void expandReferences(BibtexFile file) {
-        expand(new MacroReferenceExpander(true, true, true, false), file);
+        expand(new MacroReferenceExpander(true, true, false, false), file);
         expand(new CrossReferenceExpander(false), file);
         expand(new PersonListExpander(true, true, false), file);
     }
