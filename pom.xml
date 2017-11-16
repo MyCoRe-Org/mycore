@@ -792,10 +792,10 @@
                   <title>MyCoRe Component: MODS</title>
                   <packages>org.mycore.mods*</packages>
                 </group>
-              <group>
-                <title>MyCoRe Component: ORCID Integration</title>
-                <packages>org.mycore.orcid*</packages>
-              </group>
+                <group>
+                  <title>MyCoRe Component: ORCID Integration</title>
+                  <packages>org.mycore.orcid*</packages>
+                </group>
                 <group>
                   <title>MyCoRe Component: OAI</title>
                   <packages>org.mycore.oai*</packages>
@@ -1324,12 +1324,12 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-orcid</artifactId>
+        <artifactId>mycore-oai</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-oai</artifactId>
+        <artifactId>mycore-orcid</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

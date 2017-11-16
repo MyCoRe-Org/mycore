@@ -50,11 +50,11 @@ public class MCRORCIDClient {
 
     private final static MCRORCIDClient SINGLETON = new MCRORCIDClient();
 
+    private WebTarget baseTarget;
+
     public static MCRORCIDClient instance() {
         return SINGLETON;
     }
-
-    private WebTarget baseTarget;
 
     private MCRORCIDClient() {
         String baseURL = MCRConfiguration.instance().getString("MCR.ORCID.BaseURL");

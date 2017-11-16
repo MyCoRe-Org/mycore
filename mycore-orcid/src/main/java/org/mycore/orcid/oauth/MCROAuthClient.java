@@ -38,10 +38,6 @@ public class MCROAuthClient {
 
     private static MCROAuthClient SINGLETON = new MCROAuthClient();
 
-    public static MCROAuthClient instance() {
-        return SINGLETON;
-    }
-
     private String baseURL;
 
     private String clientID;
@@ -49,6 +45,10 @@ public class MCROAuthClient {
     private String clientSecret;
 
     private Client client;
+
+    public static MCROAuthClient instance() {
+        return SINGLETON;
+    }
 
     private MCROAuthClient() {
         String prefix = "MCR.ORCID.OAuth.";
