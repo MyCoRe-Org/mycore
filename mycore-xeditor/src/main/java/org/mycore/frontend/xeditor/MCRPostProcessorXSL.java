@@ -45,8 +45,7 @@ class MCRNormalizeUnicodeTransformer extends MCRContentTransformer {
     public MCRJDOMContent transform(MCRContent source) throws IOException {
         try {
             Element root = source.asXML().getRootElement().clone();
-            for (Iterator<Text> iter = root.getDescendants(Filters.text()).iterator(); iter.hasNext(); ) {
-                Text text = iter.next();
+            for (Text text : root.getDescendants(Filters.text())) {
                 text.setText(MCRXMLFunctions.normalizeUnicode(text.getText()));
             }
             return new MCRJDOMContent(root);

@@ -150,8 +150,8 @@ public class MCRTopologicalSort {
         if (order == null) {
             System.out.println("An error occured!");
         } else {
-            for (int i = 0; i < order.length; i++) {
-                // System.out.print(order[i] + " <- ");
+            for (int anOrder : order) {
+                System.out.print(order + " <- ");
             }
         }
         System.out.println();
@@ -410,7 +410,7 @@ public class MCRTopologicalSort {
      * @return a string representation of the underlying graph
      */
     public String toString() {
-        StringBuffer result = new StringBuffer("[");
+        StringBuilder result = new StringBuilder("[");
         for (Integer to : edgeSources.keySet()) {
             for (Integer from : edgeSources.get(to)) {
                 result.append("[" + nodes.get(from) + "->" + nodes.get(to) + "]");

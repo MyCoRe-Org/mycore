@@ -90,7 +90,7 @@ public class MCRXPathEvaluator {
         if (result == null)
             return false;
         else if (result instanceof Boolean)
-            return ((Boolean) result).booleanValue();
+            return (Boolean) result;
         else
             return true;
     }

@@ -114,7 +114,7 @@ class MCRCleaningRule {
         if (found == null)
             return false;
         else if (found instanceof Boolean)
-            return ((Boolean) found).booleanValue();
+            return (Boolean) found;
         else
             return true; // something matching found
     }

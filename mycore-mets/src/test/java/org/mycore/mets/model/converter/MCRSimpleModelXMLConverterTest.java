@@ -50,7 +50,7 @@ public class MCRSimpleModelXMLConverterTest {
                 Boolean evaluate = xPath.evaluateFirst(document);
                 Assert.assertTrue(
                     String.format("The xpath : %s is not true! %s %s", xPath, System.lineSeparator(), documentAsString),
-                    evaluate.booleanValue());
+                    evaluate);
             });
     }
 }

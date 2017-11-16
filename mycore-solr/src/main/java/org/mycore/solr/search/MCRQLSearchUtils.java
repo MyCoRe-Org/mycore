@@ -90,8 +90,7 @@ public class MCRQLSearchUtils {
             // Remove empty sort conditions
             Element sortBy = root.getChild("sortBy");
             if (sortBy != null) {
-                for (Iterator<Element> iterator = sortBy.getChildren("field").iterator(); iterator.hasNext();) {
-                    Element field = iterator.next();
+                for (Element field : sortBy.getChildren("field")) {
                     if (field.getAttributeValue("name", "").length() == 0) {
                         empty.add(field);
                     }

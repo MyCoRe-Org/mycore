@@ -99,7 +99,7 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         if (mobileParameter != null) {
             return Boolean.parseBoolean(mobileParameter);
         } else {
-            return req.getHeader("User-Agent").indexOf("Mobile") != -1;
+            return req.getHeader("User-Agent").contains("Mobile");
         }
     }
 

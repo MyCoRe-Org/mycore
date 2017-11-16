@@ -111,7 +111,7 @@ public class MCRRestAPISearch {
         @QueryParam("facet.field") List<String> facetFields, @QueryParam("json.wrf") String jsonWrf)
         throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/search");
-        StringBuffer url = new StringBuffer(MCRSolrConstants.SERVER_URL);
+        StringBuilder url = new StringBuilder(MCRSolrConstants.SERVER_URL);
         url.append("/select?");
 
         try {

@@ -192,8 +192,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         Collections.sort(sortedPositions);
 
         StringBuilder sortBuilder = new StringBuilder();
-        for (Iterator<Integer> positionIterator = sortedPositions.iterator(); positionIterator.hasNext();) {
-            Integer position = positionIterator.next();
+        for (Integer position : sortedPositions) {
             sortBuilder.append(",");
             sortBuilder.append(positionFieldMap.get(position));
             String order = positionOrderMap.get(position);
@@ -201,8 +200,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             if (order == null) {
                 order = "asc";
                 LOGGER.warn(MessageFormat.format(
-                    "No sort order found for field with number ''{0}'' use default value : ''{1}''", position,
-                    order));
+                    "No sort order found for field with number ''{0}'' use default value : ''{1}''", position, order));
             }
             sortBuilder.append(order);
         }

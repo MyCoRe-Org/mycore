@@ -72,7 +72,7 @@ public class MCRURL {
         String query = buildQueryString(this.parameterMap);
         try {
             URI uri = this.url.toURI();
-            StringBuffer urlBuffer = new StringBuffer();
+            StringBuilder urlBuffer = new StringBuilder();
             urlBuffer.append(
                 new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), null, null));
             if (query != null) {

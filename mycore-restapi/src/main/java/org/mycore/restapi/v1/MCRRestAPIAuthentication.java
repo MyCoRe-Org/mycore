@@ -73,7 +73,7 @@ public class MCRRestAPIAuthentication {
     @Produces({ MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     public Response initAuthorization() {
         SignedJWT jwt = MCRJSONWebTokenUtil.createEmptyJWTwithPublicKey("http:/localhost:8080");
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append("{");
         msg.append("\n    \"access_token\": \"" + jwt + "\",");
         msg.append("\n}");
@@ -127,7 +127,7 @@ public class MCRRestAPIAuthentication {
             SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("restapi"),
                 MCRFrontendUtil.getBaseURL(), clientPubKey);
             if (jwt != null) {
-                StringBuffer msg = new StringBuffer();
+                StringBuilder msg = new StringBuilder();
                 msg.append("{");
                 msg.append("\n    \"login_successful\":true,");
                 msg.append("\n    \"access_token\": \"" + jwt.serialize() + "\",");
@@ -139,7 +139,7 @@ public class MCRRestAPIAuthentication {
             }
         }
 
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append("{");
         msg.append("\n    \"login_successful\":false,");
         msg.append("\n    \"error\": \"login_failed\"");
@@ -175,7 +175,7 @@ public class MCRRestAPIAuthentication {
             String authHeader = MCRJSONWebTokenUtil
                 .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
             if (authHeader != null) {
-                StringBuffer msg = new StringBuffer();
+                StringBuilder msg = new StringBuilder();
                 msg.append("{");
                 msg.append("\n    \"executed\":true,");
                 msg.append("\n    \"access_token\": \"" + authHeader.replace(HEADER_PREFIX_BEARER, "") + "\",");

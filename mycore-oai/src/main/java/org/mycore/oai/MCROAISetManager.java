@@ -253,7 +253,7 @@ public class MCROAISetManager {
 
     private String getSetSpec(String elementText) {
         if (elementText.contains(":")) {
-            StringBuffer setSpec = new StringBuffer();
+            StringBuilder setSpec = new StringBuilder();
             String classID = elementText.substring(0, elementText.indexOf(':')).trim();
             classID = MCRClassificationAndSetMapper.mapClassificationToSet(this.configPrefix, classID);
             setSpec.append(classID).append(elementText.substring(elementText.indexOf(':')));

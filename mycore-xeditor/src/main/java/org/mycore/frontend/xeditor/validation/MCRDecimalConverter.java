@@ -56,7 +56,7 @@ public class MCRDecimalConverter {
         }
 
         try {
-            return new Double(nf.parse(value).doubleValue());
+            return nf.parse(value).doubleValue();
         } catch (ParseException e) {
             return null;
         }

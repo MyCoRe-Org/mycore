@@ -471,7 +471,7 @@ public class MCRTextResolver {
         public String getValue() {
             if (!complete) {
                 // assume that the variable is not complete 
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 buf.append(getStartEnclosingString()).append(termBuffer);
                 return buf.toString();
             }
@@ -710,7 +710,7 @@ public class MCRTextResolver {
 
         @Override
         public String getMessage() {
-            StringBuffer msg = new StringBuffer("A circular dependency exception occurred");
+            StringBuilder msg = new StringBuilder("A circular dependency exception occurred");
             msg.append("\n").append("circular path: ");
             for (String dep : dependencyList) {
                 msg.append(dep).append(" > ");

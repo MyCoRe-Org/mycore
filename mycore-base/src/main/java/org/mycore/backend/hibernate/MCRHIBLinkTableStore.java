@@ -137,9 +137,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
         LOGGER.debug("Deleting " + from + " from database MCRLINKHREF");
         Session session = getSession();
-        Iterator<MCRLINKHREF> it = session.createQuery(sb.toString(), MCRLINKHREF.class).getResultList().iterator();
-        while (it.hasNext()) {
-            session.delete(it.next());
+        for (MCRLINKHREF mcrlinkhref : session.createQuery(sb.toString(), MCRLINKHREF.class).getResultList()) {
+            session.delete(mcrlinkhref);
         }
     }
 

@@ -192,7 +192,7 @@ public class MCRViewerConfiguration {
      */
     public void addLocalScript(final String file, final boolean hasMinified) {
         String baseURL = MCRFrontendUtil.getBaseURL();
-        StringBuffer scriptURL = new StringBuffer(baseURL);
+        StringBuilder scriptURL = new StringBuilder(baseURL);
         scriptURL.append("modules/iview2/js/");
         if (isDebugMode() || !hasMinified) {
             scriptURL.append(file);
@@ -217,7 +217,7 @@ public class MCRViewerConfiguration {
      */
     public void addLocalCSS(final String file) {
         String baseURL = MCRFrontendUtil.getBaseURL();
-        StringBuffer cssURL = new StringBuffer(baseURL);
+        StringBuilder cssURL = new StringBuilder(baseURL);
         cssURL.append("modules/iview2/css/").append(file);
         addCSS(cssURL.toString());
     }

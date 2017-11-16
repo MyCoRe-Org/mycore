@@ -89,7 +89,7 @@ public class DefaultApplicationController extends ApplicationController {
     }
 
     protected void download(URL fileLocation, String dest) throws IOException {
-        if (!SKIP_DOWNLOAD.booleanValue()) {
+        if (!SKIP_DOWNLOAD) {
             createTestFolder(webpath);
             InputStream openStream = new BufferedInputStream(fileLocation.openStream(), 1024 * 1024 * 16);
 

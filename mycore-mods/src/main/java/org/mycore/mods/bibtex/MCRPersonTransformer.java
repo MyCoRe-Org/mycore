@@ -59,7 +59,7 @@ class MCRPersonTransformer extends MCRFieldTransformer {
     }
 
     private String getFirstName(BibtexPerson person) {
-        StringBuffer first = new StringBuffer();
+        StringBuilder first = new StringBuilder();
         if (person.getFirst() != null) {
             first.append(person.getFirst());
         }

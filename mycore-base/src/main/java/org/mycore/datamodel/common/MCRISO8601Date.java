@@ -125,7 +125,7 @@ public class MCRISO8601Date {
         }
         String formatted = null;
         try {
-            formatted = dt == null ? null : format.indexOf("G") == -1 ? df.format(dt) : df.format(dt).replace("-", "");
+            formatted = dt == null ? null : !format.contains("G") ? df.format(dt) : df.format(dt).replace("-", "");
         } catch (Exception e) {
             LOGGER.error("Could not format date", e);
         }
