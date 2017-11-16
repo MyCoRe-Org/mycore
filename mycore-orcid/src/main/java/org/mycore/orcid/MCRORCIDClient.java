@@ -33,14 +33,12 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.orcid.oauth.MCRReadPublicTokenFactory;
 
 /**
  * Utility class working as a client for the REST API of orcid.org.
- *
  * By setting MCR.ORCID.BaseURL, application can choose to work
- * against the production registry or the sandbox of orcid.org
- * It is recommended to set MCR.ORCID.ReadPublicToken with the /read-public
- * access token, also for the public API.
+ * against the production registry or the sandbox of orcid.org.
  *
  * @author Frank L\u00FCtzenkirchen
  */
@@ -52,8 +50,6 @@ public class MCRORCIDClient {
 
     private final static MCRORCIDClient SINGLETON = new MCRORCIDClient();
 
-    private String readPublicToken;
-
     public static MCRORCIDClient instance() {
         return SINGLETON;
     }
@@ -62,8 +58,6 @@ public class MCRORCIDClient {
 
     private MCRORCIDClient() {
         String baseURL = MCRConfiguration.instance().getString("MCR.ORCID.BaseURL");
-        readPublicToken = MCRConfiguration.instance().getString("MCR.ORCID.ReadPublicToken", "");
-
         Client client = ClientBuilder.newClient();
         baseTarget = client.target(baseURL);
     }
@@ -78,9 +72,7 @@ public class MCRORCIDClient {
         LOGGER.info("get " + target.getUri());
 
         Builder b = target.request().accept(ORCID_XML_MEDIA_TYPE);
-        if (!readPublicToken.isEmpty()) {
-            b = b.header("Authorization", "Bearer " + readPublicToken);
-        }
+        b = b.header("Authorization", "Bearer " + MCRReadPublicTokenFactory.getToken());
 
         InputStream in = b.get(InputStream.class);
         return new MCRStreamContent(in);
