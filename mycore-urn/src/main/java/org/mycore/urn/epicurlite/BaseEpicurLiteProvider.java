@@ -133,6 +133,6 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
      * @see MCRContentTypes#probeContentType(Path)
      */
     public static boolean isFileSupported(Path file) throws IOException {
-        return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
+        return file != null && SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
     }
 }

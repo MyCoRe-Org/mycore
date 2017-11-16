@@ -198,7 +198,7 @@ public class MCRClassificationEditorResource {
     }
 
     interface OperationInSession {
-        public void run();
+        void run();
     }
 
     private class DeleteOp implements OperationInSession {
@@ -355,7 +355,7 @@ public class MCRClassificationEditorResource {
     @Path("link/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
-        @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException, IOException {
+        @QueryParam("rows") Integer rows) throws SolrServerException, IOException {
         // do solr query
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         ModifiableSolrParams params = new ModifiableSolrParams();
@@ -428,7 +428,7 @@ public class MCRClassificationEditorResource {
 
     private boolean isAdded(JsonElement jsonElement) {
         JsonElement added = jsonElement.getAsJsonObject().get("added");
-        return added == null ? false : jsonElement.getAsJsonObject().get("added").getAsBoolean();
+        return added != null && jsonElement.getAsJsonObject().get("added").getAsBoolean();
     }
 
     private MCRJSONCategory parseJson(String json) {

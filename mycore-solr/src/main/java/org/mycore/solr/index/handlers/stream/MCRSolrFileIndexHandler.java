@@ -24,7 +24,7 @@ import static org.mycore.solr.MCRSolrConstants.EXTRACT_PATH;
 
 public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
-    final static Logger LOGGER = LogManager.getLogger(MCRSolrFileIndexHandler.class);
+    static final Logger LOGGER = LogManager.getLogger(MCRSolrFileIndexHandler.class);
 
     protected Path file;
 
@@ -44,7 +44,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
     public void index() throws SolrServerException, IOException {
         String solrID = file.toUri().toString();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: indexing file \"" + file.toString() + "\"");
+            LOGGER.debug("Solr: indexing file \"" + file + "\"");
         }
         /* create the update request object */
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(EXTRACT_PATH);
@@ -55,14 +55,14 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         updateRequest.setCommitWithin(getCommitWithin());
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: sending binary data (" + file.toString() + " (" + solrID + "), size is " + MCRUtils
+            LOGGER.debug("Solr: sending binary data (" + file + " (" + solrID + "), size is " + MCRUtils
                 .getSizeFormatted(attrs.size()) + ") to solr server.");
         }
         long t = System.currentTimeMillis();
         /* actually send the request */
         getSolrClient().request(updateRequest);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: sending binary data \"" + file.toString() + " (" + solrID + ")\"" + " done in " + (
+            LOGGER.debug("Solr: sending binary data \"" + file + " (" + solrID + ")\"" + " done in " + (
                 System.currentTimeMillis() - t) + "ms");
         }
     }
@@ -102,7 +102,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     @Override
     public String toString() {
-        return "index " + this.file.toString();
+        return "index " + this.file;
     }
 
 }

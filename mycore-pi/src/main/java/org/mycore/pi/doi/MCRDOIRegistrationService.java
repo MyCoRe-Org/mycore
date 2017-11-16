@@ -194,7 +194,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     }
 
     public URI getRegisteredURI(MCRBase obj) throws URISyntaxException {
-        return new URI(this.registerURL + "/receive/" + obj.getId().toString());
+        return new URI(this.registerURL + "/receive/" + obj.getId());
     }
 
     /**
@@ -214,7 +214,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
                 String contentType = Optional.ofNullable(MCRContentTypes.probeContentType(mainDocumentPath))
                     .orElse("application/octet-stream");
                 entryList.add(new AbstractMap.SimpleEntry<>(contentType, new URI(this.registerURL + MCRXMLFunctions
-                    .encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDoc))));
+                    .encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId + "/" + mainDoc))));
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Error while detecting the file to register!", e);
             }
@@ -243,13 +243,13 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             } catch (SAXException e) {
                 String translatedInformation = MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_1_2);
                 throw new MCRPersistentIdentifierException(
-                    "The document " + id.toString() + " does not generate well formed Datacite!",
+                    "The document " + id + " does not generate well formed Datacite!",
                     translatedInformation, ERR_CODE_1_2, e);
             }
             return dataciteDocument;
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRPersistentIdentifierException(
-                "Could not transform the content of " + id.toString() + " with the transformer " + transformer, e);
+                "Could not transform the content of " + id + " with the transformer " + transformer, e);
         }
     }
 
@@ -258,7 +258,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         throws MCRPersistentIdentifierException {
         if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
             .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
-            LOGGER.warn("SuperUser deletes object " + obj.getId().toString() + " with registered doi " + doi.asString()
+            LOGGER.warn("SuperUser deletes object " + obj.getId() + " with registered doi " + doi.asString()
                 + ". Try to set DOI inactive.");
             try {
                 getDataciteClient().deleteMetadata(doi);

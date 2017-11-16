@@ -119,7 +119,7 @@ public class MCRRestAPIObjectsHelper {
         if (MCRRestAPIObjects.STYLE_DERIVATEDETAILS.equals(queryParamStyle) && eStructure != null) {
             Element eDerObjects = eStructure.getChild("derobjects");
             if (eDerObjects != null) {
-                for (Element eDer : (List<Element>) eDerObjects.getChildren("derobject")) {
+                for (Element eDer : eDerObjects.getChildren("derobject")) {
                     String derID = eDer.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
                     try {
                         MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID));
@@ -873,7 +873,7 @@ public class MCRRestAPIObjectsHelper {
         if (matchedDerID == null) {
             throw new MCRRestAPIException(Response.Status.NOT_FOUND,
                 new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Derivate " + derIDString + " not found.",
-                    "The MyCoRe Object with id '" + mcrObj.getId().toString()
+                    "The MyCoRe Object with id '" + mcrObj.getId()
                         + "' does not contain a derivate with id '" + derIDString + "'."));
         }
 

@@ -22,9 +22,9 @@ import org.w3c.dom.NodeList;
 
 public class MCRIncludeHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRIncludeHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRIncludeHandler.class);
 
-    private final static Map<String, Node> includesPerApplication = new ConcurrentHashMap<String, Node>();
+    private static final Map<String, Node> includesPerApplication = new ConcurrentHashMap<String, Node>();
 
     private Map<String, Node> includesPerTransformation = new HashMap<String, Node>();
 

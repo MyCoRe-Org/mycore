@@ -58,7 +58,7 @@ public enum MCRMODSDateFormat {
 
     static final Locale DATE_LOCALE = Locale.ROOT;
 
-    private MCRMODSDateFormat(String encoding, String dateFormat) {
+    MCRMODSDateFormat(String encoding, String dateFormat) {
         this.encoding = encoding;
         this.attributeValue = encoding == "iso8601" ? encoding : encoding.split("-")[0];
         this.dateFormat = dateFormat;

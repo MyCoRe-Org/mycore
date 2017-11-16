@@ -58,7 +58,7 @@ import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
  */
 public class MCRBinding {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRBinding.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRBinding.class);
 
     protected String name;
 
@@ -252,7 +252,7 @@ public class MCRBinding {
         else if (parent != null)
             return parent.getVariables();
         else
-            return Collections.<String, Object> emptyMap();
+            return Collections.emptyMap();
     }
 
     public void setVariables(Map<String, Object> variables) {

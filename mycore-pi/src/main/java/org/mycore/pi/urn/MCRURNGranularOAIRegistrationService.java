@@ -75,7 +75,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
     private MCRDNBURN registerSingleURN(MCRBase obj, String additional, MCRObjectDerivate derivate)
         throws MCRPersistentIdentifierException {
         MCRDNBURN newURN;
-        LOGGER.info("Add single urn to " + obj.getId().toString() + " / " + additional);
+        LOGGER.info("Add single urn to " + obj.getId() + " / " + additional);
 
         Session session = MCRHIBConnection.instance().getSession();
         MCRPath filePath;
@@ -98,7 +98,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
 
     private MCRDNBURN registerURNsDerivate(MCRBase obj, String additional, MCRObjectDerivate derivate)
         throws MCRPersistentIdentifierException {
-        LOGGER.info("Add URNs to all files of " + obj.getId().toString());
+        LOGGER.info("Add URNs to all files of " + obj.getId());
 
         Session session = MCRHIBConnection.instance().getSession();
 

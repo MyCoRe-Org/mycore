@@ -61,7 +61,7 @@ public class MCRDerivateURNUtils {
                 if (!isFileSupported(file)) {
                     LOGGER.info("File is not displayable within iView2. Use " + MCRFileNodeServlet.class.getSimpleName()
                         + " as url");
-                    String filePath = "/" + file.getOwner() + "/" + file.getFileName().toString();
+                    String filePath = "/" + file.getOwner() + "/" + file.getFileName();
                     return new URL(
                         MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
                             + filePath);
@@ -96,7 +96,7 @@ public class MCRDerivateURNUtils {
                 .map(MCRObjectDerivate::getInternals)
                 .map(MCRMetaIFS::getMainDoc)
                 .orElseThrow(() -> new RuntimeException(
-                    "Could not get main doc for " + derivateId.toString()));
+                    "Could not get main doc for " + derivateId));
 
             String spec = null;
             String baseURL = MCRFrontendUtil.getBaseURL();

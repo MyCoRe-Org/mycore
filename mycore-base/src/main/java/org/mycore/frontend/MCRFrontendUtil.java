@@ -58,7 +58,7 @@ public class MCRFrontendUtil {
             MCRSession session = MCRSessionMgr.getCurrentSession();
             Object value = session.get(BASE_URL_ATTRIBUTE);
             if (value != null) {
-                LOGGER.debug("Returning BaseURL " + value.toString() + " from user session.");
+                LOGGER.debug("Returning BaseURL " + value + " from user session.");
                 return value.toString();
             }
         }

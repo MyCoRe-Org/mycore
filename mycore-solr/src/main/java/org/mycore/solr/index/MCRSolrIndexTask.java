@@ -15,7 +15,7 @@ import org.apache.solr.client.solrj.SolrServerException;
  */
 public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>> {
 
-    final static Logger LOGGER = LogManager.getLogger(MCRSolrIndexTask.class);
+    static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexTask.class);
 
     protected MCRSolrIndexHandler indexHandler;
 
@@ -41,7 +41,7 @@ public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>> {
 
     @Override
     public String toString() {
-        return "Solr: " + this.indexHandler.toString();
+        return "Solr: " + this.indexHandler;
     }
 
 }

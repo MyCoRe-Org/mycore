@@ -130,7 +130,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
     @Override
     public void updateRule(MCRAccessRule rule) {
         Session session = MCRHIBConnection.instance().getSession();
-        MCRACCESSRULE hibrule = (MCRACCESSRULE) session.get(MCRACCESSRULE.class, rule.getId());
+        MCRACCESSRULE hibrule = session.get(MCRACCESSRULE.class, rule.getId());
 
         DateFormat df = new SimpleDateFormat(sqlDateformat, Locale.ROOT);
         hibrule.setCreationdate(Timestamp.valueOf(df.format(rule.getCreationTime())));

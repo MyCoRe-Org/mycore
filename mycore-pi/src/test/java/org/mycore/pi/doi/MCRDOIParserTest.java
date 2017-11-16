@@ -27,7 +27,7 @@ public class MCRDOIParserTest {
 
         Assert.assertTrue("DOI should be parsable!", parsedDOIOptional.isPresent());
 
-        MCRDigitalObjectIdentifier parsedDOI = (MCRDigitalObjectIdentifier) parsedDOIOptional.get();
+        MCRDigitalObjectIdentifier parsedDOI = parsedDOIOptional.get();
 
         Assert.assertEquals("DOI Prefix should match!", expectedPrefix,
             parsedDOI.getPrefix());

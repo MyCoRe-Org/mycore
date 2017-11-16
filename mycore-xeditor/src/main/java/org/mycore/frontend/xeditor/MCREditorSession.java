@@ -55,7 +55,7 @@ import org.xml.sax.SAXException;
  */
 public class MCREditorSession {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCREditorSession.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCREditorSession.class);
 
     private String id;
 
@@ -90,7 +90,7 @@ public class MCREditorSession {
     }
 
     public MCREditorSession() {
-        this(Collections.<String, String[]> emptyMap(), new MCRParameterCollector());
+        this(Collections.emptyMap(), new MCRParameterCollector());
     }
 
     public Map<String, Object> getVariables() {
@@ -155,7 +155,7 @@ public class MCREditorSession {
         }
     }
 
-    private final static Pattern PATTERN_URI = Pattern.compile("\\{\\$([^\\}]+)\\}");
+    private static final Pattern PATTERN_URI = Pattern.compile("\\{\\$([^\\}]+)\\}");
 
     public String replaceParameters(String uri) {
         Matcher m = PATTERN_URI.matcher(uri);

@@ -109,7 +109,7 @@ public class MCRServletContextResourceImporter implements Importer {
             String contents = getStringContent(resource);
             URI absoluteUri = resource.toURI();
 
-            LOGGER.debug("Resolved " + url + " to " + absoluteUri.toString());
+            LOGGER.debug("Resolved " + url + " to " + absoluteUri);
             return Stream.of(new Import(absolute, absolute, contents)).collect(Collectors.toList());
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("Error while resolving " + url, e);

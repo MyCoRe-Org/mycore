@@ -14,7 +14,7 @@ import org.mycore.webcli.container.MCRWebCLIContainer;
 @MCRCommandGroup(name = "Basic commands")
 public class MCRBasicWebCLICommands {
     @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.")
-    public static List<String> readCommandsFile(String file) throws IOException, FileNotFoundException {
+    public static List<String> readCommandsFile(String file) throws IOException {
         return MCRCommandLineInterface.readCommandsFile(file);
     }
 

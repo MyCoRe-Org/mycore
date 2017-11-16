@@ -48,13 +48,13 @@ import org.xml.sax.ext.EntityResolver2;
  */
 public class MCRXMLParserImpl implements MCRXMLParser {
 
-    private final static String FEATURE_NAMESPACES = "http://xml.org/sax/features/namespaces";
+    private static final String FEATURE_NAMESPACES = "http://xml.org/sax/features/namespaces";
 
-    private final static String FEATURE_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
+    private static final String FEATURE_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
 
-    private final static String FEATURE_FULL_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema-full-checking";
+    private static final String FEATURE_FULL_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema-full-checking";
 
-    private final static String msg = "Error while parsing XML document: ";
+    private static final String msg = "Error while parsing XML document: ";
 
     private boolean validate;
 

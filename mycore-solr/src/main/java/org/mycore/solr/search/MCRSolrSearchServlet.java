@@ -70,7 +70,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     static final List<String> RESERVED_PARAMETER_KEYS;
 
     static {
-        String[] parameter = new String[] { "q", "qt", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache",
+        String[] parameter = { "q", "qt", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache",
             "fl", "glob",
             "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt", "qf", "q.alt",
             "mm", "pf",
@@ -193,7 +193,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
         StringBuilder sortBuilder = new StringBuilder();
         for (Iterator<Integer> positionIterator = sortedPositions.iterator(); positionIterator.hasNext();) {
-            Integer position = (Integer) positionIterator.next();
+            Integer position = positionIterator.next();
             sortBuilder.append(",");
             sortBuilder.append(positionFieldMap.get(position));
             String order = positionOrderMap.get(position);

@@ -240,7 +240,7 @@ public class MCRObjectDerivate {
 
     public MCRFileMetadata getOrCreateFileMetadata(MCRPath file, String urn, String handle) {
         Objects.requireNonNull(file, "File may not be null");
-        String path = "/" + file.subpathComplete().toString();
+        String path = "/" + file.subpathComplete();
         return getOrCreateFileMetadata(path, urn, handle);
     }
 
@@ -423,7 +423,7 @@ public class MCRObjectDerivate {
             validate();
             return true;
         } catch (MCRException exc) {
-            LOGGER.warn("The <derivate> part of the mycorederivate '" + derivateID.toString() + "' is invalid.", exc);
+            LOGGER.warn("The <derivate> part of the mycorederivate '" + derivateID + "' is invalid.", exc);
         }
         return false;
     }

@@ -288,7 +288,7 @@ public class MCRTextResolver {
      * 
      * @author Matthias Eichner
      */
-    protected static abstract class Term {
+    protected abstract static class Term {
         /**
          * The string buffer within the term. For example: {<b>var</b>}. 
          */
@@ -443,7 +443,7 @@ public class MCRTextResolver {
                 if (value == null) {
                     resolved = false;
                     if (getTextResolver().isRetainText()) {
-                        this.valueBuffer.append(getStartEnclosingString()).append(termBuffer.toString())
+                        this.valueBuffer.append(getStartEnclosingString()).append(termBuffer)
                             .append(getEndEnclosingString());
                     }
                     this.untrack();
@@ -472,7 +472,7 @@ public class MCRTextResolver {
             if (!complete) {
                 // assume that the variable is not complete 
                 StringBuffer buf = new StringBuffer();
-                buf.append(getStartEnclosingString()).append(termBuffer.toString());
+                buf.append(getStartEnclosingString()).append(termBuffer);
                 return buf.toString();
             }
             return valueBuffer.toString();
@@ -500,7 +500,7 @@ public class MCRTextResolver {
         }
 
         protected String getTrackID() {
-            return new StringBuffer(getStartEnclosingString()).append(termBuffer.toString())
+            return new StringBuffer(getStartEnclosingString()).append(termBuffer)
                 .append(getEndEnclosingString()).toString();
         }
 

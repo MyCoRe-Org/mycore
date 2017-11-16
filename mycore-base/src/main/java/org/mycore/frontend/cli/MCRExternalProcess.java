@@ -29,7 +29,7 @@ import org.mycore.common.content.MCRContent;
 
 public class MCRExternalProcess {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRExternalProcess.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRExternalProcess.class);
 
     private String[] command;
 
@@ -91,7 +91,7 @@ public class MCRExternalProcess {
 
 class MCRStreamSucker extends Thread {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRStreamSucker.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRStreamSucker.class);
 
     /** The input stream to read from */
     private InputStream in;

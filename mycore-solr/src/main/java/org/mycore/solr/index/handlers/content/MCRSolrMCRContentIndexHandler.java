@@ -94,7 +94,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
 
     @Override
     public String toString() {
-        return "index " + id.toString();
+        return "index " + id;
     }
 
 }

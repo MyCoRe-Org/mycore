@@ -33,8 +33,8 @@ public class MCRQLSearchUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
-    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query",
-        "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));
+    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList("search", "query", "maxResults",
+        "numPerPage", "page", "mask", "mode", "redirect"));
 
     @SuppressWarnings("rawtypes")
     public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
@@ -75,7 +75,7 @@ public class MCRQLSearchUtils {
         Element conditions = root.getChild("conditions");
 
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
-            Element condition = (Element) conditions.getChildren().get(0);
+            Element condition = conditions.getChildren().get(0);
             renameElements(condition);
 
             // Remove conditions without values
@@ -223,7 +223,7 @@ public class MCRQLSearchUtils {
 
         List<String> sortFields = new ArrayList<String>();
         for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
-            String name = (String) names.nextElement();
+            String name = names.nextElement();
             if (name.contains(".sortField")) {
                 sortFields.add(name);
             }

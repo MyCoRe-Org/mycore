@@ -60,7 +60,7 @@ public class MCRLabelSetTypeAdapter extends MCRJSONTypeAdapter<MCRLabelSetWrappe
             if (label != null) {
                 labels.add(label);
             } else {
-                LOGGER.warn("Unable to add label with empty lang or text: " + labelJsonObject.toString());
+                LOGGER.warn("Unable to add label with empty lang or text: " + labelJsonObject);
             }
         }
         return new MCRLabelSetWrapper(labels);

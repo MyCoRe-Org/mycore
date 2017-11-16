@@ -10,7 +10,7 @@ public class MCRUniformResourceName implements MCRPersistentIdentifier {
     }
 
     protected MCRUniformResourceName() {
-    };
+    }
 
     public MCRUniformResourceName(String subNamespace, String namespaceSpecificString) {
         this.subNamespace = subNamespace;

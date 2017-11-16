@@ -74,7 +74,7 @@ import org.xml.sax.SAXException;
 
 public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
-    private final static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final String BASE_URI = "resource:/";
 
@@ -92,7 +92,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                 content = MCRSourceContent.getInstance(uri.toString());
                 return new Resource(uri.getScheme(), content.getInputStream());
             } catch (TransformerException e) {
-                LOGGER.error("Error while resolving uri: " + uri.toString());
+                LOGGER.error("Error while resolving uri: " + uri);
             }
 
             return null;

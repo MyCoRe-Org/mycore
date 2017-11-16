@@ -101,9 +101,9 @@ public class MCRLanguageFactory {
         return getLanguage(codeOfDefaultLanguage);
     }
 
-    public final static MCRLanguage GERMAN = MCRLanguageFactory.instance().getLanguage("de");
+    public static final MCRLanguage GERMAN = MCRLanguageFactory.instance().getLanguage("de");
 
-    public final static MCRLanguage ENGLISH = MCRLanguageFactory.instance().getLanguage("en");
+    public static final MCRLanguage ENGLISH = MCRLanguageFactory.instance().getLanguage("en");
 
     /**
      * Returns the language with the given ISO 639-1 or -2 code. When the given code contains a

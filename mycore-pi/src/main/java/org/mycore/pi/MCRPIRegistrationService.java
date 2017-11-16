@@ -211,14 +211,14 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
         if (getMetadataManager().getIdentifier(obj, additional).isPresent()) {
             throw new MCRPersistentIdentifierException(
-                "There is already a " + identType + " in the Object " + id.toString());
+                "There is already a " + identType + " in the Object " + id);
         }
     }
 
     protected void validateAlreadyCreated(MCRObjectID id, String additional) throws MCRPersistentIdentifierException {
         if (isCreated(id, additional)) {
             throw new MCRPersistentIdentifierException("There is already a registered " + getType() + " for Object "
-                + id.toString() + " and additional " + additional);
+                + id + " and additional " + additional);
         }
     }
 

@@ -126,7 +126,7 @@ public abstract class MCRWrappedContent extends MCRContent {
     }
 
     @Override
-    public String asString() throws IOException, UnsupportedEncodingException {
+    public String asString() throws IOException {
         return getBaseContent().asString();
     }
 

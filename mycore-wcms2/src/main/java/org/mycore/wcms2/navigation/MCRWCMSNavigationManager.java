@@ -36,11 +36,11 @@ public class MCRWCMSNavigationManager {
     /**
      * @see MCRWCMSNavigationProvider#toJSON(MCRNavigation)
      */
-    public synchronized static JsonObject toJSON(MCRNavigation navigation) {
+    public static synchronized JsonObject toJSON(MCRNavigation navigation) {
         return NAVIGATION_PROVIDER.toJSON(navigation);
     }
 
-    public synchronized static MCRNavigation fromJSON(JsonObject jsonNavigation) {
+    public static synchronized MCRNavigation fromJSON(JsonObject jsonNavigation) {
         return NAVIGATION_PROVIDER.fromJSON(jsonNavigation);
     }
 
@@ -57,14 +57,14 @@ public class MCRWCMSNavigationManager {
     /**
      * Returns the navigation as json.
      */
-    public synchronized static JsonObject getNavigationAsJSON() throws IOException, SAXException, JAXBException {
+    public static synchronized JsonObject getNavigationAsJSON() throws IOException, SAXException, JAXBException {
         return NAVIGATION_PROVIDER.toJSON(getNavigation());
     }
 
     /**
      * Returns the navigation as jdom document.
      */
-    public synchronized static Document getNavigationAsXML() {
+    public static synchronized Document getNavigationAsXML() {
         return MCRLayoutUtilities.getNavi();
     }
 

@@ -33,7 +33,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
  */
 public class MCRCLIExceptionHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRCLIExceptionHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCLIExceptionHandler.class);
 
     public static void handleException(InvocationTargetException ex) {
         handleException(ex.getTargetException());

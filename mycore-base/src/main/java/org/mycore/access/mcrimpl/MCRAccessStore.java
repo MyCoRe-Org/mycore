@@ -47,20 +47,20 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 public abstract class MCRAccessStore {
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessStore.class);
 
-    final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
+    protected static final String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
-    final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString(
+    protected static final String SQLAccessCtrlRule = MCRConfiguration.instance().getString(
         "MCR.Persistence.Access.Store.Table.Rule",
         "MCRACCESSRULE");
 
-    final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString(
+    protected static final String SQLAccessCtrlMapping = MCRConfiguration.instance().getString(
         "MCR.Persistence.Access.Store.Table.Map",
         "MCRACCESS");
 
-    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools",
+    protected static final String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools",
         "read,write,delete");
 
-    static private MCRAccessStore implementation;
+    private static MCRAccessStore implementation;
 
     public abstract String getRuleID(String objID, String ACPool);
 
@@ -91,7 +91,7 @@ public abstract class MCRAccessStore {
     public static MCRAccessStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRAccessStore) MCRConfiguration.instance().getSingleInstanceOf(
+                implementation = MCRConfiguration.instance().getSingleInstanceOf(
                     "MCR.Persistence.Access.Store.Class",
                     "org.mycore.backend.hibernate.MCRHIBAccessStore");
             }

@@ -22,7 +22,7 @@ import org.apache.solr.common.util.ContentStreamBase;
  * */
 public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase {
 
-    final static Logger LOGGER = LogManager.getLogger(MCRSolrAbstractContentStream.class);
+    static final Logger LOGGER = LogManager.getLogger(MCRSolrAbstractContentStream.class);
 
     protected boolean setup;
 
@@ -64,7 +64,7 @@ public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase 
      * <li>setContentType</li>
      * <li>setInputStream</li></ul>
      */
-    abstract protected void setup() throws IOException;
+    protected abstract void setup() throws IOException;
 
     /**
      * Required for {@link #getReader()} to transform any InputStream into a Reader.

@@ -1093,7 +1093,7 @@ public class MCRCalendar {
             }
 
             budcal.set(year, mon, day);
-            return (BuddhistCalendar) budcal;
+            return budcal;
         } catch (Exception e) {
             throw new MCRException("The ancient buddhist date is false.", e);
         }
@@ -1262,7 +1262,7 @@ public class MCRCalendar {
             year = newdate.get(Calendar.YEAR);
             mon = newdate.get(Calendar.MONTH) + 1;
             if (year == 1582 && mon == 10 && day >= 5 && day < 15) {
-                newdate.set(year, mon - 1, 15);
+                newdate.set(1582, mon - 1, 15);
             }
 
             return newdate;

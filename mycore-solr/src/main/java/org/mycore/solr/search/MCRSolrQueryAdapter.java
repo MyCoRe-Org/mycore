@@ -58,7 +58,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
     @Override
     public long getResultCount() {
         configureSolrQuery();
-        LOGGER.debug("query: " + solrQuery.toString());
+        LOGGER.debug("query: " + solrQuery);
         solrQuery.set("rows", 0);
         QueryResponse queryResponse;
         try {

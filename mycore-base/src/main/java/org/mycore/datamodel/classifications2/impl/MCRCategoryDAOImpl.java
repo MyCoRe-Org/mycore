@@ -547,7 +547,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list, MCRCategoryID returnID) {
-        LOGGER.debug(() -> "using prefetched list: " + list.toString());
+        LOGGER.debug(() -> "using prefetched list: " + list);
         MCRCategoryImpl predecessor = null;
         for (MCRCategoryDTO entry : list) {
             predecessor = entry.merge(predecessor);
@@ -666,7 +666,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * Method updates the last modified timestamp, for the given root id.
      * 
      */
-    synchronized protected void updateLastModified(String root) {
+    protected synchronized void updateLastModified(String root) {
         LAST_MODIFIED_MAP.put(root, System.currentTimeMillis());
     }
 

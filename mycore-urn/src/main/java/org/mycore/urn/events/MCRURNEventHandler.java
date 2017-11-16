@@ -125,7 +125,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("Could not store / update the urn for object with id " + obj.getId().toString()
+            LOGGER.error("Could not store / update the urn for object with id " + obj.getId()
                 + " into the database", ex);
         }
     }
@@ -169,12 +169,12 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         try {
             if (MCRURNManager.hasURNAssigned(obj.getId().toString())) {
-                LOGGER.info("Deleting urn from database for object belonging to " + obj.getId().toString());
+                LOGGER.info("Deleting urn from database for object belonging to " + obj.getId());
                 MCRURNManager.removeURNByObjectID(obj.getId().toString());
             }
 
         } catch (Exception ex) {
-            LOGGER.error("Could not delete the urn from the database for object with id " + obj.getId().toString(), ex);
+            LOGGER.error("Could not delete the urn from the database for object with id " + obj.getId(), ex);
         }
     }
 
@@ -192,10 +192,10 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         try {
             if (MCRURNManager.hasURNAssigned(der.getId().toString())) {
                 MCRURNManager.removeURNByObjectID(der.getId().toString());
-                LOGGER.info("Deleting urn from database for derivates belonging to " + der.getId().toString());
+                LOGGER.info("Deleting urn from database for derivates belonging to " + der.getId());
             }
         } catch (Exception ex) {
-            LOGGER.error("Could not delete the urn from the database for object with id " + der.getId().toString(), ex);
+            LOGGER.error("Could not delete the urn from the database for object with id " + der.getId(), ex);
         }
     }
 

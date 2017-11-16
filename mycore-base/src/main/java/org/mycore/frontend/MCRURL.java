@@ -74,8 +74,7 @@ public class MCRURL {
             URI uri = this.url.toURI();
             StringBuffer urlBuffer = new StringBuffer();
             urlBuffer.append(
-                new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), null, null)
-                    .toString());
+                new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), null, null));
             if (query != null) {
                 urlBuffer.append("?").append(query);
             }
@@ -88,7 +87,7 @@ public class MCRURL {
                 this.parameterMap = buildParameterMap(this.url);
             }
         } catch (Exception exc) {
-            LOGGER.error("unable to rebuild url " + this.url.toString());
+            LOGGER.error("unable to rebuild url " + this.url);
         }
     }
 
@@ -113,7 +112,7 @@ public class MCRURL {
                 this.parameterMap = buildParameterMap(this.url);
             }
         } catch (MalformedURLException exc) {
-            LOGGER.error("unable to add parameter (" + name + "=" + value + ") to url" + this.url.toString());
+            LOGGER.error("unable to add parameter (" + name + "=" + value + ") to url" + this.url);
         }
         return this;
     }

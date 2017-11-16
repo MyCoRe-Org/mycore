@@ -56,7 +56,7 @@ public abstract class MCRBase {
     /**
      * constant value for the object id length
      */
-    public final static int MAX_LABEL_LENGTH = 256;
+    public static final int MAX_LABEL_LENGTH = 256;
 
     // from configuration
     protected static final MCRConfiguration mcr_conf;
@@ -112,7 +112,7 @@ public abstract class MCRBase {
      * @exception MCRConfigurationException
      *                a special exception for configuration data
      */
-    public MCRBase() throws MCRException, MCRConfigurationException {
+    public MCRBase() throws MCRException {
         mcr_label = "";
         mcr_version = MCRCoreVersion.getVersion();
         mcr_schema = "";

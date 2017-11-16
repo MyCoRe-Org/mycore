@@ -46,9 +46,9 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  */
 public class MCROAISearchManager {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAISearchManager.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAISearchManager.class);
 
-    protected final static String TOKEN_DELIMITER = "@";
+    protected static final String TOKEN_DELIMITER = "@";
 
     protected static int MAX_AGE;
 

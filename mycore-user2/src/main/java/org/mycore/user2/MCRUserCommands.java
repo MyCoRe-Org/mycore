@@ -180,7 +180,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "export role {0} to directory {1}",
         help = "Export the role {0} to the directory {1}. The filename will be {0}.xml")
-    public static void exportRole(String roleID, String directory) throws FileNotFoundException, IOException {
+    public static void exportRole(String roleID, String directory) throws IOException {
         MCRRole mcrRole = MCRRoleManager.getRole(roleID);
         File targetFile = new File(directory, roleID + ".xml");
         try (FileOutputStream fout = new FileOutputStream(targetFile)) {
@@ -371,7 +371,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new FileNotFoundException(dir.getAbsolutePath() + " is not a directory.");
         }
         File[] listFiles = dir
-            .listFiles((FileFilter) pathname -> pathname.isFile() && pathname.getName().endsWith(".xml"));
+            .listFiles(pathname -> pathname.isFile() && pathname.getName().endsWith(".xml"));
         if (listFiles.length == 0) {
             LOGGER.warn("Did not find any user files in " + dir.getAbsolutePath());
             return null;
@@ -436,7 +436,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         StringBuilder sb = new StringBuilder();
         sb.append("       role=").append(role.getName());
         for (MCRLabel label : role.getLabels()) {
-            sb.append("\n         ").append(label.toString());
+            sb.append("\n         ").append(label);
         }
         Collection<String> userIds = MCRRoleManager.listUserIDs(role);
         for (String userId : userIds) {

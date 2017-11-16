@@ -54,7 +54,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     private static final long serialVersionUID = -9213353868244605750L;
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCRStaticXMLFileServlet.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCRStaticXMLFileServlet.class);
 
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
@@ -105,7 +105,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     protected MCRContent getResourceContent(HttpServletRequest request, HttpServletResponse response, URL resource)
-        throws IOException, JDOMException, SAXException, MalformedURLException {
+        throws IOException, JDOMException, SAXException {
         return new MCRURLContent(resource);
     }
 }

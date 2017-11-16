@@ -119,7 +119,7 @@ public class MCRFileContentTypeFactory {
         }
 
         if (typesTable.containsKey(ID)) {
-            return (MCRFileContentType) typesTable.get(ID);
+            return typesTable.get(ID);
         }
         String msg = "There is no file content type with ID = " + ID + " configured";
         throw new MCRConfigurationException(msg);
@@ -139,10 +139,10 @@ public class MCRFileContentTypeFactory {
         HashSet<String> types = new HashSet(typesTable.keySet());
 
         for (String key : types) {
-            MCRFileContentType contentType = (MCRFileContentType) typesTable.get(key);
+            MCRFileContentType contentType = typesTable.get(key);
 
             if (mimeType.equals(contentType.getMimeType()))
-                return (MCRFileContentType) typesTable.get(key);
+                return typesTable.get(key);
         }
         String msg = "There is no file content type for mime type = " + mimeType + " configured";
         throw new MCRConfigurationException(msg);

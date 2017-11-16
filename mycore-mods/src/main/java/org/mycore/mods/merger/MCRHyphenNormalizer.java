@@ -29,9 +29,9 @@ package org.mycore.mods.merger;
  **/
 public class MCRHyphenNormalizer {
 
-    private final static char HYPHEN_NORM = '-';
+    private static final char HYPHEN_NORM = '-';
 
-    private final static char[] HYPHEN_VARIANTS = { '\u002D', '\u2010', '\u2011', '\u2012', '\u2013', '\u2015',
+    private static final char[] HYPHEN_VARIANTS = { '\u002D', '\u2010', '\u2011', '\u2012', '\u2013', '\u2015',
         '\u2212', '\u2E3B', '\uFE58', '\uFE63', };
 
     /**

@@ -41,5 +41,5 @@ public interface MCRFooterInterface {
      * @param imagePath path to image relative to derivate root
      * @return an image of any height but with width of <code>imageWidth</code> px.
      */
-    public BufferedImage getFooter(int imageWidth, String derivateID, String imagePath);
+    BufferedImage getFooter(int imageWidth, String derivateID, String imagePath);
 }

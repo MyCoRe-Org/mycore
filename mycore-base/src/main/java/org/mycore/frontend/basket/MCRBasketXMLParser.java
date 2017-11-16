@@ -48,7 +48,7 @@ public class MCRBasketXMLParser {
         if (derivateID != null)
             basket.setDerivateID(derivateID);
 
-        for (Element child : (List<Element>) (xml.getChildren())) {
+        for (Element child : xml.getChildren()) {
             MCRBasketEntry entry = parseXML(child);
             basket.add(entry);
         }

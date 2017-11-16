@@ -48,7 +48,7 @@ import org.mycore.common.xml.MCRURIResolver;
  */
 public class MCRTemplatesCompiler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRTemplatesCompiler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTemplatesCompiler.class);
 
     /** The XSL transformer factory to use */
     private static SAXTransformerFactory factory;

@@ -67,8 +67,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static Element editrule;
     static {
         try {
-            readrule = (Element) new MCRStringContent(strReadRule).asXML().getRootElement().detach();
-            editrule = (Element) new MCRStringContent(strEditRule).asXML().getRootElement().detach();
+            readrule = new MCRStringContent(strReadRule).asXML().getRootElement().detach();
+            editrule = new MCRStringContent(strEditRule).asXML().getRootElement().detach();
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;

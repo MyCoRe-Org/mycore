@@ -272,7 +272,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 try {
                     Files.delete(tempFilePath);
                 } catch (IOException e) {
-                    LOGGER.error("Could not delete temp file " + tempFilePath.toString());
+                    LOGGER.error("Could not delete temp file " + tempFilePath);
                 }
             });
             this.filesUploaded++;
@@ -322,7 +322,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 updateMainFile();
             } else {
                 throw new IllegalStateException(
-                    "No files were uploaded, delete entry in database for " + derivate.getId().toString() + "!");
+                    "No files were uploaded, delete entry in database for " + derivate.getId() + "!");
             }
         }
         this.setStatus(MCRProcessableStatus.successful);

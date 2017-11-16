@@ -180,6 +180,6 @@ public class EpicurLite {
 
     @Override
     public String toString() {
-        return urn + "|" + url.toString();
+        return urn + "|" + url;
     }
 }

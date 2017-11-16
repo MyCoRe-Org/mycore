@@ -110,7 +110,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             if (ruleDescription == null) {
                 ruleDescription = "";
             }
-            Element rule = (Element) mcrpermission.getChild("condition").clone();
+            Element rule = mcrpermission.getChild("condition").clone();
             String objectid = mcrpermission.getAttributeValue("objectid");
             if (objectid == null) {
                 AI.addRule(permissionName, rule, ruleDescription);
@@ -143,7 +143,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         order = 40)
     public static void deleteAllPermissions() throws Exception {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        for (String permission : (List<String>) AI.getPermissions()) {
+        for (String permission : AI.getPermissions()) {
             AI.removeRule(permission);
         }
     }

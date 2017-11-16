@@ -12,7 +12,7 @@ public enum MCRISO8601Format {
 
     private String format;
 
-    private MCRISO8601Format(String format) {
+    MCRISO8601Format(String format) {
         this.format = format;
     }
 

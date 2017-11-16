@@ -54,7 +54,7 @@ import org.mycore.oai.pmh.dataprovider.jaxb.JAXBOAIProvider;
 public class MCROAIDataProvider extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAIDataProvider.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAIDataProvider.class);
 
     /**
      * Map of all MyCoRe oai adapter.

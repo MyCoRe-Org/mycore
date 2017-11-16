@@ -44,7 +44,7 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-final public class MCRMetaBoolean extends MCRMetaDefault {
+public final class MCRMetaBoolean extends MCRMetaDefault {
     // MCRMetaBoolean data
     private boolean value;
 

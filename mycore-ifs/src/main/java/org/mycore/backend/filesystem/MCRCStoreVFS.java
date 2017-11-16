@@ -148,7 +148,7 @@ public class MCRCStoreVFS extends MCRContentStore {
                 throw new IOException("baseURI for content store " + getID() + " is invalid: " + baseURL, e);
             }
         } else {
-            LOGGER.warn("Base URI is not a file URI: " + baseURL.toString());
+            LOGGER.warn("Base URI is not a file URI: " + baseURL);
             return null;
         }
     }

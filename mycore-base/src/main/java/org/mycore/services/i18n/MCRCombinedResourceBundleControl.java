@@ -65,7 +65,7 @@ public class MCRCombinedResourceBundleControl extends Control {
         }
         String bundleName = baseName.substring(baseName.indexOf(':') + 1);
         String filename = CONTROL_HELPER.toBundleName(bundleName, locale) + ".properties";
-        try (MCRConfigurationInputStream propertyStream = new MCRConfigurationInputStream(filename);) {
+        try (MCRConfigurationInputStream propertyStream = new MCRConfigurationInputStream(filename)) {
             if (propertyStream.isEmpty()) {
                 throw new MissingResourceException(
                     "Can't find bundle for base name " + baseName + ", locale " + locale, bundleName + "_" + locale, // className

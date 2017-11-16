@@ -57,7 +57,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
             MCRObject obj = (MCRObject) evt.get("object");
             if (obj != null) {
-                logger.debug(getClass().getName() + " handling " + obj.getId().toString() + " " + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + obj.getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleObjectCreated(evt, obj);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -80,7 +80,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         if (evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
             MCRDerivate der = (MCRDerivate) evt.get("derivate");
             if (der != null) {
-                logger.debug(getClass().getName() + " handling " + der.getId().toString() + " " + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + der.getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleDerivateCreated(evt, der);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -104,9 +104,9 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
             Path path = (Path) evt.get(MCREvent.PATH_KEY);
             if (path != null) {
                 if (!path.isAbsolute()) {
-                    logger.warn("Cannot handle path events on non absolute paths: " + path.toString());
+                    logger.warn("Cannot handle path events on non absolute paths: " + path);
                 }
-                logger.debug(getClass().getName() + " handling " + path.toString() + " " + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + path + " " + evt.getEventType());
                 BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
                 if (attrs == null && !evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
                     logger.warn("BasicFileAttributes for " + path + " was not given. Resolving now.");
@@ -171,7 +171,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
             MCRObject obj = (MCRObject) evt.get("object");
             if (obj != null) {
-                logger.debug(getClass().getName() + " handling " + obj.getId().toString() + " " + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + obj.getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     undoObjectCreated(evt, obj);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -192,7 +192,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         if (evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
             MCRDerivate der = (MCRDerivate) evt.get("derivate");
             if (der != null) {
-                logger.debug(getClass().getName() + " handling " + der.getId().toString() + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + der.getId() + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     undoDerivateCreated(evt, der);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -214,9 +214,9 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
             Path path = (Path) evt.get(MCREvent.PATH_KEY);
             if (path != null) {
                 if (!path.isAbsolute()) {
-                    logger.warn("Cannot handle path events on non absolute paths: " + path.toString());
+                    logger.warn("Cannot handle path events on non absolute paths: " + path);
                 }
-                logger.debug(getClass().getName() + " handling " + path.toString() + " " + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + path + " " + evt.getEventType());
                 BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
                 if (attrs == null && !evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
                     logger.warn("BasicFileAttributes for " + path + " was not given. Resolving now.");

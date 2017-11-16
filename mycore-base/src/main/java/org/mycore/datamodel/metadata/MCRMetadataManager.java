@@ -306,7 +306,7 @@ public final class MCRMetadataManager {
             Files.walkFileTree(sourceDir, new MCRTreeCopier(sourceDir, rootPath));
         } catch(Exception exc) {
             throw new MCRPersistenceException(
-                    "Unable to import derivate " + derivateID + " from source " + sourceDir.toAbsolutePath().toString(),
+                    "Unable to import derivate " + derivateID + " from source " + sourceDir.toAbsolutePath(),
                     exc);
         }
     }
@@ -348,7 +348,7 @@ public final class MCRMetadataManager {
         MCRObject parent = null;
         if (parent_id != null) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Parent ID = " + parent_id.toString());
+                LOGGER.debug("Parent ID = " + parent_id);
             }
             parent = MCRMetadataManager.retrieveMCRObject(parent_id);
         }
@@ -400,9 +400,9 @@ public final class MCRMetadataManager {
         if (mcrDerivate.getDerivate().getInternals() != null) {
             try {
                 deleteDerivate(id.toString());
-                LOGGER.info("IFS entries for MCRDerivate " + id.toString() + " are deleted.");
+                LOGGER.info("IFS entries for MCRDerivate " + id + " are deleted.");
             } catch (final Exception e) {
-                throw new MCRPersistenceException("Error while delete MCRDerivate " + id.toString() + " in IFS", e);
+                throw new MCRPersistenceException("Error while delete MCRDerivate " + id + " in IFS", e);
             }
         }
 
@@ -522,7 +522,7 @@ public final class MCRMetadataManager {
     private static void removeChildObject(final MCRObject mcrObject, final MCRObjectID parentId)
         throws PersistenceException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Parent ID = " + parentId.toString());
+            LOGGER.debug("Parent ID = " + parentId);
         }
         try {
             if (MCRXMLMetadataManager.instance().exists(parentId)) {
@@ -811,8 +811,8 @@ public final class MCRMetadataManager {
                 Files.walkFileTree(sourcePath, new MCRTreeCopier(sourcePath, targetPath));
             } catch (Exception exc) {
                 throw new MCRPersistenceException(
-                        "Unable to update IFS. Copy failed from " + sourcePath.toAbsolutePath().toString()
-                                + " to target " + targetPath.toAbsolutePath().toString(), exc);
+                        "Unable to update IFS. Copy failed from " + sourcePath.toAbsolutePath()
+                                + " to target " + targetPath.toAbsolutePath(), exc);
             }
         }
 

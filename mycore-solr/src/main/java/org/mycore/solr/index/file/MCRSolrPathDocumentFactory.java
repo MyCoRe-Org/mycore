@@ -53,7 +53,7 @@ public class MCRSolrPathDocumentFactory {
     private static Logger LOGGER = LogManager.getLogger(MCRSolrPathDocumentFactory.class);
 
     private static MCRSolrPathDocumentFactory instance = MCRConfiguration.instance()
-        .<MCRSolrPathDocumentFactory> getInstanceOf(CONFIG_PREFIX + "SolrInputDocument.Path.Factory", (String) null);
+        .getInstanceOf(CONFIG_PREFIX + "SolrInputDocument.Path.Factory", (String) null);
 
     private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
 
@@ -115,7 +115,7 @@ public class MCRSolrPathDocumentFactory {
         ACCUMULATOR_LIST.forEach(accumulate);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("MCRFile " + input.toString() + " transformed to:\n" + doc.toString());
+            LOGGER.debug("MCRFile " + input + " transformed to:\n" + doc);
         }
 
         return doc;

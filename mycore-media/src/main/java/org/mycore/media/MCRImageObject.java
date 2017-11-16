@@ -95,7 +95,7 @@ public class MCRImageObject extends MCRMediaObject {
         for (int c = 0; c < out.length(); c++)
             _fill += "-";
         out += _fill + "\n";
-        out += "Type             : " + type.toString() + "\n";
+        out += "Type             : " + type + "\n";
         out += (mimeType != null ? "mimeType         : " + mimeType + "\n" : "");
         out += (format != null
             ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n" : "");

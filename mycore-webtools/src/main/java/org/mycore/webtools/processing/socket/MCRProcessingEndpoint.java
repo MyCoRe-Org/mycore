@@ -231,7 +231,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         private void attachProcessable(MCRProcessable processable) {
             processable.addStatusListener(this);
             if (processable instanceof MCRListenableProgressable) {
-                ((MCRListenableProgressable) processable).addProgressListener(this);
+                processable.addProgressListener(this);
             }
         }
 

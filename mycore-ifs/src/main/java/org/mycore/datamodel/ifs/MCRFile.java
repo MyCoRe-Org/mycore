@@ -239,7 +239,7 @@ public class MCRFile extends MCRFilesystemNode {
     public File getLocalFile() throws IOException {
         MCRContentStore contentStore = getContentStore();
         if (contentStore == null) {
-            throw new IOException("Cannot read file as its content store is unknown:" + this.toString());
+            throw new IOException("Cannot read file as its content store is unknown:" + this);
         }
         return contentStore.getLocalFile(this);
     }

@@ -15,7 +15,7 @@ import org.mycore.common.MCRSessionMgr;
  */
 public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<Callable<V>> {
 
-    private final static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Callable<V> callable;
 

@@ -377,7 +377,7 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("Configuration property missing: " + name);
         }
 
-        return this.<T> loadClass(classname);
+        return this.loadClass(classname);
     }
 
     <T> T loadClass(String classname) {
@@ -443,7 +443,7 @@ public class MCRConfiguration {
             return defaultObj;
         }
 
-        return this.<T> loadClass(classname);
+        return this.loadClass(classname);
     }
 
     /**
@@ -456,7 +456,7 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public <T> T getInstanceOf(String name) throws MCRConfigurationException {
-        return getInstanceOf(name, (String) null);
+        return getInstanceOf(name, null);
     }
 
     /**
@@ -477,7 +477,7 @@ public class MCRConfiguration {
         if (inst != null) {
             return inst;
         }
-        inst = this.<T> getInstanceOf(name, defaultname); // we need a new instance, get it
+        inst = this.getInstanceOf(name, defaultname); // we need a new instance, get it
         instanceHolder.put(key, inst); // save the instance in the hashtable
         return inst;
     }
@@ -493,7 +493,7 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public <T> T getSingleInstanceOf(String name) {
-        return getSingleInstanceOf(name, (String) null);
+        return getSingleInstanceOf(name, null);
     }
 
     /**
@@ -775,7 +775,7 @@ public class MCRConfiguration {
         if (clear) {
             getBaseProperties().clear();
         } else {
-            Map<String, String> nullValues = Maps.filterValues(copy, Predicates.<String> isNull());
+            Map<String, String> nullValues = Maps.filterValues(copy, Predicates.isNull());
             for (String key : nullValues.keySet()) {
                 getBaseProperties().remove(key);
             }

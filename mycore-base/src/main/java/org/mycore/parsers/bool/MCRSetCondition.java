@@ -35,9 +35,9 @@ import org.jdom2.Element;
  */
 public abstract class MCRSetCondition<T> implements MCRCondition<T> {
 
-    public final static String AND = "and";
+    public static final String AND = "and";
 
-    public final static String OR = "or";
+    public static final String OR = "or";
 
     protected String operator;
 

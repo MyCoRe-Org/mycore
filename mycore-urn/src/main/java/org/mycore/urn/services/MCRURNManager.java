@@ -76,7 +76,7 @@ public class MCRURNManager {
     static {
         try {
 
-            store = (MCRURNStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
+            store = MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
         } catch (Throwable t) {
             // TODO: handle exception
             LOGGER.error("Init error: ", t);
@@ -218,7 +218,7 @@ public class MCRURNManager {
         int i = path.lastIndexOf("/") + 1;
         String file = path.substring(i);
         String pathDb = path.substring(0, i);
-        String[] pathParts = new String[] { pathDb, file };
+        String[] pathParts = { pathDb, file };
         return pathParts;
     }
 

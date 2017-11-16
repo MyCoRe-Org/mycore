@@ -53,7 +53,7 @@ public class MCRJPATestCase extends MCRTestCase {
                 schemaProperties.put("javax.persistence.schema-generation.scripts." + action + "-target", output);
             }
             Persistence.generateSchema(getCurrentComponentName(), schemaProperties);
-            LogManager.getLogger().debug(() -> "invoked '" + action + "' sql script:\n" + output.toString());
+            LogManager.getLogger().debug(() -> "invoked '" + action + "' sql script:\n" + output);
         }
     }
 

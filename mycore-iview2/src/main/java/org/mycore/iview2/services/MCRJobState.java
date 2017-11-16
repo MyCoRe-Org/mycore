@@ -28,11 +28,11 @@ public enum MCRJobState {
      */
     ERROR('e');
 
-    private final static Set<MCRJobState> NOT_COMPLETE_STATES = Collections.unmodifiableSet(Stream
+    private static final Set<MCRJobState> NOT_COMPLETE_STATES = Collections.unmodifiableSet(Stream
         .of(MCRJobState.ERROR, MCRJobState.PROCESSING, MCRJobState.NEW).collect(
             Collectors.toSet()));
 
-    private final static Set<MCRJobState> COMPLETE_STATES = Collections.unmodifiableSet(Stream
+    private static final Set<MCRJobState> COMPLETE_STATES = Collections.unmodifiableSet(Stream
         .of(MCRJobState.FINISHED).collect(
             Collectors.toSet()));
 
@@ -46,7 +46,7 @@ public enum MCRJobState {
 
     private char status;
 
-    private MCRJobState(char status) {
+    MCRJobState(char status) {
         this.status = status;
     }
 

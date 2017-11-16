@@ -35,7 +35,7 @@ import org.xml.sax.SAXParseException;
  */
 public class MCRXMLParserErrorHandler implements ErrorHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRXMLParserErrorHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXMLParserErrorHandler.class);
 
     protected boolean silent;
 

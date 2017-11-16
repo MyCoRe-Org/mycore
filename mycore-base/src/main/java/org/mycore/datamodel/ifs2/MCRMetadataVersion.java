@@ -70,17 +70,17 @@ public class MCRMetadataVersion {
     /**
      * A version that was created in store
      */
-    public final static char CREATED = 'A';
+    public static final char CREATED = 'A';
 
     /**
      * A version that was updated in store
      */
-    public final static char UPDATED = 'M';
+    public static final char UPDATED = 'M';
 
     /**
      * A version that was deleted in store
      */
-    public final static char DELETED = 'D';
+    public static final char DELETED = 'D';
 
     /**
      * Creates a new metadata version info object

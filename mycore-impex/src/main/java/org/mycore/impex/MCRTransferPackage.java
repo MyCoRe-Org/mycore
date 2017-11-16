@@ -178,7 +178,7 @@ public class MCRTransferPackage {
 
         // objects
         for (MCRObject object : this.objects) {
-            String fileName = CONTENT_PATH + object.getId().toString() + ".xml";
+            String fileName = CONTENT_PATH + object.getId() + ".xml";
             Document xml = object.createXML();
             content.put(fileName, new MCRJDOMContent(xml));
         }

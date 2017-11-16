@@ -62,7 +62,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRExportServlet extends MCRServlet {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRExportServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRExportServlet.class);
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
@@ -102,7 +102,7 @@ public class MCRExportServlet extends MCRServlet {
     }
 
     /** URIs beginning with these prefixes are forbidden for security reasons */
-    private final static String[] forbiddenURIs = { "file", "webapp", "resource" };
+    private static final String[] forbiddenURIs = { "file", "webapp", "resource" };
 
     private boolean isAllowed(String uri) {
         for (String prefix : forbiddenURIs)

@@ -98,7 +98,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
                 documents = debugList.iterator();
             }
             if (solrClient instanceof HttpSolrClient) {
-                updateResponse = ((HttpSolrClient) solrClient).add(documents);
+                updateResponse = solrClient.add(documents);
             } else {
                 ArrayList<SolrInputDocument> docs = new ArrayList<>(totalCount);
                 while (documents.hasNext()) {

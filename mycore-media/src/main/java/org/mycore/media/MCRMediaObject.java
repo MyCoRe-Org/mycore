@@ -239,7 +239,7 @@ public class MCRMediaObject implements Cloneable {
         for (int c = 0; c < out.length(); c++)
             _fill += "-";
         out += _fill + "\n";
-        out += (type != null ? "Main type        : " + type.toString() + "\n" : "");
+        out += (type != null ? "Main type        : " + type + "\n" : "");
         out += "mimeType         : " + mimeType + "\n";
         out += "Format           : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n";
         out += "Duration         : " + duration + "\n";
@@ -309,7 +309,7 @@ public class MCRMediaObject implements Cloneable {
         }
 
         if (xml.getChild("tags") != null) {
-            ((MCRMediaObject) media).tags = MCRMediaTagObject.buildFromXML(xml.getChild("tags"));
+            media.tags = MCRMediaTagObject.buildFromXML(xml.getChild("tags"));
         }
 
         return media;

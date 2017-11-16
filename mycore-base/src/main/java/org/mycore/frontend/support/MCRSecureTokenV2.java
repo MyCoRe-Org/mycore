@@ -148,10 +148,7 @@ public class MCRSecureTokenV2 {
         if (!sharedSecret.equals(other.sharedSecret)) {
             return false;
         }
-        if (!Arrays.equals(queryParameters, other.queryParameters)) {
-            return false;
-        }
-        return true;
+        return Arrays.equals(queryParameters, other.queryParameters);
     }
 
 }

@@ -100,7 +100,7 @@ public class MCRRealmFactory {
             }
         } else {
             File dataDirFile = new File(dataDir);
-            String realmsCfg = config.getString(REALMS_URI_CFG_KEY, dataDirFile.toURI().toString() + "realms.xml");
+            String realmsCfg = config.getString(REALMS_URI_CFG_KEY, dataDirFile.toURI() + "realms.xml");
             try {
                 realmsURI = new URI(realmsCfg);
                 LOGGER.info("Using realms defined in " + realmsURI);
@@ -108,7 +108,7 @@ public class MCRRealmFactory {
                     realmsFile = new File(realmsURI);
                     LOGGER.info("Loading realms from file: " + realmsFile);
                 } else {
-                    LOGGER.info("Try loading realms with URIResolver for scheme " + realmsURI.toString());
+                    LOGGER.info("Try loading realms with URIResolver for scheme " + realmsURI);
                 }
             } catch (URISyntaxException e) {
                 throw new MCRException(e);
@@ -136,12 +136,12 @@ public class MCRRealmFactory {
         /** List of defined realms */
         List<MCRRealm> realmsList = new ArrayList<MCRRealm>();
 
-        List<Element> realms = (List<Element>) (root.getChildren("realm"));
+        List<Element> realms = root.getChildren("realm");
         for (Element child : realms) {
             String id = child.getAttributeValue("id");
             MCRRealm realm = new MCRRealm(id);
 
-            List<Element> labels = (List<Element>) (child.getChildren("label"));
+            List<Element> labels = child.getChildren("label");
             for (Element label : labels) {
                 String text = label.getTextTrim();
                 String lang = label.getAttributeValue("lang", Namespace.XML_NAMESPACE);
@@ -218,7 +218,7 @@ public class MCRRealmFactory {
      */
     public static Document getRealmsDocument() {
         reInitIfNeeded();
-        return (Document) realmsDocument.clone();
+        return realmsDocument.clone();
     }
 
     /**

@@ -45,9 +45,9 @@ public class MCRUploadHelperTest extends MCRTestCase {
 
     static String suffix = "test..file";
 
-    static String[] genDelims = new String[] { ":", "?", "#", "[", "]", "@" };
+    static String[] genDelims = { ":", "?", "#", "[", "]", "@" };
 
-    static String[] subDelims = new String[] { "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
+    static String[] subDelims = { "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
 
     private static final String[] WINDOWS_RESERVED_CHARS = { "<", ">", ":", "\"", "|", "?", "*" };
 

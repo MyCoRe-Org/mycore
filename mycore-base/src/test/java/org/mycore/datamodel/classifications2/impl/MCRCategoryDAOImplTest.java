@@ -665,7 +665,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     private MCRCategoryImpl getRootCategoryFromSession() {
-        return (MCRCategoryImpl) MCRHIBConnection.instance().getSession().get(MCRCategoryImpl.class,
+        return MCRHIBConnection.instance().getSession().get(MCRCategoryImpl.class,
             ((MCRCategoryImpl) category).getInternalID());
     }
 

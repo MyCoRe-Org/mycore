@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
 public class MCRViewerResource {
 
     private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration.instance()
-        .<MCRIviewACLProvider> getInstanceOf("MCR.Viewer.MCRIviewACLProvider",
+        .getInstanceOf("MCR.Viewer.MCRIviewACLProvider",
             MCRIviewDefaultACLProvider.class.getName());
 
     private static final String JSON_CONFIG_ELEMENT_NAME = "json";

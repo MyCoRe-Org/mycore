@@ -37,7 +37,7 @@ import bibtex.dom.BibtexEntry;
  */
 class MCRBibTeXEntryTransformer {
 
-    private final static String XPATH_HOST = "mods:relatedItem[@type='host']";
+    private static final String XPATH_HOST = "mods:relatedItem[@type='host']";
 
     private List<MCRFieldTransformer> fieldTransformers = new ArrayList<MCRFieldTransformer>();
 

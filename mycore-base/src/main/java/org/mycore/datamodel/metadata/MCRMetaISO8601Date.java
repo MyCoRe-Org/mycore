@@ -89,7 +89,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     @Override
     public Element createXML() throws MCRException {
         if (!changed) {
-            return (Element) export.clone();
+            return export.clone();
         }
         Element elm = super.createXML();
         if (!(isoDate.getIsoFormat() == null || isoDate.getIsoFormat() == MCRISO8601Format.COMPLETE_HH_MM_SS_SSS)) {
@@ -98,7 +98,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         elm.setText(getISOString());
         export = elm;
         changed = false;
-        return (Element) export.clone();
+        return export.clone();
     }
 
     /**
@@ -132,7 +132,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         super.setFromDOM(element);
         setFormat(element.getAttributeValue("format"));
         setDate(element.getTextTrim());
-        export = (Element) element.clone();
+        export = element.clone();
     }
 
     /**
@@ -221,7 +221,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
             LOGGER.debug("Date=" + (isoDate != null ? isoDate.getISOString() : "null"));
             if (isoDate != null) {
                 MCRISO8601Format isoFormat = isoDate.getIsoFormat();
-                LOGGER.debug("Format=" + isoFormat.toString());
+                LOGGER.debug("Format=" + isoFormat);
             }
         }
     }
@@ -236,7 +236,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     @Override
     public MCRMetaISO8601Date clone() {
         MCRMetaISO8601Date out = new MCRMetaISO8601Date();
-        out.setFromDOM((Element) createXML().clone());
+        out.setFromDOM(createXML().clone());
         return out;
     }
 

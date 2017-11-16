@@ -109,13 +109,13 @@ class MCRPersistenceHelper {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             StringWriter swOrig = new StringWriter();
             xout.output(doc, swOrig);
-            LOGGER.debug("Input document \n" + swOrig.toString());
+            LOGGER.debug("Input document \n" + swOrig);
             for (String logMsg : ev.getErrorLog()) {
                 LOGGER.debug(logMsg);
             }
             StringWriter swClean = new StringWriter();
             xout.output(jdom_out, swClean);
-            LOGGER.debug("Results in \n" + swClean.toString());
+            LOGGER.debug("Results in \n" + swClean);
         }
         MCRObject mcrObject = new MCRObject(jdom_out);
         return mcrObject;

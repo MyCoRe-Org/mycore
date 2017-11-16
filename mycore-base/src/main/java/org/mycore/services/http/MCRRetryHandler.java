@@ -40,11 +40,7 @@ class MCRRetryHandler implements HttpRequestRetryHandler {
             // Connection refused
             return true;
         }
-        if (exception instanceof SSLException) {
-            // SSL handshake exception
-            return false;
-        }
-        return true;
+        return !(exception instanceof SSLException);
     }
 
 }

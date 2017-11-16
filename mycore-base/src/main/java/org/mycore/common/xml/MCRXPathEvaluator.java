@@ -23,9 +23,9 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRXPathEvaluator {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRXPathEvaluator.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXPathEvaluator.class);
 
-    private final static Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
+    private static final Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
 
     private Map<String, Object> variables;
 
@@ -95,7 +95,7 @@ public class MCRXPathEvaluator {
             return true;
     }
 
-    private final static XPathFactory factory;
+    private static final XPathFactory factory;
 
     static {
         String factoryClass = MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null);

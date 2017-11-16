@@ -38,7 +38,7 @@ import com.google.gson.JsonObject;
  * @author J. Vogler
  * @version $Revision$ $Date$
  */
-final public class MCRMetaAddress extends MCRMetaDefault {
+public final class MCRMetaAddress extends MCRMetaDefault {
     // MetaAddress data
     private String country;
 

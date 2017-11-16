@@ -23,7 +23,7 @@ import org.mycore.oai.set.MCRSet;
  */
 public abstract class MCROAISearcher {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAISearcher.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAISearcher.class);
 
     protected MCROAIIdentify identify;
 

@@ -9,8 +9,7 @@ import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 /**
  * Base class for solr indexing using content streams.
  */
-public abstract class MCRSolrAbstractStreamIndexHandler extends MCRSolrAbstractIndexHandler
-    implements MCRSolrIndexHandler {
+public abstract class MCRSolrAbstractStreamIndexHandler extends MCRSolrAbstractIndexHandler {
 
     protected MCRSolrAbstractStreamIndexHandler() {
         this(null);

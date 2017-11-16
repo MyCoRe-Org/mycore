@@ -35,6 +35,6 @@ import java.nio.channels.SeekableByteChannel;
  */
 public interface MCRSeekableChannelContent {
 
-    public SeekableByteChannel getSeekableByteChannel() throws IOException;
+    SeekableByteChannel getSeekableByteChannel() throws IOException;
 
 }

@@ -63,7 +63,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
             try {
                 Enumeration<URL> resources = this.getClass().getClassLoader().getResources("META-INF/web-fragment.xml");
                 while (resources.hasMoreElements()) {
-                    LOGGER.debug("Found: " + resources.nextElement().toString());
+                    LOGGER.debug("Found: " + resources.nextElement());
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block

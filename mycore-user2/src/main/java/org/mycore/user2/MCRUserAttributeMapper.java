@@ -169,7 +169,7 @@ public class MCRUserAttributeMapper {
                                     final Field field = (Field) annotated;
 
                                     LOGGER.debug("map attribute \"" + attribute.mapping + "\" with value \""
-                                        + value.toString() + "\" to field \"" + field.getName() + "\"");
+                                        + value + "\" to field \"" + field.getName() + "\"");
 
                                     boolean accState = field.isAccessible();
                                     field.setAccessible(true);
@@ -181,7 +181,7 @@ public class MCRUserAttributeMapper {
                                     final Method method = (Method) annotated;
 
                                     LOGGER.debug("map attribute \"" + attribute.mapping + "\" with value \""
-                                        + value.toString() + "\" to method \"" + method.getName() + "\"");
+                                        + value + "\" to method \"" + method.getName() + "\"");
 
                                     boolean accState = method.isAccessible();
                                     method.setAccessible(true);

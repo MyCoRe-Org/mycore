@@ -69,7 +69,7 @@ import org.mycore.common.config.MCRConfiguration;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-final public class MCRMetaNumber extends MCRMetaDefault {
+public final class MCRMetaNumber extends MCRMetaDefault {
 
     public static final int MAX_DIMENSION_LENGTH = 128;
 

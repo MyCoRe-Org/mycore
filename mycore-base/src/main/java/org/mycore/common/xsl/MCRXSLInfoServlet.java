@@ -59,7 +59,7 @@ import org.xml.sax.SAXException;
  */
 public final class MCRXSLInfoServlet extends MCRServlet {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRXSLInfoServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXSLInfoServlet.class);
 
     protected void doGetPost(MCRServletJob job) throws Exception {
         if ("true".equals(job.getRequest().getParameter("reload")))

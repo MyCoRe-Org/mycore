@@ -486,9 +486,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             return false;
         if (level != other.level)
             return false;
-        if (right != other.right)
-            return false;
-        return true;
+        return right == other.right;
     }
 
     @Transient

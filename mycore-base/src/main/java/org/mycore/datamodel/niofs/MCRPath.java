@@ -241,10 +241,7 @@ public abstract class MCRPath implements Path {
             }
         }
 
-        if (!that.getFileSystem().equals(getFileSystem())) {
-            return false;
-        }
-        return true;
+        return that.getFileSystem().equals(getFileSystem());
     }
 
     /* (non-Javadoc)
@@ -619,10 +616,7 @@ public abstract class MCRPath implements Path {
         }
         final int thatPathLength = that.path.length();
         // return false if this.path==/foo/bar and that.path==/fo
-        if (thatPathLength < path.length() && path.charAt(thatPathLength) != SEPARATOR) {
-            return false;
-        }
-        return true;
+        return thatPathLength >= path.length() || path.charAt(thatPathLength) == SEPARATOR;
     }
 
     /* (non-Javadoc)

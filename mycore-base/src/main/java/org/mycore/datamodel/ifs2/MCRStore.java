@@ -77,11 +77,11 @@ public abstract class MCRStore {
 
     public interface MCRStoreConfig {
 
-        public String getBaseDir();
+        String getBaseDir();
 
-        public String getID();
+        String getID();
 
-        public String getSlotLayout();
+        String getSlotLayout();
     }
 
     /** The ID of the store */
@@ -128,12 +128,12 @@ public abstract class MCRStore {
     /**
      * Indicates ascending order when listing IDs
      */
-    public final static boolean ASCENDING = true;
+    public static final boolean ASCENDING = true;
 
     /**
      * Indicates descending order when listing IDs
      */
-    public final static boolean DESCENDING = false;
+    public static final boolean DESCENDING = false;
 
     /**
      * Deletes the data stored under the given ID from the store

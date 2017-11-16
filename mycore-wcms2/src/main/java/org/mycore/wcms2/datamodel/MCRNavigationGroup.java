@@ -13,8 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "group")
 @XmlAccessorType(XmlAccessType.NONE)
-public class MCRNavigationGroup extends MCRNavigationI18nItem implements MCRNavigationBaseItem,
-    MCRNavigationItemContainer {
+public class MCRNavigationGroup extends MCRNavigationI18nItem implements MCRNavigationItemContainer {
 
     // general
     @XmlAttribute(required = true)

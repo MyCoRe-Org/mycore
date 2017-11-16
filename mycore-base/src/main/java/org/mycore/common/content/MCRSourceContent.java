@@ -71,7 +71,7 @@ public class MCRSourceContent extends MCRWrappedContent {
                             if (doc.getRootElement() == element) {
                                 baseContent = new MCRJDOMContent(doc);
                             } else {
-                                baseContent = new MCRJDOMContent((Element) element.clone());
+                                baseContent = new MCRJDOMContent(element.clone());
                             }
                         }
                         break;

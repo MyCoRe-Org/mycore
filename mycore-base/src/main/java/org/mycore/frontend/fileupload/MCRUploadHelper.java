@@ -46,9 +46,9 @@ import org.mycore.common.MCRException;
  */
 public abstract class MCRUploadHelper {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRUploadHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUploadHelper.class);
 
-    private final static Pattern PATH_SEPERATOR = Pattern.compile(Pattern.quote(File.separator.replace('\\', '/')));
+    private static final Pattern PATH_SEPERATOR = Pattern.compile(Pattern.quote(File.separator.replace('\\', '/')));
 
     /**
      * reserved URI characters should not be in uploaded filenames. See RFC3986,

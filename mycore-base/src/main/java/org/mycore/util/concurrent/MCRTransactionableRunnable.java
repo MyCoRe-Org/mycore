@@ -14,7 +14,7 @@ import org.mycore.common.MCRSessionMgr;
  */
 public class MCRTransactionableRunnable implements Runnable, MCRDecorator<Runnable> {
 
-    private final static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected Runnable runnable;
 

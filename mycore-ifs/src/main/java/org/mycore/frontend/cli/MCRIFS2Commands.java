@@ -115,7 +115,7 @@ public class MCRIFS2Commands {
             MCRFileCollection file_collection = ((MCRCStoreIFS2) store).getIFS2FileCollection(mcr_derivate_id);
             file_collection.repairMetadata();
         } catch (IOException e) {
-            LOGGER.error("Erroe while repair derivate with ID " + mcr_derivate_id.toString());
+            LOGGER.error("Erroe while repair derivate with ID " + mcr_derivate_id);
         }
     }
 
@@ -210,7 +210,7 @@ public class MCRIFS2Commands {
 
             try {
                 Path path = cs.getBaseDir().toPath();
-                LOGGER.info("Starting with path : " + path.toString());
+                LOGGER.info("Starting with path : " + path);
                 java.nio.file.Files.walkFileTree(path, new MCRUnicodeFilenameNormalizer(dry));
             } catch (IOException e) {
                 throw new MCRException("Error while get basedir of content store " + name, e);
@@ -244,7 +244,7 @@ public class MCRIFS2Commands {
             storage_base = storage_base.substring(0, storage_base.length() - derivate_id.length());
             fixMCRFSNODESForNode(root_node, content_store, derivate_id, storage_base, check_only);
         } catch (IOException e) {
-            LOGGER.error("Error while list all files of derivate with ID " + mcr_derivate_id.toString());
+            LOGGER.error("Error while list all files of derivate with ID " + mcr_derivate_id);
             e.printStackTrace();
         }
         Session session = MCRHIBConnection.instance().getSession();

@@ -55,11 +55,11 @@ import org.mycore.oai.set.MCRSet;
  */
 public class MCROAIAdapter implements OAIAdapter {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAIAdapter.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAIAdapter.class);
 
-    protected final static ZoneId UTC_ZONE = ZoneId.of("UTC");
+    protected static final ZoneId UTC_ZONE = ZoneId.of("UTC");
 
-    public final static String PREFIX = "MCR.OAIDataProvider.";
+    public static final String PREFIX = "MCR.OAIDataProvider.";
 
     public static int DEFAULT_PARTITION_SIZE;
 

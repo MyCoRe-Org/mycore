@@ -38,7 +38,7 @@ public interface MCRMetadataShareAgent {
      * @param oldVersion previous version of MCRObject
      * @param newVersion new version of MCRObject
      */
-    public boolean shareableMetadataChanged(MCRObject oldVersion, MCRObject newVersion);
+    boolean shareableMetadataChanged(MCRObject oldVersion, MCRObject newVersion);
 
     /**
      * updates all recipients of shareable metadata from <code>holder</code>.
@@ -46,11 +46,11 @@ public interface MCRMetadataShareAgent {
      * @throws MCRAccessException 
      * @throws MCRPersistenceException 
      */
-    public void distributeMetadata(MCRObject holder) throws MCRPersistenceException, MCRAccessException;
+    void distributeMetadata(MCRObject holder) throws MCRPersistenceException, MCRAccessException;
 
     /**
      * Include shareable metadata from <code>holder</code> before persisting <code>recipient</code>.
      * @param recipient on update/create before handling events.
      */
-    public void receiveMetadata(MCRObject recipient);
+    void receiveMetadata(MCRObject recipient);
 }

@@ -73,7 +73,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public synchronized final void create(String urn, String id) throws MCRPersistenceException {
+    public final synchronized void create(String urn, String id) throws MCRPersistenceException {
         if (urn == null || urn.length() == 0) {
             throw new MCRPersistenceException("The URN is null.");
         }
@@ -100,7 +100,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public synchronized final void create(String urn, String id, String path, String filename)
+    public final synchronized void create(String urn, String id, String path, String filename)
         throws MCRPersistenceException {
         if (urn == null || urn.length() == 0) {
             throw new MCRPersistenceException("The URN is null.");
@@ -152,7 +152,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @param urn
      *            a URN
      */
-    public synchronized final void delete(String urn) {
+    public final synchronized void delete(String urn) {
         if (urn == null || urn.length() == 0) {
             logger.warn("Cannot delete for urn " + urn);
             return;
@@ -181,7 +181,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @exception MCRPersistenceException
      *                the method argument is not correct
      */
-    public synchronized final void deleteByObjectID(String objID) {
+    public final synchronized void deleteByObjectID(String objID) {
         if (objID == null || objID.length() == 0) {
             logger.warn("Do not provide a null value as object id");
             return;
@@ -219,7 +219,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String querySB = "select key.mcrurn from " + classname + " where key.mcrid='" + id + "'";
-        logger.debug("HQL-Statement: " + querySB.toString());
+        logger.debug("HQL-Statement: " + querySB);
         List<String> returns = session.createQuery(querySB.toString(), String.class).getResultList();
         if (returns.size() != 1) {
             return null;
@@ -254,7 +254,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String querySB = "select key.mcrid from " + classname + " where key.mcrurn='" + urn + "'";
-        logger.debug("HQL-Statement: " + querySB.toString());
+        logger.debug("HQL-Statement: " + querySB);
         List<String> returns = session.createQuery(querySB.toString(), String.class).getResultList();
         if (returns.size() != 1) {
             return null;
@@ -276,7 +276,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String querySB = "select key.mcrurn from " + classname + " where key.mcrid='" + id + "'";
-        logger.debug("HQL-Statement: " + querySB.toString());
+        logger.debug("HQL-Statement: " + querySB);
         List<String> returns = session.createQuery(querySB.toString(), String.class).getResultList();
         return !(returns == null || returns.isEmpty());
     }

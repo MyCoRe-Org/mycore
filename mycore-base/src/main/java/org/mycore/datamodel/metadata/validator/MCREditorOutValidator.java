@@ -373,7 +373,7 @@ public class MCREditorOutValidator {
         Iterator<Element> datatagIt = datataglist.iterator();
 
         while (datatagIt.hasNext()) {
-            Element datasubtag = (Element) datatagIt.next();
+            Element datasubtag = datatagIt.next();
             MCREditorMetadataValidator validator = VALIDATOR_MAP.get(mcrclass);
             String returns = null;
             if (validator != null) {
@@ -456,7 +456,7 @@ public class MCREditorOutValidator {
         if (acls == null) {
             return;
         }
-        for (Element acl : (Iterable<Element>) acls.getChildren()) {
+        for (Element acl : acls.getChildren()) {
             Element condition = acl.getChild("condition");
             if (condition == null) {
                 continue;
@@ -465,8 +465,8 @@ public class MCREditorOutValidator {
             if (rootbool == null) {
                 continue;
             }
-            for (Element orbool : (Iterable<Element>) rootbool.getChildren("boolean")) {
-                for (Element firstcond : (Iterable<Element>) orbool.getChildren("condition")) {
+            for (Element orbool : rootbool.getChildren("boolean")) {
+                for (Element firstcond : orbool.getChildren("condition")) {
                     if (firstcond == null) {
                         continue;
                     }

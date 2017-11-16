@@ -285,7 +285,7 @@ public class MCRMailer extends MCRServlet {
         if (allowException) {
             if (mail.to == null || mail.to.isEmpty()) {
                 StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
-                sb.append(mail.toString()).append('\n');
+                sb.append(mail).append('\n');
                 throw new MCRException(sb.toString());
             }
 
@@ -346,7 +346,7 @@ public class MCRMailer extends MCRServlet {
     public static void send(EMail mail) {
         if (mail.to == null || mail.to.isEmpty()) {
             StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
-            sb.append(mail.toString()).append('\n');
+            sb.append(mail).append('\n');
             throw new MCRException(sb.toString());
         }
 
@@ -503,7 +503,7 @@ public class MCRMailer extends MCRServlet {
      * @see org.mycore.common.MCRMailer
      */
     public static Element sendMail(Document input, String stylesheet) throws Exception {
-        return sendMail(input, stylesheet, Collections.<String, String> emptyMap());
+        return sendMail(input, stylesheet, Collections.emptyMap());
     }
 
     /** 
@@ -524,7 +524,7 @@ public class MCRMailer extends MCRServlet {
         return result.asXML();
     }
 
-    private final static String delimiter = "\n--------------------------------------\n";
+    private static final String delimiter = "\n--------------------------------------\n";
 
     /** Outputs xml to the LOGGER for debugging */
     private static void debug(Element xml) {
@@ -748,7 +748,7 @@ public class MCRMailer extends MCRServlet {
 
         @XmlType(name = "mcrmailer-messagetype")
         @XmlEnum
-        public static enum MessageType {
+        public enum MessageType {
             @XmlEnumValue("text")
             TEXT("text"),
 

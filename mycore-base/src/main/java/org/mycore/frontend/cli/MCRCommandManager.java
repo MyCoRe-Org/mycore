@@ -41,7 +41,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * @author Robert Stephan
  */
 public class MCRCommandManager {
-    private final static Logger LOGGER = LogManager.getLogger(MCRCommandManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCommandManager.class);
 
     protected static TreeMap<String, List<MCRCommand>> knownCommands = new TreeMap<>();
 

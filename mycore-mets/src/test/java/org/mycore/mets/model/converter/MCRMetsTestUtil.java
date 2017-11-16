@@ -73,7 +73,7 @@ public class MCRMetsTestUtil {
     }
 
     public interface BulkOperation<T, R> {
-        public R doOperation(T input);
+        R doOperation(T input);
     }
 
     public static MCRMetsSimpleModel buildMetsSimpleModel() {

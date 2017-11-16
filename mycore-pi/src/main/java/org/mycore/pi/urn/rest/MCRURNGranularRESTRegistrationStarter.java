@@ -80,8 +80,7 @@ public class MCRURNGranularRESTRegistrationStarter
     private Consumer<Logger> startTimerTask(TimerTask task) {
         getScheduler().scheduleAtFixedRate(task, 0, period, timeUnit);
         return logger -> logger
-            .info("Started task " + task.getClass().getSimpleName() + ", refresh every " + period + timeUnit
-                .toString());
+            .info("Started task " + task.getClass().getSimpleName() + ", refresh every " + period + timeUnit);
     }
 
     public Function<MCRPIRegistrationInfo, MCREpicurLite> getEpicureProvider(UsernamePasswordCredentials credentials) {

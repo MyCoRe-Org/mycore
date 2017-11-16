@@ -18,6 +18,6 @@ public interface MCRCombineableAccessCheckStrategy extends MCRAccessCheckStrateg
      *              the access permission for the rule
      * @return true if there is a mapping to a rule defined
      */
-    public abstract boolean hasRuleMapping(String id, String permission);
+    boolean hasRuleMapping(String id, String permission);
 
 }

@@ -183,7 +183,7 @@ public class MCRURNAdder {
             return false;
         }
         /* Generating base urn for the derivate */
-        LOGGER.info("Generating base urn for derivate " + derivate.getId().toString());
+        LOGGER.info("Generating base urn for derivate " + derivate.getId());
         MCRIURNProvider urnProvider;
         try {
             urnProvider = this.getURNProvider();
@@ -197,10 +197,10 @@ public class MCRURNAdder {
          * complete book
          */
         try {
-            LOGGER.info("Assigning urn " + parentURN.toString() + " to " + derivate.getId().toString());
+            LOGGER.info("Assigning urn " + parentURN + " to " + derivate.getId());
             MCRURNManager.assignURN(parentURN.toString(), derivate.getId().toString(), null, null);
         } catch (Exception ex) {
-            LOGGER.error("Assigning base urn " + parentURN.toString() + " to derivate " + derivate.getId().toString()
+            LOGGER.error("Assigning base urn " + parentURN + " to derivate " + derivate.getId()
                 + " failed.", ex);
             return false;
         }

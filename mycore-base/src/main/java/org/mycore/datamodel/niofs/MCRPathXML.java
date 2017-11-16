@@ -53,8 +53,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-;
-
 /**
  * @author Thomas Scheffler (yagee)
  * @version $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Wed, 18 Dec 2013) $
@@ -75,7 +73,7 @@ public class MCRPathXML {
      * Sends the contents of an MCRDirectory as XML data to the client
      */
     public static Document getDirectoryXML(MCRPath path, BasicFileAttributes attr) throws IOException {
-        LOGGER.debug("MCRDirectoryXML: start listing of directory " + path.toString());
+        LOGGER.debug("MCRDirectoryXML: start listing of directory " + path);
 
         Element root = new Element("mcr_directory");
         Document doc = new org.jdom2.Document(root);

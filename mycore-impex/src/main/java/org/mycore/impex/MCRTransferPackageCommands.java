@@ -69,7 +69,7 @@ public class MCRTransferPackageCommands {
     public static List<String> importTransferPackageFromTar(String pathToTar) throws Exception {
         Path tar = Paths.get(pathToTar);
         if (!Files.exists(tar)) {
-            throw new FileNotFoundException(tar.toAbsolutePath().toString() + " does not exist.");
+            throw new FileNotFoundException(tar.toAbsolutePath() + " does not exist.");
         }
         Path targetDirectory = MCRTransferPackageUtil.getTargetDirectory(tar);
 
@@ -98,7 +98,7 @@ public class MCRTransferPackageCommands {
         List<Path> classificationPaths = MCRTransferPackageUtil.getClassifications(targetDirectory);
         for (Path pathToClassification : classificationPaths) {
             commands.add(
-                "_import transfer package classification from " + pathToClassification.toAbsolutePath().toString());
+                "_import transfer package classification from " + pathToClassification.toAbsolutePath());
         }
 
         // import objects

@@ -44,7 +44,7 @@ import org.mycore.datamodel.metadata.MCRObjectMetadata;
  */
 class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
 
-    private final static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /* (non-Javadoc)
      * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
@@ -59,7 +59,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
             oldXML = mdold.createXML();
         } catch (MCRException exc) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("The old metadata of the object " + oldVersion.getId().toString() + " was invalid.", exc);
+                LOGGER.debug("The old metadata of the object " + oldVersion.getId() + " was invalid.", exc);
             }
         }
         //simple save without changes, this is also a short-path for mycore-mods

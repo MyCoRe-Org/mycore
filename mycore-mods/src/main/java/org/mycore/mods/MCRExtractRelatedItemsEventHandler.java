@@ -47,7 +47,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRExtractRelatedItemsEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRExtractRelatedItemsEventHandler.class);
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
@@ -80,9 +80,9 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
 
         Element mods = new MCRMODSWrapper(object).getMODS();
         MCRObjectID oid = object.getId();
-        for (Element relatedItem : (List<Element>) (mods.getChildren("relatedItem", MCRConstants.MODS_NAMESPACE))) {
+        for (Element relatedItem : mods.getChildren("relatedItem", MCRConstants.MODS_NAMESPACE)) {
             String href = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-            LOGGER.info("Found related item in " + object.getId().toString() + ", href=" + href);
+            LOGGER.info("Found related item in " + object.getId() + ", href=" + href);
             //MCR-957: only create releated object if mycoreId
             MCRObjectID mcrIdCheck;
             try {
@@ -145,13 +145,13 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         Element mods = cloneRelatedItem(relatedItem);
         wrapper.setMODS(mods);
 
-        LOGGER.info("create object " + oid.toString());
+        LOGGER.info("create object " + oid);
         MCRMetadataManager.create(object);
         return oid;
     }
 
     private Element cloneRelatedItem(Element relatedItem) {
-        Element mods = (Element) (relatedItem.clone());
+        Element mods = relatedItem.clone();
         mods.setName("mods");
         mods.removeAttribute("type");
         mods.removeAttribute("href", MCRConstants.XLINK_NAMESPACE);

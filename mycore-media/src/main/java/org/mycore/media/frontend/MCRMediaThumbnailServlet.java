@@ -72,7 +72,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
     /**
      * how long should a tile be cached by the client
      */
-    final static int MAX_AGE = 60 * 60 * 24 * 365; // one year
+    static final int MAX_AGE = 60 * 60 * 24 * 365; // one year
 
     @Override
     public void init() throws ServletException {

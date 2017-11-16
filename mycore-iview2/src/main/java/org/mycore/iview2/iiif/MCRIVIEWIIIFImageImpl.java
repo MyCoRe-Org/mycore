@@ -243,7 +243,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     public MCRIIIFImageProfile getProfile() {
         MCRIIIFImageProfile mcriiifImageProfile = new MCRIIIFImageProfile();
 
-        mcriiifImageProfile.formats = this.SUPPORTED_FORMATS.stream().filter(s -> !s.isEmpty())
+        mcriiifImageProfile.formats = SUPPORTED_FORMATS.stream().filter(s -> !s.isEmpty())
             .collect(Collectors.toSet());
 
         mcriiifImageProfile.qualities.add("color");

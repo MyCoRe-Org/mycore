@@ -140,7 +140,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     private static void cloneListContent(List<Content> dest, List<Content> source) {
         dest.clear();
         for (Content c : source) {
-            dest.add((Content) c.clone());
+            dest.add(c.clone());
         }
     }
 

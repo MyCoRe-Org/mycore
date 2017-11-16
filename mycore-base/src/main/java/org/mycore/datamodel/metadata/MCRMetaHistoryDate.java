@@ -412,7 +412,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         super.setFromDOM(element);
         texts.clear(); // clear
 
-        for (Element textElement : (Collection<Element>) element.getChildren("text")) {
+        for (Element textElement : element.getChildren("text")) {
             String text = textElement.getText();
             String lang = textElement.getAttributeValue("lang", Namespace.XML_NAMESPACE);
             if (lang != null) {

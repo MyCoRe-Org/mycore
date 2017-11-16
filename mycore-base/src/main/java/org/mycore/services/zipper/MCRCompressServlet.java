@@ -149,7 +149,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
             MCRISO8601Date mcriso8601Date = new MCRISO8601Date();
             mcriso8601Date.setDate(new Date());
             String comment = "Created by " + requestURL + " at " + mcriso8601Date.getISOString();
-            try (T container = createContainer(sout, comment);) {
+            try (T container = createContainer(sout, comment)) {
                 job.getResponse().setContentType(getMimeType());
                 String filename = getFileName(id, path);
                 job.getResponse().addHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
@@ -163,8 +163,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         }
     }
 
-    private void sendObject(MCRObjectID id, MCRServletJob job, T container) throws FileNotFoundException, IOException,
-        Exception {
+    private void sendObject(MCRObjectID id, MCRServletJob job, T container) throws Exception {
         MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(id);
         if (content == null) {
             throw new FileNotFoundException("Could not find object: " + id);
@@ -190,7 +189,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         }
     }
 
-    private byte[] getMetaDataContent(MCRContent content, HttpServletRequest req) throws Exception, IOException {
+    private byte[] getMetaDataContent(MCRContent content, HttpServletRequest req) throws Exception {
         // zip the object's Metadata
         MCRParameterCollector parameters = new MCRParameterCollector(req);
         if (parameters.getParameter("Style", null) == null) {
@@ -213,13 +212,13 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         MCRPath resolvedPath = MCRPath.getPath(id.toString(), path == null ? "/" : path);
 
         if (!Files.exists(resolvedPath)) {
-            throw new NoSuchFileException(id.toString(), path, "Could not find path " + resolvedPath.toString());
+            throw new NoSuchFileException(id.toString(), path, "Could not find path " + resolvedPath);
         }
 
         if (Files.isRegularFile(resolvedPath)) {
             BasicFileAttributes attrs = Files.readAttributes(resolvedPath, BasicFileAttributes.class);
             sendCompressedFile(resolvedPath, attrs, container);
-            LOGGER.debug("file " + resolvedPath.toString() + " zipped");
+            LOGGER.debug("file " + resolvedPath + " zipped");
             return;
         }
         // root is a directory
@@ -240,7 +239,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
      */
     protected String getFilename(MCRPath path) {
         return path.getNameCount() == 0 ? path.getOwner() : path.getOwner() + '/'
-            + path.getRoot().relativize(path).toString();
+            + path.getRoot().relativize(path);
     }
 
     protected abstract void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs, T container)
@@ -279,7 +278,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
             impl.sendCompressedFile(MCRPath.toMCRPath(file), attrs, container);
-            LOGGER.debug("file " + file.toString() + " zipped");
+            LOGGER.debug("file " + file + " zipped");
             return super.visitFile(file, attrs);
         }
 

@@ -128,7 +128,7 @@ public class MCRIView2Tools {
      * @see MCRContentTypes#probeContentType(Path)
      */
     public static boolean isFileSupported(Path file) throws IOException {
-        return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
+        return file != null && SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
     }
 
     /**
@@ -236,9 +236,9 @@ public class MCRIView2Tools {
     }
 
     public static FileSystem getFileSystem(Path iviewFile) throws IOException {
-        URI uri = URI.create("jar:" + iviewFile.toUri().toString());
+        URI uri = URI.create("jar:" + iviewFile.toUri());
         try {
-            return FileSystems.newFileSystem(uri, Collections.<String, Object> emptyMap(),
+            return FileSystems.newFileSystem(uri, Collections.emptyMap(),
                 MCRIView2Tools.class.getClassLoader());
         } catch (FileSystemAlreadyExistsException exc) {
             // block until file system is closed

@@ -52,7 +52,7 @@ public class MCRViewerConfiguration {
 
     private static Logger LOGGER = LogManager.getLogger(MCRViewerConfiguration.class);
 
-    public static enum ResourceType {
+    public enum ResourceType {
         script, css
     }
 

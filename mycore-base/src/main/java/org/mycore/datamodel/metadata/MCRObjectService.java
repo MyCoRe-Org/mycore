@@ -276,7 +276,7 @@ public class MCRObjectService {
                 this.state = state;
             } else {
                 LOGGER.error("Error at setting servstate classification.",
-                    new MCRException("The category " + state.toString() + " does not exist."));
+                    new MCRException("The category " + state + " does not exist."));
             }
         }
     }

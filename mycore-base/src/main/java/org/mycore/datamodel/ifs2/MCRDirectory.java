@@ -86,7 +86,7 @@ public class MCRDirectory extends MCRStoredNode {
 
     @SuppressWarnings("unchecked")
     private Element getChildData(String name) {
-        for (Element child : (List<Element>) data.getChildren()) {
+        for (Element child : data.getChildren()) {
             if (name.equals(child.getAttributeValue("name"))) {
                 return child;
             }
@@ -128,7 +128,7 @@ public class MCRDirectory extends MCRStoredNode {
         data.setName("dir");
         data.setAttribute("name", getName());
 
-        for (Element childEntry : (List<Element>) data.getChildren()) {
+        for (Element childEntry : data.getChildren()) {
             childEntry.setName("node");
         }
 

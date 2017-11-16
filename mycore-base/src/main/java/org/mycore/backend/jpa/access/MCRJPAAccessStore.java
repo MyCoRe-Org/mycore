@@ -155,7 +155,7 @@ public class MCRJPAAccessStore extends MCRAccessStore {
             throw new NullPointerException("Cannot map a null rule.");
         }
         // update
-        MCRACCESS accdef = (MCRACCESS) session.get(MCRACCESS.class,
+        MCRACCESS accdef = session.get(MCRACCESS.class,
             new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
         accdef.setRule(accessRule);
         accdef.setCreator(rulemapping.getCreator());
@@ -255,6 +255,6 @@ public class MCRJPAAccessStore extends MCRAccessStore {
 
     private static MCRACCESSRULE getAccessRule(String rid) {
         Session session = MCRHIBConnection.instance().getSession();
-        return (MCRACCESSRULE) session.get(MCRACCESSRULE.class, rid);
+        return session.get(MCRACCESSRULE.class, rid);
     }
 }

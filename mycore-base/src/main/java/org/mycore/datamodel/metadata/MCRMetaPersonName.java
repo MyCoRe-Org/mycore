@@ -35,7 +35,7 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date: 2013-01-23 14:55:57 +0100 (Mi, 23. Jan
  *          2013) $
  */
-final public class MCRMetaPersonName extends MCRMetaDefault {
+public final class MCRMetaPersonName extends MCRMetaDefault {
     // MetaPerson data
     private String firstname;
 

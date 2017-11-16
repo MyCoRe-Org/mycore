@@ -20,7 +20,7 @@ import com.google.gson.GsonBuilder;
 
 public class MCRDOIRest {
 
-    private final static String URL_TEMPLATE = "http://doi.org/api/handles/{doi}";
+    private static final String URL_TEMPLATE = "http://doi.org/api/handles/{doi}";
 
     private static CloseableHttpClient getHttpClient() {
         return HttpClientBuilder.create().build();

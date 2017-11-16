@@ -25,22 +25,22 @@ package org.mycore.common;
 
 public interface MCRCacheManagerMBean {
 
-    public long getSize();
+    long getSize();
 
-    public long getRequests();
+    long getRequests();
 
-    public long getEvictions();
+    long getEvictions();
 
-    public long getHits();
+    long getHits();
 
-    public long getCapacity();
+    long getCapacity();
 
-    public void setCapacity(long size);
+    void setCapacity(long size);
 
-    public double getHitRate();
+    double getHitRate();
 
-    public double getFillRate();
+    double getFillRate();
 
-    public void clear();
+    void clear();
 
 }

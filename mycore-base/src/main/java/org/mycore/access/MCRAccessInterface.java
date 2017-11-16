@@ -45,7 +45,7 @@ public interface MCRAccessInterface {
      * @param description
      *              a String description of the rule in prosa 
      */
-    public void createRule(String rule, String creator, String description);
+    void createRule(String rule, String creator, String description);
 
     /**
      * create an access rule in the rulestore using an rule string in plain text
@@ -55,14 +55,14 @@ public interface MCRAccessInterface {
      * @param description
      *              a String description of the rule in prosa 
      */
-    public void createRule(Element rule, String creator, String description);
+    void createRule(Element rule, String creator, String description);
 
     /**
      * generate rule string from xml
      * 
      * @return the normalized rule string
      */
-    public String getNormalizedRuleString(Element rule);
+    String getNormalizedRuleString(Element rule);
 
     /**
      * adds an access rule for an ID to an access system. The parameter
@@ -80,7 +80,7 @@ public interface MCRAccessInterface {
      * @throws MCRException
      *             if an error occured
      */
-    public void addRule(String id, String permission, org.jdom2.Element rule, String description) throws MCRException;
+    void addRule(String id, String permission, org.jdom2.Element rule, String description) throws MCRException;
 
     /**
      * adds an access rule for an "a priori-permission" like "create-document"
@@ -94,7 +94,7 @@ public interface MCRAccessInterface {
      * @throws MCRException
      *             if an error occured
      */
-    public void addRule(String permission, org.jdom2.Element rule, String description) throws MCRException;
+    void addRule(String permission, org.jdom2.Element rule, String description) throws MCRException;
 
     /**
      * removes a rule. The parameter <code>id</code> serves as an identifier
@@ -107,7 +107,7 @@ public interface MCRAccessInterface {
      * @throws MCRException
      *             if an error occured
      */
-    public void removeRule(String id, String permission) throws MCRException;
+    void removeRule(String id, String permission) throws MCRException;
 
     /**
      * removes a rule for an "a priori permission" like "create-document"
@@ -117,7 +117,7 @@ public interface MCRAccessInterface {
      * @throws MCRException
      *             if an error occured
      */
-    public void removeRule(String permission) throws MCRException;
+    void removeRule(String permission) throws MCRException;
 
     /**
      * removes all rules of the <code>id</code>. The parameter
@@ -129,7 +129,7 @@ public interface MCRAccessInterface {
      * @throws MCRException
      *             if an errow was occured
      */
-    public void removeAllRules(String id) throws MCRException;
+    void removeAllRules(String id) throws MCRException;
 
     /**
      * updates an access rule for an ID to an access system. The parameter
@@ -147,7 +147,7 @@ public interface MCRAccessInterface {
      * @throws MCRException
      *             if an errow was occured
      */
-    public void updateRule(String id, String permission, Element rule, String description) throws MCRException;
+    void updateRule(String id, String permission, Element rule, String description) throws MCRException;
 
     /**
      * updates an access rule for an "a priori permission" 
@@ -162,7 +162,7 @@ public interface MCRAccessInterface {
      * @throws MCRException
      *             if an errow was occured
      */
-    public void updateRule(String permission, Element rule, String description) throws MCRException;
+    void updateRule(String permission, Element rule, String description) throws MCRException;
 
     /**
      * determines whether the current user has the permission to perform a
@@ -175,7 +175,7 @@ public interface MCRAccessInterface {
      *  return rule.validate();
      * </pre>
      */
-    public boolean checkPermission(String id, String permission);
+    boolean checkPermission(String id, String permission);
 
     /**
      * returns a MCRAccessRule which could be validated
@@ -198,7 +198,7 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */
-    public MCRAccessRule getAccessRule(String id, String permission);
+    MCRAccessRule getAccessRule(String id, String permission);
 
     /**
      * determines whether a given user has the permission to perform a
@@ -218,7 +218,7 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */
-    public boolean checkPermission(String id, String permission, String userID);
+    boolean checkPermission(String id, String permission, String userID);
 
     /**
      * determines whether the current user has the permission to perform a
@@ -240,7 +240,7 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */
-    public boolean checkPermission(String permission);
+    boolean checkPermission(String permission);
 
     /**
      * determines whether a given user has the permission to perform a
@@ -257,7 +257,7 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */
-    public boolean checkPermissionForUser(String permission, String userID);
+    boolean checkPermissionForUser(String permission, String userID);
 
     /**
      * determines whether the current user has the permission to perform a
@@ -275,7 +275,7 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */
-    public boolean checkPermission(org.jdom2.Element rule);
+    boolean checkPermission(org.jdom2.Element rule);
 
     /**
      * exports a access rule as JDOM element.
@@ -287,7 +287,7 @@ public interface MCRAccessInterface {
      * @return the rule as jdom element, or <code>null</code> if no rule is
      *         defined
      */
-    public Element getRule(String id, String permission);
+    Element getRule(String id, String permission);
 
     /**
      * exports a access rule for a "a priori permission"
@@ -298,7 +298,7 @@ public interface MCRAccessInterface {
      * @return the rule as jdom element, or <code>null</code> if no rule is
      *         defined
      */
-    public Element getRule(String permission);
+    Element getRule(String permission);
 
     /**
      * returns the prosa description of a defined rule for a "a priori" permission like "create-document".
@@ -307,7 +307,7 @@ public interface MCRAccessInterface {
      *            the access permission for the rule
      * @return the String of the description
      */
-    public String getRuleDescription(String permission);
+    String getRuleDescription(String permission);
 
     /**
      * returns the prosa description of a defined rule.
@@ -318,7 +318,7 @@ public interface MCRAccessInterface {
      *            the access permission for the rule
      * @return the String of the description
      */
-    public String getRuleDescription(String id, String permission);
+    String getRuleDescription(String id, String permission);
 
     /**
      * lists all permissions defined for the <code>id</code>.
@@ -329,14 +329,14 @@ public interface MCRAccessInterface {
      * @return a <code>List</code> of all for <code>id</code> defined
      *         permission
      */
-    public Collection<String> getPermissionsForID(String id);
+    Collection<String> getPermissionsForID(String id);
 
     /**
      * lists all a-priori permissions like "create-document".
      * 
      * @return a <code>List</code> of all defined permissions
      */
-    public Collection<String> getPermissions();
+    Collection<String> getPermissions();
 
     /**
      * list all object-related Access Permissions that are defined 
@@ -344,7 +344,7 @@ public interface MCRAccessInterface {
      * 
      * @return a List of permissiond from the configuration
      */
-    public Collection<String> getAccessPermissionsFromConfiguration();
+    Collection<String> getAccessPermissionsFromConfiguration();
 
     /**
      * lists all String IDs, a permission is assigned to.
@@ -354,7 +354,7 @@ public interface MCRAccessInterface {
      * 
      * @return a sorted and distinct <code>List</code> of all  <code>String</code> IDs
      */
-    public Collection<String> getAllControlledIDs();
+    Collection<String> getAllControlledIDs();
 
     /**
      * checks wether a rule with the <code>id</code> and
@@ -366,7 +366,7 @@ public interface MCRAccessInterface {
      *            the access permission for the rule
      * @return false, if getRule(id, permission) would return null, else true
      */
-    public boolean hasRule(String id, String permission);
+    boolean hasRule(String id, String permission);
 
     /**
      * checks wether a rule with the <code>id</code> is defined.
@@ -376,6 +376,6 @@ public interface MCRAccessInterface {
      * @return false, if getPermissionsForID(id) would return an empty list,
      *         else true
      */
-    public boolean hasRule(String id);
+    boolean hasRule(String id);
 
 }

@@ -225,21 +225,21 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         return true;
     }
 
-    public static interface MCRQueryAdapter {
-        public void setFieldName(String fieldname);
+    public interface MCRQueryAdapter {
+        void setFieldName(String fieldname);
 
-        public void setRestriction(String text);
+        void setRestriction(String text);
 
-        public void setCategory(String text);
+        void setCategory(String text);
 
-        public void setObjectType(String text);
+        void setObjectType(String text);
 
-        public String getObjectType();
+        String getObjectType();
 
-        public long getResultCount();
+        long getResultCount();
 
-        public String getQueryAsString() throws UnsupportedEncodingException;
+        String getQueryAsString() throws UnsupportedEncodingException;
 
-        public void configure(HttpServletRequest request);
+        void configure(HttpServletRequest request);
     }
 }

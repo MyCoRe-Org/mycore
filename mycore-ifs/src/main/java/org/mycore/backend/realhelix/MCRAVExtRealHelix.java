@@ -58,7 +58,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
 
     /** The logger */
-    private final static Logger LOGGER = LogManager.getLogger(MCRAVExtRealHelix.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRAVExtRealHelix.class);
 
     public MCRAVExtRealHelix() {
     }
@@ -188,7 +188,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
         MCRURLContent content = new MCRURLContent(new URL(getURL(startPos, stopPos)));
         content.setMimeType(getPlayerStarterContentType());
         if (file instanceof MCRFile) {
-            content.setName(((MCRFile) file).getName() + startPos + "-" + stopPos);
+            content.setName(file.getName() + startPos + "-" + stopPos);
         }
         return content;
     }

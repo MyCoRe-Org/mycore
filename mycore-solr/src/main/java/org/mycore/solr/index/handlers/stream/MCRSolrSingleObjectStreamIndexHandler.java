@@ -20,7 +20,7 @@ import java.util.Objects;
  */
 public class MCRSolrSingleObjectStreamIndexHandler extends MCRSolrObjectStreamIndexHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRSolrSingleObjectStreamIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrSingleObjectStreamIndexHandler.class);
 
     protected MCRObjectID id;
 
@@ -54,7 +54,7 @@ public class MCRSolrSingleObjectStreamIndexHandler extends MCRSolrObjectStreamIn
 
     @Override
     public String toString() {
-        return "index " + id.toString();
+        return "index " + id;
     }
 
 }

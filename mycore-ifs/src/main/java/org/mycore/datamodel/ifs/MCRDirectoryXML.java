@@ -63,7 +63,7 @@ public class MCRDirectoryXML {
      * 
      * Set with MCR.IFS.IncludeAdditionalDataByDefault, default is false 
      */
-    protected final static boolean WITH_ADDITIONAL_DATA_DEFAULT;
+    protected static final boolean WITH_ADDITIONAL_DATA_DEFAULT;
 
     static {
         WITH_ADDITIONAL_DATA_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.IFS.IncludeAdditionalDataByDefault",

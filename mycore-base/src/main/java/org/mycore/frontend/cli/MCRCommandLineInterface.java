@@ -305,7 +305,7 @@ public class MCRCommandLineInterface {
      */
     public static void getURI(String uri, String file) throws Exception {
         Element resolved = MCRURIResolver.instance().resolve(uri);
-        Element cloned = (Element) resolved.clone();
+        Element cloned = resolved.clone();
         new MCRJDOMContent(cloned).sendTo(new File(file));
     }
 
@@ -321,7 +321,7 @@ public class MCRCommandLineInterface {
      * @throws FileNotFoundException
      *             when the file was not found
      */
-    public static List<String> readCommandsFile(String file) throws IOException, FileNotFoundException {
+    public static List<String> readCommandsFile(String file) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(new File(file).toPath(), Charset.defaultCharset())) {
             output("Reading commands from file " + file);
 

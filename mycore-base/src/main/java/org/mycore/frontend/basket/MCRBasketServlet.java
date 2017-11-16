@@ -69,7 +69,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Frank L\u00fctzenkirchen
  **/
 public class MCRBasketServlet extends MCRServlet {
-    private final static Logger LOGGER = LogManager.getLogger(MCRBasketServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRBasketServlet.class);
 
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();

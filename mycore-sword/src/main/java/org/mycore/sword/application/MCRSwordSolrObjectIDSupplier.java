@@ -39,7 +39,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
             return queryResponse.getResults().getNumFound();
         } catch (SolrServerException | IOException e) {
             throw new SwordServerException(
-                "Error while getting count with MCRSword2SolrObjectIDSupplier and Query: " + this.solrQuery.toString(),
+                "Error while getting count with MCRSword2SolrObjectIDSupplier and Query: " + this.solrQuery,
                 e);
         }
     }
@@ -57,7 +57,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
                 .collect(Collectors.toList());
         } catch (SolrServerException | IOException e) {
             throw new SwordServerException("Error while getting id list with MCRSword2SolrObjectIDSupplier and Query: "
-                + this.solrQuery.toString(), e);
+                + this.solrQuery, e);
         }
     }
 }

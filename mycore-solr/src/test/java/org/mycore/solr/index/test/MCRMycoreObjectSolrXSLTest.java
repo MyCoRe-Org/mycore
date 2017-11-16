@@ -98,8 +98,7 @@ public class MCRMycoreObjectSolrXSLTest {
     }
 
     private JDOMResult xslTransformation(InputStream testXMLAsStream, String styleSheetPath)
-        throws TransformerConfigurationException,
-        TransformerFactoryConfigurationError, TransformerException {
+        throws TransformerFactoryConfigurationError, TransformerException {
         InputStream stylesheetAsStream = getClass().getResourceAsStream(styleSheetPath);
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();

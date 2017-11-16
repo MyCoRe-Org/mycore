@@ -99,7 +99,7 @@ public class MCRLayoutTransformerFactory {
     @SuppressWarnings("unchecked")
     private static String[] getStylesheets(String id, String stylesheet) {
         List<String> ignore = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Ignore",
-            Collections.<String> emptyList());
+            Collections.emptyList());
         List<String> defaults;
         if (ignore.contains(id)) {
             defaults = Collections.emptyList();

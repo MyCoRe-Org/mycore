@@ -253,10 +253,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
         } else if (!name.equals(other.name)) {
             return false;
         }
-        if (type != other.type) {
-            return false;
-        }
-        return true;
+        return type == other.type;
     }
 
     @Override

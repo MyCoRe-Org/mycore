@@ -37,7 +37,7 @@ public class MCRXMLParserFactory {
     private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.XMLParser.ValidateSchema",
         true);
 
-    private final static String XMLREADER_CLASS_NAME = "org.apache.xerces.parsers.SAXParser";
+    private static final String XMLREADER_CLASS_NAME = "org.apache.xerces.parsers.SAXParser";
 
     private static XMLReaderJDOMFactory nonValidatingFactory = new XMLReaderSAX2Factory(false, XMLREADER_CLASS_NAME);
 

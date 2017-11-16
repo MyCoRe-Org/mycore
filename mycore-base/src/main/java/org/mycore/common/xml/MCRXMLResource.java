@@ -50,7 +50,7 @@ import org.mycore.common.content.MCRURLContent;
  */
 public class MCRXMLResource {
 
-    private volatile static MCRCache<String, CacheEntry> resourceCache;
+    private static volatile MCRCache<String, CacheEntry> resourceCache;
 
     private static MCRXMLResource instance = new MCRXMLResource();
 

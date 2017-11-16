@@ -57,7 +57,7 @@ public class MCRCoreVersion {
     private static Properties loadVersionProperties() {
         Properties props = new Properties();
         URL gitPropURL = MCRCoreVersion.class.getResource("/org/mycore/git.properties");
-        try (InputStream gitPropStream = getInputStream(gitPropURL);) {
+        try (InputStream gitPropStream = getInputStream(gitPropURL)) {
             props.load(gitPropStream);
         } catch (IOException e) {
             throw new MCRException("Error while initializing MCRCoreVersion.", e);

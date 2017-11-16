@@ -66,11 +66,11 @@ import org.tmatesoft.svn.core.wc.admin.SVNAdminEvent;
  */
 public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCRVersioningMetadataStore.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCRVersioningMetadataStore.class);
 
     protected SVNURL repURL;
 
-    protected final static boolean SYNC_LAST_MODIFIED_ON_SVN_COMMIT = MCRConfiguration.instance().getBoolean(
+    protected static final boolean SYNC_LAST_MODIFIED_ON_SVN_COMMIT = MCRConfiguration.instance().getBoolean(
         "MCR.IFS2.SyncLastModifiedOnSVNCommit", true);
 
     static {
@@ -139,7 +139,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     SVNRepository getRepository() throws SVNException {
         SVNRepository repository = SVNRepositoryFactory.create(repURL);
         String user = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-        SVNAuthentication[] auth = new SVNAuthentication[] {
+        SVNAuthentication[] auth = {
             SVNUserNameAuthentication.newInstance(user, false, repURL, false) };
         BasicAuthenticationManager authManager = new BasicAuthenticationManager(auth);
         repository.setAuthenticationManager(authManager);

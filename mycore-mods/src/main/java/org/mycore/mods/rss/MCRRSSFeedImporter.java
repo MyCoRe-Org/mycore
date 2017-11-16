@@ -111,7 +111,7 @@ public class MCRRSSFeedImporter {
 
     private static final String PROPERTY_MAIL_ADDRESS = "MCR.Mail.Address";
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRRSSFeedImporter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRSSFeedImporter.class);
 
     public static void importFromFeed(String sourceSystemID, String projectID) throws Exception {
         MCRRSSFeedImporter importer = new MCRRSSFeedImporter(sourceSystemID);
@@ -163,7 +163,7 @@ public class MCRRSSFeedImporter {
         }
     }
 
-    private SyndFeed retrieveFeed() throws IOException, MalformedURLException, FeedException {
+    private SyndFeed retrieveFeed() throws IOException, FeedException {
         XmlReader feedReader = new XmlReader(new URL(feedURL));
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = input.build(feedReader);

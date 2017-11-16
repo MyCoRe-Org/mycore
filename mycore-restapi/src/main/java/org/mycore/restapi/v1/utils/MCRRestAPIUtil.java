@@ -108,6 +108,6 @@ public class MCRRestAPIUtil {
         }
         throw new MCRRestAPIException(Status.FORBIDDEN,
             new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
-                "Check access right '" + permission.toString() + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
+                "Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
     }
 }

@@ -28,9 +28,9 @@ import com.google.gson.JsonObject;
  */
 public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocketSender {
 
-    private final static AtomicInteger ID_GENERATOR;
+    private static final AtomicInteger ID_GENERATOR;
 
-    private final static Map<Object, Integer> ID_MAP;
+    private static final Map<Object, Integer> ID_MAP;
 
     static {
         ID_GENERATOR = new AtomicInteger();

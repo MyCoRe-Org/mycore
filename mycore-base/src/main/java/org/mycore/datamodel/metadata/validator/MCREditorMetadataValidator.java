@@ -42,5 +42,5 @@ public interface MCREditorMetadataValidator {
      *  null, everything is OK
      *  validation error message
      */
-    public String checkDataSubTag(Element datasubtag);
+    String checkDataSubTag(Element datasubtag);
 }

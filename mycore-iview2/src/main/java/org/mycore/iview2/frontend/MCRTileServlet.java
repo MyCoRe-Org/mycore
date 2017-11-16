@@ -67,7 +67,7 @@ public class MCRTileServlet extends HttpServlet {
         final TileInfo tileInfo = getTileInfo(getPathInfo(req));
         Path iviewFile = getTileFile(tileInfo);
         if (!Files.exists(iviewFile)) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "File does not exist: " + iviewFile.toString());
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "File does not exist: " + iviewFile);
             return;
         }
         try (FileSystem iviewFS = MCRIView2Tools.getFileSystem(iviewFile)) {

@@ -12,7 +12,7 @@ import org.jaxen.FunctionCallException;
 
 class MCRFunctionCallJava implements org.jaxen.Function {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRFunctionCallJava.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFunctionCallJava.class);
 
     @Override
     public Object call(Context context, List args) throws FunctionCallException {

@@ -39,13 +39,13 @@ public interface MCRCategory {
     /**
      * @return true if this is a root category
      */
-    public abstract boolean isClassification();
+    boolean isClassification();
 
     /**
      * @return true if this is not a root category
      * @see #isClassification()
      */
-    public abstract boolean isCategory();
+    boolean isCategory();
 
     /**
      * Tells if this category has subcategories.
@@ -53,7 +53,7 @@ public interface MCRCategory {
      * @return true if this category has subcategories
      * @see #getChildren()
      */
-    public abstract boolean hasChildren();
+    boolean hasChildren();
 
     /**
      * Returns a list of subcategories.
@@ -67,48 +67,48 @@ public interface MCRCategory {
      * @return subcategories
      * @see #hasChildren()
      */
-    public abstract List<MCRCategory> getChildren();
+    List<MCRCategory> getChildren();
 
     /**
      * @return the id
      */
-    public abstract MCRCategoryID getId();
+    MCRCategoryID getId();
 
     /**
      * @param id
      *            the id to set
      */
-    public abstract void setId(MCRCategoryID id);
+    void setId(MCRCategoryID id);
 
     /**
      * @return the labels
      */
-    public abstract Set<MCRLabel> getLabels();
+    Set<MCRLabel> getLabels();
 
     /**
      * @return the label in the current language (if available), default language (if available), any language in
      * MCR.Metadata.Languages(if available), any other language that does not start with x- or any other language
      */
-    public abstract Optional<MCRLabel> getCurrentLabel();
+    Optional<MCRLabel> getCurrentLabel();
 
     /**
      * @return the label in the specified language (if available) or null
      */
-    public abstract Optional<MCRLabel> getLabel(String lang);
+    Optional<MCRLabel> getLabel(String lang);
 
     /**
      * Returns the hierarchie level of this category.
      * 
      * @return 0 if this is the root category
      */
-    public abstract int getLevel();
+    int getLevel();
 
     /**
      * Returns root category (the classification).
      * 
      * @return the root category
      */
-    public abstract MCRCategory getRoot();
+    MCRCategory getRoot();
 
     /**
      * Returns the parent element
@@ -116,19 +116,19 @@ public interface MCRCategory {
      * @return the categories parent or null if isClassification()==true or
      *         category currently not attached
      */
-    public abstract MCRCategory getParent();
+    MCRCategory getParent();
 
     /**
      * Returns the URI associated with this category.
      * 
      * @return the URI
      */
-    public abstract URI getURI();
+    URI getURI();
 
     /**
      * @param uri
      *            the URI to set
      */
-    public abstract void setURI(URI uri);
+    void setURI(URI uri);
 
 }

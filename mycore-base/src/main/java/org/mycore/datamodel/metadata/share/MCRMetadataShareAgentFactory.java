@@ -36,7 +36,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRMetadataShareAgentFactory {
 
-    private final static String CONFIG_PREFIX = "MCR.Metadata.ShareAgent.";
+    private static final String CONFIG_PREFIX = "MCR.Metadata.ShareAgent.";
 
     private static final MCRDefaultMetadataShareAgent DEFAULT_AGENT = new MCRDefaultMetadataShareAgent();
 
@@ -46,7 +46,7 @@ public class MCRMetadataShareAgentFactory {
         if (propertyValue != null) {
             //we will not get undefined problems here
             MCRMetadataShareAgent metadataShareAgent = MCRConfiguration.instance()
-                .<MCRMetadataShareAgent> getSingleInstanceOf(propertyName, (String) null);
+                .getSingleInstanceOf(propertyName, null);
             return metadataShareAgent;
         }
         return getDefaultAgent();

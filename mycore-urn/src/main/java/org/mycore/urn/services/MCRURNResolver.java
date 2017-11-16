@@ -50,7 +50,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 @Deprecated
 public class MCRURNResolver extends MCRServlet {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRURNResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRURNResolver.class);
 
     protected String masterURL;
 

@@ -42,7 +42,7 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-final public class MCRMetaIFS extends MCRMetaDefault {
+public final class MCRMetaIFS extends MCRMetaDefault {
     // MCRMetaIFS data
     private String sourcepath;
 

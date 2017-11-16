@@ -113,11 +113,8 @@ public class MCRMODSWrapper {
         if (isSupported(obj.getId())) {
             return true;
         }
-        if (obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
-            && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElementByName(MODS_CONTAINER) != null) {
-            return true;
-        }
-        return false;
+        return obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
+            && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElementByName(MODS_CONTAINER) != null;
     }
 
     /**
@@ -203,7 +200,7 @@ public class MCRMODSWrapper {
             if (eMODS != null) {
                 return buildXPath(xPath).evaluate(eMODS);
             } else {
-                return Collections.<Element> emptyList();
+                return Collections.emptyList();
             }
         } catch (JDOMException ex) {
             String msg = "Could not get elements at " + xPath;

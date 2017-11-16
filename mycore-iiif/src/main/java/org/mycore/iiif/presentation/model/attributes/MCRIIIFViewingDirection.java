@@ -50,6 +50,6 @@ public enum MCRIIIFViewingDirection {
      * The object is read from the bottom to the top.
      */
     @SerializedName("bottom-to-top")
-    bottom_to_top();
+    bottom_to_top()
 
 }

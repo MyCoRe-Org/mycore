@@ -51,21 +51,21 @@ public class MCRStartupHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static interface AutoExecutable {
+    public interface AutoExecutable {
         /**
          * returns a name to display on start-up.
          */
-        public String getName();
+        String getName();
 
         /**
          * If order is important returns as 'heigher' priority.
          */
-        public int getPriority();
+        int getPriority();
 
         /**
          * This method get executed by {@link MCRStartupHandler#startUp(ServletContext)}
          */
-        public void startUp(ServletContext servletContext);
+        void startUp(ServletContext servletContext);
     }
 
     public static void startUp(ServletContext servletContext) {

@@ -131,17 +131,17 @@ public class MCRXMLFunctions {
 
     private static final String DEFAULT_PORT = "80";
 
-    private final static String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)\\>";
+    private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)\\>";
 
-    private final static String TAG_END = "\\</\\w+\\>";
+    private static final String TAG_END = "\\</\\w+\\>";
 
-    private final static String TAG_SELF_CLOSING = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)/\\>";
+    private static final String TAG_SELF_CLOSING = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)/\\>";
 
-    private final static String HTML_ENTITY = "&[a-zA-Z][a-zA-Z0-9]+;";
+    private static final String HTML_ENTITY = "&[a-zA-Z][a-zA-Z0-9]+;";
 
-    private final static Pattern TAG_PATTERN = Pattern.compile(TAG_START + "((.*?[^\\<]))" + TAG_END, Pattern.DOTALL);
+    private static final Pattern TAG_PATTERN = Pattern.compile(TAG_START + "((.*?[^\\<]))" + TAG_END, Pattern.DOTALL);
 
-    private final static Pattern HTML_MATCH_PATTERN = Pattern
+    private static final Pattern HTML_MATCH_PATTERN = Pattern
         .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")",
             Pattern.DOTALL);
 

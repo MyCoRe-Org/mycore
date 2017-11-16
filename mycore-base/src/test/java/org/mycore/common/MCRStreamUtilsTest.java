@@ -21,7 +21,7 @@ public class MCRStreamUtilsTest {
     @Test
     public void test() {
         //see https://commons.wikimedia.org/wiki/File%3ASorted_binary_tree_preorder.svg for tree image
-        String[] nodes = new String[] { "F", "B", "A", "D", "C", "E", "G", "I", "H" };
+        String[] nodes = { "F", "B", "A", "D", "C", "E", "G", "I", "H" };
         HashMap<String, String[]> children = new HashMap<>();
         children.put("F", new String[] { "B", "G" });
         children.put("B", new String[] { "A", "D" });

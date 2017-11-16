@@ -34,6 +34,6 @@ public interface MCRAccessRule {
      * 
      * @return true if the permission is granted, else false
      */
-    public boolean validate();
+    boolean validate();
 
 }

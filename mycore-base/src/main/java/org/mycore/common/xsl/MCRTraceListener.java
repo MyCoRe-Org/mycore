@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRTraceListener implements TraceListener {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRTraceListener.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTraceListener.class);
 
     /**
      * Traces the execution of xsl stylesheet elements in debug mode. The trace
@@ -93,7 +93,7 @@ public class MCRTraceListener implements TraceListener {
 
             // Output name of the xsl or html element currently processed
             log.append(" " + ete.getTagName());
-            LOGGER.debug("Trace" + log.toString());
+            LOGGER.debug("Trace" + log);
 
             // Output xpath of current xml source node in context
             StringBuilder path = new StringBuilder();
@@ -105,13 +105,13 @@ public class MCRTraceListener implements TraceListener {
                 }
             }
             if (path.length() > 0) {
-                LOGGER.debug("Source " + path.toString());
+                LOGGER.debug("Source " + path);
             }
             try {
                 if ("true".equals(ev.m_processor.getParameter("DEBUG"))) {
-                    ev.m_processor.getResultTreeHandler().comment(log.toString() + " ");
+                    ev.m_processor.getResultTreeHandler().comment(log + " ");
                     if (path.length() > 0) {
-                        ev.m_processor.getResultTreeHandler().comment(" source " + path.toString() + " ");
+                        ev.m_processor.getResultTreeHandler().comment(" source " + path + " ");
                     }
                 }
             } catch (Exception ignored) {

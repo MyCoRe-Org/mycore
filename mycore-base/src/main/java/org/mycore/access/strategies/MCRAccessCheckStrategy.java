@@ -15,6 +15,6 @@ public interface MCRAccessCheckStrategy {
      * @return true if the access is allowed otherwise it return
      * @see MCRAccessManager#checkPermission(String, String)
      */
-    public abstract boolean checkPermission(String id, String permission);
+    boolean checkPermission(String id, String permission);
 
 }

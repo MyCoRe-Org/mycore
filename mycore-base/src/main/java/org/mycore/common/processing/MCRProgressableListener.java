@@ -16,7 +16,7 @@ public interface MCRProgressableListener extends EventListener {
      * @param oldProgress the old progress
      * @param newProgress the new progress
      */
-    public void onProgressChange(MCRProgressable source, Integer oldProgress, Integer newProgress);
+    void onProgressChange(MCRProgressable source, Integer oldProgress, Integer newProgress);
 
     /**
      * Is fired when the progress text of the {@link MCRProgressable} has changed.
@@ -25,6 +25,6 @@ public interface MCRProgressableListener extends EventListener {
      * @param oldProgressText the old progress text
      * @param newProgressText the new progress text
      */
-    public void onProgressTextChange(MCRProgressable source, String oldProgressText, String newProgressText);
+    void onProgressTextChange(MCRProgressable source, String oldProgressText, String newProgressText);
 
 }

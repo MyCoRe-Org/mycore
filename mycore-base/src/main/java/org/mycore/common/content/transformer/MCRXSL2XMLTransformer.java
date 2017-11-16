@@ -88,7 +88,7 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
         reader.parse(source.getInputSource());
         Document resultDoc = getDocument(result);
         if (resultDoc == null) {
-            throw new MCRConfigurationException("Stylesheets " + Arrays.asList(templateSources).toString()
+            throw new MCRConfigurationException("Stylesheets " + Arrays.asList(templateSources)
                 + " does not return any content for " + source.getSystemId());
         }
         return new MCRJDOMContent(resultDoc);

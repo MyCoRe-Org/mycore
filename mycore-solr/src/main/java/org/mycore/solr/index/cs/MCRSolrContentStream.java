@@ -26,9 +26,9 @@ import org.mycore.datamodel.metadata.MCRBase;
  */
 public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRContent> {
 
-    final static Logger LOGGER = LogManager.getLogger(MCRSolrContentStream.class);
+    static final Logger LOGGER = LogManager.getLogger(MCRSolrContentStream.class);
 
-    private final static MCRContentTransformer TRANSFORMER;
+    private static final MCRContentTransformer TRANSFORMER;
 
     static {
         String transformerId = MCRConfiguration.instance().getString(

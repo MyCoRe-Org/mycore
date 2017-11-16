@@ -48,7 +48,7 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 public class MCREditorSubmissionTest extends MCRTestCase {
 
     @Test
-    public void testSubmitTextfields() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
+    public void testSubmitTextfields() throws JaxenException, JDOMException, IOException {
         String template = "document[title='Titel'][author[@firstName='John'][@lastName='Doe']]";
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
@@ -68,7 +68,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
     }
 
     @Test
-    public void testSubmitCheckbox() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
+    public void testSubmitCheckbox() throws JaxenException, JDOMException, IOException {
         String template = "document[@archive='false']";
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
@@ -91,7 +91,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
 
     @Test
     public void testSubmitSelectOptions()
-        throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
+        throws JaxenException, JDOMException, IOException {
         String template = "document[category='a'][category[2]='b'][category[3]='c']";
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));

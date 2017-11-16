@@ -16,6 +16,6 @@ public interface MCRProcessableStatusListener extends EventListener {
      * @param oldStatus the old status
      * @param newStatus the new status
      */
-    public void onStatusChange(MCRProcessable source, MCRProcessableStatus oldStatus, MCRProcessableStatus newStatus);
+    void onStatusChange(MCRProcessable source, MCRProcessableStatus oldStatus, MCRProcessableStatus newStatus);
 
 }

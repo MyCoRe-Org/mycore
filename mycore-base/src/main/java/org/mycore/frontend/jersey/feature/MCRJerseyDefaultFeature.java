@@ -52,7 +52,7 @@ public class MCRJerseyDefaultFeature extends MCRJerseyBaseFeature {
         MCRRestrictedAccess restrictedAccessMETHOD = resourceMethod.getAnnotation(MCRRestrictedAccess.class);
         MCRRestrictedAccess restrictedAccessTYPE = resourceClass.getAnnotation(MCRRestrictedAccess.class);
         if (restrictedAccessMETHOD != null) {
-            LOGGER.info("Access to " + resourceMethod.toString() + " is restricted by "
+            LOGGER.info("Access to " + resourceMethod + " is restricted by "
                 + restrictedAccessMETHOD.value().getCanonicalName());
             addFilter(context, restrictedAccessMETHOD);
         } else if (restrictedAccessTYPE != null) {

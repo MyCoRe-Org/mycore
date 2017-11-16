@@ -57,7 +57,7 @@ public class MCRMarkManager {
 
     private static MCRMarkManager INSTANCE = null;
 
-    public static enum Operation {
+    public enum Operation {
         DELETE, IMPORT
     }
 

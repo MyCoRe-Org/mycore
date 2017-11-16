@@ -53,13 +53,11 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexEventHandler.class);
 
-    @Override
-    synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
+    @Override protected synchronized void handleObjectCreated(MCREvent evt, MCRObject obj) {
         addObject(evt, obj);
     }
 
-    @Override
-    synchronized protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+    @Override protected synchronized void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         if (MCRSolrUtils.useNestedDocuments()) {
             solrDelete(obj.getId());
         }
@@ -74,8 +72,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         addObject(evt, obj);
     }
 
-    @Override
-    synchronized protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+    @Override protected synchronized void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         solrDelete(obj.getId());
     }
 
@@ -138,7 +135,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         handleObjectUpdated(evt, obj);
     }
 
-    synchronized protected void addObject(MCREvent evt, MCRBase objectOrDerivate) {
+    protected synchronized void addObject(MCREvent evt, MCRBase objectOrDerivate) {
         if (MCRMarkManager.instance().isMarkedForImport(objectOrDerivate.getId())) {
             return;
         }
@@ -146,7 +143,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             long tStart = System.currentTimeMillis();
             try {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() +
+                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId() +
                             "\" for indexing");
                 }
                 MCRContent content = (MCRContent) evt.get("content");
@@ -158,7 +155,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                 indexHandler.setCommitWithin(1000);
                 MCRSolrIndexer.submitIndexHandler(indexHandler, MCRSolrIndexer.HIGH_PRIORITY);
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString()
+                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId()
                         + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
                 }
             } catch (Exception ex) {
@@ -167,26 +164,26 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         });
     }
 
-    synchronized protected void solrDelete(MCRObjectID id) {
+    protected synchronized void solrDelete(MCRObjectID id) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> MCRSolrIndexer.deleteById(id.toString()));
     }
 
-    synchronized protected void deleteDerivate(MCRDerivate derivate) {
+    protected synchronized void deleteDerivate(MCRDerivate derivate) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> MCRSolrIndexer.deleteDerivate(derivate.getId().toString()));
     }
 
-    synchronized protected void addFile(Path path, BasicFileAttributes attrs) {
+    protected synchronized void addFile(Path path, BasicFileAttributes attrs) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             try {
                 MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
                     MCRSolrClientFactory.getSolrClient()), MCRSolrIndexer.HIGH_PRIORITY);
             } catch (Exception ex) {
-                LOGGER.error("Error creating transfer thread for file " + path.toString(), ex);
+                LOGGER.error("Error creating transfer thread for file " + path, ex);
             }
         });
     }
 
-    synchronized protected void removeFile(Path file) {
+    protected synchronized void removeFile(Path file) {
         if (isMarkedForDeletion(file)) {
             return;
         }

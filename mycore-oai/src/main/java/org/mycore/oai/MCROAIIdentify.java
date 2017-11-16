@@ -48,7 +48,7 @@ import org.mycore.oai.pmh.SimpleIdentify;
  */
 public class MCROAIIdentify extends SimpleIdentify {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAIIdentify.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAIIdentify.class);
 
     private MCRConfiguration config;
 

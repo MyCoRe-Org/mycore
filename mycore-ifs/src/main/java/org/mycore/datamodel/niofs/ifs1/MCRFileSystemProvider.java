@@ -302,13 +302,13 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         try {
             child.delete();
         } catch (RuntimeException e) {
-            throw new IOException("Could not delete: " + mcrPath.toString(), e);
+            throw new IOException("Could not delete: " + mcrPath, e);
         }
     }
 
     private static MCRDirectory getParentDirectory(MCRPath mcrPath) throws NoSuchFileException, NotDirectoryException {
         if (mcrPath.getNameCount() == 0) {
-            throw new IllegalArgumentException("Root component has no parent: " + mcrPath.toString());
+            throw new IllegalArgumentException("Root component has no parent: " + mcrPath);
         }
         MCRDirectory rootDirectory = getRootDirectory(mcrPath);
         if (mcrPath.getNameCount() == 1) {
@@ -592,8 +592,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             : FILE_SYSTEM_INSTANCE);
     }
 
-    static MCRFilesystemNode resolvePath(MCRPath path) throws NoSuchFileException, NotDirectoryException,
-        IOException {
+    static MCRFilesystemNode resolvePath(MCRPath path) throws IOException {
         try {
             String ifsid = nodeCache.getUnchecked(path);
             MCRFilesystemNode node = MCRFilesystemNode.getNode(ifsid);
@@ -617,8 +616,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
     }
 
-    private static MCRFilesystemNode doResolvePath(MCRPath path) throws NoSuchFileException, NotDirectoryException,
-        IOException {
+    private static MCRFilesystemNode doResolvePath(MCRPath path) throws IOException {
         if (path.getNameCount() == 0) {
             //root components
             MCRDirectory rootDirectory = MCRDirectory.getRootDirectory(path.getOwner());
@@ -807,7 +805,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             if (MD5_NAME.equals(name)) {
                 MCRFilesystemNode node = resolveNode();
                 if (node instanceof MCRDirectory) {
-                    throw new IOException("Cannot set md5sum on directories: " + path.toString());
+                    throw new IOException("Cannot set md5sum on directories: " + path);
                 }
                 ((MCRFile) node).adjustMetadata(null, (String) value, node.getSize());
             } else {

@@ -70,7 +70,7 @@ public class MCRUserServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     /** The logger */
-    private final static Logger LOGGER = LogManager.getLogger(MCRUserServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUserServlet.class);
 
     /**
      * Handles requests. The parameter 'action' selects what to do, possible
@@ -329,7 +329,7 @@ public class MCRUserServlet extends MCRServlet {
         if (gs != null) {
             user.getSystemRoleIDs().clear();
             user.getExternalRoleIDs().clear();
-            List<Element> groupList = (List<Element>) gs.getChildren("role");
+            List<Element> groupList = gs.getChildren("role");
             for (Element group : groupList) {
                 String groupName = group.getAttributeValue("name");
                 if (hasAdminPermission || currentUser.isUserInRole(groupName)) {

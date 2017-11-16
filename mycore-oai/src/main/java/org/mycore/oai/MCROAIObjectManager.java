@@ -47,7 +47,7 @@ import org.mycore.oai.pmh.SimpleMetadata;
  */
 public class MCROAIObjectManager {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAIObjectManager.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAIObjectManager.class);
 
     protected MCROAIIdentify identify;
 

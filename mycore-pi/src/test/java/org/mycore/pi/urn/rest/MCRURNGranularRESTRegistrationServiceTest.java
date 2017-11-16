@@ -65,7 +65,7 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
             return IntStream
                 .iterate(0, i -> i + 1)
                 .mapToObj(i -> {
-                    return "/foo/" + UUID.randomUUID().toString() + "_" + String
+                    return "/foo/" + UUID.randomUUID() + "_" + String
                         .format(Locale.getDefault(), "%02d", i);
                 })
                 .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
@@ -103,14 +103,14 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
     public class MockObjectDerivate extends MockUp<MCRObjectDerivate> {
         @Mock
         public MCRFileMetadata getOrCreateFileMetadata(MCRPath file, String urn) {
-            System.out.println("getOrCreateFileMetadata: " + file.toString() + " - " + urn);
+            System.out.println("getOrCreateFileMetadata: " + file + " - " + urn);
             return new MCRFileMetadata(file.getOwnerRelativePath(), urn, null);
         }
 
         @Mock
         public MCRMetaIFS getInternals() {
             MCRMetaIFS mcrMetaIFS = new MCRMetaIFS();
-            mcrMetaIFS.setMainDoc("mainDoc_" + UUID.randomUUID().toString());
+            mcrMetaIFS.setMainDoc("mainDoc_" + UUID.randomUUID());
             return mcrMetaIFS;
         }
     }

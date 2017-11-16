@@ -39,7 +39,7 @@ public class MCRCategoryDAOFactory {
     private static MCRCategoryDAO INSTANCE;
 
     static {
-        INSTANCE = MCRConfiguration.instance().<MCRCategoryDAO> getInstanceOf("MCR.Category.DAO", STANDARD_DAO);
+        INSTANCE = MCRConfiguration.instance().getInstanceOf("MCR.Category.DAO", STANDARD_DAO);
     }
 
     /**

@@ -34,7 +34,7 @@ import org.jdom2.Element;
  */
 class MCRMessageLogger {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRMessageLogger.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMessageLogger.class);
 
     static void logMessage(String message) {
         LOGGER.warn(message);

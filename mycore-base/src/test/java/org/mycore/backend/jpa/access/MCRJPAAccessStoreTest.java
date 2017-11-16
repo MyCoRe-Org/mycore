@@ -154,7 +154,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         ruleMapping.setRuleId(FALSE_RULE.getRid());
         ACCESS_STORE.updateAccessDefinition(ruleMapping);
         startNewTransaction();
-        MCRACCESS access = (MCRACCESS) MCRHIBConnection.instance().getSession().get(MCRACCESS.class,
+        MCRACCESS access = MCRHIBConnection.instance().getSession().get(MCRACCESS.class,
             new MCRACCESSPK(permission, objID));
         assertEquals(FALSE_RULE, access.getRule());
     }

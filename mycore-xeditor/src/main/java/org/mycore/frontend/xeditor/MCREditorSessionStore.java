@@ -52,5 +52,5 @@ public class MCREditorSessionStore {
         return cachedSessions.get(id);
     }
 
-    public final static String XEDITOR_SESSION_PARAM = "_xed_session";
+    public static final String XEDITOR_SESSION_PARAM = "_xed_session";
 }

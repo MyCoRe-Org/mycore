@@ -67,7 +67,7 @@ public class MCRAccessManager {
     }
 
     public static MCRAccessInterface getAccessImpl() {
-        return MCRConfiguration.instance().<MCRAccessInterface> getSingleInstanceOf("MCR.Access.Class",
+        return MCRConfiguration.instance().getSingleInstanceOf("MCR.Access.Class",
             MCRAccessBaseImpl.class.getName());
     }
 

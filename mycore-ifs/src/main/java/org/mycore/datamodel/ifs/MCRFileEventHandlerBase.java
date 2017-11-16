@@ -22,9 +22,9 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
 
     private static Logger LOGGER = LogManager.getLogger(MCRFileEventHandlerBase.class);
 
-    final static public String FILE_TYPE = "MCRFile";
+    public static final String FILE_TYPE = "MCRFile";
 
-    final static public String DIRECTORY_TYPE = "MCRDirectory";
+    public static final String DIRECTORY_TYPE = "MCRDirectory";
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase#doHandleEvent(org.mycore.common.events.MCREvent)

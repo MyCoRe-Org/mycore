@@ -64,7 +64,7 @@ public final class MCRWebsiteWriteProtection {
             return new DOMOutputter().output(new Document());
         } else {
             Element messageElem = config.getChild("message");
-            Document message = new Document((Element) messageElem.clone());
+            Document message = new Document(messageElem.clone());
             return new DOMOutputter().output(message);
         }
     }

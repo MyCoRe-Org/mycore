@@ -20,7 +20,7 @@ import com.google.inject.Module;
  */
 public class MCRInjectorConfig {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRInjectorConfig.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRInjectorConfig.class);
 
     private static Injector INJECTOR;
 

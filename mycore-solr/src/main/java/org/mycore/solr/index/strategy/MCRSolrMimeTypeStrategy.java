@@ -21,7 +21,7 @@ import org.mycore.common.xml.MCRXMLFunctions;
  */
 public class MCRSolrMimeTypeStrategy implements MCRSolrFileStrategy {
 
-    private final static Pattern IGNORE_PATTERN;
+    private static final Pattern IGNORE_PATTERN;
 
     static {
         String acceptPattern = MCRConfiguration.instance().getString(CONFIG_PREFIX + "MimeTypeStrategy.Pattern");

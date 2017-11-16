@@ -149,7 +149,7 @@ public class MCRJobQueueResource {
         }
     }
 
-    private <T> String toJSON(T entity) throws JsonGenerationException, JsonMappingException, IOException {
+    private <T> String toJSON(T entity) throws IOException {
         StringWriter sw = new StringWriter();
 
         ObjectMapper mapper = new ObjectMapper();

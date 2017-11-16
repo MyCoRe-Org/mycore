@@ -250,7 +250,7 @@ public class MCRTileCombineServlet extends MCRServlet {
 
         final ImageWriter curImgWriter = imageWriter.get();
         try (ServletOutputStream sout = job.getResponse().getOutputStream();
-            ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);) {
+            ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout)) {
             curImgWriter.setOutput(imageOutputStream);
             final IIOImage iioImage = new IIOImage(combinedImage, null, null);
             curImgWriter.write(null, iioImage, imageWriteParam);
@@ -279,14 +279,14 @@ public class MCRTileCombineServlet extends MCRServlet {
     }
 
     private void sendThumbnail(final File iviewFile, final HttpServletResponse response) throws IOException {
-        try (ZipFile zipFile = new ZipFile(iviewFile);) {
+        try (ZipFile zipFile = new ZipFile(iviewFile)) {
             final ZipEntry ze = zipFile.getEntry("0/0/0.jpg");
             if (ze != null) {
                 response.setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                 response.setContentType("image/jpeg");
                 response.setContentLength((int) ze.getSize());
                 try (ServletOutputStream out = response.getOutputStream();
-                    InputStream zin = zipFile.getInputStream(ze);) {
+                    InputStream zin = zipFile.getInputStream(ze)) {
                     IOUtils.copy(zin, out);
                 }
             } else {

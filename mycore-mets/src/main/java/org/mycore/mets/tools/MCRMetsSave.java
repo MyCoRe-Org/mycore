@@ -72,7 +72,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRMetsSave {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRMetsSave.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMetsSave.class);
 
     public static final String ALTO_FILE_GROUP_USE = "ALTO";
 
@@ -617,7 +617,7 @@ public class MCRMetsSave {
                                 return mets;
                             }
 
-                            LogicalDiv logicalSubDiv = (LogicalDiv) logicalDiv;
+                            LogicalDiv logicalSubDiv = logicalDiv;
 
                             // there are still files for this logical sub div, nothing to do
                             if (modifiedMets.getStructLink().getSmLinkByFrom(logicalSubDiv.getId()).size() > 0) {
@@ -667,9 +667,9 @@ public class MCRMetsSave {
         LogicalDiv logicalDiv = ((LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE)).getDivContainer();
         if (parent.getParent() == logicalDiv) {
             //the parent the log div container itself, thus we quit here and remove the log div
-            logicalDiv.remove((LogicalDiv) parent);
+            logicalDiv.remove(parent);
         } else {
-            handleParents((LogicalDiv) parent, mets);
+            handleParents(parent, mets);
         }
     }
 

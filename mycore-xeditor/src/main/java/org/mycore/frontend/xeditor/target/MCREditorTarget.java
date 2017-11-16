@@ -33,6 +33,6 @@ import org.mycore.frontend.xeditor.MCREditorSession;
  */
 public interface MCREditorTarget {
 
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
+    void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception;
 }

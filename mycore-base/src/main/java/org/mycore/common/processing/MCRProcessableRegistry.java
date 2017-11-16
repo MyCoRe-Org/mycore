@@ -15,34 +15,34 @@ public interface MCRProcessableRegistry {
      * 
      * @param collection the collection to register
      */
-    public void register(MCRProcessableCollection collection);
+    void register(MCRProcessableCollection collection);
 
     /**
      * Removes a collection from the registry
      * 
      * @param collection the collection to remove
      */
-    public void unregister(MCRProcessableCollection collection);
+    void unregister(MCRProcessableCollection collection);
 
     /**
      * Streams all the collections of this registry.
      * 
      * @return stream of the registry content.
      */
-    public Stream<MCRProcessableCollection> stream();
+    Stream<MCRProcessableCollection> stream();
 
     /**
      * Adds a new listener.
      * 
      * @param listener the listener to add
      */
-    public void addListener(MCRProcessableRegistryListener listener);
+    void addListener(MCRProcessableRegistryListener listener);
 
     /**
      * Removes a listener.
      * 
      * @param listener the listener to remove
      */
-    public void removeListener(MCRProcessableRegistryListener listener);
+    void removeListener(MCRProcessableRegistryListener listener);
 
 }

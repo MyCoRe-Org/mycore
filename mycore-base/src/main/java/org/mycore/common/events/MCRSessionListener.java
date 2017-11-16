@@ -31,6 +31,6 @@ package org.mycore.common.events;
  */
 public interface MCRSessionListener {
 
-    public void sessionEvent(MCRSessionEvent event);
+    void sessionEvent(MCRSessionEvent event);
 
 }

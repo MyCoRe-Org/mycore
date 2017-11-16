@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 public class MCRBibTeX2MODSTransformerTest extends MCRTestCase {
 
     @Test
-    public void testTransformation() throws UnsupportedEncodingException, IOException, JDOMException, SAXException {
+    public void testTransformation() throws IOException, JDOMException, SAXException {
         ClassLoader classLoader = getClass().getClassLoader();
         File baseDir = new File(classLoader.getResource("BibTeX2MODSTransformerTest").getFile());
         int numTests = baseDir.list().length / 2;

@@ -74,7 +74,7 @@ import org.mycore.util.concurrent.MCRFixedUserCallable;
  */
 public class MCROAISetManager {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAISetManager.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAISetManager.class);
 
     protected String configPrefix;
 

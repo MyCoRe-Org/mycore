@@ -39,6 +39,6 @@ public interface MCRUserAttributeConverter<ValueType, BoundType> {
      * @return the converted value of type <code>&lt;BoundType&gt;</code>
      * @throws Exception if there's an error during the conversion.
      */
-    public abstract BoundType convert(ValueType value, String separator, Map<String, String> valueMapping)
+    BoundType convert(ValueType value, String separator, Map<String, String> valueMapping)
         throws Exception;
 }

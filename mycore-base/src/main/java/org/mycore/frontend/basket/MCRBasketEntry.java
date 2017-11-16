@@ -96,7 +96,7 @@ public class MCRBasketEntry {
      * Sets the XML data of the object in the basket entry.
      */
     public void setContent(Element content) {
-        this.content = (Element) (content.clone());
+        this.content = content.clone();
     }
 
     /**

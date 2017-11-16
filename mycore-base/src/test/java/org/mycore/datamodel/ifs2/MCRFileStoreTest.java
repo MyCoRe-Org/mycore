@@ -156,8 +156,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         assertEquals(l1, l2);
     }
 
-    private void createFileCollection(int numOfCollections) throws Exception,
-        IOException {
+    private void createFileCollection(int numOfCollections) throws Exception {
         for (int i = 0; i < numOfCollections; i++) {
             MCRFileCollection fileCollection = getStore().create();
             int collectionID = fileCollection.getID();
@@ -221,16 +220,16 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
     @Test
     public void repairMetadata() throws Exception {
         MCRFileCollection col = getStore().create();
-        Document xml1 = (Document) col.getMetadata().clone();
+        Document xml1 = col.getMetadata().clone();
         col.repairMetadata();
-        Document xml2 = (Document) col.getMetadata().clone();
+        Document xml2 = col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
         MCRDirectory dir = col.createDir("foo");
-        xml1 = (Document) col.getMetadata().clone();
+        xml1 = col.getMetadata().clone();
         assertFalse(equals(xml1, xml2));
         dir.delete();
-        xml1 = (Document) col.getMetadata().clone();
+        xml1 = col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
         MCRDirectory dir2 = col.createDir("dir");
@@ -241,18 +240,18 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         MCRFile file3 = col.createFile("test2.txt");
         file3.setContent(new MCRStringContent("Test 2"));
         file3.setLabel("de", "Die Testdatei");
-        xml2 = (Document) col.getMetadata().clone();
+        xml2 = col.getMetadata().clone();
 
         col.repairMetadata();
-        xml1 = (Document) col.getMetadata().clone();
+        xml1 = col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
         file3.clearLabels();
-        xml2 = (Document) col.getMetadata().clone();
+        xml2 = col.getMetadata().clone();
 
         col.fo.getChild("mcrdata.xml").delete();
         col = getStore().retrieve(col.getID());
-        xml1 = (Document) col.getMetadata().clone();
+        xml1 = col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
         col.fo.getChild("test1.txt").delete();

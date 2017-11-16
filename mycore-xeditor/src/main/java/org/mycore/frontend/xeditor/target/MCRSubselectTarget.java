@@ -42,7 +42,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
 
     public static final String PARAM_SUBSELECT_SESSION = "_xed_subselect_session";
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRSubselectTarget.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSubselectTarget.class);
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {

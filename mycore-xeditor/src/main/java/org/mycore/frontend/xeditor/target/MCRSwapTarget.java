@@ -36,9 +36,9 @@ public class MCRSwapTarget extends MCRSwapInsertTarget {
         repeatBinding.swap(pos);
     }
 
-    public final static boolean MOVE_DOWN = true;
+    public static final boolean MOVE_DOWN = true;
 
-    public final static boolean MOVE_UP = false;
+    public static final boolean MOVE_UP = false;
 
     public static String getSwapParameter(MCRRepeatBinding repeatBinding, boolean direction) throws JaxenException {
         int pos = repeatBinding.getRepeatPosition() + (direction == MOVE_UP ? -1 : 0);

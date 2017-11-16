@@ -126,7 +126,7 @@ public class MCRRestAPIUploadHelper {
                 mcrID = MCRObjectID.getNextFreeId(mcrID.getBase());
             }
 
-            fXML = UPLOAD_DIR.resolve(mcrID.toString() + ".xml");
+            fXML = UPLOAD_DIR.resolve(mcrID + ".xml");
 
             docOut.getRootElement().setAttribute("ID", mcrID.toString());
             docOut.getRootElement().setAttribute("label", mcrID.toString());
@@ -143,7 +143,7 @@ public class MCRRestAPIUploadHelper {
             MCRObjectCommands.updateFromFile(fXML.toString(), false); // handles "create" as well
             mcrSession.setUserInformation(currentUser);
 
-            return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
+            return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID).build())
                 .type("application/xml; charset=UTF-8")
                 .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
 
@@ -346,7 +346,7 @@ public class MCRRestAPIUploadHelper {
                     session.setUserInformation(currentUser);
                     return Response
                         .created(info.getBaseUriBuilder()
-                            .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
+                            .path("v1/objects/" + objID + "/derivates/" + derID + "/contents")
                             .build())
                         .type("application/xml; charset=UTF-8")
                         .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
@@ -410,7 +410,7 @@ public class MCRRestAPIUploadHelper {
                 session.setUserInformation(currentUser);
                 response = Response
                     .created(info.getBaseUriBuilder()
-                        .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
+                        .path("v1/objects/" + objID + "/derivates/" + derID + "/contents")
                         .build())
                     .type("application/xml; charset=UTF-8")
                     .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
@@ -468,7 +468,7 @@ public class MCRRestAPIUploadHelper {
             }
             session.setUserInformation(currentUser);
             response = Response
-                .created(info.getBaseUriBuilder().path("v1/objects/" + objID.toString() + "/derivates").build())
+                .created(info.getBaseUriBuilder().path("v1/objects/" + objID + "/derivates").build())
                 .type("application/xml; charset=UTF-8").header(HEADER_NAME_AUTHORIZATION,
                     "Bearer " + MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
                 .build();

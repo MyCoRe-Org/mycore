@@ -46,7 +46,7 @@ public interface MCRLinkTableInterface {
      * @param attr
      *            a string with the link ID MCRATTR
      */
-    public void create(String from, String to, String type, String attr);
+    void create(String from, String to, String type, String attr);
 
     /**
      * The method remove a item for the from ID from the datastore.
@@ -58,7 +58,7 @@ public interface MCRLinkTableInterface {
      * @param type
      *            an array of strings with the link ID MCRTYPE
      */
-    public void delete(String from, String to, String type);
+    void delete(String from, String to, String type);
 
     /**
      * The method count the number of references with '%from%' and 'to' and
@@ -74,7 +74,7 @@ public interface MCRLinkTableInterface {
      *            a first part of the to ID as String, it can be null
      * @return the number of references
      */
-    public int countTo(String fromtype, String to, String type, String restriction);
+    int countTo(String fromtype, String to, String type, String restriction);
 
     /**
      * The method returns a Map of all counted distinct references
@@ -87,7 +87,7 @@ public interface MCRLinkTableInterface {
      * mcrto;
      * 
      */
-    public Map<String, Number> getCountedMapOfMCRTO(String mcrtoPrefix);
+    Map<String, Number> getCountedMapOfMCRTO(String mcrtoPrefix);
 
     /**
      * Returns a List of all link sources of <code>to</code> and a special
@@ -100,7 +100,7 @@ public interface MCRLinkTableInterface {
      *            classid, child, parent, reference and derivate.
      * @return List of Strings (Source-IDs)
      */
-    public Collection<String> getSourcesOf(String to, String type);
+    Collection<String> getSourcesOf(String to, String type);
 
     /**
      * Returns a List of all link destination of <code>from</code> and a
@@ -113,6 +113,6 @@ public interface MCRLinkTableInterface {
      *            classid, child, parent, reference and derivate.
      * @return List of Strings (Destination-IDs)
      */
-    public Collection<String> getDestinationsOf(String from, String type);
+    Collection<String> getDestinationsOf(String from, String type);
 
 }

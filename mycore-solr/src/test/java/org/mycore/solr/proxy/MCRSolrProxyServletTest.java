@@ -23,7 +23,7 @@ public class MCRSolrProxyServletTest extends MCRTestCase {
     @Test
     public final void testToMultiMap() {
         ModifiableSolrParams params = new ModifiableSolrParams();
-        String[] paramValues = new String[] { "title:junit", "author:john" };
+        String[] paramValues = { "title:junit", "author:john" };
         String paramName = "fq";
         params.add(paramName, paramValues);
         Map<String, String[]> multiMap = MCRSolrProxyServlet.toMultiMap(params);

@@ -68,16 +68,16 @@ public class MCRLayoutUtilities {
 
     private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
 
-    final static String OBJIDPREFIX_WEBPAGE = "webpage:";
+    static final String OBJIDPREFIX_WEBPAGE = "webpage:";
 
     // strategies for access verification
-    public final static int ALLTRUE = 1;
+    public static final int ALLTRUE = 1;
 
-    public final static int ONETRUE_ALLTRUE = 2;
+    public static final int ONETRUE_ALLTRUE = 2;
 
-    public final static int ALL2BLOCKER_TRUE = 3;
+    public static final int ALL2BLOCKER_TRUE = 3;
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
 
     private static HashMap<String, Element> itemStore = new HashMap<String, Element>();
 

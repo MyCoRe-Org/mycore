@@ -53,7 +53,7 @@ import org.mycore.media.MCRVideoObject;
  */
 public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     /** The logger */
-    private final static Logger LOGGER = LogManager.getLogger(MCRMediaAVExtender.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRMediaAVExtender.class);
 
     /** The asset file this extender belongs to */
     protected MCRFile file;

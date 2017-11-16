@@ -49,7 +49,7 @@ import org.xml.sax.SAXParseException;
  * @version $Revision$ $Date: 2010-09-30 17:49:21 +0200 (Thu, 30 Sep
  *          2010) $
  */
-final public class MCRDerivate extends MCRBase {
+public final class MCRDerivate extends MCRBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -65,7 +65,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRConfigurationException
      *                a special exception for configuartion data
      */
-    public MCRDerivate() throws MCRException, MCRConfigurationException {
+    public MCRDerivate() throws MCRException {
         super();
         mcr_derivate = new MCRObjectDerivate(getId());
     }
@@ -191,12 +191,12 @@ final public class MCRDerivate extends MCRBase {
         super.validate();
         MCRObjectDerivate derivate = getDerivate();
         if (derivate == null) {
-            throw new MCRException("The <derivate> part of '" + getId().toString() + "' is undefined.");
+            throw new MCRException("The <derivate> part of '" + getId() + "' is undefined.");
         }
         try {
             derivate.validate();
         } catch (Exception exc) {
-            throw new MCRException("The <derivate> part of '" + getId().toString() + "' is invalid.", exc);
+            throw new MCRException("The <derivate> part of '" + getId() + "' is invalid.", exc);
         }
     }
 

@@ -85,13 +85,13 @@ public final class MCRGoogleSitemapCommon {
     /** The namespaces */
     private static final Namespace ns = Namespace.getNamespace("http://www.sitemaps.org/schemas/sitemap/0.9");
 
-    private final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
+    private static final String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
-    private final static Namespace XSI_NAMESPACE = Namespace.getNamespace("xsi", XSI_URL);
+    private static final Namespace XSI_NAMESPACE = Namespace.getNamespace("xsi", XSI_URL);
 
-    private final static String SITEINDEX_SCHEMA = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd";
+    private static final String SITEINDEX_SCHEMA = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd";
 
-    private final static String SITEMAP_SCHEMA = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
+    private static final String SITEMAP_SCHEMA = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
 
     /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
     private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");

@@ -109,8 +109,8 @@ public class MCRServlet extends HttpServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         Object value = session.get(BASE_URL_ATTRIBUTE);
         if (value != null) {
-            LOGGER.debug("Returning BaseURL " + value.toString() + "servlets/ from user session.");
-            return value.toString() + "servlets/";
+            LOGGER.debug("Returning BaseURL " + value + "servlets/ from user session.");
+            return value + "servlets/";
         }
         return SERVLET_URL != null ? SERVLET_URL : MCRFrontendUtil.getBaseURL() + "servlets/";
     }
@@ -187,7 +187,7 @@ public class MCRServlet extends HttpServlet {
         HttpSession theSession = req.getSession(true);
         if (reusedSession) {
             LOGGER.debug(() -> "Reused HTTP session: " + theSession.getId() + ", created: " + LocalDateTime
-                .ofInstant(Instant.ofEpochMilli(theSession.getCreationTime()), ZoneId.systemDefault()).toString());
+                .ofInstant(Instant.ofEpochMilli(theSession.getCreationTime()), ZoneId.systemDefault()));
         } else {
             LOGGER.info(() -> "Created new HTTP session: " + theSession.getId());
         }
@@ -206,7 +206,7 @@ public class MCRServlet extends HttpServlet {
                 String newip = MCRFrontendUtil.getRemoteAddr(req);
                 if (!lastIP.equals(newip) && !newip.equals(MCRFrontendUtil.getHostIP())) {
                     LOGGER.warn("Session steal attempt from IP " + newip + ", previous IP was " + lastIP
-                        + ". Session: " + session.toString());
+                        + ". Session: " + session);
                     MCRSessionMgr.releaseCurrentSession();
                     session.close(); //MCR-1409 do not leak old session
                     session = MCRSessionMgr.getCurrentSession();
@@ -341,7 +341,7 @@ public class MCRServlet extends HttpServlet {
         if (message != null && throwable instanceof IOException && message.contains("Broken pipe")) {
             return true;
         }
-        return throwable.getCause() != null ? isBrokenPipe(throwable.getCause()) : false;
+        return throwable.getCause() != null && isBrokenPipe(throwable.getCause());
     }
 
     private void configureSession(MCRServletJob job) {
@@ -499,7 +499,7 @@ public class MCRServlet extends HttpServlet {
 
             redirectURL.append(name).append("=").append(value);
         }
-        LOGGER.debug("Sending redirect to " + redirectURL.toString());
+        LOGGER.debug("Sending redirect to " + redirectURL);
         return redirectURL.toString();
     }
 

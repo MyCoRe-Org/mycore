@@ -39,7 +39,7 @@ public class Table {
                 }
                 sb.append(value);
             }
-            out.println(sb.toString());
+            out.println(sb);
         }
     }
 }

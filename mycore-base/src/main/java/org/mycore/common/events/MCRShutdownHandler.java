@@ -114,7 +114,7 @@ public class MCRShutdownHandler {
         }
         final String system = cfgSystemName;
         System.out.println(system + " Shutting down system, please wait...\n");
-        logger.debug(() -> "requests: " + requests.toString());
+        logger.debug(() -> "requests: " + requests);
         Closeable[] closeables = requests.stream().toArray(i -> new Closeable[i]);
         Stream.of(closeables)
             .peek(c -> logger.debug("Prepare Closing (1): {}", c))
@@ -168,7 +168,7 @@ public class MCRShutdownHandler {
          * cleanly closes this object that implements <code>Closeable</code>. You can provide some functionality to
          * close open files and sockets or so.
          */
-        public void close();
+        void close();
 
         /**
          * Returns the priority. A Closeable with a higher priority will be closed before a Closeable with a lower
@@ -186,7 +186,7 @@ public class MCRShutdownHandler {
         /**
          * The default priority
          */
-        public static int DEFAULT_PRIORITY = 5;
+        int DEFAULT_PRIORITY = 5;
     }
 
 }

@@ -110,7 +110,7 @@ public class DefaultApplicationController extends ApplicationController {
     }
 
     private void extractZip(String dest, List<String> relativePaths, ZipInputStream zipInputStream)
-        throws IOException, FileNotFoundException {
+        throws IOException {
         ZipEntry nextEntry;
         zipInputStream.available();
         while ((nextEntry = zipInputStream.getNextEntry()) != null) {

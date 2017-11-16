@@ -8,8 +8,8 @@ import com.google.gson.JsonElement;
  */
 public interface MCRWCMSJSONProvider<O, J extends JsonElement> {
 
-    public J toJSON(O object);
+    J toJSON(O object);
 
-    public O fromJSON(J json);
+    O fromJSON(J json);
 
 }

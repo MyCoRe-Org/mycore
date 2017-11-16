@@ -41,7 +41,7 @@ import bibtex.dom.BibtexEntry;
  */
 class MCRFieldTransformer {
 
-    final static String AS_NEW_ELEMENT = "[999]";
+    static final String AS_NEW_ELEMENT = "[999]";
 
     protected String field;
 
@@ -78,7 +78,7 @@ class MCRFieldTransformer {
         if (fieldValues == null) {
             fieldValues = entry.getFieldValuesAsList(field.toUpperCase(Locale.ROOT));
         }
-        return fieldValues == null ? Collections.<BibtexAbstractValue>emptyList() : fieldValues;
+        return fieldValues == null ? Collections.emptyList() : fieldValues;
     }
 
     void buildField(BibtexAbstractValue value, Element parent) {

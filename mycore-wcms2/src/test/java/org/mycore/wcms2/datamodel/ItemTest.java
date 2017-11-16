@@ -57,8 +57,8 @@ public class ItemTest {
         assertEquals("false", itemElement.getAttributeValue("replaceMenu"));
         assertEquals("item.test.key", itemElement.getAttributeValue("i18nKey"));
 
-        Element label1 = (Element) itemElement.getChildren().get(0);
-        Element label2 = (Element) itemElement.getChildren().get(1);
+        Element label1 = itemElement.getChildren().get(0);
+        Element label2 = itemElement.getChildren().get(1);
 
         assertEquals("Deutschland", label1.getValue());
         assertEquals("England", label2.getValue());

@@ -104,7 +104,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
         String sourceId = getSourceId();
         try {
             LOGGER.info(
-                "Creating transfer package for " + sourceId + " at " + SAVE_DIRECTORY_PATH.toAbsolutePath().toString());
+                "Creating transfer package for " + sourceId + " at " + SAVE_DIRECTORY_PATH.toAbsolutePath());
             MCRTransferPackage transferPackage = build();
             checkAndCreateSaveDirectory();
             buildTar(getTarPath(transferPackage), transferPackage);
@@ -129,7 +129,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
      * @return path to the *.tar location
      */
     public Path getTarPath(MCRTransferPackage transferPackage) {
-        return SAVE_DIRECTORY_PATH.resolve(transferPackage.getSource().getId().toString() + ".tar");
+        return SAVE_DIRECTORY_PATH.resolve(transferPackage.getSource().getId() + ".tar");
     }
 
     /**
@@ -146,7 +146,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
                 String filePath = contentEntry.getKey();
                 byte[] data = contentEntry.getValue().asByteArray();
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Adding '" + filePath + "' to " + pathToTar.toAbsolutePath().toString());
+                    LOGGER.debug("Adding '" + filePath + "' to " + pathToTar.toAbsolutePath());
                 }
                 writeFile(tarOutStream, filePath, data);
                 writeMD5(tarOutStream, filePath + ".md5", data);
@@ -188,7 +188,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     private void checkAndCreateSaveDirectory() throws IOException {
         if (!Files.exists(SAVE_DIRECTORY_PATH)) {
-            LOGGER.info("Creating directory " + SAVE_DIRECTORY_PATH.toAbsolutePath().toString());
+            LOGGER.info("Creating directory " + SAVE_DIRECTORY_PATH.toAbsolutePath());
             Files.createDirectories(SAVE_DIRECTORY_PATH);
         }
     }

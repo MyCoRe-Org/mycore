@@ -49,7 +49,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRParameterCollector {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRParameterCollector.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRParameterCollector.class);
 
     /** The collected parameters */
     private Map<String, Object> parameters = new HashMap<String, Object>();

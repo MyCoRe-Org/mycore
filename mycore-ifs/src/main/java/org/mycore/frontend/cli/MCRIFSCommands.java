@@ -85,7 +85,7 @@ public class MCRIFSCommands {
 
     private static Logger LOGGER = LogManager.getLogger(MCRIFSCommands.class);
 
-    private static abstract class FSNodeChecker {
+    private abstract static class FSNodeChecker {
         public abstract String getName();
 
         public abstract boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts);
@@ -100,17 +100,17 @@ public class MCRIFSCommands {
             atts.addAttribute(NS_URI, ATT_IFS_ID, ATT_IFS_ID, CDATA, node.getId());
         }
 
-        final static String ATT_STORAGEID = "storageid";
+        static final String ATT_STORAGEID = "storageid";
 
-        final static String ATT_OWNER = "owner";
+        static final String ATT_OWNER = "owner";
 
-        final static String ATT_NAME = "fileName";
+        static final String ATT_NAME = "fileName";
 
-        final static String ATT_MD5 = "md5";
+        static final String ATT_MD5 = "md5";
 
-        final static String ATT_SIZE = "size";
+        static final String ATT_SIZE = "size";
 
-        final static String ATT_IFS_ID = "ifsid";
+        static final String ATT_IFS_ID = "ifsid";
 
     }
 
@@ -327,7 +327,7 @@ public class MCRIFSCommands {
     }
 
     private static void writeReport(File targetDir, FSNodeChecker checker) throws TransformerFactoryConfigurationError,
-        SAXException, IOException, FileNotFoundException, TransformerConfigurationException {
+        SAXException, IOException, TransformerConfigurationException {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         MCRStreamQuery<MCRFSNODES> query = MCRStreamQuery.getInstance(em,
             "from MCRFSNODES where type='F' order by storeid, owner, name",

@@ -32,10 +32,10 @@ package org.mycore.services.fieldquery;
  */
 public class MCRSortBy {
     /** Sort this field in ascending order */
-    public final static boolean ASCENDING = true;
+    public static final boolean ASCENDING = true;
 
     /** Sort this field in descending order */
-    public final static boolean DESCENDING = false;
+    public static final boolean DESCENDING = false;
 
     /** The field to sort by */
     private String fieldName;

@@ -414,7 +414,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (mycore_obj.hasParent()) {
             MCRObjectID parentID = mycore_obj.getStructure().getParentID();
             if (!MCRMetadataManager.exists(mycore_obj.getStructure().getParentID())) {
-                throw new MCRException("The parent object " + parentID + "does not exist for " + mycore_obj.toString()
+                throw new MCRException("The parent object " + parentID + "does not exist for " + mycore_obj
                     + ".");
             }
         }
@@ -423,10 +423,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         if (update) {
             MCRMetadataManager.update(mycore_obj);
-            LOGGER.info(mycore_obj.getId().toString() + " updated.");
+            LOGGER.info(mycore_obj.getId() + " updated.");
         } else {
             MCRMetadataManager.create(mycore_obj);
-            LOGGER.info(mycore_obj.getId().toString() + " loaded.");
+            LOGGER.info(mycore_obj.getId() + " loaded.");
         }
 
         return true;
@@ -663,8 +663,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException
      * @throws MCRException
      */
-    private static boolean exportMCRObject(File dir, Transformer trans, String nid) throws FileNotFoundException,
-        TransformerException, IOException, MCRException, SAXParseException {
+    private static boolean exportMCRObject(File dir, Transformer trans, String nid) throws TransformerException, IOException, MCRException, SAXParseException {
         MCRContent content;
         try {
             // if object do'snt exist - no exception is catched!
@@ -1003,7 +1002,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error("The type " + type + " was not found.");
             return Collections.emptyList();
         }
-        List<String> ar = (List<String>) MCRXMLMetadataManager.instance().listIDsOfType(type);
+        List<String> ar = MCRXMLMetadataManager.instance().listIDsOfType(type);
         if (ar.size() == 0) {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return Collections.emptyList();
@@ -1041,7 +1040,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         MCRBase obj = MCRMetadataManager.retrieve(mid);
         MCRMetadataManager.fireRepairEvent(obj);
-        LOGGER.info("Repaired " + mid.toString());
+        LOGGER.info("Repaired " + mid);
     }
 
     @MCRCommand(
@@ -1107,7 +1106,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRPath mainDerivateRootPath = MCRPath.getPath(mainID, "/");
 
         derivateIDs.stream().skip(1).forEach(derivateID -> {
-            LOGGER.info("Merge " + derivateID.toString() + " into " + mainID + "...");
+            LOGGER.info("Merge " + derivateID + " into " + mainID + "...");
             MCRPath copyRootPath = MCRPath.getPath(derivateID.toString(), "/");
             try {
                 MCRTreeCopier treeCopier = new MCRTreeCopier(copyRootPath, mainDerivateRootPath);

@@ -48,7 +48,7 @@ import com.google.gson.JsonObject;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-final public class MCRObject extends MCRBase {
+public final class MCRObject extends MCRBase {
     // the object content
     private final MCRObjectStructure mcr_struct;
 
@@ -69,7 +69,7 @@ final public class MCRObject extends MCRBase {
      * @exception MCRConfigurationException
      *                a special exception for configuartion data
      */
-    public MCRObject() throws MCRException, MCRConfigurationException {
+    public MCRObject() throws MCRException {
         super();
         mcr_struct = new MCRObjectStructure();
         mcr_metadata = new MCRObjectMetadata();
@@ -191,7 +191,7 @@ final public class MCRObject extends MCRBase {
             if (mcr_id == null) {
                 LOGGER.debug("MCRObject ID : missing");
             } else {
-                LOGGER.debug("MCRObject ID : " + mcr_id.toString());
+                LOGGER.debug("MCRObject ID : " + mcr_id);
             }
             LOGGER.debug("MCRObject Label : " + mcr_label);
             LOGGER.debug("MCRObject Schema : " + mcr_schema);

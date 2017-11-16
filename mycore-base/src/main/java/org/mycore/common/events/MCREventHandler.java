@@ -52,7 +52,7 @@ public interface MCREventHandler {
      * @param evt
      *            the Event object containing information about the event
      */
-    public void doHandleEvent(MCREvent evt) throws MCRException;
+    void doHandleEvent(MCREvent evt) throws MCRException;
 
     /**
      * Handles rollback of event handling. The handler should roll back the
@@ -62,5 +62,5 @@ public interface MCREventHandler {
      * @param evt
      *            the Event object containing information about the event
      */
-    public void undoHandleEvent(MCREvent evt) throws MCRException;
+    void undoHandleEvent(MCREvent evt) throws MCRException;
 }

@@ -24,7 +24,7 @@ import org.mycore.solr.MCRSolrUtils;
  */
 public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAIClassificationToSetHandler.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAIClassificationToSetHandler.class);
 
     private String classField;
 

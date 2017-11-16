@@ -24,7 +24,7 @@ import java.net.URI;
 @Deprecated
 public class MCRURN {
 
-    final private static String URN_PREFIX = "urn:nbn:de:";
+    private static final String URN_PREFIX = "urn:nbn:de:";
 
     /** the part after the prefix
      *     usually the acronym of a German library network and a library specific number number

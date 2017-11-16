@@ -39,37 +39,37 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
     private static final long serialVersionUID = 1L;
 
     /** Pre-defined event types * */
-    final static public String CREATE_EVENT = "create";
+    public static final String CREATE_EVENT = "create";
 
-    final static public String UPDATE_EVENT = "update";
+    public static final String UPDATE_EVENT = "update";
 
-    final static public String DELETE_EVENT = "delete";
+    public static final String DELETE_EVENT = "delete";
 
-    final static public String REPAIR_EVENT = "repair";
+    public static final String REPAIR_EVENT = "repair";
 
-    final static public String INDEX_EVENT = "index";
+    public static final String INDEX_EVENT = "index";
 
-    final static public String OBJECT_TYPE = "MCRObject";
+    public static final String OBJECT_TYPE = "MCRObject";
 
-    final static public String DERIVATE_TYPE = "MCRDerivate";
+    public static final String DERIVATE_TYPE = "MCRDerivate";
 
-    final static public String CLASS_TYPE = "MCRClassification";
+    public static final String CLASS_TYPE = "MCRClassification";
 
-    final static public String PATH_TYPE = "MCRPath";
+    public static final String PATH_TYPE = "MCRPath";
 
-    final public static String MOVE_EVENT = "move";
+    public static final String MOVE_EVENT = "move";
 
-    final static public String PATH_KEY = PATH_TYPE;
+    public static final String PATH_KEY = PATH_TYPE;
 
-    final static public String FILEATTR_KEY = PATH_TYPE + ":attr";
+    public static final String FILEATTR_KEY = PATH_TYPE + ":attr";
 
-    final static public String OBJECT_KEY = "object";
+    public static final String OBJECT_KEY = "object";
 
-    final static public String OBJECT_OLD_KEY = "object.old";
+    public static final String OBJECT_OLD_KEY = "object.old";
 
-    final static public String DERIVATE_KEY = "derivate";
+    public static final String DERIVATE_KEY = "derivate";
 
-    final static public String DERIVATE_OLD_KEY = "derivate.old";
+    public static final String DERIVATE_OLD_KEY = "derivate.old";
 
     /** The object type like object or file * */
     private String objType;

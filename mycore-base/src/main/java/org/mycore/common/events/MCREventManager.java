@@ -57,10 +57,10 @@ public class MCREventManager {
     private Hashtable<String, List<MCREventHandler>> handlers;
 
     /** Call event handlers in forward direction (create, update) */
-    public final static boolean FORWARD = true;
+    public static final boolean FORWARD = true;
 
     /** Call event handlers in backward direction (delete) */
-    public final static boolean BACKWARD = false;
+    public static final boolean BACKWARD = false;
 
     /**
      * Parse the property key of event handlers, extract type and mode.
@@ -299,7 +299,7 @@ public class MCREventManager {
         return configuredInitializer.getInstance(propertyValue);
     }
 
-    public static interface MCREventHandlerInitializer {
-        public MCREventHandler getInstance(String propertyValue);
+    public interface MCREventHandlerInitializer {
+        MCREventHandler getInstance(String propertyValue);
     }
 }

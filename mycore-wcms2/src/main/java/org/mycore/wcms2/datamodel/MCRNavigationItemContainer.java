@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface MCRNavigationItemContainer extends MCRNavigationBaseItem {
 
-    public List<MCRNavigationBaseItem> getChildren();
+    List<MCRNavigationBaseItem> getChildren();
 
 }

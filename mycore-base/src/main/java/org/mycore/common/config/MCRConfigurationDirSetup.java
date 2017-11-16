@@ -157,7 +157,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         Stream<File> toClassPath = Stream.of(resourceDir);
         if (libDir.isDirectory()) {
             File[] listFiles = libDir
-                .listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
+                .listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
             if (listFiles.length != 0) {
                 toClassPath = Stream.concat(toClassPath, Stream.of(listFiles));
             }

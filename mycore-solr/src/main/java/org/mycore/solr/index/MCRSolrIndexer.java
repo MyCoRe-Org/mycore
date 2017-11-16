@@ -87,13 +87,13 @@ public class MCRSolrIndexer {
      * Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is
      * 100.
      */
-    final static int BULK_SIZE = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.BulkSize", 100);
+    static final int BULK_SIZE = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.BulkSize", 100);
 
-    final static MCRProcessableExecutor SOLR_EXECUTOR;
+    static final MCRProcessableExecutor SOLR_EXECUTOR;
 
-    final static ExecutorService SOLR_SUB_EXECUTOR;
+    static final ExecutorService SOLR_SUB_EXECUTOR;
 
-    final static MCRProcessableDefaultCollection SOLR_COLLECTION;
+    static final MCRProcessableDefaultCollection SOLR_COLLECTION;
 
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 

@@ -123,8 +123,7 @@ public class MCRRequestDebugFilter implements Filter {
         HttpSession session = request.getSession(false);
         if (session != null) {
             sb.append("SESSION " + request.getSession().getId() + " created at: " + LocalDateTime
-                .ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()), ZoneId.systemDefault())
-                .toString() + "\n");
+                .ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()), ZoneId.systemDefault()) + "\n");
             sb.append("SESSION ATTRIBUTES: \n");
             MCRStreamUtils
                 .asStream(session.getAttributeNames())

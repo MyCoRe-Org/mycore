@@ -260,7 +260,7 @@ public abstract class MCRContent {
      * 
      * @return content as String
      */
-    public String asString() throws IOException, UnsupportedEncodingException {
+    public String asString() throws IOException {
         return new String(asByteArray(), getSafeEncoding());
     }
 

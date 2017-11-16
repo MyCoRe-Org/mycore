@@ -49,7 +49,7 @@ public class MCRDefaultAltoChangeApplier implements MCRAltoChangeApplier {
 
             if (!Files.exists(altoFilePath)) {
                 LOGGER.warn("Could not find file {} which was referenced by alto change!", altoFilePath);
-                throw new MCRException(new IOException("Alto-File " + altoFilePath.toString() + " does not exist"));
+                throw new MCRException(new IOException("Alto-File " + altoFilePath + " does not exist"));
             }
 
             Document altoDocument = readALTO(altoFilePath);

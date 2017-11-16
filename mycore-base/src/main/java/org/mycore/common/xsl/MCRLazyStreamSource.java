@@ -40,8 +40,8 @@ public class MCRLazyStreamSource extends StreamSource {
     }
 
     @FunctionalInterface
-    public static interface InputStreamSupplier {
-        public InputStream get() throws IOException;
+    public interface InputStreamSupplier {
+        InputStream get() throws IOException;
     }
 
 }

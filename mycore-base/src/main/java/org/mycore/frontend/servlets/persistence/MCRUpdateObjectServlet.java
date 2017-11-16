@@ -49,7 +49,7 @@ public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
         } else
             response.sendRedirect(
                 response.encodeRedirectURL(buildRedirectURL(
-                    MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(),
+                    MCRFrontendUtil.getBaseURL() + "receive/" + returnID,
                     MCRPersistenceHelper.getXSLProperties(request))));
     }
 

@@ -17,7 +17,7 @@ public interface MCRSolrIndexHandler {
     /**
      * Commits something to solr.
      */
-    public void index() throws IOException, SolrServerException;
+    void index() throws IOException, SolrServerException;
 
     /**
      * Returns a list of index handlers which should be executed after
@@ -26,22 +26,22 @@ public interface MCRSolrIndexHandler {
      * 
      * @return list of <code>MCRSolrIndexHandler</code>
      */
-    public List<MCRSolrIndexHandler> getSubHandlers();
+    List<MCRSolrIndexHandler> getSubHandlers();
 
     /**
      * Time in milliseconds solr should index the stream.
      *  -1 by default, says that solr decide when to commit.
      */
-    public void setCommitWithin(int commitWithin);
+    void setCommitWithin(int commitWithin);
 
-    public int getCommitWithin();
+    int getCommitWithin();
 
-    public SolrClient getSolrClient();
+    SolrClient getSolrClient();
 
-    public void setSolrServer(SolrClient solrClient);
+    void setSolrServer(SolrClient solrClient);
 
-    public MCRSolrIndexStatistic getStatistic();
+    MCRSolrIndexStatistic getStatistic();
 
-    public int getDocuments();
+    int getDocuments();
 
 }

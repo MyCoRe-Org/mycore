@@ -140,7 +140,7 @@ public final class MCRURIResolver implements URIResolver {
 
     private static ServletContext context;
 
-    final static String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
+    static final String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
 
     static {
         try {
@@ -390,7 +390,7 @@ public final class MCRURIResolver implements URIResolver {
      *
      * @author Thomas Scheffler
      */
-    public static interface MCRResolverProvider {
+    public interface MCRResolverProvider {
         /**
          * provides a Map of URIResolver mappings. Key is the scheme, e.g. <code>http</code>, where value is an
          * implementation of {@link URIResolver}.
@@ -398,11 +398,11 @@ public final class MCRURIResolver implements URIResolver {
          * @see URIResolver
          * @return a Map of URIResolver mappings
          */
-        public Map<String, URIResolver> getURIResolverMapping();
+        Map<String, URIResolver> getURIResolverMapping();
     }
 
-    public static interface MCRCacheableURIResolver extends URIResolver {
-        public MCRCacheableURIResponse getResponse(String href, String base) throws TransformerException;
+    public interface MCRCacheableURIResolver extends URIResolver {
+        MCRCacheableURIResponse getResponse(String href, String base) throws TransformerException;
 
         @Override
         default Source resolve(String href, String base) throws TransformerException {
@@ -1055,7 +1055,7 @@ public final class MCRURIResolver implements URIResolver {
                     returns = MCRCategoryTransformer.getEditorItems(cl, labelFormat, sort, emptyLeaves, completeId);
                 }
             } else if (format.equals("metadata")) {
-                returns = (Element) MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement().detach();
+                returns = MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement().detach();
             } else {
                 LOGGER.error("Unknown target format given. URI: " + uri);
                 throw new IllegalArgumentException(
@@ -1308,7 +1308,7 @@ public final class MCRURIResolver implements URIResolver {
             List<String> propValue = Collections.emptyList();
             if (includePart.startsWith("class.")) {
                 MCRXslIncludeHrefs incHrefClass = MCRConfiguration.instance()
-                    .<MCRXslIncludeHrefs> getInstanceOf(propertyName);
+                    .getInstanceOf(propertyName);
                 propValue = incHrefClass.getHrefs();
             } else {
                 propValue = MCRConfiguration.instance().getStrings(propertyName, propValue);
@@ -1327,7 +1327,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     public interface MCRXslIncludeHrefs {
-        public List<String> getHrefs();
+        List<String> getHrefs();
     }
 
     /**

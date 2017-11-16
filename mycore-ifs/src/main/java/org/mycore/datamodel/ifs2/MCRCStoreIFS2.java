@@ -62,7 +62,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
     private boolean ignoreOwnerBase;
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRCStoreIFS2.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCStoreIFS2.class);
 
     @Override
     public void init(String storeID) {

@@ -101,7 +101,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
         }
         // clone it for further replacements
         // TODO: whats faster? cloning or building it new from file
-        return (Element) cachedElement.clone();
+        return cachedElement.clone();
     }
 
     /**
@@ -157,7 +157,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
             }
 
             // attributes
-            for (Attribute attrib : (List<Attribute>) element.getAttributes()) {
+            for (Attribute attrib : element.getAttributes()) {
                 String attribValue = attrib.getValue();
                 if (attribValue.contains("{")) {
                     attrib.setValue(varResolver.resolve(attribValue));

@@ -33,7 +33,7 @@ abstract class MCRFileSystemUtils {
         MCRPath mcrPath = MCRPath.toMCRPath(path);
         if (!(Objects.requireNonNull(mcrPath.getFileSystem(), "'path' requires a associated filesystem.")
             .provider() instanceof MCRFileSystemProvider)) {
-            throw new ProviderMismatchException("Path does not match to this provider: " + path.toString());
+            throw new ProviderMismatchException("Path does not match to this provider: " + path);
         }
         if (!mcrPath.isAbsolute()) {
             throw new InvalidPathException(mcrPath.toString(), "'path' must be absolute.");

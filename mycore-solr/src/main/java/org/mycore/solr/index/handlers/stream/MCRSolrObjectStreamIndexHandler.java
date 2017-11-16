@@ -23,10 +23,10 @@ import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
  */
 public abstract class MCRSolrObjectStreamIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRSolrObjectStreamIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrObjectStreamIndexHandler.class);
 
-    final static String STYLESHEET = MCRConfiguration.instance()
-        .getString(CONFIG_PREFIX + "IndexHandler.ContentStream.ServerStyleSheet");
+    static final String STYLESHEET = MCRConfiguration.instance()
+                                                     .getString(CONFIG_PREFIX + "IndexHandler.ContentStream.ServerStyleSheet");
 
     public MCRSolrObjectStreamIndexHandler() {
         this(null);
@@ -48,7 +48,7 @@ public abstract class MCRSolrObjectStreamIndexHandler extends MCRSolrAbstractStr
         if (LOGGER.isDebugEnabled()) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("Solr: indexing data of \"");
-            stringBuilder.append(this.toString());
+            stringBuilder.append(this);
             stringBuilder.append("\" (");
             stringBuilder.append((System.currentTimeMillis() - tStart));
             stringBuilder.append("ms)");
@@ -56,7 +56,7 @@ public abstract class MCRSolrObjectStreamIndexHandler extends MCRSolrAbstractStr
                 stringBuilder.append('\n');
                 stringBuilder.append(entry.getKey());
                 stringBuilder.append('=');
-                stringBuilder.append(entry.getValue().toString());
+                stringBuilder.append(entry.getValue());
             }
             LOGGER.debug(stringBuilder.toString());
         }

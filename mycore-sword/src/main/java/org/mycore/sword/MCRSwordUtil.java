@@ -243,8 +243,8 @@ public class MCRSwordUtil {
 
     public static void extractZipToPath(Path zipFilePath, MCRPath target)
         throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
-        LOGGER.info("Extracting zip: " + zipFilePath.toString());
-        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri().toString()),
+        LOGGER.info("Extracting zip: " + zipFilePath);
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri()),
             new HashMap<String, Object>())) {
             final Path sourcePath = zipfs.getPath("/");
             Files.walkFileTree(sourcePath,
@@ -269,7 +269,7 @@ public class MCRSwordUtil {
                         throws IOException {
                         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
 
-                        LOGGER.info("Extracting: " + file.toString());
+                        LOGGER.info("Extracting: " + file);
                         Path targetFilePath = target.resolve(sourcePath.relativize(file));
                         // WORKAROUND: copy is bad with IFS because fsnodes is locked until copy is completed
                         // so we end the transaction after we got a byte channel, then we write the data
@@ -301,7 +301,7 @@ public class MCRSwordUtil {
 
     public static List<MCRValidationResult> validateZipFile(final MCRFileValidator validator, Path zipFile)
         throws IOException, URISyntaxException {
-        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri().toString()),
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri()),
             new HashMap<String, Object>())) {
             final Path sourcePath = zipfs.getPath("/");
             ArrayList<MCRValidationResult> validationResults = new ArrayList<>();
@@ -381,7 +381,7 @@ public class MCRSwordUtil {
             String[] urlParts = editIRI.toString().split(iri);
 
             if (urlParts.length < 2) {
-                final String message = "Invalid " + iri + " : " + editIRI.toString();
+                final String message = "Invalid " + iri + " : " + editIRI;
                 throw new IllegalArgumentException(message);
             }
 

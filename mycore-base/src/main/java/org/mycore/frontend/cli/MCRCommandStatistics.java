@@ -55,7 +55,7 @@ public class MCRCommandStatistics {
         System.out.println();
         for (Entry<MCRCommand, StatisticsEntry> entry : entries.entrySet()) {
             System.out.println(entry.getKey().getSyntax());
-            System.out.println(entry.getValue().toString());
+            System.out.println(entry.getValue());
         }
     }
 }

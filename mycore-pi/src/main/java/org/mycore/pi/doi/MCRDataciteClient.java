@@ -208,7 +208,7 @@ public class MCRDataciteClient {
     }
 
     private Function<Map.Entry<String, URI>, String> buildPair() {
-        return entry -> entry.getKey() + "=" + entry.getValue().toString();
+        return entry -> entry.getKey() + "=" + entry.getValue();
     }
 
     public void mintDOI(final MCRDigitalObjectIdentifier doiParam, URI url) throws MCRPersistentIdentifierException {
@@ -257,7 +257,7 @@ public class MCRDataciteClient {
                     while (scanner.hasNextLine()) {
                         String line = scanner.nextLine();
                         Optional<MCRDigitalObjectIdentifier> parse = new MCRDOIParser().parse(line);
-                        MCRDigitalObjectIdentifier doi = (MCRDigitalObjectIdentifier) parse
+                        MCRDigitalObjectIdentifier doi = parse
                             .orElseThrow(() -> new MCRException("Could not parse DOI from Datacite!"));
                         doiList.add(doi);
                     }
@@ -438,7 +438,7 @@ public class MCRDataciteClient {
             "//datacite:identifier[@identifierType='DOI']", Filters.element(), null,
             Namespace.getNamespace("datacite", "http://datacite.org/schema/kernel-3"));
         Element element = compile.evaluateFirst(metadata);
-        MCRDigitalObjectIdentifier doi = (MCRDigitalObjectIdentifier) new MCRDOIParser()
+        MCRDigitalObjectIdentifier doi = new MCRDOIParser()
             .parse(element.getText())
             .orElseThrow(() -> new MCRException("Datacite Document contains invalid DOI!"));
         String testDOI = doi.toTestPrefix().asString();

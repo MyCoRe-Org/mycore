@@ -64,7 +64,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         }
         jw.name("name").value(isRoot ? "" : mcrPath.getFileName().toString());
         jw.name("path")
-            .value(attrs.isDirectory() ? toStringValue(relativePath) : SEPARATOR_STRING + relativePath.toString());
+            .value(attrs.isDirectory() ? toStringValue(relativePath) : SEPARATOR_STRING + relativePath);
         if (!isRoot) {
             jw.name("parentPath").value(toStringValue(relativePath.getParent()));
         }

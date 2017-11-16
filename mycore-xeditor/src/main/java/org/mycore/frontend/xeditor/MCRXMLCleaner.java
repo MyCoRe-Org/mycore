@@ -84,7 +84,7 @@ public class MCRXMLCleaner {
 
     private boolean isRelevant(Object node) {
         MCRCleaningRule rule = nodes2rules.get(node);
-        return (rule == null ? true : rule.isRelevant(node));
+        return (rule == null || rule.isRelevant(node));
     }
 }
 

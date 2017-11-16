@@ -35,7 +35,7 @@ import org.mycore.common.config.MCRConfiguration;
  * @version $Revision$ $Date: 2009-07-28 11:32:04 +0200 (Tue, 28 Jul
  *          2009) $
  */
-abstract public class MCRAbstractCommands implements MCRExternalCommandInterface {
+public abstract class MCRAbstractCommands implements MCRExternalCommandInterface {
     /** The configuration instance */
     protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 

@@ -48,7 +48,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class MCRTemplatesSource {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRTemplatesSource.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTemplatesSource.class);
 
     /** The path to the XSL resource */
     private String resource;

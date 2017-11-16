@@ -79,7 +79,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
             redirectToUpdateDerivate(request, response);
         } else {
             response.sendRedirect(
-                    response.encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
+                    response.encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID));
         }
     }
 

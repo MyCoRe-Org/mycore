@@ -85,9 +85,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     }
 
     public interface MCRObjectIDFormat {
-        public int numberDistance();
+        int numberDistance();
 
-        public NumberFormat numberFormat();
+        NumberFormat numberFormat();
     }
 
     private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat {
@@ -360,7 +360,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * @return true if all parts are equal, else return false
      */
     public boolean equals(MCRObjectID in) {
-        return this == in || (in == null ? false : toString().equals(in.toString()));
+        return this == in || (in != null && toString().equals(in.toString()));
     }
 
     /**

@@ -14,7 +14,7 @@ public interface MCRProcessableRegistryListener {
      * @param source the source registry
      * @param collection the collection added
      */
-    public void onAdd(MCRProcessableRegistry source, MCRProcessableCollection collection);
+    void onAdd(MCRProcessableRegistry source, MCRProcessableCollection collection);
 
     /**
      * Fired when a collection was removed.
@@ -22,6 +22,6 @@ public interface MCRProcessableRegistryListener {
      * @param source the source registry
      * @param collection the collection removed
      */
-    public void onRemove(MCRProcessableRegistry source, MCRProcessableCollection collection);
+    void onRemove(MCRProcessableRegistry source, MCRProcessableCollection collection);
 
 }

@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "navigation")
 @XmlAccessorType(XmlAccessType.NONE)
-public class MCRNavigation implements MCRNavigationBaseItem, MCRNavigationItemContainer {
+public class MCRNavigation implements MCRNavigationItemContainer {
 
     // general
     @XmlAttribute

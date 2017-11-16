@@ -34,7 +34,7 @@ import javax.ws.rs.container.ContainerRequestContext;
  */
 public interface MCRResourceAccessChecker {
 
-    public boolean isPermitted(ContainerRequestContext request);
+    boolean isPermitted(ContainerRequestContext request);
 
     /**
      * http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string?answertab=votes#tab-top
@@ -42,7 +42,7 @@ public interface MCRResourceAccessChecker {
      * @param is the inputstream to read
      * @return the string
      */
-    public default String convertStreamToString(InputStream is) {
+    default String convertStreamToString(InputStream is) {
         try (Scanner s = new Scanner(is, "UTF-8")) {
             s.useDelimiter("\\A");
             return s.hasNext() ? s.next() : "";

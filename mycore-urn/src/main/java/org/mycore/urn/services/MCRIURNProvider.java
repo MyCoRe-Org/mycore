@@ -9,14 +9,14 @@ package org.mycore.urn.services;
  */
 public interface MCRIURNProvider {
     /** Generates a single URN */
-    public MCRURN generateURN();
+    MCRURN generateURN();
 
     /**
      * Generates multiple urns
      * 
      * @param amount the amount of urn to generate, must be &gt;= 1
      */
-    public MCRURN[] generateURN(int amount);
+    MCRURN[] generateURN(int amount);
 
     /**
      * Generates multiple urns. The generated urns have the following structure
@@ -27,7 +27,7 @@ public interface MCRIURNProvider {
      * @param base
      *            the base urn
      */
-    public MCRURN[] generateURN(int amount, MCRURN base);
+    MCRURN[] generateURN(int amount, MCRURN base);
 
     /**
      * Generates multiple urns. The generated urns have the following structure
@@ -43,10 +43,10 @@ public interface MCRIURNProvider {
      * @return an Array of {@link MCRURN} or <code>null</code> if the base urn is
      *         null or amount &lt;1 or the setID &lt;0
      */
-    public MCRURN[] generateURN(int amount, MCRURN base, String setId);
+    MCRURN[] generateURN(int amount, MCRURN base, String setId);
 
     /**
      * @return the Namespace Specific String (NISS)
      */
-    public String getNISS();
+    String getNISS();
 }

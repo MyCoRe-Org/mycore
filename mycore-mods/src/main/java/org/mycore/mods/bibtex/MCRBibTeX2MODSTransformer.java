@@ -46,7 +46,7 @@ import bibtex.parser.ParseException;
  */
 public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
 
-    private final static Pattern MISSING_KEYS_PATTERN = Pattern
+    private static final Pattern MISSING_KEYS_PATTERN = Pattern
             .compile("(@[a-zA-Z0-9]+\\s*\\{)(\\s*[a-zA-Z0-9]+\\s*\\=)");
 
     @Override
@@ -72,7 +72,7 @@ public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
         return sb.toString();
     }
 
-    private BibtexFile parse(String input) throws UnsupportedEncodingException, IOException {
+    private BibtexFile parse(String input) throws IOException {
         BibtexFile bibtexFile = new BibtexFile();
         BibtexParser parser = new BibtexParser(false);
         parser.setMultipleFieldValuesPolicy(BibtexMultipleFieldValuesPolicy.KEEP_ALL);

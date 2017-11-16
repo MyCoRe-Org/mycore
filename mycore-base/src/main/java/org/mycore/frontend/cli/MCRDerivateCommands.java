@@ -344,11 +344,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         if (update) {
             MCRMetadataManager.update(derivate);
-            LOGGER.info(derivate.getId().toString() + " updated.");
+            LOGGER.info(derivate.getId() + " updated.");
             LOGGER.info("");
         } else {
             MCRMetadataManager.create(derivate);
-            LOGGER.info(derivate.getId().toString() + " loaded.");
+            LOGGER.info(derivate.getId() + " loaded.");
             LOGGER.info("");
         }
 
@@ -533,8 +533,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @throws TransformerException
      * @throws IOException
      */
-    private static void exportDerivate(File dir, Transformer trans, String nid) throws FileNotFoundException,
-        TransformerException, IOException {
+    private static void exportDerivate(File dir, Transformer trans, String nid) throws TransformerException, IOException {
         // store the XML file
         Document xml = null;
         MCRDerivate obj;
@@ -583,7 +582,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRPath rootPath = MCRPath.getPath(derivateID.toString(), "/");
         Files.walkFileTree(rootPath, new MCRTreeCopier(rootPath, dir.toPath()));
 
-        LOGGER.info("Derivate " + nid + " saved under " + dir.toString() + " and " + xmlOutput.toString() + ".");
+        LOGGER.info("Derivate " + nid + " saved under " + dir + " and " + xmlOutput + ".");
     }
 
     /**
@@ -731,7 +730,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         // update mycoreobject
         if (isset) {
             MCRMetadataManager.fireUpdateEvent(obj);
-            LOGGER.info("Synchronized " + mid.toString());
+            LOGGER.info("Synchronized " + mid);
         }
     }
 
@@ -824,8 +823,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mcrderid);
             MCRObjectID objid = der.getOwnerID();
             if (!mgr.exists(objid)) {
-                LOGGER.error("   !!! Missing object " + objid.toString() + " in database for derivate ID "
-                    + mcrderid.toString());
+                LOGGER.error("   !!! Missing object " + objid + " in database for derivate ID "
+                    + mcrderid);
             }
         }
         LOGGER.info("Check done for " + Integer.toString(counter) + " entries");

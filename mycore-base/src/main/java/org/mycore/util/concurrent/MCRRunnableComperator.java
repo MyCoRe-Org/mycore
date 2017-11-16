@@ -25,7 +25,7 @@ public class MCRRunnableComperator implements Comparator<Runnable> {
     @Override
     public int compare(Runnable o1, Runnable o2) {
         if (isComparable(o1, o2)) {
-            return ((Comparable) o1).compareTo((Comparable) o2);
+            return ((Comparable) o1).compareTo(o2);
         }
         // T might be AsyncSupply, UniApply, etc., but we want to
         // compare our original Runnables.
