@@ -96,10 +96,6 @@ public final class MCRGoogleSitemapCommon {
     /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
     private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");
 
-    /** The types to build sitemaps */
-    private static final String[] types = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Types", "document")
-        .split(",");
-
     /** The frequence of crawle by Google */
     private static final String freq = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Freq", "monthly");
 
@@ -110,8 +106,8 @@ public final class MCRGoogleSitemapCommon {
     private static final String objectPath = MCRConfiguration.instance().getString("MCR.GoogleSitemap.ObjectPath",
         "receive/");
 
-    /** The XML table API */
-    private static final MCRXMLMetadataManager tm = MCRXMLMetadataManager.instance();
+    /** The filter query for selecting objects to present in google sitemap */
+    private static final String SOLR_QUERY = MCRConfiguration.instance().getString("MCR.GoogleSitemap.SolrQuery");
 
     /** The logger */
     private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
@@ -133,8 +129,6 @@ public final class MCRGoogleSitemapCommon {
 
     /** local data */
     private List<MCRObjectIDDate> objidlist = null;
-
-    private static final String SOLR_QUERY = MCRConfiguration.instance().getString("MCR.GoogleSitemap.SolrQuery");
 
     /** The constructor 
      * @throws NotDirectoryException */
