@@ -47,7 +47,6 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRObjectIDDate;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.solr.MCRSolrClientFactory;
 
