@@ -228,7 +228,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
                 String name = fieldAttributes.getName();
 
                 return Stream.of("mcrRevision", "mycoreID", "id", "mcrVersion")
-                             .anyMatch(field -> field.equals(name));
+                    .anyMatch(field -> field.equals(name));
             }
 
             @Override

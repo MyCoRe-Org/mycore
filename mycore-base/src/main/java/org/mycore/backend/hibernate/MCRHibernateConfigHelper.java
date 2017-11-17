@@ -42,7 +42,7 @@ public class MCRHibernateConfigHelper {
             }
         } catch (PersistenceException e) {
             LogManager.getLogger()
-                      .warn("Unsupported EntityManagerFactory found: {}", entityManagerFactory.getClass().getName());
+                .warn("Unsupported EntityManagerFactory found: {}", entityManagerFactory.getClass().getName());
         }
     }
 

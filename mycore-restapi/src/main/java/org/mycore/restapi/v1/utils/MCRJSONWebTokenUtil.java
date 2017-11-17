@@ -283,7 +283,8 @@ public class MCRJSONWebTokenUtil {
         String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(oldJWT);
         JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(oldJWT);
         if (submittedUser != null && clientPubKey != null) {
-            return MCRJSONWebTokenUtil.createJWT(submittedUser, Collections.singletonList("restapi"), MCRFrontendUtil.getBaseURL(),
+            return MCRJSONWebTokenUtil.createJWT(submittedUser, Collections.singletonList("restapi"),
+                MCRFrontendUtil.getBaseURL(),
                 clientPubKey);
         }
         return null;

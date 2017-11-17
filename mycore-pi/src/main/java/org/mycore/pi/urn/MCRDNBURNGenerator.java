@@ -30,10 +30,9 @@ public abstract class MCRDNBURNGenerator extends MCRPersistentIdentifierGenerato
     public String getNamespace() {
         String namespace = getProperties().get("Namespace").trim();
 
-        if(namespace.startsWith(URN_NBN_DE)){
-            namespace=namespace.substring(URN_NBN_DE.length());
+        if (namespace.startsWith(URN_NBN_DE)) {
+            namespace = namespace.substring(URN_NBN_DE.length());
         }
-
 
         return namespace;
     }

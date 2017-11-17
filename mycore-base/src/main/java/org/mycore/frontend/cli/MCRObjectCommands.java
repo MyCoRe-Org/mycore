@@ -132,7 +132,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the type of the MCRObjects that should be deleted
      */
     @MCRCommand(
-        syntax = "delete all objects of type {0}", help = "Removes MCRObjects of type {0}.", order = 20)
+        syntax = "delete all objects of type {0}",
+        help = "Removes MCRObjects of type {0}.",
+        order = 20)
     public static List<String> deleteAllObjects(String type) {
         final List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
         List<String> cmds = new ArrayList<>(objectIds.size());
@@ -176,7 +178,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRPersistenceException
      */
     @MCRCommand(
-        syntax = "delete object {0}", help = "Removes a MCRObject with the MCRObjectID {0}", order = 40)
+        syntax = "delete object {0}",
+        help = "Removes a MCRObject with the MCRObjectID {0}",
+        order = 40)
     public static void delete(String ID) throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
         MCRObjectID mcrId = MCRObjectID.getInstance(ID);
         MCRMetadataManager.deleteMCRObject(mcrId);
@@ -332,7 +336,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRObject)}
      */
     @MCRCommand(
-        syntax = "load object from file {0}", help = "Adds a MCRObject from the file {0} to the system.", order = 60)
+        syntax = "load object from file {0}",
+        help = "Adds a MCRObject from the file {0} to the system.",
+        order = 60)
     public static boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException,
         IOException, MCRAccessException {
         return loadFromFile(file, true);
@@ -663,7 +669,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException
      * @throws MCRException
      */
-    private static boolean exportMCRObject(File dir, Transformer trans, String nid) throws TransformerException, IOException, MCRException, SAXParseException {
+    private static boolean exportMCRObject(File dir, Transformer trans, String nid)
+        throws TransformerException, IOException, MCRException, SAXParseException {
         MCRContent content;
         try {
             // if object do'snt exist - no exception is catched!
@@ -723,7 +730,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * List all selected MCRObjects.
      */
     @MCRCommand(
-        syntax = "list selected", help = "Prints the id of selected objects", order = 190)
+        syntax = "list selected",
+        help = "Prints the id of selected objects",
+        order = 190)
     public static void listSelected() {
         LOGGER.info("List selected MCRObjects");
         if (getSelectedObjectIDs().isEmpty()) {
@@ -744,7 +753,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            id of MyCoRe Object
      */
     @MCRCommand(
-        syntax = "list revisions of {0}", help = "List revisions of MCRObject.", order = 260)
+        syntax = "list revisions of {0}",
+        help = "List revisions of MCRObject.",
+        order = 260)
     public static void listRevisions(String id) {
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT);

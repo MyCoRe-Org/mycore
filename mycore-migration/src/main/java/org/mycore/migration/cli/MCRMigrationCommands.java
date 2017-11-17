@@ -232,10 +232,10 @@ public class MCRMigrationCommands {
         MCRObjectStructure parentStructure = parent.getStructure();
         int sizeBefore = parentStructure.getChildren().size();
         children.stream().map(MCRObjectID::getInstance)
-                .filter(cid -> !parentStructure.getChildren().stream()
+            .filter(cid -> !parentStructure.getChildren().stream()
                 .anyMatch(candidate -> candidate.getXLinkHrefID().equals(cid)))
-                .sorted().map(MCRMigrationCommands::toLinkId).sequential()
-                .peek(lid -> LOGGER.info("Adding {} to {}", lid, parentId)).forEach(parentStructure::addChild);
+            .sorted().map(MCRMigrationCommands::toLinkId).sequential()
+            .peek(lid -> LOGGER.info("Adding {} to {}", lid, parentId)).forEach(parentStructure::addChild);
         if (parentStructure.getChildren().size() != sizeBefore) {
             MCRMetadataManager.fireUpdateEvent(parent);
         }

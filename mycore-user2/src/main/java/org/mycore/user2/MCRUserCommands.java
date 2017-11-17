@@ -102,7 +102,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the new user ID
      */
     @MCRCommand(
-        syntax = "login {0}", help = "Starts the login dialog for the user {0}.", order = 20)
+        syntax = "login {0}",
+        help = "Starts the login dialog for the user {0}.",
+        order = 20)
     public static void login(String user) {
         char[] password = {};
         do {
@@ -217,7 +219,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be deleted
      */
     @MCRCommand(
-        syntax = "delete user {0}", help = "Delete the user {0}.", order = 110)
+        syntax = "delete user {0}",
+        help = "Delete the user {0}.",
+        order = 110)
     public static void deleteUser(String userID) throws Exception {
         MCRUserManager.deleteUser(userID);
     }
@@ -229,7 +233,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be enabled
      */
     @MCRCommand(
-        syntax = "enable user {0}", help = "Enables the user for the access.", order = 60)
+        syntax = "enable user {0}",
+        help = "Enables the user for the access.",
+        order = 60)
     public static void enableUser(String userID) throws Exception {
         MCRUser mcrUser = MCRUserManager.getUser(userID);
         mcrUser.enableLogin();
@@ -278,7 +284,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be enabled
      */
     @MCRCommand(
-        syntax = "disable user {0}", help = "Disables access of the user {0}", order = 70)
+        syntax = "disable user {0}",
+        help = "Disables access of the user {0}",
+        order = 70)
     public static void disableUser(String userID) throws Exception {
         MCRUser mcrUser = MCRUserManager.getUser(userID);
         mcrUser.disableLogin();
@@ -290,7 +298,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * datastore.
      */
     @MCRCommand(
-        syntax = "list all users", help = "Lists all users.", order = 160)
+        syntax = "list all users",
+        help = "Lists all users.",
+        order = 160)
     public static void listAllUsers() throws Exception {
         List<MCRUser> users = MCRUserManager.listUsers(null, null, null);
 
@@ -304,7 +314,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * persistent datastore.
      */
     @MCRCommand(
-        syntax = "list all roles", help = "List all roles.", order = 140)
+        syntax = "list all roles",
+        help = "List all roles.",
+        order = 140)
     public static void listAllRoles() throws Exception {
         List<MCRRole> roles = MCRRoleManager.listSystemRoles();
 
@@ -354,13 +366,15 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "import all users from directory {0}", help = "Imports all users from directory {0}.")
+        syntax = "import all users from directory {0}",
+        help = "Imports all users from directory {0}.")
     public static List<String> importAllUsersFromDirectory(String directory) throws FileNotFoundException {
         return batchLoadFromDirectory("import user from file", directory);
     }
 
     @MCRCommand(
-        syntax = "update all users from directory {0}", help = "Updates all users from directory {0}.")
+        syntax = "update all users from directory {0}",
+        help = "Updates all users from directory {0}.")
     public static List<String> updateAllUsersFromDirectory(String directory) throws FileNotFoundException {
         return batchLoadFromDirectory("update user from file", directory);
     }
@@ -392,7 +406,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            Name of the file to import user from
      */
     @MCRCommand(
-        syntax = "import user from file {0}", help = "Imports a user from file {0}.")
+        syntax = "import user from file {0}",
+        help = "Imports a user from file {0}.")
     public static void importUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser user = getMCRUserFromFile(filename);
         if (MCRUserManager.exists(user.getUserName(), user.getRealmID())) {
@@ -426,7 +441,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the role for which the XML-representation is needed
      */
     @MCRCommand(
-        syntax = "list role {0}", help = "Lists the role {0}.", order = 150)
+        syntax = "list role {0}",
+        help = "Lists the role {0}.",
+        order = 150)
     public static void listRole(String roleID) throws MCRException {
         MCRRole role = MCRRoleManager.getRole(roleID);
         listRole(role);
@@ -453,7 +470,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user for which the XML-representation is needed
      */
     @MCRCommand(
-        syntax = "list user {0}", help = "Lists the user {0}.", order = 170)
+        syntax = "list user {0}",
+        help = "Lists the user {0}.",
+        order = 170)
     public static void listUser(String userID) throws MCRException {
         MCRUser user = MCRUserManager.getUser(userID);
         listUser(user);
@@ -515,7 +534,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *             if file could not be parsed
      */
     @MCRCommand(
-        syntax = "update user from file {0}", help = "Updates a user from file {0}.", order = 200)
+        syntax = "update user from file {0}",
+        help = "Updates a user from file {0}.",
+        order = 200)
     public static void updateUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.updateUser(user);

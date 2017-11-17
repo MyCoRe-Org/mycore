@@ -82,7 +82,7 @@ public class MCRThumbnailServlet extends MCRServlet {
     private int thumbnailSize = MCRImage.getTileSize();
 
     private static transient LoadingCache<String, Long> modifiedCache = CacheBuilder.newBuilder().maximumSize(5000)
-                                                                                    .expireAfterWrite(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS).weakKeys().build(new CacheLoader<String, Long>() {
+        .expireAfterWrite(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS).weakKeys().build(new CacheLoader<String, Long>() {
             @Override
             public Long load(String id) throws Exception {
                 ThumnailInfo thumbnailInfo = getThumbnailInfo(id);

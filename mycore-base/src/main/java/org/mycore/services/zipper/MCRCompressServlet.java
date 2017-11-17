@@ -238,8 +238,9 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
      * @param path absolute path
      */
     protected String getFilename(MCRPath path) {
-        return path.getNameCount() == 0 ? path.getOwner() : path.getOwner() + '/'
-            + path.getRoot().relativize(path);
+        return path.getNameCount() == 0 ? path.getOwner()
+            : path.getOwner() + '/'
+                + path.getRoot().relativize(path);
     }
 
     protected abstract void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs, T container)

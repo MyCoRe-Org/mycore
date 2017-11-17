@@ -218,7 +218,8 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         for (MCRFileMetadata metadata : fileMetadata) {
             String fileURN = metadata.getUrn();
             if (fileURN != null) {
-                LOGGER.info(MessageFormat.format("load file urn : %s, %s, %s", fileURN, derivateID, metadata.getName()));
+                LOGGER
+                    .info(MessageFormat.format("load file urn : %s, %s, %s", fileURN, derivateID, metadata.getName()));
                 MCRURNManager.assignURN(fileURN, derivateID.toString(), metadata.getName());
             }
         }

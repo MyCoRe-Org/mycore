@@ -26,7 +26,7 @@ public abstract class MCRSolrObjectStreamIndexHandler extends MCRSolrAbstractStr
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrObjectStreamIndexHandler.class);
 
     static final String STYLESHEET = MCRConfiguration.instance()
-                                                     .getString(CONFIG_PREFIX + "IndexHandler.ContentStream.ServerStyleSheet");
+        .getString(CONFIG_PREFIX + "IndexHandler.ContentStream.ServerStyleSheet");
 
     public MCRSolrObjectStreamIndexHandler() {
         this(null);

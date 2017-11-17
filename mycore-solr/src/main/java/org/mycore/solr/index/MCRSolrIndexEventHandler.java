@@ -53,11 +53,13 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexEventHandler.class);
 
-    @Override protected synchronized void handleObjectCreated(MCREvent evt, MCRObject obj) {
+    @Override
+    protected synchronized void handleObjectCreated(MCREvent evt, MCRObject obj) {
         addObject(evt, obj);
     }
 
-    @Override protected synchronized void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+    @Override
+    protected synchronized void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         if (MCRSolrUtils.useNestedDocuments()) {
             solrDelete(obj.getId());
         }
@@ -72,7 +74,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         addObject(evt, obj);
     }
 
-    @Override protected synchronized void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+    @Override
+    protected synchronized void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         solrDelete(obj.getId());
     }
 
@@ -124,7 +127,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
-        MCRSessionMgr.getCurrentSession().onCommit(() -> MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
+        MCRSessionMgr.getCurrentSession()
+            .onCommit(() -> MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
                 MCRSolrIndexer.HIGH_PRIORITY));
     }
 

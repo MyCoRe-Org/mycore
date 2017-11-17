@@ -60,11 +60,13 @@ public class MCRMetsTestUtil {
         }
     }
 
-    @SafeVarargs public static <T> boolean comparer(Comparator<T> comparator, T object, T... withList) {
+    @SafeVarargs
+    public static <T> boolean comparer(Comparator<T> comparator, T object, T... withList) {
         return Arrays.stream(withList).noneMatch(with -> comparator.compare(object, with) != 0);
     }
 
-    @SafeVarargs public static <T, R> List<R> bulk(BulkOperation<T, R> op, T... on) {
+    @SafeVarargs
+    public static <T, R> List<R> bulk(BulkOperation<T, R> op, T... on) {
         return Arrays.asList(on).stream().map(op::doOperation).collect(toList());
     }
 
@@ -92,16 +94,16 @@ public class MCRMetsTestUtil {
 
     private static void buildSimpleModelPages(MCRMetsSimpleModel metsSimpleModel) {
         MCRMetsPage metsPage1 = new MCRMetsPage("1_P", "1", "URN:special-urn1");
-        metsPage1.getFileList().add(new MCRMetsFile("1_M","1.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
+        metsPage1.getFileList().add(new MCRMetsFile("1_M", "1.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
         metsPage1.getFileList().add(new MCRMetsFile("1_A", "1.xml", "text/xml", MCRMetsFileUse.ALTO));
 
         MCRMetsPage metsPage2 = new MCRMetsPage("2_P", "2", "URN:special-urn2");
         metsPage2.getFileList().add(new MCRMetsFile("2_M", "2.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
-        metsPage2.getFileList().add(new MCRMetsFile("2_A","2.xml", "text/xml", MCRMetsFileUse.ALTO));
+        metsPage2.getFileList().add(new MCRMetsFile("2_A", "2.xml", "text/xml", MCRMetsFileUse.ALTO));
 
-        MCRMetsPage metsPage3 = new MCRMetsPage("3_P","3", "URN:special-urn3");
-        metsPage3.getFileList().add(new MCRMetsFile("3_M","3.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
-        metsPage3.getFileList().add(new MCRMetsFile("3_A","3.xml", "text/xml", MCRMetsFileUse.ALTO));
+        MCRMetsPage metsPage3 = new MCRMetsPage("3_P", "3", "URN:special-urn3");
+        metsPage3.getFileList().add(new MCRMetsFile("3_M", "3.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
+        metsPage3.getFileList().add(new MCRMetsFile("3_A", "3.xml", "text/xml", MCRMetsFileUse.ALTO));
 
         metsSimpleModel.getMetsPageList().add(metsPage1);
         metsSimpleModel.getMetsPageList().add(metsPage2);
@@ -109,7 +111,7 @@ public class MCRMetsTestUtil {
     }
 
     private static void builSimpleModelSections(MCRMetsSimpleModel metsSimpleModel) {
-        MCRMetsSection rootSection = new MCRMetsSection("root","testRootType", "testRootLabel", null);
+        MCRMetsSection rootSection = new MCRMetsSection("root", "testRootType", "testRootLabel", null);
         metsSimpleModel.setRootSection(rootSection);
 
         MCRMetsSection subSection1 = new MCRMetsSection("sub1", "subSection", "subSection1Label", rootSection);

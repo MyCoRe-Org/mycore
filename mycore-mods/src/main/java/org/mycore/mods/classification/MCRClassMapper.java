@@ -170,7 +170,8 @@ public class MCRClassMapper {
 
     public static void assignCategory(org.jdom2.Element modsElement, MCRCategoryID categID) {
         MCRAuthorityInfo authInfo = modsElement.getNamespace().equals(MCRConstants.MODS_NAMESPACE)
-            ? getAuthInfo(categID, modsElement.getName()) : null;
+            ? getAuthInfo(categID, modsElement.getName())
+            : null;
         if (authInfo == null) {
             throw new MCRException(modsElement.getQualifiedName() + " could not be assigned to category " + categID);
         }
@@ -179,7 +180,8 @@ public class MCRClassMapper {
 
     public static void assignCategory(Element modsElement, MCRCategoryID categID) {
         MCRAuthorityInfo authInfo = modsElement.getNamespaceURI().equals(MCRConstants.MODS_NAMESPACE.getURI())
-            ? getAuthInfo(categID, modsElement.getLocalName()) : null;
+            ? getAuthInfo(categID, modsElement.getLocalName())
+            : null;
         if (authInfo == null) {
             throw new MCRException(modsElement.getTagName() + " could not be assigned to category " + categID);
         }

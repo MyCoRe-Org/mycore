@@ -14,7 +14,8 @@ import org.mycore.common.config.MCRConfiguration;
  * @author Thomas Scheffler
  */
 @Plugin(
-    name = "mcrcfg", category = StrLookup.CATEGORY)
+    name = "mcrcfg",
+    category = StrLookup.CATEGORY)
 public class MCRConfigurationLookup implements StrLookup {
 
     @Override

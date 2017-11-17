@@ -147,7 +147,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
 
                                 fmaps.stream().filter(mapping -> mapping.getChildText("filter-name", ns).equals(name))
                                     .findFirst().ifPresent(mapping -> {
-                                    LOGGER.info("Register Filter {} ({})...", name, className);
+                                        LOGGER.info("Register Filter {} ({})...", name, className);
                                         Optional.ofNullable(servletContext.addFilter(name, className))
                                             .<Runnable> map(fr -> () -> {
                                                 final List<Element> dispatchers = mapping
@@ -207,12 +207,13 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                         LOGGER.info("Register Servlet {} ({})...", name, className);
                                         Optional.ofNullable(servletContext.addServlet(name, className))
                                             .<Runnable> map(sr -> () -> mapping.getChildren("url-pattern", ns).stream()
-                                                                           .forEach(url -> {
-                                                                               LOGGER.info("...add url mapping: {}",
-                                                                                   url.getTextTrim());
+                                                .forEach(url -> {
+                                                    LOGGER.info("...add url mapping: {}",
+                                                        url.getTextTrim());
                                                     sr.addMapping(url.getTextTrim());
-                                                })).orElse(() -> LOGGER.error("Servlet{} already registered!", name))
-                                                       .run();
+                                                }))
+                                            .orElse(() -> LOGGER.error("Servlet{} already registered!", name))
+                                            .run();
                                     });
                             });
                         } catch (IOException | JDOMException e) {

@@ -327,8 +327,8 @@ public class MCRSession implements Cloneable {
 
     @Override
     public String toString() {
-        String sb =
-            "MCRSession[" + getID() + ",user:'" + getUserInformation().getUserID() + "',ip:" + getCurrentIP() + "]";
+        String sb = "MCRSession[" + getID() + ",user:'" + getUserInformation().getUserID() + "',ip:" + getCurrentIP()
+            + "]";
         return sb;
     }
 

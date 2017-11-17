@@ -13,11 +13,11 @@ public class MCRAltoHighlightResourceTest {
         assertEquals("alto_content:Jena alto_content:Stadt", r.buildQuery("Jena Stadt"));
         assertEquals("alto_content:\"Jena Stadt\"", r.buildQuery("\"Jena Stadt\""));
         assertEquals("alto_content:Berlin alto_content:\"Jena Stadt\" alto_content:Hamburg",
-                r.buildQuery("Berlin \"Jena Stadt\" Hamburg"));
+            r.buildQuery("Berlin \"Jena Stadt\" Hamburg"));
         assertEquals("alto_content:\"Berlin Hamburg\" alto_content:\"Jena Stadt\"",
-                r.buildQuery("\"Berlin Hamburg\" \"Jena Stadt\""));
+            r.buildQuery("\"Berlin Hamburg\" \"Jena Stadt\""));
         assertEquals("alto_content:Berlin alto_content:\"Jena Stadt\" alto_content:Hamburg",
-                r.buildQuery("Berlin   \"Jena Stadt\"     Hamburg"));
+            r.buildQuery("Berlin   \"Jena Stadt\"     Hamburg"));
     }
 
 }

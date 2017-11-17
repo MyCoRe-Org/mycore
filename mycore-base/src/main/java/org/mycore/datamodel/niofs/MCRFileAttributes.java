@@ -80,7 +80,8 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
 
     public static <T> MCRFileAttributes<T> file(final T filekey, final long size, final String md5sum,
         final FileTime creationTime, final FileTime lastModified, final FileTime lastAccessTime) {
-        return new MCRFileAttributes<>(fileType.file, size, filekey, md5sum, creationTime, lastModified, lastAccessTime);
+        return new MCRFileAttributes<>(fileType.file, size, filekey, md5sum, creationTime, lastModified,
+            lastAccessTime);
     }
 
     /* (non-Javadoc)

@@ -56,15 +56,15 @@ class MCRFieldTransformer {
     /** Converts german umlauts and other special LaTeX characters */
     protected String normalizeValue(String value) {
         return value.replaceAll("\\s+", " ").trim().replace("{\\\"a}", "\u00e4").replace("{\\\"o}", "\u00f6")
-                .replace("{\\\"u}", "\u00fc").replace("{\\\"A}", "\u00c4").replace("{\\\"O}", "\u00d6")
-                .replace("{\\\"U}", "\u00dc").replace("{\\ss}", "\u00df").replace("\\\"a", "\u00e4")
-                .replace("\\\"o", "\u00f6").replace("\\\"u", "\u00fc").replace("\\\"A", "\u00c4")
-                .replace("\\\"O", "\u00d6").replace("\\\"U", "\u00dc").replace("{\\'a}", "\u00e1")
-                .replace("{\\'e}", "\u00e9").replace("{\\'i}", "\u00ed").replace("{\\'o}", "\u00f3")
-                .replace("{\\'u}", "\u00fa").replace("{\\`a}", "\u00e0").replace("{\\`e}", "\u00e8")
-                .replace("{\\`i}", "\u00ec").replace("{\\`o}", "\u00f2").replace("{\\`u}", "\u00f9")
-                .replace("{\\'\\i}", "\u00ed").replace("{\\`\\i}", "\u00ec").replace("{", "").replace("}", "")
-                .replace("---", "-").replace("--", "-");
+            .replace("{\\\"u}", "\u00fc").replace("{\\\"A}", "\u00c4").replace("{\\\"O}", "\u00d6")
+            .replace("{\\\"U}", "\u00dc").replace("{\\ss}", "\u00df").replace("\\\"a", "\u00e4")
+            .replace("\\\"o", "\u00f6").replace("\\\"u", "\u00fc").replace("\\\"A", "\u00c4")
+            .replace("\\\"O", "\u00d6").replace("\\\"U", "\u00dc").replace("{\\'a}", "\u00e1")
+            .replace("{\\'e}", "\u00e9").replace("{\\'i}", "\u00ed").replace("{\\'o}", "\u00f3")
+            .replace("{\\'u}", "\u00fa").replace("{\\`a}", "\u00e0").replace("{\\`e}", "\u00e8")
+            .replace("{\\`i}", "\u00ec").replace("{\\`o}", "\u00f2").replace("{\\`u}", "\u00f9")
+            .replace("{\\'\\i}", "\u00ed").replace("{\\`\\i}", "\u00ec").replace("{", "").replace("}", "")
+            .replace("---", "-").replace("--", "-");
     }
 
     void transformField(BibtexEntry entry, Element parent) {

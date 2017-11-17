@@ -123,9 +123,11 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     public synchronized MCRMediaObject parse(File file) throws Exception {
         throw new Exception("File is'n supported by ViewSource Parser");
     }
+
     public synchronized MCRMediaObject parse(org.mycore.datamodel.ifs.MCRFile file) throws Exception {
         return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
     }
+
     private MCRMediaObject setFileInfo(MCRMediaObject media, File file) {
         media.fileName = file.getName();
         String path = file.getAbsolutePath();

@@ -93,9 +93,10 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
             registrationService.isCreated(id, ""));
 
         Assert.assertTrue("There should be one resolver", MCRPersistentIdentifierManager.getInstance()
-                                                                                        .getResolvers().stream()
-                                                                                        .filter(r -> r.getName()
-                                                                                                                                                                              .equals(MCRMockResolver.NAME)).count() > 0);
+            .getResolvers().stream()
+            .filter(r -> r.getName()
+                .equals(MCRMockResolver.NAME))
+            .count() > 0);
 
     }
 
@@ -105,8 +106,8 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
 
         long numOfUnregisteredPI = (long) MCRPersistentIdentifierManager.getInstance()
-                                                                        .getUnregisteredIdentifiers("Unregistered")
-                                                                        .size();
+            .getUnregisteredIdentifiers("Unregistered")
+            .size();
 
         Assert.assertEquals("Wrong number of unregistered PI: ", 2, numOfUnregisteredPI);
     }

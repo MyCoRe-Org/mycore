@@ -376,7 +376,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             LOGGER.info("Transformer lastModified: {}", transformerLastModified);
             LOGGER.info("Source lastModified     : {}", source.lastModified());
             this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0)
-                ? Math.max(transformerLastModified, source.lastModified()) : -1;
+                ? Math.max(transformerLastModified, source.lastModified())
+                : -1;
             this.eTag = generateETag(source, lastModified, parameter.hashCode());
             this.name = fileName;
             this.mimeType = mimeType;

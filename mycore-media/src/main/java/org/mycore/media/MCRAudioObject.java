@@ -96,7 +96,8 @@ public class MCRAudioObject extends MCRMediaObject {
     public int getStreamBitRate() {
         //currently only video can be a parent
         int calcBitRate = (parentContainer != null
-            ? ((MCRVideoObject) parentContainer).bitRate - ((MCRVideoObject) parentContainer).streamBitRate : 0);
+            ? ((MCRVideoObject) parentContainer).bitRate - ((MCRVideoObject) parentContainer).streamBitRate
+            : 0);
 
         return (streamBitRate != 0 ? streamBitRate : calcBitRate);
     }
@@ -130,7 +131,8 @@ public class MCRAudioObject extends MCRMediaObject {
         out += "Type             : " + type + "\n";
         out += (mimeType != null ? "mimeType         : " + mimeType + "\n" : "");
         out += (format != null
-            ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n" : "");
+            ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n"
+            : "");
         out += "Format           : " + subFormat + (subFormatFull != null ? " (" + subFormatFull + ")" : "") + "\n";
         out += "Codec            : " + codec + (codecFull != null ? " - " + codecFull : "")
             + (codecURL != null ? " (" + codecURL + ")" : "") + "\n";
@@ -138,7 +140,8 @@ public class MCRAudioObject extends MCRMediaObject {
         out += "Duration         : " + duration + "\n";
 
         int calcBitRate = (parentContainer != null
-            ? ((MCRVideoObject) parentContainer).bitRate - ((MCRVideoObject) parentContainer).streamBitRate : 0);
+            ? ((MCRVideoObject) parentContainer).bitRate - ((MCRVideoObject) parentContainer).streamBitRate
+            : 0);
         if (streamBitRate != 0)
             out += "BitRate          : " + streamBitRate + (streamBitRateMode != null ? " @ " + streamBitRateMode : "")
                 + "\n";

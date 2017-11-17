@@ -52,7 +52,7 @@ class MCRBibTeXFileTransformer {
                 BibtexEntry entry = (BibtexEntry) obj;
                 if (entry.getFields().isEmpty()) {
                     MCRMessageLogger.logMessage("Skipping entry of type " + entry.getEntryType() + ", has no fields",
-                            collection);
+                        collection);
                 } else {
                     collection.addContent(transformer.transform(entry));
                 }

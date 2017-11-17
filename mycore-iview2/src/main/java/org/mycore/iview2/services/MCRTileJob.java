@@ -20,11 +20,13 @@ import javax.persistence.UniqueConstraint;
  *
  */
 @Entity
-@Table(name = "MCRTileJob", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "derivate", "path" }),
-}, indexes = {
-    @Index(columnList = "derivate,status")
-})
+@Table(name = "MCRTileJob",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "derivate", "path" }),
+    },
+    indexes = {
+        @Index(columnList = "derivate,status")
+    })
 @NamedQueries({
     @NamedQuery(name = "MCRTileJob.all",
         query = "SELECT job FROM MCRTileJob as job"),

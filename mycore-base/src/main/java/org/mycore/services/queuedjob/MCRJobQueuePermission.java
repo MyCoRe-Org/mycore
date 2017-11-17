@@ -51,7 +51,8 @@ public class MCRJobQueuePermission implements MCRResourceAccessChecker {
     @Override
     public boolean isPermitted(ContainerRequestContext request) {
         String queueName = request.getUriInfo().getPathSegments().size() > 1
-            ? request.getUriInfo().getPathSegments().get(1).getPath() : null;
+            ? request.getUriInfo().getPathSegments().get(1).getPath()
+            : null;
         try {
             if (queueName == null || queueName.isEmpty()) {
                 return MCRAccessManager.checkPermission(PERMISSION_LIST);

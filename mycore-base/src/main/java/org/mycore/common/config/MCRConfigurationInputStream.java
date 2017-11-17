@@ -97,7 +97,7 @@ public class MCRConfigurationInputStream extends InputStream {
         InputStream initStream = null;
         if (configurationDirectory != null) {
             LogManager.getLogger()
-                      .info("Current configuration directory: {}", configurationDirectory.getAbsolutePath());
+                .info("Current configuration directory: {}", configurationDirectory.getAbsolutePath());
             //set MCR.basedir, is normally overwritten later
             if (configurationDirectory.isDirectory()) {
                 initStream = getBaseDirInputStream(configurationDirectory);

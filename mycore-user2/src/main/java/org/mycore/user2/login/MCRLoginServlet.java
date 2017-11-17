@@ -76,7 +76,8 @@ public class MCRLoginServlet extends MCRServlet {
 
     private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
 
-    protected static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(HTTPS_ONLY_PROPERTY);
+    protected static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance()
+        .getBoolean(HTTPS_ONLY_PROPERTY);
 
     private static Logger LOGGER = LogManager.getLogger();
 

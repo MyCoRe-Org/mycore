@@ -112,7 +112,8 @@ public class MCRMetsCommands extends MCRAbstractCommands {
         if (!Files.exists(metsFile)) {
             try {
                 LOGGER.debug("Start MCRMETSGenerator for derivate {}", derivateID);
-                Document mets = MCRMETSGeneratorFactory.create(MCRPath.getPath(derivateID, "/")).generate().asDocument();
+                Document mets = MCRMETSGeneratorFactory.create(MCRPath.getPath(derivateID, "/")).generate()
+                    .asDocument();
                 MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivateID));
                 LOGGER.debug("Stop MCRMETSGenerator for derivate {}", derivateID);
             } catch (Exception e) {

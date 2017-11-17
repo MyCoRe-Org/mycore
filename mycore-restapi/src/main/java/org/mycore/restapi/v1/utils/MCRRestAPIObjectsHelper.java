@@ -96,6 +96,7 @@ import com.google.gson.stream.JsonWriter;
  */
 public class MCRRestAPIObjectsHelper {
     private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
     private static final String GENERAL_ERROR_MSG = "A problem occured while fetching the data.";
 
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPIObjectsHelper.class);
@@ -517,29 +518,29 @@ public class MCRRestAPIObjectsHelper {
         //Parameters are checked - continue to retrieve data
 
         List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrObjID).getStructure().getDerivates().stream()
-                                                                      .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> new MCRObjectIDDate() {
-                                                                          long lastModified;
-                                                                          {
-                                                                              try {
-                                                                                  lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
-                                                                              } catch (IOException e) {
-                                                                                  lastModified = 0;
-                                                                                  LOGGER.error(
-                                                                                      "Exception while getting last modified of {}",
-                                                                                      id, e);
-                                                                              }
-                                                                          }
+            .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> new MCRObjectIDDate() {
+                long lastModified;
+                {
+                    try {
+                        lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+                    } catch (IOException e) {
+                        lastModified = 0;
+                        LOGGER.error(
+                            "Exception while getting last modified of {}",
+                            id, e);
+                    }
+                }
 
-                                                                          @Override
-                                                                          public String getId() {
-                                                                              return id.toString();
-                                                                          }
+                @Override
+                public String getId() {
+                    return id.toString();
+                }
 
-                                                                          @Override
-                                                                          public Date getLastModified() {
-                                                                              return new Date(lastModified);
-                                                                          }
-                                                                      }).sorted(new MCRRestAPISortObjectComparator(sortObj)::compare).collect(Collectors.toList());
+                @Override
+                public Date getLastModified() {
+                    return new Date(lastModified);
+                }
+            }).sorted(new MCRRestAPISortObjectComparator(sortObj)::compare).collect(Collectors.toList());
 
         String authHeader = MCRJSONWebTokenUtil
             .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
@@ -649,25 +650,27 @@ public class MCRRestAPIObjectsHelper {
                 return responseBuilder.header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
             switch (format) {
-            case MCRRestAPIObjects.FORMAT_XML:
-                Document docOut = listDerivateContentAsXML(derObj, path, depth, info);
-                try (StringWriter sw = new StringWriter()) {
-                    XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-                    xout.output(docOut, sw);
-                    return response(sw.toString(), "application/xml", lastModified, authHeader);
-                } catch (IOException e) {
+                case MCRRestAPIObjects.FORMAT_XML:
+                    Document docOut = listDerivateContentAsXML(derObj, path, depth, info);
+                    try (StringWriter sw = new StringWriter()) {
+                        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+                        xout.output(docOut, sw);
+                        return response(sw.toString(), "application/xml", lastModified, authHeader);
+                    } catch (IOException e) {
+                        throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+                            new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG,
+                                e.getMessage()));
+                    }
+                case MCRRestAPIObjects.FORMAT_JSON:
+                    if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
+                        String result = listDerivateContentAsJson(derObj, path, depth, info);
+                        return response(result, "application/json", lastModified, authHeader);
+                    }
+                default:
                     throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                        new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
-                }
-            case MCRRestAPIObjects.FORMAT_JSON:
-                if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-                    String result = listDerivateContentAsJson(derObj, path, depth, info);
-                    return response(result, "application/json", lastModified, authHeader);
-                }
-            default:
-                throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Unexepected program flow termination.",
-                        "Please contact a developer!"));
+                        new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
+                            "Unexepected program flow termination.",
+                            "Please contact a developer!"));
             }
         } catch (IOException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(

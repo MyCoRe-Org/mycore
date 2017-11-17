@@ -96,7 +96,7 @@ public class MCRAltoHighlightResource {
             return Response.ok().entity(new Gson().toJson(response)).build();
         } catch (Exception exc) {
             throw new WebApplicationException("Unable to highlight '" + query + "' of derivate " + derivateId, exc,
-                    Response.Status.INTERNAL_SERVER_ERROR);
+                Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
 

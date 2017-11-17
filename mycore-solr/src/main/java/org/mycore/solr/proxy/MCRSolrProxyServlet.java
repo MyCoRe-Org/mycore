@@ -229,7 +229,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     private void updateQueryHandlerMap() {
         List<String> whitelistPropertyList = MCRConfiguration.instance().getStrings("MCR.Module-solr.Proxy.WhiteList",
-                Collections.singletonList("/select"));
+            Collections.singletonList("/select"));
         this.queryHandlerWhitelist = new HashSet<>(whitelistPropertyList);
     }
 

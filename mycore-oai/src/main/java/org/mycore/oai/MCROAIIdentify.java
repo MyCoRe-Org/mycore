@@ -129,7 +129,7 @@ public class MCROAIIdentify extends SimpleIdentify {
     protected Instant calculateEarliestTimestamp() {
         MCROAISearcher searcher = MCROAISearchManager.getSearcher(this, null, 1, null, null);
         return searcher.getEarliestTimestamp().orElse(DateUtils
-                .parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01")));
+            .parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01")));
     }
 
 }

@@ -533,7 +533,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @throws TransformerException
      * @throws IOException
      */
-    private static void exportDerivate(File dir, Transformer trans, String nid) throws TransformerException, IOException {
+    private static void exportDerivate(File dir, Transformer trans, String nid)
+        throws TransformerException, IOException {
         // store the XML file
         Document xml = null;
         MCRDerivate obj;

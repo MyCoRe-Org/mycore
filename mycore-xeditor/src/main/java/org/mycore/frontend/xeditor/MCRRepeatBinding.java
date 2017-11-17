@@ -22,7 +22,7 @@ public class MCRRepeatBinding extends MCRBinding {
     private int maxRepeats;
 
     private static final String DEFAULT_METHOD = MCRConfiguration.instance()
-                                                                 .getString("MCR.XEditor.InsertTarget.DefaultMethod", "build");
+        .getString("MCR.XEditor.InsertTarget.DefaultMethod", "build");
 
     private String method = DEFAULT_METHOD; // build|clone
 

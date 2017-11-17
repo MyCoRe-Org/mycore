@@ -209,14 +209,13 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         TypedQuery<MCRTileJob> allTileJobQuery = em.createNamedQuery("MCRTileJob.all", MCRTileJob.class);
         List<MCRTileJob> tiles = allTileJobQuery.getResultList();
         tiles.stream()
-            .filter(tj->{
+            .filter(tj -> {
                 MCRPath path = MCRPath.getPath(tj.getDerivate(), tj.getPath());
                 return !Files.exists(path);
             })
-            .peek(tj->LOGGER.info("Delete TileJob {}:{}", tj.getDerivate(), tj.getPath()))
+            .peek(tj -> LOGGER.info("Delete TileJob {}:{}", tj.getDerivate(), tj.getPath()))
             .forEach(em::remove);
     }
-
 
     /**
      * checks and repairs tile of this derivate.

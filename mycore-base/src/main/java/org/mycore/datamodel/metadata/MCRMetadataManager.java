@@ -201,7 +201,7 @@ public final class MCRMetadataManager {
         byte[] objectBackup;
         try {
             objectBackup = MCRXMLMetadataManager.instance().retrieveBLOB(objid);
-        } catch(IOException ioExc) {
+        } catch (IOException ioExc) {
             throw new MCRPersistenceException("Unable to retrieve xml blob of " + objid);
         }
         if (objectBackup == null) {
@@ -246,12 +246,12 @@ public final class MCRMetadataManager {
                     BasicFileAttributes attrs = Files.readAttributes(rootPath, BasicFileAttributes.class);
                     if (!(attrs.fileKey() instanceof String)) {
                         throw new MCRPersistenceException(
-                                "Cannot get ID from newely created directory, as it is not a String." + rootPath);
+                            "Cannot get ID from newely created directory, as it is not a String." + rootPath);
                     }
                     mcrDerivate.getDerivate().getInternals().setIFSID(attrs.fileKey().toString());
                 } catch (IOException ioExc) {
                     throw new MCRPersistenceException(
-                            "Cannot create root of '" + rootPath.getOwner() + "' or read the file attributes.", ioExc);
+                        "Cannot create root of '" + rootPath.getOwner() + "' or read the file attributes.", ioExc);
                 }
             } else {
                 final String sourcepath = mcrDerivate.getDerivate().getInternals().getSourcePath();
@@ -291,7 +291,7 @@ public final class MCRMetadataManager {
             }
             Files.walkFileTree(rootPath, MCRRecursiveDeleter.instance());
             rootPath.getFileSystem().removeRoot(derivateID);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new MCRPersistenceException("Unable to delete derivate " + derivateID, exc);
         }
     }
@@ -304,10 +304,10 @@ public final class MCRMetadataManager {
             }
             rootPath.getFileSystem().createRoot(derivateID);
             Files.walkFileTree(sourceDir, new MCRTreeCopier(sourceDir, rootPath));
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new MCRPersistenceException(
-                    "Unable to import derivate " + derivateID + " from source " + sourceDir.toAbsolutePath(),
-                    exc);
+                "Unable to import derivate " + derivateID + " from source " + sourceDir.toAbsolutePath(),
+                exc);
         }
     }
 
@@ -487,7 +487,7 @@ public final class MCRMetadataManager {
                 continue;
             }
             MCRMetadataManager.deleteMCRObject(childId, (MCRObject o, MCRObjectID p) -> {
-                 // Do nothing with the parent, because its removed anyway.
+                // Do nothing with the parent, because its removed anyway.
             });
         }
 
@@ -811,8 +811,9 @@ public final class MCRMetadataManager {
                 Files.walkFileTree(sourcePath, new MCRTreeCopier(sourcePath, targetPath));
             } catch (Exception exc) {
                 throw new MCRPersistenceException(
-                        "Unable to update IFS. Copy failed from " + sourcePath.toAbsolutePath()
-                                + " to target " + targetPath.toAbsolutePath(), exc);
+                    "Unable to update IFS. Copy failed from " + sourcePath.toAbsolutePath()
+                        + " to target " + targetPath.toAbsolutePath(),
+                    exc);
             }
         }
 

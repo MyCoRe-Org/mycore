@@ -171,7 +171,7 @@ public class MCRRSSFeedImporter {
     }
 
     private MCRObject handleFeedEntry(SyndEntry entry, String projectID)
-            throws MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException {
         String publicationID = getPublicationID(entry);
         if (publicationID == null) {
             return null;

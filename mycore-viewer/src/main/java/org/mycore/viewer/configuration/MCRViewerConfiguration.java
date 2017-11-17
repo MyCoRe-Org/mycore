@@ -138,7 +138,7 @@ public class MCRViewerConfiguration {
     public static String getFilePath(HttpServletRequest request) {
         try {
             String fromPath = getFromPath(request.getPathInfo(), 2);
-            if(fromPath == null || fromPath.isEmpty() || fromPath.equals("/")){
+            if (fromPath == null || fromPath.isEmpty() || fromPath.equals("/")) {
                 String derivate = getDerivate(request);
                 MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
                 String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();

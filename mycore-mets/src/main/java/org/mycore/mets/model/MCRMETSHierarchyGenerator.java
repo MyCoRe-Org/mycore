@@ -220,7 +220,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
             // set fLocat
             String path = file.getKey().getOwnerRelativePath().substring(1);
             try {
-                final String href = MCRXMLFunctions.encodeURIPath(path,true);
+                final String href = MCRXMLFunctions.encodeURIPath(path, true);
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
                 metsFile.setFLocat(fLocat);
             } catch (URISyntaxException uriSyntaxException) {
@@ -268,7 +268,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
     protected Optional<String> getOrderLabel(String fileId) {
         return getOldMets().map(oldMets -> {
             PhysicalSubDiv subDiv = oldMets.getPhysicalStructMap().getDivContainer().byFileId(fileId);
-            if(subDiv == null) {
+            if (subDiv == null) {
                 LOGGER.error("Unable to get @ORDERLABEL of physical div '{}'.", fileId);
                 return null;
             }

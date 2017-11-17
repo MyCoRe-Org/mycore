@@ -280,8 +280,8 @@ public class MCRDirectory extends MCRFilesystemNode {
                 return hasParent() ? getParent() : null;
             default:
                 return Optional.ofNullable(children)
-                               .map(m -> m.get(name))
-                               .orElseGet(() -> manager.retrieveChild(ID, name));
+                    .map(m -> m.get(name))
+                    .orElseGet(() -> manager.retrieveChild(ID, name));
         }
     }
 

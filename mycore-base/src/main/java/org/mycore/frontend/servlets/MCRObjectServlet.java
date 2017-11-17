@@ -84,8 +84,9 @@ public class MCRObjectServlet extends MCRContentServlet {
         if (revision != null) {
             rev = Long.parseLong(revision);
         }
-        MCRContent localObject = (rev == REV_CURRENT) ? requestLocalObject(mcrid, resp) : requestVersionedObject(mcrid,
-            resp, rev);
+        MCRContent localObject = (rev == REV_CURRENT) ? requestLocalObject(mcrid, resp)
+            : requestVersionedObject(mcrid,
+                resp, rev);
         if (localObject == null) {
             return null;
         }

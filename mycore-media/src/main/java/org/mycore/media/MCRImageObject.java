@@ -98,7 +98,8 @@ public class MCRImageObject extends MCRMediaObject {
         out += "Type             : " + type + "\n";
         out += (mimeType != null ? "mimeType         : " + mimeType + "\n" : "");
         out += (format != null
-            ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n" : "");
+            ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n"
+            : "");
         out += "Format           : " + subFormat + (subFormatFull != null ? " (" + subFormatFull + ")" : "") + "\n";
         out += "Codec            : " + codec + (codecFull != null ? " - " + codecFull : "")
             + (codecURL != null ? " (" + codecURL + ")" : "") + "\n";

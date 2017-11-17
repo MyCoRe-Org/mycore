@@ -53,8 +53,8 @@ public class MCRTransferPackageCommands {
             throw new FileNotFoundException(directory + " does not exist or is not a directory.");
         }
         List<String> importStatements = new LinkedList<>();
-        try (Stream<Path> stream = Files.find(dir, 0, (path, attr) ->
-            String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
+        try (Stream<Path> stream = Files.find(dir, 0,
+            (path, attr) -> String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
             stream.map(Path::toAbsolutePath).map(Path::toString).forEach(path -> {
                 String subCommand = MessageFormat.format("import transfer package from tar {0}", path);
                 importStatements.add(subCommand);
@@ -119,8 +119,9 @@ public class MCRTransferPackageCommands {
     public static List<String> _importObject(String objectId, String targetDirectoryPath) throws Exception {
         Path targetDirectory = Paths.get(targetDirectoryPath);
         List<String> derivates = MCRTransferPackageUtil.importObjectCLI(targetDirectory, objectId);
-        return derivates.stream().map(derId ->
-            "_import transfer package derivate " + derId + " from " + targetDirectoryPath).collect(Collectors.toList());
+        return derivates.stream()
+            .map(derId -> "_import transfer package derivate " + derId + " from " + targetDirectoryPath)
+            .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "_import transfer package derivate {0} from {1}")

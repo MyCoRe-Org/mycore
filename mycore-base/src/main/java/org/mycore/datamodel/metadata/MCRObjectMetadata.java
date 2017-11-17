@@ -304,7 +304,8 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
         // waiting for https://bugs.openjdk.java.net/browse/JDK-8050820
         return metadata.map(
             mcrMetaInterfaces -> StreamSupport.stream(mcrMetaInterfaces.spliterator(), false).map(metaInterface -> {
-                @SuppressWarnings("unchecked") T t = (T) metaInterface;
+                @SuppressWarnings("unchecked")
+                T t = (T) metaInterface;
                 return t;
             })).orElseGet(Stream::empty);
     }

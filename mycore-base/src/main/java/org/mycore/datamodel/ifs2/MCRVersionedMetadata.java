@@ -88,12 +88,12 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         super(store, fo, id, docType);
         super.deleted = deleted;
         revision = () -> {
-        try {
-            // 1. current revision, 2. deleted revision, empty()
+            try {
+                // 1. current revision, 2. deleted revision, empty()
                 return Optional.ofNullable(Optional.ofNullable(getStore().getRepository().info(getFilePath(), -1))
-                .map(SVNDirEntry::getRevision).orElseGet(this::getLastRevision));
-        } catch (SVNException e) {
-            LOGGER.error("Could not get last revision of {}_{}", getStore().getID(), id, e);
+                    .map(SVNDirEntry::getRevision).orElseGet(this::getLastRevision));
+            } catch (SVNException e) {
+                LOGGER.error("Could not get last revision of {}_{}", getStore().getID(), id, e);
                 return Optional.empty();
             }
         };

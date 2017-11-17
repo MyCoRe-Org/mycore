@@ -31,7 +31,10 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
      *            FATAL, providing any other value will lead to DEBUG as new log
      *            level
      */
-    @MCRCommand(syntax = "change log level of {0} to {1}", help = "{0} the package or class name for which to change the log level, {1} the log level to set. If the log level cannot be read it is set to DEBUG by default.", order = 10) public static synchronized void changeLogLevel(String name, String logLevelToSet) {
+    @MCRCommand(syntax = "change log level of {0} to {1}",
+        help = "{0} the package or class name for which to change the log level, {1} the log level to set. If the log level cannot be read it is set to DEBUG by default.",
+        order = 10)
+    public static synchronized void changeLogLevel(String name, String logLevelToSet) {
         LOGGER.info("Setting log level for \"{}\" to \"{}\"", name, logLevelToSet);
 
         Level newLevel = Level.toLevel(logLevelToSet);

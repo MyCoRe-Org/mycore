@@ -51,9 +51,8 @@ public class MCRSolrBulkXMLIndexHandler extends MCRSolrObjectStreamIndexHandler 
         contentMap = contentMap.entrySet().stream().filter(entry -> {
             MCRObjectID id = entry.getKey();
             boolean exists = MCRMetadataManager.exists(id);
-            LOGGER.info(exists ?
-                "Submitting data of \"" + id + "\" for indexing" :
-                "Cannot submit \"" + id + "\" cause it does not exists anymore.");
+            LOGGER.info(exists ? "Submitting data of \"" + id + "\" for indexing"
+                : "Cannot submit \"" + id + "\" cause it does not exists anymore.");
             return exists;
         }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         contentMap.forEach((id, content) -> {

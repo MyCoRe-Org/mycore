@@ -179,8 +179,9 @@ public class MCRIFS2Commands {
         LOGGER.info("Stop repair of MCRFSNODES for derivate {}", derivate_id);
     }
 
-    @MCRCommand(syntax = "repair unicode in database {0}", help = "this fixes consequences of MCR-1423 in Database. If "
-        + "{0} is false then nothing will be done (dry run).")
+    @MCRCommand(syntax = "repair unicode in database {0}",
+        help = "this fixes consequences of MCR-1423 in Database. If "
+            + "{0} is false then nothing will be done (dry run).")
     public static void repairUnicodeInDatabase(String execute) {
         boolean dry = execute.toLowerCase(Locale.ROOT).equals(Boolean.FALSE.toString().toLowerCase(Locale.ROOT));
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
@@ -201,8 +202,9 @@ public class MCRIFS2Commands {
         });
     }
 
-    @MCRCommand(syntax = "repair unicode in content stores {0}", help = "this fixes consequences of MCR-1423 in content"
-        + " stores . If {0} is false then nothing will be done (dry run).")
+    @MCRCommand(syntax = "repair unicode in content stores {0}",
+        help = "this fixes consequences of MCR-1423 in content"
+            + " stores . If {0} is false then nothing will be done (dry run).")
     public static void repairUnicodeInContentStores(String execute) {
         boolean dry = execute.toLowerCase(Locale.ROOT).equals(Boolean.FALSE.toString().toLowerCase(Locale.ROOT));
         MCRContentStoreFactory.getAvailableStores().forEach((name, cs) -> {

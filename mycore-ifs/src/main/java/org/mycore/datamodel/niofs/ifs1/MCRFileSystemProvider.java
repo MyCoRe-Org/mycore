@@ -622,7 +622,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             MCRDirectory rootDirectory = MCRDirectory.getRootDirectory(path.getOwner());
             if (rootDirectory == null) {
                 throw new NoSuchFileException(path.toString());
-        }
+            }
             rootDirectory.getChildren(); //prepare cache
             return rootDirectory;
         }
@@ -635,7 +635,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
         if (child == null) {
             throw new NoSuchFileException(parent.toPath().toString(), path.toString(), null);
-    }
+        }
         return child;
     }
 

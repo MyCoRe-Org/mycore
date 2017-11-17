@@ -617,7 +617,8 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.instance();
                 MCRContent content = params.containsKey("r")
-                    ? xmlmm.retrieveContent(mcrid, Long.valueOf(params.get("r"))) : xmlmm.retrieveContent(mcrid);
+                    ? xmlmm.retrieveContent(mcrid, Long.valueOf(params.get("r")))
+                    : xmlmm.retrieveContent(mcrid);
                 if (content == null) {
                     return null;
                 }

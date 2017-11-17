@@ -238,7 +238,7 @@ public class MCRXMLFunctions {
         throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             String sb = "isoDate=" + isoDate + ", simpleFormat=" + simpleFormat + ", isoFormat=" + isoFormat
-                    + ", iso649Language=" + iso639Language + ", timeZone=" + timeZone;
+                + ", iso649Language=" + iso639Language + ", timeZone=" + timeZone;
             LOGGER.debug(sb);
         }
         Locale locale = new Locale(iso639Language);
@@ -290,7 +290,7 @@ public class MCRXMLFunctions {
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
     public static String getISODateFromMCRHistoryDate(String date_value, String field_name, String calendar_name)
-            throws ParseException {
+        throws ParseException {
         String formatted_date;
         if (field_name == null || field_name.trim().length() == 0) {
             return "";
@@ -308,7 +308,7 @@ public class MCRXMLFunctions {
             }
         } catch (Exception e) {
             String errorMsg = "Error while converting date string : " + date_value + " - " + use_last_value +
-                    " - " + calendar_name;
+                " - " + calendar_name;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(errorMsg, e);
             }
@@ -497,7 +497,7 @@ public class MCRXMLFunctions {
         CompletableFuture<Boolean> permission = MCRAccessManager.checkPermission(
             MCRSystemUserInformation.getGuestInstance(),
             () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ)
-                    && checkReadPermissionOfDerivates(mcrObjectID));
+                && checkReadPermissionOfDerivates(mcrObjectID));
         try {
             return permission.join();
         } catch (CancellationException | CompletionException e) {
@@ -817,8 +817,7 @@ public class MCRXMLFunctions {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-            MCRCategory
-                category = dao.getCategory(categID, 0);
+            MCRCategory category = dao.getCategory(categID, 0);
             return Optional.ofNullable(category)
                 .map(MCRCategory::getCurrentLabel)
                 .filter(Optional::isPresent)

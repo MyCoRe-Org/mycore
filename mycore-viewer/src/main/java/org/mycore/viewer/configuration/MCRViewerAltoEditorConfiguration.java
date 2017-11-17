@@ -29,7 +29,7 @@ public class MCRViewerAltoEditorConfiguration extends MCRViewerConfiguration {
             String[] altoChangeIDS;
 
             boolean isReviewer = MCRAccessManager.checkPermission(derivate, MCRALTOUtil.REVIEW_ALTO_PERMISSION);
-            if(isReviewer){
+            if (isReviewer) {
                 this.setProperty("altoReviewer", true);
             }
 

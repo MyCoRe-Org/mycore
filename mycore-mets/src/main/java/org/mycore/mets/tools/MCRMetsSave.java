@@ -370,7 +370,7 @@ public class MCRMetsSave {
         XPathExpression<Element> xpath;
         xpath = XPathFactory.instance().compile(
             "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']", Filters.element(),
-                null, MCRConstants.METS_NAMESPACE);
+            null, MCRConstants.METS_NAMESPACE);
         return xpath.evaluateFirst(mets);
     }
 
@@ -507,7 +507,7 @@ public class MCRMetsSave {
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
             LOGGER.info(
-                    MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivateID));
+                MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivateID));
             return;
         }
         LOGGER.info(MessageFormat.format("Update {0} URNS in Mets.xml", fileUrnMap.size()));
@@ -738,11 +738,11 @@ public class MCRMetsSave {
      */
     public static void updateFiles(Mets mets, final MCRPath derivatePath) throws IOException {
         List<String> metsFiles = mets.getFileSec().getFileGroups().stream().flatMap(g -> g.getFileList().stream())
-                                     .map(File::getFLocat).map(FLocat::getHref).collect(Collectors.toList());
+            .map(File::getFLocat).map(FLocat::getHref).collect(Collectors.toList());
         List<String> derivateFiles = Files.walk(derivatePath).filter(MCRStreamUtils.not(Files::isDirectory))
-                                          .map(MCRPath::toMCRPath).map(MCRPath::getOwnerRelativePath)
-                                          .map(path -> path.substring(1)).filter(href -> !"mets.xml".equals(href))
-                                          .collect(Collectors.toList());
+            .map(MCRPath::toMCRPath).map(MCRPath::getOwnerRelativePath)
+            .map(path -> path.substring(1)).filter(href -> !"mets.xml".equals(href))
+            .collect(Collectors.toList());
 
         ArrayList<String> removedFiles = new ArrayList<>(metsFiles);
         removedFiles.removeAll(derivateFiles);
@@ -772,25 +772,24 @@ public class MCRMetsSave {
             // remove from physical
             PhysicalSubDiv physicalSubDiv = physicalDiv.byFileId(file.getId());
             physicalSubDiv.remove(physicalSubDiv.getFptr(file.getId()));
-            if(physicalSubDiv.getChildren().isEmpty()) {
+            if (physicalSubDiv.getChildren().isEmpty()) {
                 physicalDiv.remove(physicalSubDiv);
             }
             // remove from struct link
             structLink.getSmLinkByTo(physicalSubDiv.getId()).forEach(smLink -> {
                 structLink.removeSmLink(smLink);
-                if(structLink.getSmLinkByFrom(smLink.getFrom()).isEmpty()) {
+                if (structLink.getSmLinkByFrom(smLink.getFrom()).isEmpty()) {
                     unlinkedLogicalIds.add(smLink.getFrom());
                 }
             });
         });
 
         // fix unlinked logical divs
-        if(!unlinkedLogicalIds.isEmpty()) {
+        if (!unlinkedLogicalIds.isEmpty()) {
             // get first physical div
             List<PhysicalSubDiv> physicalChildren = physicalStructMap.getDivContainer().getChildren();
-            String firstPhysicalID = physicalChildren.isEmpty() ?
-                    physicalStructMap.getDivContainer().getId() :
-                    physicalChildren.get(0).getId();
+            String firstPhysicalID = physicalChildren.isEmpty() ? physicalStructMap.getDivContainer().getId()
+                : physicalChildren.get(0).getId();
 
             // a logical div is not linked anymore -> link with first physical div
             unlinkedLogicalIds.forEach(from -> structLink.addSmLink(new SmLink(from, firstPhysicalID)));
@@ -823,19 +822,20 @@ public class MCRMetsSave {
 
                 // structMap physical
                 String existingFileID = mets.getFileSec().getFileGroups().stream()
-                                            .filter(grp -> !grp.getUse().equals(fileGroupUse))
-                                            .flatMap(grp -> grp.getFileList().stream()).filter(brotherFile -> fileBase
-                                .equals(getFileBase(brotherFile.getFLocat().getHref()))).map(File::getId).findAny()
-                                            .orElse(null);
+                    .filter(grp -> !grp.getUse().equals(fileGroupUse))
+                    .flatMap(grp -> grp.getFileList().stream()).filter(brotherFile -> fileBase
+                        .equals(getFileBase(brotherFile.getFLocat().getHref())))
+                    .map(File::getId).findAny()
+                    .orElse(null);
                 PhysicalSubDiv physicalSubDiv;
-                if(existingFileID != null) {
+                if (existingFileID != null) {
                     // there is a file (e.g. img or alto) which the same file base -> add the file to this mets:div
                     physicalSubDiv = physicalDiv.byFileId(existingFileID);
                     physicalSubDiv.add(new Fptr(file.getId()));
                 } else {
                     // there is no mets:div with this file
                     physicalSubDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileBase,
-                            PhysicalSubDiv.TYPE_PAGE);
+                        PhysicalSubDiv.TYPE_PAGE);
                     physicalSubDiv.add(new Fptr(file.getId()));
                     physicalDiv.add(physicalSubDiv);
                 }

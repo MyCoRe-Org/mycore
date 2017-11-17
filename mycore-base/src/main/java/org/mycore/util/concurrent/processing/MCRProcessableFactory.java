@@ -135,7 +135,7 @@ public abstract class MCRProcessableFactory {
      * A callable that runs given task and returns given result
      */
     private static final class RunnableProgressableAdapter<T>
-    implements Callable<T>, MCRListenableProgressable, MCRDecorator<Runnable> {
+        implements Callable<T>, MCRListenableProgressable, MCRDecorator<Runnable> {
         final Runnable task;
 
         RunnableProgressableAdapter(Runnable task) {

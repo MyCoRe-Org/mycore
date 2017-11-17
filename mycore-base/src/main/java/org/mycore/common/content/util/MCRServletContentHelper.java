@@ -494,8 +494,9 @@ public abstract class MCRServletContentHelper {
             }
         } else {
             try (InputStream contentIS = content.getInputStream();
-                final InputStream in = isInputStreamBuffered(contentIS, content) ? contentIS : new BufferedInputStream(
-                    contentIS, inputBufferSize)) {
+                final InputStream in = isInputStreamBuffered(contentIS, content) ? contentIS
+                    : new BufferedInputStream(
+                        contentIS, inputBufferSize)) {
                 endCurrentTransaction();
                 // Copy the inputBufferSize stream to the outputBufferSize stream
                 bytesCopied = IOUtils.copyLarge(in, out, new byte[outputBufferSize]);

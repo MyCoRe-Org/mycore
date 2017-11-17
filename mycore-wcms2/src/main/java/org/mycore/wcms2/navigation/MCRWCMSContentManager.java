@@ -143,8 +143,9 @@ public class MCRWCMSContentManager {
                 continue;
             }
 
-            JsonElement webpageIdElement = item.has("href") ? item.get("href") : (item.has("hrefStartingPage") ? item
-                .get("hrefStartingPage") : null);
+            JsonElement webpageIdElement = item.has("href") ? item.get("href")
+                : (item.has("hrefStartingPage") ? item
+                    .get("hrefStartingPage") : null);
             if (webpageIdElement == null || !webpageIdElement.isJsonPrimitive()) {
                 continue;
             }

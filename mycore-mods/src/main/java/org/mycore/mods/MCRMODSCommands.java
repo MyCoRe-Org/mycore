@@ -69,7 +69,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     private static final Logger LOGGER = LogManager.getLogger(MCRMODSCommands.class);
 
     @MCRCommand(syntax = "load all mods documents from directory {0} for project {1}",
-        help = "Load all MODS documents as MyCoRe Objects for project {1} from directory {0}", order = 10)
+        help = "Load all MODS documents as MyCoRe Objects for project {1} from directory {0}",
+        order = 10)
     public static List<String> loadFromDirectory(String directory, String projectID) {
         File dir = new File(directory);
         if (!dir.isDirectory()) {
@@ -89,7 +90,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "load mods document from file {0} for project {1}",
-        help = "Load MODS document {0} as MyCoRe Object for project {1}", order = 20)
+        help = "Load MODS document {0} as MyCoRe Object for project {1}",
+        order = 20)
     public static void loadFromFile(String modsFileName, String projectID) throws JDOMException, IOException,
         MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
         File modsFile = new File(modsFileName);
@@ -116,7 +118,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "load mods document from file {0} with files from directory {1} for project {2}",
-        help = "Load MODS document {0} as MyCoRe Object with files from direcory {1} for project {2}", order = 10)
+        help = "Load MODS document {0} as MyCoRe Object with files from direcory {1} for project {2}",
+        order = 10)
     public static void loadFromFileWithFiles(String modsFileName, String fileDirName, String projectID)
         throws JDOMException, IOException,
         MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {

@@ -144,14 +144,13 @@ public class MCROAISearchManager {
     }
 
     protected OAIDataList<Record> getRecordList(MCROAISearcher searcher, MCROAIResult result) {
-        OAIDataList<Record> recordList = runListRecordsParallel ?
-                getRecordListParallel(searcher, result) :
-                getRecordListSequential(searcher, result);
+        OAIDataList<Record> recordList = runListRecordsParallel ? getRecordListParallel(searcher, result)
+            : getRecordListSequential(searcher, result);
         if (recordList.contains(null)) {
             if (getConfig().getBoolean("MCR.OAIDataProvider.FailOnErrorRecords", false)) {
                 throw new MCRException(
-                        "An internal error occur. Some of the following records are invalid and cannot be processed."
-                                + " Please inform the system administrator. " + result.list());
+                    "An internal error occur. Some of the following records are invalid and cannot be processed."
+                        + " Please inform the system administrator. " + result.list());
             }
             recordList.removeIf(Objects::isNull);
         }
@@ -179,7 +178,8 @@ public class MCROAISearchManager {
         for (int i = 0; i < listSize; i++) {
             Header header = headerList.get(i);
             int resultIndex = i;
-            MCRTransactionableRunnable r = new MCRTransactionableRunnable(() -> records[resultIndex] = this.objManager.getRecord(header, metadataFormat), mcrSession);
+            MCRTransactionableRunnable r = new MCRTransactionableRunnable(
+                () -> records[resultIndex] = this.objManager.getRecord(header, metadataFormat), mcrSession);
             CompletableFuture<Void> future = CompletableFuture.runAsync(r, executorService);
             futures[i] = future;
         }
@@ -232,7 +232,7 @@ public class MCROAISearchManager {
     }
 
     public static MCROAISearcher getSearcher(MCROAIIdentify identify, MetadataFormat format, int partitionSize,
-            MCROAISetManager setManager, MCROAIObjectManager objectManager) {
+        MCROAISetManager setManager, MCROAIObjectManager objectManager) {
         String className = identify.getConfigPrefix() + "Searcher";
         String defaultClass = MCROAICombinedSearcher.class.getName();
         MCROAISearcher searcher = getConfig().getInstanceOf(className, defaultClass);

@@ -1,9 +1,9 @@
 package org.mycore.viewer.alto.model;
 
-
 public class MCRAltoWordChange extends MCRAltoChange {
 
-    public MCRAltoWordChange(String file, String type, int hpos, int vpos, int width, int height, String from, String to) {
+    public MCRAltoWordChange(String file, String type, int hpos, int vpos, int width, int height, String from,
+        String to) {
         super(file, type);
         this.hpos = hpos;
         this.vpos = vpos;
@@ -17,10 +17,15 @@ public class MCRAltoWordChange extends MCRAltoChange {
     }
 
     private int hpos;
+
     private int vpos;
+
     private int width;
+
     private int height;
+
     private String from;
+
     private String to;
 
     public int getHpos() {

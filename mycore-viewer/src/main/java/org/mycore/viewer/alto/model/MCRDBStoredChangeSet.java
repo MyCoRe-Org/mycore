@@ -22,27 +22,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @NamedQueries({
     @NamedQuery(name = "Count.ALTOCS.Unapplied",
         query = "select count(u) from " + MCRDBStoredChangeSet.ENTITY_NAME + " u "
-            + "where u.applied IS NULL"
-    ),
+            + "where u.applied IS NULL"),
     @NamedQuery(name = "Get.ALTOCS.ByPID",
         query = "select u from " + MCRDBStoredChangeSet.ENTITY_NAME + " u "
             + "where u.pid = :pid "
-            + "and u.applied IS NULL"
-    ),
+            + "and u.applied IS NULL"),
     @NamedQuery(name = "Get.ALTOCS.Unapplied",
-        query = "select u from " + MCRDBStoredChangeSet.ENTITY_NAME + " u where u.applied IS NULL"
-    ),
+        query = "select u from " + MCRDBStoredChangeSet.ENTITY_NAME + " u where u.applied IS NULL"),
     @NamedQuery(name = "Get.ALTOCS.Unapplied.bySID",
         query = "select u from " + MCRDBStoredChangeSet.ENTITY_NAME
-            + " u where u.sessionID = :sid and u.applied IS NULL"
-    ),
+            + " u where u.sessionID = :sid and u.applied IS NULL"),
     @NamedQuery(name = "Get.ALTOCS.Unapplied.byDerivate",
         query = "select u from " + MCRDBStoredChangeSet.ENTITY_NAME
-            + " u where u.derivateID = :derivateID and u.applied IS NULL"
-    ),
+            + " u where u.derivateID = :derivateID and u.applied IS NULL"),
     @NamedQuery(name = "Delete.ALTOCS.byPID",
-        query = "delete from " + MCRDBStoredChangeSet.ENTITY_NAME + " u where u.pid = :pid"
-    ) })
+        query = "delete from " + MCRDBStoredChangeSet.ENTITY_NAME + " u where u.pid = :pid") })
 public class MCRDBStoredChangeSet extends MCRStoredChangeSet {
 
     protected static final String ENTITY_NAME = "MCRAltoChangeStore";

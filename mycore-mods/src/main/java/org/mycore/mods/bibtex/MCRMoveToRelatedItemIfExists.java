@@ -55,7 +55,7 @@ class MCRMoveToRelatedItemIfExists extends MCRFieldTransformer {
 
     Element getRelatedItemIfExists(Element parent) {
         XPathExpression<Element> xPath = XPathFactory.instance().compile(xPathOfRelatedItem, Filters.element(), null,
-                MCRConstants.getStandardNamespaces());
+            MCRConstants.getStandardNamespaces());
         Element fixedParent = xPath.evaluateFirst(parent);
         return fixedParent != null ? fixedParent : parent;
     }

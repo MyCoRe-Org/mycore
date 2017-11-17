@@ -23,8 +23,10 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         /* Add PIs to DB if they are not there */
-        MCRPersistentIdentifierManager.getInstance().getRegistered(obj).forEach(pi -> MCRPersistentIdentifierManager.getInstance().delete(pi.getMycoreID(), pi.getAdditional(), pi.getType(),
-            pi.getService()));
+        MCRPersistentIdentifierManager.getInstance().getRegistered(obj)
+            .forEach(pi -> MCRPersistentIdentifierManager.getInstance().delete(pi.getMycoreID(), pi.getAdditional(),
+                pi.getType(),
+                pi.getService()));
 
         Gson gson = new Gson();
         obj.getService().getFlags(MCRPIRegistrationService.PI_FLAG).stream()

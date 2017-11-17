@@ -9,7 +9,6 @@ import org.mycore.viewer.alto.service.impl.MCRJPAAltoChangeSetStore;
 
 import com.google.inject.AbstractModule;
 
-
 public class MCRViewerALTOTestModule extends AbstractModule {
     @Override
     protected void configure() {

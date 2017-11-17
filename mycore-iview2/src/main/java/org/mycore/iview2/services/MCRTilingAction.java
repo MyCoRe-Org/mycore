@@ -60,11 +60,13 @@ public class MCRTilingAction implements Runnable {
             MCRTileEventHandler tileEventHandler = new MCRTileEventHandler() {
                 Transaction transaction;
 
-                @Override public void preImageReaderCreated() {
+                @Override
+                public void preImageReaderCreated() {
                     transaction = session.beginTransaction();
                 }
 
-                @Override public void postImageReaderCreated() {
+                @Override
+                public void postImageReaderCreated() {
                     session.clear(); //beside tileJob, no write access so far
                     if (transaction.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
                         transaction.commit();

@@ -277,7 +277,7 @@ public class MCRMetadataHistoryCommands {
                     }
                 } catch (JDOMException | SAXException e) {
                     LogManager.getLogger()
-                              .error("Error while reading revision {} of {}", version.getRevision(), derId, e);
+                        .error("Error while reading revision {} of {}", version.getRevision(), derId, e);
                 }
             }
         }
@@ -317,7 +317,7 @@ public class MCRMetadataHistoryCommands {
                     }
                 } catch (JDOMException | SAXException e) {
                     LogManager.getLogger()
-                              .error("Error while reading revision {} of {}", version.getRevision(), objId, e);
+                        .error("Error while reading revision {} of {}", version.getRevision(), objId, e);
                 }
             }
         }

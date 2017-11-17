@@ -14,7 +14,14 @@ import org.mycore.common.processing.MCRProcessableRegistry;
 public interface MCRProcessableWebsocketSender {
 
     enum Type {
-        error, registry, addCollection, removeCollection, addProcessable, removeProcessable, updateProcessable, updateCollectionProperty
+        error,
+        registry,
+        addCollection,
+        removeCollection,
+        addProcessable,
+        removeProcessable,
+        updateProcessable,
+        updateCollectionProperty
     }
 
     /**

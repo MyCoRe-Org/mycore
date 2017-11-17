@@ -1,6 +1,5 @@
 package org.mycore.viewer.alto.model;
 
-
 public class MCRAltoChangePID {
 
     public MCRAltoChangePID(String pid) {

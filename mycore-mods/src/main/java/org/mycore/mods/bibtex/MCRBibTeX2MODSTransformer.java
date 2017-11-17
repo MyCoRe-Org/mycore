@@ -47,7 +47,7 @@ import bibtex.parser.ParseException;
 public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
 
     private static final Pattern MISSING_KEYS_PATTERN = Pattern
-            .compile("(@[a-zA-Z0-9]+\\s*\\{)(\\s*[a-zA-Z0-9]+\\s*\\=)");
+        .compile("(@[a-zA-Z0-9]+\\s*\\{)(\\s*[a-zA-Z0-9]+\\s*\\=)");
 
     @Override
     public MCRJDOMContent transform(MCRContent source) throws IOException {

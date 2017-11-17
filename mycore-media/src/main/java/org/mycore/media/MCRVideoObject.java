@@ -206,26 +206,26 @@ public class MCRVideoObject extends MCRMediaObject {
         out.append(_fill).append("\n");
         out.append("Type             : ").append(type).append("\n");
         out.append(mimeType != null ? "mimeType         : " + mimeType + "\n" : "");
-        out.append(format != null ?
-            "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n" :
-            "");
+        out.append(
+            format != null ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n"
+                : "");
         out.append("Format           : ")
-           .append(subFormat)
-           .append(subFormatFull != null ? " (" + subFormatFull + ")" : "")
-           .append("\n");
+            .append(subFormat)
+            .append(subFormatFull != null ? " (" + subFormatFull + ")" : "")
+            .append("\n");
         out.append("Codec            : ")
-           .append(codec)
-           .append(codecFull != null ? " - " + codecFull : "")
-           .append(codecURL != null ? " (" + codecURL + ")" : "")
-           .append("\n");
+            .append(codec)
+            .append(codecFull != null ? " - " + codecFull : "")
+            .append(codecURL != null ? " (" + codecURL + ")" : "")
+            .append("\n");
         out.append("Duration         : ").append(duration).append("\n");
         out.append("Dimention        : ")
-           .append(width)
-           .append("x")
-           .append(height)
-           .append(" @ ")
-           .append(frameRate)
-           .append("\n");
+            .append(width)
+            .append("x")
+            .append(height)
+            .append(" @ ")
+            .append(frameRate)
+            .append("\n");
         out.append(aspectRatio != null ? "Aspect Ratio     : " + aspectRatio + "\n" : "");
         out.append("BitRate          : ").append(streamBitRate).append("\n");
         out.append(encoderStr != null ? "Encoder          : " + encoderStr + "\n" : "");

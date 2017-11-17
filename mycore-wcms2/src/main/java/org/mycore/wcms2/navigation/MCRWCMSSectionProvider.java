@@ -19,7 +19,8 @@ public interface MCRWCMSSectionProvider extends MCRWCMSJSONProvider<Element, Jso
     /**
      * 
      */
-    @Override Element fromJSON(JsonArray jsonSection);
+    @Override
+    Element fromJSON(JsonArray jsonSection);
 
     /**
      * Converts a MyCoRe Webpage to a json array. The array contains
@@ -31,6 +32,7 @@ public interface MCRWCMSSectionProvider extends MCRWCMSJSONProvider<Element, Jso
      * ]
      * </p>
      */
-    @Override JsonArray toJSON(Element object);
+    @Override
+    JsonArray toJSON(Element object);
 
 }

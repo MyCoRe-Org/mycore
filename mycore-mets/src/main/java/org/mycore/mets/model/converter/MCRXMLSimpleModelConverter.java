@@ -158,7 +158,7 @@ public class MCRXMLSimpleModelConverter {
         fileGroup.getFileList().forEach(file -> {
             MCRMetsFileUse use = Enum.valueOf(MCRMetsFileUse.class, fileGroupUse);
             idPageMap.put(file.getId(), new MCRMetsFile(file.getId(),
-                    file.getFLocat().getHref(), file.getMimeType(), use));
+                file.getFLocat().getHref(), file.getMimeType(), use));
         });
     }
 

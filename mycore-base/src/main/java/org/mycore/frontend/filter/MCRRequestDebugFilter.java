@@ -113,30 +113,30 @@ public class MCRRequestDebugFilter implements Filter {
 
     private void logSessionAttributes(HttpServletRequest request, StringBuilder sb) {
         sb.append("Session ")
-          .append(request.isRequestedSessionIdFromCookie() ? "is" : "is not")
-          .append(" requested by cookie.\n");
+            .append(request.isRequestedSessionIdFromCookie() ? "is" : "is not")
+            .append(" requested by cookie.\n");
         sb.append("Session ")
-          .append(request.isRequestedSessionIdFromURL() ? "is" : "is not")
-          .append(" requested by URL.\n");
+            .append(request.isRequestedSessionIdFromURL() ? "is" : "is not")
+            .append(" requested by URL.\n");
         sb.append("Session ").append(request.isRequestedSessionIdValid() ? "is" : "is not").append(" valid.\n");
         HttpSession session = request.getSession(false);
         if (session != null) {
             sb.append("SESSION ")
-              .append(request.getSession().getId())
-              .append(" created at: ")
-              .append(LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()),
-                  ZoneId.systemDefault()))
-              .append("\n");
+                .append(request.getSession().getId())
+                .append(" created at: ")
+                .append(LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()),
+                    ZoneId.systemDefault()))
+                .append("\n");
             sb.append("SESSION ATTRIBUTES: \n");
             MCRStreamUtils
                 .asStream(session.getAttributeNames())
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .forEachOrdered(attrName -> sb.append(" ")
-                                              .append(attrName)
-                                              .append(": ")
-                                              .append(getValue(attrName,
-                                                  Optional.ofNullable(session.getAttribute(attrName))))
-                                              .append("\n"));
+                    .append(attrName)
+                    .append(": ")
+                    .append(getValue(attrName,
+                        Optional.ofNullable(session.getAttribute(attrName))))
+                    .append("\n"));
             sb.append("SESSION ATTRIBUTES END \n\n");
         }
     }

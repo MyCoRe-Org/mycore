@@ -276,7 +276,7 @@ public class MCRRestAPIUploadHelper {
 
                 MCRAccessManager.invalidPermissionCache(derID.toString(), PERMISSION_WRITE);
                 if (MCRAccessManager.checkPermission(derID.toString(), PERMISSION_WRITE)) {
-                	
+
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
                     java.nio.file.Path derDir = null;

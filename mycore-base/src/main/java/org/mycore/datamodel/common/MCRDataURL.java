@@ -314,12 +314,12 @@ public class MCRDataURL implements Serializable {
 
         if (parameters != null) {
             this.parameters = Collections.unmodifiableMap(new LinkedHashMap<>(parameters.entrySet()
-                                                                                        .stream()
-                                                                                        .filter(
-                                                                                            e -> !CHARSET_PARAM.equals(e.getKey()))
-                                                                                        .collect(Collectors.toMap(
-                                                                                            Map.Entry::getKey,
-                                                                                            Map.Entry::getValue))));
+                .stream()
+                .filter(
+                    e -> !CHARSET_PARAM.equals(e.getKey()))
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue))));
             this.charset = parameters.containsKey(CHARSET_PARAM) && parameters.get(CHARSET_PARAM) != null
                 && !parameters.get(CHARSET_PARAM).isEmpty() ? Charset.forName(parameters.get(CHARSET_PARAM))
                     : StandardCharsets.US_ASCII;
@@ -456,9 +456,9 @@ public class MCRDataURL implements Serializable {
         parameters.forEach((key, value) -> {
             try {
                 sb.append(TOKEN_SEPARATOR)
-                  .append(key)
-                  .append(PARAM_SEPARATOR)
-                  .append(encode(value, StandardCharsets.UTF_8));
+                    .append(key)
+                    .append(PARAM_SEPARATOR)
+                    .append(encode(value, StandardCharsets.UTF_8));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(
                     "Error encoding the parameter value \"" + value + "\". Error: " + e.getMessage());

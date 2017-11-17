@@ -127,8 +127,8 @@ class MCRPersistenceHelper {
             if (context.getResource("/" + modernPage) == null
                 && context.getResource("/" + deprecatedPage) != null) {
                 LogManager.getLogger()
-                          .warn("Could not find {} in webapp root, using deprecated {} instead.", modernPage,
-                              deprecatedPage);
+                    .warn("Could not find {} in webapp root, using deprecated {} instead.", modernPage,
+                        deprecatedPage);
                 return deprecatedPage;
             }
         } catch (MalformedURLException e) {

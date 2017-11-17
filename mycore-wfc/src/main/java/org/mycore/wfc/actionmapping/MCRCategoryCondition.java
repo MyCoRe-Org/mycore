@@ -60,8 +60,8 @@ public class MCRCategoryCondition implements MCRCondition<MCRWorkflowData> {
         MCRCategLinkReference reference = workflowData.getCategoryReference();
         if (reference == null) {
             LogManager.getLogger(getClass())
-                      .error("Cannot evaluate '{}', if MCRWorkflowData does not contain an object reference",
-                          toString());
+                .error("Cannot evaluate '{}', if MCRWorkflowData does not contain an object reference",
+                    toString());
             return false;
         }
         return LINK_SERVICE.isInCategory(reference, mcrCategoryID) ^ not;

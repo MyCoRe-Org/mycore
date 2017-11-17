@@ -29,7 +29,7 @@ public class MCRJerseyResourceConfig extends ResourceConfig {
         MCRJerseyConfiguration configuration;
         try {
             configuration = MCRConfiguration.instance().getInstanceOf("MCR.Jersey.Configuration",
-                    new MCRJerseyDefaultConfiguration());
+                new MCRJerseyDefaultConfiguration());
         } catch (MCRConfigurationException exc) {
             LogManager.getLogger().error("Unable to initialize jersey.", exc);
             return;

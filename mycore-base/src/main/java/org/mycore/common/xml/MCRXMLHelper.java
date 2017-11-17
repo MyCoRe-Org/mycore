@@ -402,17 +402,17 @@ public class MCRXMLHelper {
             // children
             // - build child map of <name,namespace> pair with their respective elements
             Map<Pair<String, Namespace>, List<Element>> childContentMap = new HashMap<>();
-            for(Element child : element.getChildren()) {
+            for (Element child : element.getChildren()) {
                 Pair key = new Pair<>(child.getName(), child.getNamespace());
                 List<Element> contentList = childContentMap.computeIfAbsent(key, k -> new ArrayList<>());
                 contentList.add(child);
             }
             // - run through the map and serialize
-            for(Map.Entry<Pair<String, Namespace>, List<Element>> entry: childContentMap.entrySet()) {
+            for (Map.Entry<Pair<String, Namespace>, List<Element>> entry : childContentMap.entrySet()) {
                 Pair<String, Namespace> key = entry.getKey();
                 List<Element> contentList = entry.getValue();
                 String name = getName(key.x, key.y);
-                if(entry.getValue().size() == 1) {
+                if (entry.getValue().size() == 1) {
                     json.add(name, serializeElement(contentList.get(0)));
                 } else if (contentList.size() >= 2) {
                     JsonArray arr = new JsonArray();
@@ -420,7 +420,7 @@ public class MCRXMLHelper {
                     json.add(name, arr);
                 } else {
                     throw new MCRException(
-                            "Unexcpected error while parsing children of element '" + element.getName() + "'");
+                        "Unexcpected error while parsing children of element '" + element.getName() + "'");
                 }
             }
             return json;
@@ -471,7 +471,7 @@ public class MCRXMLHelper {
                 }
                 Pair<?, ?> pair = (Pair<?, ?>) o;
                 return Objects.equals(x, pair.x) &&
-                        Objects.equals(y, pair.y);
+                    Objects.equals(y, pair.y);
             }
 
             @Override

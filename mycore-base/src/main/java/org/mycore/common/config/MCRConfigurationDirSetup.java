@@ -149,7 +149,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                 });
         } catch (NoSuchMethodException | SecurityException e) {
             LogManager.getLogger(MCRConfigurationInputStream.class)
-                      .warn("{} does not support adding additional JARs at runtime", classLoaderClass, e);
+                .warn("{} does not support adding additional JARs at runtime", classLoaderClass, e);
         }
     }
 

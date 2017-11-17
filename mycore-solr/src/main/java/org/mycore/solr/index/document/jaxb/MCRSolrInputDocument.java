@@ -44,9 +44,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "MCRSolrInputDocument", propOrder = {
-    "fieldOrDoc"
-})
+@XmlType(name = "MCRSolrInputDocument",
+    propOrder = {
+        "fieldOrDoc"
+    })
 public class MCRSolrInputDocument {
 
     @XmlElements({

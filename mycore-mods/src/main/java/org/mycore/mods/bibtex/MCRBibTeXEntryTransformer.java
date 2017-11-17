@@ -43,54 +43,54 @@ class MCRBibTeXEntryTransformer {
 
     MCRBibTeXEntryTransformer() {
         fieldTransformers
-                .add(new MCRField2XPathTransformer("document_type", "mods:genre" + MCRFieldTransformer.AS_NEW_ELEMENT));
+            .add(new MCRField2XPathTransformer("document_type", "mods:genre" + MCRFieldTransformer.AS_NEW_ELEMENT));
         fieldTransformers.add(new MCRField2XPathTransformer("title",
-                "mods:titleInfo" + MCRFieldTransformer.AS_NEW_ELEMENT + "/mods:title"));
+            "mods:titleInfo" + MCRFieldTransformer.AS_NEW_ELEMENT + "/mods:title"));
         fieldTransformers.add(new MCRPersonListTransformer("author", "aut"));
         fieldTransformers.add(new MCRField2XPathTransformer("journal",
-                XPATH_HOST + "[mods:genre='journal']/mods:titleInfo/mods:title"));
+            XPATH_HOST + "[mods:genre='journal']/mods:titleInfo/mods:title"));
         fieldTransformers.add(new MCRField2XPathTransformer("booktitle",
-                XPATH_HOST + "[mods:genre='collection']/mods:titleInfo/mods:title"));
+            XPATH_HOST + "[mods:genre='collection']/mods:titleInfo/mods:title"));
         fieldTransformers
-                .add(new MCRMoveToRelatedItemIfExists(XPATH_HOST, new MCRPersonListTransformer("editor", "edt")));
+            .add(new MCRMoveToRelatedItemIfExists(XPATH_HOST, new MCRPersonListTransformer("editor", "edt")));
         fieldTransformers.add(new MCRMoveToRelatedItemIfExists(XPATH_HOST,
-                new MCRField2XPathTransformer("edition", "mods:originInfo/mods:edition")));
+            new MCRField2XPathTransformer("edition", "mods:originInfo/mods:edition")));
         fieldTransformers.add(new MCRMoveToRelatedItemIfExists(XPATH_HOST,
-                new MCRField2XPathTransformer("howpublished", "mods:originInfo/mods:edition")));
+            new MCRField2XPathTransformer("howpublished", "mods:originInfo/mods:edition")));
         fieldTransformers.add(new MCRMoveToRelatedItemIfExists(XPATH_HOST,
-                new MCRField2XPathTransformer("publisher", "mods:originInfo/mods:publisher")));
+            new MCRField2XPathTransformer("publisher", "mods:originInfo/mods:publisher")));
         fieldTransformers.add(new MCRMoveToRelatedItemIfExists(XPATH_HOST,
-                new MCRField2XPathTransformer("address", "mods:originInfo/mods:place/mods:placeTerm[@type='text']")));
+            new MCRField2XPathTransformer("address", "mods:originInfo/mods:place/mods:placeTerm[@type='text']")));
         fieldTransformers.add(
-                new MCRMoveToRelatedItemIfExists(XPATH_HOST + "[mods:genre='collection']", new MCRYearTransformer()));
+            new MCRMoveToRelatedItemIfExists(XPATH_HOST + "[mods:genre='collection']", new MCRYearTransformer()));
         fieldTransformers.add(new MCRMoveToRelatedItemIfExists(
-                XPATH_HOST + "[mods:genre='journal']|descendant::mods:relatedItem[@type='series']",
-                new MCRField2XPathTransformer("volume", "mods:part/mods:detail[@type='volume']/mods:number")));
+            XPATH_HOST + "[mods:genre='journal']|descendant::mods:relatedItem[@type='series']",
+            new MCRField2XPathTransformer("volume", "mods:part/mods:detail[@type='volume']/mods:number")));
         fieldTransformers.add(new MCRField2XPathTransformer("number",
-                XPATH_HOST + "/mods:part/mods:detail[@type='issue']/mods:number"));
+            XPATH_HOST + "/mods:part/mods:detail[@type='issue']/mods:number"));
         fieldTransformers.add(new MCRField2XPathTransformer("issue",
-                XPATH_HOST + "/mods:part/mods:detail[@type='issue']/mods:number"));
+            XPATH_HOST + "/mods:part/mods:detail[@type='issue']/mods:number"));
         fieldTransformers.add(new MCRPagesTransformer());
         fieldTransformers.add(new MCRMoveToRelatedItemIfExists(XPATH_HOST, new MCRField2XPathTransformer("isbn",
-                "mods:identifier[@type='isbn']" + MCRFieldTransformer.AS_NEW_ELEMENT)));
+            "mods:identifier[@type='isbn']" + MCRFieldTransformer.AS_NEW_ELEMENT)));
         fieldTransformers.add(new MCRMoveToRelatedItemIfExists(XPATH_HOST,
-                new MCRField2XPathTransformer("series", "mods:relatedItem[@type='series']/mods:titleInfo/mods:title")));
+            new MCRField2XPathTransformer("series", "mods:relatedItem[@type='series']/mods:titleInfo/mods:title")));
         fieldTransformers.add(new MCRMoveToRelatedItemIfExists(
-                XPATH_HOST + "[mods:genre='journal']|descendant::mods:relatedItem[@type='series']",
-                new MCRField2XPathTransformer("issn",
-                        "mods:identifier[@type='issn']" + MCRFieldTransformer.AS_NEW_ELEMENT)));
+            XPATH_HOST + "[mods:genre='journal']|descendant::mods:relatedItem[@type='series']",
+            new MCRField2XPathTransformer("issn",
+                "mods:identifier[@type='issn']" + MCRFieldTransformer.AS_NEW_ELEMENT)));
         fieldTransformers.add(new MCRField2XPathTransformer("doi",
-                "mods:identifier[@type='doi']" + MCRFieldTransformer.AS_NEW_ELEMENT));
+            "mods:identifier[@type='doi']" + MCRFieldTransformer.AS_NEW_ELEMENT));
         fieldTransformers.add(new MCRField2XPathTransformer("urn",
-                "mods:identifier[@type='urn']" + MCRFieldTransformer.AS_NEW_ELEMENT));
+            "mods:identifier[@type='urn']" + MCRFieldTransformer.AS_NEW_ELEMENT));
         fieldTransformers.add(
-                new MCRField2XPathTransformer("url", "mods:location/mods:url" + MCRFieldTransformer.AS_NEW_ELEMENT));
+            new MCRField2XPathTransformer("url", "mods:location/mods:url" + MCRFieldTransformer.AS_NEW_ELEMENT));
         fieldTransformers.add(new MCRField2XPathTransformer("keywords",
-                "mods:subject" + MCRFieldTransformer.AS_NEW_ELEMENT + "/mods:topic"));
+            "mods:subject" + MCRFieldTransformer.AS_NEW_ELEMENT + "/mods:topic"));
         fieldTransformers.add(new MCRField2XPathTransformer("author_keywords",
-                "mods:subject" + MCRFieldTransformer.AS_NEW_ELEMENT + "/mods:topic"));
+            "mods:subject" + MCRFieldTransformer.AS_NEW_ELEMENT + "/mods:topic"));
         fieldTransformers
-                .add(new MCRField2XPathTransformer("abstract", "mods:abstract" + MCRFieldTransformer.AS_NEW_ELEMENT));
+            .add(new MCRField2XPathTransformer("abstract", "mods:abstract" + MCRFieldTransformer.AS_NEW_ELEMENT));
         fieldTransformers.add(new MCRField2XPathTransformer("note", "mods:note" + MCRFieldTransformer.AS_NEW_ELEMENT));
         fieldTransformers.add(new MCRField2XPathTransformer("type", "mods:note" + MCRFieldTransformer.AS_NEW_ELEMENT));
         fieldTransformers.add(new MCRField2XPathTransformer("source", "mods:recordInfo/mods:recordOrigin"));

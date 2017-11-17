@@ -151,8 +151,8 @@ public abstract class MCRContentStore {
             doDeleteContent(storageID);
         } catch (Exception exc) {
             if (!(exc instanceof MCRException)) {
-                String msg =
-                    "Could not delete content of file with storage ID [" + storageID + "] in store [" + storeID + "]";
+                String msg = "Could not delete content of file with storage ID [" + storageID + "] in store [" + storeID
+                    + "]";
                 throw new MCRPersistenceException(msg, exc);
             }
             throw (MCRException) exc;
@@ -190,9 +190,9 @@ public abstract class MCRContentStore {
             return doRetrieveMCRContent(file).getInputStream();
         } catch (Exception exc) {
             if (!(exc instanceof MCRException)) {
-                String msg =
-                    "Could not retrieve content of file with storage ID [" + file.getStorageID() + "] in store ["
-                        + storeID + "]";
+                String msg = "Could not retrieve content of file with storage ID [" + file.getStorageID()
+                    + "] in store ["
+                    + storeID + "]";
                 throw new MCRPersistenceException(msg, exc);
             }
             throw (MCRException) exc;

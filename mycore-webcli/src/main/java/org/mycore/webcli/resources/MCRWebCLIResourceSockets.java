@@ -25,8 +25,10 @@ import com.google.gson.JsonObject;
  * @author Michel Buechner (mcrmibue)
  * 
  */
-@ServerEndpoint(value = "/ws/mycore-webcli/socket", configurator = MCRWebsocketDefaultConfigurator.class, decoders = {
-    MCRWebsocketJSONDecoder.class })
+@ServerEndpoint(value = "/ws/mycore-webcli/socket",
+    configurator = MCRWebsocketDefaultConfigurator.class,
+    decoders = {
+        MCRWebsocketJSONDecoder.class })
 public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
 
     private static final String SESSION_KEY = "MCRWebCLI";

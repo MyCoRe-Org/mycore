@@ -79,7 +79,8 @@ public class MCRAbstractProgressable implements MCRListenableProgressable {
 
     protected void fireProgressTextChanged(String oldProgressText) {
         synchronized (this.progressListener) {
-            this.progressListener.forEach(listener -> listener.onProgressTextChange(this, oldProgressText, getProgressText()));
+            this.progressListener
+                .forEach(listener -> listener.onProgressTextChange(this, oldProgressText, getProgressText()));
         }
     }
 }

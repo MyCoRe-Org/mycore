@@ -181,7 +181,8 @@ public class MCRMetsMods2IIIFConverter {
         complete.add(range);
         range.setLabel(divContainer.getLabel());
 
-        this.logicalIdIdentifiersMap.get(divContainer.getId()).stream().map(refId -> refId).forEach(canvasRef -> range.canvases.add(canvasRef));
+        this.logicalIdIdentifiersMap.get(divContainer.getId()).stream().map(refId -> refId)
+            .forEach(canvasRef -> range.canvases.add(canvasRef));
 
         divContainer.getChildren().stream()
             .forEach(div -> {

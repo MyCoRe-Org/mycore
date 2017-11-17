@@ -122,7 +122,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
             .getPaths()
             .stream()
             .filter(file -> predicateList.stream()
-                                         .noneMatch(p -> p.test(file.toString().split(":")[1])))
+                .noneMatch(p -> p.test(file.toString().split(":")[1])))
             .map(p -> (MCRPath) p)
             .sorted()
             .collect(Collectors.toList());

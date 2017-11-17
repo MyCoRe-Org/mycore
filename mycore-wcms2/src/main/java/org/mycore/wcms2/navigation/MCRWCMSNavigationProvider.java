@@ -48,13 +48,15 @@ public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNaviga
      * </pre>
      * @return the generated json
      */
-    @Override JsonObject toJSON(MCRNavigation navigation);
+    @Override
+    JsonObject toJSON(MCRNavigation navigation);
 
     /**
      * Converts an WCMS JSON Object to an <code>Navigation</code> object.
      * 
      * TODO: json data structure
      */
-    @Override MCRNavigation fromJSON(JsonObject jsonNavigation);
+    @Override
+    MCRNavigation fromJSON(JsonObject jsonNavigation);
 
 }

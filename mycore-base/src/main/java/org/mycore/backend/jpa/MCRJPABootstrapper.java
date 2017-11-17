@@ -59,11 +59,11 @@ public class MCRJPABootstrapper implements AutoExecutable {
         Metamodel metamodel = MCREntityManagerProvider.getEntityManagerFactory().getMetamodel();
         checkHibernateMappingConfig(metamodel);
         LogManager.getLogger()
-                  .info("Mapping these entities: {}", metamodel.getEntities()
-                                                               .stream()
-                                                               .map(EntityType::getJavaType)
-                                                               .map(Class::getName)
-                                                               .collect(Collectors.toList()));
+            .info("Mapping these entities: {}", metamodel.getEntities()
+                .stream()
+                .map(EntityType::getJavaType)
+                .map(Class::getName)
+                .collect(Collectors.toList()));
         MCRShutdownHandler.getInstance().addCloseable(new MCRJPAShutdownProcessor());
     }
 

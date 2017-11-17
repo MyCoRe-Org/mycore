@@ -646,9 +646,9 @@ public class MCRFile extends MCRFilesystemNode {
 
     @Override
     public String toString() {
-        String sb =
-            super.toString() + "ContentType = " + contentTypeID + " " + "MD5         = " + md5 + " " + "StoreID     = "
-                + storeID + " " + "StorageID   = " + storageID;
+        String sb = super.toString() + "ContentType = " + contentTypeID + " " + "MD5         = " + md5 + " "
+            + "StoreID     = "
+            + storeID + " " + "StorageID   = " + storageID;
 
         return sb;
     }

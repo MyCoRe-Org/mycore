@@ -508,8 +508,9 @@ public class MCRServlet extends HttpServlet {
         if (ENABLE_BROWSER_CACHE) {
             // we can cache every (local) request
             long lastModified = MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfiguration.instance()
-                .getSystemLastModified() ? MCRSessionMgr.getCurrentSession().getLoginTime() : MCRConfiguration
-                    .instance().getSystemLastModified();
+                .getSystemLastModified() ? MCRSessionMgr.getCurrentSession().getLoginTime()
+                    : MCRConfiguration
+                        .instance().getSystemLastModified();
             LOGGER.info("LastModified: {}", lastModified);
             return lastModified;
         }

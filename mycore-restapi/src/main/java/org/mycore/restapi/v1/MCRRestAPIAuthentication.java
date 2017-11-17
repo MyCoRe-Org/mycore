@@ -64,6 +64,7 @@ public class MCRRestAPIAuthentication {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIAuthentication.class);
 
     private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
     private static final String HEADER_PREFIX_BEARER = "Bearer ";
 
     /**
@@ -76,7 +77,7 @@ public class MCRRestAPIAuthentication {
         String msg = "{" + "\n    \"access_token\": \"" + jwt + "\"," + "\n}";
 
         return Response.ok(msg).type("application/json; charset=UTF-8")
-                       .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
+            .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
     }
 
     /**
@@ -124,12 +125,12 @@ public class MCRRestAPIAuthentication {
             SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Collections.singletonList("restapi"),
                 MCRFrontendUtil.getBaseURL(), clientPubKey);
             if (jwt != null) {
-                String msg =
-                    "{" + "\n    \"login_successful\":true," + "\n    \"access_token\": \"" + jwt.serialize() + "\","
-                        + "\n    \"token_type\": \"Bearer\"" + "\n}";
+                String msg = "{" + "\n    \"login_successful\":true," + "\n    \"access_token\": \"" + jwt.serialize()
+                    + "\","
+                    + "\n    \"token_type\": \"Bearer\"" + "\n}";
 
                 return Response.ok(msg).type("application/json; charset=UTF-8")
-                               .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
+                    .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
             }
         }
 
@@ -138,7 +139,7 @@ public class MCRRestAPIAuthentication {
             + "\"Login failed. Please provider proper user name and password via HTTP Basic Authentication.\"" + "\n}";
 
         return Response.status(Status.FORBIDDEN).header("WWW-Authenticate", "Basic realm=\"MyCoRe REST API\"")
-                       .entity(msg).type("application/json; charset=UTF-8").build();
+            .entity(msg).type("application/json; charset=UTF-8").build();
     }
 
     @GET
@@ -170,7 +171,7 @@ public class MCRRestAPIAuthentication {
                     + data + "\"," + "\n}";
 
                 return Response.ok(msg).type("application/json; charset=UTF-8")
-                               .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
         } catch (MCRRestAPIException rae) {
             throw rae;

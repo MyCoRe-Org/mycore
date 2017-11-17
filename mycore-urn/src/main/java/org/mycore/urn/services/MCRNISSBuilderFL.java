@@ -52,9 +52,9 @@ public class MCRNISSBuilderFL implements MCRNISSBuilder {
 
         String DDDDD = String.valueOf(yyy * 366 + ddd);
 
-        String niss =
-            String.valueOf(DDDDD.charAt(4)) + DDDDD.charAt(2) + DDDDD.charAt(1) + DDDDD.charAt(3) + DDDDD.charAt(0)
-                + sss;
+        String niss = String.valueOf(DDDDD.charAt(4)) + DDDDD.charAt(2) + DDDDD.charAt(1) + DDDDD.charAt(3)
+            + DDDDD.charAt(0)
+            + sss;
 
         if (niss.equals(last)) {
             try {

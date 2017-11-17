@@ -72,8 +72,8 @@ public class MCRDerivateServlet extends MCRServlet {
                 break;
             default:
                 job.getResponse()
-                   .sendError(HttpServletResponse.SC_BAD_REQUEST,
-                       MessageFormat.format("The task \"{0}\" is not supported.", task));
+                    .sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        MessageFormat.format("The task \"{0}\" is not supported.", task));
                 break;
         }
         return !job.getResponse().isCommitted();

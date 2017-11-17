@@ -55,7 +55,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public void index() throws IOException, SolrServerException {
         MCRObjectID mcrID = MCRObjectID.getInstance(getID());
-        if(!MCRMetadataManager.exists(mcrID)) {
+        if (!MCRMetadataManager.exists(mcrID)) {
             LOGGER.warn("Unable to index '{}' cause it doesn't exists anymore!", mcrID);
             return;
         }

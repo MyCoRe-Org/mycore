@@ -45,7 +45,7 @@ public class MCRSolrSingleObjectStreamIndexHandler extends MCRSolrObjectStreamIn
      * Invokes an index request for the current content stream.
      */
     public void index() throws IOException, SolrServerException {
-        if(!MCRMetadataManager.exists(id)) {
+        if (!MCRMetadataManager.exists(id)) {
             LOGGER.warn("Unable to index '{}' cause it doesn't exists anymore!", id);
             return;
         }

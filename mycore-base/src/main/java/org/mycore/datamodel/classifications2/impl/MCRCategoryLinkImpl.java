@@ -97,14 +97,15 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
             + "  GROUP BY cat.id.ID"),
     @NamedQuery(name = "MCRCategoryLink.deleteByObjectID",
         query = "DELETE FROM MCRCategoryLinkImpl WHERE objectReference.objectID=:id and objectReference.type=:type"),
-    @NamedQuery(name = "MCRCategoryLink.CategoryAndObjectID", query = "SELECT link.objectReference.objectID"
-        + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
-        + "  WHERE cattree.internalID = link.category"
-        + "    AND link.objectReference.objectID=:objectID"
-        + "    AND link.objectReference.type=:type"
-        + "    AND cattree.id.rootID=:rootID"
-        + "    AND cat.id.rootID=:rootID"
-        + "    AND cat.id.ID=:categID"
+    @NamedQuery(name = "MCRCategoryLink.CategoryAndObjectID",
+        query = "SELECT link.objectReference.objectID"
+            + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
+            + "  WHERE cattree.internalID = link.category"
+            + "    AND link.objectReference.objectID=:objectID"
+            + "    AND link.objectReference.type=:type"
+            + "    AND cattree.id.rootID=:rootID"
+            + "    AND cat.id.rootID=:rootID"
+            + "    AND cat.id.ID=:categID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right",
         hints = { @QueryHint(name = QueryHints.READ_ONLY, value = "true") }),
     @NamedQuery(name = "MCRCategoryLink.linkedClassifications",
