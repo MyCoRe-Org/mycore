@@ -57,6 +57,8 @@ public class MCREditorSession {
 
     private static final Logger LOGGER = LogManager.getLogger(MCREditorSession.class);
 
+    private static final Pattern PATTERN_URI = Pattern.compile("\\{\\$([^\\}]+)\\}");
+
     private String id;
 
     private String url;
@@ -154,8 +156,6 @@ public class MCREditorSession {
             this.cancelURL = cancelURL;
         }
     }
-
-    private static final Pattern PATTERN_URI = Pattern.compile("\\{\\$([^\\}]+)\\}");
 
     public String replaceParameters(String uri) {
         Matcher m = PATTERN_URI.matcher(uri);

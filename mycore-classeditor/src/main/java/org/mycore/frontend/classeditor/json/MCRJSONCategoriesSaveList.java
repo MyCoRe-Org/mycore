@@ -6,20 +6,6 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 public class MCRJSONCategoriesSaveList {
-    private class CategorySaveElement {
-        private MCRCategory categ;
-
-        private MCRCategoryID parentID;
-
-        private int index;
-
-        public CategorySaveElement(MCRCategory categ, MCRCategoryID parentID, int index) {
-            this.categ = categ;
-            this.parentID = parentID;
-            this.index = index;
-        }
-    }
-
     ArrayList<CategorySaveElement> updateList = new ArrayList<>();
 
     ArrayList<CategorySaveElement> deleteList = new ArrayList<>();
@@ -31,6 +17,18 @@ public class MCRJSONCategoriesSaveList {
             deleteList.add(new CategorySaveElement(categ, parentID, index));
         } else {
             throw new Exception("Unknown status.");
+        }
+    }
+
+    private class CategorySaveElement {
+        private MCRCategory categ;
+        private MCRCategoryID parentID;
+        private int index;
+
+        public CategorySaveElement(MCRCategory categ, MCRCategoryID parentID, int index) {
+            this.categ = categ;
+            this.parentID = parentID;
+            this.index = index;
         }
     }
 

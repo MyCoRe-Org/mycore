@@ -105,7 +105,7 @@ public class MCRRequestDebugFilter implements Filter {
                 } catch (Exception e) {
                     LOGGER.error("BeanUtils Exception describing cookie", e);
                 }
-                sb.append(" ").append(description).append('\n');
+                sb.append(' ').append(description).append('\n');
             }
         }
         sb.append("COOKIES END \n\n");

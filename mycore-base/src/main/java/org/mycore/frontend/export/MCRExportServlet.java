@@ -64,6 +64,9 @@ public class MCRExportServlet extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRExportServlet.class);
 
+    /** URIs beginning with these prefixes are forbidden for security reasons */
+    private static final String[] forbiddenURIs = { "file", "webapp", "resource" };
+
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         MCRExportCollection collection = createCollection(job.getRequest());
@@ -100,9 +103,6 @@ public class MCRExportServlet extends MCRServlet {
                 }
             }
     }
-
-    /** URIs beginning with these prefixes are forbidden for security reasons */
-    private static final String[] forbiddenURIs = { "file", "webapp", "resource" };
 
     private boolean isAllowed(String uri) {
         for (String prefix : forbiddenURIs)

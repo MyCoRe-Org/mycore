@@ -229,7 +229,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         StringBuilder sb = new StringBuilder("DELETE FROM MCRJob");
         if (action != null) {
-            sb.append(" WHERE action='").append(action.getName()).append("'");
+            sb.append(" WHERE action='").append(action.getName()).append('\'');
         }
 
         Query query = em.createQuery(sb.toString());
@@ -468,7 +468,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
                 .append(paramKey)
                 .append("'] = '")
                 .append(params.get(paramKey))
-                .append("'");
+                .append('\'');
         }
 
         Query query = em.createQuery(qStr.toString());

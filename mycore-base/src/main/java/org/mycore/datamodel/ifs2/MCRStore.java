@@ -75,15 +75,6 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public abstract class MCRStore {
 
-    public interface MCRStoreConfig {
-
-        String getBaseDir();
-
-        String getID();
-
-        String getSlotLayout();
-    }
-
     /**
      * Indicates ascending order when listing IDs
      */
@@ -522,5 +513,11 @@ public abstract class MCRStore {
             }
         }
         return null;
+    }
+
+    public interface MCRStoreConfig {
+        String getBaseDir();
+        String getID();
+        String getSlotLayout();
     }
 }
