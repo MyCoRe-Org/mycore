@@ -24,7 +24,6 @@
 package org.mycore.common.config;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;

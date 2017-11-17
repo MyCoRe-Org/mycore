@@ -45,6 +45,39 @@ import org.mycore.datamodel.niofs.MCRPath;
  *          2010) $
  */
 public class MCRDirectory extends MCRFilesystemNode {
+    /** Constant for choosing file nodes * */
+    public static final int FILES = 1;
+
+    /** Constant for choosing directory nodes * */
+    public static final int DIRECTORIES = 2;
+
+    /** Constant for choosing any node type * */
+    public static final int NODES = 3;
+
+    /** Constant for choosing only direct child nodes of this directory * */
+    public static final int HERE = 1;
+
+    /**
+     * Constant for choosing both direct and indirect child nodes contained in
+     * subdirectories of this directory *
+     */
+    public static final int TOTAL = 2;
+
+    /** Sorts children by filename, case insensitive * */
+    public static final Comparator<MCRFilesystemNode> SORT_BY_NAME_IGNORECASE = Comparator
+        .comparing(MCRFilesystemNode::getName, String::compareToIgnoreCase);
+
+    /** Sorts children by filename, case sensitive * */
+    public static final Comparator<MCRFilesystemNode> SORT_BY_NAME = Comparator.comparing(MCRFilesystemNode::getName);
+
+    /** Sorts children by file size or total directory size * */
+    public static final Comparator<MCRFilesystemNode> SORT_BY_SIZE = Comparator
+        .comparingLong(MCRFilesystemNode::getSize);
+
+    /** Sorts children by date of last modification * */
+    public static final Comparator<MCRFilesystemNode> SORT_BY_DATE = Comparator
+        .comparing(MCRFilesystemNode::getLastModified);
+
     /** The child nodes in this directory * */
     private ConcurrentMap<String, MCRFilesystemNode> children;
 
@@ -361,24 +394,6 @@ public class MCRDirectory extends MCRFilesystemNode {
         return 0;
     }
 
-    /** Constant for choosing file nodes * */
-    public static final int FILES = 1;
-
-    /** Constant for choosing directory nodes * */
-    public static final int DIRECTORIES = 2;
-
-    /** Constant for choosing any node type * */
-    public static final int NODES = 3;
-
-    /** Constant for choosing only direct child nodes of this directory * */
-    public static final int HERE = 1;
-
-    /**
-     * Constant for choosing both direct and indirect child nodes contained in
-     * subdirectories of this directory *
-     */
-    public static final int TOTAL = 2;
-
     /**
      * Returns the number of child nodes in this directory. The additional
      * parameters control what type of nodes will be counted and if only direct
@@ -450,21 +465,6 @@ public class MCRDirectory extends MCRFilesystemNode {
         numChildFilesHere = 0;
         numChildFilesTotal = 0;
     }
-
-    /** Sorts children by filename, case insensitive * */
-    public static final Comparator<MCRFilesystemNode> SORT_BY_NAME_IGNORECASE = Comparator
-        .comparing(MCRFilesystemNode::getName, String::compareToIgnoreCase);
-
-    /** Sorts children by filename, case sensitive * */
-    public static final Comparator<MCRFilesystemNode> SORT_BY_NAME = Comparator.comparing(MCRFilesystemNode::getName);
-
-    /** Sorts children by file size or total directory size * */
-    public static final Comparator<MCRFilesystemNode> SORT_BY_SIZE = Comparator
-        .comparingLong(MCRFilesystemNode::getSize);
-
-    /** Sorts children by date of last modification * */
-    public static final Comparator<MCRFilesystemNode> SORT_BY_DATE = Comparator
-        .comparing(MCRFilesystemNode::getLastModified);
 
     /**
      * Creates a list of all MD5 checksums of all files that are direct or

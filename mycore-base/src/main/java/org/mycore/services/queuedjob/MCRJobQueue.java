@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -100,7 +100,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     /**
      * Returns an singleton instance of this class.
-     * 
+     *
      * @param action the {@link MCRJobAction} or <code>null</code>
      * @return singleton instance of this class
      */
@@ -117,9 +117,11 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     /**
      * @return next available job instance
      */
+    @Override
     public MCRJob poll() {
-        if (!running)
+        if (!running) {
             return null;
+        }
         try {
             pollLock.lock();
             MCRJob job = getElement();
@@ -143,8 +145,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      */
     @Override
     public MCRJob remove() throws NoSuchElementException {
-        if (!running)
+        if (!running) {
             return null;
+        }
         MCRJob job = poll();
         if (job == null) {
             throw new NoSuchElementException();
@@ -153,12 +156,14 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     /**
-     * get next job without modifying it state to {@link MCRJobStatus#PROCESSING} 
+     * get next job without modifying it state to {@link MCRJobStatus#PROCESSING}
      * @return the next job
      */
+    @Override
     public MCRJob peek() {
-        if (!running)
+        if (!running) {
             return null;
+        }
         MCRJob job = getElement();
         return job;
     }
@@ -170,8 +175,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      */
     @Override
     public MCRJob element() throws NoSuchElementException {
-        if (!running)
+        if (!running) {
             return null;
+        }
         MCRJob job = peek();
         if (job == null) {
             throw new NoSuchElementException();
@@ -180,16 +186,19 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     /**
-     * adds {@link MCRJob} to queue and starts {@link MCRJobMaster} if 
+     * adds {@link MCRJob} to queue and starts {@link MCRJobMaster} if
      * <code>"MCR.QueuedJob.autostart"</code> is set <code>true</code>.
      * alters date added to current time and status of job to {@link MCRJobStatus#NEW}
      */
+    @Override
     public boolean offer(MCRJob job) {
-        if (!running)
+        if (!running) {
             return false;
+        }
 
-        if (job.getAction() == null && action != null)
+        if (job.getAction() == null && action != null) {
             job.setAction(action);
+        }
 
         MCRJob oldJob = getJob(job.getAction(), job.getParameters());
         if (oldJob != null) {
@@ -212,14 +221,16 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      */
     @Override
     public void clear() {
-        if (!running)
+        if (!running) {
             return;
+        }
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         StringBuilder sb = new StringBuilder("DELETE FROM MCRJob");
-        if (action != null)
+        if (action != null) {
             sb.append(" WHERE action='").append(action.getName()).append("'");
+        }
 
         Query query = em.createQuery(sb.toString());
         query.executeUpdate();
@@ -227,7 +238,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     /**
      * iterates over jobs of status {@link MCRJobStatus#NEW}
-     * 
+     *
      * does not change the status.
      */
     @Override
@@ -250,10 +261,12 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         Root<MCRJob> root = cq.from(MCRJob.class);
 
         List<Predicate> predicates = new ArrayList<>();
-        if (status != null)
+        if (status != null) {
             predicates.add(cb.equal(root.get("status"), status));
-        if (action != null)
+        }
+        if (action != null) {
             predicates.add(cb.equal(root.get("action"), action));
+        }
         cq.where(cb.and(predicates.toArray(new Predicate[] {})));
         cq.orderBy(cb.asc(root.get("added")));
         cq.distinct(true);
@@ -268,13 +281,15 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      */
     @Override
     public int size() {
-        if (!running)
+        if (!running) {
             return 0;
+        }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         StringBuilder sb = new StringBuilder("SELECT count(*) FROM MCRJob WHERE ");
-        if (action != null)
+        if (action != null) {
             sb.append("action='").append(action.getName()).append("' AND ");
+        }
         sb.append("status='" + MCRJobStatus.NEW + "'");
 
         return em.createQuery(sb.toString(), Number.class).getSingleResult().intValue();
@@ -282,16 +297,18 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     /**
      * get the specific job and alters it status to {@link MCRJobStatus#PROCESSING}
-     * 
+     *
      * @param action the {@link MCRJobAction}
      */
     public MCRJob getElementOutOfOrder(Class<? extends MCRJobAction> action, Map<String, String> params)
         throws NoSuchElementException {
-        if (!running)
+        if (!running) {
             return null;
+        }
         MCRJob job = getJob(action, params);
-        if (job == null)
+        if (job == null) {
             return null;
+        }
         job.setStart(new Date(System.currentTimeMillis()));
         job.setStatus(MCRJobStatus.PROCESSING);
         if (!updateJob(job)) {
@@ -302,7 +319,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     /**
      * returns a specific job from given parameters or null if not found.
-     *  
+     *
      * @param params the parameters
      * @return the job
      */
@@ -311,8 +328,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     private MCRJob getJob(Class<? extends MCRJobAction> action, Map<String, String> params) {
-        if (!running)
+        if (!running) {
             return null;
+        }
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
@@ -323,7 +341,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
                 .append(paramKey)
                 .append("'] = '")
                 .append(params.get(paramKey))
-                .append("'");
+                .append('\'');
         }
 
         TypedQuery<MCRJob> query = em.createQuery(qStr.toString(), MCRJob.class);
@@ -338,8 +356,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     private MCRJob getElement() {
-        if (!running)
+        if (!running) {
             return null;
+        }
         MCRJob job = getNextPrefetchedElement();
         if (job != null) {
             return job;
@@ -366,8 +385,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("status"), MCRJobStatus.NEW));
-        if (action != null)
+        if (action != null) {
             predicates.add(cb.equal(root.get("action"), action));
+        }
         cq.where(cb.and(predicates.toArray(new Predicate[] {})));
         cq.orderBy(cb.asc(root.get("added")));
         cq.distinct(true);
@@ -379,8 +399,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         int i = 0;
         for (MCRJob job : jobs) {
-            if (job.getParameters().isEmpty())
+            if (job.getParameters().isEmpty()) {
                 continue;
+            }
 
             i++;
             preFetch.add(job.clone());
@@ -395,16 +416,18 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     }
 
     private boolean updateJob(MCRJob job) {
-        if (!running)
+        if (!running) {
             return false;
+        }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.merge(job);
         return true;
     }
 
     private boolean addJob(MCRJob job) {
-        if (!running)
+        if (!running) {
             return false;
+        }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.persist(job);
         return true;
@@ -420,20 +443,22 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         boolean autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "autostart", true);
         autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "autostart", autostart);
 
-        if (autostart)
+        if (autostart) {
             MCRJobMaster.startMasterThread(action);
+        }
     }
 
     /**
      * removes specific job from queue no matter what its current status is.
-     * 
+     *
      * @param action - the action class
      * @param params - parameters to get jobs
      * @return the number of jobs deleted
      */
     public int remove(Class<? extends MCRJobAction> action, Map<String, String> params) {
-        if (!running)
+        if (!running) {
             return 0;
+        }
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
@@ -450,8 +475,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         @SuppressWarnings("unchecked")
         Iterator<MCRJob> results = query.getResultList().iterator();
-        if (!results.hasNext())
+        if (!results.hasNext()) {
             return 0;
+        }
 
         MCRJob job = results.next();
 
@@ -466,13 +492,14 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     /**
      * Removes all jobs from queue of specified action.
-     * 
+     *
      * @param action - the action class
      * @return the number of jobs deleted
      */
     public int remove(Class<? extends MCRJobAction> action) {
-        if (!running)
+        if (!running) {
             return 0;
+        }
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
@@ -480,8 +507,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         @SuppressWarnings("unchecked")
         Iterator<MCRJob> results = query.getResultList().iterator();
-        if (!results.hasNext())
+        if (!results.hasNext()) {
             return 0;
+        }
         try {
             int delC = 0;
             while (results.hasNext()) {
@@ -500,6 +528,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     /**
      * Shuts down {@link MCRStalledJobResetter} and does not alter any job anymore.
      */
+    @Override
     public void prepareClose() {
         StalledJobScheduler.shutdownNow();
         running = false;
@@ -514,6 +543,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     /**
      * does nothing
      */
+    @Override
     public void close() {
         //nothing to be done in this phase
     }

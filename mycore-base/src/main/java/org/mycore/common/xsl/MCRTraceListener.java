@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
  * Traces the execution of xsl stylesheet elements in debug mode. The trace
  * is written to the log, and in parallel as comment elements to the output
  * html.
- * 
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRTraceListener implements TraceListener {
@@ -51,6 +51,7 @@ public class MCRTraceListener implements TraceListener {
      * is written to the log, and in parallel as comment elements to the output
      * html.
      */
+    @Override
     public void trace(TracerEvent ev) {
         if (LOGGER.isDebugEnabled()) {
             ElemTemplateElement ete = ev.m_styleNode; // Current position in
@@ -79,20 +80,20 @@ public class MCRTraceListener implements TraceListener {
                 ElemTemplate et = ev.m_processor.getCurrentTemplate();
                 log.append(" in <xsl:template");
                 if (et.getMatch() != null) {
-                    log.append(" match=\"").append(et.getMatch().getPatternString()).append("\"");
+                    log.append(" match=\"").append(et.getMatch().getPatternString()).append('"');
                 }
                 if (et.getName() != null) {
-                    log.append(" name=\"").append(et.getName().getLocalName()).append("\"");
+                    log.append(" name=\"").append(et.getName().getLocalName()).append('"');
                 }
                 if (et.getMode() != null) {
-                    log.append(" mode=\"").append(et.getMode().getLocalName()).append("\"");
+                    log.append(" mode=\"").append(et.getMode().getLocalName()).append('"');
                 }
-                log.append(">");
+                log.append('>');
             } catch (Exception ignored) {
             }
 
             // Output name of the xsl or html element currently processed
-            log.append(" ").append(ete.getTagName());
+            log.append(' ').append(ete.getTagName());
             LOGGER.debug("Trace{}", log);
 
             // Output xpath of current xml source node in context
@@ -123,6 +124,7 @@ public class MCRTraceListener implements TraceListener {
      * When a stylesheet generates characters, they will be logged in debug
      * mode.
      */
+    @Override
     public void generated(GenerateEvent ev) {
         if (LOGGER.isDebugEnabled() && ev.m_eventtype == 12) {
             LOGGER.debug("Output {}", new String(ev.m_characters, ev.m_start, ev.m_length).trim());
@@ -134,6 +136,7 @@ public class MCRTraceListener implements TraceListener {
      * similar elements, the selection element and xpath is logged in debug
      * mode.
      */
+    @Override
     public void selected(SelectionEvent ev) {
         if (LOGGER.isDebugEnabled()) {
             String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\""

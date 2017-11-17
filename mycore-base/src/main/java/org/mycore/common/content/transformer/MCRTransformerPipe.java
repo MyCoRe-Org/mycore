@@ -44,6 +44,9 @@ import org.mycore.common.xsl.MCRParameterCollector;
  */
 public class MCRTransformerPipe extends MCRParameterizedTransformer {
 
+    /** List of transformers to execute */
+    private List<MCRContentTransformer> transformers = new ArrayList<>();
+
     public MCRTransformerPipe(MCRContentTransformer... transformers) {
         this();
         this.transformers.addAll(Arrays.asList(transformers));
@@ -53,9 +56,6 @@ public class MCRTransformerPipe extends MCRParameterizedTransformer {
     public MCRTransformerPipe() {
         super();
     }
-
-    /** List of transformers to execute */
-    private List<MCRContentTransformer> transformers = new ArrayList<>();
 
     @Override
     public void init(String id) {

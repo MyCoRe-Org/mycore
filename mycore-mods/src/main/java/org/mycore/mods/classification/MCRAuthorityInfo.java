@@ -25,14 +25,6 @@ abstract class MCRAuthorityInfo {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     /**
-     * Returns the label value of the given type ("language"), or the given default if that label does not exist in the
-     * category.
-     */
-    protected static String getLabel(MCRCategory category, String labelType, String defaultLabel) {
-        return category.getLabel(labelType).map(MCRLabel::getText).orElse(defaultLabel);
-    }
-
-    /**
      * A cache that maps authority information to the category ID that is represented by that info.
      */
     private static final MCRCache<String, Object> categoryIDbyAuthorityInfo = new MCRCache<>(1000,
@@ -42,6 +34,14 @@ abstract class MCRAuthorityInfo {
      * Used in the cache to indicate the case when no category ID maps to the given authority info
      */
     private static final String NULL = "null";
+
+    /**
+     * Returns the label value of the given type ("language"), or the given default if that label does not exist in the
+     * category.
+     */
+    protected static String getLabel(MCRCategory category, String labelType, String defaultLabel) {
+        return category.getLabel(labelType).map(MCRLabel::getText).orElse(defaultLabel);
+    }
 
     /**
      * Returns the category ID that is represented by this authority information.

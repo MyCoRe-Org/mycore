@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.frontend.filter;
 
@@ -75,7 +75,7 @@ public class MCRRequestDebugFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         StringBuilder sb = new StringBuilder("RESPONSE (" + req.getMethod() + ") URI: " + req.getRequestURI() + " \n");
         HttpServletResponse res = (HttpServletResponse) response;
-        sb.append("Status: ").append(res.getStatus()).append("\n");
+        sb.append("Status: ").append(res.getStatus()).append('\n');
         logHeader(res.getHeaderNames().stream(), s -> res.getHeaders(s).stream(), sb);
         return sb.append("\n\n").toString();
     }
@@ -105,7 +105,7 @@ public class MCRRequestDebugFilter implements Filter {
                 } catch (Exception e) {
                     LOGGER.error("BeanUtils Exception describing cookie", e);
                 }
-                sb.append(" ").append(description).append("\n");
+                sb.append(" ").append(description).append('\n');
             }
         }
         sb.append("COOKIES END \n\n");
@@ -145,7 +145,6 @@ public class MCRRequestDebugFilter implements Filter {
         String description = value.map(o -> {
             if (!hasSafeToString(o)) {
                 try {
-                    @SuppressWarnings("unchecked")
                     Map<String, String> beanDescription = BeanUtils.describe(value);
                     if (!beanDescription.isEmpty()) {
                         return beanDescription.toString();
@@ -178,7 +177,7 @@ public class MCRRequestDebugFilter implements Filter {
             .stream()
             .sorted((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getKey(), o2.getKey()))
             .forEachOrdered(entry -> {
-                sb.append(" ").append(entry.getKey()).append(": ");
+                sb.append(' ').append(entry.getKey()).append(": ");
                 for (String s : entry.getValue()) {
                     sb.append(s);
                     sb.append(", ");

@@ -50,6 +50,9 @@ public final class MCRConstants {
     /** MCR.Metadata.DefaultLang */
     public static final String DEFAULT_LANG = "de";
 
+    /** The default encoding */
+    public static final String DEFAULT_ENCODING = "UTF-8";
+
     public static final Namespace XML_NAMESPACE = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
 
     public static final Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
@@ -168,8 +171,5 @@ public final class MCRConstants {
     public static Namespace getStandardNamespace(String prefix) {
         return namespacesByPrefix.get(prefix);
     }
-
-    /** The default encoding */
-    public static final String DEFAULT_ENCODING = "UTF-8";
 
 }

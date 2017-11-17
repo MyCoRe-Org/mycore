@@ -422,38 +422,53 @@ public class MCRCalendar {
             }
             // correct data
             int julian_day = calendar.get(Calendar.JULIAN_DAY);
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 6 && fields[3] == 1)
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 6 && fields[3] == 1) {
                 julian_day = 2299162;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 7 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 7 && fields[3] == 1) {
                 julian_day = 2299163;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 8 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 8 && fields[3] == 1) {
                 julian_day = 2299164;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 9 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 9 && fields[3] == 1) {
                 julian_day = 2299165;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 10 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 10 && fields[3] == 1) {
                 julian_day = 2299166;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 11 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 11 && fields[3] == 1) {
                 julian_day = 2299167;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 12 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 12 && fields[3] == 1) {
                 julian_day = 2299168;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 13 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 13 && fields[3] == 1) {
                 julian_day = 2299169;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 14 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 14 && fields[3] == 1) {
                 julian_day = 2299170;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 15 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 15 && fields[3] == 1) {
                 julian_day = 2299171;
+            }
             if ((fields[0] > 1582 || (fields[0] == 1582 && fields[1] > 9)
                 || (fields[0] == 1582 && fields[1] == 9 && fields[2] > 15))
-                && fields[3] == 1)
+                && fields[3] == 1) {
                 julian_day += 10;
-            if ((fields[0] > 1700 || (fields[0] == 1700 && fields[1] >= 2)) && fields[3] == 1)
+            }
+            if ((fields[0] > 1700 || (fields[0] == 1700 && fields[1] >= 2)) && fields[3] == 1) {
                 julian_day += 1;
-            if ((fields[0] > 1800 || (fields[0] == 1800 && fields[1] >= 2)) && fields[3] == 1)
+            }
+            if ((fields[0] > 1800 || (fields[0] == 1800 && fields[1] >= 2)) && fields[3] == 1) {
                 julian_day += 1;
-            if ((fields[0] > 1900 || (fields[0] == 1900 && fields[1] >= 2)) && fields[3] == 1)
+            }
+            if ((fields[0] > 1900 || (fields[0] == 1900 && fields[1] >= 2)) && fields[3] == 1) {
                 julian_day += 1;
-            if ((fields[0] > 2100 || (fields[0] == 2100 && fields[1] >= 2)) && fields[3] == 1)
+            }
+            if ((fields[0] > 2100 || (fields[0] == 2100 && fields[1] >= 2)) && fields[3] == 1) {
                 julian_day += 1;
+            }
             calendar.set(Calendar.JULIAN_DAY, julian_day);
             return calendar;
         } catch (Exception e) {
@@ -861,7 +876,6 @@ public class MCRCalendar {
             datestr = datestr.trim();
 
             // boolean bm = false;
-            int era = 0;
             int start = 0;
 
             // german or ISO?
@@ -927,6 +941,7 @@ public class MCRCalendar {
                 }
             }
 
+            int era;
             switch (syear.substring(0, 1)) {
                 case "H":
                     era = 235;
@@ -940,6 +955,8 @@ public class MCRCalendar {
                 case "M":
                     era = 232;
                     break;
+                default:
+                    era = 0;
             }
             year = Integer.parseInt(syear.substring(1).trim());
             // test of the monthly

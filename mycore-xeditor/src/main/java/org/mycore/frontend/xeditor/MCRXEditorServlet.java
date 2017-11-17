@@ -42,6 +42,8 @@ public class MCRXEditorServlet extends MCRServlet {
 
     protected static final Logger LOGGER = LogManager.getLogger(MCRXEditorServlet.class);
 
+    private static final String TARGET_PATTERN = "_xed_submit_";
+
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         String xEditorStepID = job.getRequest().getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
@@ -60,8 +62,6 @@ public class MCRXEditorServlet extends MCRServlet {
 
         sendToTarget(job, session);
     }
-
-    private static final String TARGET_PATTERN = "_xed_submit_";
 
     private void sendToTarget(MCRServletJob job, MCREditorSession session) throws Exception {
         String targetID = "debug";

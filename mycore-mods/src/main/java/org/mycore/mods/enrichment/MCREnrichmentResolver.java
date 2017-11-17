@@ -44,8 +44,6 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.mods.MCRMODSSorter;
 import org.mycore.mods.merger.MCRMergeTool;
-import org.mycore.mods.merger.MCRMerger;
-import org.mycore.mods.merger.MCRMergerFactory;
 
 /**
  * @author Frank L\u00FCtzenkirchen

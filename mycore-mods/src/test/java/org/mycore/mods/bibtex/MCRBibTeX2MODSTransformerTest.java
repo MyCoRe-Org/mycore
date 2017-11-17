@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;

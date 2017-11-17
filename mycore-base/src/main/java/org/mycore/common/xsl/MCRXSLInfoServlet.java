@@ -61,6 +61,10 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXSLInfoServlet.class);
 
+    private Map<String, Stylesheet> stylesheets = new HashMap<>();
+
+    private Set<String> unknown = new HashSet<>();
+
     protected void doGetPost(MCRServletJob job) throws Exception {
         if ("true".equals(job.getRequest().getParameter("reload")))
             stylesheets.clear();
@@ -153,10 +157,6 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         source = source.substring(9); // cut off "/WEB-INF/"
         stylesheet.origin.add(source);
     }
-
-    private Map<String, Stylesheet> stylesheets = new HashMap<>();
-
-    private Set<String> unknown = new HashSet<>();
 
     private Stylesheet getStylesheet(String name) {
         return stylesheets.computeIfAbsent(name, Stylesheet::new);

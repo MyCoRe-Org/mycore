@@ -235,11 +235,11 @@ public class MCRMODSWrapper {
         // add attributes to xpath with and operator
         if (isAttributeDataPresent) {
 
-            xPath.append("[");
+            xPath.append('[');
             Iterator<Map.Entry<String, String>> attributeIterator = attributes.entrySet().iterator();
             while (attributeIterator.hasNext()) {
                 Map.Entry<String, String> attribute = attributeIterator.next();
-                xPath.append("@").append(attribute.getKey()).append("='").append(attribute.getValue()).append("'");
+                xPath.append('@').append(attribute.getKey()).append("='").append(attribute.getValue()).append('\'');
 
                 if (attributeIterator.hasNext()) {
                     xPath.append(" and ");

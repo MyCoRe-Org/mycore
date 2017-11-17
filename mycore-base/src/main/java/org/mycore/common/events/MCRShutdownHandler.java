@@ -156,6 +156,11 @@ public class MCRShutdownHandler {
     @FunctionalInterface
     public interface Closeable extends Comparable<Closeable> {
         /**
+         * The default priority
+         */
+        int DEFAULT_PRIORITY = 5;
+
+        /**
          * prepare for closing this object that implements <code>Closeable</code>. This is the first part of the closing
          * process. As a object may need database access to close cleanly this method can be used to be ahead of
          * database outtake.
@@ -182,11 +187,6 @@ public class MCRShutdownHandler {
         default int compareTo(Closeable other) {
             return Integer.compare(other.getPriority(), getPriority());
         }
-
-        /**
-         * The default priority
-         */
-        int DEFAULT_PRIORITY = 5;
     }
 
 }

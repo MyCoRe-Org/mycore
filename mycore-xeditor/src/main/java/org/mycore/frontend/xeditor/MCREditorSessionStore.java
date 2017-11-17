@@ -33,6 +33,8 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCREditorSessionStore {
 
+    public static final String XEDITOR_SESSION_PARAM = "_xed_session";
+
     private MCRCache<String, MCREditorSession> cachedSessions;
 
     private AtomicInteger idGenerator = new AtomicInteger(0);
@@ -51,6 +53,4 @@ public class MCREditorSessionStore {
     public MCREditorSession getSession(String id) {
         return cachedSessions.get(id);
     }
-
-    public static final String XEDITOR_SESSION_PARAM = "_xed_session";
 }

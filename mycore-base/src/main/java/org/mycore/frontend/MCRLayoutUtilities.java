@@ -59,7 +59,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 
 /**
- * 
+ *
  * Xalan extention for navigation.xsl
  *
  */
@@ -155,7 +155,7 @@ public class MCRLayoutUtilities {
      * verified item with read access. So, only items of the ancestor axis till
      * and exclusive $blockerWebpageID are verified. Use this, if you want to
      * speed up the check
-     * 
+     *
      * @param webpageID
      *            any item/@href from navigation.xml
      * @param blockerWebpageID
@@ -178,7 +178,7 @@ public class MCRLayoutUtilities {
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
      * permission, based on ACL-System. To be used by XSL with
      * Xalan-Java-Extension-Call.
-     * 
+     *
      * @param webpageID
      *            any item/@href from navigation.xml
      * @return true if access granted, false if not
@@ -198,7 +198,7 @@ public class MCRLayoutUtilities {
     /**
      * Returns all labels of the ancestor axis for the given item within
      * navigation.xml
-     * 
+     *
      * @param item a navigation item
      * @return Label as String, like "labelRoot &gt; labelChild &gt;
      *         labelChildOfChild"
@@ -218,7 +218,7 @@ public class MCRLayoutUtilities {
                 Filters.element());
             labelEl = xpath.evaluateFirst(getNavi());
             if (labelEl != null) {
-                if (label.toString().equals("")) {
+                if (label.length() == 0) {
                     label = new StringBuilder(labelEl.getTextTrim());
                 } else {
                     label.insert(0, labelEl.getTextTrim() + " > ");
@@ -230,7 +230,7 @@ public class MCRLayoutUtilities {
 
     /**
      * Verifies, if an item of navigation.xml has a given $permission.
-     * 
+     *
      * @param webpageID
      *            item/@href
      * @param permission
@@ -262,7 +262,7 @@ public class MCRLayoutUtilities {
     /**
      * Verifies, if an item of navigation.xml has a given $permission with a
      * stop item ($blockerWebpageID)
-     * 
+     *
      * @param webpageID
      *            item/@href
      * @param permission
@@ -292,7 +292,7 @@ public class MCRLayoutUtilities {
 
     /**
      * Returns a Element presentation of an item[@href=$webpageID]
-     * 
+     *
      * @param webpageID
      * @return Element
      */
@@ -308,7 +308,7 @@ public class MCRLayoutUtilities {
 
     /**
      * Verifies a single item on access according to $permission
-     * 
+     *
      * @param permission an ACL permission
      * @param item element to check
      * @param access
@@ -325,7 +325,7 @@ public class MCRLayoutUtilities {
     /**
      * Verifies a single item on access according to $permission and for a given
      * user
-     * 
+     *
      * @param permission an ACL permission
      * @param item element to check
      * @param access
@@ -356,7 +356,7 @@ public class MCRLayoutUtilities {
     /**
      * Returns the navigation.xml as org.jdom2.document, using a cache the
      * enhance loading time.
-     * 
+     *
      * @return navigation.xml as org.jdom2.document
      */
     public static Document getNavi() {
@@ -378,7 +378,7 @@ public class MCRLayoutUtilities {
 
     /**
      * Returns the navigation.xml as URL.
-     * 
+     *
      * Use this method if you need to parse it on your own.
      */
     public static URL getNavigationURL() {

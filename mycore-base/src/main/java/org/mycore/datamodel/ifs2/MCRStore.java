@@ -84,6 +84,16 @@ public abstract class MCRStore {
         String getSlotLayout();
     }
 
+    /**
+     * Indicates ascending order when listing IDs
+     */
+    public static final boolean ASCENDING = true;
+
+    /**
+     * Indicates descending order when listing IDs
+     */
+    public static final boolean DESCENDING = false;
+
     /** The ID of the store */
     protected String id;
 
@@ -124,16 +134,6 @@ public abstract class MCRStore {
      * The last ID assigned by this store.
      */
     protected int lastID = 0;
-
-    /**
-     * Indicates ascending order when listing IDs
-     */
-    public static final boolean ASCENDING = true;
-
-    /**
-     * Indicates descending order when listing IDs
-     */
-    public static final boolean DESCENDING = false;
 
     /**
      * Deletes the data stored under the given ID from the store

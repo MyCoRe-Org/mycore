@@ -23,6 +23,7 @@
 package org.mycore.mods.merger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.jdom2.Attribute;
@@ -44,6 +45,9 @@ import org.mycore.common.xml.MCRXMLHelper;
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRMerger {
+
+    /** Holds the MODS namespace */
+    private static List<Namespace> NS = Collections.singletonList(MCRConstants.MODS_NAMESPACE);
 
     /** The MODS element wrapped and compared by this merger */
     protected Element element;
@@ -128,13 +132,6 @@ public class MCRMerger {
         }
         entries.add(newEntry);
         element.addContent(newEntry.element.clone());
-    }
-
-    /** Holds the MODS namespace */
-    private static List<Namespace> NS = new ArrayList<>();
-
-    static {
-        NS.add(MCRConstants.MODS_NAMESPACE);
     }
 
     /**

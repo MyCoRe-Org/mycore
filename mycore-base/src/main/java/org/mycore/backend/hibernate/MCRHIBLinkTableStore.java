@@ -25,7 +25,6 @@ package org.mycore.backend.hibernate;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.persistence.EntityManager;

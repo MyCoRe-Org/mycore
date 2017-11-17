@@ -85,7 +85,21 @@ public class MCRIFSCommands {
 
     private static Logger LOGGER = LogManager.getLogger(MCRIFSCommands.class);
 
+    private static int MAX_COUNTER = 10000;
+
     private abstract static class FSNodeChecker {
+        static final String ATT_STORAGEID = "storageid";
+
+        static final String ATT_OWNER = "owner";
+
+        static final String ATT_NAME = "fileName";
+
+        static final String ATT_MD5 = "md5";
+
+        static final String ATT_SIZE = "size";
+
+        static final String ATT_IFS_ID = "ifsid";
+
         public abstract String getName();
 
         public abstract boolean checkNode(MCRFSNODES node, File localFile, Attributes2Impl atts);
@@ -99,18 +113,6 @@ public class MCRIFSCommands {
             atts.addAttribute(NS_URI, ATT_NAME, ATT_NAME, CDATA, node.getName());
             atts.addAttribute(NS_URI, ATT_IFS_ID, ATT_IFS_ID, CDATA, node.getId());
         }
-
-        static final String ATT_STORAGEID = "storageid";
-
-        static final String ATT_OWNER = "owner";
-
-        static final String ATT_NAME = "fileName";
-
-        static final String ATT_MD5 = "md5";
-
-        static final String ATT_SIZE = "size";
-
-        static final String ATT_IFS_ID = "ifsid";
 
     }
 
@@ -621,8 +623,6 @@ public class MCRIFSCommands {
         }
         return comp == 0 ? 0 : 1;
     }
-
-    private static int MAX_COUNTER = 10000;
 
     @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for owner {2}",
         help = "moves all files of derivates from content store {0} to content store {1} for defined owner {2}")

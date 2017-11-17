@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -25,7 +25,7 @@ package org.mycore.media;
 
 /**
  * This Class represents the basic metadata of an Image.
- * 
+ *
  * @author René Adler (Eagle)
  *
  */
@@ -92,8 +92,9 @@ public class MCRImageObject extends MCRMediaObject {
     public String toString() {
         String out = fileName + " (" + fileSize + ")\n";
         StringBuilder _fill = new StringBuilder();
-        for (int c = 0; c < out.length(); c++)
-            _fill.append("-");
+        for (int c = 0; c < out.length(); c++) {
+            _fill.append('-');
+        }
         out += _fill + "\n";
         out += "Type             : " + type + "\n";
         out += (mimeType != null ? "mimeType         : " + mimeType + "\n" : "");
@@ -106,8 +107,9 @@ public class MCRImageObject extends MCRMediaObject {
         out += "Dimention        : " + width + "x" + height + " @ " + resolution + "\n";
         out += (encoderStr != null ? "Encoder          : " + encoderStr + "\n" : "");
 
-        if (tags != null)
+        if (tags != null) {
             out += tags.toString();
+        }
 
         return out;
     }

@@ -246,7 +246,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                         phrase = null;
                     } else // in middle of phrase
                     {
-                        phrase.append(" ").append(value);
+                        phrase.append(' ').append(value);
                     }
                 } else if (value.startsWith("'")) // begin of phrase
                 {

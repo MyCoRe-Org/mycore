@@ -112,8 +112,9 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
                     default:
                         throw new MCRParseException("Not a valid operator <" + operator + ">");
                 }
+            default:
+                return null;
         }
-        return null;
     }
 
     private MCRCondition<MCRAccessData> getIPClause(String value) {

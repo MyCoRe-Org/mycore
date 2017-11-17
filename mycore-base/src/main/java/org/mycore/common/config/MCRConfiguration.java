@@ -34,13 +34,11 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -50,9 +48,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPropertiesResolver;
-
-import com.google.common.base.Predicates;
-import com.google.common.collect.Maps;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.

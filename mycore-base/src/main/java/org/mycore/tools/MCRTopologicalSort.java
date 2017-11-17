@@ -1,6 +1,6 @@
 /*
- * 
- * $Revision: 28695 $ 
+ *
+ * $Revision: 28695 $
  * $Date: 2013-12-19 09:38:31 +0100 (Do, 19 Dez 2013) $
  *
  * This file is part of ***  M y C o R e  ***
@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +53,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 /**
- * This class implements an algorithm for topological ordering. 
+ * This class implements an algorithm for topological ordering.
  * It can be used to retrieve the order in which MyCoRe object can be imported to be
  * sure that parent objects are imported first.
  *
@@ -76,7 +75,7 @@ public class MCRTopologicalSort {
     private static final Logger LOGGER = LogManager.getLogger(MCRTopologicalSort.class);
 
     /** store the edges as adjacent list
-     *  for each target node a list of corresponding source node is stored 
+     *  for each target node a list of corresponding source node is stored
      */
     Map<Integer, TreeSet<Integer>> edgeSources = new TreeMap<>();
 
@@ -152,7 +151,7 @@ public class MCRTopologicalSort {
             System.out.println("An error occured!");
         } else {
             for (int anOrder : order) {
-                System.out.print(Arrays.toString(order) + " <- ");
+                System.out.print(anOrder + " <- ");
             }
         }
         System.out.println();
@@ -405,14 +404,15 @@ public class MCRTopologicalSort {
     /**
      * @return a string representation of the underlying graph
      */
+    @Override
     public String toString() {
         StringBuilder result = new StringBuilder("[");
         for (Integer to : edgeSources.keySet()) {
             for (Integer from : edgeSources.get(to)) {
-                result.append("[").append(nodes.get(from)).append("->").append(nodes.get(to)).append("]");
+                result.append('[').append(nodes.get(from)).append("->").append(nodes.get(to)).append(']');
             }
         }
-        result.append("]");
+        result.append(']');
         return result.toString();
     }
 }

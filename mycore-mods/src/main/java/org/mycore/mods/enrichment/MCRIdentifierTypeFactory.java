@@ -36,11 +36,11 @@ class MCRIdentifierTypeFactory {
 
     private static MCRIdentifierTypeFactory INSTANCE = new MCRIdentifierTypeFactory();
 
+    private MCRCache<String, MCRIdentifierType> id2type = new MCRCache<>(30, "identifier types");
+
     public static MCRIdentifierTypeFactory instance() {
         return INSTANCE;
     }
-
-    private MCRCache<String, MCRIdentifierType> id2type = new MCRCache<>(30, "identifier types");
 
     private MCRIdentifierTypeFactory() {
     }

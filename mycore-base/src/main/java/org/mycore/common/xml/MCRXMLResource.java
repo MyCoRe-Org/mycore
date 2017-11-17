@@ -42,23 +42,23 @@ import org.mycore.common.content.MCRURLContent;
 
 /**
  * provides a cache for reading XML resources.
- * 
+ *
  * Cache size can be configured by property
  * <code>MCR.MCRXMLResouce.Cache.Size</code> which defaults to <code>100</code>.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLResource {
 
-    private static volatile MCRCache<String, CacheEntry> resourceCache;
+    private static final MCRCache<String, CacheEntry> resourceCache = new MCRCache<>(
+        MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100),
+        "XML resources");;
 
     private static MCRXMLResource instance = new MCRXMLResource();
 
     private static Logger LOGGER = LogManager.getLogger(MCRXMLResource.class);
 
     private MCRXMLResource() {
-        resourceCache = new MCRCache<>(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100),
-            "XML resources");
     }
 
     /**
@@ -86,7 +86,7 @@ public class MCRXMLResource {
 
     /**
      * Returns MCRContent using ClassLoader of MCRXMLResource class
-     * 
+     *
      * @param name
      *            resource name
      * @see MCRXMLResource#getResource(String, ClassLoader)
@@ -97,7 +97,7 @@ public class MCRXMLResource {
 
     /**
      * returns xml as byte array using ClassLoader of MCRXMLResource class
-     * 
+     *
      * @param name
      *            resource name
      * @see MCRXMLResource#getRawResource(String, ClassLoader)
@@ -108,10 +108,10 @@ public class MCRXMLResource {
 
     /**
      * Returns MCRContent of resource.
-     * 
+     *
      * A cache is used to avoid reparsing if the source of the resource did not
      * change.
-     * 
+     *
      * @param name
      *            the resource name
      * @param classLoader
@@ -147,7 +147,7 @@ public class MCRXMLResource {
 
     /**
      * Returns raw XML resource as byte array. Note that no cache will be used.
-     * 
+     *
      * @param name
      *            the resource name
      * @param classLoader

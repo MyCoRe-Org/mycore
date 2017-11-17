@@ -92,6 +92,8 @@ public class MCRMailer extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMailer.class);
 
+    private static final String delimiter = "\n--------------------------------------\n";
+
     private static Session mailSession;
 
     protected static final String encoding;
@@ -517,8 +519,6 @@ public class MCRMailer extends MCRServlet {
         MCRContent result = transformer.transform(source, parameterCollector);
         return result.asXML();
     }
-
-    private static final String delimiter = "\n--------------------------------------\n";
 
     /** Outputs xml to the LOGGER for debugging */
     private static void debug(Element xml) {

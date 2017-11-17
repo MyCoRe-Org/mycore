@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -38,29 +38,19 @@ import org.jdom2.Namespace;
 import org.jdom2.Text;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaXML.
- * 
+ *
  * @author Thomas Scheffler
  * @version $Revision$ $Date$
  *
  */
 public class MCRMetaXMLTest extends MCRTestCase {
-    private static Logger LOGGER;
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();//org.mycore.datamodel.metadata.MCRMetaXML
-        if (LOGGER == null) {
-            LOGGER = LogManager.getLogger(MCRMetaXMLTest.class);
-        }
-    }
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void xmlRoundrip() throws IOException {

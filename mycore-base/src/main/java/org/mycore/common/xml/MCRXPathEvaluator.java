@@ -27,9 +27,16 @@ public class MCRXPathEvaluator {
 
     private static final Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
 
+    private static final XPathFactory factory;
+
     private Map<String, Object> variables;
 
     private List<Object> context;
+
+    static {
+        String factoryClass = MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null);
+        factory = factoryClass == null ? XPathFactory.instance() : XPathFactory.newInstance(factoryClass);
+    }
 
     public MCRXPathEvaluator(Map<String, Object> variables, List<Object> context) {
         this.variables = variables;
@@ -93,13 +100,6 @@ public class MCRXPathEvaluator {
             return (Boolean) result;
         else
             return true;
-    }
-
-    private static final XPathFactory factory;
-
-    static {
-        String factoryClass = MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null);
-        factory = factoryClass == null ? XPathFactory.instance() : XPathFactory.newInstance(factoryClass);
     }
 
     public Object evaluateFirst(String xPathExpression) {
