@@ -56,7 +56,7 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
             extractWords(rootElement).forEach(value -> document.addField("alto_words", value));
             document.addField("alto_content", extractContent(rootElement));
         } catch (JDOMException e) {
-            LogManager.getLogger().error("Unable to parse " + filePath, e);
+            LogManager.getLogger().error("Unable to parse {}", filePath, e);
         }
     }
 

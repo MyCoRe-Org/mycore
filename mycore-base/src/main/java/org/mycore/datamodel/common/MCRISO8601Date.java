@@ -247,11 +247,11 @@ public class MCRISO8601Date {
                 result = pDate.toInstant();
                 return result;
             } catch (final ParseException e) {
-                LOGGER.warn("Date guess failed for locale: " + locale);
+                LOGGER.warn("Date guess failed for locale: {}", locale);
                 //we need no big exception in the logs, if we can't guess what it is, a warning should be enough
             }
         }
-        LOGGER.error("Error trying to guess date for string: " + date);
+        LOGGER.error("Error trying to guess date for string: {}", date);
         return null;
     }
 

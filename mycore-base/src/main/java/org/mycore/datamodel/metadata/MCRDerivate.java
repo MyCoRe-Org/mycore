@@ -169,9 +169,9 @@ public final class MCRDerivate extends MCRBase {
      */
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("MCRDerivate ID : " + mcr_id);
-            LOGGER.debug("MCRDerivate Label : " + mcr_label);
-            LOGGER.debug("MCRDerivate Schema : " + mcr_schema);
+            LOGGER.debug("MCRDerivate ID : {}", mcr_id);
+            LOGGER.debug("MCRDerivate Label : {}", mcr_label);
+            LOGGER.debug("MCRDerivate Schema : {}", mcr_schema);
             LOGGER.debug("");
         }
     }

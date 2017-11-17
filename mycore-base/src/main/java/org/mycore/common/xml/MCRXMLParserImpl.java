@@ -133,7 +133,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
                         return resolveEntity(name, publicId, baseDirURI.toString(), relativeURI);
                     }
                 } catch (RuntimeException e) {
-                    LOGGER.debug("Could not separate baseURI from " + systemId, e);
+                    LOGGER.debug("Could not separate baseURI from {}", systemId, e);
                 }
             }
             String relativeSystemId = relativize(baseURI, systemId);
@@ -159,7 +159,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
             LOGGER.debug(MessageFormat.format("systemId: {0} prefixed? {1}", systemId, systemId.startsWith(prefix)));
             if (prefix.length() > 0 && systemId.startsWith(prefix)) {
                 systemId = systemId.substring(prefix.length());
-                LOGGER.debug("new systemId: " + systemId);
+                LOGGER.debug("new systemId: {}", systemId);
                 return systemId;
             }
             return systemId;
@@ -169,7 +169,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
             try {
                 return URI.create(baseURI).normalize().toString();
             } catch (RuntimeException e) {
-                LOGGER.debug("Error while normalizing " + baseURI, e);
+                LOGGER.debug("Error while normalizing {}", baseURI, e);
                 return baseURI;
             }
         }

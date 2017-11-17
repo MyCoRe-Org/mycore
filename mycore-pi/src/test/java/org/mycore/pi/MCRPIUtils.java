@@ -51,7 +51,7 @@ public class MCRPIUtils {
             return new URL(url);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            LOGGER.error("Malformed URL: " + url);
+            LOGGER.error("Malformed URL: {}", url);
         }
 
         return null;

@@ -80,7 +80,7 @@ public class MCROAIAdapter implements OAIAdapter {
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
         DEFAULT_PARTITION_SIZE = MCRConfiguration.instance().getInt(prefix + "PartitionSize", 50);
-        LOGGER.info(MCROAIAdapter.PREFIX + "ResumptionTokens.PartitionSize is set to " + DEFAULT_PARTITION_SIZE);
+        LOGGER.info(MCROAIAdapter.PREFIX + "ResumptionTokens.PartitionSize is set to {}", DEFAULT_PARTITION_SIZE);
     }
 
     /**

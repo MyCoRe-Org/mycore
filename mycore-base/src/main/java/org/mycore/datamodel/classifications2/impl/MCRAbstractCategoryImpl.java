@@ -66,7 +66,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     private static HashSet<String> LANGUAGES;
 
-    {
+    static {
         LANGUAGES = new HashSet<>(MCRConfiguration.instance().getStrings("MCR.Metadata.Languages",
             Collections.emptyList()));
     }

@@ -82,19 +82,19 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         String fileName = path.substring(lastPathElement);
         String parent = path.substring(0, lastPathElement);
         request.setAttribute("XSL.StaticFilePath", request.getServletPath().substring(1));
-        request.setAttribute("XSL.DocumentBaseURL", parent.toString());
+        request.setAttribute("XSL.DocumentBaseURL", parent);
         request.setAttribute("XSL.FileName", fileName);
         request.setAttribute("XSL.FilePath", path);
     }
 
     private URL resolveResource(MCRServletJob job) throws IOException {
         String requestedPath = job.getRequest().getServletPath();
-        LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
+        LOGGER.info("MCRStaticXMLFileServlet {}", requestedPath);
 
         URL resource = getServletContext().getResource(requestedPath);
         if (resource != null) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Resolved to " + resource);
+                LOGGER.debug("Resolved to {}", resource);
             }
             return resource;
         }

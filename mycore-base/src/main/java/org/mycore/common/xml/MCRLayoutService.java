@@ -81,7 +81,7 @@ public class MCRLayoutService {
     public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent source) throws IOException,
         TransformerException, SAXException {
         if (res.isCommitted()) {
-            LOGGER.warn("Response already committed: " + res.getStatus() + ":" + res.getContentType());
+            LOGGER.warn("Response already committed: {}:{}", res.getStatus(), res.getContentType());
             return;
         }
         String docType = source.getDocType();
@@ -185,7 +185,7 @@ public class MCRLayoutService {
             } else {
                 response.setContentType(ct);
             }
-            LOGGER.debug("MCRLayoutService starts to output " + response.getContentType());
+            LOGGER.debug("MCRLayoutService starts to output {}", response.getContentType());
             ServletOutputStream servletOutputStream = response.getOutputStream();
             long start = System.currentTimeMillis();
             try {
@@ -200,7 +200,7 @@ public class MCRLayoutService {
                 response.setContentLength(bout.size());
                 bout.writeTo(servletOutputStream);
             } finally {
-                LOGGER.debug("MCRContent transformation took " + (System.currentTimeMillis() - start) + " ms.");
+                LOGGER.debug("MCRContent transformation took {} ms.", System.currentTimeMillis() - start);
             }
         } catch (TransformerException | IOException | SAXException e) {
             throw e;
@@ -222,7 +222,7 @@ public class MCRLayoutService {
 
     private MCRContent transform(MCRContentTransformer transformer, MCRContent source, MCRParameterCollector parameter,
         String filename) throws IOException, TransformerException, SAXException {
-        LOGGER.debug("MCRLayoutService starts to output " + getMimeType(transformer));
+        LOGGER.debug("MCRLayoutService starts to output {}", getMimeType(transformer));
         long start = System.currentTimeMillis();
         try {
             if (transformer instanceof MCRParameterizedTransformer) {
@@ -232,7 +232,7 @@ public class MCRLayoutService {
                 return transformer.transform(source);
             }
         } finally {
-            LOGGER.debug("MCRContent transformation took " + (System.currentTimeMillis() - start) + " ms.");
+            LOGGER.debug("MCRContent transformation took {} ms.", System.currentTimeMillis() - start);
         }
     }
 

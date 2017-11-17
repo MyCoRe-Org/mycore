@@ -54,7 +54,7 @@ import org.apache.logging.log4j.Logger;
 public class MCRURIResolverFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
-    static ThreadLocal<List<String>> uriList = ThreadLocal.withInitial(() -> new MyLinkedList());
+    static ThreadLocal<List<String>> uriList = ThreadLocal.withInitial(MyLinkedList::new);
 
     /**
      * adds debug information from MCRURIResolver to Servlet output.
@@ -102,7 +102,7 @@ public class MCRURIResolverFilter implements Filter {
                     out.write(origOutput.substring(pos, origOutput.length()).getBytes(characterEncoding));
                     // delete debuglist
                     uriList.remove();
-                    LOGGER.debug("end filter: " + origOutput.substring(origOutput.length() - 10, origOutput.length()));
+                    LOGGER.debug("end filter: {}", origOutput.substring(origOutput.length() - 10, origOutput.length()));
                 }
             } else {
                 LOGGER.debug("Sending original response");
@@ -218,7 +218,7 @@ public class MCRURIResolverFilter implements Filter {
         @Override
         public String getCharacterEncoding() {
             final String encoding = super.getCharacterEncoding();
-            LOGGER.debug("Character Encoding: " + encoding);
+            LOGGER.debug("Character Encoding: {}", encoding);
             return encoding;
         }
 

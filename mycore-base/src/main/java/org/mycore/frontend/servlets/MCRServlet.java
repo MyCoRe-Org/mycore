@@ -109,7 +109,7 @@ public class MCRServlet extends HttpServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         Object value = session.get(BASE_URL_ATTRIBUTE);
         if (value != null) {
-            LOGGER.debug("Returning BaseURL " + value + "servlets/ from user session.");
+            LOGGER.debug("Returning BaseURL {}servlets/ from user session.", value);
             return value + "servlets/";
         }
         return SERVLET_URL != null ? SERVLET_URL : MCRFrontendUtil.getBaseURL() + "servlets/";
@@ -205,8 +205,8 @@ public class MCRServlet extends HttpServlet {
                 //check if request IP equals last known IP
                 String newip = MCRFrontendUtil.getRemoteAddr(req);
                 if (!lastIP.equals(newip) && !newip.equals(MCRFrontendUtil.getHostIP())) {
-                    LOGGER.warn("Session steal attempt from IP " + newip + ", previous IP was " + lastIP
-                        + ". Session: " + session);
+                    LOGGER.warn("Session steal attempt from IP {}, previous IP was {}. Session: {}", newip, lastIP,
+                        session);
                     MCRSessionMgr.releaseCurrentSession();
                     session.close(); //MCR-1409 do not leak old session
                     session = MCRSessionMgr.getCurrentSession();
@@ -278,7 +278,7 @@ public class MCRServlet extends HttpServlet {
             // Set default to UTF-8
             ReqCharEncoding = MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8");
             req.setCharacterEncoding(ReqCharEncoding);
-            LOGGER.debug("Setting ReqCharEncoding to: " + ReqCharEncoding);
+            LOGGER.debug("Setting ReqCharEncoding to: {}", ReqCharEncoding);
         }
 
         if ("true".equals(req.getParameter("reload.properties"))) {
@@ -311,7 +311,7 @@ public class MCRServlet extends HttpServlet {
             if (ex.getMessage() == null) {
                 LOGGER.error("Exception while in rendering phase.", ex);
             } else {
-                LOGGER.error("Exception while in rendering phase: " + ex.getMessage());
+                LOGGER.error("Exception while in rendering phase: {}", ex.getMessage());
             }
             if (ex instanceof ServletException) {
                 throw (ServletException) ex;
@@ -350,13 +350,9 @@ public class MCRServlet extends HttpServlet {
         String c = getClass().getName();
         c = c.substring(c.lastIndexOf(".") + 1);
 
-        StringBuilder msg = new StringBuilder();
-        msg.append(c);
-        msg.append(" ip=");
-        msg.append(MCRFrontendUtil.getRemoteAddr(job.getRequest()));
-        msg.append(" mcr=").append(session.getID());
-        msg.append(" user=").append(session.getUserInformation().getUserID());
-        LOGGER.info(msg.toString());
+        String msg = c + " ip=" + MCRFrontendUtil.getRemoteAddr(job.getRequest()) + " mcr=" + session.getID() + " user="
+            + session.getUserInformation().getUserID();
+        LOGGER.info(msg);
 
         MCRFrontendUtil.configureSession(session, job.getRequest(), job.getResponse());
     }
@@ -466,7 +462,7 @@ public class MCRServlet extends HttpServlet {
         String cname = this.getClass().getName();
         String servlet = cname.substring(cname.lastIndexOf(".") + 1);
 
-        LOGGER.warn("Exception caught in : " + servlet, ex);
+        LOGGER.warn("Exception caught in : {}", servlet, ex);
     }
 
     /**
@@ -499,7 +495,7 @@ public class MCRServlet extends HttpServlet {
 
             redirectURL.append(name).append("=").append(value);
         }
-        LOGGER.debug("Sending redirect to " + redirectURL);
+        LOGGER.debug("Sending redirect to {}", redirectURL);
         return redirectURL.toString();
     }
 
@@ -514,7 +510,7 @@ public class MCRServlet extends HttpServlet {
             long lastModified = MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfiguration.instance()
                 .getSystemLastModified() ? MCRSessionMgr.getCurrentSession().getLoginTime() : MCRConfiguration
                     .instance().getSystemLastModified();
-            LOGGER.info("LastModified: " + lastModified);
+            LOGGER.info("LastModified: {}", lastModified);
             return lastModified;
         }
         return -1; // time is not known
@@ -553,7 +549,7 @@ public class MCRServlet extends HttpServlet {
             return new URL(referer);
         } catch (MalformedURLException e) {
             //should not happen
-            LOGGER.error("Referer is not a valid URL: " + referer, e);
+            LOGGER.error("Referer is not a valid URL: {}", referer, e);
             return null;
         }
     }
@@ -582,7 +578,7 @@ public class MCRServlet extends HttpServlet {
         if (referrer != null) {
             response.sendRedirect(response.encodeRedirectURL(referrer.toString()));
         } else {
-            LOGGER.warn("Could not get referrer, returning to " + altURL);
+            LOGGER.warn("Could not get referrer, returning to {}", altURL);
             response.sendRedirect(response.encodeRedirectURL(altURL));
         }
     }

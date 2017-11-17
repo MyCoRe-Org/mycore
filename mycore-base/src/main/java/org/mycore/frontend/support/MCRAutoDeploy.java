@@ -91,11 +91,11 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
             try {
                 final JarFile jar = new JarFile(comp.getJarFile());
 
-                LOGGER.info("Deploy web resources to " + webRoot + "...");
+                LOGGER.info("Deploy web resources to {}...", webRoot);
                 Collections.list(jar.entries()).stream().filter(file -> file.getName().startsWith(RESOURCE_DIR))
                     .forEach(file -> {
                         final String fileName = file.getName().substring(RESOURCE_DIR.length());
-                        LOGGER.debug("...deploy " + fileName);
+                        LOGGER.debug("...deploy {}", fileName);
 
                         final File f = new File(webRoot + File.separator + fileName);
                         if (file.isDirectory()) {
@@ -109,7 +109,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                 }
                                 fos.close();
                             } catch (IOException e) {
-                                LOGGER.error("Couldn't deploy file " + fileName + ".", e);
+                                LOGGER.error("Couldn't deploy file {}.", fileName, e);
                             }
                         }
                     });
@@ -147,7 +147,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
 
                                 fmaps.stream().filter(mapping -> mapping.getChildText("filter-name", ns).equals(name))
                                     .findFirst().ifPresent(mapping -> {
-                                        LOGGER.info("Register Filter " + name + " (" + className + ")...");
+                                    LOGGER.info("Register Filter {} ({})...", name, className);
                                         Optional.ofNullable(servletContext.addFilter(name, className))
                                             .<Runnable> map(fr -> () -> {
                                                 final List<Element> dispatchers = mapping
@@ -168,8 +168,8 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                                         false,
                                                         servletNames.stream()
                                                             .map(sn -> {
-                                                                LOGGER.info(
-                                                                    "...add servlet mapping: " + sn.getTextTrim());
+                                                                LOGGER.info("...add servlet mapping: {}",
+                                                                    sn.getTextTrim());
                                                                 return sn.getTextTrim();
                                                             })
                                                             .toArray(String[]::new));
@@ -182,13 +182,13 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                                     fr.addMappingForUrlPatterns(eDT,
                                                         false, urlPattern.stream()
                                                             .map(url -> {
-                                                                LOGGER.info("...add url mapping: " + url.getTextTrim());
+                                                                LOGGER.info("...add url mapping: {}",
+                                                                    url.getTextTrim());
                                                                 return url.getTextTrim();
                                                             })
                                                             .toArray(String[]::new));
                                                 }
-                                            }).orElse(() -> LOGGER
-                                                .warn("Filter " + name + " already registered!"))
+                                            }).orElse(() -> LOGGER.warn("Filter {} already registered!", name))
                                             .run();
                                     });
                             });
@@ -204,14 +204,14 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                     .filter(mapping -> mapping.getChildText("servlet-name", ns).equals(name))
                                     .findFirst()
                                     .ifPresent(mapping -> {
-                                        LOGGER.info("Register Servlet " + name + " (" + className + ")...");
+                                        LOGGER.info("Register Servlet {} ({})...", name, className);
                                         Optional.ofNullable(servletContext.addServlet(name, className))
                                             .<Runnable> map(sr -> () -> mapping.getChildren("url-pattern", ns).stream()
                                                                            .forEach(url -> {
-                                                    LOGGER.info("...add url mapping: " + url.getTextTrim());
+                                                                               LOGGER.info("...add url mapping: {}",
+                                                                                   url.getTextTrim());
                                                     sr.addMapping(url.getTextTrim());
-                                                })).orElse(() -> LOGGER
-                                                .error("Servlet" + name + " already registered!"))
+                                                })).orElse(() -> LOGGER.error("Servlet{} already registered!", name))
                                                        .run();
                                     });
                             });

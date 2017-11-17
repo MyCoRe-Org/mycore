@@ -147,7 +147,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
         // parse sections
         for (JsonElement sectionElement : jsonSectionArray) {
             if (!sectionElement.isJsonObject()) {
-                LOGGER.warn("Invalid json element in content array! " + sectionElement);
+                LOGGER.warn("Invalid json element in content array! {}", sectionElement);
                 continue;
             }
             JsonObject sectionObject = sectionElement.getAsJsonObject();

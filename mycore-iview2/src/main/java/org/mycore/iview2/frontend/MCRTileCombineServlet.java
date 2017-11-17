@@ -77,14 +77,8 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTileCombineServlet.class);
 
-    private ThreadLocal<ImageWriter> imageWriter = new ThreadLocal<ImageWriter>() {
-
-        @Override
-        protected ImageWriter initialValue() {
-            return ImageIO.getImageWritersBySuffix("jpeg").next();
-        }
-
-    };
+    private ThreadLocal<ImageWriter> imageWriter = ThreadLocal.withInitial(
+        () -> ImageIO.getImageWritersBySuffix("jpeg").next());
 
     private JPEGImageWriteParam imageWriteParam;
 
@@ -144,14 +138,14 @@ public class MCRTileCombineServlet extends MCRServlet {
             pathInfo = pathInfo.substring(zoomAlias.length() + 1);
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
             String imagePath = pathInfo.substring(derivate.length());
-            LOGGER.info("Zoom-Level: " + zoomAlias + ", derivate: " + derivate + ", image: " + imagePath);
+            LOGGER.info("Zoom-Level: {}, derivate: {}, image: {}", zoomAlias, derivate, imagePath);
             final Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
             try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
                 Path iviewFileRoot = fs.getRootDirectories().iterator().next();
                 final MCRTiledPictureProps pictureProps = MCRTiledPictureProps.getInstanceFromDirectory(iviewFileRoot);
                 final int maxZoomLevel = pictureProps.getZoomlevel();
                 request.setAttribute(THUMBNAIL_KEY, iviewFile);
-                LOGGER.info("IView2 file: " + iviewFile);
+                LOGGER.info("IView2 file: {}", iviewFile);
                 int zoomLevel = 0;
                 switch (zoomAlias) {
                     case "MIN":
@@ -210,7 +204,7 @@ public class MCRTileCombineServlet extends MCRServlet {
             }
 
         } finally {
-            LOGGER.info("Finished sending " + request.getPathInfo());
+            LOGGER.info("Finished sending {}", request.getPathInfo());
         }
     }
 
@@ -245,7 +239,7 @@ public class MCRTileCombineServlet extends MCRServlet {
         job.getResponse().setContentType("image/jpeg");
         job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
         final Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
-        LOGGER.info("Last-Modified: " + new Date(iviewFile.lastModified()) + ", expire on: " + expires);
+        LOGGER.info("Last-Modified: {}, expire on: {}", new Date(iviewFile.lastModified()), expires);
         job.getResponse().setDateHeader("Expires", expires.getTime());
 
         final ImageWriter curImgWriter = imageWriter.get();

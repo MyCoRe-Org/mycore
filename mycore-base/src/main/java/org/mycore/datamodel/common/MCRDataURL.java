@@ -450,12 +450,15 @@ public class MCRDataURL implements Serializable {
         }
 
         if (charset != StandardCharsets.US_ASCII) {
-            sb.append(TOKEN_SEPARATOR + CHARSET_PARAM + PARAM_SEPARATOR + charset.name());
+            sb.append(TOKEN_SEPARATOR + CHARSET_PARAM + PARAM_SEPARATOR).append(charset.name());
         }
 
         parameters.forEach((key, value) -> {
             try {
-                sb.append(TOKEN_SEPARATOR + key + PARAM_SEPARATOR + encode(value, StandardCharsets.UTF_8));
+                sb.append(TOKEN_SEPARATOR)
+                  .append(key)
+                  .append(PARAM_SEPARATOR)
+                  .append(encode(value, StandardCharsets.UTF_8));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(
                     "Error encoding the parameter value \"" + value + "\". Error: " + e.getMessage());
@@ -463,11 +466,11 @@ public class MCRDataURL implements Serializable {
         });
 
         if (encoding == MCRDataURLEncoding.BASE64) {
-            sb.append(TOKEN_SEPARATOR + encoding.value());
-            sb.append(DATA_SEPARATOR + Base64.getEncoder().withoutPadding().encodeToString(data));
+            sb.append(TOKEN_SEPARATOR).append(encoding.value());
+            sb.append(DATA_SEPARATOR).append(Base64.getEncoder().withoutPadding().encodeToString(data));
         } else {
             try {
-                sb.append(DATA_SEPARATOR + encode(new String(data, charset), charset));
+                sb.append(DATA_SEPARATOR).append(encode(new String(data, charset), charset));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Error encoding the data. Error: " + e.getMessage());
             }
@@ -484,7 +487,7 @@ public class MCRDataURL implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((charset == null) ? 0 : charset.hashCode());
-        result = prime * result + ((data == null) ? 0 : data.hashCode());
+        result = prime * result + ((data == null) ? 0 : Arrays.hashCode(data));
         result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
         result = prime * result + ((mimeType == null) ? 0 : mimeType.hashCode());
         result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());

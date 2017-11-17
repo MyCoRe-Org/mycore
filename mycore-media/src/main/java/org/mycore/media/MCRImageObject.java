@@ -91,9 +91,9 @@ public class MCRImageObject extends MCRMediaObject {
     @Override
     public String toString() {
         String out = fileName + " (" + fileSize + ")\n";
-        String _fill = "";
+        StringBuilder _fill = new StringBuilder();
         for (int c = 0; c < out.length(); c++)
-            _fill += "-";
+            _fill.append("-");
         out += _fill + "\n";
         out += "Type             : " + type + "\n";
         out += (mimeType != null ? "mimeType         : " + mimeType + "\n" : "");

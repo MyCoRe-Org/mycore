@@ -499,9 +499,7 @@ public class MCRRestAPIObjectsHelper {
         try {
             sortObj = createSortObject(sort);
         } catch (MCRRestAPIException rae) {
-            for (MCRRestAPIError fe : rae.getErrors()) {
-                errors.add(fe);
-            }
+            errors.addAll(rae.getErrors());
         }
 
         //analyze format
@@ -527,7 +525,9 @@ public class MCRRestAPIObjectsHelper {
                                                                                   lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
                                                                               } catch (IOException e) {
                                                                                   lastModified = 0;
-                                                                                  LOGGER.error("Exception while getting last modified of " + id, e);
+                                                                                  LOGGER.error(
+                                                                                      "Exception while getting last modified of {}",
+                                                                                      id, e);
                                                                               }
                                                                           }
 

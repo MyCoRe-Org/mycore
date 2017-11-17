@@ -133,7 +133,7 @@ public class MCRSolrCore {
 
     private void shutdownGracefully(SolrClient client) throws SolrServerException, IOException {
         if (client != null) {
-            LOGGER.info("Shutting down solr client: " + client);
+            LOGGER.info("Shutting down solr client: {}", client);
             client.commit(false, false);
             client.close();
         }

@@ -267,8 +267,8 @@ public class MCRMetaLangText extends MCRMetaDefault {
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Format             = " + form);
-            LOGGER.debug("Text               = " + text);
+            LOGGER.debug("Format             = {}", form);
+            LOGGER.debug("Text               = {}", text);
             LOGGER.debug(" ");
         }
     }

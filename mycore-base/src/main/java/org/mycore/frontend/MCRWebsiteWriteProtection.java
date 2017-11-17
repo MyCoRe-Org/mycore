@@ -23,8 +23,7 @@ public final class MCRWebsiteWriteProtection {
     private static final String CONFIG_FOLDER_PATH = MCRConfiguration.instance().getString("MCR.datadir") + FS
         + "config";
 
-    private static final String CONFIG_FILE_PATH = new String(CONFIG_FOLDER_PATH + FS
-        + "config-writeProtectionWebsite.xml");
+    private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH + FS + "config-writeProtectionWebsite.xml";
 
     private static final File CONFIG_FILE = new File(CONFIG_FILE_PATH);
 

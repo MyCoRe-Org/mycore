@@ -487,7 +487,7 @@ public class MCRClassificationEditorResource {
                 return -1;
             }
             if (depthLevel1.getAsInt() != depthLevel2.getAsInt()) {
-                return new Integer(depthLevel1.getAsInt()).compareTo(depthLevel2.getAsInt());
+                return Integer.compare(depthLevel1.getAsInt(), depthLevel2.getAsInt());
             }
             // compare index
             JsonPrimitive index1 = jsonElement1.getAsJsonObject().getAsJsonPrimitive("index");
@@ -498,7 +498,7 @@ public class MCRClassificationEditorResource {
             if (index2 == null) {
                 return -1;
             }
-            return new Integer(index1.getAsInt()).compareTo(index2.getAsInt());
+            return Integer.compare(index1.getAsInt(), index2.getAsInt());
         }
     }
 

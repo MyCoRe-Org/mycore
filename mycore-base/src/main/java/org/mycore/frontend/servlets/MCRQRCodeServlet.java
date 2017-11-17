@@ -73,7 +73,7 @@ public class MCRQRCodeServlet extends MCRContentServlet {
         if (queryString != null) {
             url += '?' + queryString;
         }
-        LOGGER.info("Generating QR CODE: " + url);
+        LOGGER.info("Generating QR CODE: {}", url);
         MCRContent content = getPNGContent(url, size);
         content.setLastModified(0);
         if (!"HEAD".equals(req.getMethod())) {

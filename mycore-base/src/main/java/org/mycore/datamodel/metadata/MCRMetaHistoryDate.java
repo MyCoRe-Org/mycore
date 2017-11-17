@@ -296,8 +296,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             ivon = von.get(Calendar.JULIAN_DAY);
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.warn("The von date " + date_string + " for calendar " + calendar_string
-                + " is false. Set to default!");
+            LOGGER.warn("The von date {} for calendar {} is false. Set to default!", date_string, calendar_string);
             setDefaultVon();
         }
     }
@@ -331,7 +330,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         try {
             c = MCRCalendar.getHistoryDateAsCalendar(set_date, true, calstr);
         } catch (Exception e) {
-            LOGGER.warn("The bis date " + set_date + " for calendar " + calstr + " is false.");
+            LOGGER.warn("The bis date {} for calendar {} is false.", set_date, calstr);
             c = null;
         }
         setBisDate(c);
@@ -511,13 +510,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             for (MCRMetaHistoryDateText text : texts) {
-                LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());
+                LOGGER.debug("Text / lang         = {} / {}", text.getText(), text.getLang());
             }
-            LOGGER.debug("Calendar           = " + calendar);
-            LOGGER.debug("Von (String)       = " + getVonToString());
-            LOGGER.debug("Von (JulianDay)    = " + ivon);
-            LOGGER.debug("Bis (String)       = " + getBisToString());
-            LOGGER.debug("Bis (JulianDay)    = " + ibis);
+            LOGGER.debug("Calendar           = {}", calendar);
+            LOGGER.debug("Von (String)       = {}", getVonToString());
+            LOGGER.debug("Von (JulianDay)    = {}", ivon);
+            LOGGER.debug("Bis (String)       = {}", getBisToString());
+            LOGGER.debug("Bis (JulianDay)    = {}", ibis);
             LOGGER.debug("Stop");
             LOGGER.debug("");
         }

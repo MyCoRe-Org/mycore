@@ -37,9 +37,9 @@ public class MCRSolrIndexStatistic {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    AtomicInteger documents;
+    final AtomicInteger documents;
 
-    AtomicLong accumulatedTime;
+    final AtomicLong accumulatedTime;
 
     String name;
 

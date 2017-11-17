@@ -76,21 +76,21 @@ public class MCRLayoutTransformerFactory {
 
     private static MCRContentTransformer buildLayoutTransformer(String id) throws Exception {
         String idStripped = id.replaceAll("-default$", "");
-        LOGGER.info("Configure property MCR.ContentTransformer." + idStripped
-            + ".Class if you do not want to use default behaviour.");
+        LOGGER.info("Configure property MCR.ContentTransformer.{}.Class if you do not want to use default behaviour.",
+            idStripped);
         String stylesheet = getResourceName(id);
         if (stylesheet == null) {
-            LOGGER.info("Using noop transformer for " + idStripped);
+            LOGGER.info("Using noop transformer for {}", idStripped);
             return NOOP_TRANSFORMER;
         }
         String[] stylesheets = getStylesheets(idStripped, stylesheet);
         MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheets);
         if ("application/pdf".equals(transformer.getMimeType())) {
             transformer = new MCRTransformerPipe(transformer, fopper);
-            LOGGER.info("Using stylesheet '" + Lists.newArrayList(stylesheets) + "' for " + idStripped
-                + " and MCRFopper for PDF output.");
+            LOGGER.info("Using stylesheet '{}' for {} and MCRFopper for PDF output.", Lists.newArrayList(stylesheets),
+                idStripped);
         } else {
-            LOGGER.info("Using stylesheet '" + Lists.newArrayList(stylesheets) + "' for " + idStripped);
+            LOGGER.info("Using stylesheet '{}' for {}", Lists.newArrayList(stylesheets), idStripped);
         }
         transformers.put(id, transformer);
         return transformer;
@@ -123,7 +123,7 @@ public class MCRLayoutTransformerFactory {
     }
 
     private static String getResourceName(String id) {
-        LOGGER.debug("MCRLayoutService using style " + id);
+        LOGGER.debug("MCRLayoutService using style {}", id);
 
         String styleName = buildStylesheetName(id);
         try {
@@ -138,7 +138,7 @@ public class MCRLayoutTransformerFactory {
         // You can transform raw xml code by providing a stylesheed named
         // [doctype]-xml.xsl now
         if (id.endsWith("-xml") || id.endsWith("-default")) {
-            LOGGER.warn("XSL stylesheet not found: " + styleName);
+            LOGGER.warn("XSL stylesheet not found: {}", styleName);
             return null;
         }
         throw new MCRException("XSL stylesheet not found: " + styleName);

@@ -63,10 +63,8 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
 
         Function<MCRDerivate, Stream<MCRPath>> foo = deriv -> IntStream
             .iterate(0, i -> i + 1)
-            .mapToObj(i -> {
-                return "/foo/" + UUID.randomUUID() + "_" + String
-                    .format(Locale.getDefault(), "%02d", i);
-            })
+            .mapToObj(i -> "/foo/" + UUID.randomUUID() + "_" + String
+                .format(Locale.getDefault(), "%02d", i))
             .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
             .limit(numOfDerivFiles);
         String serviceID = "TestService";

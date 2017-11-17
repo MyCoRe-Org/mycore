@@ -100,7 +100,7 @@ public class URNServer {
             elp.setPassword(getConfiguration().getPassword());
             String content = new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite());
 
-            LOGGER.debug("EpicurLite \"put\" for urn " + elp.getUrn() + "\n" + content);
+            LOGGER.debug("EpicurLite \"put\" for urn {}\n{}", elp.getUrn(), content);
 
             put = new PutMethod(getConfiguration().getServiceURL() + elp.getUrn());
             put.setDoAuthentication(true);
@@ -135,7 +135,7 @@ public class URNServer {
             elp.setPassword(getConfiguration().getPassword());
             String content = new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite());
 
-            LOGGER.debug("EpicurLite \"posted\" for urn " + elp.getUrn() + "\n" + content);
+            LOGGER.debug("EpicurLite \"posted\" for urn {}\n{}", elp.getUrn(), content);
 
             post = new PostMethod(getConfiguration().getServiceURL() + elp.getUrn() + "/links");
             post.setDoAuthentication(true);

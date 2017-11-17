@@ -73,7 +73,7 @@ public class MCRPathXML {
      * Sends the contents of an MCRDirectory as XML data to the client
      */
     public static Document getDirectoryXML(MCRPath path, BasicFileAttributes attr) throws IOException {
-        LOGGER.debug("MCRDirectoryXML: start listing of directory " + path);
+        LOGGER.debug("MCRDirectoryXML: start listing of directory {}", path);
 
         Element root = new Element("mcr_directory");
         Document doc = new org.jdom2.Document(root);
@@ -154,7 +154,7 @@ public class MCRPathXML {
             addAttributes(child, fileEntry.getValue(), fileEntry.getKey());
         }
 
-        LOGGER.debug("MCRDirectoryXML: end listing of directory " + path);
+        LOGGER.debug("MCRDirectoryXML: end listing of directory {}", path);
 
         return doc;
 

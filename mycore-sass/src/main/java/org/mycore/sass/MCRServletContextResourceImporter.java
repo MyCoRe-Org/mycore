@@ -109,10 +109,10 @@ public class MCRServletContextResourceImporter implements Importer {
             String contents = getStringContent(resource);
             URI absoluteUri = resource.toURI();
 
-            LOGGER.debug("Resolved " + url + " to " + absoluteUri);
+            LOGGER.debug("Resolved {} to {}", url, absoluteUri);
             return Stream.of(new Import(absolute, absolute, contents)).collect(Collectors.toList());
         } catch (IOException | URISyntaxException e) {
-            LOGGER.error("Error while resolving " + url, e);
+            LOGGER.error("Error while resolving {}", url, e);
             return null;
         }
     }

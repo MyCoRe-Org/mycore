@@ -82,7 +82,7 @@ public class MCREnrichmentResolver implements URIResolver {
     }
 
     private void enrichPublicationLevel(Element mods, String configID) {
-        LOGGER.debug("resolving via config " + configID + " : " + MCRXPathBuilder.buildXPath(mods));
+        LOGGER.debug("resolving via config {} : {}", configID, MCRXPathBuilder.buildXPath(mods));
 
         boolean withinGroup = false;
         boolean dataSourceCompleted = false;
@@ -99,7 +99,7 @@ public class MCREnrichmentResolver implements URIResolver {
                 withinGroup = false;
                 dataSourceCompleted = false;
             } else if (withinGroup && dataSourceCompleted) {
-                LOGGER.debug("Skipping data source " + token);
+                LOGGER.debug("Skipping data source {}", token);
                 continue;
             } else {
                 String dataSourceID = token;
@@ -111,11 +111,11 @@ public class MCREnrichmentResolver implements URIResolver {
                     for (Element identifierElement : identifiersFound) {
                         String identifier = identifierElement.getTextTrim();
 
-                        LOGGER.debug("resolving " + idType + " " + identifier + " from " + dataSource + "...");
+                        LOGGER.debug("resolving {} {} from {}...", idType, identifier, dataSource);
                         Element resolved = resolver.resolve(identifier);
 
                         if (resolved == null) {
-                            LOGGER.debug("no data returned from " + dataSource);
+                            LOGGER.debug("no data returned from {}", dataSource);
                         } else {
                             mergeResolvedIntoExistingData(mods, resolved);
                             dataSourceCompleted = true;
@@ -146,7 +146,7 @@ public class MCREnrichmentResolver implements URIResolver {
         if (LOGGER.isDebugEnabled()) {
             mods.removeChildren("extension", MCRConstants.MODS_NAMESPACE);
             try {
-                LOGGER.debug("\n-------------------- " + headline + ": --------------------\n");
+                LOGGER.debug("\n-------------------- {}: --------------------\n", headline);
                 XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
                 LOGGER.debug(xout.outputString(mods));
                 LOGGER.debug("\n");

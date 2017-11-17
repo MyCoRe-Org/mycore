@@ -103,7 +103,7 @@ public class MCRTransferPackage {
             }
         }
         // add classifications
-        MCRObjectUtils.getCategories(object).forEach(categories::add);
+        categories.addAll(MCRObjectUtils.getCategories(object));
 
         // add the object to the objectMap
         objectMap.put(object.getId(), object);

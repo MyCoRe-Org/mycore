@@ -87,7 +87,7 @@ public abstract class MCRTransferPackageUtil {
         MCRTransferPackageUtil.importFromDirectory(targetDirectory);
 
         // delete the extracted files, but keep the tar
-        LOGGER.info("Deleting expanded tar in " + targetDirectory);
+        LOGGER.info("Deleting expanded tar in {}", targetDirectory);
         Files.walkFileTree(targetDirectory, MCRRecursiveDeleter.instance());
     }
 
@@ -243,7 +243,7 @@ public abstract class MCRTransferPackageUtil {
 
         MCRDirectory dir = MCRDirectory.getRootDirectory(der.getId().toString());
         if (dir == null) {
-            LOGGER.info("Creating missing " + MCRFilesystemNode.class.getSimpleName() + " " + der.getId());
+            LOGGER.info("Creating missing {} {}", MCRFilesystemNode.class.getSimpleName(), der.getId());
             final MCRDirectory difs = new MCRDirectory(der.getId().toString());
             der.getDerivate().getInternals().setIFSID(difs.getID());
             MCRMetadataManager.update(der);

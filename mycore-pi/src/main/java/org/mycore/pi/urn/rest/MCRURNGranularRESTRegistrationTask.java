@@ -50,7 +50,7 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
 
     @Override
     public void close() throws IOException {
-        LOGGER.info("Stopping " + getClass().getSimpleName());
+        LOGGER.info("Stopping {}", getClass().getSimpleName());
     }
 
     public static class MCRTransactionExec {

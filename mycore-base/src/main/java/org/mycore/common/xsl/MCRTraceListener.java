@@ -72,28 +72,28 @@ public class MCRTraceListener implements TraceListener {
             }
 
             // Output current line number and column number
-            log.append(" line " + ete.getLineNumber() + " col " + ete.getColumnNumber());
+            log.append(" line ").append(ete.getLineNumber()).append(" col ").append(ete.getColumnNumber());
 
             // Find the name of the xsl:template currently processed
             try {
                 ElemTemplate et = ev.m_processor.getCurrentTemplate();
                 log.append(" in <xsl:template");
                 if (et.getMatch() != null) {
-                    log.append(" match=\"" + et.getMatch().getPatternString() + "\"");
+                    log.append(" match=\"").append(et.getMatch().getPatternString()).append("\"");
                 }
                 if (et.getName() != null) {
-                    log.append(" name=\"" + et.getName().getLocalName() + "\"");
+                    log.append(" name=\"").append(et.getName().getLocalName()).append("\"");
                 }
                 if (et.getMode() != null) {
-                    log.append(" mode=\"" + et.getMode().getLocalName() + "\"");
+                    log.append(" mode=\"").append(et.getMode().getLocalName()).append("\"");
                 }
                 log.append(">");
             } catch (Exception ignored) {
             }
 
             // Output name of the xsl or html element currently processed
-            log.append(" " + ete.getTagName());
-            LOGGER.debug("Trace" + log);
+            log.append(" ").append(ete.getTagName());
+            LOGGER.debug("Trace{}", log);
 
             // Output xpath of current xml source node in context
             StringBuilder path = new StringBuilder();
@@ -105,7 +105,7 @@ public class MCRTraceListener implements TraceListener {
                 }
             }
             if (path.length() > 0) {
-                LOGGER.debug("Source " + path);
+                LOGGER.debug("Source {}", path);
             }
             try {
                 if ("true".equals(ev.m_processor.getParameter("DEBUG"))) {
@@ -125,7 +125,7 @@ public class MCRTraceListener implements TraceListener {
      */
     public void generated(GenerateEvent ev) {
         if (LOGGER.isDebugEnabled() && ev.m_eventtype == 12) {
-            LOGGER.debug("Output " + new String(ev.m_characters, ev.m_start, ev.m_length).trim());
+            LOGGER.debug("Output {}", new String(ev.m_characters, ev.m_start, ev.m_length).trim());
         }
     }
 

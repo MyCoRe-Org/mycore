@@ -218,7 +218,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         if (Files.isRegularFile(resolvedPath)) {
             BasicFileAttributes attrs = Files.readAttributes(resolvedPath, BasicFileAttributes.class);
             sendCompressedFile(resolvedPath, attrs, container);
-            LOGGER.debug("file " + resolvedPath + " zipped");
+            LOGGER.debug("file {} zipped", resolvedPath);
             return;
         }
         // root is a directory
@@ -278,7 +278,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
             impl.sendCompressedFile(MCRPath.toMCRPath(file), attrs, container);
-            LOGGER.debug("file " + file + " zipped");
+            LOGGER.debug("file {} zipped", file);
             return super.visitFile(file, attrs);
         }
 

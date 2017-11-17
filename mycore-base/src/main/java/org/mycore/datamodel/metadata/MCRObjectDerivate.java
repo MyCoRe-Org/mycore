@@ -423,7 +423,7 @@ public class MCRObjectDerivate {
             validate();
             return true;
         } catch (MCRException exc) {
-            LOGGER.warn("The <derivate> part of the mycorederivate '" + derivateID + "' is invalid.", exc);
+            LOGGER.warn("The <derivate> part of the mycorederivate '{}' is invalid.", derivateID, exc);
         }
         return false;
     }

@@ -61,7 +61,7 @@ public class MCRSolrBulkXMLIndexHandler extends MCRSolrObjectStreamIndexHandler 
                 Document mcrObjXML = content.asXML();
                 elementList.add(mcrObjXML.getRootElement().detach());
             } catch (Exception e) {
-                LOGGER.error("Cannot submit \"" + id + "\" cause content couldn't be parsed.", e);
+                LOGGER.error("Cannot submit \"{}\" cause content couldn't be parsed.", id, e);
             }
         });
         return contentStream;

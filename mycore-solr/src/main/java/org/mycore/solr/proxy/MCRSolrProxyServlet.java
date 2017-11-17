@@ -173,7 +173,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         throws IOException {
         String requestURL = MessageFormat.format("{0}solr{1}{2}", getServletBaseURL(), queryHandlerPath,
             toSolrParams(parameters).toQueryString());
-        LOGGER.info("Redirect to: " + requestURL);
+        LOGGER.info("Redirect to: {}", requestURL);
         resp.sendRedirect(resp.encodeRedirectURL(requestURL));
     }
 
@@ -182,7 +182,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter);
         try {
-            LOGGER.info("Sending Request: " + solrHttpMethod.getURI());
+            LOGGER.info("Sending Request: {}", solrHttpMethod.getURI());
             HttpResponse response = httpClient.execute(solrHost, solrHttpMethod);
             int statusCode = response.getStatusLine().getStatusCode();
 
@@ -264,7 +264,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
 
-        LOGGER.info("Initializing SOLR connection to \"" + SERVER_URL + "\"");
+        LOGGER.info("Initializing SOLR connection to \"{}\"", SERVER_URL);
 
         this.updateQueryHandlerMap();
 

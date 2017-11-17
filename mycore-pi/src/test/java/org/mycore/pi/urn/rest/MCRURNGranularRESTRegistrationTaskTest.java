@@ -59,7 +59,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         } while (progressedIdentifiersFromDatabase > 0);
 
         boolean registered = MCRPersistentIdentifierManager.getInstance().isRegistered(urn1);
-        LOGGER.info("Registered: " + registered);
+        LOGGER.info("Registered: {}", registered);
 
         MCRPI mcrpi = MCREntityManagerProvider.getCurrentEntityManager().find(MCRPI.class, urn1.getId());
         Optional.ofNullable(mcrpi)

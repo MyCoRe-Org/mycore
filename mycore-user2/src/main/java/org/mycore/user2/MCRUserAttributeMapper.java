@@ -152,9 +152,7 @@ public class MCRUserAttributeMapper {
 
                             if (convCls != null) {
                                 MCRUserAttributeConverter converter = convCls.newInstance();
-                                LOGGER.debug(
-                                    "convert value \"" + value + "\" with \"" + converter.getClass().getName()
-                                        + "\"");
+                                LOGGER.debug("convert value \"{}\" with \"{}\"", value, converter.getClass().getName());
                                 value = converter.convert(value,
                                     attribute.separator != null ? attribute.separator : attrAnno.separator(),
                                     attribute.getValueMap());
@@ -168,8 +166,8 @@ public class MCRUserAttributeMapper {
                                 if (annotated instanceof Field) {
                                     final Field field = (Field) annotated;
 
-                                    LOGGER.debug("map attribute \"" + attribute.mapping + "\" with value \""
-                                        + value + "\" to field \"" + field.getName() + "\"");
+                                    LOGGER.debug("map attribute \"{}\" with value \"{}\" to field \"{}\"",
+                                        attribute.mapping, value, field.getName());
 
                                     boolean accState = field.isAccessible();
                                     field.setAccessible(true);
@@ -180,8 +178,8 @@ public class MCRUserAttributeMapper {
                                 } else if (annotated instanceof Method) {
                                     final Method method = (Method) annotated;
 
-                                    LOGGER.debug("map attribute \"" + attribute.mapping + "\" with value \""
-                                        + value + "\" to method \"" + method.getName() + "\"");
+                                    LOGGER.debug("map attribute \"{}\" with value \"{}\" to method \"{}\"",
+                                        attribute.mapping, value, method.getName());
 
                                     boolean accState = method.isAccessible();
                                     method.setAccessible(true);

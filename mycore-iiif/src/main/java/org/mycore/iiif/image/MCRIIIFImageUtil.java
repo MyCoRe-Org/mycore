@@ -43,7 +43,7 @@ public class MCRIIIFImageUtil {
     }
 
     public static String buildProfileURL() throws UnsupportedEncodingException {
-        return String.format(Locale.ROOT, "<" + IIIF_IMAGE_API_2_LEVEL2 + ">;rel=\"profile\"");
+        return "<" + IIIF_IMAGE_API_2_LEVEL2 + ">;rel=\"profile\"";
     }
 
     public static String getIIIFURL(MCRIIIFImageImpl impl) {

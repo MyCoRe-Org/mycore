@@ -87,7 +87,7 @@ public class MCRURL {
                 this.parameterMap = buildParameterMap(this.url);
             }
         } catch (Exception exc) {
-            LOGGER.error("unable to rebuild url " + this.url);
+            LOGGER.error("unable to rebuild url {}", this.url);
         }
     }
 
@@ -112,7 +112,7 @@ public class MCRURL {
                 this.parameterMap = buildParameterMap(this.url);
             }
         } catch (MalformedURLException exc) {
-            LOGGER.error("unable to add parameter (" + name + "=" + value + ") to url" + this.url);
+            LOGGER.error("unable to add parameter ({}={}) to url{}", name, value, this.url);
         }
         return this;
     }

@@ -32,7 +32,7 @@ public class MCRIncludeHandler {
         boolean bStatic = "true".equals(sStatic) || includesPerApplication.containsKey(uri);
         Map<String, Node> includes = bStatic ? includesPerApplication : includesPerTransformation;
 
-        LOGGER.debug("Including " + uri + " static=" + bStatic + " cached=" + includes.containsKey(uri));
+        LOGGER.debug("Including {} static={} cached={}", uri, bStatic, includes.containsKey(uri));
 
         Node node = includes.get(uri);
         if (node == null) {

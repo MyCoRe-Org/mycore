@@ -233,7 +233,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             // Normalize value when contains operator is used
             List<String> values = new ArrayList<>();
 
-            String phrase = null;
+            StringBuilder phrase = null;
             StringTokenizer st = new StringTokenizer(qc.getValue(), " ");
             while (st.hasMoreTokens()) {
                 String value = st.nextToken();
@@ -246,7 +246,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                         phrase = null;
                     } else // in middle of phrase
                     {
-                        phrase = phrase + " " + value;
+                        phrase.append(" ").append(value);
                     }
                 } else if (value.startsWith("'")) // begin of phrase
                 {
@@ -254,7 +254,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                     {
                         values.add(value.substring(1, value.length() - 1));
                     } else {
-                        phrase = value;
+                        phrase = new StringBuilder(value);
                     }
                 } else if (value.startsWith("-'")) // begin of NOT phrase
                 {
@@ -262,7 +262,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                     {
                         values.add("-" + value.substring(2, value.length() - 1));
                     } else {
-                        phrase = value;
+                        phrase = new StringBuilder(value);
                     }
                 } else {
                     values.add(value);

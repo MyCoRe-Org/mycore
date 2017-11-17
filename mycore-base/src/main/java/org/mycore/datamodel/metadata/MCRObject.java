@@ -191,10 +191,10 @@ public final class MCRObject extends MCRBase {
             if (mcr_id == null) {
                 LOGGER.debug("MCRObject ID : missing");
             } else {
-                LOGGER.debug("MCRObject ID : " + mcr_id);
+                LOGGER.debug("MCRObject ID : {}", mcr_id);
             }
-            LOGGER.debug("MCRObject Label : " + mcr_label);
-            LOGGER.debug("MCRObject Schema : " + mcr_schema);
+            LOGGER.debug("MCRObject Label : {}", mcr_label);
+            LOGGER.debug("MCRObject Schema : {}", mcr_schema);
             LOGGER.debug("");
         }
         mcr_struct.debug();

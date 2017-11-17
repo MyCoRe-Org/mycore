@@ -59,7 +59,7 @@ public class MCRUploadHandlerManager {
     }
 
     static void register(MCRUploadHandler handler) {
-        LOGGER.debug("Registering " + handler.getClass().getName() + " with upload ID " + handler.getID());
+        LOGGER.debug("Registering {} with upload ID {}", handler.getClass().getName(), handler.getID());
         String sessionID = MCRSessionMgr.getCurrentSession().getID();
         HANDLERS.put(handler.getID(), new MCRUploadHandlerCacheEntry(sessionID, handler));
         COLLECTION.add(handler);

@@ -101,7 +101,7 @@ public class MCRMetadataHistoryCommands {
     public static List<String> buildHistory(String baseId) {
         MCRMetadataStore store = MCRXMLMetadataManager.instance().getStore(baseId);
         if (store instanceof MCRVersioningMetadataStore) {
-            LogManager.getLogger().info("Verify SVN history of " + baseId);
+            LogManager.getLogger().info("Verify SVN history of {}", baseId);
             ((MCRVersioningMetadataStore) store).verify();
         }
         ExecutorService executorService = Executors.newWorkStealingPool();
@@ -160,7 +160,7 @@ public class MCRMetadataHistoryCommands {
                 return buildDerivateHistory(derId, versions);
             }
         } catch (IOException e) {
-            LogManager.getLogger().error("Error while getting history of " + derId);
+            LogManager.getLogger().error("Error while getting history of {}", derId);
             return Stream.empty();
         }
     }
@@ -180,7 +180,7 @@ public class MCRMetadataHistoryCommands {
                 return buildObjectHistory(objId, versions);
             }
         } catch (IOException e) {
-            LogManager.getLogger().error("Error while getting history of " + objId);
+            LogManager.getLogger().error("Error while getting history of {}", objId);
             return Stream.empty();
         }
     }
@@ -196,7 +196,7 @@ public class MCRMetadataHistoryCommands {
             try {
                 creator = MCRCreatorCache.getCreator(der.getId());
             } catch (ExecutionException e) {
-                LogManager.getLogger().warn("Error while getting creator of " + derId, e);
+                LogManager.getLogger().warn("Error while getting creator of {}", derId, e);
                 creator = null;
             }
             String user = Optional.ofNullable(creator)
@@ -226,7 +226,7 @@ public class MCRMetadataHistoryCommands {
             try {
                 creator = MCRCreatorCache.getCreator(obj.getId());
             } catch (ExecutionException e) {
-                LogManager.getLogger().warn("Error while getting creator of " + objId, e);
+                LogManager.getLogger().warn("Error while getting creator of {}", objId, e);
                 creator = null;
             }
             String user = Optional.ofNullable(creator)
@@ -277,7 +277,7 @@ public class MCRMetadataHistoryCommands {
                     }
                 } catch (JDOMException | SAXException e) {
                     LogManager.getLogger()
-                        .error("Error while reading revision " + version.getRevision() + " of " + derId, e);
+                              .error("Error while reading revision {} of {}", version.getRevision(), derId, e);
                 }
             }
         }
@@ -317,7 +317,7 @@ public class MCRMetadataHistoryCommands {
                     }
                 } catch (JDOMException | SAXException e) {
                     LogManager.getLogger()
-                        .error("Error while reading revision " + version.getRevision() + " of " + objId, e);
+                              .error("Error while reading revision {} of {}", version.getRevision(), objId, e);
                 }
             }
         }

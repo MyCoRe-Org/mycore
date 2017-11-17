@@ -64,7 +64,7 @@ public class MCRSessionMgr {
      * 
      * @see ThreadLocal
      */
-    private static ThreadLocal<MCRSession> theThreadLocalSession = ThreadLocal.withInitial(() -> new MCRSession());
+    private static ThreadLocal<MCRSession> theThreadLocalSession = ThreadLocal.withInitial(MCRSession::new);
 
     private static ThreadLocal<Boolean> isSessionAttached = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
@@ -104,7 +104,7 @@ public class MCRSessionMgr {
         if (theThreadLocalSession != null && hasCurrentSession()) {
             MCRSession session = theThreadLocalSession.get();
             session.passivate();
-            MCRSession.LOGGER.debug("MCRSession released " + session.getID());
+            MCRSession.LOGGER.debug("MCRSession released {}", session.getID());
             theThreadLocalSession.remove();
             isSessionAttached.remove();
         }
@@ -138,7 +138,7 @@ public class MCRSessionMgr {
     public static MCRSession getSession(String sessionID) {
         MCRSession s = sessions.get(sessionID);
         if (s == null) {
-            MCRSession.LOGGER.warn("MCRSession with ID " + sessionID + " not cached any more");
+            MCRSession.LOGGER.warn("MCRSession with ID {} not cached any more", sessionID);
         }
         return s;
     }

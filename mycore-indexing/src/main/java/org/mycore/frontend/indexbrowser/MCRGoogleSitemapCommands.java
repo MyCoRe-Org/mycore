@@ -69,29 +69,29 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
         common.removeSitemapFiles();
         // compute number of files
         int number = common.checkSitemapFile();
-        LOGGER.debug("Build Google number of URL files " + Integer.toString(number) + ".");
+        LOGGER.debug("Build Google number of URL files {}.", Integer.toString(number));
         if (number == 1) {
             String fn = common.getFileName(1, true);
             File xml = new File(fn);
             Document jdom = common.buildSingleSitemap();
-            LOGGER.info("Write Google sitemap file " + fn + ".");
+            LOGGER.info("Write Google sitemap file {}.", fn);
             new MCRJDOMContent(jdom).sendTo(xml);
         } else {
             String fn = common.getFileName(1, true);
             File xml = new File(fn);
             Document jdom = common.buildSitemapIndex(number);
-            LOGGER.info("Write Google sitemap file " + fn + ".");
+            LOGGER.info("Write Google sitemap file {}.", fn);
             new MCRJDOMContent(jdom).sendTo(xml);
             for (int i = 0; i < number; i++) {
                 fn = common.getFileName(i + 2, true);
                 xml = new File(fn);
                 jdom = common.buildPartSitemap(i);
-                LOGGER.info("Write Google sitemap file " + fn + ".");
+                LOGGER.info("Write Google sitemap file {}.", fn);
                 new MCRJDOMContent(jdom).sendTo(xml);
             }
         }
         // check time
-        LOGGER.debug("Google sitemap request took " + (System.currentTimeMillis() - start) + "ms.");
+        LOGGER.debug("Google sitemap request took {}ms.", System.currentTimeMillis() - start);
     }
 
 }

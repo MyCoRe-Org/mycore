@@ -284,10 +284,10 @@ public class MCRParameterCollector {
     }
 
     private void debugSessionParameters() {
-        LOGGER.debug("XSL.HttpSession =" + parameters.get("HttpSession"));
-        LOGGER.debug("XSL.JSessionID =" + parameters.get("JSessionID"));
-        LOGGER.debug("XSL.CurrentUser =" + parameters.get("CurrentUser"));
-        LOGGER.debug("XSL.Referer =" + parameters.get("Referer"));
+        LOGGER.debug("XSL.HttpSession ={}", parameters.get("HttpSession"));
+        LOGGER.debug("XSL.JSessionID ={}", parameters.get("JSessionID"));
+        LOGGER.debug("XSL.CurrentUser ={}", parameters.get("CurrentUser"));
+        LOGGER.debug("XSL.Referer ={}", parameters.get("Referer"));
     }
 
     /** Sets the request and referer URL */
@@ -313,7 +313,7 @@ public class MCRParameterCollector {
         }
 
         String url = buffer.toString();
-        LOGGER.debug("Complete request URL : " + url);
+        LOGGER.debug("Complete request URL : {}", url);
         return url;
     }
 

@@ -110,12 +110,12 @@ public class MCRRoleManager {
     public static MCRRole getExternalRole(String name) {
         MCRCategoryID categoryID = MCRCategoryID.fromString(name);
         if (categoryID.isRootID()) {
-            LOGGER.debug("External role may not be a rootCategory: " + categoryID);
+            LOGGER.debug("External role may not be a rootCategory: {}", categoryID);
             return null;
         }
         MCRCategory category = DAO.getCategory(categoryID, 0);
         if (category == null) {
-            LOGGER.debug("Category does not exist: " + categoryID);
+            LOGGER.debug("Category does not exist: {}", categoryID);
             return null;
         }
         MCRRole role = new MCRRole(name, category.getLabels());
@@ -186,7 +186,7 @@ public class MCRRoleManager {
             MCRCategoryID categID = MCRCategoryID.fromString(roleID);
             categories.add(categID);
         }
-        LOGGER.info("Assigning " + user.getUserID() + " to these roles: " + categories);
+        LOGGER.info("Assigning {} to these roles: {}", user.getUserID(), categories);
         CATEG_LINK_SERVICE.setLinks(ref, categories);
     }
 

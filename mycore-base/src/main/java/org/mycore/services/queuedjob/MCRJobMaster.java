@@ -126,8 +126,7 @@ public class MCRJobMaster implements Runnable, Closeable {
      */
     public static void startMasterThread(Class<? extends MCRJobAction> action) {
         if (!isRunning(action)) {
-            LOGGER.info("Starting job master thread" + (action == null ? "" : " for action \"" + action.getName())
-                + "\".");
+            LOGGER.info("Starting job master thread{}\".", action == null ? "" : " for action \"" + action.getName());
             final Thread master = new Thread(getInstance(action));
             master.start();
         }
@@ -149,8 +148,8 @@ public class MCRJobMaster implements Runnable, Closeable {
         activated = activated
             && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "activated", true);
 
-        LOGGER.info("JobQueue" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " is "
-            + (activated ? "activated" : "deactivated"));
+        LOGGER.info("JobQueue{} is {}", MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"",
+            activated ? "activated" : "deactivated");
         if (activated) {
             running = true;
             int jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads", 2);
@@ -189,8 +188,8 @@ public class MCRJobMaster implements Runnable, Closeable {
             jobServe = MCRProcessableFactory.newPool(executor, processableCollection);
             processableCollection.setProperty("running", running);
 
-            LOGGER.info("JobMaster" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " with "
-                + jobThreadCount + " thread(s) is started");
+            LOGGER.info("JobMaster{} with {} thread(s) is started",
+                MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"", jobThreadCount);
             while (running) {
                 try {
                     while (activeThreads.get() < jobThreadCount) {
@@ -234,7 +233,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                             }
                             if (job != null && action != null && action.isActivated()
                                 && !jobServe.getExecutor().isShutdown()) {
-                                LOGGER.info("Creating:" + job);
+                                LOGGER.info("Creating:{}", job);
                                 jobServe.submit(new MCRJobThread(job));
                             } else {
                                 try {
@@ -274,7 +273,7 @@ public class MCRJobMaster implements Runnable, Closeable {
             } // while(running)
             processableCollection.setProperty("running", running);
         }
-        LOGGER.info(getName() + " thread finished");
+        LOGGER.info("{} thread finished", getName());
         MCRSessionMgr.releaseCurrentSession();
     }
 

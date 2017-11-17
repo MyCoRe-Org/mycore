@@ -120,10 +120,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             if (currentClassElement == null) {
                 LOGGER.error("Error while finding classification elements", je);
             } else {
-                LOGGER.error(
-                    "Error while finding classification elements for "
-                        + new XMLOutputter().outputString(currentClassElement),
-                    je);
+                LOGGER.error("Error while finding classification elements for {}",
+                    new XMLOutputter().outputString(currentClassElement), je);
             }
         } finally {
             if (mappings == null || mappings.size() == 0) {

@@ -126,11 +126,11 @@ public class MCRXMLResource {
         CacheEntry entry = resourceCache.getIfUpToDate(name, modifiedHandle);
         URL resolvedURL = modifiedHandle.getURL();
         if (entry != null && (resolvedURL == null || entry.resourceURL.equals(resolvedURL))) {
-            LOGGER.debug("Using cached resource " + name);
+            LOGGER.debug("Using cached resource {}", name);
             return entry.content;
         }
         if (resolvedURL == null) {
-            LOGGER.warn("Could not resolve resource: " + name);
+            LOGGER.warn("Could not resolve resource: {}", name);
             return null;
         }
         entry = new CacheEntry();
@@ -172,9 +172,9 @@ public class MCRXMLResource {
     }
 
     private static URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
-        LOGGER.debug("Reading xml from classpath resource " + name);
+        LOGGER.debug("Reading xml from classpath resource {}", name);
         URL url = MCRConfigurationDir.getConfigResource(name, classLoader);
-        LOGGER.debug("Resource URL:" + url);
+        LOGGER.debug("Resource URL:{}", url);
         if (url == null) {
             return null;
         }
@@ -245,7 +245,7 @@ public class MCRXMLResource {
             try {
                 long lastModified = con.getLastModified();
                 resolvedURL = con.getURL();
-                LOGGER.debug(name + " last modified: " + lastModified);
+                LOGGER.debug("{} last modified: {}", name, lastModified);
                 return lastModified;
             } finally {
                 closeURLConnection(con);

@@ -84,7 +84,7 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
             String derivateID = tok.nextToken();
 
             org.jdom2.Document mediaXML = null;
-            LOGGER.info("Get metadata for file " + file.getStoreID() + "@" + file.getStorageID() + "...");
+            LOGGER.info("Get metadata for file {}@{}...", file.getStoreID(), file.getStorageID());
             try {
                 mediaXML = MCRMediaIFSTools.getMetadataFromStore(derivateID, file.getPath());
             } catch (Throwable e) {
@@ -160,20 +160,20 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     public String getContentTypeID() {
         if (media.getMimeType() != null) {
             try {
-                LOGGER.info("Try to detect file content type by mime type '" + media.getMimeType() + "'...");
+                LOGGER.info("Try to detect file content type by mime type '{}'...", media.getMimeType());
                 MCRFileContentType cType = MCRFileContentTypeFactory.getTypeByMimeType(media.getMimeType());
                 contentTypeID = cType.getID();
             } catch (Throwable ex) {
-                LOGGER.info("Try to detect file content type with extension '" + file.getExtension() + "'...");
+                LOGGER.info("Try to detect file content type with extension '{}'...", file.getExtension());
                 try {
                     MCRFileContentType cType = MCRFileContentTypeFactory.getType(file.getExtension());
                     contentTypeID = cType.getID();
                 } catch (Throwable ex2) {
-                    LOGGER.info("Try to detect file content type with format '" + media.getFormat() + "'...");
+                    LOGGER.info("Try to detect file content type with format '{}'...", media.getFormat());
                     contentTypeID = detectContentTypeIDByFormat(media.getFormat());
                     if (contentTypeID == null) {
-                        LOGGER.info("Try to detect file content type with subformat '"
-                            + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
+                        LOGGER.info("Try to detect file content type with subformat '{}'...",
+                            isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
                         contentTypeID = detectContentTypeIDByFormat(
                             isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
                         if (contentTypeID == null) {
@@ -183,16 +183,16 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
                 }
             }
         } else {
-            LOGGER.info("Try to detect file content type with extension '" + file.getExtension() + "'...");
+            LOGGER.info("Try to detect file content type with extension '{}'...", file.getExtension());
             try {
                 MCRFileContentType cType = MCRFileContentTypeFactory.getType(file.getExtension());
                 contentTypeID = cType.getID();
             } catch (Throwable ex2) {
-                LOGGER.info("Try to detect file content type with format '" + media.getFormat() + "'...");
+                LOGGER.info("Try to detect file content type with format '{}'...", media.getFormat());
                 contentTypeID = detectContentTypeIDByFormat(media.getFormat());
                 if (contentTypeID == null) {
-                    LOGGER.info("Try to detect file content type with subformat '"
-                        + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
+                    LOGGER.info("Try to detect file content type with subformat '{}'...",
+                        isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
                     contentTypeID = detectContentTypeIDByFormat(
                         isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
                     if (contentTypeID == null) {

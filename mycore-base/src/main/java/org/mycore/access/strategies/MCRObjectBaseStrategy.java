@@ -61,7 +61,7 @@ public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy 
      *      java.lang.String)
      */
     public boolean checkPermission(String id, String permission) {
-        LOGGER.debug("check permission " + permission + " for MCRBaseID " + id);
+        LOGGER.debug("check permission {} for MCRBaseID {}", permission, id);
         if (id == null || id.length() == 0 || permission == null || permission.length() == 0)
             return false;
         if (MCRAccessManager.getAccessImpl().hasRule(id, permission)) {

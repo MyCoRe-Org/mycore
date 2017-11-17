@@ -81,7 +81,7 @@ public class MCRStalledJobResetter implements Runnable {
 
         StringBuilder sb = new StringBuilder("FROM MCRJob WHERE ");
         if (action != null)
-            sb.append("action='" + action.getName() + "' AND ");
+            sb.append("action='").append(action.getName()).append("' AND ");
         sb.append(" status='" + MCRJobStatus.PROCESSING + "' ORDER BY id ASC");
 
         TypedQuery<MCRJob> query = em.createQuery(sb.toString(), MCRJob.class);

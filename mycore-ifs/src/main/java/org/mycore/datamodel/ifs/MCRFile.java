@@ -646,14 +646,11 @@ public class MCRFile extends MCRFilesystemNode {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(super.toString());
-        sb.append("ContentType = ").append(contentTypeID).append(" ");
-        sb.append("MD5         = ").append(md5).append(" ");
-        sb.append("StoreID     = ").append(storeID).append(" ");
-        sb.append("StorageID   = ").append(storageID);
+        String sb =
+            super.toString() + "ContentType = " + contentTypeID + " " + "MD5         = " + md5 + " " + "StoreID     = "
+                + storeID + " " + "StorageID   = " + storageID;
 
-        return sb.toString();
+        return sb;
     }
 
     /**

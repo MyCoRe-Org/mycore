@@ -107,7 +107,7 @@ public class MCRBibUtilsTransformer extends MCRContentTransformer {
         System.arraycopy(args1, 0, args2, 0, args1.length);
         args2[args1.length] = path;
 
-        LOGGER.info(command + " " + path);
+        LOGGER.info("{} {}", command, path);
         return args2;
     }
 }

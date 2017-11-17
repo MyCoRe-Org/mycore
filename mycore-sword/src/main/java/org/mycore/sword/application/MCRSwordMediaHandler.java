@@ -76,7 +76,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                 is = Files.newInputStream(path);
                 resultRessource = new MediaResource(is, Files.probeContentType(path), UriRegistry.PACKAGE_BINARY);
             } catch (IOException e) {
-                LOGGER.error("Error while opening File: " + path, e);
+                LOGGER.error("Error while opening File: {}", path, e);
                 if (is != null) {
                     try {
                         is.close();
@@ -187,10 +187,10 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
         } finally {
             if (tempFile != null) {
                 try {
-                    LOGGER.info("Delete temp file: " + tempFile);
+                    LOGGER.info("Delete temp file: {}", tempFile);
                     Files.delete(tempFile);
                 } catch (IOException e) {
-                    LOGGER.error("Could not delete temp file: " + tempFile, e);
+                    LOGGER.error("Could not delete temp file: {}", tempFile, e);
                 }
             }
         }

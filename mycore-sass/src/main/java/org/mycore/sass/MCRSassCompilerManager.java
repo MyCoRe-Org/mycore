@@ -143,7 +143,7 @@ public class MCRSassCompilerManager {
     private String compile(String name, List<Importer> importer) throws CompilationException, IOException {
         Options options = new Options();
         Collection<Importer> importerList = options.getImporters();
-        importer.forEach(importerList::add);
+        importerList.addAll(importer);
 
         String realFileName = name.replace(".min.css", ".scss").replace(".css", ".scss");
 

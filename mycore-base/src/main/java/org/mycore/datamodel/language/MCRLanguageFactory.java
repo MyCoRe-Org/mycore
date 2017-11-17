@@ -123,7 +123,7 @@ public class MCRLanguageFactory {
             code = code.split("-")[0];
 
         if (!languageByCode.containsKey(code)) {
-            LOGGER.warn("Unknown language: " + code);
+            LOGGER.warn("Unknown language: {}", code);
             buildLanguage(code, code.length() > 2 ? code : null, null);
         }
 
@@ -242,7 +242,7 @@ public class MCRLanguageFactory {
 
         MCRCategory root = DAO.getCategory(classification, -1);
         if (root == null) {
-            LOGGER.warn("Language classification " + classification.getRootID() + " not found");
+            LOGGER.warn("Language classification {} not found", classification.getRootID());
             return;
         }
 

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +88,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         if ((el != null) && (el.trim().length() > 0))
             emptyLeaves = Boolean.valueOf(el);
 
-        LOGGER.info("ClassificationBrowser " + classifID + " " + (categID == null ? "" : categID));
+        LOGGER.info("ClassificationBrowser {} {}", classifID, categID == null ? "" : categID);
 
         MCRCategoryID id = new MCRCategoryID(classifID, categID);
         Element xml = new Element("classificationBrowserData");
@@ -111,7 +112,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             xml.setAttribute("parameters", parameters);
         }
 
-        List<Element> data = new ArrayList<Element>();
+        List<Element> data = new ArrayList<>();
         MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 1);
         if (category == null) {
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, "Could not find category: " + id);
@@ -152,7 +153,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         renderToHTML(job, req, xml);
 
         time = (System.nanoTime() - time) / 1000000;
-        LOGGER.info("ClassificationBrowser finished in " + time + " ms");
+        LOGGER.info("ClassificationBrowser finished in {} ms", time);
     }
 
     /**
@@ -196,15 +197,16 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     /** Sorts by id, by label in current language, or keeps natural order */
     private void sortCategories(HttpServletRequest req, List<Element> data) {
         final String sortBy = req.getParameter("sortby");
-        if (sortBy != null)
-            Collections.sort(data, (a, b) -> {
-                if ("id".equals(sortBy))
-                    return (a.getAttributeValue("id").compareTo(b.getAttributeValue("id")));
-                else if ("label".equals(sortBy))
-                    return (a.getChildText("label").compareToIgnoreCase(b.getChildText("label")));
-                else
-                    return 0;
-            });
+        switch (sortBy) {
+            case "id":
+                data.sort(Comparator.comparing(e -> e.getAttributeValue("id")));
+                break;
+            case "label":
+                data.sort(Comparator.comparing(e -> e.getChildText("label"), String::compareToIgnoreCase));
+                break;
+            default:
+                //no sort;
+        }
     }
 
     /** Sends output to client browser 

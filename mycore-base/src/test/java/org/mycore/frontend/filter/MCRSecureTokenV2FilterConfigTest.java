@@ -7,6 +7,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class MCRSecureTokenV2FilterConfigTest extends MCRTestCase {
      */
     @Test
     public void testGetExtensionPattern() {
-        testMP4Files(MCRSecureTokenV2FilterConfig.getExtensionPattern(Arrays.asList("mp4")));
+        testMP4Files(MCRSecureTokenV2FilterConfig.getExtensionPattern(Collections.singletonList("mp4")));
         testMP4Files(MCRSecureTokenV2FilterConfig.getExtensionPattern(Arrays.asList("flv", "mp4")));
         testMP4Files(MCRSecureTokenV2FilterConfig.getExtensionPattern(Arrays.asList("mp4", "flv")));
     }

@@ -209,14 +209,14 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
-            LOGGER.warn(directory + " ignored, is not a directory.");
+            LOGGER.warn("{} ignored, is not a directory.", directory);
             return null;
         }
 
         String[] list = dir.list();
 
         if (list.length == 0) {
-            LOGGER.warn("No files found in directory " + directory);
+            LOGGER.warn("No files found in directory {}", directory);
             return null;
         }
 
@@ -251,13 +251,13 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
                     dir.mkdir();
                 }
                 if (!dir.isDirectory()) {
-                    LOGGER.error("Can't find or create directory " + dir.getAbsolutePath());
+                    LOGGER.error("Can't find or create directory {}", dir.getAbsolutePath());
                     return false;
                 } else {
                     dname = dirname;
                 }
             } catch (Exception e) {
-                LOGGER.error("Can't find or create directory " + dirname, e);
+                LOGGER.error("Can't find or create directory {}", dirname, e);
                 return false;
             }
         }
@@ -275,7 +275,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             xout.output(classDoc, out);
             out.flush();
         }
-        LOGGER.info("Classifcation " + ID + " saved to " + xmlOutput.getCanonicalPath() + ".");
+        LOGGER.info("Classifcation {} saved to {}.", ID, xmlOutput.getCanonicalPath());
         return true;
     }
 
@@ -367,7 +367,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         if (cl != null) {
             listCategory(cl);
         } else {
-            LOGGER.error("Can't find classification " + classid);
+            LOGGER.error("Can't find classification {}", classid);
         }
     }
 
@@ -379,10 +379,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         }
         String space = sb.toString();
         if (categ.isCategory()) {
-            LOGGER.info(space + "  ID    : " + categ.getId().getID());
+            LOGGER.info("{}  ID    : {}", space, categ.getId().getID());
         }
         for (MCRLabel label : categ.getLabels()) {
-            LOGGER.info(space + "  Label : (" + label.getLang() + ") " + label.getText());
+            LOGGER.info("{}  Label : ({}) {}", space, label.getLang(), label.getText());
         }
         List<MCRCategory> children = categ.getChildren();
         for (MCRCategory child : children) {
@@ -397,7 +397,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         Session session = MCRHIBConnection.instance().getSession();
         String deleteEmptyLabels = "delete from {h-schema}MCRCategoryLabels where text is null or trim(text) = ''";
         int affected = session.createNativeQuery(deleteEmptyLabels).executeUpdate();
-        LOGGER.info("Deleted " + affected + " labels.");
+        LOGGER.info("Deleted {} labels.", affected);
         String sqlQuery = "select cat.classid,cat.categid from {h-schema}MCRCategory cat left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where label.text is null";
         @SuppressWarnings("unchecked")
         List<Object[]> list = session.createNativeQuery(sqlQuery).getResultList();
@@ -410,8 +410,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             MCRCategoryID mcrCategID = new MCRCategoryID(classIDString, categIDString);
             MCRLabel mcrCategLabel = new MCRLabel(MCRConstants.DEFAULT_LANG, categIDString, null);
             MCRCategoryDAOFactory.getInstance().setLabel(mcrCategID, mcrCategLabel);
-            LOGGER.info("fixing category with class ID \"" + classIDString + "\" and category ID \"" + categIDString
-                + "\"");
+            LOGGER.info("fixing category with class ID \"{}\" and category ID \"{}\"", classIDString, categIDString);
         }
         LOGGER.info("Fixing category labels completed!");
     }
@@ -436,10 +435,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number firstErrorPositionInParent = (Number) parentWithErrors[1];
-                LOGGER
-                    .info("Category " + parentID + " has the missing position " + firstErrorPositionInParent + " ...");
+                LOGGER.info("Category {} has the missing position {} ...", parentID, firstErrorPositionInParent);
                 repairCategoryWithGapInPos(parentID, firstErrorPositionInParent);
-                LOGGER.info("Fixed position " + firstErrorPositionInParent + " for category " + parentID + ".");
+                LOGGER.info("Fixed position {} for category {}.", firstErrorPositionInParent, parentID);
             }
         }
 
@@ -460,10 +458,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number wrongStartPositionInParent = (Number) parentWithErrors[1];
-                LOGGER.info("Category " + parentID + " has the the starting position " + wrongStartPositionInParent
-                    + " ...");
+                LOGGER.info("Category {} has the the starting position {} ...", parentID, wrongStartPositionInParent);
                 repairCategoryWithWrongStartPos(parentID, wrongStartPositionInParent);
-                LOGGER.info("Fixed position " + wrongStartPositionInParent + " for category " + parentID + ".");
+                LOGGER.info("Fixed position {} for category {}.", wrongStartPositionInParent, parentID);
             }
         }
         LOGGER.info("Repair position in parent finished!");
@@ -501,7 +498,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 130)
     public static void repairLeftRightValue(String classID) {
         if (!(DAO instanceof MCRCategoryDAOImpl)) {
-            LOGGER.error("Command not compatible with " + DAO.getClass().getName());
+            LOGGER.error("Command not compatible with {}", DAO.getClass().getName());
             return;
         }
         ((MCRCategoryDAOImpl) DAO).repairLeftRightValue(classID);
@@ -523,16 +520,16 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "checks if all redundant information are stored without conflicts",
         order = 150)
     public static void checkClassification(String id) {
-        LOGGER.info("Checking classifcation " + id);
+        LOGGER.info("Checking classifcation {}", id);
         ArrayList<String> log = new ArrayList<>();
-        LOGGER.info(id + ": checking for missing parentID");
+        LOGGER.info("{}: checking for missing parentID", id);
         checkMissingParent(id, log);
-        LOGGER.info(id + ": checking for empty labels");
+        LOGGER.info("{}: checking for empty labels", id);
         checkEmptyLabels(id, log);
         if (log.isEmpty()) {
             MCRCategoryImpl category = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(
                 MCRCategoryID.rootID(id), -1);
-            LOGGER.info(id + ": checking left, right and level values and for non-null children");
+            LOGGER.info("{}: checking left, right and level values and for non-null children", id);
             checkLeftRightAndLevel(category, 0, 0, log);
         }
         if (log.size() > 0) {
@@ -541,9 +538,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             for (String msg : log) {
                 sb.append(msg).append('\n');
             }
-            LOGGER.error("Error report for classification " + id + "\n" + sb);
+            LOGGER.error("Error report for classification {}\n{}", id, sb);
         } else {
-            LOGGER.info("Classifcation " + id + " has no errors.");
+            LOGGER.info("Classifcation {} has no errors.", id);
         }
     }
 

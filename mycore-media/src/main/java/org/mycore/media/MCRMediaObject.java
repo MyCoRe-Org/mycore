@@ -194,14 +194,10 @@ public class MCRMediaObject implements Cloneable {
      */
     public String getDurationTimecode() {
         DecimalFormat formatter = new DecimalFormat("00");
-        StringBuilder sb = new StringBuilder();
-        sb.append(formatter.format(getDurationHours()));
-        sb.append(":");
-        sb.append(formatter.format(getDurationMinutes()));
-        sb.append(":");
-        sb.append(formatter.format(getDurationSeconds()));
+        String sb = formatter.format(getDurationHours()) + ":" + formatter.format(getDurationMinutes()) + ":"
+            + formatter.format(getDurationSeconds());
 
-        return sb.toString();
+        return sb;
     }
 
     /**
@@ -235,9 +231,9 @@ public class MCRMediaObject implements Cloneable {
     @Override
     public String toString() {
         String out = fileName + " (" + fileSize + ")\n";
-        String _fill = "";
+        StringBuilder _fill = new StringBuilder();
         for (int c = 0; c < out.length(); c++)
-            _fill += "-";
+            _fill.append("-");
         out += _fill + "\n";
         out += (type != null ? "Main type        : " + type + "\n" : "");
         out += "mimeType         : " + mimeType + "\n";

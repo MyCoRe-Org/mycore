@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,7 +60,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        List<String> defaults = Arrays.asList("MyCoReWebPage");
+        List<String> defaults = Collections.singletonList("MyCoReWebPage");
         List<String> docTypes = MCRConfiguration.instance().getStrings("MCR.XEditor.DocTypes", defaults);
         docTypesIncludingEditors.addAll(docTypes);
     }

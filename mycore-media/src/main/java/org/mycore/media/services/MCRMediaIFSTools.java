@@ -53,7 +53,7 @@ public class MCRMediaIFSTools {
     }
 
     public static void deleteMetadata(String derivateID, String filePath) throws MCRException {
-        LOGGER.debug("Delete metadata for file \"" + filePath + "\" in Derivate " + derivateID);
+        LOGGER.debug("Delete metadata for file \"{}\" in Derivate {}", filePath, derivateID);
         try {
             MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
             if (store == null)
@@ -79,7 +79,7 @@ public class MCRMediaIFSTools {
 
     public static void storeMetadata(org.jdom2.Element mediaXML, String derivateID, String filePath)
         throws MCRException {
-        LOGGER.debug("Store metadata for file \"" + filePath + "\" in Derivate " + derivateID);
+        LOGGER.debug("Store metadata for file \"{}\" in Derivate {}", filePath, derivateID);
         try {
             MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
             if (store == null)
@@ -108,7 +108,7 @@ public class MCRMediaIFSTools {
     }
 
     public static void deleteThumbnail(String derivateID, String filePath) throws MCRException {
-        LOGGER.debug("Delete thumbnail for file \"" + filePath + "\" in Derivate " + derivateID);
+        LOGGER.debug("Delete thumbnail for file \"{}\" in Derivate {}", filePath, derivateID);
         try {
             MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
             if (store == null)
@@ -133,7 +133,7 @@ public class MCRMediaIFSTools {
     }
 
     public static org.jdom2.Document getMetadataFromStore(String derivateID, String filePath) throws MCRException {
-        LOGGER.debug("Get metadata for file \"" + filePath + "\" in Derivate " + derivateID);
+        LOGGER.debug("Get metadata for file \"{}\" in Derivate {}", filePath, derivateID);
         try {
             MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
             if (store == null)
@@ -154,7 +154,7 @@ public class MCRMediaIFSTools {
     }
 
     public static void storeThumbnail(byte[] thumb, String derivateID, String filePath) throws MCRException {
-        LOGGER.debug("Store thumbnail for file \"" + filePath + "\" in Derivate " + derivateID);
+        LOGGER.debug("Store thumbnail for file \"{}\" in Derivate {}", filePath, derivateID);
         try {
             MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
             if (store == null)
@@ -183,7 +183,7 @@ public class MCRMediaIFSTools {
     }
 
     public static MCRFile getThumbnailFromStore(String derivateID, String filePath) throws MCRException {
-        LOGGER.debug("Get thumbnail for file \"" + filePath + "\" in Derivate " + derivateID);
+        LOGGER.debug("Get thumbnail for file \"{}\" in Derivate {}", filePath, derivateID);
         try {
             MCRFileStore store = MCRStoreManager.getStore(mediaStore, MCRFileStore.class);
             if (store == null)

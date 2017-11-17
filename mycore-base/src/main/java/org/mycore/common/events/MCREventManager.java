@@ -143,7 +143,7 @@ public class MCREventManager {
             String type = eventHandlerProperty.getType();
             String mode = eventHandlerProperty.getMode();
 
-            logger.debug("EventManager instantiating handler " + config.getString(propertyKey) + " for type " + type);
+            logger.debug("EventManager instantiating handler {} for type {}", config.getString(propertyKey), type);
 
             if (propKeyIsSet(propertyKey)) {
                 addEventHandler(type, getEventHandler(mode, propertyKey));
@@ -189,8 +189,8 @@ public class MCREventManager {
         Exception handleEventExceptionCaught = null;
         for (int i = first; i != last + step; i += step) {
             MCREventHandler eh = list.get(i);
-            logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling handler "
-                + eh.getClass().getName());
+            logger.debug("EventManager {} {} calling handler {}", evt.getObjectType(), evt.getEventType(),
+                eh.getClass().getName());
 
             try {
                 eh.doHandleEvent(evt);
@@ -208,8 +208,8 @@ public class MCREventManager {
         // Rollback by calling undo of successfull handlers
         for (int i = undoPos - step; i != first - step; i -= step) {
             MCREventHandler eh = list.get(i);
-            logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling undo of handler "
-                + eh.getClass().getName());
+            logger.debug("EventManager {} {} calling undo of handler {}", evt.getObjectType(), evt.getEventType(),
+                eh.getClass().getName());
 
             try {
                 eh.undoHandleEvent(evt);

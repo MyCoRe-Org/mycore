@@ -94,8 +94,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         setup(derivateId);
         try {
             Mets mets = createMets();
-            LOGGER.info("mets creation for derivate " + derivateId + " took " + (System.currentTimeMillis() - startTime)
-                    + "ms!");
+            LOGGER.info("mets creation for derivate {} took {}ms!", derivateId, System.currentTimeMillis() - startTime);
             return mets;
         } catch (Exception exc) {
             throw new MCRException("Unable to create mets.xml of " + derivateId, exc);
@@ -123,7 +122,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
      * @throws IOException files of the path couldn't be read
      */
     protected Mets createMets() throws IOException {
-        LOGGER.info("create mets for derivate " + this.mcrDer.getId() + "...");
+        LOGGER.info("create mets for derivate {}...", this.mcrDer.getId());
 
         this.structLinkMap = new HashMap<>();
 
@@ -225,7 +224,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
                 metsFile.setFLocat(fLocat);
             } catch (URISyntaxException uriSyntaxException) {
-                LOGGER.error("invalid href " + path, uriSyntaxException);
+                LOGGER.error("invalid href {}", path, uriSyntaxException);
             }
             fgroup.addFile(metsFile);
         }
@@ -270,7 +269,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         return getOldMets().map(oldMets -> {
             PhysicalSubDiv subDiv = oldMets.getPhysicalStructMap().getDivContainer().byFileId(fileId);
             if(subDiv == null) {
-                LOGGER.error("Unable to get @ORDERLABEL of physical div '" + fileId + "'.");
+                LOGGER.error("Unable to get @ORDERLABEL of physical div '{}'.", fileId);
                 return null;
             }
             return subDiv.getOrderLabel();

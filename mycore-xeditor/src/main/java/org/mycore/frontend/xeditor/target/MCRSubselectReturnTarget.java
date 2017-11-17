@@ -23,7 +23,7 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {
         String baseXPath = getBaseXPathForSubselect(session);
-        LOGGER.info("Returning from subselect for " + baseXPath);
+        LOGGER.info("Returning from subselect for {}", baseXPath);
 
         if ("cancel".equals(parameter)) {
             session.setBreakpoint("After canceling subselect for " + baseXPath);

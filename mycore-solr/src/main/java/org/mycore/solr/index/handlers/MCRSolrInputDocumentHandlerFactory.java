@@ -65,7 +65,7 @@ public class MCRSolrInputDocumentHandlerFactory extends MCRSolrIndexHandlerFacto
             throw new MCRException(e);
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(id + " results in: " + document);
+            LOGGER.debug("{} results in: {}", id, document);
         }
         return document;
     }

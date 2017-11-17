@@ -91,7 +91,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         Vector<String> catalogURIs = new Vector<>();
         while (systemResources.hasMoreElements()) {
             URL catalogURL = systemResources.nextElement();
-            LOGGER.info("Using XML catalog: " + catalogURL);
+            LOGGER.info("Using XML catalog: {}", catalogURL);
             catalogURIs.add(catalogURL.toString());
         }
         String[] catalogs = catalogURIs.toArray(new String[catalogURIs.size()]);
@@ -181,17 +181,17 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
                     return is != null;
                 }
             } catch (IOException e) {
-                LOGGER.error("Error while checking (URL) URI: " + absoluteSystemId, e);
+                LOGGER.error("Error while checking (URL) URI: {}", absoluteSystemId, e);
             }
         }
         try {
             if (isFileSystemAvailable(absoluteSystemId.getScheme())) {
                 Path pathTest = Paths.get(absoluteSystemId);
-                LOGGER.debug("Checking: " + pathTest);
+                LOGGER.debug("Checking: {}", pathTest);
                 return Files.exists(pathTest);
             }
         } catch (Exception e) {
-            LOGGER.error("Error while checking (Path) URI: " + absoluteSystemId, e);
+            LOGGER.error("Error while checking (Path) URI: {}", absoluteSystemId, e);
         }
         return false;
     }
@@ -233,12 +233,12 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     private InputSource getCachedResource(String classResource) throws IOException {
         URL resourceURL = this.getClass().getResource(classResource);
         if (resourceURL == null) {
-            LOGGER.debug(classResource + " not found");
+            LOGGER.debug("{} not found", classResource);
             return null;
         }
         InputSourceProvider is = bytesCache.get(classResource);
         if (is == null) {
-            LOGGER.debug("Resolving resource " + classResource);
+            LOGGER.debug("Resolving resource {}", classResource);
             final byte[] bytes;
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 InputStream in = resourceURL.openStream()) {
@@ -255,11 +255,11 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     public XMLInputSource resolveEntity(XMLResourceIdentifier resourceIdentifier) throws XNIException, IOException {
         XMLInputSource entity = catalogResolver.resolveEntity(resourceIdentifier);
         if (entity == null) {
-            LOGGER.info("Could not resolve entity: " + resourceIdentifier.getBaseSystemId());
-            LOGGER.info("Identifer: " + catalogResolver.resolveIdentifier(resourceIdentifier));
+            LOGGER.info("Could not resolve entity: {}", resourceIdentifier.getBaseSystemId());
+            LOGGER.info("Identifer: {}", catalogResolver.resolveIdentifier(resourceIdentifier));
             return null;
         }
-        LOGGER.info("Resolve entity: " + resourceIdentifier.getBaseSystemId() + " --> " + entity.getBaseSystemId());
+        LOGGER.info("Resolve entity: {} --> {}", resourceIdentifier.getBaseSystemId(), entity.getBaseSystemId());
         return entity;
     }
 

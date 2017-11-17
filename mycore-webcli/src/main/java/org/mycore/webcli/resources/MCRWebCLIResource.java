@@ -36,8 +36,8 @@ public class MCRWebCLIResource {
     public Response start() {
         InputStream mainGui = getClass().getResourceAsStream("/META-INF/resources/modules/webcli/index.html");
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        LOGGER.info("MyCore Session REST ID: " + mcrSession.getID());
-        LOGGER.info("REST ThreadID: " + Thread.currentThread().getName());
+        LOGGER.info("MyCore Session REST ID: {}", mcrSession.getID());
+        LOGGER.info("REST ThreadID: {}", Thread.currentThread().getName());
         return Response.ok(mainGui).build();
     }
 

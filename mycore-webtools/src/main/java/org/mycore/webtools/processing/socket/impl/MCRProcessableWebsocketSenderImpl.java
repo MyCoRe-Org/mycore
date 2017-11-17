@@ -176,7 +176,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
                 try {
                     session.getBasicRemote().sendText(msg);
                 } catch (Exception exc) {
-                    LOGGER.error("Websocket error " + session.getId() + ": Unable to send message " + msg);
+                    LOGGER.error("Websocket error {}: Unable to send message {}", session.getId(), msg);
                 }
             });
 

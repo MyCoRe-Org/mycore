@@ -53,12 +53,12 @@ public class MCRMediaParser {
             Map<String, String> supportedParsers = config.getPropertiesMap("MCR.Media.Parser.");
             for (String name : supportedParsers.keySet()) {
                 try {
-                    LOGGER.info("instantiate Parser \"" + config.getString(name) + "\"...");
+                    LOGGER.info("instantiate Parser \"{}\"...", config.getString(name));
                     MCRMediaParser parser = config.getInstanceOf(name, null);
                     parsers.add(parser);
                 } catch (Throwable ex) {
-                    LOGGER.warn("Couldn't instantiate Parser \"" + config.getString(name) + "\" because "
-                        + ex.getMessage() + ".");
+                    LOGGER.warn("Couldn't instantiate Parser \"{}\" because {}.", config.getString(name),
+                        ex.getMessage());
                 }
             }
         }

@@ -84,11 +84,11 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
             try {
                 //we are running in a servlet container
                 webappBasePath = getWebAppBaseDir();
-                LOGGER.info("WebAppBasePath=" + webappBasePath.getAbsolutePath());
+                LOGGER.info("WebAppBasePath={}", webappBasePath.getAbsolutePath());
                 wcmsDataDir = getWCMSDataDir();
                 if (!wcmsDataDir.isDirectory()) {
-                    LOGGER.info(wcmsDataDir.getAbsolutePath()
-                        + " does not exist or is not a directory. Skipping synchronization.");
+                    LOGGER.info("{} does not exist or is not a directory. Skipping synchronization.",
+                        wcmsDataDir.getAbsolutePath());
                     return;
                 }
                 synchronize(wcmsDataDir, webappBasePath);

@@ -113,7 +113,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             parent = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(),
                 parent.getId());
         }
-        LOGGER.info("parentID:" + parent.getId());
+        LOGGER.info("parentID:{}", parent.getId());
         String classID = parent.getId().getRootID();
         Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + queryName);
         // query can take long time, please cache result
@@ -143,7 +143,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         q.setParameter("id", reference.getObjectID());
         q.setParameter("type", reference.getType());
         int deleted = q.executeUpdate();
-        LOGGER.debug("Number of Links deleted: " + deleted);
+        LOGGER.debug("Number of Links deleted: {}", deleted);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             q.setParameter("type", entry.getKey());
             deleted += q.executeUpdate();
         }
-        LOGGER.debug("Number of Links deleted: " + deleted);
+        LOGGER.debug("Number of Links deleted: {}", deleted);
     }
 
     @Override
@@ -230,7 +230,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                     LOGGER.debug(debugMessage.toString());
                 }
                 entityManager.persist(link);
-                LOGGER.debug("===DONE: " + link.id);
+                LOGGER.debug("===DONE: {}", link.id);
             });
     }
 

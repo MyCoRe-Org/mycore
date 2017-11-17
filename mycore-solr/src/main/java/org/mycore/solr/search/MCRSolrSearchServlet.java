@@ -251,7 +251,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         buildedSolrParameters.putAll(solrParameters);
 
         request.setAttribute(MCRSolrProxyServlet.MAP_KEY, buildedSolrParameters);
-        LOGGER.info("Forward SOLR Parameters: " + buildedSolrParameters);
+        LOGGER.info("Forward SOLR Parameters: {}", buildedSolrParameters);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }

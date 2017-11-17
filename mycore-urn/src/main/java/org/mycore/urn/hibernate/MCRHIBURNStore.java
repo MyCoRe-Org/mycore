@@ -83,7 +83,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         MCRURN tab = new MCRURN(id, urn);
-        logger.debug("Inserting " + id + "/" + urn + " into database");
+        logger.debug("Inserting {}/{} into database", id, urn);
         session.saveOrUpdate(tab);
         session.flush();
     }
@@ -111,7 +111,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         MCRURN tab = new MCRURN(id, urn, path, filename);
-        logger.debug("Inserting " + id + "/" + urn + "(" + path + filename + ") into database");
+        logger.debug("Inserting {}/{}({}{}) into database", id, urn, path, filename);
         session.saveOrUpdate(tab);
     }
 
@@ -154,7 +154,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      */
     public final synchronized void delete(String urn) {
         if (urn == null || urn.length() == 0) {
-            logger.warn("Cannot delete for urn " + urn);
+            logger.warn("Cannot delete for urn {}", urn);
             return;
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
@@ -169,7 +169,7 @@ public class MCRHIBURNStore implements MCRURNStore {
                 .getSingleResult();
             em.remove(entry);
         } catch (NoResultException e) {
-            logger.warn("URN " + urn + " is unknown and cannot be deleted");
+            logger.warn("URN {} is unknown and cannot be deleted", urn);
         }
     }
 
@@ -190,7 +190,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         Query<?> q = getSession().createQuery("delete from " + classname + " where MCRID = :theObjectId");
         q.setParameter("theObjectId", objID);
         int rowCount = q.executeUpdate();
-        logger.info(rowCount + " entries were deleted for object " + objID + " from " + MCRURN.class.getSimpleName());
+        logger.info("{} entries were deleted for object {} from {}", rowCount, objID, MCRURN.class.getSimpleName());
     }
 
     /**
@@ -219,8 +219,8 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String querySB = "select key.mcrurn from " + classname + " where key.mcrid='" + id + "'";
-        logger.debug("HQL-Statement: " + querySB);
-        List<String> returns = session.createQuery(querySB.toString(), String.class).getResultList();
+        logger.debug("HQL-Statement: {}", querySB);
+        List<String> returns = session.createQuery(querySB, String.class).getResultList();
         if (returns.size() != 1) {
             return null;
         }
@@ -254,8 +254,8 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String querySB = "select key.mcrid from " + classname + " where key.mcrurn='" + urn + "'";
-        logger.debug("HQL-Statement: " + querySB);
-        List<String> returns = session.createQuery(querySB.toString(), String.class).getResultList();
+        logger.debug("HQL-Statement: {}", querySB);
+        List<String> returns = session.createQuery(querySB, String.class).getResultList();
         if (returns.size() != 1) {
             return null;
         }
@@ -276,8 +276,8 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String querySB = "select key.mcrurn from " + classname + " where key.mcrid='" + id + "'";
-        logger.debug("HQL-Statement: " + querySB);
-        List<String> returns = session.createQuery(querySB.toString(), String.class).getResultList();
+        logger.debug("HQL-Statement: {}", querySB);
+        List<String> returns = session.createQuery(querySB, String.class).getResultList();
         return !(returns == null || returns.isEmpty());
     }
 
@@ -294,7 +294,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String query = "select key.mcrid from " + classname + " where key.mcrurn = '" + urn + "'";
-        List<String> l = session.createQuery(query.toString(), String.class).getResultList();
+        List<String> l = session.createQuery(query, String.class).getResultList();
         if (!l.isEmpty()) {
             exists = true;
         }
@@ -332,8 +332,7 @@ public class MCRHIBURNStore implements MCRURNStore {
             return null;
         }
         if (returns.size() != 1) {
-            logger.warn(
-                "There are more than just one urn for file \"" + fileName + "\" in derivate \"" + derivateId + "\"");
+            logger.warn("There are more than just one urn for file \"{}\" in derivate \"{}\"", fileName, derivateId);
         }
         String urn = returns.get(0);
 

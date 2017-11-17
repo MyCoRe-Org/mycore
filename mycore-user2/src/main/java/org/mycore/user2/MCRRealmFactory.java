@@ -92,7 +92,7 @@ public class MCRRealmFactory {
         String dataDirProperty = "MCR.datadir";
         String dataDir = config.getString(dataDirProperty, null);
         if (dataDir == null) {
-            LOGGER.warn(dataDirProperty + " is undefined.");
+            LOGGER.warn("{} is undefined.", dataDirProperty);
             try {
                 realmsURI = new URI(config.getString(REALMS_URI_CFG_KEY, RESOURCE_REALMS_URI));
             } catch (URISyntaxException e) {
@@ -103,12 +103,12 @@ public class MCRRealmFactory {
             String realmsCfg = config.getString(REALMS_URI_CFG_KEY, dataDirFile.toURI() + "realms.xml");
             try {
                 realmsURI = new URI(realmsCfg);
-                LOGGER.info("Using realms defined in " + realmsURI);
+                LOGGER.info("Using realms defined in {}", realmsURI);
                 if ("file".equals(realmsURI.getScheme())) {
                     realmsFile = new File(realmsURI);
-                    LOGGER.info("Loading realms from file: " + realmsFile);
+                    LOGGER.info("Loading realms from file: {}", realmsFile);
                 } else {
-                    LOGGER.info("Try loading realms with URIResolver for scheme " + realmsURI);
+                    LOGGER.info("Try loading realms with URIResolver for scheme {}", realmsURI);
                 }
             } catch (URISyntaxException e) {
                 throw new MCRException(e);
@@ -179,7 +179,7 @@ public class MCRRealmFactory {
             return MCRSourceContent.getInstance(realmsURI.toASCIIString()).asXML();
         }
         if (!realmsFile.exists() || realmsFile.length() == 0) {
-            LOGGER.info("Creating " + realmsFile.getAbsolutePath() + "...");
+            LOGGER.info("Creating {}...", realmsFile.getAbsolutePath());
             MCRSourceContent realmsContent = MCRSourceContent.getInstance(RESOURCE_REALMS_URI);
             realmsContent.sendTo(realmsFile);
         }

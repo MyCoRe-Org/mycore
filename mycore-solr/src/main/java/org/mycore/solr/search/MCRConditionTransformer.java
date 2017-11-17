@@ -238,7 +238,7 @@ public class MCRConditionTransformer {
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
 
         String sort = q.getSortField();
-        LOGGER.info("Legacy Query transformed to: " + q.getQuery() + (sort != null ? " " + sort : ""));
+        LOGGER.info("Legacy Query transformed to: {}{}", q.getQuery(), sort != null ? " " + sort : "");
         return q;
     }
 

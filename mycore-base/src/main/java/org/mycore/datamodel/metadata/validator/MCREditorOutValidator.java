@@ -107,11 +107,11 @@ public class MCREditorOutValidator {
         input = jdom_in;
         this.id = id;
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XML before validation:\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(input));
+            LOGGER.debug("XML before validation:\n{}", new XMLOutputter(Format.getPrettyFormat()).outputString(input));
         }
         checkObject();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XML after validation:\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(input));
+            LOGGER.debug("XML after validation:\n{}", new XMLOutputter(Format.getPrettyFormat()).outputString(input));
         }
     }
 
@@ -132,7 +132,7 @@ public class MCREditorOutValidator {
             obj = new MCRObject(xml, true);
         } catch (SAXParseException e) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            LOGGER.warn("Failure while parsing document:\n" + xout.outputString(input));
+            LOGGER.warn("Failure while parsing document:\n{}", xout.outputString(input));
             throw e;
         }
         Date curTime = new Date();
@@ -174,7 +174,7 @@ public class MCREditorOutValidator {
             try {
                 String className = entry.getKey();
                 className = className.substring(className.lastIndexOf('.') + 1);
-                LOGGER.info("Adding Validator " + entry.getValue() + " for class " + className);
+                LOGGER.info("Adding Validator {} for class {}", entry.getValue(), className);
                 @SuppressWarnings("unchecked")
                 Class<? extends MCREditorMetadataValidator> cl = (Class<? extends MCREditorMetadataValidator>) Class
                     .forName(entry.getValue());
@@ -218,7 +218,7 @@ public class MCREditorOutValidator {
     public static String checkMetaObjectWithLang(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         if (datasubtag.getAttribute("lang") != null) {
             datasubtag.getAttribute("lang").setNamespace(XML_NAMESPACE);
-            LOGGER.warn("namespace add for xml:lang attribute in " + datasubtag.getName());
+            LOGGER.warn("namespace add for xml:lang attribute in {}", datasubtag.getName());
         }
         return checkMetaObject(datasubtag, metaClass, true);
     }
@@ -242,21 +242,21 @@ public class MCREditorOutValidator {
         } else if (datasubtag.getAttribute("type") != null
             && datasubtag.getAttribute("type", XLINK_NAMESPACE) == null) {
             datasubtag.getAttribute("type").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:type attribute in " + datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:type attribute in {}", datasubtag.getName());
         }
         if (datasubtag.getAttribute("href") != null) {
             datasubtag.getAttribute("href").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:href attribute in " + datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:href attribute in {}", datasubtag.getName());
         }
 
         if (datasubtag.getAttribute("title") != null) {
             datasubtag.getAttribute("title").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:title attribute in " + datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:title attribute in {}", datasubtag.getName());
         }
 
         if (datasubtag.getAttribute("label") != null) {
             datasubtag.getAttribute("label").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:label attribute in " + datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:label attribute in {}", datasubtag.getName());
         }
         return checkMetaObject(datasubtag, metaClass, false);
     }
@@ -291,7 +291,7 @@ public class MCREditorOutValidator {
                 }
                 if (child.getAttribute("lang") != null) {
                     child.getAttribute("lang").setNamespace(XML_NAMESPACE);
-                    LOGGER.warn("namespace add for xml:lang attribute in " + datasubtag.getName());
+                    LOGGER.warn("namespace add for xml:lang attribute in {}", datasubtag.getName());
                 }
             }
             if (children.size() == 0) {
@@ -379,8 +379,8 @@ public class MCREditorOutValidator {
             if (validator != null) {
                 returns = validator.checkDataSubTag(datasubtag);
             } else {
-                LOGGER.warn("Tag <" + datatag.getName() + "> of type " + mcrclass
-                    + " has no validator defined, fallback to default behaviour");
+                LOGGER.warn("Tag <{}> of type {} has no validator defined, fallback to default behaviour",
+                    datatag.getName(), mcrclass);
                 // try to create MCRMetaInterface instance
                 try {
                     Class<? extends MCRMetaInterface> metaClass = getClass(mcrclass);
@@ -442,8 +442,8 @@ public class MCREditorOutValidator {
         if (aclxml == null) {
             aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
             if (aclxml == null) {
-                LOGGER.warn("Can't find default object ACL file " + resourcebase.substring(1) + " or "
-                    + resourcetype.substring(1));
+                LOGGER.warn("Can't find default object ACL file {} or {}", resourcebase.substring(1),
+                    resourcetype.substring(1));
                 String resource = "/editor_default_acls.xml"; // fallback
                 aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
                 if (aclxml == null) {
@@ -486,9 +486,8 @@ public class MCREditorOutValidator {
                     int i = value.indexOf("$CurrentIP");
                     if (i != -1) {
                         String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
-                        StringBuilder sb = new StringBuilder(64);
-                        sb.append(value.substring(0, i)).append(thisip).append(value.substring(i + 10, value.length()));
-                        firstcond.setAttribute("value", sb.toString());
+                        firstcond.setAttribute("value",
+                            value.substring(0, i) + thisip + value.substring(i + 10, value.length()));
                     }
                 }
             }
@@ -511,7 +510,7 @@ public class MCREditorOutValidator {
             Element datatag = metaIt.next();
             if (!checkMetaTags(datatag)) {
                 // e.g. datatag is empty
-                LOGGER.debug("Removing element :" + datatag.getName());
+                LOGGER.debug("Removing element :{}", datatag.getName());
                 metaIt.remove();
             }
         }

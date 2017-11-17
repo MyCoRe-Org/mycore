@@ -81,7 +81,7 @@ public class MCRXEditorServlet extends MCRServlet {
                 break;
             }
         }
-        LOGGER.info("sending submission to target " + targetID + " " + parameter);
+        LOGGER.info("sending submission to target {} {}", targetID, parameter);
         getTarget(targetID).handleSubmission(getServletContext(), job, session, parameter);
     }
 

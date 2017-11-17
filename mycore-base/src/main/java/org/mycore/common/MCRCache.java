@@ -316,13 +316,10 @@ public class MCRCache<K, V> {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Cache capacity:  ").append(capacity).append("\n");
-        sb.append("Cache size:      ").append(backingCache.size()).append("\n");
-        sb.append("Cache fill rate: ").append(getFillRate()).append("\n");
-        sb.append("Cache hit rate:  ").append(getHitRate());
+        String sb = "Cache capacity:  " + capacity + "\n" + "Cache size:      " + backingCache.size() + "\n"
+            + "Cache fill rate: " + getFillRate() + "\n" + "Cache hit rate:  " + getHitRate();
 
-        return sb.toString();
+        return sb;
     }
 
     /**

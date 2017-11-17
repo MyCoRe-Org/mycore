@@ -199,7 +199,7 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
     public void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Value              = " + Boolean.toString(value));
+            LOGGER.debug("Value              = {}", Boolean.toString(value));
             LOGGER.debug(" ");
         }
     }

@@ -99,7 +99,7 @@ public abstract class MCRBase {
         // Default Encoding
         mcr_encoding = mcr_conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Encoding = " + mcr_encoding);
+            LOGGER.debug("Encoding = {}", mcr_encoding);
         }
     }
 
@@ -328,7 +328,7 @@ public abstract class MCRBase {
             validate();
             return true;
         } catch (MCRException exc) {
-            LOGGER.warn("The content of this object '" + mcr_id + "' is invalid.", exc);
+            LOGGER.warn("The content of this object '{}' is invalid.", mcr_id, exc);
         }
         return false;
     }

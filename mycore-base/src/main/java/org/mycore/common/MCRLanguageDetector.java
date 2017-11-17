@@ -106,7 +106,7 @@ public class MCRLanguageDetector {
             }
         }
 
-        LOGGER.debug("Score " + lang + " = " + score);
+        LOGGER.debug("Score {} = {}", lang, score);
         return score;
     }
 
@@ -115,7 +115,7 @@ public class MCRLanguageDetector {
             LOGGER.warn("The text for language detection is null or empty");
             return null;
         }
-        LOGGER.debug("Detecting language of [" + text + "]");
+        LOGGER.debug("Detecting language of [{}]", text);
 
         Map<Integer, AtomicInteger> scores = new HashMap<>();
         buildScores(text, scores);
@@ -158,7 +158,7 @@ public class MCRLanguageDetector {
      * @return the language code: de, en, fr, ar ,el, zh, he, jp or null
      */
     public static String detectLanguage(String text) {
-        LOGGER.debug("Detecting language of [" + text + "]");
+        LOGGER.debug("Detecting language of [{}]", text);
 
         String bestLanguage = detectLanguageByCharacter(text);
 
@@ -178,7 +178,7 @@ public class MCRLanguageDetector {
             }
         }
 
-        LOGGER.debug("Detected language = " + bestLanguage);
+        LOGGER.debug("Detected language = {}", bestLanguage);
         return bestLanguage;
     }
 }

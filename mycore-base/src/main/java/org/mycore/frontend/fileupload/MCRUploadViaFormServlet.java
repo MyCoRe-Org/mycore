@@ -74,7 +74,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         }
 
         MCRUploadHandler handler = uh.get();
-        LOGGER.info("UploadHandler form based file upload for ID " + handler.getID());
+        LOGGER.info("UploadHandler form based file upload for ID {}", handler.getID());
 
         handleUploadedFiles(handler, job.getRequest().getParts());
 
@@ -95,7 +95,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
 
     private void handleUploadedFiles(MCRUploadHandler handler, Collection<Part> files) throws Exception {
         int numFiles = (int) files.stream().map(Part::getSubmittedFileName).filter(Objects::nonNull).count();
-        LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
+        LOGGER.info("UploadHandler uploading {} file(s)", numFiles);
         handler.startUpload(numFiles);
 
         MCRSession session = MCRSessionMgr.getCurrentSession();
@@ -135,7 +135,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     }
 
     private void handleUploadedFile(MCRUploadHandler handler, long size, String path, InputStream in) throws Exception {
-        LOGGER.info("UploadServlet uploading " + path);
+        LOGGER.info("UploadServlet uploading {}", path);
         MCRUploadHelper.checkPathName(path);
 
         Transaction tx = MCRUploadHelper.startTransaction();
@@ -153,7 +153,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         for (ZipEntry entry; (entry = zis.getNextEntry()) != null;) {
             String path = convertAbsolutePathToRelativePath(entry.getName());
             if (entry.isDirectory()) {
-                LOGGER.debug("UploadServlet skipping ZIP entry " + path + ", is a directory");
+                LOGGER.debug("UploadServlet skipping ZIP entry {}, is a directory", path);
             } else {
                 handler.incrementNumFiles();
                 handleUploadedFile(handler, entry.getSize(), path, nis);

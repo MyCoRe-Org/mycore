@@ -34,25 +34,32 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
         if (evt.getObjectType().equals(MCRFileEventHandlerBase.FILE_TYPE)) {
             MCRFile file = (MCRFile) evt.get(MCRFILE_EVENT_KEY);
             if (file != null) {
-                LOGGER.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath()
-                    + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
-                    handleFileCreated(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
-                    handleFileUpdated(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
-                    handleFileDeleted(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
-                    handleFileRepaired(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.INDEX_EVENT)) {
-                    updateFileIndex(evt, file);
-                } else {
-                    LOGGER.warn("Can't find method for file data handler for event type " + evt.getEventType());
+                LOGGER.debug("{} handling {}/{} {}", getClass().getName(), file.getOwnerID(), file.getAbsolutePath(),
+                    evt.getEventType());
+                switch (evt.getEventType()) {
+                    case MCREvent.CREATE_EVENT:
+                        handleFileCreated(evt, file);
+                        break;
+                    case MCREvent.UPDATE_EVENT:
+                        handleFileUpdated(evt, file);
+                        break;
+                    case MCREvent.DELETE_EVENT:
+                        handleFileDeleted(evt, file);
+                        break;
+                    case MCREvent.REPAIR_EVENT:
+                        handleFileRepaired(evt, file);
+                        break;
+                    case MCREvent.INDEX_EVENT:
+                        updateFileIndex(evt, file);
+                        break;
+                    default:
+                        LOGGER.warn("Can't find method for file data handler for event type " + evt.getEventType());
+                        break;
                 }
                 return;
             }
-            LOGGER.warn("Can't find method for " + MCRFileEventHandlerBase.FILE_TYPE + " for event type "
-                + evt.getEventType());
+            LOGGER.warn("Can't find method for " + MCRFileEventHandlerBase.FILE_TYPE + " for event type {}",
+                evt.getEventType());
             return;
         }
         super.doHandleEvent(evt);
@@ -66,23 +73,29 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
         if (evt.getObjectType().equals(MCRFileEventHandlerBase.FILE_TYPE)) {
             MCRFile file = (MCRFile) evt.get(MCRFILE_EVENT_KEY);
             if (file != null) {
-                LOGGER.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath()
-                    + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
-                    undoFileCreated(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
-                    undoFileUpdated(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
-                    undoFileDeleted(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
-                    undoFileRepaired(evt, file);
-                } else {
-                    LOGGER.warn("Can't find method for file data handler for event type " + evt.getEventType());
+                LOGGER.debug("{} handling {}/{} {}", getClass().getName(), file.getOwnerID(), file.getAbsolutePath(),
+                    evt.getEventType());
+                switch (evt.getEventType()) {
+                    case MCREvent.CREATE_EVENT:
+                        undoFileCreated(evt, file);
+                        break;
+                    case MCREvent.UPDATE_EVENT:
+                        undoFileUpdated(evt, file);
+                        break;
+                    case MCREvent.DELETE_EVENT:
+                        undoFileDeleted(evt, file);
+                        break;
+                    case MCREvent.REPAIR_EVENT:
+                        undoFileRepaired(evt, file);
+                        break;
+                    default:
+                        LOGGER.warn("Can't find method for file data handler for event type " + evt.getEventType());
+                        break;
                 }
                 return;
             }
-            LOGGER.warn("Can't find method for " + MCRFileEventHandlerBase.FILE_TYPE + " for event type "
-                + evt.getEventType());
+            LOGGER.warn("Can't find method for " + MCRFileEventHandlerBase.FILE_TYPE + " for event type {}",
+                evt.getEventType());
             return;
         }
 
@@ -98,7 +111,7 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
 
     private MCREvent toMCRFileEvent(MCREvent source, Path path, BasicFileAttributes attrs) {
         if (!(path.getFileSystem() instanceof MCRIFSFileSystem)) {
-            LOGGER.error("Cannot transform path from " + path.getFileSystem() + " to MCRFile.");
+            LOGGER.error("Cannot transform path from {} to MCRFile.", path.getFileSystem());
             return null;
         }
         if (attrs != null && !attrs.isDirectory()) {
@@ -106,19 +119,18 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
             target.putAll(source);//includes probably "file";
             if (!target.contains(FILE_TYPE)) {
                 if (target.getEventType().equals(MCREvent.DELETE_EVENT)) {
-                    LOGGER.warn("Could not restore MCRFile for Path event: " + path);
+                    LOGGER.warn("Could not restore MCRFile for Path event: {}", path);
                     return null;
                 } else {
                     MCRFile file = MCRFile.getFile(attrs.fileKey().toString()); //fileKey is always internal id;
                     if (file == null) {
-                        LOGGER
-                            .warn("Could not restore MCRFile with id " + attrs.fileKey() + " for Path event: " + path);
+                        LOGGER.warn("Could not restore MCRFile with id {} for Path event: {}", attrs.fileKey(), path);
                         return null;
                     }
                     target.put(MCRFILE_EVENT_KEY, file);
                 }
             }
-            LOGGER.info("Transformed " + source + " -> " + target);
+            LOGGER.info("Transformed {} -> {}", source, target);
             return target;
         }
         return null;

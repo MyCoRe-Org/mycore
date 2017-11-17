@@ -177,7 +177,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
         } else {
             if (dimension.length() > DIMENSION_LENGTH) {
                 this.dimension = dimension.substring(DIMENSION_LENGTH);
-                LOGGER.warn(getSubTag() + ": dimension is too long: " + dimension.length());
+                LOGGER.warn("{}: dimension is too long: {}", getSubTag(), dimension.length());
             } else {
                 this.dimension = dimension;
             }
@@ -197,7 +197,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
         } else {
             if (measurement.length() > MEASUREMENT_LENGTH) {
                 this.measurement = measurement.substring(MEASUREMENT_LENGTH);
-                LOGGER.warn(getSubTag() + ": measurement is too long: " + measurement.length());
+                LOGGER.warn("{}: measurement is too long: {}", getSubTag(), measurement.length());
             } else {
                 this.measurement = measurement;
             }
@@ -331,9 +331,9 @@ public final class MCRMetaNumber extends MCRMetaDefault {
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Measurement        = " + measurement);
-            LOGGER.debug("Dimension          = " + dimension);
-            LOGGER.debug("Value              = " + number.toPlainString());
+            LOGGER.debug("Measurement        = {}", measurement);
+            LOGGER.debug("Dimension          = {}", dimension);
+            LOGGER.debug("Value              = {}", number.toPlainString());
             LOGGER.debug("");
         }
     }

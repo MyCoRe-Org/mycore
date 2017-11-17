@@ -56,7 +56,7 @@ public class MCRMetsResolver implements URIResolver {
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String id = href.substring(href.indexOf(":") + 1);
-        LOGGER.debug("Reading METS for ID " + id);
+        LOGGER.debug("Reading METS for ID {}", id);
         MCRObjectID objId = MCRObjectID.getInstance(id);
         if (!objId.getTypeId().equals("derivate")) {
             String derivateID = getDerivateFromObject(id);

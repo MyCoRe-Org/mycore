@@ -64,8 +64,8 @@ public class MCRURNGranularRESTRegistrationStarter
     }
 
     private Consumer<Logger> couldNotStartTask() {
-        return logger -> logger
-            .warn("Could not start Task " + MCRURNGranularRESTRegistrationTask.class.getSimpleName());
+        return logger -> logger.warn("Could not start Task {}",
+            MCRURNGranularRESTRegistrationTask.class.getSimpleName());
     }
 
     private ScheduledExecutorService getScheduler() {
@@ -79,8 +79,8 @@ public class MCRURNGranularRESTRegistrationStarter
 
     private Consumer<Logger> startTimerTask(TimerTask task) {
         getScheduler().scheduleAtFixedRate(task, 0, period, timeUnit);
-        return logger -> logger
-            .info("Started task " + task.getClass().getSimpleName() + ", refresh every " + period + timeUnit);
+        return logger -> logger.info("Started task {}, refresh every {}{}", task.getClass().getSimpleName(), period,
+            timeUnit);
     }
 
     public Function<MCRPIRegistrationInfo, MCREpicurLite> getEpicureProvider(UsernamePasswordCredentials credentials) {
@@ -93,8 +93,7 @@ public class MCRURNGranularRESTRegistrationStarter
         String password = MCRConfiguration.instance().getString("MCR.URN.DNB.Credentials.Password", null);
 
         if (username == null || password == null || username.length() == 0 || password.length() == 0) {
-            LOGGER.warn("Could not instantiate " + this.getClass().getName()
-                + " as required credentials are unset");
+            LOGGER.warn("Could not instantiate {} as required credentials are unset", this.getClass().getName());
             LOGGER.warn("Please set MCR.URN.DNB.Credentials.Login and MCR.URN.DNB.Credentials.Password");
             return Optional.empty();
         }

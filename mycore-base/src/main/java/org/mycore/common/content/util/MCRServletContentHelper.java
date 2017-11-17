@@ -152,9 +152,9 @@ public abstract class MCRServletContentHelper {
         final String path = getRequestPath(request);
         if (LOGGER.isDebugEnabled()) {
             if (serveContent) {
-                LOGGER.debug("Serving '" + path + "' headers and data");
+                LOGGER.debug("Serving '{}' headers and data", path);
             } else {
-                LOGGER.debug("Serving '" + path + "' headers only");
+                LOGGER.debug("Serving '{}' headers only", path);
             }
         }
 
@@ -240,13 +240,13 @@ public abstract class MCRServletContentHelper {
                 //No ranges
                 if (contentType != null) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("contentType='" + contentType + "'");
+                        LOGGER.debug("contentType='{}'", contentType);
                     }
                     response.setContentType(contentType);
                 }
                 if (contentLength >= 0) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("contentLength=" + contentLength);
+                        LOGGER.debug("contentLength={}", contentLength);
                     }
                     setContentLengthLong(response, contentLength);
                 }
@@ -274,7 +274,7 @@ public abstract class MCRServletContentHelper {
 
                     if (contentType != null) {
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("contentType='" + contentType + "'");
+                            LOGGER.debug("contentType='{}'", contentType);
                         }
                         response.setContentType(contentType);
                     }
@@ -466,7 +466,7 @@ public abstract class MCRServletContentHelper {
 
             if (LOGGER.isDebugEnabled()) {
                 long percentage = Math.round(bytes / ((double) size) * 100.0);
-                LOGGER.debug("overall bytes transfered: " + bytes + " progress " + percentage + "%");
+                LOGGER.debug("overall bytes transfered: {} progress {}%", bytes, percentage);
             }
 
         }
@@ -474,7 +474,7 @@ public abstract class MCRServletContentHelper {
         if (LOGGER.isDebugEnabled()) {
             time += System.currentTimeMillis();
             double kBps = (bytes / 1024.0) / (time / 1000.0);
-            LOGGER.debug("Transfered: " + bytes + " bytes in: " + (time / 1000.0) + " s -> " + kBps + " kbytes/s");
+            LOGGER.debug("Transfered: {} bytes in: {} s -> {} kbytes/s", bytes, time / 1000.0, kBps);
         }
         return bytes;
     }
@@ -505,7 +505,7 @@ public abstract class MCRServletContentHelper {
             throw new EOFException("Bytes to send: " + length + " actual: " + bytesCopied);
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Wrote " + bytesCopied + " bytes.");
+            LOGGER.debug("Wrote {} bytes.", bytesCopied);
         }
     }
 
@@ -615,7 +615,7 @@ public abstract class MCRServletContentHelper {
         final long start, final long end, final int outputBufferSize) {
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Serving bytes:" + start + "-" + end);
+            LOGGER.trace("Serving bytes:{}-{}", start, end);
         }
 
         final long bytesToRead = end - start + 1;
@@ -623,7 +623,7 @@ public abstract class MCRServletContentHelper {
         try {
             final long copied = copyLarge(in, out, skip, bytesToRead, new byte[outputBufferSize]);
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("Served bytes:" + copied);
+                LOGGER.trace("Served bytes:{}", copied);
             }
             if (copied != bytesToRead) {
                 return new EOFException("Bytes to send: " + bytesToRead + " actual: " + copied);

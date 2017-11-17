@@ -44,7 +44,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
     public void index() throws SolrServerException, IOException {
         String solrID = file.toUri().toString();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: indexing file \"" + file + "\"");
+            LOGGER.debug("Solr: indexing file \"{}\"", file);
         }
         /* create the update request object */
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(EXTRACT_PATH);
@@ -55,15 +55,15 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         updateRequest.setCommitWithin(getCommitWithin());
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: sending binary data (" + file + " (" + solrID + "), size is " + MCRUtils
-                .getSizeFormatted(attrs.size()) + ") to solr server.");
+            LOGGER.debug("Solr: sending binary data ({} ({}), size is {}) to solr server.", file, solrID,
+                MCRUtils.getSizeFormatted(attrs.size()));
         }
         long t = System.currentTimeMillis();
         /* actually send the request */
         getSolrClient().request(updateRequest);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: sending binary data \"" + file + " (" + solrID + ")\"" + " done in " + (
-                System.currentTimeMillis() - t) + "ms");
+            LOGGER.debug("Solr: sending binary data \"{} ({})\" done in {}ms", file, solrID,
+                System.currentTimeMillis() - t);
         }
     }
 

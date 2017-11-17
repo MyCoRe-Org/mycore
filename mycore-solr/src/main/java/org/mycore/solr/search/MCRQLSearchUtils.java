@@ -119,7 +119,7 @@ public class MCRQLSearchUtils {
             String field = new StringTokenizer(element.getAttributeValue("field"), " -,").nextToken();
             String operator = element.getAttributeValue("operator");
             if (operator == null) {
-                LOGGER.warn("No operator defined for field: " + field);
+                LOGGER.warn("No operator defined for field: {}", field);
                 operator = "=";
             }
             element.setAttribute("operator", operator);

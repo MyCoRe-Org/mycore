@@ -59,7 +59,7 @@ public class MCRContentTypes {
         ArrayList<FileTypeDetector> detectors = new ArrayList<>();
         ServiceLoader<FileTypeDetector> serviceLoader = ServiceLoader.load(FileTypeDetector.class);
         for (FileTypeDetector fileTypeDetector : serviceLoader) {
-            LOGGER.info("Adding content type detector: " + fileTypeDetector.getClass());
+            LOGGER.info("Adding content type detector: {}", fileTypeDetector.getClass());
             detectors.add(fileTypeDetector);
         }
         return detectors;
@@ -75,12 +75,12 @@ public class MCRContentTypes {
      * @throws IOException if an I/O error occurs
      */
     public static String probeContentType(Path path) throws IOException {
-        LOGGER.debug("Probing content type: " + path);
+        LOGGER.debug("Probing content type: {}", path);
         for (FileTypeDetector fileTypeDetector : fileTypeDetectors) {
-            LOGGER.debug("Using type detector: " + fileTypeDetector.getClass());
+            LOGGER.debug("Using type detector: {}", fileTypeDetector.getClass());
             String contentType = fileTypeDetector.probeContentType(path);
             if (contentType != null) {
-                LOGGER.debug("Content type: " + contentType);
+                LOGGER.debug("Content type: {}", contentType);
                 return contentType;
             }
         }

@@ -135,7 +135,7 @@ public class MCRWCMSContentManager {
         XMLOutputter out = new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
         for (JsonElement e : items) {
             if (!e.isJsonObject()) {
-                LOGGER.warn("Invalid json element in items " + e);
+                LOGGER.warn("Invalid json element in items {}", e);
                 continue;
             }
             JsonObject item = e.getAsJsonObject();
@@ -163,7 +163,7 @@ public class MCRWCMSContentManager {
             try (OutputStream fout = MCRWebPagesSynchronizer.getOutputStream(webpageId)) {
                 out.output(new Document(mycoreWebpage), fout);
             } catch (Exception exc) {
-                LOGGER.error("Error while saving " + webpageId, exc);
+                LOGGER.error("Error while saving {}", webpageId, exc);
                 throwError(ErrorType.couldNotSave, webpageId);
             }
         }
@@ -193,7 +193,7 @@ public class MCRWCMSContentManager {
                 Files.delete(Paths.get(fromURL.toURI()));
             }
         } catch (Exception exc) {
-            LOGGER.error("Error moving " + from + " to " + to, exc);
+            LOGGER.error("Error moving {} to {}", from, to, exc);
             throwError(ErrorType.couldNotMove, to);
         }
     }

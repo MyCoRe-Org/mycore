@@ -128,7 +128,7 @@ public class MCRMetaXML extends MCRMetaDefault {
         getContent().forEach(content -> {
             JsonElement jsonContent = MCRXMLHelper.jsonSerialize(content);
             if (jsonContent == null) {
-                LOGGER.warn("Unable to serialize xml content '" + content + "' to json.");
+                LOGGER.warn("Unable to serialize xml content '{}' to json.", content);
                 return;
             }
             jsonContentArray.add(jsonContent);
@@ -179,7 +179,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     public void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Number of contents  = \n" + content.size());
+            LOGGER.debug("Number of contents  = \n{}", content.size());
         }
     }
 

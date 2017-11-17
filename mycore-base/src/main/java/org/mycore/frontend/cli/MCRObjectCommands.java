@@ -112,7 +112,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static Hashtable<String, javax.xml.transform.Transformer> translist = new Hashtable<>();
 
     public static void setSelectedObjectIDs(List<String> selected) {
-        LOGGER.info(selected.size() + " objects selected");
+        LOGGER.info("{} objects selected", selected.size());
         MCRSessionMgr.getCurrentSession().put("mcrSelectedObjects", selected);
     }
 
@@ -180,7 +180,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static void delete(String ID) throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
         MCRObjectID mcrId = MCRObjectID.getInstance(ID);
         MCRMetadataManager.deleteMCRObject(mcrId);
-        LOGGER.info(mcrId + " deleted.");
+        LOGGER.info("{} deleted.", mcrId);
     }
 
     /**
@@ -291,14 +291,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
-            LOGGER.warn(directory + " ignored, is not a directory.");
+            LOGGER.warn("{} ignored, is not a directory.", directory);
             return null;
         }
 
         String[] list = dir.list();
 
         if (list.length == 0) {
-            LOGGER.warn("No files found in directory " + directory);
+            LOGGER.warn("No files found in directory {}", directory);
             return null;
         }
 
@@ -399,16 +399,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static boolean processFromFile(File file, boolean update, boolean importMode)
         throws MCRActiveLinkException, MCRException, SAXParseException, IOException, MCRAccessException {
         if (!file.getName().endsWith(".xml")) {
-            LOGGER.warn(file + " ignored, does not end with *.xml");
+            LOGGER.warn("{} ignored, does not end with *.xml", file);
             return false;
         }
 
         if (!file.isFile()) {
-            LOGGER.warn(file + " ignored, is not a file.");
+            LOGGER.warn("{} ignored, is not a file.", file);
             return false;
         }
 
-        LOGGER.info("Reading file " + file + " ...");
+        LOGGER.info("Reading file {} ...", file);
 
         MCRObject mycore_obj = new MCRObject(file.toURI());
         if (mycore_obj.hasParent()) {
@@ -419,14 +419,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             }
         }
         mycore_obj.setImportMode(importMode);
-        LOGGER.debug("Label --> " + mycore_obj.getLabel());
+        LOGGER.debug("Label --> {}", mycore_obj.getLabel());
 
         if (update) {
             MCRMetadataManager.update(mycore_obj);
-            LOGGER.info(mycore_obj.getId() + " updated.");
+            LOGGER.info("{} updated.", mycore_obj.getId());
         } else {
             MCRMetadataManager.create(mycore_obj);
-            LOGGER.info(mycore_obj.getId() + " loaded.");
+            LOGGER.info("{} loaded.", mycore_obj.getId());
         }
 
         return true;
@@ -441,7 +441,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static void showNextID(String base) {
 
         try {
-            LOGGER.info("The next free ID  is " + MCRObjectID.getNextFreeId(base));
+            LOGGER.info("The next free ID  is {}", MCRObjectID.getNextFreeId(base));
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -455,7 +455,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     public static void showLastID(String base) {
         try {
-            LOGGER.info("The last used ID  is " + MCRObjectID.getLastID(base));
+            LOGGER.info("The last used ID  is {}", MCRObjectID.getLastID(base));
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -506,13 +506,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             fid = MCRObjectID.getInstance(fromID);
             tid = MCRObjectID.getInstance(toID);
         } catch (Exception ex) {
-            LOGGER.error("FromID : " + ex.getMessage());
+            LOGGER.error("FromID : {}", ex.getMessage());
             return;
         }
         // check dirname
         File dir = new File(dirname);
         if (!dir.isDirectory()) {
-            LOGGER.error(dirname + " is not a dirctory.");
+            LOGGER.error("{} is not a dirctory.", dirname);
             return;
         }
 
@@ -531,10 +531,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
+            LOGGER.error("Exception while store file to {}", dir.getAbsolutePath());
             return;
         }
-        LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
+        LOGGER.info("{} Object's stored under {}.", k, dir.getAbsolutePath());
     }
 
     /**
@@ -579,7 +579,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     private static List<String> buildExportCommands(File dir, String style, List<String> objectIds) {
         if (dir.isFile()) {
-            LOGGER.error(dir + " is not a dirctory.");
+            LOGGER.error("{} is not a dirctory.", dir);
             return Collections.emptyList();
         }
         List<String> cmds = new ArrayList<>(objectIds.size());
@@ -610,7 +610,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (trans != null) {
             return trans;
         }
-        LOGGER.debug("Will load transformer stylesheet " + xslfile + "for export.");
+        LOGGER.debug("Will load transformer stylesheet {}for export.", xslfile);
 
         URL xslURL = MCRObjectCommands.class.getResource("/" + xslfile);
         if (xslURL == null) {
@@ -625,10 +625,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 translist.put(xslfile, trans);
                 return trans;
             } else {
-                LOGGER.warn("Can't load transformer ressource " + xslfile + " or " + DEFAULT_TRANSFORMER + ".");
+                LOGGER.warn("Can't load transformer ressource {} or " + DEFAULT_TRANSFORMER + ".", xslfile);
             }
         } catch (Exception e) {
-            LOGGER.warn("Error while load transformer ressource " + xslfile + " or " + DEFAULT_TRANSFORMER + ".");
+            LOGGER.warn("Error while load transformer ressource {} or " + DEFAULT_TRANSFORMER + ".", xslfile);
             if (LOGGER.isDebugEnabled()) {
                 e.printStackTrace();
             }
@@ -682,7 +682,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         } else {
             content.sendTo(xmlOutput);
         }
-        LOGGER.info("Object " + nid + " saved to " + xmlOutput.getCanonicalPath() + ".");
+        LOGGER.info("Object {} saved to {}.", nid, xmlOutput.getCanonicalPath());
         return true;
     }
 
@@ -778,13 +778,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Restores the selected MCRObject to the selected revision.",
         order = 270)
     public static void restoreToRevision(String id, long revision) {
-        LOGGER.info("Try to restore object " + id + " with revision " + revision);
+        LOGGER.info("Try to restore object {} with revision {}", id, revision);
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
         try {
             MCRObjectUtils.restore(mcrId, revision);
-            LOGGER.info("Object " + id + " successfully restored!");
+            LOGGER.info("Object {} successfully restored!", id);
         } catch (Exception exc) {
-            LOGGER.error("While retrieving object " + id + " with revision " + revision, exc);
+            LOGGER.error("While retrieving object {} with revision {}", id, revision, exc);
         }
     }
 
@@ -842,7 +842,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             try {
                 xslURL = new URL(xslFilePath);
             } catch (MalformedURLException e) {
-                LOGGER.error("XSL parameter is not a file or URL: " + xslFilePath);
+                LOGGER.error("XSL parameter is not a file or URL: {}", xslFilePath);
                 return;
             }
         } else {
@@ -894,7 +894,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID newParentObjectID = MCRObjectID.getInstance(newParentId);
 
         if (newParentObjectID.equals(oldParentId)) {
-            LOGGER.info("Object " + sourceId + " is already child of " + newParentId);
+            LOGGER.info("Object {} is already child of {}", sourceId, newParentId);
             return;
         }
 
@@ -904,30 +904,30 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             try {
                 oldParentMCRObject = MCRMetadataManager.retrieveMCRObject(oldParentId);
             } catch (Exception exc) {
-                LOGGER.error("Unable to get old parent object " + oldParentId + ", its probably deleted.", exc);
+                LOGGER.error("Unable to get old parent object {}, its probably deleted.", oldParentId, exc);
             }
         }
 
         // change href to new parent
-        LOGGER.info("Setting link in \"" + sourceId + "\" to parent \"" + newParentObjectID + "\"");
+        LOGGER.info("Setting link in \"{}\" to parent \"{}\"", sourceId, newParentObjectID);
         MCRMetaLinkID parentLinkId = new MCRMetaLinkID("parent", 0);
         parentLinkId.setReference(newParentObjectID, null, null);
         sourceMCRObject.getStructure().setParent(parentLinkId);
 
         if (oldParentMCRObject != null) {
             // remove Child in old parent
-            LOGGER.info("Remove child \"" + sourceId + "\" in old parent \"" + oldParentId + "\"");
+            LOGGER.info("Remove child \"{}\" in old parent \"{}\"", sourceId, oldParentId);
             oldParentMCRObject.getStructure().removeChild(sourceMCRObject.getId());
 
-            LOGGER.info("Update old parent \"" + oldParentId + "\n");
+            LOGGER.info("Update old parent \"{}\n", oldParentId);
             MCRMetadataManager.update(oldParentMCRObject);
         }
 
-        LOGGER.info("Update \"" + sourceId + "\" in datastore (saving new link)");
+        LOGGER.info("Update \"{}\" in datastore (saving new link)", sourceId);
         MCRMetadataManager.update(sourceMCRObject);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Structure: " + sourceMCRObject.getStructure().isValid());
-            LOGGER.debug("Object: " + sourceMCRObject.isValid());
+            LOGGER.debug("Structure: {}", sourceMCRObject.getStructure().isValid());
+            LOGGER.debug("Object: {}", sourceMCRObject.isValid());
         }
     }
 
@@ -953,7 +953,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         int maxresults = id_list.size();
         for (String objid : id_list) {
             counter++;
-            LOGGER.info("Processing dataset " + counter + " from " + maxresults + " with ID: " + objid);
+            LOGGER.info("Processing dataset {} from {} with ID: {}", counter, maxresults, objid);
             // get from data
             MCRObjectID mcrobjid = MCRObjectID.getInstance(objid);
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrobjid);
@@ -961,11 +961,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             for (MCRMetaLinkID derivate_entry : derivate_entries) {
                 String derid = derivate_entry.getXLinkHref();
                 if (!mgr.exists(MCRObjectID.getInstance(derid))) {
-                    LOGGER.error("   !!! Missing derivate " + derid + " in database for base ID " + base_id);
+                    LOGGER.error("   !!! Missing derivate {} in database for base ID {}", derid, base_id);
                 }
             }
         }
-        LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
+        LOGGER.info("Check done for {} entries", Integer.toString(counter));
     }
 
     @MCRCommand(
@@ -995,16 +995,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Scans the metadata store for MCRObjects of type {0} and restore them in the search store.",
         order = 170)
     public static List<String> repairMetadataSearch(String type) {
-        LOGGER.info("Start the repair for type " + type);
+        LOGGER.info("Start the repair for type {}", type);
         String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
 
         if (typetest.length() == 0) {
-            LOGGER.error("The type " + type + " was not found.");
+            LOGGER.error("The type {} was not found.", type);
             return Collections.emptyList();
         }
         List<String> ar = MCRXMLMetadataManager.instance().listIDsOfType(type);
         if (ar.size() == 0) {
-            LOGGER.warn("No ID's was found for type " + type + ".");
+            LOGGER.warn("No ID's was found for type {}.", type);
             return Collections.emptyList();
         }
 
@@ -1027,20 +1027,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Retrieves the MCRObject with the MCRObjectID {0} and restores it in the search store.",
         order = 180)
     public static void repairMetadataSearchForID(String id) {
-        LOGGER.info("Start the repair for the ID " + id);
+        LOGGER.info("Start the repair for the ID {}", id);
 
         MCRObjectID mid = null;
 
         try {
             mid = MCRObjectID.getInstance(id);
         } catch (Exception e) {
-            LOGGER.error("The String " + id + " is not a MCRObjectID.");
+            LOGGER.error("The String {} is not a MCRObjectID.", id);
             return;
         }
 
         MCRBase obj = MCRMetadataManager.retrieve(mid);
         MCRMetadataManager.fireRepairEvent(obj);
-        LOGGER.info("Repaired " + mid);
+        LOGGER.info("Repaired {}", mid);
     }
 
     @MCRCommand(
@@ -1087,7 +1087,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static void mergeDerivatesOfObject(String id) {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         if (!MCRMetadataManager.exists(objectID)) {
-            LOGGER.error("The object with the id " + id + " does not exist!");
+            LOGGER.error("The object with the id {} does not exist!", id);
             return;
         }
 
@@ -1098,7 +1098,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             .collect(Collectors.toList());
 
         if (derivateIDs.size() <= 1) {
-            LOGGER.error("The object with the id " + id + " has no Derivates to merge!");
+            LOGGER.error("The object with the id {} has no Derivates to merge!", id);
             return;
         }
 
@@ -1106,7 +1106,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRPath mainDerivateRootPath = MCRPath.getPath(mainID, "/");
 
         derivateIDs.stream().skip(1).forEach(derivateID -> {
-            LOGGER.info("Merge " + derivateID + " into " + mainID + "...");
+            LOGGER.info("Merge {} into {}...", derivateID, mainID);
             MCRPath copyRootPath = MCRPath.getPath(derivateID.toString(), "/");
             try {
                 MCRTreeCopier treeCopier = new MCRTreeCopier(copyRootPath, mainDerivateRootPath);

@@ -88,7 +88,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
             case "derivate":
                 if (object.contains("_derivate_")) {
                     try {
-                        LOGGER.info("Adding URN to derivate " + object);
+                        LOGGER.info("Adding URN to derivate {}", object);
                         if (!urnAdder.addURNToDerivate(object)) {
                             job.getResponse().sendRedirect(
                                 job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
@@ -106,7 +106,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 /* assign urn to derivate */
                 if (object.contains("_derivate_")) {
                     try {
-                        LOGGER.info("Adding URN to all files in derivate (urn granular) " + object);
+                        LOGGER.info("Adding URN to all files in derivate (urn granular) {}", object);
                         if (!urnAdder.addURNToDerivates(object)) {
                             job.getResponse().sendRedirect(
                                 job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));
@@ -118,7 +118,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 } else {
                     /* assign urn to a mycore object */
                     try {
-                        LOGGER.info("Assigning urn to object '" + object);
+                        LOGGER.info("Assigning urn to object '{}", object);
                         if (!urnAdder.addURN(object)) {
                             job.getResponse().sendRedirect(
                                 job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USER_ERROR_PAGE));

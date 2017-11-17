@@ -50,7 +50,7 @@ public class MCRTilingAction implements Runnable {
             image = getMCRImage();
             image.setTileDir(tileDir);
         } catch (IOException e) {
-            LOGGER.error("Error while retrieving image for job: " + tileJob, e);
+            LOGGER.error("Error while retrieving image for job: {}", tileJob, e);
             return;
         }
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();

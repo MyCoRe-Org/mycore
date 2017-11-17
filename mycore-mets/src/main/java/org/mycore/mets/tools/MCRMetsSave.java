@@ -128,14 +128,14 @@ public class MCRMetsSave {
         }
 
         if (validate && !Mets.isValid(document)) {
-            LOGGER.warn("Storing mets.xml for " + derivateId + " failed cause the given document was invalid.");
+            LOGGER.warn("Storing mets.xml for {} failed cause the given document was invalid.", derivateId);
             return false;
         }
 
         try (OutputStream metsOut = Files.newOutputStream(metsFile)) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             xout.output(document, metsOut);
-            LOGGER.info("Storing file content from \"" + getMetsFileName() + "\" to derivate \"" + derivateId + "\"");
+            LOGGER.info("Storing file content from \"{}\" to derivate \"{}\"", getMetsFileName(), derivateId);
         } catch (Exception e) {
             LOGGER.error(e);
             return false;
@@ -158,7 +158,7 @@ public class MCRMetsSave {
         MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwner());
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
-            LOGGER.info("Derivate with id \"" + derivateID + "\" has no mets file. Nothing to do");
+            LOGGER.info("Derivate with id \"{}\" has no mets file. Nothing to do", derivateID);
             return;
         }
         mets = MCRMetsSave.updateOnFileAdd(mets, file);
@@ -240,7 +240,7 @@ public class MCRMetsSave {
                 updateOnCustomFile(mets, fileId, relPath);
             }
         } catch (Exception ex) {
-            LOGGER.error("Error occured while adding file " + file + " to the existing mets file", ex);
+            LOGGER.error("Error occured while adding file {} to the existing mets file", file, ex);
             return null;
         }
 
@@ -280,16 +280,16 @@ public class MCRMetsSave {
 
         if (matchId == null) {
             // there is no file wich belongs to the alto xml so just return
-            LOGGER.warn("no file found wich belongs to the custom xml : " + path);
+            LOGGER.warn("no file found wich belongs to the custom xml : {}", path);
             return;
         }
         // check if there is a physical file
         Element physPageElement = getPhysicalFile(mets, matchId);
         if (physPageElement != null) {
             physPageElement.addContent(new Fptr(fileId).asElement());
-            LOGGER.warn("physical page found for file " + matchId);
+            LOGGER.warn("physical page found for file {}", matchId);
         } else {
-            LOGGER.warn("no physical page found for file " + matchId);
+            LOGGER.warn("no physical page found for file {}", matchId);
         }
     }
 
@@ -467,7 +467,7 @@ public class MCRMetsSave {
         MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwner());
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
-            LOGGER.info("Derivate with id \"" + derivateID + "\" has no mets file. Nothing to do");
+            LOGGER.info("Derivate with id \"{}\" has no mets file. Nothing to do", derivateID);
             return;
         }
         mets = MCRMetsSave.updateOnFileDelete(mets, file);
@@ -611,8 +611,7 @@ public class MCRMetsSave {
                             LogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
                                 logID);
                             if (logicalDiv == null) {
-                                LOGGER.error("Could not find " + LogicalDiv.class.getSimpleName() + " with id "
-                                    + logID);
+                                LOGGER.error("Could not find {} with id {}", LogicalDiv.class.getSimpleName(), logID);
                                 LOGGER.error("Mets document remains unchanged");
                                 return mets;
                             }
@@ -643,7 +642,7 @@ public class MCRMetsSave {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("Error occured while removing file " + file + " from the existing mets file", ex);
+            LOGGER.error("Error occured while removing file {} from the existing mets file", file, ex);
             return null;
         }
 
@@ -843,7 +842,7 @@ public class MCRMetsSave {
                 // add to struct link
                 structLink.addSmLink(new SmLink(lastLogicalDiv.getId(), physicalSubDiv.getId()));
             } catch (Exception exc) {
-                LOGGER.error("Unable to add file " + href + " to mets.xml of " + derivatePath.getOwner(), exc);
+                LOGGER.error("Unable to add file {} to mets.xml of {}", href, derivatePath.getOwner(), exc);
             }
         });
     }

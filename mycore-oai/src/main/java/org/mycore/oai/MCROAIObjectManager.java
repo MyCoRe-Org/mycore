@@ -92,7 +92,7 @@ public class MCROAIObjectManager {
         try {
             recordElement = getJDOMRecord(getMyCoReId(header.getId()), format);
         } catch (Exception exc) {
-            LOGGER.error("unable to get record " + header.getId() + " (" + format.getPrefix() + ")", exc);
+            LOGGER.error("unable to get record {} ({})", header.getId(), format.getPrefix(), exc);
             return null;
         }
         Record record = new Record(header);
@@ -130,7 +130,7 @@ public class MCROAIObjectManager {
                     new Header(getOAIId(mcrId), deletedDate, Status.deleted)))
                 .orElse(null);
         } catch (Exception ex) {
-            LOGGER.warn("Error while retrieving deleted record " + mcrId, ex);
+            LOGGER.warn("Error while retrieving deleted record {}", mcrId, ex);
         }
         return null;
     }
@@ -143,7 +143,7 @@ public class MCROAIObjectManager {
     protected Element getURI(String uri) {
         Element e = MCRURIResolver.instance().resolve(uri).detach();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("get " + uri);
+            LOGGER.debug("get {}", uri);
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
             LOGGER.debug(out.outputString(e));
         }

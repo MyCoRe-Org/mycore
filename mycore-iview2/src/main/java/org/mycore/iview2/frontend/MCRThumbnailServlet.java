@@ -91,7 +91,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                 try {
                     return Files.readAttributes(iviewFile, BasicFileAttributes.class).lastModifiedTime().toMillis();
                 } catch (IOException x) {
-                    return -1l;
+                    return -1L;
                 }
             }
         });
@@ -110,7 +110,7 @@ public class MCRThumbnailServlet extends MCRServlet {
         if (thSize != null) {
             thumbnailSize = Integer.parseInt(thSize);
         }
-        LOGGER.info(getServletName() + ": setting thumbnail size to " + thumbnailSize);
+        LOGGER.info("{}: setting thumbnail size to {}", getServletName(), thumbnailSize);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class MCRThumbnailServlet extends MCRServlet {
             ThumnailInfo thumbnailInfo = getThumbnailInfo(job.getRequest().getPathInfo());
             Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
                 thumbnailInfo.imagePath);
-            LOGGER.info("IView2 file: " + iviewFile);
+            LOGGER.info("IView2 file: {}", iviewFile);
             BasicFileAttributes fileAttributes = MCRPathUtils.getAttributes(iviewFile, BasicFileAttributes.class);
             if (fileAttributes == null) {
                 job.getResponse().sendError(
@@ -151,7 +151,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                 job.getResponse().setContentType("image/png");
                 job.getResponse().setDateHeader("Last-Modified", fileAttributes.lastModifiedTime().toMillis());
                 Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
-                LOGGER.debug("Last-Modified: " + fileAttributes.lastModifiedTime() + ", expire on: " + expires);
+                LOGGER.debug("Last-Modified: {}, expire on: {}", fileAttributes.lastModifiedTime(), expires);
                 job.getResponse().setDateHeader("Expires", expires.getTime());
 
                 ImageWriter imageWriter = getImageWriter();
@@ -175,7 +175,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                 return;
             }
         } finally {
-            LOGGER.debug("Finished sending " + job.getRequest().getPathInfo());
+            LOGGER.debug("Finished sending {}", job.getRequest().getPathInfo());
         }
     }
 
@@ -184,7 +184,7 @@ public class MCRThumbnailServlet extends MCRServlet {
             pathInfo = pathInfo.substring(1);
         final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
         String imagePath = pathInfo.substring(derivate.length());
-        LOGGER.debug("derivate: " + derivate + ", image: " + imagePath);
+        LOGGER.debug("derivate: {}, image: {}", derivate, imagePath);
         return new ThumnailInfo(derivate, imagePath);
     }
 
@@ -217,7 +217,7 @@ public class MCRThumbnailServlet extends MCRServlet {
             int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
             int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
             if (x != 0 && y != 0) {
-                LOGGER.warn("Writing at position " + x + "," + y);
+                LOGGER.warn("Writing at position {},{}", x, y);
             }
             bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
                 (int) Math.ceil(height), null);

@@ -87,7 +87,7 @@ public class MCRCommandManager {
                 if (className.isEmpty()) {
                     continue;
                 }
-                LOGGER.debug("Will load commands from the " + type + " class " + className);
+                LOGGER.debug("Will load commands from the {} class {}", type, className);
                 try {
                     Class<?> cliClass = Class.forName(className);
                     if (cliClass.isAnnotationPresent(MCRCommandGroup.class)) {
@@ -97,7 +97,7 @@ public class MCRCommandManager {
                     }
 
                 } catch (ClassNotFoundException cnfe) {
-                    LOGGER.error("MyCoRe Command Class " + className + " not found.");
+                    LOGGER.error("MyCoRe Command Class {} not found.", className);
                 }
             }
         }

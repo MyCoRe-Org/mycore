@@ -81,7 +81,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
             return;
         }
         int totalCount = documents.size();
-        LOGGER.info("Handling " + totalCount + " documents");
+        LOGGER.info("Handling {} documents", totalCount);
         SolrClient solrClient = getSolrClient();
         if (solrClient instanceof ConcurrentUpdateSolrClient) {
             LOGGER.info("Detected ConcurrentUpdateSolrClient. Split up batch update.");
@@ -101,11 +101,10 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
             return;
         }
         if (updateResponse.getStatus() != 0) {
-            LOGGER.error("Error while indexing document collection. Split and retry: " + updateResponse.getResponse());
+            LOGGER.error("Error while indexing document collection. Split and retry: {}", updateResponse.getResponse());
             splitDocuments();
         } else {
-            LOGGER.info("Sending " + totalCount + " documents was successful in " + updateResponse.getElapsedTime()
-                + " ms.");
+            LOGGER.info("Sending {} documents was successful in {} ms.", totalCount, updateResponse.getElapsedTime());
         }
     }
 

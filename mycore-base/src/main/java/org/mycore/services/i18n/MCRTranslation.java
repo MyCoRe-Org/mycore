@@ -152,7 +152,7 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label, Locale locale, String baseName) {
-        LOGGER.debug("Translation for current locale: " + locale.getLanguage());
+        LOGGER.debug("Translation for current locale: {}", locale.getLanguage());
         ResourceBundle message;
         try {
             message = getResourceBundle(baseName, locale);
@@ -164,7 +164,7 @@ public class MCRTranslation {
         String result = null;
         try {
             result = message.getString(label);
-            LOGGER.debug("Translation for " + label + "=" + result);
+            LOGGER.debug("Translation for {}={}", label, result);
         } catch (MissingResourceException mre) {
             // try to get new key if 'label' is deprecated
             if (!DEPRECATED_MESSAGES_PRESENT) {
@@ -177,7 +177,7 @@ public class MCRTranslation {
                 } catch (java.util.MissingResourceException e) {
                 }
                 if (result != null) {
-                    LOGGER.warn("Usage of deprected I18N key '" + label + "'. Please use '" + newLabel + "' instead.");
+                    LOGGER.warn("Usage of deprected I18N key '{}'. Please use '{}' instead.", label, newLabel);
                     return result;
                 }
             }
@@ -210,7 +210,7 @@ public class MCRTranslation {
      * @return map of labels with translated values
      */
     public static Map<String, String> translatePrefix(String prefix, Locale locale) {
-        LOGGER.debug("Translation for locale: " + locale.getLanguage());
+        LOGGER.debug("Translation for locale: {}", locale.getLanguage());
         HashMap<String, String> map = new HashMap<>();
         ResourceBundle message = getResourceBundle(MESSAGES_BUNDLE, locale);
         Enumeration<String> keys = message.getKeys();
@@ -237,7 +237,7 @@ public class MCRTranslation {
         String msgFormat = translate(label);
         MessageFormat formatter = new MessageFormat(msgFormat, currentLocale);
         String result = formatter.format(arguments);
-        LOGGER.debug("Translation for " + label + "=" + result);
+        LOGGER.debug("Translation for {}={}", label, result);
         return result;
     }
 
@@ -268,7 +268,7 @@ public class MCRTranslation {
             // INDONESIAN      ID     OCEANIC/INDONESIAN [*Changed 1989 from original ISO 639:1988, IN]
             // Java doesn't work with id
             language = "in";
-            LOGGER.debug("Translation for current locale: " + language);
+            LOGGER.debug("Translation for current locale: {}", language);
         }
         Locale locale = new Locale(language);
         return locale;
@@ -389,7 +389,7 @@ public class MCRTranslation {
                     languages.add(bundle.getLocale().toString());
                 }
             } catch (MissingResourceException e) {
-                LOGGER.debug("Could not load " + MESSAGES_BUNDLE + " for locale: " + locale);
+                LOGGER.debug("Could not load " + MESSAGES_BUNDLE + " for locale: {}", locale);
             }
         }
         return languages;
@@ -417,7 +417,7 @@ public class MCRTranslation {
                 try (OutputStream os = new FileOutputStream(resolvedMsgFile)) {
                     props.store(os, "MyCoRe Messages for Locale " + lang);
                 } catch (IOException e) {
-                    LOGGER.warn("Could not store resolved properties to " + resolvedMsgFile.getAbsolutePath(), e);
+                    LOGGER.warn("Could not store resolved properties to {}", resolvedMsgFile.getAbsolutePath(), e);
                 }
             }
         }

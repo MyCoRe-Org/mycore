@@ -48,7 +48,7 @@ public class MCRPersistTransientUserEventHandler extends MCREventHandlerBase {
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         if (!MCRUserManager.isInvalidUser(currentUser) && MCRUserManager.getUser(currentUser.getUserID()) == null) {
-            LOGGER.info("create new user \"" + currentUser.getUserID() + "\"");
+            LOGGER.info("create new user \"{}\"", currentUser.getUserID());
             MCRUserManager.createUser((MCRTransientUser) currentUser);
         }
     }

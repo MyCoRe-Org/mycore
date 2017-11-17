@@ -114,12 +114,12 @@ public class MCRBinding {
                 throw new RuntimeException(
                     "XPath MUST only bind either element, attribute or document nodes: " + xPath);
 
-        LOGGER.debug("Bind to " + xPath + " selected " + boundNodes.size() + " node(s)");
+        LOGGER.debug("Bind to {} selected {} node(s)", xPath, boundNodes.size());
 
         if (boundNodes.isEmpty() && buildIfNotExists) {
             MCRNodeBuilder builder = new MCRNodeBuilder(variables);
             Object built = builder.buildNode(xPath, initialValue, (Parent) (parent.getBoundNode()));
-            LOGGER.debug("Bind to " + xPath + " generated node " + MCRXPathBuilder.buildXPath(built));
+            LOGGER.debug("Bind to {} generated node {}", xPath, MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
             trackNodeCreated(builder.getFirstNodeBuilt());
         }
@@ -128,7 +128,7 @@ public class MCRBinding {
     public MCRBinding(int pos, MCRBinding parent) {
         this(parent);
         boundNodes.add(parent.getBoundNodes().get(pos - 1));
-        LOGGER.debug("Repeater bind to child [" + pos + "]");
+        LOGGER.debug("Repeater bind to child [{}]", pos);
     }
 
     public String getXPath() {

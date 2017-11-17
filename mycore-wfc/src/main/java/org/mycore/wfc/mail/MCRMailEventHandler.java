@@ -56,7 +56,7 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
     private static final Logger LOGGER = LogManager.getLogger(MCRMailEventHandler.class);
 
     private void sendNotificationMail(MCREvent evt, MCRContent doc, String description) throws Exception {
-        LOGGER.info("Preparing mail for: " + description);
+        LOGGER.info("Preparing mail for: {}", description);
         HashMap<String, String> parameters = new HashMap<>();
         for (Map.Entry<String, Object> entry : evt.entrySet()) {
             parameters.put(entry.getKey(), entry.getValue().toString());
@@ -92,7 +92,7 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
             xml = new MCRJDOMContent(MCRPathXML.getFileXML(path, attrs));
             handleEvent(evt, xml, path.toString());
         } catch (IOException e) {
-            LOGGER.error("Error while generating mail for " + file, e);
+            LOGGER.error("Error while generating mail for {}", file, e);
         }
     }
 
@@ -100,7 +100,7 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
         try {
             sendNotificationMail(evt, xml, description);
         } catch (Exception e) {
-            LOGGER.error("Error while handling event: " + evt, e);
+            LOGGER.error("Error while handling event: {}", evt, e);
         }
     }
 

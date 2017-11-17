@@ -143,7 +143,7 @@ public final class MCRGoogleSitemapCommon {
             throw new NotDirectoryException(baseDir.getAbsolutePath());
         }
         this.webappBaseDir = baseDir;
-        LOGGER.info("Using webappbaseDir: " + baseDir.getAbsolutePath());
+        LOGGER.info("Using webappbaseDir: {}", baseDir.getAbsolutePath());
         objidlist = new ArrayList<>();
         if ((numberOfURLs < 1) || (numberOfURLs > 50000))
             numberOfURLs = 50000;
@@ -252,7 +252,7 @@ public final class MCRGoogleSitemapCommon {
      * @return The sitemap.xml as JDOM document
      */
     protected final Document buildPartSitemap(int number) throws Exception {
-        LOGGER.debug("Build Google URL sitemap list number " + Integer.toString(number));
+        LOGGER.debug("Build Google URL sitemap list number {}", Integer.toString(number));
         // build document frame
         Element urlset = new Element("urlset", ns);
         urlset.addNamespaceDeclaration(XSI_NAMESPACE);
@@ -264,8 +264,7 @@ public final class MCRGoogleSitemapCommon {
         int stop = numberOfURLs * (number + 1);
         if (stop > objidlist.size())
             stop = objidlist.size();
-        LOGGER.debug("Build Google URL in range from " + Integer.toString(start) + " to " + Integer.toString(stop - 1)
-            + ".");
+        LOGGER.debug("Build Google URL in range from {} to {}.", Integer.toString(start), Integer.toString(stop - 1));
         for (int i = start; i < stop; i++) {
             MCRObjectIDDate objectIDDate = objidlist.get(i);
             urlset.addContent(buildURLElement(objectIDDate));
@@ -298,7 +297,7 @@ public final class MCRGoogleSitemapCommon {
      * @return The index sitemap_google.xml as JDOM document
      */
     protected final Document buildSitemapIndex(int number) {
-        LOGGER.debug("Build Google sitemap number " + Integer.toString(number));
+        LOGGER.debug("Build Google sitemap number {}", Integer.toString(number));
         // build document frame
         Element index = new Element("sitemapindex", ns);
         index.addNamespaceDeclaration(XSI_NAMESPACE);
@@ -308,9 +307,7 @@ public final class MCRGoogleSitemapCommon {
         for (int i = 0; i < number; i++) {
             Element sitemap = new Element("sitemap", ns);
             index.addContent(sitemap);
-            StringBuilder sb = new StringBuilder(128);
-            sb.append(baseurl).append(getFileName(i + 2, false));
-            sitemap.addContent(new Element("loc", ns).addContent(sb.toString().trim()));
+            sitemap.addContent(new Element("loc", ns).addContent((baseurl + getFileName(i + 2, false)).trim()));
             String datestr = formatter.format((new GregorianCalendar(SITEMAP_TIMEZONE, SITEMAP_LOCALE)).getTime());
             sitemap.addContent(new Element("lastmod", ns).addContent(datestr.trim()));
         }
@@ -326,7 +323,7 @@ public final class MCRGoogleSitemapCommon {
         if (li != null) {
             for (File fi : li) {
                 if (fi.getName().startsWith("sitemap_google")) {
-                    LOGGER.debug("Remove file " + fi.getName());
+                    LOGGER.debug("Remove file {}", fi.getName());
                     fi.delete();
                 }
             }

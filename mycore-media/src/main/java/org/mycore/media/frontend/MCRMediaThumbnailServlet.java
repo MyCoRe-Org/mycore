@@ -88,7 +88,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
         if (thSize != null) {
             thumbnailSize = Integer.parseInt(thSize);
         }
-        LOGGER.info(getServletName() + ": setting thumbnail size to " + thumbnailSize);
+        LOGGER.info("{}: setting thumbnail size to {}", getServletName(), thumbnailSize);
     }
 
     @Override
@@ -107,9 +107,9 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
                 pathInfo = pathInfo.substring(1);
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
             String imagePath = pathInfo.substring(derivate.length());
-            LOGGER.info("derivate: " + derivate + ", image: " + imagePath);
+            LOGGER.info("derivate: {}, image: {}", derivate, imagePath);
             MCRFile thumbFile = MCRMediaIFSTools.getThumbnailFromStore(derivate, imagePath);
-            LOGGER.info("Thumbnail file: " + thumbFile.getPath());
+            LOGGER.info("Thumbnail file: {}", thumbFile.getPath());
             BufferedImage thumbnail = getThumbnail(thumbFile);
             if (thumbnail != null) {
                 thumbnail = centerThumbnail(thumbnail);
@@ -117,19 +117,17 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
                 job.getResponse().setContentType("image/png");
                 job.getResponse().setDateHeader("Last-Modified", thumbFile.getLastModified().getTime());
                 Date expires = new Date(System.currentTimeMillis() + MAX_AGE * 1000);
-                LOGGER.info("Last-Modified: " + thumbFile.getLastModified() + ", expire on: " + expires);
+                LOGGER.info("Last-Modified: {}, expire on: {}", thumbFile.getLastModified(), expires);
                 job.getResponse().setDateHeader("Expires", expires.getTime());
                 try (ServletOutputStream sout = job.getResponse().getOutputStream()) {
-                    ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
                     ImageWriter imageWriter = getImageWriter();
-                    try {
+                    try (ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout)) {
                         imageWriter.setOutput(imageOutputStream);
                         IIOImage iioImage = new IIOImage(thumbnail, null, null);
                         imageWriter.write(null, iioImage, imageWriteParam);
                     } finally {
                         imageWriter.reset();
                         imageWriters.add(imageWriter);
-                        imageOutputStream.close();
                     }
                 }
             } else {
@@ -137,7 +135,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
                 return;
             }
         } finally {
-            LOGGER.info("Finished sending " + job.getRequest().getPathInfo());
+            LOGGER.info("Finished sending {}", job.getRequest().getPathInfo());
         }
     }
 

@@ -57,7 +57,7 @@ public class MCRCombinedResourceBundleControl extends Control {
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
         throws IllegalAccessException, InstantiationException, IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("New bundle: " + baseName + ", locale " + locale);
+            LOGGER.debug("New bundle: {}, locale {}", baseName, locale);
         }
         if (locale.equals(Locale.ROOT)) {
             //MCR-1064 fallback should be default language, if property key does not exist

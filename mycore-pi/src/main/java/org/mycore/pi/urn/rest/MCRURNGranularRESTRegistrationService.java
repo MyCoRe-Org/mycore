@@ -76,9 +76,9 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
                 .map(MCRPath::toMCRPath)
                 .filter(p -> !p.equals(derivRoot));
         } catch (IOException e) {
-            LOGGER.error("I/O error while access the starting file of derivate " + derivateId + "!", e);
+            LOGGER.error("I/O error while access the starting file of derivate {}!", derivateId, e);
         } catch (SecurityException s) {
-            LOGGER.error("No access to starting file of derivate " + derivateId + "!", s);
+            LOGGER.error("No access to starting file of derivate {}!", derivateId, s);
         }
 
         return Stream.empty();
@@ -133,7 +133,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
         try {
             MCRMetadataManager.update(deriv);
         } catch (MCRPersistenceException | MCRAccessException e) {
-            LOGGER.error("Error while updating derivate " + derivID, e);
+            LOGGER.error("Error while updating derivate {}", derivID, e);
         }
 
         EntityTransaction transaction = MCREntityManagerProvider

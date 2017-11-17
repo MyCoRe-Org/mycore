@@ -99,9 +99,7 @@ public class MCRURNManager {
         String base = "MCR.URN.SubNamespace." + configID + ".";
         String prefix = MCRConfiguration.instance().getString(base + "Prefix");
 
-        StringBuilder buffer = new StringBuilder(prefix);
-        buffer.append(niss);
-        return org.mycore.urn.services.MCRURN.create(buffer.toString()).toString();
+        return org.mycore.urn.services.MCRURN.create(prefix + niss).toString();
     }
 
     /**
@@ -263,7 +261,7 @@ public class MCRURNManager {
     public static synchronized String buildAndAssignURN(String documentID, String configID) {
         if (hasURNAssigned(documentID)) {
             String urn = getURNforDocument(documentID);
-            LOGGER.warn("Returning the already assign URN: " + urn + " for document " + documentID + ".");
+            LOGGER.warn("Returning the already assign URN: {} for document {}.", urn, documentID);
             return urn;
         }
         String urn = buildURN(configID);

@@ -111,7 +111,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     }
 
     private Set<String> diveInto(String base) {
-        LOGGER.info("Diving into " + base + "...");
+        LOGGER.info("Diving into {}...", base);
         Set<String> paths = getServletContext().getResourcePaths(base);
 
         Set<String> more = new HashSet<>();
@@ -125,7 +125,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     }
 
     private void findXSLinJar(String pathOfJarFile) throws IOException {
-        LOGGER.info("Diving into " + pathOfJarFile + "...");
+        LOGGER.info("Diving into {}...", pathOfJarFile);
 
         InputStream in = getServletContext().getResourceAsStream(pathOfJarFile);
         ZipInputStream zis = new ZipInputStream(in);
@@ -148,7 +148,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private void foundStylesheet(String path, String source) {
         String file = path.substring(path.lastIndexOf("xsl/") + 4);
-        LOGGER.info("Found " + file + " in " + source);
+        LOGGER.info("Found {} in {}", file, source);
         Stylesheet stylesheet = getStylesheet(file);
         source = source.substring(9); // cut off "/WEB-INF/"
         stylesheet.origin.add(source);
@@ -212,7 +212,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             List<Element> includes = xsl.getChildren(tag, MCRConstants.XSL_NAMESPACE);
             for (Element include : includes) {
                 String href = include.getAttributeValue("href");
-                LOGGER.info(name + " " + tag + "s " + href);
+                LOGGER.info("{} {}s {}", name, tag, href);
                 set.add(href);
                 if (!stylesheets.containsKey(href)) {
                     unknown.add(href);

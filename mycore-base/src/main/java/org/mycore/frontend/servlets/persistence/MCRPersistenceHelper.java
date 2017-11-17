@@ -58,7 +58,7 @@ class MCRPersistenceHelper {
         if (referer == null || referer.equals("")) {
             referer = MCRFrontendUtil.getBaseURL();
         }
-        LOGGER.debug("Referer: " + referer);
+        LOGGER.debug("Referer: {}", referer);
         return referer;
     }
 
@@ -82,7 +82,7 @@ class MCRPersistenceHelper {
         }
         if (inDoc.getRootElement().getAttribute("ID") == null) {
             String mcrID = MCRServlet.getProperty(request, "mcrid");
-            LOGGER.info("Adding MCRObjectID from request: " + mcrID);
+            LOGGER.info("Adding MCRObjectID from request: {}", mcrID);
             inDoc.getRootElement().setAttribute("ID", mcrID);
         }
         return inDoc;
@@ -109,13 +109,13 @@ class MCRPersistenceHelper {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             StringWriter swOrig = new StringWriter();
             xout.output(doc, swOrig);
-            LOGGER.debug("Input document \n" + swOrig);
+            LOGGER.debug("Input document \n{}", swOrig);
             for (String logMsg : ev.getErrorLog()) {
                 LOGGER.debug(logMsg);
             }
             StringWriter swClean = new StringWriter();
             xout.output(jdom_out, swClean);
-            LOGGER.debug("Results in \n" + swClean);
+            LOGGER.debug("Results in \n{}", swClean);
         }
         MCRObject mcrObject = new MCRObject(jdom_out);
         return mcrObject;
@@ -127,8 +127,8 @@ class MCRPersistenceHelper {
             if (context.getResource("/" + modernPage) == null
                 && context.getResource("/" + deprecatedPage) != null) {
                 LogManager.getLogger()
-                    .warn("Could not find " + modernPage + " in webapp root, using deprecated " + deprecatedPage
-                        + " instead.");
+                          .warn("Could not find {} in webapp root, using deprecated {} instead.", modernPage,
+                              deprecatedPage);
                 return deprecatedPage;
             }
         } catch (MalformedURLException e) {

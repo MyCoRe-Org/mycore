@@ -62,9 +62,9 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
         String currentID;
         for (currentID = id; currentID != null
             && !MCRAccessManager.getAccessImpl().hasRule(currentID, permission); currentID = getParentID(currentID)) {
-            LOGGER.debug("No access rule specified for: " + currentID + ". Trying to use parent ID.");
+            LOGGER.debug("No access rule specified for: {}. Trying to use parent ID.", currentID);
         }
-        LOGGER.debug("Using access rule defined for: " + currentID);
+        LOGGER.debug("Using access rule defined for: {}", currentID);
         return MCRAccessManager.getAccessImpl().checkPermission(currentID, permission);
     }
 
@@ -73,7 +73,7 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
         try {
             parentDoc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(objectID));
         } catch (IOException | JDOMException | SAXException e) {
-            LOGGER.error("Could not read object: " + objectID, e);
+            LOGGER.error("Could not read object: {}", objectID, e);
             return null;
         }
         final Element parentElement = parentDoc.getRootElement().getChild("structure").getChild("parents");

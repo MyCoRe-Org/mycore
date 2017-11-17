@@ -111,8 +111,8 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             throw new MCRPersistentIdentifierException("There is more then one identifier with type DOI!");
         } else if (doiList.size() == 1) {
             Element doiElement = doiList.stream().findAny().get();
-            LOGGER.warn("Found existing DOI(" + doiElement.getTextTrim() + ") in Document will be replaced with "
-                + doi.asString());
+            LOGGER.warn("Found existing DOI({}) in Document will be replaced with {}", doiElement.getTextTrim(),
+                doi.asString());
             doiElement.setText(doi.asString());
         } else {
             // must be 0
@@ -258,12 +258,12 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         throws MCRPersistentIdentifierException {
         if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
             .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
-            LOGGER.warn("SuperUser deletes object " + obj.getId() + " with registered doi " + doi.asString()
-                + ". Try to set DOI inactive.");
+            LOGGER.warn("SuperUser deletes object {} with registered doi {}. Try to set DOI inactive.", obj.getId(),
+                doi.asString());
             try {
                 getDataciteClient().deleteMetadata(doi);
             } catch (MCRPersistentIdentifierException e) {
-                LOGGER.error("Error while setting " + doi.asString() + " inactive! Delete of object should continue!");
+                LOGGER.error("Error while setting {} inactive! Delete of object should continue!", doi.asString());
             }
         } else {
             throw new MCRPersistentIdentifierException("Object should not be deleted! (It has a registered DOI)");

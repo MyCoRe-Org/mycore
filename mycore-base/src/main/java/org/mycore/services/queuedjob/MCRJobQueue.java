@@ -219,7 +219,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         StringBuilder sb = new StringBuilder("DELETE FROM MCRJob");
         if (action != null)
-            sb.append(" WHERE action='" + action.getName() + "'");
+            sb.append(" WHERE action='").append(action.getName()).append("'");
 
         Query query = em.createQuery(sb.toString());
         query.executeUpdate();
@@ -274,7 +274,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         StringBuilder sb = new StringBuilder("SELECT count(*) FROM MCRJob WHERE ");
         if (action != null)
-            sb.append("action='" + action.getName() + "' AND ");
+            sb.append("action='").append(action.getName()).append("' AND ");
         sb.append("status='" + MCRJobStatus.NEW + "'");
 
         return em.createQuery(sb.toString(), Number.class).getSingleResult().intValue();
@@ -319,7 +319,11 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '"
             + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
-            qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
+            qStr.append(" AND job.parameters['")
+                .append(paramKey)
+                .append("'] = '")
+                .append(params.get(paramKey))
+                .append("'");
         }
 
         TypedQuery<MCRJob> query = em.createQuery(qStr.toString(), MCRJob.class);
@@ -349,7 +353,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     private MCRJob getNextPrefetchedElement() {
         MCRJob job = preFetch.poll();
-        LOGGER.debug("Fetched job: " + job);
+        LOGGER.debug("Fetched job: {}", job);
         return job;
     }
 
@@ -382,7 +386,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             preFetch.add(job.clone());
             em.detach(job);
         }
-        LOGGER.debug("prefetched " + i + " jobs");
+        LOGGER.debug("prefetched {} jobs", i);
         return i;
     }
 
@@ -435,7 +439,11 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         StringBuilder qStr = new StringBuilder("FROM MCRJob job WHERE action = '" + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
-            qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
+            qStr.append(" AND job.parameters['")
+                .append(paramKey)
+                .append("'] = '")
+                .append(params.get(paramKey))
+                .append("'");
         }
 
         Query query = em.createQuery(qStr.toString());

@@ -103,7 +103,7 @@ public class MCRVFSContent extends MCRContent {
         return Stream
             .of(stackTrace)
             .skip(i)
-            .filter(s -> !(s.getClassName().equals(getClass()) && s.getMethodName().contains("Debug")))
+            .filter(s -> !(s.getClassName().equals(getClass().getName()) && s.getMethodName().contains("Debug")))
             .map(s -> "\tat " + s)
             .collect(Collectors.joining(System.getProperty("line.separator")));
     }

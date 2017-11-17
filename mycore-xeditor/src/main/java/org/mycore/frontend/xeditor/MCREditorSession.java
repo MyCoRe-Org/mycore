@@ -102,7 +102,7 @@ public class MCREditorSession {
             String name = entries.next().getKey();
             String result = Verifier.checkXMLName(name);
             if (result != null) {
-                LOGGER.warn("Illegally named transformation parameter, removing " + name);
+                LOGGER.warn("Illegally named transformation parameter, removing {}", name);
                 entries.remove();
             }
         }
@@ -123,7 +123,7 @@ public class MCREditorSession {
     public void setPageURL(String pageURL) {
         if (url == null) {
             this.url = pageURL.contains("?") ? pageURL.substring(0, pageURL.indexOf("?")) : pageURL;
-            LOGGER.debug("Editor page URL set to " + this.url);
+            LOGGER.debug("Editor page URL set to {}", this.url);
         }
     }
 
@@ -150,7 +150,7 @@ public class MCREditorSession {
 
         cancelURL = replaceParameters(cancelURL);
         if (!cancelURL.contains("{")) {
-            LOGGER.debug(id + " set cancel URL to " + cancelURL);
+            LOGGER.debug("{} set cancel URL to {}", id, cancelURL);
             this.cancelURL = cancelURL;
         }
     }
@@ -191,7 +191,7 @@ public class MCREditorSession {
         if ((editedXML != null) || (uri = replaceParameters(uri)).contains("{"))
             return;
 
-        LOGGER.info("Reading edited XML from " + uri);
+        LOGGER.info("Reading edited XML from {}", uri);
         Document xml = MCRSourceContent.getInstance(uri).asXML();
         setEditedXML(xml);
         setBreakpoint("Reading XML from " + uri);

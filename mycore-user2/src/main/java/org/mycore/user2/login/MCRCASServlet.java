@@ -116,7 +116,7 @@ public class MCRCASServlet extends MCRServlet {
 
         // Get user name logged in
         String userName = principal.getName();
-        LOGGER.info("Login " + userName);
+        LOGGER.info("Login {}", userName);
 
         MCRUser user;
         boolean userExists = MCRUserManager.exists(userName, realmID);

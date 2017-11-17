@@ -56,7 +56,7 @@ class MCRIdentifierResolver {
             String uri = MessageFormat.format(uriPattern, identifier, URLEncoder.encode(identifier, "UTF-8"));
             resolved = MCRURIResolver.instance().resolve(uri);
         } catch (Exception ex) {
-            LOGGER.warn("Exception resolving " + identifier + ": " + ex.getClass().getName() + " " + ex.getMessage());
+            LOGGER.warn("Exception resolving {}: {} {}", identifier, ex.getClass().getName(), ex.getMessage());
         }
 
         // Normalize various error/not found cases:

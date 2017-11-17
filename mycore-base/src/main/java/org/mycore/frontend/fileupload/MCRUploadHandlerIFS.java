@@ -153,7 +153,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         if (this.derivate != null) {
             return;
         }
-        LOGGER.debug("upload starting, expecting " + getNumFiles() + " files");
+        LOGGER.debug("upload starting, expecting {} files", getNumFiles());
 
         MCRObjectID derivateID = getOrCreateDerivateID();
 
@@ -164,7 +164,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
         getOrCreateRootDirectory();
 
-        LOGGER.debug("uploading into " + this.derivateID + " of " + this.documentID);
+        LOGGER.debug("uploading into {} of {}", this.derivateID, this.documentID);
     }
 
     private MCRObjectID getOrCreateDerivateID() {
@@ -197,7 +197,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         ifs.setSourcePath(null);
         derivate.getDerivate().setInternals(ifs);
 
-        LOGGER.debug("Creating new derivate with ID " + this.derivateID);
+        LOGGER.debug("Creating new derivate with ID {}", this.derivateID);
         MCRMetadataManager.create(derivate);
 
         setDefaultPermissions(derivateID);
@@ -225,7 +225,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     @Override
     public boolean acceptFile(String path, String checksum, long length) throws Exception {
-        LOGGER.debug("incoming acceptFile request: " + path + " " + checksum + " " + length + " bytes");
+        LOGGER.debug("incoming acceptFile request: {} {} {} bytes", path, checksum, length);
         boolean shouldAcceptFile = true;
         if (rootDir != null) {
             MCRPath child = MCRPath.toMCRPath(rootDir.resolve(path));
@@ -236,14 +236,14 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                     || !(checksum.equals(attrs.md5sum()) && child.getFileSystem().verifies(child, attrs));
             }
         }
-        LOGGER.debug("Should the client send this file? " + shouldAcceptFile);
+        LOGGER.debug("Should the client send this file? {}", shouldAcceptFile);
         return shouldAcceptFile;
     }
 
     @Override
     public synchronized long receiveFile(String path, InputStream in, long length, String checksum)
         throws IOException, MCRPersistenceException, MCRAccessException {
-        LOGGER.debug("incoming receiveFile request: " + path + " " + checksum + " " + length + " bytes");
+        LOGGER.debug("incoming receiveFile request: {} {} {} bytes", path, checksum, length);
 
         this.setProgressText(path);
 
@@ -264,7 +264,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 prepareUpload();
             }
             MCRPath file = getFile(path);
-            LOGGER.info("Creating file " + file + ".");
+            LOGGER.info("Creating file {}.", file);
             Files.copy(fIn, file, StandardCopyOption.REPLACE_EXISTING);
             return tempFiles.isEmpty() ? length : Files.size(tempFiles.stream().reduce((a, b) -> b).get());
         } finally {
@@ -272,7 +272,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 try {
                     Files.delete(tempFilePath);
                 } catch (IOException e) {
-                    LOGGER.error("Could not delete temp file " + tempFilePath);
+                    LOGGER.error("Could not delete temp file {}", tempFilePath);
                 }
             });
             this.filesUploaded++;
@@ -335,7 +335,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             .isEmpty()));
         if ((mainFile == null) || mainFile.trim().isEmpty() && hasNoMainFile) {
             mainFile = getPathOfMainFile();
-            LOGGER.debug("Setting main file to " + mainFile);
+            LOGGER.debug("Setting main file to {}", mainFile);
             derivate.getDerivate().getInternals().setMainDoc(mainFile);
             MCRMetadataManager.updateMCRDerivateXML(derivate);
         }

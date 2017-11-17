@@ -83,13 +83,13 @@ public class MCRTransferPackageCommands {
     public static void _untar(String pathToTar) throws Exception {
         Path tar = Paths.get(pathToTar);
         Path targetDirectory = MCRTransferPackageUtil.getTargetDirectory(tar);
-        LOGGER.info("Untar " + pathToTar + " to " + targetDirectory + "...");
+        LOGGER.info("Untar {} to {}...", pathToTar, targetDirectory);
         MCRUtils.untar(tar, targetDirectory);
     }
 
     @MCRCommand(syntax = "_import transfer package from directory {0}")
     public static List<String> _fromDirectory(String targetDirectoryPath) throws Exception {
-        LOGGER.info("Import transfer package from " + targetDirectoryPath + "...");
+        LOGGER.info("Import transfer package from {}...", targetDirectoryPath);
         Path targetDirectory = Paths.get(targetDirectoryPath);
         List<String> commands = new ArrayList<>();
 
@@ -142,7 +142,7 @@ public class MCRTransferPackageCommands {
         MCRSolrIndexer.rebuildMetadataIndex(mcrObjects);
 
         // deleting expanded directory
-        LOGGER.info("Deleting expanded tar in " + targetDirectoryPath + "...");
+        LOGGER.info("Deleting expanded tar in {}...", targetDirectoryPath);
         Files.walkFileTree(Paths.get(targetDirectoryPath), MCRRecursiveDeleter.instance());
     }
 

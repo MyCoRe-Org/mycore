@@ -47,7 +47,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
                 for (final String key : attributeMapper.getAttributeNames()) {
                     final Object value = req.getAttribute(key);
                     if (value != null) {
-                        LOGGER.info("received " + key + ":" + value);
+                        LOGGER.info("received {}:{}", key, value);
                         attributes.put(key, value);
                     }
                 }
@@ -56,7 +56,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
                 MCRUser user = MCRUserManager.getUser(userId, realmId);
                 if (user != null) {
-                    LOGGER.debug("login existing user \"" + user.getUserID() + "\"");
+                    LOGGER.debug("login existing user \"{}\"", user.getUserID());
 
                     attributeMapper.mapAttributes(user, attributes);
                     user.setLastLogin();

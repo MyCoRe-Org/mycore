@@ -109,7 +109,7 @@ public class MCRSwordUtil {
 
         derivate.getDerivate().setInternals(ifs);
 
-        LOGGER.debug("Creating new derivate with ID " + derivateID);
+        LOGGER.debug("Creating new derivate with ID {}", derivateID);
         MCRMetadataManager.create(derivate);
 
         if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
@@ -175,7 +175,7 @@ public class MCRSwordUtil {
             final ZipArchiveEntry zipArchiveEntry;
             try {
                 final String fileName = getFilename(p);
-                LOGGER.info("Addding " + fileName + " to zip file!");
+                LOGGER.info("Addding {} to zip file!", fileName);
                 if (isDir) {
                     addDirectoryToZip(zipOutputStream, p);
                 } else {
@@ -190,7 +190,7 @@ public class MCRSwordUtil {
                     zipOutputStream.closeArchiveEntry();
                 }
             } catch (IOException e) {
-                LOGGER.error("Could not add path " + p);
+                LOGGER.error("Could not add path {}", p);
             }
         });
     }
@@ -243,7 +243,7 @@ public class MCRSwordUtil {
 
     public static void extractZipToPath(Path zipFilePath, MCRPath target)
         throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
-        LOGGER.info("Extracting zip: " + zipFilePath);
+        LOGGER.info("Extracting zip: {}", zipFilePath);
         try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
             Files.walkFileTree(sourcePath,
@@ -268,7 +268,7 @@ public class MCRSwordUtil {
                         throws IOException {
                         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
 
-                        LOGGER.info("Extracting: " + file);
+                        LOGGER.info("Extracting: {}", file);
                         Path targetFilePath = target.resolve(sourcePath.relativize(file));
                         // WORKAROUND: copy is bad with IFS because fsnodes is locked until copy is completed
                         // so we end the transaction after we got a byte channel, then we write the data
@@ -520,7 +520,7 @@ public class MCRSwordUtil {
                 });
                 return iris.stream();
             } catch (IOException e) {
-                LOGGER.error("Error while processing directory stream of " + derivateId, e);
+                LOGGER.error("Error while processing directory stream of {}", derivateId, e);
                 throw new MCRException(e);
             }
         }

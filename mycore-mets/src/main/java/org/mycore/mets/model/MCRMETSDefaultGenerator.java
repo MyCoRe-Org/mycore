@@ -199,7 +199,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length() : href
                 .lastIndexOf(".");
         String fileName = href.substring(beginIndex, endIndex);
-        LOGGER.debug("Created fileName: " + fileName);
+        LOGGER.debug("Created fileName: {}", fileName);
 
         if (!(hrefIdMap.containsKey(fileName) || hrefIdMap.containsValue(baseID)
                 && isInExcludedRootFolder(dir))) {
@@ -302,7 +302,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         try {
             return (MCRILogicalStructMapTypeProvider) Class.forName(className).newInstance();
         } catch (Exception e) {
-            LOGGER.warn("Could not load class " + className);
+            LOGGER.warn("Could not load class {}", className);
             return new MCRDefaultLogicalStructMapTypeProvider();
         }
     }

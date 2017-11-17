@@ -69,7 +69,7 @@ public class MCRUploadServletDeployer implements AutoExecutable {
                 "'" + MCR_FILE_UPLOAD_TEMP_STORAGE_PATH + "=" + location + "' must be an absolute path!");
         }
         if (Files.notExists(targetDir)) {
-            LogManager.getLogger().info("Creating directory: " + targetDir);
+            LogManager.getLogger().info("Creating directory: {}", targetDir);
             Files.createDirectories(targetDir);
         }
         if (!Files.isDirectory(targetDir)) {
@@ -79,7 +79,7 @@ public class MCRUploadServletDeployer implements AutoExecutable {
 
     private MultipartConfigElement getMultipartConfig() {
         String location = MCRConfiguration2.getStringOrThrow(MCR_FILE_UPLOAD_TEMP_STORAGE_PATH);
-        long maxFileSize = MCRConfiguration2.getLong("MCR.FileUpload.MaxSize").orElse(5000000l);
+        long maxFileSize = MCRConfiguration2.getLong("MCR.FileUpload.MaxSize").orElse(5000000L);
         long maxRequestSize = maxFileSize;
         int fileSizeThreshold = MCRConfiguration2.getInt("MCR.FileUpload.MemoryThreshold").orElse(1000000);
         LogManager.getLogger()

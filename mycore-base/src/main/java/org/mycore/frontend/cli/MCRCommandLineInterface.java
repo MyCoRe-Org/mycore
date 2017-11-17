@@ -215,7 +215,7 @@ public class MCRCommandLineInterface {
         StrSubstitutor strSubstitutor = new StrSubstitutor(MCRConfiguration.instance().getPropertiesMap());
         String expandedCommand = strSubstitutor.replace(command);
         if (!expandedCommand.equals(command)) {
-            LOGGER.info(command + " --> " + expandedCommand);
+            LOGGER.info("{} --> {}", command, expandedCommand);
         }
         return expandedCommand;
     }

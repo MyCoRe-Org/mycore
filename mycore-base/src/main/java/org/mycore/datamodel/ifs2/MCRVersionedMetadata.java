@@ -93,7 +93,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 return Optional.ofNullable(Optional.ofNullable(getStore().getRepository().info(getFilePath(), -1))
                 .map(SVNDirEntry::getRevision).orElseGet(this::getLastRevision));
         } catch (SVNException e) {
-            LOGGER.error("Could not get last revision of " + getStore().getID() + "_" + id, e);
+            LOGGER.error("Could not get last revision of {}_{}", getStore().getID(), id, e);
                 return Optional.empty();
             }
         };
@@ -160,7 +160,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
             // Create directories in SVN that do not exist yet
             for (int i = existing; i < paths.length - 1; i++) {
-                LOGGER.debug("SVN create directory " + paths[i]);
+                LOGGER.debug("SVN create directory {}", paths[i]);
                 editor.addDir(paths[i], null, -1);
                 editor.closeDir();
             }
@@ -192,7 +192,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             throw new IOException(e);
         }
         revision = () -> Optional.of(info.getNewRevision());
-        LOGGER.info("SVN commit of " + mode + " finished, new revision " + getRevision());
+        LOGGER.info("SVN commit of {} finished, new revision {}", mode, getRevision());
 
         if (MCRVersioningMetadataStore.shouldSyncLastModifiedOnSVNCommit()) {
             setLastModified(info.getDate());
@@ -337,7 +337,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             long lastRevision = getLastRevision(true);
             return lastRevision < 0 ? null : lastRevision;
         } catch (SVNException e) {
-            LOGGER.warn("Could not get last revision of: " + getStore() + "_" + id, e);
+            LOGGER.warn("Could not get last revision of: {}_{}", getStore(), id, e);
             return null;
         }
     }
@@ -349,7 +349,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * @return the revision number of the local version
      */
     public long getRevision() {
-        return revision.get().orElse(-1l);
+        return revision.get().orElse(-1L);
     }
 
     /**

@@ -60,7 +60,7 @@ public class MCRJobQueuePermission implements MCRResourceAccessChecker {
             String permissionType = request.getMethod().matches("(?i)(POST|PUT|DELETE)") ? PERMISSION_WRITE
                 : PERMISSION_READ;
             if (!MCRAccessManager.checkPermission(queueName, permissionType)) {
-                LOGGER.info("Permission \"" + permissionType + "\" denied for queue \"" + queueName + "\".");
+                LOGGER.info("Permission \"{}\" denied for queue \"{}\".", permissionType, queueName);
                 return false;
             }
 

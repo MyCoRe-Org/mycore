@@ -95,7 +95,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
                 cachedElement = doc.getRootElement();
                 lastModified = System.currentTimeMillis();
             } catch (Exception exc) {
-                LOGGER.error("Error while parsing " + xmlFile + "!", exc);
+                LOGGER.error("Error while parsing {}!", xmlFile, exc);
                 return null;
             }
         }

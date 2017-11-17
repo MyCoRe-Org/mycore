@@ -76,13 +76,13 @@ public class MCRUserAgentFilter implements Filter {
             if (userAgent != null) {
                 if (agentPattern.matcher(userAgent).find()) {
                     try {
-                        LOGGER.info("Closing session: " + userAgent + " matches " + agentPattern);
+                        LOGGER.info("Closing session: {} matches {}", userAgent, agentPattern);
                         session.invalidate();
                     } catch (IllegalStateException e) {
                         LOGGER.warn("Session was allready closed");
                     }
                 } else {
-                    LOGGER.debug(userAgent + " does not match " + agentPattern);
+                    LOGGER.debug("{} does not match {}", userAgent, agentPattern);
                 }
             } else {
                 LOGGER.warn("No User-Agent was send.");

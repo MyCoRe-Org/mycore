@@ -77,7 +77,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         }
         String[] list = dir.list();
         if (list.length == 0) {
-            LOGGER.warn("No files found in directory " + dir);
+            LOGGER.warn("No files found in directory {}", dir);
             return null;
         }
         return Arrays.stream(list)
@@ -177,7 +177,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         ifs.setSourcePath(fileDir.getAbsolutePath());
         derivate.getDerivate().setInternals(ifs);
 
-        LOGGER.debug("Creating new derivate with ID " + derivate.getId());
+        LOGGER.debug("Creating new derivate with ID {}", derivate.getId());
         MCRMetadataManager.create(derivate);
 
         setDefaultPermissions(derivate.getId());

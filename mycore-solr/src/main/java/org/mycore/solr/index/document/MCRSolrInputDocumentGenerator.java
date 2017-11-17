@@ -71,7 +71,7 @@ public class MCRSolrInputDocumentGenerator {
                     continue;
                 }
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("adding " + field.getName() + "=" + field.getValue());
+                    LOGGER.debug("adding {}={}", field.getName(), field.getValue());
                 }
                 duplicateFilter.add(field);
                 doc.addField(field.getName(), field.getValue());
@@ -115,7 +115,7 @@ public class MCRSolrInputDocumentGenerator {
                 continue;
             }
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("adding " + field.getName() + "=" + field.getValue());
+                LOGGER.debug("adding {}={}", field.getName(), field.getValue());
             }
             duplicateFilter.add(field);
             doc.addField(field.getName(), field.getValue());

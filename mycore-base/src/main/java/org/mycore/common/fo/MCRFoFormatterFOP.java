@@ -92,7 +92,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                 content = MCRSourceContent.getInstance(uri.toString());
                 return new Resource(uri.getScheme(), content.getInputStream());
             } catch (TransformerException e) {
-                LOGGER.error("Error while resolving uri: " + uri);
+                LOGGER.error("Error while resolving uri: {}", uri);
             }
 
             return null;
@@ -118,9 +118,9 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                     // FIXME Workaround to get hyphenation work in FOP.
                     // FOP should use "hyphenation-base" to get base URI for patterns 
                     Optional<Configuration[]> hyphPat = Optional.ofNullable(cfg.getChildren("hyphenation-pattern"));
-                    if (hyphPat.isPresent()) {
+                    hyphPat.ifPresent(configurations -> {
                         Map<String, String> hyphPatMap = new HashMap<>();
-                        Arrays.stream(hyphPat.get()).forEach(c -> {
+                        Arrays.stream(configurations).forEach(c -> {
                             try {
                                 String lang = c.getAttribute("lang");
                                 String file = c.getValue();
@@ -132,7 +132,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                             }
                         });
                         fopFactoryBuilder.setHyphPatNames(hyphPatMap);
-                    }
+                    });
 
                 } catch (ConfigurationException | SAXException | IOException e) {
                     LOGGER.error("Exception while loading FOP configuration from {}.", fo_cfg, e);

@@ -104,7 +104,7 @@ public class MCRLayoutUtilities {
 
         private void parseDocument() throws JDOMException, IOException {
             lastModified = getLastModified();
-            LOGGER.info("Parsing: " + docURL);
+            LOGGER.info("Parsing: {}", docURL);
             parsedDocument = new SAXBuilder(XMLReaders.NONVALIDATING).build(docURL);
         }
 
@@ -136,7 +136,7 @@ public class MCRLayoutUtilities {
             public ListenableFuture<DocumentHolder> reload(final String key, DocumentHolder oldValue) throws Exception {
                 URL url = SERVLET_CONTEXT.getResource(key);
                 if (oldValue.isValid(url)) {
-                    LOGGER.info("Keeping " + url + " in cache");
+                    LOGGER.info("Keeping {} in cache", url);
                     return Futures.immediateFuture(oldValue);
                 }
                 ListenableFutureTask<DocumentHolder> task = ListenableFutureTask.create(() -> load(key));
@@ -166,8 +166,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALL2BLOCKER_TRUE, blockerWebpageID);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID ="
-                + blockerWebpageID + ") => " + access + ": took " + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= {} (with blockerWebpageID ={}) => {}: took {} msec.",
+                webpageID, blockerWebpageID, access, getDuration(startTime));
             return access;
         } else {
             return true;
@@ -187,8 +187,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALLTRUE);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took "
-                + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= {} => {}: took {} msec.", webpageID, access,
+                getDuration(startTime));
             return access;
         } else {
             return true;
@@ -204,7 +204,7 @@ public class MCRLayoutUtilities {
      *         labelChildOfChild"
      */
     public static String getAncestorLabels(Element item) {
-        String label = "";
+        StringBuilder label = new StringBuilder();
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage().trim();
         XPathExpression<Element> xpath;
         Element ic = null;
@@ -218,14 +218,14 @@ public class MCRLayoutUtilities {
                 Filters.element());
             labelEl = xpath.evaluateFirst(getNavi());
             if (labelEl != null) {
-                if (label.equals("")) {
-                    label = labelEl.getTextTrim();
+                if (label.toString().equals("")) {
+                    label = new StringBuilder(labelEl.getTextTrim());
                 } else {
-                    label = labelEl.getTextTrim() + " > " + label;
+                    label.insert(0, labelEl.getTextTrim() + " > ");
                 }
             }
         }
-        return label;
+        return label.toString();
     }
 
     /**
@@ -425,7 +425,7 @@ public class MCRLayoutUtilities {
                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 transformer.transform(new DOMSource(personalNavi), new StreamResult(bout));
-                LOGGER.debug("personal navigation: " + bout.toString(encoding));
+                LOGGER.debug("personal navigation: {}", bout.toString(encoding));
             } catch (IllegalArgumentException | TransformerFactoryConfigurationError | TransformerException
                 | UnsupportedEncodingException e) {
                 LOGGER.warn("Error while getting debug information.", e);

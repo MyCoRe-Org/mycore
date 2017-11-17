@@ -101,13 +101,13 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
             throw new MCRConfigurationException(msg, e);
         }
         try {
-            LOGGER.info("Versioning metadata store " + type + " repository URL: " + repositoryURI);
+            LOGGER.info("Versioning metadata store {} repository URL: {}", type, repositoryURI);
             repURL = SVNURL.create(repositoryURI.getScheme(), repositoryURI.getUserInfo(), repositoryURI.getHost(),
                 repositoryURI.getPort(), repositoryURI.getPath(), true);
-            LOGGER.info("repURL: " + repURL);
+            LOGGER.info("repURL: {}", repURL);
             File dir = new File(repURL.getPath());
             if (!dir.exists() || (dir.isDirectory() && dir.list().length == 0)) {
-                LOGGER.info("Repository does not exist, creating new SVN repository at " + repositoryURI);
+                LOGGER.info("Repository does not exist, creating new SVN repository at {}", repositoryURI);
                 repURL = SVNRepositoryFactory.createLocalRepository(dir, true, false);
             }
         } catch (SVNException ex) {
@@ -259,9 +259,9 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
             editor.closeDir();
 
             info = editor.closeEdit();
-            LOGGER.info("SVN commit of delete finished, new revision " + info.getNewRevision());
+            LOGGER.info("SVN commit of delete finished, new revision {}", info.getNewRevision());
         } catch (SVNException e) {
-            LOGGER.error("Error while deleting " + id + " in SVN ", e);
+            LOGGER.error("Error while deleting {} in SVN ", id, e);
         } finally {
             super.delete(id);
         }

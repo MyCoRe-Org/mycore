@@ -144,7 +144,7 @@ public class MediaInfo {
             Handle = MediaInfoDLL_Internal.INSTANCE.New();
         } catch (Throwable e) {
             if (e != null)
-                LOGGER.error("Error loading MediaInfo library: " + e.getMessage());
+                LOGGER.error("Error loading MediaInfo library: {}", e.getMessage());
             if (!Platform.isWindows() && !Platform.isMac()) {
                 LOGGER.error("Make sure you have libmediainfo and libzen installed");
             }

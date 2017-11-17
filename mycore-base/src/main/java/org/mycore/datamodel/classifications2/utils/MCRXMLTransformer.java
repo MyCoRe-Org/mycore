@@ -91,7 +91,7 @@ public class MCRXMLTransformer {
 
     public static Set<MCRLabel> getLabels(List<Element> elements)
         throws NullPointerException, IllegalArgumentException {
-        Set<MCRLabel> labels = new HashSet<>(elements.size(), 1l);
+        Set<MCRLabel> labels = new HashSet<>(elements.size(), 1L);
         for (Element labelElement : elements) {
             MCRLabel label = getLabel(labelElement);
             labels.add(label);

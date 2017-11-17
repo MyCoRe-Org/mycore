@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -151,7 +152,7 @@ public class MCRTopologicalSort {
             System.out.println("An error occured!");
         } else {
             for (int anOrder : order) {
-                System.out.print(order + " <- ");
+                System.out.print(Arrays.toString(order) + " <- ");
             }
         }
         System.out.println();
@@ -393,7 +394,7 @@ public class MCRTopologicalSort {
         }
         // if graph has edges then return error (graph has at least one cycle)
         if (!edgeSources.isEmpty()) {
-            LOGGER.error("The input contained circular dependencies: \n" + toString());
+            LOGGER.error("The input contained circular dependencies: \n{}", toString());
             return null;
             // else return L (a topologically sorted order)
         } else {
@@ -408,7 +409,7 @@ public class MCRTopologicalSort {
         StringBuilder result = new StringBuilder("[");
         for (Integer to : edgeSources.keySet()) {
             for (Integer from : edgeSources.get(to)) {
-                result.append("[" + nodes.get(from) + "->" + nodes.get(to) + "]");
+                result.append("[").append(nodes.get(from)).append("->").append(nodes.get(to)).append("]");
             }
         }
         result.append("]");

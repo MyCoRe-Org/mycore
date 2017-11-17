@@ -420,7 +420,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             validate();
             return true;
         } catch (MCRException exc) {
-            LOGGER.warn("The '" + getTag() + "' is invalid.", exc);
+            LOGGER.warn("The '{}' is invalid.", getTag(), exc);
         }
         return false;
     }
@@ -476,11 +476,11 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      */
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("ClassName          = " + getClassName());
-            LOGGER.debug("Tag                = " + tag);
-            LOGGER.debug("Heritable          = " + String.valueOf(heritable));
-            LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
-            LOGGER.debug("Elements           = " + String.valueOf(list.size()));
+            LOGGER.debug("ClassName          = {}", getClassName());
+            LOGGER.debug("Tag                = {}", tag);
+            LOGGER.debug("Heritable          = {}", String.valueOf(heritable));
+            LOGGER.debug("NotInherit         = {}", String.valueOf(notinherit));
+            LOGGER.debug("Elements           = {}", String.valueOf(list.size()));
             LOGGER.debug(" ");
             for (MCRMetaInterface aList : list) {
                 aList.debug();

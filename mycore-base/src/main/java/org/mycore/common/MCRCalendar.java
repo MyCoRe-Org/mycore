@@ -130,8 +130,8 @@ public class MCRCalendar {
         throws MCRException {
         Calendar out = null;
         // check date_string
-        LOGGER.debug("Input of getHistoryDateAsCalendar: " + date_string + "  " + calendar_string + "  "
-            + Boolean.toString(last));
+        LOGGER.debug("Input of getHistoryDateAsCalendar: {}  {}  {}", date_string, calendar_string,
+            Boolean.toString(last));
         if (date_string == null || date_string.trim().length() == 0) {
             throw new MCRException("The ancient date string is null or empty");
         }
@@ -189,7 +189,7 @@ public class MCRCalendar {
         if (calendar_string.equals(TAG_HEBREW)) {
             out = getCalendarFromHebrewDate(date_string, last);
         }
-        LOGGER.debug("Output of getHistoryDateAsCalendar: " + getCalendarDateToFormattedString(out));
+        LOGGER.debug("Output of getHistoryDateAsCalendar: {}", getCalendarDateToFormattedString(out));
         return out;
     }
 
@@ -927,14 +927,19 @@ public class MCRCalendar {
                 }
             }
 
-            if (syear.substring(0, 1).equals("H")) {
-                era = 235;
-            } else if (syear.substring(0, 1).equals("S")) {
-                era = 234;
-            } else if (syear.substring(0, 1).equals("T")) {
-                era = 233;
-            } else if (syear.substring(0, 1).equals("M")) {
-                era = 232;
+            switch (syear.substring(0, 1)) {
+                case "H":
+                    era = 235;
+                    break;
+                case "S":
+                    era = 234;
+                    break;
+                case "T":
+                    era = 233;
+                    break;
+                case "M":
+                    era = 232;
+                    break;
             }
             year = Integer.parseInt(syear.substring(1).trim());
             // test of the monthly

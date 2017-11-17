@@ -73,10 +73,10 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
     public void onError(Session session, Throwable error) {
         if (error instanceof SocketTimeoutException) {
             this.close(session);
-            LOGGER.warn("Websocket error " + session.getId() + ": websocket timeout");
+            LOGGER.warn("Websocket error {}: websocket timeout", session.getId());
             return;
         }
-        LOGGER.error("Websocket error " + session.getId(), error);
+        LOGGER.error("Websocket error {}", session.getId(), error);
     }
 
     @OnClose
@@ -199,8 +199,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
                 try {
                     this.session.close(new CloseReason(CloseCodes.GOING_AWAY, "client disconnected"));
                 } catch (IOException ioExc) {
-                    LOGGER.error("Websocket error " + session.getId() + ": Unable to close websocket connection",
-                        ioExc);
+                    LOGGER.error("Websocket error {}: Unable to close websocket connection", session.getId(), ioExc);
                 }
                 return true;
             }

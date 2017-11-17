@@ -237,7 +237,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
     public void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Category            = " + category);
+            LOGGER.debug("Category            = {}", category);
             LOGGER.debug(" ");
         }
     }

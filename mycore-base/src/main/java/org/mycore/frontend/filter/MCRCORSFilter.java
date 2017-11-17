@@ -45,7 +45,7 @@ public class MCRCORSFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         String filterName = filterConfig.getInitParameter(CORS_FILTER_NAME);
         if (filterName != null) {
-            LOGGER.info("initializing " + MCRCORSFilter.class.getSimpleName());
+            LOGGER.info("initializing {}", MCRCORSFilter.class.getSimpleName());
             LOGGER.info(String.format(Locale.ROOT, "%s is %s", CORS_FILTER_NAME, filterName));
             String propertyName = String.format(Locale.ROOT, "%s.%s", CONFIGURATION_PREFIX, filterName);
             String allowOriginValue = MCRConfiguration.instance().getString(propertyName);
@@ -70,7 +70,7 @@ public class MCRCORSFilter implements Filter {
 
     @Override
     public void destroy() {
-        LOGGER.info("destroying " + MCRCORSFilter.class.getSimpleName());
+        LOGGER.info("destroying {}", MCRCORSFilter.class.getSimpleName());
     }
 
 }

@@ -35,8 +35,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
                 //                    entry.setMcrRevision(MCRCoreVersion.getRevision());
                 entry.setMcrVersion(MCRCoreVersion.getVersion());
                 entry.setMycoreID(obj.getId().toString());
-                LOGGER.info(
-                    "Add PI : " + entry.getIdentifier() + " with service " + entry.getService() + " to database!");
+                LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
                 MCRHIBConnection.instance().getSession().save(entry);
             });
 

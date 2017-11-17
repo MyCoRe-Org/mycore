@@ -90,7 +90,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             attr = "";
         }
         EntityManager entityMananger = MCREntityManagerProvider.getCurrentEntityManager();
-        LOGGER.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
+        LOGGER.debug("Inserting {}/{}/{} into database MCRLINKHREF", from, to, type);
 
         MCRLINKHREFPK key = getKey(from, to, type);
         MCRLINKHREF linkHref = entityMananger.find(MCRLINKHREF.class, key);
@@ -135,7 +135,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         if (type != null && (type = type.trim()).length() > 0) {
             sb.append(" and MCRTYPE = '").append(type).append("'");
         }
-        LOGGER.debug("Deleting " + from + " from database MCRLINKHREF");
+        LOGGER.debug("Deleting {} from database MCRLINKHREF", from);
         Session session = getSession();
         for (MCRLINKHREF mcrlinkhref : session.createQuery(sb.toString(), MCRLINKHREF.class).getResultList()) {
             session.delete(mcrlinkhref);

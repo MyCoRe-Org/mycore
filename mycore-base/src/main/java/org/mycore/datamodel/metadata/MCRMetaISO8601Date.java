@@ -218,10 +218,10 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     public void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Date=" + (isoDate != null ? isoDate.getISOString() : "null"));
+            LOGGER.debug("Date={}", isoDate != null ? isoDate.getISOString() : "null");
             if (isoDate != null) {
                 MCRISO8601Format isoFormat = isoDate.getIsoFormat();
-                LOGGER.debug("Format=" + isoFormat);
+                LOGGER.debug("Format={}", isoFormat);
             }
         }
     }

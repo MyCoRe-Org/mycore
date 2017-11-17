@@ -50,13 +50,13 @@ public class MCRDOICommands {
 
         URI uri = dataciteClient.resolveDOI(doi);
         if (!uri.toString().startsWith(registrationService.getRegisterURL())) {
-            LOGGER.info("DOI/URL is not from this application: " + doi.asString() + "/" + uri);
+            LOGGER.info("DOI/URL is not from this application: {}/{}", doi.asString(), uri);
             return;
         }
 
         MCRObjectID objectID = getObjectID(uri);
         if (!MCRMetadataManager.exists(objectID)) {
-            LOGGER.info("Could not find Object : " + objectID);
+            LOGGER.info("Could not find Object : {}", objectID);
             return;
         }
 
@@ -65,7 +65,7 @@ public class MCRDOICommands {
             .getMetadataManager();
 
         if (!registrationService.isRegistered(objectID, doiString)) {
-            LOGGER.info(objectID + " is not found in PI-Database. Insert it..");
+            LOGGER.info("{} is not found in PI-Database. Insert it..", objectID);
             registrationService.insertIdentifierToDatabase(mcrObject, "", doi);
         }
 
@@ -95,11 +95,11 @@ public class MCRDOICommands {
                     URI uri = dataciteClient.resolveDOI(doi);
 
                     if (uri.toString().startsWith(registrationService.getRegisterURL())) {
-                        LOGGER.info("Checking DOI: " + doi.asString());
+                        LOGGER.info("Checking DOI: {}", doi.asString());
                         MCRObjectID objectID = getObjectID(uri);
                         if (MCRMetadataManager.exists(objectID)) {
                             if (!registrationService.isRegistered(objectID, "")) {
-                                LOGGER.info("DOI is not registered in MyCoRe. Add to Database: " + doi.asString());
+                                LOGGER.info("DOI is not registered in MyCoRe. Add to Database: {}", doi.asString());
                                 MCRPI databaseEntry = new MCRPI(doi.asString(), registrationService.getType(),
                                     objectID.toString(), "", serviceID, new Date());
                                 MCRHIBConnection.instance().getSession().save(databaseEntry);
@@ -110,13 +110,13 @@ public class MCRDOICommands {
                             List<Map.Entry<String, URI>> entryList = registrationService.getMediaList(obj);
                             dataciteClient.setMediaList(doi, entryList);
                         } else {
-                            LOGGER.info("Could not find Object : " + objectID);
+                            LOGGER.info("Could not find Object : {}", objectID);
                         }
                     } else {
-                        LOGGER.info("DOI/URL is not from this application: " + doi.asString() + "/" + uri);
+                        LOGGER.info("DOI/URL is not from this application: {}/{}", doi.asString(), uri);
                     }
                 } catch (MCRPersistentIdentifierException e) {
-                    LOGGER.error("Error occurred for DOI: " + doi, e);
+                    LOGGER.error("Error occurred for DOI: {}", doi, e);
                 }
             });
         } catch (MCRPersistentIdentifierException e) {
@@ -171,7 +171,7 @@ public class MCRDOICommands {
 
             if (uri.toString().startsWith(registrationService.getRegisterURL())) {
                 String s = uri.toString();
-                LOGGER.info("Checking DOI: " + doi.asString() + " / " + s);
+                LOGGER.info("Checking DOI: {} / {}", doi.asString(), s);
                 String idString = s.substring(s.lastIndexOf("/") + 1);
 
                 MCRObjectID objectID = MCRObjectID.getInstance(idString);
@@ -183,7 +183,7 @@ public class MCRDOICommands {
                     try {
                         oldMediaList = dataciteClient.getMediaList(doi);
                     } catch (MCRIdentifierUnresolvableException e) {
-                        LOGGER.warn(doi + " had no media list!");
+                        LOGGER.warn("{} had no media list!", doi);
                         oldMediaList = new ArrayList<>();
                     }
 
@@ -205,16 +205,15 @@ public class MCRDOICommands {
                     });
 
                     dataciteClient.setMediaList(doi, newHashMap.entrySet().stream().collect(Collectors.toList()));
-                    LOGGER.info("Updated media-list of " + doiString);
+                    LOGGER.info("Updated media-list of {}", doiString);
                 } else {
-                    LOGGER.info("Object " + objectID + " does not exist in this application!");
+                    LOGGER.info("Object {} does not exist in this application!", objectID);
                 }
             } else {
-                LOGGER.info("DOI is not from this application: (" + uri + ") "
-                    + registrationService.getRegisterURL());
+                LOGGER.info("DOI is not from this application: ({}) {}", uri, registrationService.getRegisterURL());
             }
         } catch (MCRPersistentIdentifierException e) {
-            LOGGER.error("Error occurred for DOI: " + doi, e);
+            LOGGER.error("Error occurred for DOI: {}", doi, e);
         }
     }
 }

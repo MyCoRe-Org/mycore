@@ -181,7 +181,7 @@ public class MCRLoginServlet extends MCRServlet {
                 //user logged in
                 // MCR-1154
                 req.changeSessionId();
-                LOGGER.info("user " + uid + " logged in successfully.");
+                LOGGER.info("user {} logged in successfully.", uid);
                 res.sendRedirect(res.encodeRedirectURL(getReturnURL(req)));
                 return;
             }
@@ -281,7 +281,7 @@ public class MCRLoginServlet extends MCRServlet {
             String rest = url.substring(MCRFrontendUtil.getBaseURL().length());
             url = MCRFrontendUtil.getBaseURL() + encodePath(rest);
         }
-        LOGGER.info("Storing redirect URL to session: " + url);
+        LOGGER.info("Storing redirect URL to session: {}", url);
         MCRSessionMgr.getCurrentSession().put(LOGIN_REDIRECT_URL_KEY, url);
     }
 
@@ -293,12 +293,20 @@ public class MCRLoginServlet extends MCRServlet {
 
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            if (token.equals(" "))
-                result.append("%20");
-            else if (token.equals("/") || token.equals("?") || token.equals("&") || token.equals("="))
-                result.append(token);
-            else
-                result.append(java.net.URLEncoder.encode(token, "UTF-8"));
+            switch (token) {
+                case " ":
+                    result.append("%20");
+                    break;
+                case "/":
+                case "?":
+                case "&":
+                case "=":
+                    result.append(token);
+                    break;
+                default:
+                    result.append(java.net.URLEncoder.encode(token, "UTF-8"));
+                    break;
+            }
         }
 
         return result.toString();
@@ -313,7 +321,7 @@ public class MCRLoginServlet extends MCRServlet {
             LOGGER.warn("Could not get redirect URL from session.");
             url = MCRFrontendUtil.getBaseURL();
         }
-        LOGGER.info("Redirecting to url: " + url);
+        LOGGER.info("Redirecting to url: {}", url);
         res.sendRedirect(res.encodeRedirectURL(url));
     }
 }

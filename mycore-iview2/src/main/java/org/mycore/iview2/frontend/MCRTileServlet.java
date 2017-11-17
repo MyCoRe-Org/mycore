@@ -88,7 +88,7 @@ public class MCRTileServlet extends HttpServlet {
                 resp.setContentType("image/jpeg");
             }
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Extracting " + tilePath + " size " + fileAttributes.size());
+                LOGGER.debug("Extracting {} size {}", tilePath, fileAttributes.size());
             }
             //size of a tile or imageinfo.xml file is always smaller than Integer.MAX_VALUE
             resp.setContentLength((int) fileAttributes.size());
@@ -132,7 +132,7 @@ public class MCRTileServlet extends HttpServlet {
      * @return a {@link TileInfo} instance for <code>pathInfo</code>
      */
     static TileInfo getTileInfo(final String pathInfo) {
-        LOGGER.debug("Starting MCRTileServlet: " + pathInfo);
+        LOGGER.debug("Starting MCRTileServlet: {}", pathInfo);
         String path = pathInfo.startsWith("/") ? pathInfo.substring(1) : pathInfo;
         final String derivate = path.substring(0, path.indexOf('/'));
         String imagePath = path.substring(derivate.length());

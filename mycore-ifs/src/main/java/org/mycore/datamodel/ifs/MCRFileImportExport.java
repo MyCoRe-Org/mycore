@@ -65,7 +65,7 @@ public class MCRFileImportExport {
                 dir.delete();
             } // Try to delete all content stored so far
             catch (Exception ignored) {
-                LOGGER.error("Exception while deleting MCRDirectory for derivate: " + ownerID, ignored);
+                LOGGER.error("Exception while deleting MCRDirectory for derivate: {}", ownerID, ignored);
             }
             if (ex instanceof RuntimeException) {
                 throw (RuntimeException) ex;

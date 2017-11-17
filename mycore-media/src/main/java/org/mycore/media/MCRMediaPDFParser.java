@@ -120,7 +120,7 @@ public class MCRMediaPDFParser extends MCRMediaParser {
 
         MCRPDFObject media = new MCRPDFObject();
 
-        LOGGER.info("parse " + file.getName() + "...");
+        LOGGER.info("parse {}...", file.getName());
 
         try (PDDocument pdf = PDDocument.load(file)) {
             media.fileName = file.getName();

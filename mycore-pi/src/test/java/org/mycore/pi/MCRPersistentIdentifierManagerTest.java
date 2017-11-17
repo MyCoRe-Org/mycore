@@ -104,11 +104,9 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
 
-        long numOfUnregisteredPI = MCRPersistentIdentifierManager
-            .getInstance()
-            .getUnregisteredIdentifiers("Unregistered")
-            .stream()
-            .count();
+        long numOfUnregisteredPI = (long) MCRPersistentIdentifierManager.getInstance()
+                                                                        .getUnregisteredIdentifiers("Unregistered")
+                                                                        .size();
 
         Assert.assertEquals("Wrong number of unregistered PI: ", 2, numOfUnregisteredPI);
     }

@@ -82,7 +82,7 @@ public class MCRURNResolver extends MCRServlet {
             return;
         }
 
-        LOGGER.info("Resolving URN " + urn);
+        LOGGER.info("Resolving URN {}", urn);
 
         String docID = MCRURNManager.getDocumentIDforURN(urn);
 

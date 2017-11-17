@@ -33,6 +33,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -283,7 +284,7 @@ public class MCRJSONWebTokenUtil {
         String submittedUser = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(oldJWT);
         JWK clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(oldJWT);
         if (submittedUser != null && clientPubKey != null) {
-            return MCRJSONWebTokenUtil.createJWT(submittedUser, Arrays.asList("restapi"), MCRFrontendUtil.getBaseURL(),
+            return MCRJSONWebTokenUtil.createJWT(submittedUser, Collections.singletonList("restapi"), MCRFrontendUtil.getBaseURL(),
                 clientPubKey);
         }
         return null;

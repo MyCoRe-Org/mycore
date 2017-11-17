@@ -62,7 +62,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         //if any metadata changed we need to update children
         boolean metadataChanged = !MCRXMLHelper.deepEqual(md.createXML(), mdold.createXML());
         if (!metadataChanged) {
-            LOGGER.info("Metadata did not change on update of " + newVersion.getId());
+            LOGGER.info("Metadata did not change on update of {}", newVersion.getId());
         }
         return metadataChanged;
     }
@@ -79,11 +79,11 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
             for (MCRMetaLinkID childIdRef : children) {
                 MCRObjectID childId = childIdRef.getXLinkHrefID();
                 if (MCRMODSWrapper.isSupported(childId)) {
-                    LOGGER.info("Update: " + childIdRef);
+                    LOGGER.info("Update: {}", childIdRef);
                     MCRObject child = MCRMetadataManager.retrieveMCRObject(childId);
                     MCRMODSWrapper childWrapper = new MCRMODSWrapper(child);
                     inheritToChild(holderWrapper, childWrapper);
-                    LOGGER.info("Saving: " + childIdRef);
+                    LOGGER.info("Saving: {}", childIdRef);
                     try {
                         MCRMetadataManager.update(child);
                     } catch (MCRPersistenceException | MCRAccessException e) {
@@ -97,7 +97,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         for (String rId : recipientIds) {
             MCRObjectID recipientId = MCRObjectID.getInstance(rId);
             if (MCRMODSWrapper.isSupported(recipientId)) {
-                LOGGER.info("distribute metadata to " + rId);
+                LOGGER.info("distribute metadata to {}", rId);
                 MCRObject recipient = MCRMetadataManager.retrieveMCRObject(recipientId);
                 MCRMODSWrapper recipientWrapper = new MCRMODSWrapper(recipient);
                 for (Element relatedItem : recipientWrapper.getLinkedRelatedItems()) {
@@ -108,7 +108,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                             MCRConstants.MODS_NAMESPACE).negate();
                         relatedItem.removeContent(sharedMetadata);
                         relatedItem.addContent(holderWrapper.getMODS().cloneContent());
-                        LOGGER.info("Saving: " + recipientId);
+                        LOGGER.info("Saving: {}", recipientId);
                         try {
                             MCRMetadataManager.update(recipient);
                         } catch (MCRPersistenceException | MCRAccessException e) {
@@ -137,7 +137,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         for (Element relatedItem : childWrapper.getLinkedRelatedItems()) {
             String type = relatedItem.getAttributeValue("type");
             String holderId = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-            LOGGER.info("receive metadata from " + type + " document " + holderId);
+            LOGGER.info("receive metadata from {} document {}", type, holderId);
             if ((holderId == null || parentID != null && parentID.toString().equals(holderId))
                 && MCRMODSRelationshipType.host.name().equals(type)) {
                 //already received metadata from parent;

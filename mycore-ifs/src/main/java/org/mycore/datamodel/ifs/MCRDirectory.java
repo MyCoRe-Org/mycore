@@ -273,14 +273,15 @@ public class MCRDirectory extends MCRFilesystemNode {
     public MCRFilesystemNode getChild(String name) {
         ensureNotDeleted();
 
-        if (name.equals(".")) {
-            return this;
-        } else if (name.equals("..")) {
-            return hasParent() ? getParent() : null;
-        } else {
-            return Optional.ofNullable(children)
-                .map(m -> m.get(name))
-                .orElseGet(() -> manager.retrieveChild(ID, name));
+        switch (name) {
+            case ".":
+                return this;
+            case "..":
+                return hasParent() ? getParent() : null;
+            default:
+                return Optional.ofNullable(children)
+                               .map(m -> m.get(name))
+                               .orElseGet(() -> manager.retrieveChild(ID, name));
         }
     }
 
@@ -519,13 +520,10 @@ public class MCRDirectory extends MCRFilesystemNode {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(super.toString());
-        sb.append("NumChildDirectoriesHere  = ").append(numChildDirsHere);
-        sb.append("NumChildFilesHere        = ").append(numChildFilesHere);
-        sb.append("NumChildDirectoriesTotal = ").append(numChildDirsTotal);
-        sb.append("NumChildFilesTotal       = ").append(numChildFilesTotal);
+        String sb = super.toString() + "NumChildDirectoriesHere  = " + numChildDirsHere + "NumChildFilesHere        = "
+            + numChildFilesHere + "NumChildDirectoriesTotal = " + numChildDirsTotal + "NumChildFilesTotal       = "
+            + numChildFilesTotal;
 
-        return sb.toString();
+        return sb;
     }
 }

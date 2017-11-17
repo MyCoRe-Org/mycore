@@ -78,7 +78,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String, org.jdom2.Element)
      */
     public void addRule(String id, String permission, org.jdom2.Element rule, String description) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl addRule for ID " + id + " for permission " + permission);
+        LOGGER.debug("Execute MCRAccessBaseImpl addRule for ID {} for permission {}", id, permission);
     }
 
     /*
@@ -88,7 +88,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      org.jdom2.Element)
      */
     public void addRule(String permission, Element rule, String description) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl addRule for permission " + permission);
+        LOGGER.debug("Execute MCRAccessBaseImpl addRule for permission {}", permission);
     }
 
     /*
@@ -98,7 +98,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String)
      */
     public void removeRule(String id, String permission) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl removeRule for ID " + id + " for permission " + permission);
+        LOGGER.debug("Execute MCRAccessBaseImpl removeRule for ID {} for permission {}", id, permission);
     }
 
     /*
@@ -107,7 +107,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#removeRule(java.lang.String)
      */
     public void removeRule(String permission) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl removeRule for permission " + permission);
+        LOGGER.debug("Execute MCRAccessBaseImpl removeRule for permission {}", permission);
     }
 
     /*
@@ -116,7 +116,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#removeAllRules(java.lang.String)
      */
     public void removeAllRules(String id) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl removeAllRules for ID " + id);
+        LOGGER.debug("Execute MCRAccessBaseImpl removeAllRules for ID {}", id);
     }
 
     /*
@@ -127,7 +127,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      */
     public void updateRule(String id, String permission, org.jdom2.Element rule, String description)
         throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl updateRule for ID " + id + " for permission " + permission);
+        LOGGER.debug("Execute MCRAccessBaseImpl updateRule for ID {} for permission {}", id, permission);
     }
 
     /*
@@ -137,7 +137,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      org.jdom2.Element)
      */
     public void updateRule(String permission, Element rule, String description) throws MCRException {
-        LOGGER.debug("Execute MCRAccessBaseImpl updateRule for permission " + permission);
+        LOGGER.debug("Execute MCRAccessBaseImpl updateRule for permission {}", permission);
     }
 
     /*
@@ -147,7 +147,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String)
      */
     public boolean checkPermission(String id, String permission) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission);
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID {} for permission {}", id, permission);
         long start = System.currentTimeMillis();
         try {
             MCRAccessRule rule = getAccessRule(id, permission);
@@ -161,7 +161,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
             LOGGER.debug(validate ? "Current user has permission." : "Current user does not have permission.");
             return validate;
         } finally {
-            LOGGER.debug("Check " + permission + " on " + id + " took:" + (System.currentTimeMillis() - start));
+            LOGGER.debug("Check {} on {} took:{}", permission, id, System.currentTimeMillis() - start);
         }
     }
 
@@ -172,8 +172,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String, MCRUser)
      */
     public boolean checkPermission(String id, String permission, String userID) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission
-            + " for user" + userID);
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID {} for permission {} for user{}", id, permission,
+            userID);
         return true;
     }
 
@@ -183,7 +183,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String)
      */
     public boolean checkPermission(String permission) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission " + permission);
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission {}", permission);
         return true;
     }
 
@@ -193,7 +193,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String, MCRUser)
      */
     public boolean checkPermissionForUser(String permission, String userID) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission " + permission + " for user " + userID);
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission {} for user {}", permission, userID);
         return true;
     }
 
@@ -309,7 +309,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
     }
 
     public void createRule(String rule, String creator, String description) {
-        LOGGER.debug("Execute MCRAccessBaseImpl createRule with rule " + rule + " \n and description " + description);
+        LOGGER.debug("Execute MCRAccessBaseImpl createRule with rule {} \n and description {}", rule, description);
 
     }
 

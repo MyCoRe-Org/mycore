@@ -40,8 +40,8 @@ public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
         String derivate = pathTokens[0];
         String path = pathInfo.substring(derivate.length());
 
-        LOGGER.debug("Derivate : " + derivate);
-        LOGGER.debug("Path : " + path);
+        LOGGER.debug("Derivate : {}", derivate);
+        LOGGER.debug("Path : {}", path);
 
         MCRPath mcrPath = MCRPath.getPath(derivate, path);
         MCRContent pc = new MCRPathContent(mcrPath);

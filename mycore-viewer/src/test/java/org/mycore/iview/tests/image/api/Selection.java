@@ -78,8 +78,8 @@ public abstract class Selection {
             }
         }
 
-        LOGGER.debug("upper: " + upper);
-        LOGGER.debug("left: " + left);
+        LOGGER.debug("upper: {}", upper);
+        LOGGER.debug("left: {}", left);
 
         return new Position(left, upper);
     }
@@ -103,8 +103,8 @@ public abstract class Selection {
             }
         }
 
-        LOGGER.debug("lower: " + lower);
-        LOGGER.debug("right: " + right);
+        LOGGER.debug("lower: {}", lower);
+        LOGGER.debug("right: {}", right);
 
         return new Position(right, lower);
     }

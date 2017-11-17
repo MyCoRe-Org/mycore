@@ -115,7 +115,7 @@ public class MCRSolrPathDocumentFactory {
         ACCUMULATOR_LIST.forEach(accumulate);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("MCRFile " + input + " transformed to:\n" + doc);
+            LOGGER.debug("MCRFile {} transformed to:\n{}", input, doc);
         }
 
         return doc;

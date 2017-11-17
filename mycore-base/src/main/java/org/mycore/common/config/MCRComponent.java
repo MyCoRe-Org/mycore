@@ -98,16 +98,16 @@ public class MCRComponent implements Comparable<MCRComponent> {
         this.artifactId = artifactId;
         this.manifest = manifest;
         buildSortCriteria();
-        LOGGER.debug(artifactId + " is of type " + type + " and named " + getName() + ": " + jarFile);
+        LOGGER.debug("{} is of type {} and named {}: {}", artifactId, type, getName(), jarFile);
     }
 
     private void buildSortCriteria() {
         String priorityAtt = manifest.getMainAttributes().getValue(ATT_PRIORITY);
         if (priorityAtt == null) {
             priorityAtt = DEFAULT_PRIORITY;
-            LOGGER.debug(artifactId + " has DEFAULT priority " + priorityAtt);
+            LOGGER.debug("{} has DEFAULT priority {}", artifactId, priorityAtt);
         } else {
-            LOGGER.debug(artifactId + " has priority " + priorityAtt);
+            LOGGER.debug("{} has priority {}", artifactId, priorityAtt);
         }
         int priority = Integer.parseInt(priorityAtt);
         if (priority > 99 || priority < 0) {
@@ -137,7 +137,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
         String resourceName = resourceBase + filename;
         InputStream resourceStream = this.getClass().getClassLoader().getResourceAsStream(resourceName);
         if (resourceStream != null) {
-            LOGGER.info("Reading config resource: " + resourceName);
+            LOGGER.info("Reading config resource: {}", resourceName);
         }
         return resourceStream;
     }
@@ -154,7 +154,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             case module:
                 return "config/" + getName() + "/";
             default:
-                LOGGER.debug(getName() + ": there is no resource base for type " + type);
+                LOGGER.debug("{}: there is no resource base for type {}", getName(), type);
                 break;
         }
         return null;

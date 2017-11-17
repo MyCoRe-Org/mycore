@@ -36,7 +36,7 @@ import org.mycore.common.MCRException;
  */
 public class MCRDateConverter {
 
-    private static final Date CHECK_DATE = new Date(0l);
+    private static final Date CHECK_DATE = new Date(0L);
 
     private List<SimpleDateFormat> formats = new ArrayList<>();
 

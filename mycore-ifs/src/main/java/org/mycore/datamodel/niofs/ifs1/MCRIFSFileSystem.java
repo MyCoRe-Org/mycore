@@ -104,7 +104,7 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
             LogManager.getLogger(getClass()).warn("Catched run time exception while creating new root directory.", e);
             throw new FileSystemException(rootPath.toString(), null, e.getMessage());
         }
-        LogManager.getLogger(getClass()).info("Created root directory: " + rootPath);
+        LogManager.getLogger(getClass()).info("Created root directory: {}", rootPath);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
             LogManager.getLogger(getClass()).warn("Catched run time exception while removing root directory.", e);
             throw new FileSystemException(rootPath.toString(), null, e.getMessage());
         }
-        LogManager.getLogger(getClass()).info("Removed root directory: " + rootPath);
+        LogManager.getLogger(getClass()).info("Removed root directory: {}", rootPath);
     }
 
 }

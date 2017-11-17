@@ -64,7 +64,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
             return null;
 
         if (valueURI == null || valueURI.length() == 0) {
-            LOGGER.warn("Did find attribute authorityURI='" + authorityURI + "', but no valueURI");
+            LOGGER.warn("Did find attribute authorityURI='{}', but no valueURI", authorityURI);
             return null;
         }
         return new MCRAuthorityWithURI(authorityURI, valueURI);
@@ -121,7 +121,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
             try {
                 categId = valueURI.substring(authorityURI.length() + 1);
             } catch (RuntimeException e) {
-                LOGGER.warn("authorityURI:" + authorityURI + ", valueURI:" + valueURI);
+                LOGGER.warn("authorityURI:{}, valueURI:{}", authorityURI, valueURI);
                 throw e;
             }
             int internalStylePos = authorityURI.indexOf(CLASS_URI_PART);

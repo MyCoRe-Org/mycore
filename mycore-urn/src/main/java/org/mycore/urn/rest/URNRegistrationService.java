@@ -49,11 +49,11 @@ public class URNRegistrationService extends TimerTask implements Closeable {
     @Override
     public void run() {
         try {
-            LOGGER.debug("Currently there are a total of  " + MCRURNManager.getCount(false) + " unregistered urn");
+            LOGGER.debug("Currently there are a total of  {} unregistered urn", MCRURNManager.getCount(false));
 
             LOGGER.debug("Getting bunch of urn for registration at the DNB");
             List<MCRURN> list = getURNList();
-            LOGGER.debug("Found a total of " + list.size() + " urn");
+            LOGGER.debug("Found a total of {} urn", list.size());
 
             URNProcessor processor = new URNProcessor(server, epicurLiteProvider);
             for (MCRURN urn : list) {
@@ -71,6 +71,6 @@ public class URNRegistrationService extends TimerTask implements Closeable {
 
     @Override
     public void close() throws IOException {
-        LOGGER.info("Stopping " + getClass().getSimpleName());
+        LOGGER.info("Stopping {}", getClass().getSimpleName());
     }
 }

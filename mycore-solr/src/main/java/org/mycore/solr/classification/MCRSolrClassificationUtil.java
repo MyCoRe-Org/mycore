@@ -54,7 +54,7 @@ public abstract class MCRSolrClassificationUtil {
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         List<MCRCategoryID> rootCategoryIDs = categoryDAO.getRootCategoryIDs();
         for (MCRCategoryID rootID : rootCategoryIDs) {
-            LOGGER.info("rebuild classification '" + rootID + "'...");
+            LOGGER.info("rebuild classification '{}'...", rootID);
             MCRCategory rootCategory = categoryDAO.getCategory(rootID, -1);
             List<MCRCategory> categoryList = getDescendants(rootCategory);
             categoryList.add(rootCategory);
@@ -65,7 +65,7 @@ public abstract class MCRSolrClassificationUtil {
         MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
         Collection<String> linkTypes = linkService.getTypes();
         for (String linkType : linkTypes) {
-            LOGGER.info("rebuild '" + linkType + "' links...");
+            LOGGER.info("rebuild '{}' links...", linkType);
             bulkIndex(linkService.getLinks(linkType).stream()
                 .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
                     link.getObjectReference()))
@@ -87,7 +87,7 @@ public abstract class MCRSolrClassificationUtil {
         for (List<SolrInputDocument> part : partitionList) {
             try {
                 solrClient.add(part, 500);
-                LOGGER.info("Added " + (added += part.size()) + "/" + docNum + " documents");
+                LOGGER.info("Added {}/{} documents", added += part.size(), docNum);
             } catch (SolrServerException | IOException e) {
                 LOGGER.error("Unable to add classification documents.", e);
             }
@@ -177,7 +177,7 @@ public abstract class MCRSolrClassificationUtil {
             try {
                 solrClient.add(solrCategory.toSolrDocument());
             } catch (Exception exc) {
-                LOGGER.error("Unable to reindex " + category.getId(), exc);
+                LOGGER.error("Unable to reindex {}", category.getId(), exc);
             }
         }
         try {

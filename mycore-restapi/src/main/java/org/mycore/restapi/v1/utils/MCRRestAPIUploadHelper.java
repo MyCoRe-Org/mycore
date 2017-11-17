@@ -148,7 +148,7 @@ public class MCRRestAPIUploadHelper {
                 .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
 
         } catch (Exception e) {
-            LOGGER.error("Unable to Upload file: " + String.valueOf(fXML), e);
+            LOGGER.error("Unable to Upload file: {}", String.valueOf(fXML), e);
             throw new MCRRestAPIException(Status.BAD_REQUEST, new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
                 "Unable to Upload file: " + String.valueOf(fXML), e.getMessage()));
         } finally {
@@ -156,7 +156,7 @@ public class MCRRestAPIUploadHelper {
                 try {
                     Files.delete(fXML);
                 } catch (IOException e) {
-                    LOGGER.error("Unable to delete temporary workflow file: " + String.valueOf(fXML), e);
+                    LOGGER.error("Unable to delete temporary workflow file: {}", String.valueOf(fXML), e);
                 }
             }
         }
@@ -307,7 +307,7 @@ public class MCRRestAPIUploadHelper {
                                     new BufferedInputStream(uploadedInputStream))) {
                                     ZipEntry entry;
                                     while ((entry = zis.getNextEntry()) != null) {
-                                        LOGGER.debug("Unzipping: " + entry.getName());
+                                        LOGGER.debug("Unzipping: {}", entry.getName());
                                         java.nio.file.Path target = derDir.resolve(entry.getName());
                                         Files.createDirectories(target.getParent());
                                         Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
@@ -438,9 +438,6 @@ public class MCRRestAPIUploadHelper {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
         SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
-        SortedMap<String, String> parameter = new TreeMap<>();
-        parameter.put("mcrObjectID", pathParamMcrObjID);
-        parameter.put("mcrDerivateID", pathParamMcrDerID);
 
         String base64Signature = request.getHeader("X-MyCoRe-RestAPI-Signature");
         if (base64Signature == null) {

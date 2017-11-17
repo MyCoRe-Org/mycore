@@ -80,7 +80,7 @@ public class MCROAISearchManager {
                     String searchId = entry.getKey();
                     MCROAISearcher searcher = entry.getValue();
                     if ((searcher != null) && searcher.isExpired()) {
-                        LOGGER.info("Removing expired resumption token " + searchId);
+                        LOGGER.info("Removing expired resumption token {}", searchId);
                         resultMap.remove(searchId);
                     }
                 }

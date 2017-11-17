@@ -80,7 +80,7 @@ public class MCRErrorServlet extends HttpServlet {
             String msg = MessageFormat.format("Handling error {0} for request ''{1}'' message: {2}", statusCode,
                 requestURI, message);
             LOGGER.debug(msg, exception);
-            LOGGER.debug("Has current session: " + MCRSessionMgr.hasCurrentSession());
+            LOGGER.debug("Has current session: {}", MCRSessionMgr.hasCurrentSession());
         }
         if (acceptWebPage(req)) {
             try {
@@ -90,7 +90,7 @@ public class MCRErrorServlet extends HttpServlet {
                 resp.sendError(statusCode, message);
             }
         } else {
-            LOGGER.info("Client does not accept HTML pages: " + req.getHeader("Accept"));
+            LOGGER.info("Client does not accept HTML pages: {}", req.getHeader("Accept"));
             resp.sendError(statusCode, message);
         }
     }
@@ -249,11 +249,11 @@ public class MCRErrorServlet extends HttpServlet {
             }
         } else {
             if (request.getAttribute(requestAttr) != null) {
-                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"
-                    + request.getAttribute(requestAttr));
+                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n{}",
+                    request.getAttribute(requestAttr));
             } else {
-                LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n"
-                    + msg);
+                LOGGER.warn(
+                    "Could not send error page. Response allready commited. The following message was given:\n{}", msg);
             }
         }
     }

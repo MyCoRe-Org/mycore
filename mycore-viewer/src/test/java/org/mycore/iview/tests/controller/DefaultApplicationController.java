@@ -99,10 +99,10 @@ public class DefaultApplicationController extends ApplicationController {
                 String fileName = token[token.length - 1];
                 String destination = dest + "/" + fileName;
 
-                LOGGER.info("Downloading pdf file to " + destination);
+                LOGGER.info("Downloading pdf file to {}", destination);
                 IOUtils.copy(openStream, new FileOutputStream(destination));
             } else {
-                LOGGER.info("Downloading test files to : " + dest);
+                LOGGER.info("Downloading test files to : {}", dest);
                 byte[] bytes = IOUtils.toByteArray(openStream);
                 extractZip(dest, new ArrayList<>(), new ZipInputStream(new ByteArrayInputStream(bytes)));
             }
@@ -152,7 +152,7 @@ public class DefaultApplicationController extends ApplicationController {
         String path = null;
         path = MCRSeleniumTestBase.getBaseUrl(System.getProperty("BaseUrlPort")) + "/test-classes/testFiles/"
             + DefaultApplicationController.derivateHTMLMapping.get(testDerivate);
-        LOGGER.info("Open Viewer with path : " + path);
+        LOGGER.info("Open Viewer with path : {}", path);
         webdriver.navigate().to(path);
 
         WebDriverWait wait = new WebDriverWait(webdriver, 5000);

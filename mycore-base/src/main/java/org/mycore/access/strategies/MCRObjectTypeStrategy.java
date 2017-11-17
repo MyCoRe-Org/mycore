@@ -91,7 +91,7 @@ public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy 
             try {
                 rootID = MCRCategoryID.rootID(id);
             } catch (Exception e) {
-                LOGGER.debug("ID '" + id + "' is not a valid category id.");
+                LOGGER.debug("ID '{}' is not a valid category id.", id);
                 return null;
             }
             if (DAO.exist(rootID)) {

@@ -69,7 +69,7 @@ public class MCRTestJobAction extends MCRJobAction {
      */
     @Override
     public void execute() throws ExecutionException {
-        LOGGER.info("job num: " + job.getParameter("count"));
+        LOGGER.info("job num: {}", job.getParameter("count"));
         job.setParameter("done", "true");
     }
 

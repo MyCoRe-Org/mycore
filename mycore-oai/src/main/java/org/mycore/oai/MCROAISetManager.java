@@ -78,7 +78,7 @@ public class MCROAISetManager {
 
     protected String configPrefix;
 
-    protected Map<String, MCROAISetConfiguration<?, ?, ?>> setConfigurationMap;
+    protected final Map<String, MCROAISetConfiguration<?, ?, ?>> setConfigurationMap;
 
     /**
      * Time in milliseconds when the classification changed.
@@ -138,11 +138,12 @@ public class MCROAISetManager {
     }
 
     protected void updateURIs() {
-        this.setConfigurationMap = Collections.synchronizedMap(new HashMap<>());
-        getDefinedSetIds().stream()
+        Map<String, MCROAISolrSetConfiguration> newVersion = getDefinedSetIds().stream()
             .map(String::trim)
             .map(setId -> new MCROAISolrSetConfiguration(this.configPrefix, setId))
-            .forEach(c -> setConfigurationMap.put(c.getId(), c));
+            .collect(Collectors.toMap(c -> c.getId(), c -> c));
+        setConfigurationMap.entrySet().removeIf(c -> !newVersion.containsKey(c.getKey()));
+        setConfigurationMap.replaceAll((k,v) -> newVersion.get(k));
     }
 
     public List<String> getDefinedSetIds() {

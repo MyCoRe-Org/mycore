@@ -141,8 +141,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             long tStart = System.currentTimeMillis();
             try {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId() +
-                            "\" for indexing");
+                    LOGGER.debug("Solr: submitting data of \"{}\" for indexing", objectOrDerivate.getId());
                 }
                 MCRContent content = (MCRContent) evt.get("content");
                 if (content == null) {
@@ -153,11 +152,11 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                 indexHandler.setCommitWithin(1000);
                 MCRSolrIndexer.submitIndexHandler(indexHandler, MCRSolrIndexer.HIGH_PRIORITY);
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId()
-                        + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
+                    LOGGER.debug("Solr: submitting data of \"{}\" for indexing done in {}ms ", objectOrDerivate.getId(),
+                        System.currentTimeMillis() - tStart);
                 }
             } catch (Exception ex) {
-                LOGGER.error("Error creating transfer thread for object " + objectOrDerivate, ex);
+                LOGGER.error("Error creating transfer thread for object {}", objectOrDerivate, ex);
             }
         });
     }
@@ -176,7 +175,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                 MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
                     MCRSolrClientFactory.getSolrClient()), MCRSolrIndexer.HIGH_PRIORITY);
             } catch (Exception ex) {
-                LOGGER.error("Error creating transfer thread for file " + path, ex);
+                LOGGER.error("Error creating transfer thread for file {}", path, ex);
             }
         });
     }
@@ -188,7 +187,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             UpdateResponse updateResponse = MCRSolrIndexer.deleteById(file.toUri().toString());
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Deleted file " + file + ". Response:" + updateResponse);
+                LOGGER.debug("Deleted file {}. Response:{}", file, updateResponse);
             }
         });
     }

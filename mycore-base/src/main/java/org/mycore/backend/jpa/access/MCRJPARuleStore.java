@@ -101,7 +101,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
             hibrule.setDescription(rule.getDescription());
             session.saveOrUpdate(hibrule);
         } else {
-            LOGGER.error("rule with id '" + rule.getId() + "' can't be created, rule still exists.");
+            LOGGER.error("rule with id '{}' can't be created, rule still exists.", rule.getId());
         }
     }
 

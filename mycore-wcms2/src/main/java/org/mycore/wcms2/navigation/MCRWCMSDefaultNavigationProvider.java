@@ -77,7 +77,7 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         } else if (item instanceof MCRNavigationGroup) {
             type = WCMSType.group;
         } else {
-            LOGGER.warn("Unable to set type for item " + id);
+            LOGGER.warn("Unable to set type for item {}", id);
         }
         jsonItem.addProperty(JSON_WCMS_TYPE, type.name());
         if (href != null) {
@@ -112,7 +112,7 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         }
         MCRNavigationBaseItem item = getNavigationItem(hierarchyObject.get(JSON_WCMS_ID).getAsString(), items);
         if (item == null) {
-            LOGGER.warn("While saving navigation.xml. Item with id " + hierarchyObject.get(JSON_WCMS_ID) + " is null!");
+            LOGGER.warn("While saving navigation.xml. Item with id {} is null!", hierarchyObject.get(JSON_WCMS_ID));
             return null;
         }
 

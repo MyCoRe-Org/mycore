@@ -82,7 +82,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         MCRObjectID oid = object.getId();
         for (Element relatedItem : mods.getChildren("relatedItem", MCRConstants.MODS_NAMESPACE)) {
             String href = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-            LOGGER.info("Found related item in " + object.getId() + ", href=" + href);
+            LOGGER.info("Found related item in {}, href={}", object.getId(), href);
             //MCR-957: only create releated object if mycoreId
             MCRObjectID mcrIdCheck;
             try {
@@ -103,21 +103,21 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
                     }
 
                     href = relatedID.toString();
-                    LOGGER.info("Setting href of related item to " + href);
+                    LOGGER.info("Setting href of related item to {}", href);
                     relatedItem.setAttribute("href", href, MCRConstants.XLINK_NAMESPACE);
 
                     if (isHost(relatedItem)) {
-                        LOGGER.info("Setting " + href + " as parent of " + oid);
+                        LOGGER.info("Setting {} as parent of {}", href, oid);
                         object.getStructure().setParent(relatedID);
                     }
                 }
             } else if (isParentExists(relatedItem)) {
                 MCRObjectID relatedID = MCRObjectID.getInstance(href);
                 if (object.getStructure().getParentID() == null) {
-                    LOGGER.info("Setting " + href + " as parent of " + oid);
+                    LOGGER.info("Setting {} as parent of {}", href, oid);
                     object.getStructure().setParent(relatedID);
                 } else if (!object.getStructure().getParentID().equals(relatedID)) {
-                    LOGGER.info("Setting " + href + " as parent of " + oid);
+                    LOGGER.info("Setting {} as parent of {}", href, oid);
                     object.getStructure().setParent(relatedID);
                 }
             }
@@ -145,7 +145,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         Element mods = cloneRelatedItem(relatedItem);
         wrapper.setMODS(mods);
 
-        LOGGER.info("create object " + oid);
+        LOGGER.info("create object {}", oid);
         MCRMetadataManager.create(object);
         return oid;
     }

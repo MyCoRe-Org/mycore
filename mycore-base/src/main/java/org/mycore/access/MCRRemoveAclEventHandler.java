@@ -90,13 +90,13 @@ public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
             rulesize--;
         }
         long diff = System.currentTimeMillis() - start;
-        LOGGER.debug("event handled in " + diff);
+        LOGGER.debug("event handled in {}", diff);
     }
 
     private void handleDelete(MCRBase base) {
         long start = System.currentTimeMillis();
         MCRAccessManager.removeAllRules(base.getId());
         long diff = System.currentTimeMillis() - start;
-        LOGGER.debug("event handled in " + diff);
+        LOGGER.debug("event handled in {}", diff);
     }
 }

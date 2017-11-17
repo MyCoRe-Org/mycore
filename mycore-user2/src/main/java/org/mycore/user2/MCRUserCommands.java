@@ -33,6 +33,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -142,7 +143,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new MCRException("Can't create the superuser role.", e);
         }
 
-        LOGGER.info("The role " + srole + " is installed.");
+        LOGGER.info("The role {} is installed.", srole);
 
         // the superuser
         try {
@@ -156,7 +157,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         }
 
         LOGGER.info(MessageFormat.format("The user {0} with password {1} is installed.", suser, spasswd));
-        return Arrays.asList("change to user " + suser + " with " + spasswd);
+        return Collections.singletonList("change to user " + suser + " with " + spasswd);
     }
 
     /**
@@ -200,13 +201,13 @@ public class MCRUserCommands extends MCRAbstractCommands {
         help = "Imports a role from file, if that role does not exist",
         order = 90)
     public static void addRole(String fileName) throws SAXParseException, IOException {
-        LOGGER.info("Reading file " + fileName + " ...");
+        LOGGER.info("Reading file {} ...", fileName);
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
         MCRRole role = MCRRoleTransformer.buildMCRRole(doc.getRootElement());
         if (MCRRoleManager.getRole(role.getName()) == null) {
             MCRRoleManager.addRole(role);
         } else {
-            LOGGER.info("Role " + role.getName() + " does already exist.");
+            LOGGER.info("Role {} does already exist.", role.getName());
         }
     }
 
@@ -255,7 +256,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (inputFile == null) {
             return;
         }
-        LOGGER.info("Reading file " + inputFile.getAbsolutePath() + " ...");
+        LOGGER.info("Reading file {} ...", inputFile.getAbsolutePath());
 
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(inputFile));
         Element rootelm = doc.getRootElement();
@@ -329,10 +330,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
     public static void exportUserToFile(String userID, String filename) throws IOException {
         MCRUser user = MCRUserManager.getUser(userID);
         if (user.getSystemRoleIDs().isEmpty()) {
-            LOGGER.warn("User " + user.getUserID() + " has not any system roles.");
+            LOGGER.warn("User {} has not any system roles.", user.getUserID());
         }
         FileOutputStream outFile = new FileOutputStream(filename);
-        LOGGER.info("Writing to file " + filename + " ...");
+        LOGGER.info("Writing to file {} ...", filename);
         saveToXMLFile(user, outFile);
     }
 
@@ -373,7 +374,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         File[] listFiles = dir
             .listFiles(pathname -> pathname.isFile() && pathname.getName().endsWith(".xml"));
         if (listFiles.length == 0) {
-            LOGGER.warn("Did not find any user files in " + dir.getAbsolutePath());
+            LOGGER.warn("Did not find any user files in {}", dir.getAbsolutePath());
             return null;
         }
         Arrays.sort(listFiles);
@@ -480,14 +481,14 @@ public class MCRUserCommands extends MCRAbstractCommands {
      */
     private static File getCheckedFile(String filename) {
         if (!filename.endsWith(".xml")) {
-            LOGGER.warn(filename + " ignored, does not end with *.xml");
+            LOGGER.warn("{} ignored, does not end with *.xml", filename);
 
             return null;
         }
 
         File file = new File(filename);
         if (!file.isFile()) {
-            LOGGER.warn(filename + " ignored, is not a file.");
+            LOGGER.warn("{} ignored, is not a file.", filename);
 
             return null;
         }
@@ -526,7 +527,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (inputFile == null) {
             return null;
         }
-        LOGGER.info("Reading file " + inputFile.getAbsolutePath() + " ...");
+        LOGGER.info("Reading file {} ...", inputFile.getAbsolutePath());
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(inputFile));
         return MCRUserTransformer.buildMCRUser(doc.getRootElement());
     }

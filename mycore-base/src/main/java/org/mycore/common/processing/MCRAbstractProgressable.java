@@ -17,7 +17,7 @@ public class MCRAbstractProgressable implements MCRListenableProgressable {
 
     protected String progressText;
 
-    protected List<MCRProgressableListener> progressListener;
+    protected final List<MCRProgressableListener> progressListener;
 
     public MCRAbstractProgressable() {
         this.progress = null;

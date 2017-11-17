@@ -80,7 +80,7 @@ public class MCRIdentifierXSLUtils {
                         service.setAttribute("inscribed", "false");
                     }
                 } catch (MCRPersistentIdentifierException e1) {
-                    LOGGER.warn("Error happened while try to read PI from object: " + objectID, e1);
+                    LOGGER.warn("Error happened while try to read PI from object: {}", objectID, e1);
                     service.setAttribute("inscribed", "false");
                 }
 

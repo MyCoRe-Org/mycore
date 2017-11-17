@@ -141,7 +141,7 @@ public class MCRFile extends MCRStoredNode {
         cis.close();
         String md5 = cis.getMD5String();
         if (!md5.equals(data.getAttributeValue("md5"))) {
-            LOGGER.warn("Fixed MD5 of " + getPath() + " to " + md5);
+            LOGGER.warn("Fixed MD5 of {} to {}", getPath(), md5);
             data.setAttribute("md5", md5);
         }
     }

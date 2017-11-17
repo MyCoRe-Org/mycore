@@ -53,7 +53,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
     protected void think(MCRServletJob job) throws Exception {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setUserInformation(new ContainerUserInformation(session));
-        LOGGER.info("Logged in: " + session.getUserInformation().getUserID());
+        LOGGER.info("Logged in: {}", session.getUserInformation().getUserID());
     }
 
     /* (non-Javadoc)
@@ -100,7 +100,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
         }
 
         protected Optional<HttpServletRequest> getCurrentRequest() {
-            LogManager.getLogger(getClass()).debug("Getting request from session: " + session.getID());
+            LogManager.getLogger(getClass()).debug("Getting request from session: {}", session.getID());
             return session.getServletRequest();
         }
     }

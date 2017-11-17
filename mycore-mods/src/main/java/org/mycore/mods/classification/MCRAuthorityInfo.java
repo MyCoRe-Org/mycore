@@ -50,11 +50,11 @@ abstract class MCRAuthorityInfo {
      */
     public MCRCategoryID getCategoryID() {
         String key = toString();
-        LOGGER.debug("get categoryID for " + key);
+        LOGGER.debug("get categoryID for {}", key);
 
         Object categoryID = categoryIDbyAuthorityInfo.getIfUpToDate(key, DAO.getLastModified());
         if (categoryID == null) {
-            LOGGER.debug("lookup categoryID for " + key);
+            LOGGER.debug("lookup categoryID for {}", key);
             categoryID = lookupCategoryID();
             if (categoryID == null)
                 categoryID = NULL; // Indicate that no matching category found, null can not be cached directly

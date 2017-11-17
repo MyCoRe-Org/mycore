@@ -39,7 +39,7 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
 
     protected Map<String, Object> properties;
 
-    protected List<MCRProcessableStatusListener> statusListener;
+    protected final List<MCRProcessableStatusListener> statusListener;
 
     public MCRAbstractProcessable() {
         super();

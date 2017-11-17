@@ -49,7 +49,7 @@ public class MCRHttpsClient {
         try (CloseableHttpClient httpClient = getHttpsClient()) {
             return httpClient.execute(httpHead);
         } catch (IOException e) {
-            LOGGER.error("There is a problem or the connection was aborted for URL: " + url, e);
+            LOGGER.error("There is a problem or the connection was aborted for URL: {}", url, e);
         }
 
         return null;
@@ -76,11 +76,11 @@ public class MCRHttpsClient {
 
             return httpClient.execute(request);
         } catch (URISyntaxException e) {
-            LOGGER.error("Worng format for URL: " + url, e);
+            LOGGER.error("Worng format for URL: {}", url, e);
         } catch (ClientProtocolException e) {
-            LOGGER.error("There is a HTTP protocol error for URL: " + url, e);
+            LOGGER.error("There is a HTTP protocol error for URL: {}", url, e);
         } catch (IOException e) {
-            LOGGER.error("There is a problem or the connection was aborted for URL: " + url, e);
+            LOGGER.error("There is a problem or the connection was aborted for URL: {}", url, e);
         }
 
         return null;

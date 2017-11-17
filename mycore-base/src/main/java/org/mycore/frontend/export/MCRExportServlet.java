@@ -89,14 +89,14 @@ public class MCRExportServlet extends MCRServlet {
         if (basketID != null) {
             MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(basketID);
             collection.add(basket);
-            LOGGER.info("exporting basket " + basketID + " via " + req.getParameter("transformer"));
+            LOGGER.info("exporting basket {} via {}", basketID, req.getParameter("transformer"));
         }
 
         if (req.getParameter("uri") != null)
             for (String uri : req.getParameterValues("uri")) {
                 if (isAllowed(uri)) {
                     collection.add(uri);
-                    LOGGER.info("exporting " + uri + " via " + req.getParameter("transformer"));
+                    LOGGER.info("exporting {} via {}", uri, req.getParameter("transformer"));
                 }
             }
     }
@@ -107,7 +107,7 @@ public class MCRExportServlet extends MCRServlet {
     private boolean isAllowed(String uri) {
         for (String prefix : forbiddenURIs)
             if (uri.startsWith(prefix)) {
-                LOGGER.warn("URI " + uri + " is not allowed for security reasons");
+                LOGGER.warn("URI {} is not allowed for security reasons", uri);
                 return false;
             }
         return true;

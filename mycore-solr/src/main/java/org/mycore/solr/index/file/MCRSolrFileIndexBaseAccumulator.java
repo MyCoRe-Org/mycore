@@ -48,7 +48,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
             MCRObjectID mcrObjID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(mcrPath.getOwner()), 10,
                 TimeUnit.SECONDS);
             if (mcrObjID == null) {
-                LOGGER.warn("Could not determine MCRObject for file " + absolutePath);
+                LOGGER.warn("Could not determine MCRObject for file {}", absolutePath);
                 doc.setField("returnId", mcrPath.getOwner());
             } else {
                 doc.setField("returnId", mcrObjID.toString());
@@ -69,7 +69,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
                 doc.addField("fileCategory", category.toString());
             }
         } catch (ProviderMismatchException e) {
-            LOGGER.warn("Cannot build all fields as input is not an instance of MCRPath: " + input);
+            LOGGER.warn("Cannot build all fields as input is not an instance of MCRPath: {}", input);
         }
         doc.setField("objectType", "data_file");
         doc.setField("fileName", input.getFileName().toString());

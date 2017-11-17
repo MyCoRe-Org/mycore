@@ -56,7 +56,7 @@ public class MCRCLIExceptionHandler {
         Map<String, Collection<String>> links = activeLinks.getActiveLinks();
 
         for (String curDest : links.keySet()) {
-            LOGGER.debug("Current Destination: " + curDest);
+            LOGGER.debug("Current Destination: {}", curDest);
             Collection<String> sources = links.get(curDest);
             for (String source : sources)
                 MCRCommandLineInterface.output(source + " ==> " + curDest);

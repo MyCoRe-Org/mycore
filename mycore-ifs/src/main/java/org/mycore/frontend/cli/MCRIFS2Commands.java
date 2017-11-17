@@ -92,7 +92,7 @@ public class MCRIFS2Commands {
     @MCRCommand(syntax = "repair mcrdata.xml for derivate {0} in content store {1}",
         help = "repair the entries in mcrdata.xml with data from content store {1} for MCRDerivate {0}")
     public static void repairMcrdataXmlForDerivate(String derivate_id, String content_store) {
-        LOGGER.info("Start repair of mcrdata.xml for derivate " + derivate_id + " in store " + content_store);
+        LOGGER.info("Start repair of mcrdata.xml for derivate {} in store {}", derivate_id, content_store);
         // check input;
         MCRObjectID mcr_derivate_id;
         try {
@@ -115,68 +115,68 @@ public class MCRIFS2Commands {
             MCRFileCollection file_collection = ((MCRCStoreIFS2) store).getIFS2FileCollection(mcr_derivate_id);
             file_collection.repairMetadata();
         } catch (IOException e) {
-            LOGGER.error("Erroe while repair derivate with ID " + mcr_derivate_id);
+            LOGGER.error("Erroe while repair derivate with ID {}", mcr_derivate_id);
         }
     }
 
     @MCRCommand(syntax = "check mcrfsnodes for project id {0} of content store {1}",
         help = "check the entries of MCRFNODES with data from content store {1} for project ID {0}")
     public static void checkMCRFSNODESForProject(String project_id, String content_store) {
-        LOGGER.info("Start check of MCRFSNODES for project " + project_id);
+        LOGGER.info("Start check of MCRFSNODES for project {}", project_id);
         ArrayList<String> derivates = getDerivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
             checkMCRFSNODESForDerivate(derivate, content_store);
         }
-        LOGGER.info("Stop check of MCRFSNODES for project " + project_id);
+        LOGGER.info("Stop check of MCRFSNODES for project {}", project_id);
     }
 
     @MCRCommand(syntax = "check mcrfsnodes for object {0} of content store {1}",
         help = "check the entries of MCRFNODES with data from content store {1} for MCRObject {0}")
     public static void checkMCRFSNODESForObject(String object_id, String content_store) {
-        LOGGER.info("Start check of MCRFSNODES for object " + object_id);
+        LOGGER.info("Start check of MCRFSNODES for object {}", object_id);
         ArrayList<String> derivates = getDerivatesOfObject(content_store, object_id);
         for (String derivate : derivates) {
             checkMCRFSNODESForDerivate(derivate, content_store);
         }
-        LOGGER.info("Stop check of MCRFSNODES for object " + object_id);
+        LOGGER.info("Stop check of MCRFSNODES for object {}", object_id);
     }
 
     @MCRCommand(syntax = "check mcrfsnodes for derivate {0} of content store {1}",
         help = "check the entries of MCRFSNODES with data from content store {1} for MCRDerivate {0}")
     public static void checkMCRFSNODESForDerivate(String derivate_id, String content_store) {
-        LOGGER.info("Start check of MCRFSNODES for derivate " + derivate_id);
+        LOGGER.info("Start check of MCRFSNODES for derivate {}", derivate_id);
         fixMCRFSNODESForDerivate(content_store, derivate_id, true);
-        LOGGER.info("Stop check of MCRFSNODES for derivate " + derivate_id);
+        LOGGER.info("Stop check of MCRFSNODES for derivate {}", derivate_id);
     }
 
     @MCRCommand(syntax = "repair mcrfsnodes for project id {0} of content store {1}",
         help = "repair the entries of MCRFNODES with data from content store {1} for project ID {0}")
     public static void repairMCRFSNODESForProject(String project_id, String content_store) {
-        LOGGER.info("Start repair of MCRFSNODES for project " + project_id);
+        LOGGER.info("Start repair of MCRFSNODES for project {}", project_id);
         ArrayList<String> derivates = getDerivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
             repairMCRFSNODESForDerivate(derivate, content_store);
         }
-        LOGGER.info("Stop repair of MCRFSNODES for project " + project_id);
+        LOGGER.info("Stop repair of MCRFSNODES for project {}", project_id);
     }
 
     @MCRCommand(syntax = "repair mcrfsnodes for object {0} of content store {1}",
         help = "repair the entries of MCRFNODES with data from content store {1} for MCRObject {0}")
     public static void repairMCRFSNODESForObject(String object_id, String content_store) {
-        LOGGER.info("Start repair of MCRFSNODES for object " + object_id);
+        LOGGER.info("Start repair of MCRFSNODES for object {}", object_id);
         ArrayList<String> derivates = getDerivatesOfObject(content_store, object_id);
         for (String derivate : derivates) {
             repairMCRFSNODESForDerivate(derivate, content_store);
         }
-        LOGGER.info("Stop repair of MCRFSNODES for project " + object_id);
+        LOGGER.info("Stop repair of MCRFSNODES for project {}", object_id);
     }
 
     @MCRCommand(syntax = "repair mcrfsnodes for derivate {0} of content store {1}",
         help = "repair the entries of MCRFSNODES with data from content store {1} for MCRDerivate {0}")
     public static void repairMCRFSNODESForDerivate(String derivate_id, String content_store) {
-        LOGGER.info("Start repair of MCRFSNODES for derivate " + derivate_id);
+        LOGGER.info("Start repair of MCRFSNODES for derivate {}", derivate_id);
         fixMCRFSNODESForDerivate(content_store, derivate_id, false);
-        LOGGER.info("Stop repair of MCRFSNODES for derivate " + derivate_id);
+        LOGGER.info("Stop repair of MCRFSNODES for derivate {}", derivate_id);
     }
 
     @MCRCommand(syntax = "repair unicode in database {0}", help = "this fixes consequences of MCR-1423 in Database. If "
@@ -210,7 +210,7 @@ public class MCRIFS2Commands {
 
             try {
                 Path path = cs.getBaseDir().toPath();
-                LOGGER.info("Starting with path : " + path);
+                LOGGER.info("Starting with path : {}", path);
                 java.nio.file.Files.walkFileTree(path, new MCRUnicodeFilenameNormalizer(dry));
             } catch (IOException e) {
                 throw new MCRException("Error while get basedir of content store " + name, e);
@@ -244,7 +244,7 @@ public class MCRIFS2Commands {
             storage_base = storage_base.substring(0, storage_base.length() - derivate_id.length());
             fixMCRFSNODESForNode(root_node, content_store, derivate_id, storage_base, check_only);
         } catch (IOException e) {
-            LOGGER.error("Error while list all files of derivate with ID " + mcr_derivate_id);
+            LOGGER.error("Error while list all files of derivate with ID {}", mcr_derivate_id);
             e.printStackTrace();
         }
         Session session = MCRHIBConnection.instance().getSession();
@@ -257,7 +257,7 @@ public class MCRIFS2Commands {
     private static void fixMCRFSNODESForNode(File node, String content_store, String derivate_id, String storage_base,
         boolean check_only) {
         if (node.isDirectory()) {
-            LOGGER.debug("fixMCRFSNODESForNode (directory) : " + node.getAbsolutePath());
+            LOGGER.debug("fixMCRFSNODESForNode (directory) : {}", node.getAbsolutePath());
             fixDirectoryEntry(node, derivate_id, storage_base, check_only);
             File[] nodes = node.listFiles();
             for (File next_node : nodes) {
@@ -267,7 +267,7 @@ public class MCRIFS2Commands {
             if (node.getName().equals("mcrdata.xml")) {
                 return;
             }
-            LOGGER.debug("fixMCRFSNODESForNode (file) : " + node.getAbsolutePath());
+            LOGGER.debug("fixMCRFSNODESForNode (file) : {}", node.getAbsolutePath());
             fixFileEntry(node, content_store, derivate_id, storage_base, check_only);
         }
 
@@ -275,7 +275,7 @@ public class MCRIFS2Commands {
 
     private static void fixDirectoryEntry(File node, String derivate_id, String storage_base, boolean check_only) {
         String name = node.getName();
-        LOGGER.debug("fixDirectoryEntry : name = " + name);
+        LOGGER.debug("fixDirectoryEntry : name = {}", name);
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.getTransaction();
         if (tx.getStatus().isNotOneOf(TransactionStatus.ACTIVE)) {
@@ -292,20 +292,20 @@ public class MCRIFS2Commands {
                     cb.equal(nodes.get(MCRFSNODES_.name), name),
                     cb.equal(nodes.get(MCRFSNODES_.type), "D")))
                 .getSingleResult());
-            LOGGER.debug("Found directory entry for " + name);
+            LOGGER.debug("Found directory entry for {}", name);
             return;
         } catch (NoResultException e) {
-            LOGGER.error("Can't find directory entry for " + name);
+            LOGGER.error("Can't find directory entry for {}", name);
             if (check_only)
                 return;
         } catch (NonUniqueResultException e) {
-            LOGGER.error("Non unique directory entry for " + name);
+            LOGGER.error("Non unique directory entry for {}", name);
             return;
         } catch (Exception e) {
             e.printStackTrace();
         }
         // fix entry
-        LOGGER.info("Fix entry for directory " + name);
+        LOGGER.info("Fix entry for directory {}", name);
         MCRFileMetadataManager fmmgr = MCRFileMetadataManager.instance();
         String id = fmmgr.createNodeID();
         String pid = null;
@@ -313,12 +313,12 @@ public class MCRIFS2Commands {
             pid = getParentID(node, derivate_id);
         } catch (NoResultException e1) {
             if (!derivate_id.equals(name)) {
-                LOGGER.error("Can't find parent id for directory " + name);
+                LOGGER.error("Can't find parent id for directory {}", name);
                 return;
             }
         } catch (NonUniqueResultException e1) {
-            LOGGER.error("The directory entry for " + derivate_id + " and " + node.getParentFile().getName()
-                + " is not unique!");
+            LOGGER.error("The directory entry for {} and {} is not unique!", derivate_id,
+                node.getParentFile().getName());
             return;
         }
         try {
@@ -331,7 +331,7 @@ public class MCRIFS2Commands {
             mcrfsnodes.setDate(new Date(node.lastModified()));
             em.persist(mcrfsnodes);
             tx.commit();
-            LOGGER.debug("Entry " + name + " fixed.");
+            LOGGER.debug("Entry {} fixed.", name);
         } catch (HibernateException he) {
             if (tx != null) {
                 tx.rollback();
@@ -344,9 +344,9 @@ public class MCRIFS2Commands {
 
     private static void fixFileEntry(File node, String content_store, String derivate_id, String storage_base,
         boolean check_only) {
-        LOGGER.debug("fixFileEntry : name = " + node.getName());
+        LOGGER.debug("fixFileEntry : name = {}", node.getName());
         String storageid = node.getAbsolutePath().substring(storage_base.length()).replace("\\", "/");
-        LOGGER.debug("fixFileEntry : storageid = " + storageid);
+        LOGGER.debug("fixFileEntry : storageid = {}", storageid);
         String id = "";
         String md5_old = "";
         long size_old = 0;
@@ -369,18 +369,18 @@ public class MCRIFS2Commands {
                         cb.equal(nodes.get(MCRFSNODES_.storageid), storageid),
                         cb.equal(nodes.get(MCRFSNODES_.type), "F")))
                     .getSingleResult();
-                LOGGER.debug("Found file entry for " + storageid);
+                LOGGER.debug("Found file entry for {}", storageid);
                 foundEntry = true;
                 id = fsNode.getId();
                 md5_old = fsNode.getMd5();
                 size_old = fsNode.getSize();
                 em.detach(fsNode);
             } catch (NoResultException e) {
-                LOGGER.error("Can't find file entry for " + storageid);
+                LOGGER.error("Can't find file entry for {}", storageid);
                 if (check_only)
                     return;
             } catch (NonUniqueResultException e) {
-                LOGGER.error("Non unique file entry for " + storageid);
+                LOGGER.error("Non unique file entry for {}", storageid);
                 return;
             }
         } catch (Exception e) {
@@ -399,21 +399,21 @@ public class MCRIFS2Commands {
             return;
         }
         long size = node.length();
-        LOGGER.debug("size old : " + Long.toString(size_old) + " <--> size : " + Long.toString(size));
-        LOGGER.debug("MD5 old : " + md5_old + " <--> MD5 : " + md5);
+        LOGGER.debug("size old : {} <--> size : {}", Long.toString(size_old), Long.toString(size));
+        LOGGER.debug("MD5 old : {} <--> MD5 : {}", md5_old, md5);
         if (size_old == size && md5_old.equals(md5)) {
             return;
         }
         if (foundEntry && size_old != size) {
-            LOGGER.warn("Wrong file size for " + storageid + " : " + size_old + " <-> " + size);
+            LOGGER.warn("Wrong file size for {} : {} <-> {}", storageid, size_old, size);
         }
         if (foundEntry && !md5.equals(md5_old)) {
-            LOGGER.warn("Wrong file md5 for " + storageid + " : " + md5_old + " <-> " + md5);
+            LOGGER.warn("Wrong file md5 for {} : {} <-> {}", storageid, md5_old, md5);
         }
         if (check_only)
             return;
         // fix entry
-        LOGGER.info("Fix entry for file " + storageid);
+        LOGGER.info("Fix entry for file {}", storageid);
         if (!foundEntry) {
             MCRFileMetadataManager fmmgr = MCRFileMetadataManager.instance();
             id = fmmgr.createNodeID();
@@ -422,10 +422,10 @@ public class MCRIFS2Commands {
         try {
             pid = getParentID(node, derivate_id);
         } catch (NoResultException e1) {
-            LOGGER.error("Can't find parent id of directory for file " + storageid);
+            LOGGER.error("Can't find parent id of directory for file {}", storageid);
         } catch (NonUniqueResultException e1) {
-            LOGGER.error("The directory entry for " + derivate_id + " and " + node.getParentFile().getName()
-                + " is not unique!");
+            LOGGER.error("The directory entry for {} and {} is not unique!", derivate_id,
+                node.getParentFile().getName());
             return;
         }
         try {
@@ -443,7 +443,7 @@ public class MCRIFS2Commands {
             mcrfsnodes.setMd5(md5);
             em.merge(mcrfsnodes);
             mcrSession.commitTransaction();
-            LOGGER.debug("Entry " + node.getName() + " fixed.");
+            LOGGER.debug("Entry {} fixed.", node.getName());
         } catch (PersistenceException pe) {
             mcrSession.rollbackTransaction();
             pe.printStackTrace();
@@ -465,7 +465,7 @@ public class MCRIFS2Commands {
                 cb.equal(nodes.get(MCRFSNODES_.name), parent_node.getName()),
                 cb.equal(nodes.get(MCRFSNODES_.type), "D")))
             .getSingleResult();
-        LOGGER.debug("Found directory entry for " + parent_node.getName());
+        LOGGER.debug("Found directory entry for {}", parent_node.getName());
         em.detach(fsNode);
         return fsNode.getId();
     }
@@ -476,19 +476,17 @@ public class MCRIFS2Commands {
         MCRConfiguration config = MCRConfiguration.instance();
         String content_store_basepath = config.getString("MCR.IFS.ContentStore." + content_store + ".BaseDir", "");
         if (content_store_basepath.length() == 0) {
-            LOGGER
-                .error("Cant find base directory property in form MCR.IFS.ContentStore." + content_store + ".BaseDir");
+            LOGGER.error("Cant find base directory property in form MCR.IFS.ContentStore.{}.BaseDir", content_store);
             return derivates;
         }
         String slot_layout = config.getString("MCR.IFS.ContentStore." + content_store + ".SlotLayout", "");
         if (slot_layout.length() == 0) {
-            LOGGER
-                .error("Cant find slot layout property in form MCR.IFS.ContentStore." + content_store + ".SlotLayout");
+            LOGGER.error("Cant find slot layout property in form MCR.IFS.ContentStore.{}.SlotLayout", content_store);
             return derivates;
         }
         File project_dir = new File(content_store_basepath, project_id);
         if (!project_dir.exists()) {
-            LOGGER.error("Wrong project ID; can't find directory " + project_dir.getAbsolutePath());
+            LOGGER.error("Wrong project ID; can't find directory {}", project_dir.getAbsolutePath());
             return derivates;
         }
         File derivate_dir = new File(project_dir, "derivate");
@@ -502,8 +500,7 @@ public class MCRIFS2Commands {
         MCRConfiguration config = MCRConfiguration.instance();
         String content_store_basepath = config.getString("MCR.IFS.ContentStore." + content_store + ".BaseDir", "");
         if (content_store_basepath.length() == 0) {
-            LOGGER
-                .error("Cant find base directory property in form MCR.IFS.ContentStore." + content_store + ".BaseDir");
+            LOGGER.error("Cant find base directory property in form MCR.IFS.ContentStore.{}.BaseDir", content_store);
             return derivates;
         }
         derivates = (ArrayList<String>) MCRLinkTableManager.instance().getDestinationOf(object_id, "derivate");

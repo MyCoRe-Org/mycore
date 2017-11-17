@@ -80,7 +80,7 @@ public class MCRJWPlayerResource {
         private String type;
 
         public Source(String file, String type) {
-            LogManager.getLogger().info("file : " + file);
+            LogManager.getLogger().info("file : {}", file);
             this.file = file;
             this.type = type;
         }

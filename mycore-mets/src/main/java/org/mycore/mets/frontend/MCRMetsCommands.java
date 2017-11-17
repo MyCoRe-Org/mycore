@@ -43,7 +43,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
         List<String> selectedObjectIDs = MCRObjectCommands.getSelectedObjectIDs();
 
         for (String objectID : selectedObjectIDs) {
-            LOGGER.info("Validate mets.xml of " + objectID);
+            LOGGER.info("Validate mets.xml of {}", objectID);
             MCRPath metsFile = MCRPath.getPath(objectID, "/mets.xml");
             if (Files.exists(metsFile)) {
                 try {
@@ -58,9 +58,9 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                         LOGGER.error(validationException.getMessage());
                     }
                 } catch (IOException e) {
-                    LOGGER.error("Error while reading mets.xml of " + objectID, e);
+                    LOGGER.error("Error while reading mets.xml of {}", objectID, e);
                 } catch (JDOMException e) {
-                    LOGGER.error("Error while parsing mets.xml of " + objectID, e);
+                    LOGGER.error("Error while parsing mets.xml of {}", objectID, e);
                 }
             }
 
@@ -73,7 +73,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
     public static void fixInvalidMets() {
         String selectedObjectID;
         while ((selectedObjectID = invalidMetsQueue.poll()) != null) {
-            LOGGER.info("Try to fix METS of " + selectedObjectID);
+            LOGGER.info("Try to fix METS of {}", selectedObjectID);
             MCRPath metsFile = MCRPath.getPath(selectedObjectID, "/mets.xml");
             SAXBuilder saxBuilder = new SAXBuilder();
             Document metsDocument;
@@ -111,12 +111,12 @@ public class MCRMetsCommands extends MCRAbstractCommands {
         MCRPath metsFile = MCRPath.getPath(derivateID, "/mets.xml");
         if (!Files.exists(metsFile)) {
             try {
-                LOGGER.debug("Start MCRMETSGenerator for derivate " + derivateID);
+                LOGGER.debug("Start MCRMETSGenerator for derivate {}", derivateID);
                 Document mets = MCRMETSGeneratorFactory.create(MCRPath.getPath(derivateID, "/")).generate().asDocument();
                 MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivateID));
-                LOGGER.debug("Stop MCRMETSGenerator for derivate " + derivateID);
+                LOGGER.debug("Stop MCRMETSGenerator for derivate {}", derivateID);
             } catch (Exception e) {
-                LOGGER.error("Can't create mets file for derivate " + derivateID);
+                LOGGER.error("Can't create mets file for derivate {}", derivateID);
             }
         }
     }

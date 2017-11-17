@@ -52,7 +52,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
         String xPath = parameter.substring(0, pos);
         String href = decode(parameter.substring(pos + 1));
 
-        LOGGER.info("New subselect for " + xPath + " using pattern " + href);
+        LOGGER.info("New subselect for {} using pattern {}", xPath, href);
 
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         href = binding.getXPathEvaluator().replaceXPaths(href, true);
@@ -62,7 +62,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
 
         href += (href.contains("?") ? "&" : "?") + PARAM_SUBSELECT_SESSION + "=" + session.getCombinedSessionStepID();
 
-        LOGGER.info("Redirecting to subselect " + href);
+        LOGGER.info("Redirecting to subselect {}", href);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(href));
     }
 

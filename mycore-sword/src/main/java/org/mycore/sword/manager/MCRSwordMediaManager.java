@@ -54,7 +54,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
     public MediaResource getMediaResourceRepresentation(String editMediaIRI, Map<String, String> accept,
         AuthCredentials authCredentials, SwordConfiguration swordConfiguration)
         throws SwordError, SwordServerException, SwordAuthException {
-        LOGGER.info("getMediaResourceRepresentation: " + editMediaIRI);
+        LOGGER.info("getMediaResourceRepresentation: {}", editMediaIRI);
         final IRI mediaEditIRI = new IRI(editMediaIRI);
         final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
             .getDerivateFromMediaEditIRI(mediaEditIRI);
@@ -70,7 +70,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
 
     public DepositReceipt replaceMediaResource(String editMediaIRI, Deposit deposit, AuthCredentials authCredentials,
         SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
-        LOGGER.info("replaceMediaResource: " + editMediaIRI);
+        LOGGER.info("replaceMediaResource: {}", editMediaIRI);
         final IRI mediaEditIRI = new IRI(editMediaIRI);
 
         final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
@@ -89,7 +89,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
 
     public DepositReceipt addResource(String editMediaIRI, Deposit deposit, AuthCredentials authCredentials,
         SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
-        LOGGER.info("addResource: " + editMediaIRI);
+        LOGGER.info("addResource: {}", editMediaIRI);
 
         final IRI mediaEditIRI = new IRI(editMediaIRI);
         final String requestDerivateID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
@@ -111,7 +111,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
 
     public void deleteMediaResource(String editMediaIRI, AuthCredentials authCredentials,
         SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
-        LOGGER.info("deleteMediaResource: " + editMediaIRI);
+        LOGGER.info("deleteMediaResource: {}", editMediaIRI);
         final IRI mediaEditIRI = new IRI(editMediaIRI);
         final String requestObjectID = MCRSwordUtil.ParseLinkUtil.MediaEditIRI
             .getDerivateFromMediaEditIRI(mediaEditIRI);

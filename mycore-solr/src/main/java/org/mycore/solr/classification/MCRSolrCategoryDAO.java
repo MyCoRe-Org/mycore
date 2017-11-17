@@ -81,7 +81,7 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
             // reindex parent
             MCRSolrClassificationUtil.reindex(parent);
         } catch (Exception exc) {
-            LOGGER.error("Solr: unable to delete categories of parent " + id);
+            LOGGER.error("Solr: unable to delete categories of parent {}", id);
         }
     }
 
@@ -100,7 +100,7 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
             reindexList.add(newParentID.toString());
             MCRSolrClassificationUtil.reindex(MCRSolrClassificationUtil.fromString(reindexList));
         } catch (Exception exc) {
-            LOGGER.error("Solr: unable to move categories of category " + id + " to " + newParentID);
+            LOGGER.error("Solr: unable to move categories of category {} to {}", id, newParentID);
         }
     }
 

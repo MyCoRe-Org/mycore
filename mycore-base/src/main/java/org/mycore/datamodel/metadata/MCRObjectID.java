@@ -448,8 +448,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         }
         String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
         if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
-            LOGGER.warn("Property MCR.Metadata.Type." + objectType + " is not set. Thus " + id
-                + " cannot be a valid id");
+            LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
             return false;
         }
         try {

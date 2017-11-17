@@ -122,7 +122,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRObjectID objectID = MCRObjectID.getInstance(ID);
         MCRMetadataManager.deleteMCRDerivate(objectID);
-        LOGGER.info(objectID + " deleted.");
+        LOGGER.info("{} deleted.", objectID);
     }
 
     /**
@@ -198,14 +198,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
-            LOGGER.warn(directory + " ignored, is not a directory.");
+            LOGGER.warn("{} ignored, is not a directory.", directory);
             return null;
         }
 
         File[] list = dir.listFiles();
 
         if (list.length == 0) {
-            LOGGER.warn("No files found in directory " + directory);
+            LOGGER.warn("No files found in directory {}", directory);
             return null;
         }
 
@@ -303,16 +303,16 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     private static boolean processFromFile(File file, boolean update, boolean importMode) throws SAXParseException,
         IOException, MCRPersistenceException, MCRAccessException {
         if (!file.getName().endsWith(".xml")) {
-            LOGGER.warn(file + " ignored, does not end with *.xml");
+            LOGGER.warn("{} ignored, does not end with *.xml", file);
             return false;
         }
 
         if (!file.isFile()) {
-            LOGGER.warn(file + " ignored, is not a file.");
+            LOGGER.warn("{} ignored, is not a file.", file);
             return false;
         }
 
-        LOGGER.info("Reading file " + file + " ...");
+        LOGGER.info("Reading file {} ...", file);
 
         MCRDerivate derivate = new MCRDerivate(file.toURI());
         derivate.setImportMode(importMode);
@@ -337,18 +337,18 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             }
 
             derivate.getDerivate().getInternals().setSourcePath(path);
-            LOGGER.info("Source path --> " + path);
+            LOGGER.info("Source path --> {}", path);
         }
 
-        LOGGER.info("Label --> " + derivate.getLabel());
+        LOGGER.info("Label --> {}", derivate.getLabel());
 
         if (update) {
             MCRMetadataManager.update(derivate);
-            LOGGER.info(derivate.getId() + " updated.");
+            LOGGER.info("{} updated.", derivate.getId());
             LOGGER.info("");
         } else {
             MCRMetadataManager.create(derivate);
-            LOGGER.info(derivate.getId() + " loaded.");
+            LOGGER.info("{} loaded.", derivate.getId());
             LOGGER.info("");
         }
 
@@ -422,7 +422,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         try {
             fid = MCRObjectID.getInstance(fromID);
         } catch (Exception ex) {
-            LOGGER.error("FromID : " + ex.getMessage());
+            LOGGER.error("FromID : {}", ex.getMessage());
 
             return;
         }
@@ -430,7 +430,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         try {
             tid = MCRObjectID.getInstance(toID);
         } catch (Exception ex) {
-            LOGGER.error("ToID : " + ex.getMessage());
+            LOGGER.error("ToID : {}", ex.getMessage());
 
             return;
         }
@@ -439,7 +439,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         File dir = new File(dirname);
 
         if (dir.isFile()) {
-            LOGGER.error(dirname + " is not a dirctory.");
+            LOGGER.error("{} is not a dirctory.", dirname);
 
             return;
         }
@@ -457,12 +457,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store file or objects to " + dir.getAbsolutePath(), ex);
+            LOGGER.error("Exception while store file or objects to {}", dir.getAbsolutePath(), ex);
 
             return;
         }
 
-        LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
+        LOGGER.info("{} Object's stored under {}.", k, dir.getAbsolutePath());
     }
 
     /**
@@ -543,9 +543,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             obj = MCRMetadataManager.retrieveMCRDerivate(derivateID);
             String path = obj.getDerivate().getInternals().getSourcePath();
             // reset from the absolute to relative path, for later reload
-            LOGGER.info("Old Internal Path ====>" + path);
+            LOGGER.info("Old Internal Path ====>{}", path);
             obj.getDerivate().getInternals().setSourcePath(nid);
-            LOGGER.info("New Internal Path ====>" + nid);
+            LOGGER.info("New Internal Path ====>{}", nid);
             // add ACL's
             Collection<String> l = ACCESS_IMPL.getPermissionsForID(nid);
             for (String permission : l) {
@@ -556,7 +556,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             xml = obj.createXML();
 
         } catch (MCRException ex) {
-            LOGGER.warn("Could not read " + nid + ", continue with next ID");
+            LOGGER.warn("Could not read {}, continue with next ID", nid);
             return;
         }
         File xmlOutput = new File(dir, derivateID + ".xml");
@@ -573,7 +573,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             out.close();
         }
 
-        LOGGER.info("Object " + nid + " stored under " + xmlOutput + ".");
+        LOGGER.info("Object {} stored under {}.", nid, xmlOutput);
 
         // store the derivate file under dirname
         if (!dir.isDirectory()) {
@@ -582,7 +582,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRPath rootPath = MCRPath.getPath(derivateID.toString(), "/");
         Files.walkFileTree(rootPath, new MCRTreeCopier(rootPath, dir.toPath()));
 
-        LOGGER.info("Derivate " + nid + " saved under " + dir + " and " + xmlOutput + ".");
+        LOGGER.info("Derivate {} saved under {} and {}.", nid, dir, xmlOutput);
     }
 
     /**
@@ -642,9 +642,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         help = "The command read the Content store for MCRObjectID {0} and reindex the derivate search store.",
         order = 150)
     public static void repairDerivateSearchForID(String id) throws IOException {
-        LOGGER.info("Start the repair for the ID " + id);
+        LOGGER.info("Start the repair for the ID {}", id);
         doForChildren(MCRPath.getPath(id, "/"));
-        LOGGER.info("Repaired " + id);
+        LOGGER.info("Repaired {}", id);
     }
 
     /**
@@ -663,7 +663,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 evt.put(MCREvent.PATH_KEY, file);
                 evt.put(MCREvent.FILEATTR_KEY, attrs);
                 MCREventManager.instance().handleEvent(evt);
-                LOGGER.debug("repaired file " + file);
+                LOGGER.debug("repaired file {}", file);
                 return super.visitFile(file, attrs);
             }
 
@@ -705,7 +705,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         try {
             mid = MCRObjectID.getInstance(id);
         } catch (Exception e) {
-            LOGGER.error("The String " + id + " is not a MCRObjectID.");
+            LOGGER.error("The String {} is not a MCRObjectID.", id);
             return;
         }
 
@@ -730,7 +730,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         // update mycoreobject
         if (isset) {
             MCRMetadataManager.fireUpdateEvent(obj);
-            LOGGER.info("Synchronized " + mid);
+            LOGGER.info("Synchronized {}", mid);
         }
     }
 
@@ -742,7 +742,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         order = 180)
     public static void linkDerivateToObject(String derivateId, String objectId) throws Exception {
         if (derivateId == null || objectId == null) {
-            LOGGER.error("Either derivate id or object id is null. Derivate=" + derivateId + ", object=" + objectId);
+            LOGGER.error("Either derivate id or object id is null. Derivate={}, object={}", derivateId, objectId);
             return;
         }
         MCRObjectID derID = MCRObjectID.getInstance(derivateId);
@@ -761,7 +761,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCRObjectID oldOwnerId = oldDerivateToObjectLink.getXLinkHrefID();
 
         /* set link to new parent in the derivate object */
-        LOGGER.info("Setting " + objID + " as parent for derivate " + derID);
+        LOGGER.info("Setting {} as parent for derivate {}", objID, derID);
         derObj.getDerivate().getMetaLink()
             .setReference(objID, oldDerivateToObjectLink.getXLinkLabel(), oldDerivateToObjectLink.getXLinkTitle());
         derObj.setLabel("data object from " + objectId + " (prev. owner was " + oldOwnerId);
@@ -779,7 +779,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         if (oldObjectToDerivateLink == null) {
             oldObjectToDerivateLink = new MCRMetaLinkID();
         }
-        LOGGER.info("Linking derivate " + derID + " to " + objID);
+        LOGGER.info("Linking derivate {} to {}", derID, objID);
         MCRMetaLinkID derivateLink = new MCRMetaLinkID();
         derivateLink.setReference(derID, oldObjectToDerivateLink.getXLinkLabel(),
             oldObjectToDerivateLink.getXLinkTitle());
@@ -788,7 +788,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         /* removing link from old parent */
         boolean flag = oldOwner.getStructure().removeDerivate(derID);
-        LOGGER.info("Unlinking derivate " + derID + " from object " + oldOwnerId + ". Success=" + flag);
+        LOGGER.info("Unlinking derivate {} from object {}. Success={}", derID, oldOwnerId, flag);
         MCRMetadataManager.fireUpdateEvent(oldOwner);
     }
 
@@ -808,7 +808,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
         int project_part_position = base_id.indexOf('_');
         if (project_part_position == -1) {
-            LOGGER.error("The given base ID " + base_id + " has not the syntax of project_type");
+            LOGGER.error("The given base ID {} has not the syntax of project_type", base_id);
             return;
         }
         MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
@@ -817,17 +817,16 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         int maxresults = id_list.size();
         for (String derid : id_list) {
             counter++;
-            LOGGER.info("Processing dataset " + counter + " from " + maxresults + " with ID: " + derid);
+            LOGGER.info("Processing dataset {} from {} with ID: {}", counter, maxresults, derid);
             // get from data
             MCRObjectID mcrderid = MCRObjectID.getInstance(derid);
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mcrderid);
             MCRObjectID objid = der.getOwnerID();
             if (!mgr.exists(objid)) {
-                LOGGER.error("   !!! Missing object " + objid + " in database for derivate ID "
-                    + mcrderid);
+                LOGGER.error("   !!! Missing object {} in database for derivate ID {}", objid, mcrderid);
             }
         }
-        LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
+        LOGGER.info("Check done for {} entries", Integer.toString(counter));
     }
 
     @MCRCommand(syntax = "transform xml matching file name pattern {0} in derivate {1} with stylesheet {2}",
@@ -843,7 +842,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                 throws IOException {
                 if (matcher.matches(file)) {
-                    LOGGER.info("The file " + file + " matches the pattern " + pattern);
+                    LOGGER.info("The file {} matches the pattern {}", file, pattern);
                     MCRContent sourceContent = new MCRPathContent(file);
 
                     MCRContent resultContent = transformer.transform(sourceContent);

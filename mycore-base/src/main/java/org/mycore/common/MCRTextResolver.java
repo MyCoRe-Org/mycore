@@ -471,9 +471,7 @@ public class MCRTextResolver {
         public String getValue() {
             if (!complete) {
                 // assume that the variable is not complete 
-                StringBuilder buf = new StringBuilder();
-                buf.append(getStartEnclosingString()).append(termBuffer);
-                return buf.toString();
+                return getStartEnclosingString() + termBuffer;
             }
             return valueBuffer.toString();
         }
@@ -500,8 +498,7 @@ public class MCRTextResolver {
         }
 
         protected String getTrackID() {
-            return new StringBuffer(getStartEnclosingString()).append(termBuffer)
-                .append(getEndEnclosingString()).toString();
+            return getStartEnclosingString() + termBuffer + getEndEnclosingString();
         }
 
         /**
@@ -679,7 +676,7 @@ public class MCRTextResolver {
         public void untrack(String type, String id) {
             List<String> idList = trackMap.get(type);
             if (idList == null) {
-                LOGGER.error("text resolver circular dependency tracking error: cannot get type " + type + " of " + id);
+                LOGGER.error("text resolver circular dependency tracking error: cannot get type {} of {}", type, id);
                 return;
             }
             idList.remove(id);

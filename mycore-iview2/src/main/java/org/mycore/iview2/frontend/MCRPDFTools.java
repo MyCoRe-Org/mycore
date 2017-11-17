@@ -69,20 +69,20 @@ class MCRPDFTools implements AutoCloseable {
             }
             final double width = level1Image.getWidth();
             final double height = level1Image.getHeight();
-            LOGGER.info("new PDFBox: " + width + "x" + height);
-            LOGGER.info("temporary image dimensions: " + width + "x" + height);
+            LOGGER.info("new PDFBox: {}x{}", width, height);
+            LOGGER.info("temporary image dimensions: {}x{}", width, height);
             final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
             final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
             //if centered make thumbnailSize x thumbnailSize image
             final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth,
                 centered ? thumbnailSize : newHeight, imageType);
-            LOGGER.info("target image dimensions: " + bicubic.getWidth() + "x" + bicubic.getHeight());
+            LOGGER.info("target image dimensions: {}x{}", bicubic.getWidth(), bicubic.getHeight());
             final Graphics2D bg = bicubic.createGraphics();
             bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
             int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
             if (x != 0 && y != 0) {
-                LOGGER.warn("Writing at position " + x + "," + y);
+                LOGGER.warn("Writing at position {},{}", x, y);
             }
             bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
                 (int) Math.ceil(height), null);

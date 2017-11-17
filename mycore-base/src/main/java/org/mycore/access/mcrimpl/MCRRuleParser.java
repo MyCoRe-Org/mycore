@@ -63,16 +63,17 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     @Override
     protected MCRCondition<?> parseSimpleCondition(Element e) throws MCRParseException {
         String name = e.getName();
-        if (name.equals("boolean")) {
-            return super.parseSimpleCondition(e);
-        } else if (name.equals("condition")) {
-            MCRCondition<?> condition = parseElement(e);
-            if (condition == null) {
-                throw new MCRParseException("Not a valid condition field <" + e.getAttributeValue("field") + ">");
-            }
-            return condition;
-        } else {
-            throw new MCRParseException("Not a valid name <" + e.getName() + ">");
+        switch (name) {
+            case "boolean":
+                return super.parseSimpleCondition(e);
+            case "condition":
+                MCRCondition<?> condition = parseElement(e);
+                if (condition == null) {
+                    throw new MCRParseException("Not a valid condition field <" + e.getAttributeValue("field") + ">");
+                }
+                return condition;
+            default:
+                throw new MCRParseException("Not a valid name <" + e.getName() + ">");
         }
     }
 
@@ -91,24 +92,26 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         String value = e.getAttributeValue("value").trim();
         boolean not = "!=".equals(operator);
 
-        if (field.equals("group")) {
-            return new MCRGroupClause(value, not);
-        } else if (field.equals("user")) {
-            return new MCRUserClause(value, not);
-        } else if (field.equals("ip")) {
-            return getIPClause(value);
-        } else if (field.equals("date")) {
-            if (operator.equals("<")) {
-                return new MCRDateBeforeClause(parseDate(value, false));
-            } else if (operator.equals("<=")) {
-                return new MCRDateBeforeClause(parseDate(value, true));
-            } else if (operator.equals(">")) {
-                return new MCRDateAfterClause(parseDate(value, true));
-            } else if (operator.equals(">=")) {
-                return new MCRDateAfterClause(parseDate(value, false));
-            } else {
-                throw new MCRParseException("Not a valid operator <" + operator + ">");
-            }
+        switch (field) {
+            case "group":
+                return new MCRGroupClause(value, not);
+            case "user":
+                return new MCRUserClause(value, not);
+            case "ip":
+                return getIPClause(value);
+            case "date":
+                switch (operator) {
+                    case "<":
+                        return new MCRDateBeforeClause(parseDate(value, false));
+                    case "<=":
+                        return new MCRDateBeforeClause(parseDate(value, true));
+                    case ">":
+                        return new MCRDateAfterClause(parseDate(value, true));
+                    case ">=":
+                        return new MCRDateAfterClause(parseDate(value, false));
+                    default:
+                        throw new MCRParseException("Not a valid operator <" + operator + ">");
+                }
         }
         return null;
     }

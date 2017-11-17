@@ -234,7 +234,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
             return imageInformation;
         } catch (FileSystemNotFoundException e) {
-            LOGGER.error("Could not find Iview ZIP for " + identifier, e);
+            LOGGER.error("Could not find Iview ZIP for {}", identifier, e);
             throw new MCRIIIFImageNotFoundException(identifier);
         }
     }

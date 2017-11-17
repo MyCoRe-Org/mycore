@@ -468,13 +468,13 @@ public class MCRMetaLink extends MCRMetaDefault {
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Link Type          = " + linktype);
-            LOGGER.debug("Label              = " + label);
-            LOGGER.debug("Title              = " + title);
-            LOGGER.debug("HREF               = " + href);
-            LOGGER.debug("Role               = " + role);
-            LOGGER.debug("From               = " + from);
-            LOGGER.debug("To                 = " + to);
+            LOGGER.debug("Link Type          = {}", linktype);
+            LOGGER.debug("Label              = {}", label);
+            LOGGER.debug("Title              = {}", title);
+            LOGGER.debug("HREF               = {}", href);
+            LOGGER.debug("Role               = {}", role);
+            LOGGER.debug("From               = {}", from);
+            LOGGER.debug("To                 = {}", to);
             LOGGER.debug("");
         }
     }

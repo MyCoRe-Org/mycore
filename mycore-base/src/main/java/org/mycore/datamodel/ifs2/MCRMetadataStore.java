@@ -71,7 +71,7 @@ public class MCRMetadataStore extends MCRStore {
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
         if (forceXML) {
             forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".ForceDocType", null);
-            LogManager.getLogger(MCRMetadataStore.class).info("Set doctype for " + type + " to " + forceDocType);
+            LogManager.getLogger(MCRMetadataStore.class).info("Set doctype for {} to {}", type, forceDocType);
         }
     }
 
@@ -90,8 +90,7 @@ public class MCRMetadataStore extends MCRStore {
         if (forceXML) {
             forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType",
                 null);
-            LogManager.getLogger(MCRMetadataStore.class)
-                .info("Set doctype for " + config.getID() + " to " + forceDocType);
+            LogManager.getLogger(MCRMetadataStore.class).info("Set doctype for {} to {}", config.getID(), forceDocType);
         }
     }
 

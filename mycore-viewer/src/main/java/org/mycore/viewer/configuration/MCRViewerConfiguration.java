@@ -123,7 +123,7 @@ public class MCRViewerConfiguration {
         try {
             return getFromPath(request.getPathInfo(), 1);
         } catch (Exception exc) {
-            LOGGER.warn("Unable to get the derivate id of request " + request.getRequestURI());
+            LOGGER.warn("Unable to get the derivate id of request {}", request.getRequestURI());
             return null;
         }
     }
@@ -146,7 +146,7 @@ public class MCRViewerConfiguration {
             }
             return fromPath;
         } catch (Exception exc) {
-            LOGGER.warn("Unable to get the file path of request " + request.getRequestURI());
+            LOGGER.warn("Unable to get the file path of request {}", request.getRequestURI());
             return null;
         }
     }
@@ -217,9 +217,7 @@ public class MCRViewerConfiguration {
      */
     public void addLocalCSS(final String file) {
         String baseURL = MCRFrontendUtil.getBaseURL();
-        StringBuilder cssURL = new StringBuilder(baseURL);
-        cssURL.append("modules/iview2/css/").append(file);
-        addCSS(cssURL.toString());
+        addCSS(baseURL + "modules/iview2/css/" + file);
     }
 
     /**

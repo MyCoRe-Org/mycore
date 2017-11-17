@@ -83,7 +83,7 @@ public class MCRBasketServlet extends MCRServlet {
         URL referer = getReferer(req);
         boolean resolveContent = "true".equals(req.getParameter("resolve"));
 
-        LOGGER.info(action + " " + type + " " + (ids == null ? "" : ids));
+        LOGGER.info("{} {} {}", action, type, ids == null ? "" : ids);
 
         MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
 
