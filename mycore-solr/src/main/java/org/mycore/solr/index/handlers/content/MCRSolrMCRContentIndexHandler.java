@@ -24,7 +24,6 @@
 package org.mycore.solr.index.handlers.content;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

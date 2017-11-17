@@ -2,7 +2,6 @@ package org.mycore.pi;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;

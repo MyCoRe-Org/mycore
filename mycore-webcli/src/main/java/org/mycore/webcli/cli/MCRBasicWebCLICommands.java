@@ -1,6 +1,5 @@
 package org.mycore.webcli.cli;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 

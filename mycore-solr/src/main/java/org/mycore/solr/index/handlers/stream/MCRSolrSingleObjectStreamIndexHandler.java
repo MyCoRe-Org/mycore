@@ -1,5 +1,8 @@
 package org.mycore.solr.index.handlers.stream;
 
+import java.io.IOException;
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -9,9 +12,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.cs.MCRSolrAbstractContentStream;
 import org.mycore.solr.index.cs.MCRSolrContentStream;
-
-import java.io.IOException;
-import java.util.Objects;
 
 /**
  * Index one mycore object with a MCRSolrContentStream.

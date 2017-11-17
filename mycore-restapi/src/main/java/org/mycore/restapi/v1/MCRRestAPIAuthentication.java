@@ -24,7 +24,6 @@ package org.mycore.restapi.v1;
 
 import java.nio.charset.StandardCharsets;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 

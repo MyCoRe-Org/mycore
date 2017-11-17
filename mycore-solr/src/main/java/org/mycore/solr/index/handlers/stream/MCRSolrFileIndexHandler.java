@@ -1,5 +1,13 @@
 package org.mycore.solr.index.handlers.stream;
 
+import static org.mycore.solr.MCRSolrConstants.EXTRACT_PATH;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -13,14 +21,6 @@ import org.mycore.solr.index.cs.MCRSolrPathContentStream;
 import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import static org.mycore.solr.MCRSolrConstants.EXTRACT_PATH;
 
 public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 

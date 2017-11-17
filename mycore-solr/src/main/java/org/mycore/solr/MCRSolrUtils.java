@@ -23,9 +23,9 @@
 
 package org.mycore.solr;
 
-import org.mycore.common.config.MCRConfiguration;
-
 import java.util.regex.Pattern;
+
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * @author Thomas Scheffler (yagee)

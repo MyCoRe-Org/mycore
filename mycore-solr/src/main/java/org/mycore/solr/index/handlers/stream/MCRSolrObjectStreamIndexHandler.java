@@ -1,5 +1,11 @@
 package org.mycore.solr.index.handlers.stream;
 
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -9,12 +15,6 @@ import org.apache.solr.common.util.NamedList;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
-
-import java.io.IOException;
-import java.util.Map;
-
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
-import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
 
 /**
  * Base class for stream indexing MCRObject's with the default UPDATE_PATH.

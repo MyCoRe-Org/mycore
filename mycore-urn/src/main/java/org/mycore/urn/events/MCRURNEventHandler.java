@@ -22,7 +22,6 @@
  */
 package org.mycore.urn.events;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
