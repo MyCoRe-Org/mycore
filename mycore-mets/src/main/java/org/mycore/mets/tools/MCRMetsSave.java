@@ -64,7 +64,7 @@ import org.xml.sax.SAXException;
 /**
  * Class is responsible for saving a mets document to a derivate. It also can
  * handle addition and removing files from a derivate.
- * 
+ *
  * @author shermann
  *          Sebastian Hofmann
  *
@@ -95,7 +95,7 @@ public class MCRMetsSave {
      * the derivate with the given id. The name of the file depends on property
      * 'MCR.Mets.Filename'. If this property has not been set 'mets.xml' is used
      * as a default filename.
-     * 
+     *
      * @return
      *          true if the given document was successfully saved, otherwise false
      */
@@ -108,8 +108,8 @@ public class MCRMetsSave {
      * the derivate with the given id. The name of the file depends on property
      * 'MCR.Mets.Filename'. If this property has not been set 'mets.xml' is used
      * as a default filename.
-     * 
-     * @param overwrite 
+     *
+     * @param overwrite
      *          if true existing mets-file will be overwritten
      * @param validate
      *          if true the document will be validated before its stored
@@ -162,8 +162,9 @@ public class MCRMetsSave {
             return;
         }
         mets = MCRMetsSave.updateOnFileAdd(mets, file);
-        if (mets != null)
+        if (mets != null) {
             MCRMetsSave.saveMets(mets, derivateID);
+        }
 
     }
 
@@ -174,7 +175,7 @@ public class MCRMetsSave {
      * @return the mets.xml as JDOM document
      * @throws JDOMException
      * @throws IOException
-     * @throws SAXException 
+     * @throws SAXException
      */
     private static Document getCurrentMets(String derivateID) throws JDOMException, IOException, SAXException {
         MCRPath metsFile = getMetsFile(derivateID);
@@ -193,7 +194,7 @@ public class MCRMetsSave {
     // TODO: should use mets-model api
     /**
      * Alters the mets file
-     * 
+     *
      * @param mets
      *            the unmodified source
      * @param file
@@ -525,14 +526,14 @@ public class MCRMetsSave {
         throws UnsupportedEncodingException {
         // put all files of the mets in a list
         List<FileGrp> fileGroups = mets.getFileSec().getFileGroups();
-        List<org.mycore.mets.model.files.File> files = new ArrayList<>();
+        List<File> files = new ArrayList<>();
         for (FileGrp fileGrp : fileGroups) {
             files.addAll(fileGrp.getFileList());
         }
 
         // combine the filename and the id in a map
         Map<String, String> idFileMap = new HashMap<>();
-        for (org.mycore.mets.model.files.File file : files) {
+        for (File file : files) {
             idFileMap.put(file.getId(), file.getFLocat().getHref());
         }
 
@@ -673,7 +674,7 @@ public class MCRMetsSave {
     }
 
     /**
-     * @return true if all files owned by the derivate appearing in the master file group or false otherwise 
+     * @return true if all files owned by the derivate appearing in the master file group or false otherwise
      */
     public static boolean isComplete(Mets mets, MCRObjectID derivateId) {
         try {

@@ -109,7 +109,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static final String DEFAULT_TRANSFORMER = "save-object.xsl";
 
     /** static compiled transformer stylesheets */
-    private static Hashtable<String, javax.xml.transform.Transformer> translist = new Hashtable<>();
+    private static Hashtable<String, Transformer> translist = new Hashtable<>();
 
     public static void setSelectedObjectIDs(List<String> selected) {
         LOGGER.info("{} objects selected", selected.size());

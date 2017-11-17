@@ -24,7 +24,6 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;

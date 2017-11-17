@@ -28,7 +28,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -78,6 +77,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static HashMap<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
 
+    @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
         int position = -1;
         if (category instanceof MCRCategoryImpl) {
@@ -86,6 +86,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return addCategory(parentID, category, position);
     }
 
+    @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
         if (exist(category.getId())) {
             throw new MCRException("Cannot add category. A category with ID " + category.getId() + " already exists");
@@ -137,6 +138,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         });
     }
 
+    @Override
     public void deleteCategory(MCRCategoryID id) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         LOGGER.debug("Will get: {}", id);
@@ -166,6 +168,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @see org.mycore.datamodel.classifications2.MCRCategoryDAO#exist(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
+    @Override
     public boolean exist(MCRCategoryID id) {
         return getLeftRightLevelValues(MCREntityManagerProvider.getCurrentEntityManager(), id) != null;
     }
@@ -179,6 +182,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             .getResultList());
     }
 
+    @Override
     public List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         MCRCategoryDTO leftRight = getLeftRightLevelValues(entityManager, baseID);
@@ -192,6 +196,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             .getResultList());
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
@@ -233,6 +238,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @see org.mycore.datamodel.classifications2.MCRClassificationService#getChildren(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
+    @Override
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
         LOGGER.debug("Get children of category: {}", cid);
         return Optional.ofNullable(cid)
@@ -249,6 +255,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             .orElse(new MCRCategoryChildList(null, null));
     }
 
+    @Override
     public List<MCRCategory> getParents(MCRCategoryID id) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         MCRCategoryDTO leftRight = getLeftRightLevelValues(entityManager, id);
@@ -272,12 +279,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return parents;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<MCRCategoryID> getRootCategoryIDs() {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         return entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "rootIds").getResultList();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getRootCategories() {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
@@ -314,6 +323,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 }));
     }
 
+    @Override
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
         return Optional.ofNullable(getCategory(baseID, childLevel))
             .map(c -> {
@@ -340,12 +350,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @see org.mycore.datamodel.classifications2.MCRClassificationService#hasChildren(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
+    @Override
     public boolean hasChildren(MCRCategoryID cid) {
         // SELECT * FROM MCRCATEGORY WHERE PARENTID=(SELECT INTERNALID FROM
         // MCRCATEGORY WHERE rootID=cid.getRootID() and ID...);
         return getNumberOfChildren(MCREntityManagerProvider.getCurrentEntityManager(), cid) > 0;
     }
 
+    @Override
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID) {
         int index = getNumberOfChildren(MCREntityManagerProvider.getCurrentEntityManager(), newParentID);
         moveCategory(id, newParentID, index);
@@ -372,6 +384,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return getSingleResult(q);
     }
 
+    @Override
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
         withoutFlush(MCREntityManagerProvider.getCurrentEntityManager(), true, e -> {
             MCRCategoryImpl subTree = getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), id);
@@ -393,6 +406,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         });
     }
 
+    @Override
     public MCRCategory removeLabel(MCRCategoryID id, String lang) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         MCRCategoryImpl category = getByNaturalID(entityManager, id);
@@ -404,6 +418,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return category;
     }
 
+    @Override
     public Collection<MCRCategoryImpl> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
         if (!exist(newCategory.getId())) {
             throw new IllegalArgumentException(
@@ -499,6 +514,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         MCREntityManagerProvider.getCurrentEntityManager().remove(category);
     }
 
+    @Override
     public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         MCRCategoryImpl category = getByNaturalID(entityManager, id);
@@ -519,6 +535,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return category;
     }
 
+    @Override
     public MCRCategory setURI(MCRCategoryID id, URI uri) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         MCRCategoryImpl category = getByNaturalID(entityManager, id);
@@ -538,6 +555,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         });
     }
 
+    @Override
     public long getLastModified() {
         return LAST_MODIFIED;
     }
@@ -670,6 +688,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @return the last modified timestamp (if any) or -1
      */
+    @Override
     public long getLastModified(String root) {
         Long long1 = LAST_MODIFIED_MAP.get(root);
         if (long1 != null) {

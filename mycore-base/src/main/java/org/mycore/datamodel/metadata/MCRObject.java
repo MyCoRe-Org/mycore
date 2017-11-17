@@ -31,7 +31,6 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -66,8 +65,6 @@ public final class MCRObject extends MCRBase {
      * 
      * @exception MCRException
      *                general Exception of MyCoRe
-     * @exception MCRConfigurationException
-     *                a special exception for configuartion data
      */
     public MCRObject() throws MCRException {
         super();
@@ -118,6 +115,7 @@ public final class MCRObject extends MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
+    @Override
     protected final void setUp() throws MCRException {
         super.setUp();
 
@@ -170,6 +168,7 @@ public final class MCRObject extends MCRBase {
      * 
      * @return a json gson representation of this object
      */
+    @Override
     public JsonObject createJSON() {
         JsonObject object = super.createJSON();
         object.add("structure", mcr_struct.createJSON());
@@ -213,6 +212,7 @@ public final class MCRObject extends MCRBase {
      * 
      * @throws MCRException the MCRObject is invalid
      */
+    @Override
     public void validate() {
         super.validate();
         MCRObjectStructure structure = getStructure();

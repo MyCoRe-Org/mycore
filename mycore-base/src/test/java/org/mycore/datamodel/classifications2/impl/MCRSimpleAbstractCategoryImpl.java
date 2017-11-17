@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRLabel;
 
 final class MCRSimpleAbstractCategoryImpl extends MCRAbstractCategoryImpl {
     {
@@ -22,6 +21,7 @@ final class MCRSimpleAbstractCategoryImpl extends MCRAbstractCategoryImpl {
     protected void setChildrenUnlocked(List<MCRCategory> children) {
     }
 
+    @Override
     public int getLevel() {
         return 0;
     }

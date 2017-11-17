@@ -37,7 +37,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfigurationException;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -62,8 +61,6 @@ public final class MCRDerivate extends MCRBase {
      * 
      * @exception MCRException
      *                general Exception of MyCoRe
-     * @exception MCRConfigurationException
-     *                a special exception for configuartion data
      */
     public MCRDerivate() throws MCRException {
         super();
@@ -103,6 +100,7 @@ public final class MCRDerivate extends MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
+    @Override
     protected final void setUp() throws MCRException {
         super.setUp();
 
@@ -187,6 +185,7 @@ public final class MCRDerivate extends MCRBase {
      * 
      * @throws MCRException the MCRDerivate is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         MCRObjectDerivate derivate = getDerivate();

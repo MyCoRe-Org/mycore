@@ -25,8 +25,6 @@ package org.mycore.media;
 
 import static java.util.Collections.singletonMap;
 
-import java.lang.reflect.Method;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,8 +44,9 @@ public class MediaInfo {
         try {
             // We need to load dependencies first, because we know where our native libs are (e.g. Jetty Classpath).
             // If we do not, the system will look for dependencies, but only in the library path.
-            if (!Platform.isWindows() && !Platform.isMac())
+            if (!Platform.isWindows() && !Platform.isMac()) {
                 NativeLibrary.getInstance("zen");
+            }
         } catch (LinkageError e) {
             LOGGER.warn("Failed to preload libzen");
         }
@@ -56,7 +55,7 @@ public class MediaInfo {
     //Internal stuff
     interface MediaInfoDLL_Internal extends Library {
 
-        MediaInfoDLL_Internal INSTANCE = (MediaInfoDLL_Internal) Native.loadLibrary(
+        MediaInfoDLL_Internal INSTANCE = Native.loadLibrary(
             (Platform.isWindows() && Platform.is64Bit()) ? "mediainfo64" : "mediainfo", MediaInfoDLL_Internal.class,
             singletonMap(OPTION_FUNCTION_MAPPER, (FunctionMapper) (lib, method) -> {
                 // MediaInfo_New(), MediaInfo_Open() ...
@@ -143,8 +142,9 @@ public class MediaInfo {
         try {
             Handle = MediaInfoDLL_Internal.INSTANCE.New();
         } catch (Throwable e) {
-            if (e != null)
+            if (e != null) {
                 LOGGER.error("Error loading MediaInfo library: {}", e.getMessage());
+            }
             if (!Platform.isWindows() && !Platform.isMac()) {
                 LOGGER.error("Make sure you have libmediainfo and libzen installed");
             }
@@ -157,8 +157,9 @@ public class MediaInfo {
     }
 
     public void dispose() {
-        if (Handle == null)
+        if (Handle == null) {
             throw new IllegalStateException();
+        }
 
         MediaInfoDLL_Internal.INSTANCE.Delete(Handle);
         Handle = null;
@@ -166,8 +167,9 @@ public class MediaInfo {
 
     @Override
     protected void finalize() throws Throwable {
-        if (Handle != null)
+        if (Handle != null) {
             dispose();
+        }
     }
 
     //File

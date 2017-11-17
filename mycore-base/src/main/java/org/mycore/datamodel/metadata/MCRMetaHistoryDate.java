@@ -24,7 +24,6 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -465,6 +464,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * 
      * @throws MCRException the MCRMetaHistoryDate is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         for (int i = 0; i < texts.size(); i++) {

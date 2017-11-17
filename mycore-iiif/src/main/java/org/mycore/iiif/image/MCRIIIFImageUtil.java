@@ -25,7 +25,6 @@ import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_AP
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Locale;
 
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;

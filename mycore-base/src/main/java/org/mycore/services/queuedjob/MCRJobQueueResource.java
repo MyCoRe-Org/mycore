@@ -46,8 +46,6 @@ import javax.xml.bind.annotation.XmlValue;
 
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 

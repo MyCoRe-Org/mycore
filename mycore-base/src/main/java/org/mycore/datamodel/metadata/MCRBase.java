@@ -37,7 +37,6 @@ import org.jdom2.Element;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -109,8 +108,6 @@ public abstract class MCRBase {
      * 
      * @exception MCRException
      *                general Exception of MyCoRe
-     * @exception MCRConfigurationException
-     *                a special exception for configuration data
      */
     public MCRBase() throws MCRException {
         mcr_label = "";

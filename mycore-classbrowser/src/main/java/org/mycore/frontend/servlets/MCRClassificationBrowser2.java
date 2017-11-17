@@ -25,7 +25,6 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -71,6 +70,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         queryAdapter.configure(req);
     }
 
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         long time = System.nanoTime();
 
@@ -85,8 +85,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         String el = req.getParameter("emptyleaves");
         boolean emptyLeaves = true;
-        if ((el != null) && (el.trim().length() > 0))
+        if ((el != null) && (el.trim().length() > 0)) {
             emptyLeaves = Boolean.valueOf(el);
+        }
 
         LOGGER.info("ClassificationBrowser {} {}", classifID, categID == null ? "" : categID);
 
@@ -126,22 +127,26 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             }
             if (countResults) {
                 numResults = queryAdapter.getResultCount();
-                if ((!emptyLeaves) && (numResults < 1))
+                if ((!emptyLeaves) && (numResults < 1)) {
                     continue;
+                }
             }
 
             Element categoryE = new Element("category");
             data.add(categoryE);
-            if (countResults)
+            if (countResults) {
                 categoryE.setAttribute("numResults", String.valueOf(numResults));
+            }
 
             categoryE.setAttribute("id", childID);
             categoryE.setAttribute("children", Boolean.toString(child.hasChildren()));
-            if (queryAdapter != null)
+            if (queryAdapter != null) {
                 categoryE.setAttribute("query", queryAdapter.getQueryAsString());
+            }
 
-            if (uri && (child.getURI() != null))
+            if (uri && (child.getURI() != null)) {
                 categoryE.addContent(new Element("uri").setText(child.getURI().toString()));
+            }
 
             addLabel(req, child, categoryE);
         }
@@ -168,15 +173,17 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         // if true, add description
         boolean descr = Boolean.valueOf(req.getParameter("adddescription"));
-        if (descr && (label.getDescription() != null))
+        if (descr && (label.getDescription() != null)) {
             category.addContent(new Element("description").setText(label.getDescription()));
+        }
     }
 
     /** Add link count to each category */
     private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category,
         List<Element> data) {
-        if (!Boolean.valueOf(req.getParameter("countlinks")))
+        if (!Boolean.valueOf(req.getParameter("countlinks"))) {
             return;
+        }
         if (objectType != null && objectType.trim().length() == 0) {
             objectType = null;
         }
@@ -189,8 +196,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
             int num = (count.containsKey(childID) ? count.get(childID).intValue() : 0);
             child.setAttribute("numLinks", String.valueOf(num));
-            if ((!emptyLeaves) && (num < 1))
+            if ((!emptyLeaves) && (num < 1)) {
                 it.remove();
+            }
         }
     }
 
@@ -216,8 +224,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         throws IOException, TransformerException,
         SAXException {
         String style = req.getParameter("style"); // XSL.Style, optional
-        if ((style != null) && (style.length() > 0))
+        if ((style != null) && (style.length() > 0)) {
             req.setAttribute("XSL.Style", style);
+        }
 
         MCRServlet.getLayoutService().doLayout(req, job.getResponse(), new MCRJDOMContent(xml));
     }
