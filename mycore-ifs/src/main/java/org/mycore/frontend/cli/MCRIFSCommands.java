@@ -210,7 +210,7 @@ public class MCRIFSCommands {
                 }
 
                 private LinkedList<Iterator<File>> initIterator() {
-                    LinkedList<Iterator<File>> iterators = new LinkedList<Iterator<File>>();
+                    LinkedList<Iterator<File>> iterators = new LinkedList<>();
                     iterators.add(getIterator(files));
                     return iterators;
                 }
@@ -222,7 +222,7 @@ public class MCRIFSCommands {
                 private LinkedList<File> getInitialList(File currentDir) {
                     File[] children = currentDir.listFiles();
                     Arrays.sort(children, NameFileComparator.NAME_COMPARATOR);
-                    LinkedList<File> list = new LinkedList<File>();
+                    LinkedList<File> list = new LinkedList<>();
                     list.addAll(Arrays.asList(children));
                     return list;
                 }

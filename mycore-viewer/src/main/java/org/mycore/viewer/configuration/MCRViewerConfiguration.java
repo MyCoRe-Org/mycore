@@ -257,7 +257,7 @@ public class MCRViewerConfiguration {
      */
     public MCRXMLContent toXML() throws JAXBException {
         MCRIViewClientXMLConfiguration xmlConfig = new MCRIViewClientXMLConfiguration(resources, properties);
-        MCRJAXBContent<MCRIViewClientXMLConfiguration> config = new MCRJAXBContent<MCRIViewClientXMLConfiguration>(
+        MCRJAXBContent<MCRIViewClientXMLConfiguration> config = new MCRJAXBContent<>(
             JAXBContext.newInstance(xmlConfig.getClass()), xmlConfig);
         return config;
     }

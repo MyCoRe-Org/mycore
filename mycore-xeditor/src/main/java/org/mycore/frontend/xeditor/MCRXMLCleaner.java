@@ -24,9 +24,9 @@ public class MCRXMLCleaner {
     private static final MCRCleaningRule PRESERVE_STRUCTURE_AND_SERVICE = new MCRCleaningRule(
         "/mycoreobject/structure|/mycoreobject/service", "true()");
 
-    private List<MCRCleaningRule> rules = new ArrayList<MCRCleaningRule>();
+    private List<MCRCleaningRule> rules = new ArrayList<>();
 
-    private Map<Object, MCRCleaningRule> nodes2rules = new HashMap<Object, MCRCleaningRule>();
+    private Map<Object, MCRCleaningRule> nodes2rules = new HashMap<>();
 
     public MCRXMLCleaner() {
         addRule(REMOVE_EMPTY_ATTRIBUTES);

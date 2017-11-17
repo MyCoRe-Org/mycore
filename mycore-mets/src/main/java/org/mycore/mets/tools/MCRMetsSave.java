@@ -525,13 +525,13 @@ public class MCRMetsSave {
         throws UnsupportedEncodingException {
         // put all files of the mets in a list
         List<FileGrp> fileGroups = mets.getFileSec().getFileGroups();
-        List<org.mycore.mets.model.files.File> files = new ArrayList<org.mycore.mets.model.files.File>();
+        List<org.mycore.mets.model.files.File> files = new ArrayList<>();
         for (FileGrp fileGrp : fileGroups) {
             files.addAll(fileGrp.getFileList());
         }
 
         // combine the filename and the id in a map
-        Map<String, String> idFileMap = new HashMap<String, String>();
+        Map<String, String> idFileMap = new HashMap<>();
         for (org.mycore.mets.model.files.File file : files) {
             idFileMap.put(file.getId(), file.getFLocat().getHref());
         }
@@ -574,7 +574,7 @@ public class MCRMetsSave {
                     ArrayList<PhysicalSubDiv> physicalSubDivsToRemove = new ArrayList<>();
                     // remove file from mets:mets/mets:structMap[@TYPE='PHYSICAL']
                     for (PhysicalSubDiv physicalSubDiv : divContainer.getChildren()) {
-                        ArrayList<Fptr> fptrsToRemove = new ArrayList<Fptr>();
+                        ArrayList<Fptr> fptrsToRemove = new ArrayList<>();
                         for (Fptr fptr : physicalSubDiv.getChildren()) {
                             if (fptr.getFileId().equals(fileToRemove.getId())) {
                                 if (fileGrp.getUse().equals(FileGrp.USE_MASTER)) {

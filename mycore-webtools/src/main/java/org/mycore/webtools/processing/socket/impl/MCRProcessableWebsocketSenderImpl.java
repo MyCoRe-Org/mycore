@@ -48,9 +48,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
     public void sendRegistry(Session session, MCRProcessableRegistry registry) {
         JsonObject registryMessage = new JsonObject();
         send(session, registryMessage, Type.registry);
-        registry.stream().forEach(collection -> {
-            addCollection(session, registry, collection);
-        });
+        registry.stream().forEach(collection -> addCollection(session, registry, collection));
     }
 
     @Override
@@ -61,9 +59,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
         addCollectionMessage.add("properties", MCRProcessableJSONUtil.toJSON(collection.getProperties()));
         send(session, addCollectionMessage, Type.addCollection);
 
-        collection.stream().forEach(processable -> {
-            addProcessable(session, collection, processable);
-        });
+        collection.stream().forEach(processable -> addProcessable(session, collection, processable));
     }
 
     @Override
@@ -72,9 +68,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
         if (id == null) {
             return;
         }
-        collection.stream().forEach(processable -> {
-            removeProcessable(session, processable);
-        });
+        collection.stream().forEach(processable -> removeProcessable(session, processable));
         JsonObject removeCollectionMessage = new JsonObject();
         removeCollectionMessage.addProperty("id", id);
         send(session, removeCollectionMessage, Type.removeCollection);
@@ -116,12 +110,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
     }
 
     public synchronized Integer getId(Object object) {
-        Integer id = ID_MAP.get(object);
-        if (id == null) {
-            id = ID_GENERATOR.incrementAndGet();
-            ID_MAP.put(object, id);
-        }
-        return id;
+        return ID_MAP.computeIfAbsent(object, k -> ID_GENERATOR.incrementAndGet());
     }
 
     public synchronized Integer remove(Object object) {
@@ -180,20 +169,15 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
          * @param msg the message
          */
         public static void send(Session session, String msg) {
-            SERVICE.submit(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (session != null && !session.isOpen()) {
-                        return;
-                    }
-                    try {
-                        session.getBasicRemote().sendText(msg);
-                    } catch (Exception exc) {
-                        LOGGER.error("Websocket error " + session.getId() + ": Unable to send message " + msg);
-                    }
+            SERVICE.submit(() -> {
+                if (session != null && !session.isOpen()) {
+                    return;
                 }
-
+                try {
+                    session.getBasicRemote().sendText(msg);
+                } catch (Exception exc) {
+                    LOGGER.error("Websocket error " + session.getId() + ": Unable to send message " + msg);
+                }
             });
 
         }

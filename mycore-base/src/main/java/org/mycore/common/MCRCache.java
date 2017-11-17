@@ -329,7 +329,7 @@ public class MCRCache<K, V> {
      * A small sample program for testing this class.
      */
     public static void main(String[] args) {
-        MCRCache<String, String> cache = new MCRCache<String, String>(4, "Small Sample Program");
+        MCRCache<String, String> cache = new MCRCache<>(4, "Small Sample Program");
         System.out.println(cache);
         cache.put("a", "Anton");
         cache.put("b", "Bohnen");

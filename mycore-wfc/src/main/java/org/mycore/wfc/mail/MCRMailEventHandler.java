@@ -57,7 +57,7 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
 
     private void sendNotificationMail(MCREvent evt, MCRContent doc, String description) throws Exception {
         LOGGER.info("Preparing mail for: " + description);
-        HashMap<String, String> parameters = new HashMap<String, String>();
+        HashMap<String, String> parameters = new HashMap<>();
         for (Map.Entry<String, Object> entry : evt.entrySet()) {
             parameters.put(entry.getKey(), entry.getValue().toString());
         }

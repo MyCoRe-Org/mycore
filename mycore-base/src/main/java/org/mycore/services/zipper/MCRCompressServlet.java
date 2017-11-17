@@ -222,7 +222,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
             return;
         }
         // root is a directory
-        Files.walkFileTree(resolvedPath, new CompressVisitor<T>(this, container));
+        Files.walkFileTree(resolvedPath, new CompressVisitor<>(this, container));
     }
 
     private String getFileName(MCRObjectID id, String path) {

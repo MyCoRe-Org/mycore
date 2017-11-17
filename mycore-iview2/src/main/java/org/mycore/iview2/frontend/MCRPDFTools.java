@@ -59,8 +59,7 @@ class MCRPDFTools implements AutoCloseable {
 
     static BufferedImage getThumbnail(Path pdfFile, int thumbnailSize, boolean centered) throws IOException {
         InputStream fileIS = Files.newInputStream(pdfFile);
-        PDDocument pdf = PDDocument.load(fileIS);
-        try {
+        try (PDDocument pdf = PDDocument.load(fileIS)) {
             PDFRenderer pdfRenderer = new PDFRenderer(pdf);
             BufferedImage level1Image = pdfRenderer.renderImage(0);
             int imageType = BufferedImage.TYPE_INT_ARGB;
@@ -76,9 +75,7 @@ class MCRPDFTools implements AutoCloseable {
             final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
             //if centered make thumbnailSize x thumbnailSize image
             final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth,
-                centered ? thumbnailSize
-                    : newHeight,
-                imageType);
+                centered ? thumbnailSize : newHeight, imageType);
             LOGGER.info("target image dimensions: " + bicubic.getWidth() + "x" + bicubic.getHeight());
             final Graphics2D bg = bicubic.createGraphics();
             bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
@@ -91,8 +88,6 @@ class MCRPDFTools implements AutoCloseable {
                 (int) Math.ceil(height), null);
             bg.dispose();
             return bicubic;
-        } finally {
-            pdf.close();
         }
     }
 

@@ -83,11 +83,11 @@ public class MCRUserTransformerTest extends MCRUserTestCase {
     @XmlAccessorType(XmlAccessType.NONE)
     public static class HashMapTest2 {
 
-        public Map<String, String> map = new HashMap<String, String>();
+        public Map<String, String> map = new HashMap<>();
 
         @XmlElement(name = "entry")
         public MapEntry[] getMap() {
-            List<MapEntry> list = new ArrayList<MapEntry>();
+            List<MapEntry> list = new ArrayList<>();
             for (Entry<String, String> entry : map.entrySet()) {
                 MapEntry mapEntry = new MapEntry();
                 mapEntry.key = entry.getKey();

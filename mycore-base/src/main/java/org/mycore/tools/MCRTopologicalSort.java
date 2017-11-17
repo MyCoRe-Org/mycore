@@ -190,7 +190,7 @@ public class MCRTopologicalSort {
         edgeSources.clear();
 
         String file = null;
-        Map<Integer, List<String>> parentNames = new HashMap<Integer, List<String>>();
+        Map<Integer, List<String>> parentNames = new HashMap<>();
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         for (int i = 0; i < files.length; i++) {
             file = files[i];
@@ -208,14 +208,14 @@ public class MCRTopologicalSort {
                                     .getAttributeValue("http://www.w3.org/1999/xlink", "href");
                                 if (xmlStreamReader.getLocalName().equals("parent")) {
                                     List<String> dependencyList = parentNames.computeIfAbsent(i,
-                                        e -> new ArrayList<String>());
+                                        e -> new ArrayList<>());
                                     dependencyList.add(
                                         href);
                                 } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
                                     if (MCRObjectID.isValid(
                                         href)) {
                                         List<String> dependencyList = parentNames
-                                            .computeIfAbsent(i, e -> new ArrayList<String>());
+                                            .computeIfAbsent(i, e -> new ArrayList<>());
                                         dependencyList.add(
                                             href);
                                     }
@@ -321,12 +321,7 @@ public class MCRTopologicalSort {
      * @param to - the target node
      */
     public void addEdge(Integer from, Integer to) {
-        TreeSet<Integer> ts = edgeSources.get(to);
-        if (ts == null) {
-            ts = new TreeSet<Integer>();
-            edgeSources.put(to, ts);
-        }
-        ts.add(from);
+        edgeSources.computeIfAbsent(to, k -> new TreeSet<>()).add(from);
     }
 
     /**
@@ -385,7 +380,7 @@ public class MCRTopologicalSort {
             // add n to tail of L (we use head, because we need an inverted list !!)
             result[cursor--] = node;
             // for each node m with an edge e from n to m do
-            for (Integer to : new TreeSet<Integer>(edgeSources.keySet())) {
+            for (Integer to : new TreeSet<>(edgeSources.keySet())) {
                 Set<Integer> ts = edgeSources.get(to);
                 if (ts != null && ts.contains(node)) {
                     // remove edge e from the graph

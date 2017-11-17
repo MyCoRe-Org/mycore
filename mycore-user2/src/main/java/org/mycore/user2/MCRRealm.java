@@ -46,7 +46,7 @@ public class MCRRealm {
     private String id;
 
     /** The labels of the realm */
-    private HashMap<String, String> labels = new HashMap<String, String>();
+    private HashMap<String, String> labels = new HashMap<>();
 
     /** The URL where users from this realm can change their password */
     private String passwordChangeURL;

@@ -11,7 +11,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 
 final class MCRSimpleAbstractCategoryImpl extends MCRAbstractCategoryImpl {
     {
-        labels = new HashSet<MCRLabel>();
+        labels = new HashSet<>();
     }
 
     public MCRSimpleAbstractCategoryImpl() {

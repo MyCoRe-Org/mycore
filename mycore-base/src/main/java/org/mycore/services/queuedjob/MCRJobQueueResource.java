@@ -66,7 +66,7 @@ public class MCRJobQueueResource {
         try {
             Queues queuesEntity = new Queues();
             queuesEntity.addAll(
-                MCRJobQueue.INSTANCES.keySet().stream().map(n -> new Queue(n)).collect(Collectors.toList()));
+                MCRJobQueue.INSTANCES.keySet().stream().map(Queue::new).collect(Collectors.toList()));
 
             return Response.ok().status(Response.Status.OK).entity(queuesEntity)
                 .build();
@@ -84,7 +84,7 @@ public class MCRJobQueueResource {
         try {
             Queues queuesEntity = new Queues();
             queuesEntity.addAll(
-                MCRJobQueue.INSTANCES.keySet().stream().map(n -> new Queue(n)).collect(Collectors.toList()));
+                MCRJobQueue.INSTANCES.keySet().stream().map(Queue::new).collect(Collectors.toList()));
 
             return Response.ok().status(Response.Status.OK).entity(toJSON(queuesEntity))
                 .build();
@@ -107,7 +107,7 @@ public class MCRJobQueueResource {
 
                     MCRJobQueue jq = e.getValue();
                     Iterable<MCRJob> iterable = () -> jq.iterator(null);
-                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(j -> new Job(j))
+                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(Job::new)
                         .collect(Collectors.toList());
 
                     return q;
@@ -134,7 +134,7 @@ public class MCRJobQueueResource {
 
                     MCRJobQueue jq = e.getValue();
                     Iterable<MCRJob> iterable = () -> jq.iterator(null);
-                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(j -> new Job(j))
+                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(Job::new)
                         .collect(Collectors.toList());
 
                     return q;

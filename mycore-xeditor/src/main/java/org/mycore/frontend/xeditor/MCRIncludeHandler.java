@@ -24,9 +24,9 @@ public class MCRIncludeHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRIncludeHandler.class);
 
-    private static final Map<String, Node> includesPerApplication = new ConcurrentHashMap<String, Node>();
+    private static final Map<String, Node> includesPerApplication = new ConcurrentHashMap<>();
 
-    private Map<String, Node> includesPerTransformation = new HashMap<String, Node>();
+    private Map<String, Node> includesPerTransformation = new HashMap<>();
 
     public XNodeSet resolve(ExpressionContext context, String uri, String sStatic) throws TransformerException {
         boolean bStatic = "true".equals(sStatic) || includesPerApplication.containsKey(uri);

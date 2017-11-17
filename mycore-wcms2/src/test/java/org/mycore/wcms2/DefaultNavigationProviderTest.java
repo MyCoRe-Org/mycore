@@ -85,7 +85,7 @@ public class DefaultNavigationProviderTest {
 
     @SuppressWarnings("unused")
     private List<JsonObject> getByWCMSType(String type, JsonArray items) {
-        List<JsonObject> itemList = new ArrayList<JsonObject>();
+        List<JsonObject> itemList = new ArrayList<>();
         for (JsonElement e : items) {
             JsonObject item = (JsonObject) e;
             if (item.getAsJsonPrimitive("wcmsType").getAsString().equals(type))

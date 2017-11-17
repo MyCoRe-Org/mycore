@@ -63,11 +63,9 @@ public class MCRMediaSourceProvider {
         getDashStream()
             .map(s -> new MCRMediaSource(s, MCRMediaSourceType.dash_stream))
             .ifPresent(mediaSources::add);
-        userAgent.filter(MCRMediaSourceProvider::mayContainHLSStream).ifPresent(f -> {
-            getHLSStream()
-                .map(s -> new MCRMediaSource(s, MCRMediaSourceType.hls_stream))
-                .ifPresent(mediaSources::add);
-        });
+        userAgent.filter(MCRMediaSourceProvider::mayContainHLSStream).ifPresent(f -> getHLSStream()
+            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.hls_stream))
+            .ifPresent(mediaSources::add));
         getRTMPStream()
             .map(s -> new MCRMediaSource(s, MCRMediaSourceType.rtmp_stream))
             .ifPresent(mediaSources::add);

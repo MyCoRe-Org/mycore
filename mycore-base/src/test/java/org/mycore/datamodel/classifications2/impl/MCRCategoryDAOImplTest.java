@@ -156,7 +156,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         assertTrue("Exist check failed for Category " + category.getId(), DAO.exist(category.getId()));
         MCRCategoryImpl india = new MCRCategoryImpl();
         india.setId(new MCRCategoryID(category.getId().getRootID(), "India"));
-        india.setLabels(new HashSet<MCRLabel>());
+        india.setLabels(new HashSet<>());
         india.getLabels().add(new MCRLabel("de", "Indien", null));
         india.getLabels().add(new MCRLabel("en", "India", null));
         DAO.addCategory(new MCRCategoryID(category.getId().getRootID(), "Asia"), india);
@@ -227,7 +227,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategoryImpl america = new MCRCategoryImpl();
         MCRCategoryID categoryID = new MCRCategoryID(category.getId().getRootID(), "America");
         america.setId(categoryID);
-        america.setLabels(new HashSet<MCRLabel>());
+        america.setLabels(new HashSet<>());
         america.getLabels().add(new MCRLabel("de", "Amerika", null));
         america.getLabels().add(new MCRLabel("en", "America", null));
         DAO.addCategory(category.getId(), america, 1);
@@ -506,7 +506,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     private void addChild(MCRCategoryImpl parent, MCRCategoryImpl child) {
         List<MCRCategory> children = parent.getChildren();
         if (children == null) {
-            parent.setChildren(new ArrayList<MCRCategory>());
+            parent.setChildren(new ArrayList<>());
             children = parent.getChildren();
         }
         children.add(child);
@@ -515,7 +515,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     private MCRCategoryImpl newCategory(MCRCategoryID id, String description) {
         MCRCategoryImpl newCateg = new MCRCategoryImpl();
         newCateg.setId(id);
-        Set<MCRLabel> labels = new HashSet<MCRLabel>();
+        Set<MCRLabel> labels = new HashSet<>();
         labels.add(new MCRLabel("en", id.toString(), description));
         newCateg.setLabels(labels);
         return newCateg;
@@ -651,7 +651,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl test = new MCRCategoryImpl();
         test.setId(new MCRCategoryID(category.getId().getRootID(), "test"));
-        test.setLabels(new HashSet<MCRLabel>());
+        test.setLabels(new HashSet<>());
         test.getLabels().add(new MCRLabel("de", "JUnit testcase", null));
         category.getChildren().add(test);
         category.getChildren().remove(0);
@@ -715,19 +715,12 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     private void printCategoryTable() {
         Session session = MCRHIBConnection.instance().getSession();
         session.doWork(connection -> {
-            try {
-                Statement statement = connection.createStatement();
-                try {
-                    String tableName = getDefaultSchema().map(s -> s + ".").orElse("") + "MCRCategory";
-                    ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
-                    printResultSet(resultSet, System.out);
-                } catch (SQLException e1) {
-                    LogManager.getLogger().warn("Error while querying MCRCategory", e1);
-                } finally {
-                    statement.close();
-                }
-            } catch (SQLException e2) {
-                LogManager.getLogger().warn("Error while querying MCRCategory", e2);
+            try (Statement statement = connection.createStatement()) {
+                String tableName = getDefaultSchema().map(s -> s + ".").orElse("") + "MCRCategory";
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
+                printResultSet(resultSet, System.out);
+            } catch (SQLException e1) {
+                LogManager.getLogger().warn("Error while querying MCRCategory", e1);
             }
         });
     }

@@ -152,7 +152,7 @@ class ExtentPagesBuilder {
 
     private static final String FF = "(" + SPACES + "ff?\\.?)" + OPTIONAL;
 
-    private List<PagesPattern> patterns = new ArrayList<PagesPattern>();
+    private List<PagesPattern> patterns = new ArrayList<>();
 
     ExtentPagesBuilder() {
         PagesPattern startEnd = new PagesPattern(PAGE + PAGENR + HYPHEN + PAGENR + DOT + OPTIONAL);
@@ -226,7 +226,7 @@ class PagesPattern {
     private Pattern pattern;
 
     /** Mapping from MODS Element name to group number in the pattern */
-    private Map<String, Integer> mods2group = new LinkedHashMap<String, Integer>();
+    private Map<String, Integer> mods2group = new LinkedHashMap<>();
 
     PagesPattern(String regularExpression) {
         pattern = Pattern.compile(regularExpression);

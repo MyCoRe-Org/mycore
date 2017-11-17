@@ -49,7 +49,7 @@ public abstract class MCRObjectUtils {
      * @return list of ancestors
      */
     public static List<MCRObject> getAncestors(MCRObject mcrObject) {
-        List<MCRObject> ancestorList = new ArrayList<MCRObject>();
+        List<MCRObject> ancestorList = new ArrayList<>();
         while (mcrObject.hasParent()) {
             MCRObjectID parentID = mcrObject.getStructure().getParentID();
             MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);
@@ -67,7 +67,7 @@ public abstract class MCRObjectUtils {
      * @return list of ancestors
      */
     public static List<MCRObject> getAncestorsAndSelf(MCRObject mcrObject) {
-        List<MCRObject> ancestorList = new ArrayList<MCRObject>();
+        List<MCRObject> ancestorList = new ArrayList<>();
         ancestorList.add(mcrObject);
         ancestorList.addAll(getAncestors(mcrObject));
         return ancestorList;
@@ -96,7 +96,7 @@ public abstract class MCRObjectUtils {
         return mcrObject.getStructure()
             .getChildren()
             .stream()
-            .map(link -> link.getXLinkHrefID())
+            .map(MCRMetaLinkID::getXLinkHrefID)
             .map(MCRMetadataManager::retrieveMCRObject)
             .collect(Collectors.toList());
     }
@@ -122,9 +122,7 @@ public abstract class MCRObjectUtils {
      */
     public static List<MCRObject> getDescendants(MCRObject mcrObject) {
         List<MCRObject> objectList = new ArrayList<>();
-        getChildren(mcrObject).forEach(child -> {
-            objectList.addAll(getDescendantsAndSelf(child));
-        });
+        getChildren(mcrObject).forEach(child -> objectList.addAll(getDescendantsAndSelf(child)));
         return objectList;
     }
 

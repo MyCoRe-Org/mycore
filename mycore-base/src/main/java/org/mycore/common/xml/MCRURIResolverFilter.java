@@ -54,12 +54,7 @@ import org.apache.logging.log4j.Logger;
 public class MCRURIResolverFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
-    static ThreadLocal<List<String>> uriList = new ThreadLocal<List<String>>() {
-        @Override
-        protected List<String> initialValue() {
-            return new MyLinkedList();
-        }
-    };
+    static ThreadLocal<List<String>> uriList = ThreadLocal.withInitial(() -> new MyLinkedList());
 
     /**
      * adds debug information from MCRURIResolver to Servlet output.

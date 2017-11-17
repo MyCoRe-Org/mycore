@@ -81,7 +81,7 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
         } catch (JAXBException e) {
             throw new IOException(e);
         }
-        return new MCRJAXBContent<T>(context, result);
+        return new MCRJAXBContent<>(context, result);
     }
 
     private T getJAXBObject(MCRContent source, XMLReader reader, TransformerHandler transformerHandler)

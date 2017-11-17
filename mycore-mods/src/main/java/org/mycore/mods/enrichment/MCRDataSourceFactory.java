@@ -36,7 +36,7 @@ class MCRDataSourceFactory {
         return INSTANCE;
     }
 
-    private MCRCache<String, MCRDataSource> dataSources = new MCRCache<String, MCRDataSource>(30, "data sources");
+    private MCRCache<String, MCRDataSource> dataSources = new MCRCache<>(30, "data sources");
 
     private MCRDataSourceFactory() {
     }

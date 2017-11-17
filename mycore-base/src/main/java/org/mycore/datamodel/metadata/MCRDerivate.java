@@ -138,7 +138,7 @@ public final class MCRDerivate extends MCRBase {
      * @return A {@link Map} which contains the files as key and the urns as value. If no URN assigned the map will be empty.
      */
     public Map<String, String> getUrnMap() {
-        Map<String, String> fileUrnMap = new HashMap<String, String>();
+        Map<String, String> fileUrnMap = new HashMap<>();
 
         XPathExpression<Element> filesetPath = XPathFactory.instance().compile("./mycorederivate/derivate/fileset",
             Filters.element());

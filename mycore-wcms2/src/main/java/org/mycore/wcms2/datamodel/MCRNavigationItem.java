@@ -54,7 +54,7 @@ public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavig
 
     public MCRNavigationItem() {
         super();
-        this.children = new ArrayList<MCRNavigationBaseItem>();
+        this.children = new ArrayList<>();
     }
 
     public String getHref() {

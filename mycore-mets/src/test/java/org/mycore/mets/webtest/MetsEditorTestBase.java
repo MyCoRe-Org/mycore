@@ -31,7 +31,7 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
     protected void waitForElement(By byTextIgnoreCSS) throws InterruptedException {
         int maxWait = MAXIMAL_TIME_TO_WAIT_FOR_A_ELEMENT;
         WebDriver webDriver = this.getDriver();
-        List<WebElement> elements = new ArrayList<WebElement>();
+        List<WebElement> elements = new ArrayList<>();
         while (elements.isEmpty() && maxWait-- > 0) {
             elements = webDriver.findElements(byTextIgnoreCSS);
             Thread.sleep(ONE_SECOND_IN_MILLISECONDS);

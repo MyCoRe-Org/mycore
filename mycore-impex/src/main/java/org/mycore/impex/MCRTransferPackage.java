@@ -78,7 +78,7 @@ public class MCRTransferPackage {
      * @throws MCRAccessException if the Users doesn't have the rights to create this transfer package
      */
     public void build() throws MCRUsageException, MCRAccessException {
-        LinkedHashMap<MCRObjectID, MCRObject> objectMap = new LinkedHashMap<MCRObjectID, MCRObject>();
+        LinkedHashMap<MCRObjectID, MCRObject> objectMap = new LinkedHashMap<>();
         Set<MCRCategoryID> categories = new HashSet<>();
         resolveChildrenAndLinks(source, objectMap, categories);
 
@@ -130,7 +130,7 @@ public class MCRTransferPackage {
      * @return list of transfer packages file container
      */
     protected List<MCRTransferPackageFileContainer> buildFileContainers(MCRObject object) {
-        List<MCRTransferPackageFileContainer> fileContainerList = new ArrayList<MCRTransferPackageFileContainer>();
+        List<MCRTransferPackageFileContainer> fileContainerList = new ArrayList<>();
         MCRObjectUtils.getDescendantsAndSelf(object)
             .stream()
             .map(MCRObject::getStructure)

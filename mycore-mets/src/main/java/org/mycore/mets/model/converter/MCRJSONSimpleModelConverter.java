@@ -33,9 +33,7 @@ public class MCRJSONSimpleModelConverter {
         MCRMetsSimpleModel metsSimpleModel = gsonBuilder.create().fromJson(model, MCRMetsSimpleModel.class);
 
         Hashtable<String, MCRMetsPage> idPageMap = new Hashtable<>();
-        metsSimpleModel.getMetsPageList().stream().forEach(page -> {
-            idPageMap.put(page.getId(), page);
-        });
+        metsSimpleModel.getMetsPageList().stream().forEach(page -> idPageMap.put(page.getId(), page));
 
         final Map<String, MCRMetsFile> idMCRMetsFileMap = extractIdFileMap(metsSimpleModel.getMetsPageList());
 
@@ -64,13 +62,11 @@ public class MCRJSONSimpleModelConverter {
 
     private static Map<String, MCRMetsFile> extractIdFileMap(List<MCRMetsPage> pages) {
         final Map<String, MCRMetsFile> idFileMap = new Hashtable<>();
-        pages.forEach(p -> {
-            p.getFileList().stream()
-                .filter(file -> file.getUse().equals(MCRMetsFileUse.ALTO))
-                .forEach(file -> {
-                    idFileMap.put(file.getId(), file);
-                });
-        });
+        pages.forEach(p -> p.getFileList().stream()
+                        .filter(file -> file.getUse().equals(MCRMetsFileUse.ALTO))
+                        .forEach(file -> {
+                idFileMap.put(file.getId(), file);
+            }));
 
         return idFileMap;
     }

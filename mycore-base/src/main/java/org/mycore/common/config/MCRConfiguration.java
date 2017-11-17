@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -84,7 +85,7 @@ public class MCRConfiguration {
      */
     private static MCRConfiguration singleton;
 
-    private Hashtable<SingletonKey, Object> instanceHolder = new Hashtable<SingletonKey, Object>();
+    private Hashtable<SingletonKey, Object> instanceHolder = new Hashtable<>();
 
     private File lastModifiedFile;
 
@@ -153,7 +154,7 @@ public class MCRConfiguration {
 
             @Override
             public synchronized Enumeration<Object> keys() {
-                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+                return Collections.enumeration(new TreeSet<>(super.keySet()));
             }
         };
         if (props != null) {
@@ -770,20 +771,18 @@ public class MCRConfiguration {
 
     public synchronized void initialize(Map<String, String> props, boolean clear) {
         checkForDeprecatedProperties(props);
-        HashMap<String, String> copy = new HashMap<>(props);
-        copy.remove(null);
         if (clear) {
             getBaseProperties().clear();
         } else {
-            Map<String, String> nullValues = Maps.filterValues(copy, Predicates.isNull());
-            for (String key : nullValues.keySet()) {
-                getBaseProperties().remove(key);
-            }
+            getPropertiesMap().entrySet().removeIf(e -> props.get(e.getKey()) == null);
         }
-        Map<String, String> notNullValues = Maps.filterValues(copy, Predicates.notNull());
-        for (Entry<String, String> entry : notNullValues.entrySet()) {
-            getBaseProperties().setProperty(entry.getKey(), entry.getValue());
-        }
+        getBaseProperties().putAll(
+            props.entrySet()
+                 .stream()
+                 .filter(e -> e.getKey() != null)
+                 .filter(e -> e.getValue() != null)
+                 .collect(Collectors.toMap(Entry::getKey,Entry::getValue))
+        );
         resolveProperties();
         debug();
     }

@@ -27,7 +27,7 @@ public class MCRNavigationGroup extends MCRNavigationI18nItem implements MCRNavi
 
     public MCRNavigationGroup() {
         super();
-        this.children = new ArrayList<MCRNavigationBaseItem>();
+        this.children = new ArrayList<>();
     }
 
     public void addItem(MCRNavigationItem item) {

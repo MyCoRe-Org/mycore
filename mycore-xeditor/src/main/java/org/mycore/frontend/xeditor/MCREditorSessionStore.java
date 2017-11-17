@@ -39,7 +39,7 @@ public class MCREditorSessionStore {
 
     MCREditorSessionStore() {
         int maxEditorsInSession = MCRConfiguration.instance().getInt("MCR.XEditor.MaxEditorsInSession", 50);
-        cachedSessions = new MCRCache<String, MCREditorSession>(maxEditorsInSession, "Stored XEditor Sessions");
+        cachedSessions = new MCRCache<>(maxEditorsInSession, "Stored XEditor Sessions");
     }
 
     public void storeSession(MCREditorSession session) {

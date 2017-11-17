@@ -108,7 +108,7 @@ public class MCRObjectService {
      * to null.
      */
     public MCRObjectService() {
-        dates = new ArrayList<MCRMetaISO8601Date>();
+        dates = new ArrayList<>();
 
         Date curTime = new Date();
 
@@ -119,8 +119,8 @@ public class MCRObjectService {
         d.setDate(curTime);
         dates.add(d);
 
-        rules = new ArrayList<MCRMetaAccessRule>();
-        flags = new ArrayList<MCRMetaLangText>();
+        rules = new ArrayList<>();
+        flags = new ArrayList<>();
     }
 
     /**
@@ -248,7 +248,7 @@ public class MCRObjectService {
         }
 
         return IntStream.range(0, dates.size())
-            .mapToObj(i -> dates.get(i))
+            .mapToObj(dates::get)
             .filter(d -> d.getType().equals(type))
             .findAny()
             .orElse(null);

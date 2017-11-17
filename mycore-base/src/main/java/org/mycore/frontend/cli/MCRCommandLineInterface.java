@@ -67,9 +67,9 @@ public class MCRCommandLineInterface {
     private static String system = null;
 
     /** A queue of commands waiting to be executed */
-    protected static Vector<String> commandQueue = new Vector<String>();
+    protected static Vector<String> commandQueue = new Vector<>();
 
-    protected static Vector<String> failedCommands = new Vector<String>();
+    protected static Vector<String> failedCommands = new Vector<>();
 
     private static boolean interactiveMode = true;
 
@@ -326,7 +326,7 @@ public class MCRCommandLineInterface {
             output("Reading commands from file " + file);
 
             String line;
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
 

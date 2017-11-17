@@ -41,9 +41,9 @@ public class MCRNameMerger extends MCRMerger {
 
     private String familyName;
 
-    private Set<String> givenNames = new HashSet<String>();
+    private Set<String> givenNames = new HashSet<>();
 
-    private Set<String> initials = new HashSet<String>();
+    private Set<String> initials = new HashSet<>();
 
     public void setElement(Element element) {
         super.setElement(element);
@@ -155,7 +155,7 @@ public class MCRNameMerger extends MCRMerger {
     }
 
     private boolean haveAtLeaseOneCommon(Set<String> a, Set<String> b) {
-        Set<String> intersection = new HashSet<String>(a);
+        Set<String> intersection = new HashSet<>(a);
         intersection.retainAll(b);
         return !intersection.isEmpty();
     }

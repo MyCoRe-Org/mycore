@@ -36,7 +36,7 @@ public class MCRURL {
     }
 
     private Map<String, List<String>> buildParameterMap(URL url) {
-        Map<String, List<String>> p = new HashMap<String, List<String>>();
+        Map<String, List<String>> p = new HashMap<>();
         String queryString = url.getQuery();
         if (queryString == null) {
             return p;
@@ -98,7 +98,7 @@ public class MCRURL {
 
     public List<String> getParameterValues(String name) {
         List<String> valueList = getParameterMap().get(name);
-        return valueList != null ? valueList : new ArrayList<String>();
+        return valueList != null ? valueList : new ArrayList<>();
     }
 
     public MCRURL addParameter(String name, String value) {

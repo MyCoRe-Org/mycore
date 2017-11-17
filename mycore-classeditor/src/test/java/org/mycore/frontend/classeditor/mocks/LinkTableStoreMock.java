@@ -26,16 +26,16 @@ public class LinkTableStoreMock implements MCRLinkTableInterface {
 
     @Override
     public Map<String, Number> getCountedMapOfMCRTO(String mcrtoPrefix) {
-        return new HashMap<String, Number>();
+        return new HashMap<>();
     }
 
     @Override
     public Collection<String> getSourcesOf(String to, String type) {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     @Override
     public Collection<String> getDestinationsOf(String from, String type) {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 }

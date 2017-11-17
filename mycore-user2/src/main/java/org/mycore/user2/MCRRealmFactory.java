@@ -69,12 +69,12 @@ public class MCRRealmFactory {
     private static long lastModified = 0;
 
     /** Map of defined realms, key is the ID of the realm */
-    private static HashMap<String, MCRRealm> realmsMap = new HashMap<String, MCRRealm>();
+    private static HashMap<String, MCRRealm> realmsMap = new HashMap<>();
 
-    private static HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<String, MCRUserAttributeMapper>();
+    private static HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
 
     /** List of defined realms */
-    private static List<MCRRealm> realmsList = new ArrayList<MCRRealm>();
+    private static List<MCRRealm> realmsList = new ArrayList<>();
 
     /** The local realm, which is the default realm */
     private static MCRRealm localRealm;
@@ -129,12 +129,12 @@ public class MCRRealmFactory {
         }
         String localRealmID = root.getAttributeValue("local");
         /** Map of defined realms, key is the ID of the realm */
-        HashMap<String, MCRRealm> realmsMap = new HashMap<String, MCRRealm>();
+        HashMap<String, MCRRealm> realmsMap = new HashMap<>();
 
-        HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<String, MCRUserAttributeMapper>();
+        HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
 
         /** List of defined realms */
-        List<MCRRealm> realmsList = new ArrayList<MCRRealm>();
+        List<MCRRealm> realmsList = new ArrayList<>();
 
         List<Element> realms = root.getChildren("realm");
         for (Element child : realms) {

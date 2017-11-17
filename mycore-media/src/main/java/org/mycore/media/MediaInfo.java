@@ -58,13 +58,9 @@ public class MediaInfo {
 
         MediaInfoDLL_Internal INSTANCE = (MediaInfoDLL_Internal) Native.loadLibrary(
             (Platform.isWindows() && Platform.is64Bit()) ? "mediainfo64" : "mediainfo", MediaInfoDLL_Internal.class,
-            singletonMap(OPTION_FUNCTION_MAPPER, new FunctionMapper() {
-
-                @Override
-                public String getFunctionName(NativeLibrary lib, Method method) {
-                    // MediaInfo_New(), MediaInfo_Open() ...
-                    return "MediaInfo_" + method.getName();
-                }
+            singletonMap(OPTION_FUNCTION_MAPPER, (FunctionMapper) (lib, method) -> {
+                // MediaInfo_New(), MediaInfo_Open() ...
+                return "MediaInfo_" + method.getName();
             }));
 
         //Constructor/Destructor

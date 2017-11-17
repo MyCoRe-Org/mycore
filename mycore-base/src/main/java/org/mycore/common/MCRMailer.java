@@ -153,7 +153,7 @@ public class MCRMailer extends MCRServlet {
     public static void send(String sender, String recipient, String subject, String body) {
         LOGGER.debug("Called plaintext send method with single recipient.");
 
-        ArrayList<String> recipients = new ArrayList<String>();
+        ArrayList<String> recipients = new ArrayList<>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, null);
     }
@@ -179,7 +179,7 @@ public class MCRMailer extends MCRServlet {
         List<String> bccList = null;
 
         if (bcc) {
-            bccList = new ArrayList<String>();
+            bccList = new ArrayList<>();
             bccList.add(sender);
         }
 
@@ -203,7 +203,7 @@ public class MCRMailer extends MCRServlet {
     public static void send(String sender, String recipient, String subject, String body, List<String> parts) {
         LOGGER.debug("Called multipart send method with single recipient.");
 
-        ArrayList<String> recipients = new ArrayList<String>();
+        ArrayList<String> recipients = new ArrayList<>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, parts);
     }
@@ -232,7 +232,7 @@ public class MCRMailer extends MCRServlet {
         List<String> bccList = null;
 
         if (bcc) {
-            bccList = new ArrayList<String>();
+            bccList = new ArrayList<>();
             bccList.add(sender);
         }
 
@@ -328,7 +328,7 @@ public class MCRMailer extends MCRServlet {
         mail.bcc = bcc;
         mail.subject = subject;
 
-        mail.msgParts = new ArrayList<MessagePart>();
+        mail.msgParts = new ArrayList<>();
         mail.msgParts.add(new MessagePart(body));
 
         mail.parts = parts;
@@ -360,23 +360,21 @@ public class MCRMailer extends MCRServlet {
                 return;
             }
 
-            Thread t = new Thread(new Runnable() {
-                public void run() {
-                    for (int i = numTries - 1; i > 0; i--) {
-                        LOGGER.info("Retrying in 5 minutes...");
-                        try {
-                            Thread.sleep(300000);
-                        } // wait 5 minutes
-                        catch (InterruptedException ignored) {
-                        }
+            Thread t = new Thread(() -> {
+                for (int i = numTries - 1; i > 0; i--) {
+                    LOGGER.info("Retrying in 5 minutes...");
+                    try {
+                        Thread.sleep(300000);
+                    } // wait 5 minutes
+                    catch (InterruptedException ignored) {
+                    }
 
-                        try {
-                            trySending(mail);
-                            LOGGER.info("Successfully resended e-mail.");
-                            break;
-                        } catch (Exception ex) {
-                            LOGGER.info("Sending e-mail failed: ", ex);
-                        }
+                    try {
+                        trySending(mail);
+                        LOGGER.info("Successfully resended e-mail.");
+                        break;
+                    } catch (Exception ex1) {
+                        LOGGER.info("Sending e-mail failed: ", ex1);
                     }
                 }
             });
@@ -648,7 +646,7 @@ public class MCRMailer extends MCRServlet {
          * @return the XML
          */
         public Document toXML() {
-            final MCRJAXBContent<EMail> content = new MCRJAXBContent<EMail>(JAXB_CONTEXT, this);
+            final MCRJAXBContent<EMail> content = new MCRJAXBContent<>(JAXB_CONTEXT, this);
             try {
                 final Document xml = content.asXML();
                 return xml;

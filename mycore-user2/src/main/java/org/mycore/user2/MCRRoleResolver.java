@@ -56,7 +56,7 @@ public class MCRRoleResolver implements URIResolver {
             groupIDs = MCRRoleManager.listSystemRoles();
         } else if (MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION)) {
             final MCRUser currentUser = MCRUserManager.getCurrentUser();
-            groupIDs = new ArrayList<MCRRole>(currentUser.getSystemRoleIDs().size());
+            groupIDs = new ArrayList<>(currentUser.getSystemRoleIDs().size());
             for (final String id : currentUser.getSystemRoleIDs()) {
                 groupIDs.add(MCRRoleManager.getRole(id));
             }

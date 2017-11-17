@@ -27,9 +27,7 @@ public interface MCRDecorator<V> {
      * @return true if the instance is decorated by an MCRDecorator
      */
     static boolean isDecorated(Object decorator) {
-        return TypeToken.of(decorator.getClass()).getTypes().interfaces().stream().filter(tt -> {
-            return tt.isSubtypeOf(MCRDecorator.class);
-        }).findAny().isPresent();
+        return TypeToken.of(decorator.getClass()).getTypes().interfaces().stream().filter(tt -> tt.isSubtypeOf(MCRDecorator.class)).findAny().isPresent();
     }
 
     /**

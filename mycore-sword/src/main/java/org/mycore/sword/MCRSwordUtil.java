@@ -244,8 +244,7 @@ public class MCRSwordUtil {
     public static void extractZipToPath(Path zipFilePath, MCRPath target)
         throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
         LOGGER.info("Extracting zip: " + zipFilePath);
-        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri()),
-            new HashMap<String, Object>())) {
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
             Files.walkFileTree(sourcePath,
                 new SimpleFileVisitor<Path>() {
@@ -301,8 +300,7 @@ public class MCRSwordUtil {
 
     public static List<MCRValidationResult> validateZipFile(final MCRFileValidator validator, Path zipFile)
         throws IOException, URISyntaxException {
-        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri()),
-            new HashMap<String, Object>())) {
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
             ArrayList<MCRValidationResult> validationResults = new ArrayList<>();
             Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
@@ -507,7 +505,7 @@ public class MCRSwordUtil {
         private static Stream<IRI> getEditMediaFileIRIStream(final String collection, final String derivateId) {
             MCRPath derivateRootPath = MCRPath.getPath(derivateId, "/");
             try {
-                List<IRI> iris = new ArrayList<IRI>();
+                List<IRI> iris = new ArrayList<>();
                 Files.walkFileTree(derivateRootPath, new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)

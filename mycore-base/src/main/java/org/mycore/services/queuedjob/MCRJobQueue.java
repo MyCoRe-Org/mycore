@@ -58,7 +58,7 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private static Logger LOGGER = LogManager.getLogger(MCRJobQueue.class);
 
-    protected static Map<String, MCRJobQueue> INSTANCES = new HashMap<String, MCRJobQueue>();
+    protected static Map<String, MCRJobQueue> INSTANCES = new HashMap<>();
 
     protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
 
@@ -92,7 +92,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(this.action), waitTime, waitTime,
             TimeUnit.SECONDS);
-        preFetch = new ConcurrentLinkedQueue<MCRJob>();
+        preFetch = new ConcurrentLinkedQueue<>();
         running = true;
         pollLock = new ReentrantLock();
         MCRShutdownHandler.getInstance().addCloseable(this);
@@ -106,15 +106,11 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      */
     public static MCRJobQueue getInstance(Class<? extends MCRJobAction> action) {
         String key = action != null && !singleQueue ? action.getName() : "single";
-        MCRJobQueue queue = INSTANCES.get(key);
-        if (queue == null) {
-            queue = new MCRJobQueue(singleQueue ? null : action);
-            INSTANCES.put(key, queue);
-        }
+        MCRJobQueue queue = INSTANCES.computeIfAbsent(key, k -> new MCRJobQueue(singleQueue ? null : action));
 
-        if (!queue.running)
+        if (!queue.running) {
             return null;
-
+        }
         return queue;
     }
 
@@ -253,7 +249,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         CriteriaQuery<MCRJob> cq = cb.createQuery(MCRJob.class);
         Root<MCRJob> root = cq.from(MCRJob.class);
 
-        List<Predicate> predicates = new ArrayList<Predicate>();
+        List<Predicate> predicates = new ArrayList<>();
         if (status != null)
             predicates.add(cb.equal(root.get("status"), status));
         if (action != null)
@@ -364,7 +360,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         CriteriaQuery<MCRJob> cq = cb.createQuery(MCRJob.class);
         Root<MCRJob> root = cq.from(MCRJob.class);
 
-        List<Predicate> predicates = new ArrayList<Predicate>();
+        List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("status"), MCRJobStatus.NEW));
         if (action != null)
             predicates.add(cb.equal(root.get("action"), action));

@@ -47,9 +47,9 @@ public class MCRQLSearchUtils {
         } else {
             // if there is only one condition its no set condition. we don't need to group
             LOGGER.warn("Condition is not SetCondition.");
-            table = new HashMap<String, List<MCRCondition>>();
+            table = new HashMap<>();
 
-            ArrayList<MCRCondition> conditionList = new ArrayList<MCRCondition>();
+            ArrayList<MCRCondition> conditionList = new ArrayList<>();
             conditionList.add(condition);
 
             table.put("metadata", conditionList);
@@ -79,7 +79,7 @@ public class MCRQLSearchUtils {
             renameElements(condition);
 
             // Remove conditions without values
-            List<Element> empty = new ArrayList<Element>();
+            List<Element> empty = new ArrayList<>();
             for (Iterator<Element> it = conditions.getDescendants(new ElementFilter("condition")); it.hasNext();) {
                 Element cond = it.next();
                 if (cond.getAttribute("value") == null) {
@@ -220,7 +220,7 @@ public class MCRQLSearchUtils {
         String maxResults = getReqParameter(req, "maxResults", "0");
         query.setMaxResults(Integer.parseInt(maxResults));
 
-        List<String> sortFields = new ArrayList<String>();
+        List<String> sortFields = new ArrayList<>();
         for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
             String name = names.nextElement();
             if (name.contains(".sortField")) {
@@ -229,12 +229,12 @@ public class MCRQLSearchUtils {
         }
 
         if (sortFields.size() > 0) {
-            Collections.sort(sortFields, (arg0, arg1) -> {
+            sortFields.sort((arg0, arg1) -> {
                 String s0 = arg0.substring(arg0.indexOf(".sortField"));
                 String s1 = arg1.substring(arg1.indexOf(".sortField"));
                 return s0.compareTo(s1);
             });
-            List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
+            List<MCRSortBy> sortBy = new ArrayList<>();
             for (String name : sortFields) {
                 String sOrder = getReqParameter(req, name, "ascending");
                 boolean order = "ascending".equals(sOrder) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;

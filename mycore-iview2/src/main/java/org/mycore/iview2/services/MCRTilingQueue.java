@@ -42,7 +42,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime,
             TimeUnit.SECONDS);
-        preFetch = new ConcurrentLinkedQueue<MCRTileJob>();
+        preFetch = new ConcurrentLinkedQueue<>();
         running = true;
         pollLock = new ReentrantLock();
         MCRShutdownHandler.getInstance().addCloseable(this);

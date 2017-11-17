@@ -81,7 +81,7 @@ public class MCREditorOutValidator {
 
     private static Map<String, MCREditorMetadataValidator> VALIDATOR_MAP = getValidatorMap();
 
-    private static Map<String, Class<? extends MCRMetaInterface>> CLASS_MAP = new HashMap<String, Class<? extends MCRMetaInterface>>();
+    private static Map<String, Class<? extends MCRMetaInterface>> CLASS_MAP = new HashMap<>();
 
     private static final String CONFIG_PREFIX = "MCR.EditorOutValidator.";
 
@@ -103,7 +103,7 @@ public class MCREditorOutValidator {
      *            editor input
      */
     public MCREditorOutValidator(Document jdom_in, MCRObjectID id) throws JDOMException, IOException {
-        errorlog = new ArrayList<String>();
+        errorlog = new ArrayList<>();
         input = jdom_in;
         this.id = id;
         if (LOGGER.isDebugEnabled()) {
@@ -153,7 +153,7 @@ public class MCREditorOutValidator {
     }
 
     private static Map<String, MCREditorMetadataValidator> getValidatorMap() {
-        Map<String, MCREditorMetadataValidator> map = new HashMap<String, MCREditorMetadataValidator>();
+        Map<String, MCREditorMetadataValidator> map = new HashMap<>();
         map.put(MCRMetaBoolean.class.getSimpleName(), getObjectCheckInstance(MCRMetaBoolean.class));
         map.put(MCRMetaPersonName.class.getSimpleName(), getObjectCheckWithLangInstance(MCRMetaPersonName.class));
         map.put(MCRMetaInstitutionName.class.getSimpleName(),
@@ -518,16 +518,8 @@ public class MCREditorOutValidator {
     }
 
     private void checkObjectStructure(Element structure) {
-        List<Element> structurelist = structure.getChildren();
-        Iterator<Element> structIt = structurelist.iterator();
-
-        while (structIt.hasNext()) {
-            Element datatag = structIt.next();
-            if (!checkMetaTags(datatag)) {
-                // e.g. datatag is empty
-                structIt.remove();
-            }
-        }
+        // e.g. datatag is empty
+        structure.getChildren().removeIf(datatag -> !checkMetaTags(datatag));
     }
 
     /**

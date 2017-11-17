@@ -45,7 +45,7 @@ import com.google.gson.JsonObject;
 @MCRRestrictedAccess(MCRWCMSPermission.class)
 public class MCRWCMSFileBrowserResource {
 
-    private ArrayList<String> folderList = new ArrayList<String>();
+    private ArrayList<String> folderList = new ArrayList<>();
 
     private String WCMSDataPath = MCRWebPagesSynchronizer.getWCMSDataDir().getPath();
 

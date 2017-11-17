@@ -293,7 +293,7 @@ public class MCRMigrationCommands {
         String suffix = "-dfg";
 
         return Optional.of(mcrurn)
-            .filter(u -> u.isDfg())
+            .filter(org.mycore.urn.hibernate.MCRURN::isDfg)
             .flatMap(MCRMigrationCommands::parse)
             .map(dnbURN -> dnbURN.withSuffix(suffix))
             .map(MCRDNBURN::asString)

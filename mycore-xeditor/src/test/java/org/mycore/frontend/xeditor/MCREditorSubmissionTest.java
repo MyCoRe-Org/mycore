@@ -53,7 +53,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
-        Map<String, String[]> submittedValues = new HashMap<String, String[]>();
+        Map<String, String[]> submittedValues = new HashMap<>();
         submittedValues.put("/document/title", new String[] { "Title" });
         submittedValues.put("/document/author/@firstName", new String[] { "Jim" });
         submittedValues.put("/document/author/@lastName", new String[] { "" });
@@ -80,7 +80,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
 
         session.getSubmission().setXPaths2CheckResubmission("@archive");
 
-        Map<String, String[]> submittedValues = new HashMap<String, String[]>();
+        Map<String, String[]> submittedValues = new HashMap<>();
         submittedValues.put("/document/@archive", new String[] { "true" });
         session.getSubmission().setSubmittedValues(submittedValues);
 
@@ -109,7 +109,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
         session.getSubmission()
             .mark2checkResubmission(new MCRBinding("/document/category", true, session.getRootBinding()));
 
-        Map<String, String[]> submittedValues = new HashMap<String, String[]>();
+        Map<String, String[]> submittedValues = new HashMap<>();
         submittedValues.put("/document/category", new String[] { "c", "d" });
         session.getSubmission().setSubmittedValues(submittedValues);
 

@@ -114,7 +114,7 @@ public final class MCRConstants {
         .getNamespace("alto", "http://www.loc.gov/standards/alto/ns-v2#");
 
     static {
-        namespacesByPrefix = new HashMap<String, Namespace>();
+        namespacesByPrefix = new HashMap<>();
 
         Field[] fields = MCRConstants.class.getFields();
         for (Field f : fields) {

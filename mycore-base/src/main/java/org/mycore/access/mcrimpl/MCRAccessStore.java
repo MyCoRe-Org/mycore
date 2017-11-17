@@ -116,7 +116,7 @@ public abstract class MCRAccessStore {
      */
     public Collection<MCRAccessDefinition> getDefinition(String type) {
         try {
-            HashMap<String, Collection<String>> sqlDefinition = new HashMap<String, Collection<String>>();
+            HashMap<String, Collection<String>> sqlDefinition = new HashMap<>();
             Collection<String> pools = MCRAccessStore.getInstance().getDatabasePools();
             //merge pools
             pools.removeAll(getPools());
@@ -126,7 +126,7 @@ public abstract class MCRAccessStore {
                 sqlDefinition.put(pool, MCRAccessStore.getInstance().getMappedObjectId(pool));
             }
 
-            Collection<MCRAccessDefinition> ret = new LinkedList<MCRAccessDefinition>();
+            Collection<MCRAccessDefinition> ret = new LinkedList<>();
             Collection<String> elements;
             MCRAccessDefinition def = null;
 
@@ -163,7 +163,7 @@ public abstract class MCRAccessStore {
             pools.removeAll(getPools());
             pools.addAll(getPools());
 
-            Collection<MCRAccessDefinition> ret = new LinkedList<MCRAccessDefinition>();
+            Collection<MCRAccessDefinition> ret = new LinkedList<>();
             //List elements = new LinkedList();
             MCRAccessDefinition def = new MCRAccessDefinition();
             def.setObjID(objid);

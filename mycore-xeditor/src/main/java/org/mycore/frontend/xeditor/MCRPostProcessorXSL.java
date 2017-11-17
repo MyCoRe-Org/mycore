@@ -49,9 +49,7 @@ class MCRNormalizeUnicodeTransformer extends MCRContentTransformer {
                 text.setText(MCRXMLFunctions.normalizeUnicode(text.getText()));
             }
             return new MCRJDOMContent(root);
-        } catch (JDOMException ex) {
-            throw new IOException(ex);
-        } catch (SAXException ex) {
+        } catch (JDOMException | SAXException ex) {
             throw new IOException(ex);
         }
     }

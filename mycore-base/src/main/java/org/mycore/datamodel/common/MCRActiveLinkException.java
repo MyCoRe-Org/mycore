@@ -47,7 +47,7 @@ public class MCRActiveLinkException extends MCRCatchException {
      */
     private static final long serialVersionUID = 1L;
 
-    Map<String, Collection<String>> linkTable = new ConcurrentHashMap<String, Collection<String>>();
+    Map<String, Collection<String>> linkTable = new ConcurrentHashMap<>();
 
     /**
      * 
@@ -68,7 +68,7 @@ public class MCRActiveLinkException extends MCRCatchException {
      */
     public void addLink(String source, String dest) {
         if (!linkTable.containsKey(dest)) {
-            linkTable.put(dest, new ConcurrentLinkedQueue<String>());
+            linkTable.put(dest, new ConcurrentLinkedQueue<>());
         }
         linkTable.get(dest).add(source);
     }

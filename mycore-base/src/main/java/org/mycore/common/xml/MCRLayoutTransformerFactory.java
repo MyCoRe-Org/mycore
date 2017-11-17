@@ -48,7 +48,7 @@ import com.google.common.collect.Lists;
  */
 public class MCRLayoutTransformerFactory {
     /** Map of transformer instances by ID */
-    private static HashMap<String, MCRContentTransformer> transformers = new HashMap<String, MCRContentTransformer>();
+    private static HashMap<String, MCRContentTransformer> transformers = new HashMap<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRLayoutTransformerFactory.class);
 

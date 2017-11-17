@@ -64,11 +64,11 @@ public class MCRBinding {
 
     protected String xPath;
 
-    protected List<Object> boundNodes = new ArrayList<Object>();
+    protected List<Object> boundNodes = new ArrayList<>();
 
     protected MCRBinding parent;
 
-    protected List<MCRBinding> children = new ArrayList<MCRBinding>();
+    protected List<MCRBinding> children = new ArrayList<>();
 
     protected MCRChangeTracker tracker;
 
@@ -185,7 +185,7 @@ public class MCRBinding {
     }
 
     public List<MCRBinding> getAncestorsAndSelf() {
-        List<MCRBinding> ancestors = new ArrayList<MCRBinding>();
+        List<MCRBinding> ancestors = new ArrayList<>();
         MCRBinding current = this;
         do {
             ancestors.add(0, current);
@@ -260,7 +260,7 @@ public class MCRBinding {
     }
 
     public Map<String, Object> buildXPathVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.putAll(getVariables());
 
         for (MCRBinding ancestor : getAncestorsAndSelf()) {

@@ -101,7 +101,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "delete all derivates", help = "Removes all derivates from the repository", order = 10)
     public static List<String> deleteAllDerivates() {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<String>(ids.size());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add("delete derivate " + id);
         }
@@ -209,7 +209,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return null;
         }
 
-        List<String> cmds = new ArrayList<String>();
+        List<String> cmds = new ArrayList<>();
         for (File file : list) {
             String name = file.getName();
             if (!(name.endsWith(".xml") && name.contains("derivate"))) {
@@ -487,7 +487,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<String>(ids.size());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add("export derivate " + id + " to directory " + dirname + " with " + style);
         }
@@ -516,7 +516,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<String>(ids.size());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             if (!id.startsWith(project))
                 continue;
@@ -625,7 +625,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             LOGGER.warn("No ID's was found for type derivate.");
             return Collections.emptyList();
         }
-        List<String> cmds = new ArrayList<String>(ids.size());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add("repair derivate search of ID " + id);
         }
@@ -683,7 +683,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             LOGGER.warn("No ID's was found for type derivate.");
             return Collections.emptyList();
         }
-        List<String> cmds = new ArrayList<String>(ids.size());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add("synchronize derivate with ID " + id);
         }

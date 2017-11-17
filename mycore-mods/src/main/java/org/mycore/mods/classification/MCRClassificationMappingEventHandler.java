@@ -1,6 +1,7 @@
 package org.mycore.mods.classification;
 
 import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -93,7 +94,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             .map(categoryId -> DAO.getCategory(categoryId, 0))
             .filter(Objects::nonNull)
             .map(MCRClassificationMappingEventHandler::getMappings)
-            .flatMap(list -> list.stream())
+            .flatMap(Collection::stream)
             .distinct()
             .forEach(mapping -> {
                 String taskMessage = String.format(Locale.ROOT, "add mapping from '%s' to '%s'",

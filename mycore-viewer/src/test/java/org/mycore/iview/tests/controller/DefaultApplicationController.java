@@ -43,7 +43,7 @@ public class DefaultApplicationController extends ApplicationController {
 
     @Override
     public void init() {
-        DefaultApplicationController.derivateHTMLMapping = new HashMap<TestDerivate, String>();
+        DefaultApplicationController.derivateHTMLMapping = new HashMap<>();
     }
 
     @Override
@@ -104,7 +104,7 @@ public class DefaultApplicationController extends ApplicationController {
             } else {
                 LOGGER.info("Downloading test files to : " + dest);
                 byte[] bytes = IOUtils.toByteArray(openStream);
-                extractZip(dest, new ArrayList<String>(), new ZipInputStream(new ByteArrayInputStream(bytes)));
+                extractZip(dest, new ArrayList<>(), new ZipInputStream(new ByteArrayInputStream(bytes)));
             }
         }
     }

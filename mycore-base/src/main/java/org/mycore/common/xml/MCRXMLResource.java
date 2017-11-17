@@ -57,8 +57,8 @@ public class MCRXMLResource {
     private static Logger LOGGER = LogManager.getLogger(MCRXMLResource.class);
 
     private MCRXMLResource() {
-        resourceCache = new MCRCache<String, CacheEntry>(MCRConfiguration.instance().getInt(
-            "MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
+        resourceCache = new MCRCache<>(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100),
+            "XML resources");
     }
 
     /**

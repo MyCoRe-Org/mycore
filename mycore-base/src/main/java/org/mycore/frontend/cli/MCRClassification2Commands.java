@@ -512,7 +512,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 140)
     public static List<String> checkAllClassifications() {
         List<MCRCategoryID> classifications = MCRCategoryDAOFactory.getInstance().getRootCategoryIDs();
-        List<String> commands = new ArrayList<String>(classifications.size());
+        List<String> commands = new ArrayList<>(classifications.size());
         for (MCRCategoryID id : classifications) {
             commands.add("check classification " + id.getRootID());
         }
@@ -524,7 +524,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 150)
     public static void checkClassification(String id) {
         LOGGER.info("Checking classifcation " + id);
-        ArrayList<String> log = new ArrayList<String>();
+        ArrayList<String> log = new ArrayList<>();
         LOGGER.info(id + ": checking for missing parentID");
         checkMissingParent(id, log);
         LOGGER.info(id + ": checking for empty labels");

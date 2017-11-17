@@ -14,7 +14,7 @@ public class MCRTextResolverTest extends MCRTestCase {
 
     @Test
     public void variables() throws Exception {
-        Hashtable<String, String> variablesTable = new Hashtable<String, String>();
+        Hashtable<String, String> variablesTable = new Hashtable<>();
         variablesTable.put("f1", "v1");
         variablesTable.put("f2", "v2");
         variablesTable.put("f3", "v3");
@@ -51,7 +51,7 @@ public class MCRTextResolverTest extends MCRTestCase {
 
     @Test
     public void addRemove() throws Exception {
-        Hashtable<String, String> variablesTable = new Hashtable<String, String>();
+        Hashtable<String, String> variablesTable = new Hashtable<>();
         variablesTable.put("f1", "v1");
         variablesTable.put("f2", "v2");
         variablesTable.put("f3", "v3");

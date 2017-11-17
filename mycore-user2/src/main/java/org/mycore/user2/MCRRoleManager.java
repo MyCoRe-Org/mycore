@@ -53,10 +53,10 @@ public class MCRRoleManager {
     private static Logger LOGGER = LogManager.getLogger(MCRRoleManager.class);
 
     /** Map of defined roles, key is the unique role name */
-    private static HashMap<String, MCRRole> rolesByName = new HashMap<String, MCRRole>();
+    private static HashMap<String, MCRRole> rolesByName = new HashMap<>();
 
     /** List of all defined roles */
-    private static List<MCRRole> rolesList = new ArrayList<MCRRole>();
+    private static List<MCRRole> rolesList = new ArrayList<>();
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -177,7 +177,7 @@ public class MCRRoleManager {
      */
     static void storeRoleAssignments(MCRUser user) {
         MCRCategLinkReference ref = getLinkID(user);
-        LinkedList<MCRCategoryID> categories = new LinkedList<MCRCategoryID>();
+        LinkedList<MCRCategoryID> categories = new LinkedList<>();
         for (String roleID : user.getSystemRoleIDs()) {
             MCRCategoryID categID = new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), roleID);
             categories.add(categID);
@@ -224,7 +224,7 @@ public class MCRRoleManager {
         if (!DAO.exist(rootID)) {
             MCRCategoryImpl category = new MCRCategoryImpl();
             category.setId(rootID);
-            HashSet<MCRLabel> labels = new HashSet<MCRLabel>();
+            HashSet<MCRLabel> labels = new HashSet<>();
             labels.add(new MCRLabel("de", "Systemrollen", null));
             labels.add(new MCRLabel("en", "system roles", null));
             category.setLabels(labels);

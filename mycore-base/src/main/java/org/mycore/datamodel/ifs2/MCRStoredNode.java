@@ -178,7 +178,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * is the label for that language.
      */
     public Map<String, String> getLabels() {
-        Map<String, String> labels = new TreeMap<String, String>();
+        Map<String, String> labels = new TreeMap<>();
         for (Element label : data.getChildren(LABEL_ELEMENT)) {
             labels.put(label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE), label.getText());
         }

@@ -120,7 +120,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
      * @return a hashtable with all variables from the uri
      */
     protected Hashtable<String, String> createVariablesMap(String uri) {
-        Hashtable<String, String> variablesMap = new Hashtable<String, String>();
+        Hashtable<String, String> variablesMap = new Hashtable<>();
         String uriValue = uri.substring(uri.indexOf(':') + 1);
         String[] variablesArr = uriValue.split(":");
         for (int i = 0; i < variablesArr.length; i++) {

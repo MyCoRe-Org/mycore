@@ -92,12 +92,7 @@ public class MCRSession implements Cloneable {
 
     AtomicInteger concurrentAccess;
 
-    ThreadLocal<AtomicInteger> currentThreadCount = new ThreadLocal<AtomicInteger>() {
-        @Override
-        public AtomicInteger initialValue() {
-            return new AtomicInteger();
-        }
-    };
+    ThreadLocal<AtomicInteger> currentThreadCount = ThreadLocal.withInitial(() -> new AtomicInteger());
 
     /** the logger */
     static Logger LOGGER = LogManager.getLogger(MCRSession.class.getName());

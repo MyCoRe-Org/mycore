@@ -41,7 +41,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
             if (realmId != null && MCRRealmFactory.getRealm(realmId) != null) {
                 userId = realmId != null ? userId.replace("@" + realmId, "") : userId;
 
-                final Map<String, Object> attributes = new HashMap<String, Object>();
+                final Map<String, Object> attributes = new HashMap<>();
 
                 final MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(realmId);
                 for (final String key : attributeMapper.getAttributeNames()) {

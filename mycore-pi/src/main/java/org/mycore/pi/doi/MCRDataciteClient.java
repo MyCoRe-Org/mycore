@@ -150,7 +150,7 @@ public class MCRDataciteClient {
                         String[] parts = line.split("=", 2);
                         String mediaType = parts[0];
                         URI mediaURI = new URI(parts[1]);
-                        entries.add(new AbstractMap.SimpleEntry<String, URI>(mediaType, mediaURI));
+                        entries.add(new AbstractMap.SimpleEntry<>(mediaType, mediaURI));
                     }
                     return entries;
                 case HttpStatus.SC_UNAUTHORIZED:

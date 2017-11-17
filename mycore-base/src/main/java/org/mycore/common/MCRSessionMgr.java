@@ -54,7 +54,7 @@ public class MCRSessionMgr {
 
     private static Map<String, MCRSession> sessions = Collections.synchronizedMap(new HashMap<String, MCRSession>());
 
-    private static List<MCRSessionListener> listeners = new ArrayList<MCRSessionListener>();
+    private static List<MCRSessionListener> listeners = new ArrayList<>();
 
     private static MCRReadWriteGuard listenersGuard = new MCRReadWriteGuard();
 
@@ -64,19 +64,9 @@ public class MCRSessionMgr {
      * 
      * @see ThreadLocal
      */
-    private static ThreadLocal<MCRSession> theThreadLocalSession = new ThreadLocal<MCRSession>() {
-        @Override
-        public MCRSession initialValue() {
-            return new MCRSession();
-        }
-    };
+    private static ThreadLocal<MCRSession> theThreadLocalSession = ThreadLocal.withInitial(() -> new MCRSession());
 
-    private static ThreadLocal<Boolean> isSessionAttached = new ThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-            return Boolean.FALSE;
-        }
-    };
+    private static ThreadLocal<Boolean> isSessionAttached = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     /**
      * This method returns the unique MyCoRe session object for the current Thread. The session object is initialized

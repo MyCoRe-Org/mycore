@@ -75,7 +75,7 @@ public class MCRThumbnailServlet extends MCRServlet {
 
     private ImageWriteParam imageWriteParam;
 
-    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
+    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRThumbnailServlet.class);
 
@@ -99,7 +99,7 @@ public class MCRThumbnailServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
+        imageWriters = new ConcurrentLinkedQueue<>();
         imageWriteParam = ImageIO.getImageWritersBySuffix("png").next().getDefaultWriteParam();
         try {
             imageWriteParam.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);

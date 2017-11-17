@@ -115,7 +115,7 @@ public class MCRShutdownHandler {
         final String system = cfgSystemName;
         System.out.println(system + " Shutting down system, please wait...\n");
         logger.debug(() -> "requests: " + requests);
-        Closeable[] closeables = requests.stream().toArray(i -> new Closeable[i]);
+        Closeable[] closeables = requests.stream().toArray(Closeable[]::new);
         Stream.of(closeables)
             .peek(c -> logger.debug("Prepare Closing (1): {}", c))
             .forEach(Closeable::prepareClose);

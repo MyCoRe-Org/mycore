@@ -39,7 +39,7 @@ class MCRBibTeXEntryTransformer {
 
     private static final String XPATH_HOST = "mods:relatedItem[@type='host']";
 
-    private List<MCRFieldTransformer> fieldTransformers = new ArrayList<MCRFieldTransformer>();
+    private List<MCRFieldTransformer> fieldTransformers = new ArrayList<>();
 
     MCRBibTeXEntryTransformer() {
         fieldTransformers

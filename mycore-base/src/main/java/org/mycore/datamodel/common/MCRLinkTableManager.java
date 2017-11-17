@@ -412,7 +412,7 @@ public class MCRLinkTableManager {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
-        LinkedList<String> ll = new LinkedList<String>();
+        LinkedList<String> ll = new LinkedList<>();
         try {
             for (String singleTo : to) {
                 ll.addAll(persistenceclass.getSourcesOf(singleTo, type));

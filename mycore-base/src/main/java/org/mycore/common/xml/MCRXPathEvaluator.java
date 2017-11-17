@@ -38,7 +38,7 @@ public class MCRXPathEvaluator {
 
     public MCRXPathEvaluator(Map<String, Object> variables, Parent context) {
         this.variables = variables;
-        this.context = new ArrayList<Object>();
+        this.context = new ArrayList<>();
         this.context.add(context);
     }
 

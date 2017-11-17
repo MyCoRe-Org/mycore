@@ -62,7 +62,7 @@ public class MCRMODSSorter implements URIResolver {
     }
 
     public static void sort(Element mods) {
-        mods.sortChildren((Element e1, Element e2) -> compare(e1, e2));
+        mods.sortChildren(MCRMODSSorter::compare);
     }
 
     private static int compare(Element e1, Element e2) {

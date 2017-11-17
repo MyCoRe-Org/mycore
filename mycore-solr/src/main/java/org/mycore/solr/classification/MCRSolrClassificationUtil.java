@@ -130,7 +130,7 @@ public abstract class MCRSolrClassificationUtil {
      * @return list of ancestors
      */
     public static LinkedList<MCRCategory> getAncestors(MCRCategory category) {
-        LinkedList<MCRCategory> ancestors = new LinkedList<MCRCategory>();
+        LinkedList<MCRCategory> ancestors = new LinkedList<>();
         MCRCategory parent = category.getParent();
         while (parent != null) {
             ancestors.addFirst(parent);
@@ -193,7 +193,7 @@ public abstract class MCRSolrClassificationUtil {
      * @param categoryIds list of category ids as string
      */
     public static Collection<MCRCategoryID> fromString(Collection<String> categoryIds) {
-        List<MCRCategoryID> idList = new ArrayList<MCRCategoryID>(categoryIds.size());
+        List<MCRCategoryID> idList = new ArrayList<>(categoryIds.size());
         for (String categoyId : categoryIds) {
             idList.add(MCRCategoryID.fromString(categoyId));
         }
@@ -201,7 +201,7 @@ public abstract class MCRSolrClassificationUtil {
     }
 
     public static void reindex(Collection<MCRCategoryID> categoryIds) {
-        List<MCRCategory> categoryList = new ArrayList<MCRCategory>(categoryIds.size());
+        List<MCRCategory> categoryList = new ArrayList<>(categoryIds.size());
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         for (MCRCategoryID categoryId : categoryIds) {
             MCRCategory category = dao.getCategory(categoryId, 0);

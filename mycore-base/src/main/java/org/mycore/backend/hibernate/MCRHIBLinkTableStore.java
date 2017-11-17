@@ -199,9 +199,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         groupQuery.setParameter("like", mcrtoPrefix + '%');
         groupQuery.getResultList()
             .stream()
-            .forEach(row -> {
-                map.put((String) row[1], (Number) row[0]);
-            });
+            .forEach(row -> map.put((String) row[1], (Number) row[0]));
         return map;
     }
 

@@ -101,7 +101,7 @@ public class MCRMerger {
      * This is done by building MCRMerger instances for each child element and comparing them.
      */
     protected void mergeElements(MCRMerger other) {
-        List<MCRMerger> entries = new ArrayList<MCRMerger>();
+        List<MCRMerger> entries = new ArrayList<>();
         for (Element child : this.element.getChildren()) {
             entries.add(MCRMergerFactory.buildFrom(child));
         }
@@ -131,7 +131,7 @@ public class MCRMerger {
     }
 
     /** Holds the MODS namespace */
-    private static List<Namespace> NS = new ArrayList<Namespace>();
+    private static List<Namespace> NS = new ArrayList<>();
 
     static {
         NS.add(MCRConstants.MODS_NAMESPACE);

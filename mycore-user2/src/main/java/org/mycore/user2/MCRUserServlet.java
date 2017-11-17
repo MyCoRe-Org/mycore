@@ -438,7 +438,7 @@ public class MCRUserServlet extends MCRServlet {
     }
 
     private MCRJAXBContent<MCRUser> getContent(MCRUser user) {
-        return new MCRJAXBContent<MCRUser>(JAXB_CONTEXT, user.getSafeCopy());
+        return new MCRJAXBContent<>(JAXB_CONTEXT, user.getSafeCopy());
     }
 
     /**

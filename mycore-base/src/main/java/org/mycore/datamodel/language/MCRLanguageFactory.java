@@ -65,7 +65,7 @@ public class MCRLanguageFactory {
     /**
      * Map of languages by ISO 639-1 or -2 code
      */
-    private Map<String, MCRLanguage> languageByCode = new HashMap<String, MCRLanguage>();
+    private Map<String, MCRLanguage> languageByCode = new HashMap<>();
 
     /**
      * The ID of the classification containing the language codes and labels

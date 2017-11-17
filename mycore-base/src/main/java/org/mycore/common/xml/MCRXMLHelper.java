@@ -394,14 +394,10 @@ public class MCRXMLHelper {
             }
 
             // attributes
-            element.getAttributes().forEach(attr -> {
-                json.addProperty(getName(attr), attr.getValue());
-            });
+            element.getAttributes().forEach(attr -> json.addProperty(getName(attr), attr.getValue()));
 
             // namespaces
-            element.getAdditionalNamespaces().forEach(ns -> {
-                json.addProperty(getName(ns), ns.getURI());
-            });
+            element.getAdditionalNamespaces().forEach(ns -> json.addProperty(getName(ns), ns.getURI()));
 
             // children
             // - build child map of <name,namespace> pair with their respective elements
@@ -420,9 +416,7 @@ public class MCRXMLHelper {
                     json.add(name, serializeElement(contentList.get(0)));
                 } else if (contentList.size() >= 2) {
                     JsonArray arr = new JsonArray();
-                    contentList.forEach(child -> {
-                        arr.add(serialize(child));
-                    });
+                    contentList.forEach(child -> arr.add(serialize(child)));
                     json.add(name, arr);
                 } else {
                     throw new MCRException(

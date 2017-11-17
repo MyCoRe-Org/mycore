@@ -51,7 +51,7 @@ public class MCRUploadHandlerManager {
     protected static MCRProcessableCollection COLLECTION;
 
     static {
-        HANDLERS = new MCRCache<String, MCRUploadHandlerCacheEntry>(100, "UploadHandlerManager UploadHandlers");
+        HANDLERS = new MCRCache<>(100, "UploadHandlerManager UploadHandlers");
         COLLECTION = new MCRProcessableDefaultCollection("Upload Manager");
         MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
         registry.register(COLLECTION);

@@ -35,7 +35,7 @@ abstract class MCRAuthorityInfo {
     /**
      * A cache that maps authority information to the category ID that is represented by that info.
      */
-    private static final MCRCache<String, Object> categoryIDbyAuthorityInfo = new MCRCache<String, Object>(1000,
+    private static final MCRCache<String, Object> categoryIDbyAuthorityInfo = new MCRCache<>(1000,
         "Category ID by authority info");
 
     /**

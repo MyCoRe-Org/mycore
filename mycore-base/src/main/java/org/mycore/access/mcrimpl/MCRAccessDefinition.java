@@ -32,7 +32,7 @@ public class MCRAccessDefinition {
 
     private String objid;
 
-    private HashMap<String, String> pools = new HashMap<String, String>();
+    private HashMap<String, String> pools = new HashMap<>();
 
     public MCRAccessDefinition() {
         pools.clear();

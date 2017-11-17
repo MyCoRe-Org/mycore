@@ -471,7 +471,7 @@ public class MCRIFS2Commands {
     }
 
     private static ArrayList<String> getDerivatesOfProject(String content_store, String project_id) {
-        ArrayList<String> derivates = new ArrayList<String>();
+        ArrayList<String> derivates = new ArrayList<>();
         // get the IFS1.5
         MCRConfiguration config = MCRConfiguration.instance();
         String content_store_basepath = config.getString("MCR.IFS.ContentStore." + content_store + ".BaseDir", "");
@@ -498,7 +498,7 @@ public class MCRIFS2Commands {
     }
 
     private static ArrayList<String> getDerivatesOfObject(String content_store, String object_id) {
-        ArrayList<String> derivates = new ArrayList<String>();
+        ArrayList<String> derivates = new ArrayList<>();
         MCRConfiguration config = MCRConfiguration.instance();
         String content_store_basepath = config.getString("MCR.IFS.ContentStore." + content_store + ".BaseDir", "");
         if (content_store_basepath.length() == 0) {

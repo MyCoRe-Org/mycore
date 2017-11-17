@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -148,7 +149,7 @@ public class MCRSassCompilerManager {
 
         Optional<Import> importedStartStylesheet = importer.stream()
             .map(i -> i.apply(realFileName, null))
-            .filter(i -> i != null)
+            .filter(Objects::nonNull)
             .map(i -> i.stream().findFirst())
             .filter(Optional::isPresent)
             .map(Optional::get)

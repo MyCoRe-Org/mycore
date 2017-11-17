@@ -71,12 +71,9 @@ public class MCRSword {
     }
 
     private static void addCollectionShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                LOGGER.info("Shutdown Sword Collections");
-                collections.values().forEach(MCRSwordCollectionProvider::destroy);
-            }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            LOGGER.info("Shutdown Sword Collections");
+            collections.values().forEach(MCRSwordCollectionProvider::destroy);
         }));
     }
 

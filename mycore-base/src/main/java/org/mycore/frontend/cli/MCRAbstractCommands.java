@@ -52,7 +52,7 @@ public abstract class MCRAbstractCommands implements MCRExternalCommandInterface
     }
 
     private void init() {
-        setCommand(new ArrayList<MCRCommand>());
+        setCommand(new ArrayList<>());
     }
 
     /**

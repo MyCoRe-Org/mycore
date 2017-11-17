@@ -24,7 +24,7 @@ public class MCRObjectIDLockTable implements MCRSessionListener {
     }
 
     private MCRObjectIDLockTable() {
-        this.lockMap = new ConcurrentHashMap<MCRObjectID, MCRSession>();
+        this.lockMap = new ConcurrentHashMap<>();
         MCRSessionMgr.addSessionListener(this);
     }
 

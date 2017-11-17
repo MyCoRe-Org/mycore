@@ -136,7 +136,7 @@ public class MCRLDAPClient {
         if (group != null)
             defaultGroup = MCRRoleManager.getRole(group);
 
-        ldapEnv = new Hashtable<String, String>();
+        ldapEnv = new Hashtable<>();
         ldapEnv.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         ldapEnv.put("com.sun.jndi.ldap.read.timeout", readTimeout);
         ldapEnv.put(Context.PROVIDER_URL, providerURL);

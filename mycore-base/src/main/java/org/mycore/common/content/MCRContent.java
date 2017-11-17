@@ -174,11 +174,8 @@ public abstract class MCRContent {
      *            the OutputStream to write the content to
      */
     public void sendTo(OutputStream out) throws IOException {
-        InputStream in = getInputStream();
-        try {
+        try (InputStream in = getInputStream()) {
             IOUtils.copy(in, out);
-        } finally {
-            in.close();
         }
     }
 
@@ -306,12 +303,9 @@ public abstract class MCRContent {
         if (!isReusable()) {
             throw new IOException("Cannot determine DOCTYPE as it would destroy underlaying InputStream.");
         }
-        MCRContentInputStream cin = getContentInputStream();
-        try {
+        try (MCRContentInputStream cin = getContentInputStream()) {
             byte[] header = cin.getHeader();
             return MCRUtils.parseDocumentType(new ByteArrayInputStream(header));
-        } finally {
-            cin.close();
         }
     }
 

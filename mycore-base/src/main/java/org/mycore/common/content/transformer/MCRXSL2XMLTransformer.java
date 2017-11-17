@@ -57,8 +57,8 @@ import org.xml.sax.XMLReader;
  */
 public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
 
-    private static MCRCache<String, MCRXSL2XMLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSL2XMLTransformer>(
-        100, "MCRXSLTransformer instance cache");
+    private static MCRCache<String, MCRXSL2XMLTransformer> INSTANCE_CACHE = new MCRCache<>(100,
+        "MCRXSLTransformer instance cache");
 
     public MCRXSL2XMLTransformer() {
         super();

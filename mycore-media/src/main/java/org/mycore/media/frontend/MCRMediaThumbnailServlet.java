@@ -63,7 +63,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
 
     private ImageWriteParam imageWriteParam;
 
-    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
+    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRMediaThumbnailServlet.class);
 
@@ -77,7 +77,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
+        imageWriters = new ConcurrentLinkedQueue<>();
         imageWriteParam = ImageIO.getImageWritersBySuffix("png").next().getDefaultWriteParam();
         try {
             imageWriteParam.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
@@ -119,8 +119,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
                 Date expires = new Date(System.currentTimeMillis() + MAX_AGE * 1000);
                 LOGGER.info("Last-Modified: " + thumbFile.getLastModified() + ", expire on: " + expires);
                 job.getResponse().setDateHeader("Expires", expires.getTime());
-                ServletOutputStream sout = job.getResponse().getOutputStream();
-                try {
+                try (ServletOutputStream sout = job.getResponse().getOutputStream()) {
                     ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
                     ImageWriter imageWriter = getImageWriter();
                     try {
@@ -132,8 +131,6 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
                         imageWriters.add(imageWriter);
                         imageOutputStream.close();
                     }
-                } finally {
-                    sout.close();
                 }
             } else {
                 job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -166,16 +163,13 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
 
     private BufferedImage readThumb(MCRFile thumbFile, ImageReader imageReader) throws IOException {
         try {
-            InputStream zin = thumbFile.getContent().getInputStream();
-            try {
+            try (InputStream zin = thumbFile.getContent().getInputStream()) {
                 ImageInputStream iis = ImageIO.createImageInputStream(zin);
                 imageReader.setInput(iis, false);
                 BufferedImage image = imageReader.read(0);
                 imageReader.reset();
                 iis.close();
                 return image;
-            } finally {
-                zin.close();
             }
         } catch (Exception ex) {
             throw new IOException(ex);

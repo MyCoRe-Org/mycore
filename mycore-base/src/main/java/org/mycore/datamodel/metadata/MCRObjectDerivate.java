@@ -71,9 +71,9 @@ public class MCRObjectDerivate {
      */
     public MCRObjectDerivate(MCRObjectID derivateID) {
         linkmeta = null;
-        externals = new ArrayList<MCRMetaLink>();
+        externals = new ArrayList<>();
         internals = null;
-        titles = new ArrayList<MCRMetaLangText>();
+        titles = new ArrayList<>();
         files = Collections.emptyList();
         display = true;
         this.derivateID = derivateID;
@@ -143,7 +143,7 @@ public class MCRObjectDerivate {
             }
             List<Element> filesInList = filesetElements.getChildren();
             if (!filesInList.isEmpty()) {
-                files = new ArrayList<MCRFileMetadata>(filesInList.size());
+                files = new ArrayList<>(filesInList.size());
                 for (Element file : filesInList) {
                     files.add(new MCRFileMetadata(file));
                 }
@@ -269,7 +269,7 @@ public class MCRObjectDerivate {
         }
         //add path to end of list;
         if (files.isEmpty()) {
-            files = new ArrayList<MCRFileMetadata>();
+            files = new ArrayList<>();
         }
         MCRFileMetadata newFileMetadata = createFileMetadata(path, urn, handle);
         files.add(newFileMetadata);

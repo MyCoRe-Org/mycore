@@ -118,7 +118,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                 }
             };
             final AtomicInteger activeThreads = new AtomicInteger();
-            final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
+            final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
             ThreadPoolExecutor baseExecutor = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1,
                 TimeUnit.DAYS, workQueue, slaveFactory) {
 
@@ -145,10 +145,9 @@ public class MCRImageTiler implements Runnable, Closeable {
                             if (!running) {
                                 break;
                             }
-                            Session session = MCRHIBConnection.instance().getSession();
                             Transaction transaction = null;
                             MCRTileJob job = null;
-                            try {
+                            try (Session session = MCRHIBConnection.instance().getSession()) {
                                 transaction = session.beginTransaction();
                                 job = tq.poll();
                                 imageTilerCollection.setProperty("queue",
@@ -163,8 +162,6 @@ public class MCRImageTiler implements Runnable, Closeable {
                                         LOGGER.warn("Could not rollback transaction.", re);
                                     }
                                 }
-                            } finally {
-                                session.close();
                             }
                             if (job != null && !tilingServe.getExecutor().isShutdown()) {
                                 LOGGER.info("Creating:" + job.getPath());

@@ -201,7 +201,7 @@ public class MCROAIAdapter implements OAIAdapter {
      */
     @Override
     public List<MetadataFormat> getMetadataFormats() {
-        return new ArrayList<MetadataFormat>(getMetadataFormatMap().values());
+        return new ArrayList<>(getMetadataFormatMap().values());
     }
 
     /*
@@ -218,7 +218,7 @@ public class MCROAIAdapter implements OAIAdapter {
     }
 
     protected Map<String, MetadataFormat> getMetadataFormatMap() {
-        Map<String, MetadataFormat> metdataFormatMap = new HashMap<String, MetadataFormat>();
+        Map<String, MetadataFormat> metdataFormatMap = new HashMap<>();
         String formats = this.config.getString(getConfigPrefix() + "MetadataFormats", "");
         StringTokenizer st = new StringTokenizer(formats, ", ");
         while (st.hasMoreTokens()) {

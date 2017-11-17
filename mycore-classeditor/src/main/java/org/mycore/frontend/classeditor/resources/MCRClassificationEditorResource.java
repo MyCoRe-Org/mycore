@@ -173,12 +173,8 @@ public class MCRClassificationEditorResource {
     public Response getClassification() {
         Gson gson = MCRJSONManager.instance().createGson();
         List<MCRCategory> rootCategories = new LinkedList<>(CATEGORY_DAO.getRootCategories());
-        for (Iterator<MCRCategory> it = rootCategories.iterator(); it.hasNext();) {
-            MCRCategory category = it.next();
-            if (!MCRAccessManager.checkPermission(category.getId().getRootID(), PERMISSION_WRITE)) {
-                it.remove();
-            }
-        }
+        rootCategories.removeIf(
+            category -> !MCRAccessManager.checkPermission(category.getId().getRootID(), PERMISSION_WRITE));
         if (rootCategories.isEmpty()
             && !MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION)) {
             return Response.status(Status.UNAUTHORIZED).build();
@@ -282,11 +278,11 @@ public class MCRClassificationEditorResource {
         JsonStreamParser jsonStreamParser = new JsonStreamParser(json);
         if (jsonStreamParser.hasNext()) {
             JsonArray saveObjArray = jsonStreamParser.next().getAsJsonArray();
-            List<JsonObject> saveList = new ArrayList<JsonObject>();
+            List<JsonObject> saveList = new ArrayList<>();
             for (JsonElement jsonElement : saveObjArray) {
                 saveList.add(jsonElement.getAsJsonObject());
             }
-            Collections.sort(saveList, new IndexComperator());
+            saveList.sort(new IndexComperator());
             for (JsonObject jsonObject : saveList) {
                 String status = getStatus(jsonObject);
                 SaveElement categ = getCateg(jsonObject);
@@ -336,7 +332,7 @@ public class MCRClassificationEditorResource {
 
         JsonArray docList = new JsonArray();
         MCRSolrSearchUtils.stream(solrClient, p).flatMap(document -> {
-            List<String> ids = new ArrayList<String>();
+            List<String> ids = new ArrayList<>();
             ids.add(document.getFirstValue("id").toString());
             Collection<Object> fieldValues = document.getFieldValues("ancestors");
             if (fieldValues != null) {
@@ -345,9 +341,7 @@ public class MCRClassificationEditorResource {
                 }
             }
             return ids.stream();
-        }).distinct().map(id -> new JsonPrimitive(id)).forEach(jp -> {
-            docList.add(jp);
-        });
+        }).distinct().map(JsonPrimitive::new).forEach(docList::add);
         return Response.ok().entity(docList.toString()).build();
     }
 

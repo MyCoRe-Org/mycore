@@ -32,13 +32,11 @@ public abstract class MCRPersistentIdentifierMetadataManager<T extends MCRPersis
         Map<String, String> deprecatedProperties = getPropertiesWithPrefix(METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX);
         Map<String, String> properties = getPropertiesWithPrefix(METADATA_MANAGER_CONFIG_PREFIX);
 
-        deprecatedProperties.forEach((k, v) -> {
-            properties.computeIfAbsent(k, (k2) -> {
-                LOGGER.warn("You should rename {}{}.{} to {}{}.{}", METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX,
-                    metadataManagerID, k, METADATA_MANAGER_CONFIG_PREFIX, metadataManagerID, k);
-                return v;
-            });
-        });
+        deprecatedProperties.forEach((k, v) -> properties.computeIfAbsent(k, (k2) -> {
+            LOGGER.warn("You should rename {}{}.{} to {}{}.{}", METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX,
+                metadataManagerID, k, METADATA_MANAGER_CONFIG_PREFIX, metadataManagerID, k);
+            return v;
+        }));
 
         return properties;
     }

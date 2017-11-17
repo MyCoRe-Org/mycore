@@ -66,7 +66,7 @@ public class MCRVideoObject extends MCRMediaObject {
 
     protected float frameRate;
 
-    protected ArrayList<MCRAudioObject> audioCodes = new ArrayList<MCRAudioObject>();
+    protected ArrayList<MCRAudioObject> audioCodes = new ArrayList<>();
 
     public MCRVideoObject() {
         type = MCRMediaObject.MediaType.VIDEO;

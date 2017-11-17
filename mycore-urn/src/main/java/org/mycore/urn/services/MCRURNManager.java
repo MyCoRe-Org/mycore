@@ -84,7 +84,7 @@ public class MCRURNManager {
     }
 
     /** A map from configID to MCRNissBuilder objects */
-    private static Hashtable<String, MCRNISSBuilder> builders = new Hashtable<String, MCRNISSBuilder>();
+    private static Hashtable<String, MCRNISSBuilder> builders = new Hashtable<>();
 
     /**
      * Builds a URN with a custom, given NISS.

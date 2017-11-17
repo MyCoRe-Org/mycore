@@ -133,7 +133,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
         // the superuser role
         try {
-            Set<MCRLabel> labels = new HashSet<MCRLabel>();
+            Set<MCRLabel> labels = new HashSet<>();
             labels.add(new MCRLabel("en", "The superuser role", null));
 
             MCRRole mcrRole = new MCRRole(srole, labels);
@@ -463,7 +463,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         StringBuilder sb = new StringBuilder("\n");
         sb.append("       user=").append(user.getUserName()).append("   real name=").append(user.getRealName())
             .append('\n').append("   loginAllowed=").append(user.loginAllowed()).append('\n');
-        List<String> roles = new ArrayList<String>(user.getSystemRoleIDs());
+        List<String> roles = new ArrayList<>(user.getSystemRoleIDs());
         roles.addAll(user.getExternalRoleIDs());
         for (String rid : roles) {
             sb.append("          assigned to role=").append(rid).append('\n');

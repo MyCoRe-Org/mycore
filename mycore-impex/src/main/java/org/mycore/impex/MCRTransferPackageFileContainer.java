@@ -43,7 +43,7 @@ public class MCRTransferPackageFileContainer {
      */
     public List<MCRFile> getFiles() {
         if (fileList == null) {
-            this.fileList = new ArrayList<MCRFile>();
+            this.fileList = new ArrayList<>();
             this.createFileList();
         }
         return this.fileList;

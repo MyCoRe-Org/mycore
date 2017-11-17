@@ -83,7 +83,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private void handleUnknownStylesheets() {
         while (!unknown.isEmpty()) {
-            Set<String> list = new HashSet<String>();
+            Set<String> list = new HashSet<>();
             list.addAll(unknown);
             unknown.clear();
 
@@ -114,7 +114,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         LOGGER.info("Diving into " + base + "...");
         Set<String> paths = getServletContext().getResourcePaths(base);
 
-        Set<String> more = new HashSet<String>();
+        Set<String> more = new HashSet<>();
         more.addAll(paths);
 
         for (String path : paths)
@@ -154,29 +154,24 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         stylesheet.origin.add(source);
     }
 
-    private Map<String, Stylesheet> stylesheets = new HashMap<String, Stylesheet>();
+    private Map<String, Stylesheet> stylesheets = new HashMap<>();
 
-    private Set<String> unknown = new HashSet<String>();
+    private Set<String> unknown = new HashSet<>();
 
     private Stylesheet getStylesheet(String name) {
-        Stylesheet stylesheet = stylesheets.get(name);
-        if (stylesheet == null) {
-            stylesheet = new Stylesheet(name);
-            stylesheets.put(name, stylesheet);
-        }
-        return stylesheet;
+        return stylesheets.computeIfAbsent(name, Stylesheet::new);
     }
 
     class Stylesheet {
         String name;
 
-        Set<String> origin = new HashSet<String>();
+        Set<String> origin = new HashSet<>();
 
-        Set<String> includes = new HashSet<String>();
+        Set<String> includes = new HashSet<>();
 
-        Set<String> imports = new HashSet<String>();
+        Set<String> imports = new HashSet<>();
 
-        List<Element> templates = new ArrayList<Element>();
+        List<Element> templates = new ArrayList<>();
 
         Element xsl;
 
@@ -229,8 +224,8 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             List<Element> list = xsl.getChildren("template", MCRConstants.XSL_NAMESPACE);
             IteratorIterable<Element> callTemplateElements = xsl
                 .getDescendants(Filters.element("call-template", MCRConstants.XSL_NAMESPACE));
-            LinkedList<Element> templates = new LinkedList<Element>(list);
-            HashSet<String> callNames = new HashSet<String>();
+            LinkedList<Element> templates = new LinkedList<>(list);
+            HashSet<String> callNames = new HashSet<>();
             for (Element callTemplate : callTemplateElements) {
                 String name = callTemplate.getAttributeValue("name");
                 if (callNames.add(name)) {

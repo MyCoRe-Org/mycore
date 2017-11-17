@@ -27,7 +27,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     /** Constructor initializes the HashMap */
     public MCRMetaDerivateLink() {
         super();
-        map = new HashMap<String, String>();
+        map = new HashMap<>();
     }
 
     public void setLinkToFile(MCRPath file) {

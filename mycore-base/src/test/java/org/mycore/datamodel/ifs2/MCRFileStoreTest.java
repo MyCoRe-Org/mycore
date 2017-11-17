@@ -131,7 +131,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
 
         createFileCollection(expectedNumOfFileCollections);
 
-        ArrayList<Integer> l1 = new ArrayList<Integer>();
+        ArrayList<Integer> l1 = new ArrayList<>();
         IDs = getStore().listIDs(true);
         assertTrue("IDs iterator has no next element? ", IDs.hasNext());
         while (IDs.hasNext()) {
@@ -142,7 +142,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
             l1.add(id);
         }
         assertEquals("ID list size", expectedNumOfFileCollections, l1.size());
-        ArrayList<Integer> l2 = new ArrayList<Integer>();
+        ArrayList<Integer> l2 = new ArrayList<>();
         IDs = getStore().listIDs(false);
         while (IDs.hasNext()) {
             int id = IDs.next();
@@ -279,10 +279,10 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
             return;
         }
 
-        ArrayList<Element> copy = new ArrayList<Element>();
+        ArrayList<Element> copy = new ArrayList<>();
         copy.addAll(children);
 
-        Collections.sort(copy, (a, b) -> {
+        copy.sort((a, b) -> {
             String sa = a.getName() + "/" + a.getAttributeValue("name");
             String sb = b.getName() + "/" + b.getAttributeValue("name");
             return sa.compareTo(sb);

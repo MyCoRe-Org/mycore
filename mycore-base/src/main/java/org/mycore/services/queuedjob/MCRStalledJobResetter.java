@@ -44,7 +44,7 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRStalledJobResetter implements Runnable {
 
-    private static HashMap<String, MCRStalledJobResetter> INSTANCES = new HashMap<String, MCRStalledJobResetter>();
+    private static HashMap<String, MCRStalledJobResetter> INSTANCES = new HashMap<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRStalledJobResetter.class);
 
@@ -63,11 +63,8 @@ public class MCRStalledJobResetter implements Runnable {
     public static MCRStalledJobResetter getInstance(Class<? extends MCRJobAction> action) {
         String key = action != null && !MCRJobQueue.singleQueue ? action.getName() : "single";
 
-        MCRStalledJobResetter resetter = INSTANCES.get(key);
-        if (resetter == null) {
-            resetter = new MCRStalledJobResetter(MCRJobQueue.singleQueue ? null : action);
-            INSTANCES.put(key, resetter);
-        }
+        MCRStalledJobResetter resetter = INSTANCES.computeIfAbsent(key,
+            k -> new MCRStalledJobResetter(MCRJobQueue.singleQueue ? null : action));
 
         return resetter;
     }

@@ -76,7 +76,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         if (defaultLang == null) {
             defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
         }
-        labels = new HashSet<MCRLabel>();
+        labels = new HashSet<>();
     }
 
     public List<MCRCategory> getChildren() {

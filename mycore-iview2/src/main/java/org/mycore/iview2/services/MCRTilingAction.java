@@ -55,19 +55,16 @@ public class MCRTilingAction implements Runnable {
         }
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        final Session session = MCRHIBConnection.instance().getSession();
         Transaction transaction = null;
-        try {
+        try (Session session = MCRHIBConnection.instance().getSession()) {
             MCRTileEventHandler tileEventHandler = new MCRTileEventHandler() {
                 Transaction transaction;
 
-                @Override
-                public void preImageReaderCreated() {
+                @Override public void preImageReaderCreated() {
                     transaction = session.beginTransaction();
                 }
 
-                @Override
-                public void postImageReaderCreated() {
+                @Override public void postImageReaderCreated() {
                     session.clear(); //beside tileJob, no write access so far
                     if (transaction.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
                         transaction.commit();
@@ -96,13 +93,12 @@ public class MCRTilingAction implements Runnable {
                 transaction.rollback();
             }
             try {
-                Files.deleteIfExists(MCRImage.getTiledFile(tileDir,tileJob.getDerivate(), tileJob.getPath()));
+                Files.deleteIfExists(MCRImage.getTiledFile(tileDir, tileJob.getDerivate(), tileJob.getPath()));
             } catch (IOException e1) {
                 LOGGER.error("Could not delete tile file after error!", e);
             }
 
         } finally {
-            session.close();
             MCRSessionMgr.releaseCurrentSession();
             mcrSession.close();
         }

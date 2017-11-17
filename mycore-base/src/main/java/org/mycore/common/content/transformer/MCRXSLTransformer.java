@@ -215,9 +215,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             XMLReader reader = getXMLReader(transformHandlerList);
             TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
             return transform(source, reader, lastTransformerHandler, parameter);
-        } catch (TransformerException e) {
-            throw new IOException(e);
-        } catch (SAXException e) {
+        } catch (TransformerException | SAXException e) {
             throw new IOException(e);
         }
     }
@@ -238,11 +236,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             StreamResult result = new StreamResult(out);
             lastTransformerHandler.setResult(result);
             reader.parse(source.getInputSource());
-        } catch (TransformerConfigurationException e) {
-            throw new IOException(e);
-        } catch (IllegalArgumentException e) {
-            throw new IOException(e);
-        } catch (SAXException e) {
+        } catch (TransformerConfigurationException | SAXException | IllegalArgumentException e) {
             throw new IOException(e);
         } catch (RuntimeException e) {
             if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {

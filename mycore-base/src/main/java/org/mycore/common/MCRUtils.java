@@ -175,7 +175,7 @@ public class MCRUtils {
      * @return an ArrayList with file names as pathes
      */
     public static ArrayList<String> getAllFileNames(File basedir) {
-        ArrayList<String> out = new ArrayList<String>();
+        ArrayList<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -201,7 +201,7 @@ public class MCRUtils {
      * @return an ArrayList with file names as pathes
      */
     public static ArrayList<String> getAllFileNames(File basedir, String path) {
-        ArrayList<String> out = new ArrayList<String>();
+        ArrayList<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -225,7 +225,7 @@ public class MCRUtils {
      * @return an ArrayList with directory names as pathes
      */
     public static ArrayList<String> getAllDirectoryNames(File basedir) {
-        ArrayList<String> out = new ArrayList<String>();
+        ArrayList<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -248,7 +248,7 @@ public class MCRUtils {
      * @return an ArrayList with directory names as pathes
      */
     public static ArrayList<String> getAllDirectoryNames(File basedir, String path) {
-        ArrayList<String> out = new ArrayList<String>();
+        ArrayList<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {

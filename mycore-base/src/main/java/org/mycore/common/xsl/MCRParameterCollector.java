@@ -52,7 +52,7 @@ public class MCRParameterCollector {
     private static final Logger LOGGER = LogManager.getLogger(MCRParameterCollector.class);
 
     /** The collected parameters */
-    private Map<String, Object> parameters = new HashMap<String, Object>();
+    private Map<String, Object> parameters = new HashMap<>();
 
     /** If true (which is default), only those parameters starting with "XSL." are copied from session and request */
     private boolean onlySetXSLParameters = true;

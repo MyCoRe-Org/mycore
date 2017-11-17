@@ -311,7 +311,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     static Collection<MCRCategoryImpl> wrapCategories(Collection<? extends MCRCategory> categories, MCRCategory parent,
         MCRCategory root) {
-        List<MCRCategoryImpl> list = new ArrayList<MCRCategoryImpl>(categories.size());
+        List<MCRCategoryImpl> list = new ArrayList<>(categories.size());
         for (MCRCategory category : categories) {
             list.add(wrapCategory(category, parent, root));
         }
@@ -338,7 +338,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
                     + category.getId());
             }
             // copy children to temporary list
-            List<MCRCategory> children = new ArrayList<MCRCategory>(catImpl.getChildren().size());
+            List<MCRCategory> children = new ArrayList<>(catImpl.getChildren().size());
             children.addAll(catImpl.getChildren());
             // remove old children
             catImpl.getChildren().clear();
@@ -356,7 +356,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         }
         catImpl.setRoot(root);
         catImpl.level = parent.getLevel() + 1;
-        catImpl.children = new ArrayList<MCRCategory>(category.getChildren().size());
+        catImpl.children = new ArrayList<>(category.getChildren().size());
         catImpl.getChildren().addAll(category.getChildren());
         return catImpl;
     }

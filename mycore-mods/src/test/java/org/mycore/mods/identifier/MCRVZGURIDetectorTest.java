@@ -26,15 +26,15 @@ public class MCRVZGURIDetectorTest {
     @Test
     public void testDetect() throws Exception {
         MCRGBVURLDetector detector = new MCRGBVURLDetector();
-        testData.entrySet().forEach(d -> {
-            Optional<Map.Entry<String, String>> maybeDetectedGND = detector.detect(d.getKey());
+        testData.forEach((key, value) -> {
+            Optional<Map.Entry<String, String>> maybeDetectedGND = detector.detect(key);
 
             Assert.assertTrue("Should have a detected PPN", maybeDetectedGND.isPresent());
 
-            maybeDetectedGND
-                .ifPresent(gnd -> Assert.assertEquals("Should have detected the right type!", gnd.getKey(), "ppn"));
             maybeDetectedGND.ifPresent(
-                gnd -> Assert.assertEquals("Should have detected the right value!", gnd.getValue(), d.getValue()));
+                gnd -> Assert.assertEquals("Should have detected the right type!", gnd.getKey(), "ppn"));
+            maybeDetectedGND.ifPresent(
+                gnd -> Assert.assertEquals("Should have detected the right value!", gnd.getValue(), value));
         });
     }
 }

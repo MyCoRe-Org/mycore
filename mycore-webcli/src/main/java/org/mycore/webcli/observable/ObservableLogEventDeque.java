@@ -14,7 +14,7 @@ public class ObservableLogEventDeque extends Observable {
     ConcurrentLinkedDeque<LogEvent> logEventDeque;
 
     public ObservableLogEventDeque() {
-        this.logEventDeque = new ConcurrentLinkedDeque<LogEvent>();
+        this.logEventDeque = new ConcurrentLinkedDeque<>();
     }
 
     public void add(LogEvent event) {

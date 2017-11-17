@@ -25,7 +25,7 @@ public class CategoryDAOMock implements MCRCategoryDAO {
         MCRJSONCategory categ_01 = createCategory("rootID_01", "categ_01", null);
         MCRJSONCategory categ_02 = createCategory("rootID_01", "categ_02", null);
 
-        List<MCRCategory> children = new ArrayList<MCRCategory>();
+        List<MCRCategory> children = new ArrayList<>();
         children.add(categ_01);
         children.add(categ_02);
         root_01.setChildren(children);
@@ -39,8 +39,8 @@ public class CategoryDAOMock implements MCRCategoryDAO {
     }
 
     public void init() {
-        categMap = new HashMap<MCRCategoryID, MCRCategory>();
-        rootCategMap = new HashMap<MCRCategoryID, MCRCategory>();
+        categMap = new HashMap<>();
+        rootCategMap = new HashMap<>();
         buildTestCategs();
     }
 
@@ -54,7 +54,7 @@ public class CategoryDAOMock implements MCRCategoryDAO {
 
     private MCRJSONCategory createCategory(String rootID, String categID, MCRCategoryID parentID) {
         MCRCategoryID id = new MCRCategoryID(rootID, categID);
-        Set<MCRLabel> labels = new HashSet<MCRLabel>();
+        Set<MCRLabel> labels = new HashSet<>();
         labels.add(new MCRLabel("de", id + "_text", id + "_descr"));
         labels.add(new MCRLabel("en", id + "_text", id + "_descr"));
         MCRJSONCategory newCategory = new MCRJSONCategory();
@@ -103,7 +103,7 @@ public class CategoryDAOMock implements MCRCategoryDAO {
 
     @Override
     public List<MCRCategory> getChildren(MCRCategoryID id) {
-        return new ArrayList<MCRCategory>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -118,7 +118,7 @@ public class CategoryDAOMock implements MCRCategoryDAO {
 
     @Override
     public List<MCRCategory> getRootCategories() {
-        return new ArrayList<MCRCategory>(rootCategMap.values());
+        return new ArrayList<>(rootCategMap.values());
     }
 
     @Override

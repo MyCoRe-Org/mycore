@@ -124,10 +124,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
-        MCRSessionMgr.getCurrentSession().onCommit(() -> {
-            MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
-                    MCRSolrIndexer.HIGH_PRIORITY);
-        });
+        MCRSessionMgr.getCurrentSession().onCommit(() -> MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
+                MCRSolrIndexer.HIGH_PRIORITY));
     }
 
     @Override

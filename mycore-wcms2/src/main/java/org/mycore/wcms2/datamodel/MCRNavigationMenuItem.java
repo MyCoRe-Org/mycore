@@ -31,7 +31,7 @@ public class MCRNavigationMenuItem extends MCRNavigationI18nItem
     private List<MCRNavigationBaseItem> children;
 
     public MCRNavigationMenuItem() {
-        this.children = new ArrayList<MCRNavigationBaseItem>();
+        this.children = new ArrayList<>();
     }
 
     public String getId() {

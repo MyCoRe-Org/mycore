@@ -45,10 +45,8 @@ public class MCRIIIFScaleParserTest {
         testValues.put("pct:200", new MCRIIIFImageTargetSize(1000, 800));
         testValues.put("pct:50", new MCRIIIFImageTargetSize(250, 200));
 
-        testValues.forEach((scale, expectedResult) -> {
-            Assert.assertEquals(expectedResult,
-                new MCRIIIFScaleParser(scale, IMAGE_WIDTH, IMAGE_HEIGHT).parseTargetScale());
-        });
+        testValues.forEach((scale, expectedResult) -> Assert.assertEquals(expectedResult,
+            new MCRIIIFScaleParser(scale, IMAGE_WIDTH, IMAGE_HEIGHT).parseTargetScale()));
 
     }
 }

@@ -76,7 +76,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategory.";
 
-    private static HashMap<String, Long> LAST_MODIFIED_MAP = new HashMap<String, Long>();
+    private static HashMap<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
 
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
         int position = -1;
@@ -264,7 +264,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         @SuppressWarnings("unchecked")
         List<MCRCategoryDTO> resultList = parentQuery.getResultList();
         MCRCategory category = buildCategoryFromPrefetchedList(resultList, id);
-        List<MCRCategory> parents = new ArrayList<MCRCategory>();
+        List<MCRCategory> parents = new ArrayList<>();
         while (category.getParent() != null) {
             category = category.getParent();
             parents.add(category);
@@ -571,7 +571,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             LOGGER.error("Cannot get children size for category: " + category.getId(), e);
             throw e;
         }
-        newCateg.setChildren(new ArrayList<MCRCategory>(childAmount));
+        newCateg.setChildren(new ArrayList<>(childAmount));
         newCateg.setId(category.getId());
         newCateg.setLabels(category.getLabels());
         newCateg.setRoot(category.getRoot());
@@ -620,13 +620,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 }
             });
         }
-        Iterator<MCRLabel> labels = target.getLabels().iterator();
-        while (labels.hasNext()) {
-            // remove labels that are not present in new version
-            if (!source.getLabel(labels.next().getLang()).isPresent()) {
-                labels.remove();
-            }
-        }
+        // remove labels that are not present in new version
+        target.getLabels().removeIf(mcrLabel -> !source.getLabel(mcrLabel.getLang()).isPresent());
     }
 
     private static MCRCategoryDTO getLeftRightLevelValues(EntityManager entityManager, MCRCategoryID id) {

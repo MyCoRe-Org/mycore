@@ -40,7 +40,7 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
         Collection<MCRCategory> categoryByURI = MCRAuthorityWithURI.getCategoryByURI(href);
         if (categoryByURI.size() > 1) {
             throw new MCRException(
-                href + " is ambigous: " + categoryByURI.stream().map(c -> c.getId()).collect(Collectors.toList()));
+                href + " is ambigous: " + categoryByURI.stream().map(MCRCategory::getId).collect(Collectors.toList()));
         }
         if (!categoryByURI.isEmpty()) {
             return categoryByURI.iterator().next().getId();

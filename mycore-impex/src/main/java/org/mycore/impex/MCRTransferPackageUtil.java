@@ -207,7 +207,7 @@ public abstract class MCRTransferPackageUtil {
         MCRObject mcr = new MCRObject(objXML);
         mcr.setImportMode(true);
 
-        List<String> derivates = new LinkedList<String>();
+        List<String> derivates = new LinkedList<>();
         // one must copy the ids before updating the mcr objects
         for (MCRMetaLinkID id : mcr.getStructure().getDerivates()) {
             derivates.add(id.getXLinkHref());

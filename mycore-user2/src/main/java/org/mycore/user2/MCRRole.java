@@ -52,7 +52,7 @@ public class MCRRole {
     private boolean isSystemRole;
 
     private MCRRole() {
-        this.labels = new HashMap<String, MCRLabel>();
+        this.labels = new HashMap<>();
     }
 
     /**

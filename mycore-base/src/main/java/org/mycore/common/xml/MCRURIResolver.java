@@ -161,7 +161,7 @@ public final class MCRURIResolver implements URIResolver {
     private static MCRResolverProvider getExternalResolverProvider() {
         String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class",
             null);
-        final MCRResolverProvider emptyResolver = () -> new HashMap<String, URIResolver>();
+        final MCRResolverProvider emptyResolver = HashMap::new;
         if (externalClassName == null) {
             return emptyResolver;
         }
@@ -172,10 +172,7 @@ public final class MCRURIResolver implements URIResolver {
         } catch (ClassNotFoundException e) {
             LOGGER.warn("Could not find external Resolver class", e);
             return emptyResolver;
-        } catch (InstantiationException e) {
-            LOGGER.warn("Could not instantiate external Resolver class", e);
-            return emptyResolver;
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             LOGGER.warn("Could not instantiate external Resolver class", e);
             return emptyResolver;
         }
@@ -185,8 +182,7 @@ public final class MCRURIResolver implements URIResolver {
         final Map<String, URIResolver> extResolverMapping = EXT_RESOLVER.getURIResolverMapping();
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
-        HashMap<String, URIResolver> supportedSchemes = new HashMap<String, URIResolver>(10 + extResolverMapping.size(),
-            1);
+        HashMap<String, URIResolver> supportedSchemes = new HashMap<>(10 + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
@@ -240,7 +236,7 @@ public final class MCRURIResolver implements URIResolver {
     public static Hashtable<String, String> getParameterMap(String key) {
         String[] param;
         StringTokenizer tok = new StringTokenizer(key, "&");
-        Hashtable<String, String> params = new Hashtable<String, String>();
+        Hashtable<String, String> params = new Hashtable<>();
 
         while (tok.hasMoreTokens()) {
             param = tok.nextToken().split("=");
@@ -443,9 +439,9 @@ public final class MCRURIResolver implements URIResolver {
         public Map<String, URIResolver> getURIResolverMapping() {
             Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX + "ModuleResolver.");
             if (props.isEmpty()) {
-                return new HashMap<String, URIResolver>();
+                return new HashMap<>();
             }
-            Map<String, URIResolver> map = new HashMap<String, URIResolver>();
+            Map<String, URIResolver> map = new HashMap<>();
             for (Entry<String, String> entry : props.entrySet()) {
                 try {
                     String scheme = entry.getKey();
@@ -886,7 +882,7 @@ public final class MCRURIResolver implements URIResolver {
 
             String[] param;
             StringTokenizer tok = new StringTokenizer(key, "&");
-            Hashtable<String, String> params = new Hashtable<String, String>();
+            Hashtable<String, String> params = new Hashtable<>();
 
             while (tok.hasMoreTokens()) {
                 param = tok.nextToken().split("=");
@@ -941,7 +937,7 @@ public final class MCRURIResolver implements URIResolver {
         static {
             try {
                 DAO = MCRCategoryDAOFactory.getInstance();
-                categoryCache = new MCRCache<String, Element>(
+                categoryCache = new MCRCache<>(
                     MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
                     "URIResolver categories");
             } catch (Exception exc) {
@@ -1398,7 +1394,7 @@ public final class MCRURIResolver implements URIResolver {
         private static Hashtable<String, String> getParameterMap(String key) {
             String[] param;
             StringTokenizer tok = new StringTokenizer(key, "&");
-            Hashtable<String, String> params = new Hashtable<String, String>();
+            Hashtable<String, String> params = new Hashtable<>();
 
             while (tok.hasMoreTokens()) {
                 param = tok.nextToken().split("=");

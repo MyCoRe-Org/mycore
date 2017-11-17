@@ -626,7 +626,7 @@ public class MCRTextResolver {
      */
     protected static class TermContainer {
 
-        protected Map<String, Class<? extends Term>> termMap = new HashMap<String, Class<? extends Term>>();
+        protected Map<String, Class<? extends Term>> termMap = new HashMap<>();
 
         protected MCRTextResolver textResolver;
 
@@ -669,11 +669,7 @@ public class MCRTextResolver {
         }
 
         public void track(String type, String id) throws CircularDependencyExecption {
-            List<String> idList = trackMap.get(type);
-            if (idList == null) {
-                idList = new ArrayList<>();
-                trackMap.put(type, idList);
-            }
+            List<String> idList = trackMap.computeIfAbsent(type, k -> new ArrayList<>());
             if (idList.contains(id)) {
                 throw new CircularDependencyExecption(idList, id);
             }

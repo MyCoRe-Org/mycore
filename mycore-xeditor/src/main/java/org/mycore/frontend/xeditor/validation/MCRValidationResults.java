@@ -22,9 +22,9 @@ public class MCRValidationResults {
         MARKER_ERROR = MCRConfiguration.instance().getString(prefix + "error", "has-error");
     }
 
-    private Map<String, String> xPath2Marker = new HashMap<String, String>();
+    private Map<String, String> xPath2Marker = new HashMap<>();
 
-    private LinkedHashMap<String, MCRValidator> xPath2FailedRule = new LinkedHashMap<String, MCRValidator>();
+    private LinkedHashMap<String, MCRValidator> xPath2FailedRule = new LinkedHashMap<>();
 
     private boolean isValid = true;
 
@@ -47,7 +47,7 @@ public class MCRValidationResults {
     }
 
     public String getValidationMarker(String xPath) {
-        return xPath2Marker.containsKey(xPath) ? xPath2Marker.get(xPath) : MARKER_DEFAULT;
+        return xPath2Marker.getOrDefault(xPath, MARKER_DEFAULT);
     }
 
     public MCRValidator getFailedRule(String xPath) {

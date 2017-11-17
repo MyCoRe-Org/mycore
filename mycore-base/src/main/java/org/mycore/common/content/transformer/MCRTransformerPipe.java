@@ -55,7 +55,7 @@ public class MCRTransformerPipe extends MCRParameterizedTransformer {
     }
 
     /** List of transformers to execute */
-    private List<MCRContentTransformer> transformers = new ArrayList<MCRContentTransformer>();
+    private List<MCRContentTransformer> transformers = new ArrayList<>();
 
     @Override
     public void init(String id) {

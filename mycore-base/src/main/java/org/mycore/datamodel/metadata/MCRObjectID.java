@@ -61,7 +61,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     // counter for the next IDs per project base ID
-    private static HashMap<String, Integer> lastNumber = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> lastNumber = new HashMap<>();
 
     // data of the ID
     private String projectId, objectType, combinedId;
@@ -74,7 +74,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     private static HashSet<String> VALID_TYPE_LIST;
     static {
-        VALID_TYPE_LIST = new HashSet<String>();
+        VALID_TYPE_LIST = new HashSet<>();
         Map<String, String> properties = CONFIG.getPropertiesMap("MCR.Metadata.Type");
         for (Entry<String, String> prop : properties.entrySet()) {
             if (!prop.getValue().equalsIgnoreCase("true")) {
@@ -193,7 +193,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * store.
      */
     private static int getLastIDNumber(String base_id) {
-        int lastIDKnown = lastNumber.containsKey(base_id) ? lastNumber.get(base_id) : 0;
+        int lastIDKnown = lastNumber.getOrDefault(base_id, 0);
 
         String[] idParts = getIDParts(base_id);
         int highestStoredID = MCRXMLMetadataManager.instance().getHighestStoredID(idParts[0], idParts[1]);
@@ -414,7 +414,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * Returns a list of available mycore object types.
      */
     public static List<String> listTypes() {
-        return new ArrayList<String>(VALID_TYPE_LIST);
+        return new ArrayList<>(VALID_TYPE_LIST);
     }
 
     /**

@@ -65,19 +65,15 @@ public class MCRProcessableFactoryTest extends MCRTestCase {
     }
 
     private Runnable sleepyThread(Semaphore semaphore) {
-        return new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    semaphore.acquire();
-                } catch (InterruptedException e) {
-                    LOGGER.warn("test thread interrupted", e);
-                } finally {
-                    semaphore.release();
-                }
-
+        return () -> {
+            try {
+                semaphore.acquire();
+            } catch (InterruptedException e) {
+                LOGGER.warn("test thread interrupted", e);
+            } finally {
+                semaphore.release();
             }
+
         };
     }
 

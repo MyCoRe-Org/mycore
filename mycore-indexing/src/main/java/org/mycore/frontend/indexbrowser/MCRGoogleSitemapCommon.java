@@ -144,7 +144,7 @@ public final class MCRGoogleSitemapCommon {
         }
         this.webappBaseDir = baseDir;
         LOGGER.info("Using webappbaseDir: " + baseDir.getAbsolutePath());
-        objidlist = new ArrayList<MCRObjectIDDate>();
+        objidlist = new ArrayList<>();
         if ((numberOfURLs < 1) || (numberOfURLs > 50000))
             numberOfURLs = 50000;
         if (cdir.length() != 0) {

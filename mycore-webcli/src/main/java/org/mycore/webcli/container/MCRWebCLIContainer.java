@@ -155,7 +155,7 @@ public class MCRWebCLIContainer {
 
     protected static void initializeCommands() {
         if (knownCommands == null) {
-            knownCommands = new TreeMap<String, List<MCRCommand>>();
+            knownCommands = new TreeMap<>();
             knownCommands.putAll(new MCRWebCLICommandManager().getCommandsMap());
         }
     }
@@ -364,7 +364,7 @@ public class MCRWebCLIContainer {
         protected boolean processCommands() throws IOException {
             final LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
             final AbstractConfiguration logConf = (AbstractConfiguration) logCtx.getConfiguration();
-            LinkedList<String> failedQueue = new LinkedList<String>();
+            LinkedList<String> failedQueue = new LinkedList<>();
             logGrabber.grabCurrentThread();
             logGrabber.setLogEventList(logs);
             // start grabbing logs of this thread

@@ -63,7 +63,7 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     private static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private static Map<String, MCRJobMaster> INSTANCES = new HashMap<String, MCRJobMaster>();
+    private static Map<String, MCRJobMaster> INSTANCES = new HashMap<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRJobMaster.class);
 
@@ -98,15 +98,12 @@ public class MCRJobMaster implements Runnable, Closeable {
      */
     public static MCRJobMaster getInstance(Class<? extends MCRJobAction> action) {
         String key = action != null && !MCRJobQueue.singleQueue ? action.getName() : "single";
-        MCRJobMaster master = INSTANCES.get(key);
-        if (master == null) {
-            master = new MCRJobMaster(MCRJobQueue.singleQueue ? null : action);
-            INSTANCES.put(key, master);
-        }
+        MCRJobMaster master = INSTANCES.computeIfAbsent(key,
+            k -> new MCRJobMaster(MCRJobQueue.singleQueue ? null : action));
 
-        if (!master.running)
+        if (!master.running) {
             return null;
-
+        }
         return master;
     }
 
@@ -171,7 +168,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                 }
             };
             final AtomicInteger activeThreads = new AtomicInteger();
-            final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
+            final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
             ThreadPoolExecutor executor = new ThreadPoolExecutor(jobThreadCount, jobThreadCount, 1, TimeUnit.DAYS,
                 workQueue,
                 slaveFactory) {

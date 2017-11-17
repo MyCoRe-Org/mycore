@@ -1,6 +1,7 @@
 package org.mycore.sword.manager;
 
 import java.text.MessageFormat;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,7 +57,7 @@ public class MCRSwordCollectionManager implements CollectionListManager, Collect
                             LOGGER.warn("Error while creating feed for [" + id + "]! (Will be removed from List)");
                             return null;
                         }
-                    }).filter(e -> e != null)
+                    }).filter(Objects::nonNull)
                     .forEach(feed::addEntry);
 
                 MCRSwordUtil.BuildLinkUtil.addPaginationLinks(collectionIRI, collection, feed, collectionProvider);

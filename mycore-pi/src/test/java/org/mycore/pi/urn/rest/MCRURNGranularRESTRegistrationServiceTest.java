@@ -61,16 +61,14 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
 
         mockMetadataManager.put(mcrObjectID, derivate);
 
-        Function<MCRDerivate, Stream<MCRPath>> foo = deriv -> {
-            return IntStream
-                .iterate(0, i -> i + 1)
-                .mapToObj(i -> {
-                    return "/foo/" + UUID.randomUUID() + "_" + String
-                        .format(Locale.getDefault(), "%02d", i);
-                })
-                .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
-                .limit(numOfDerivFiles);
-        };
+        Function<MCRDerivate, Stream<MCRPath>> foo = deriv -> IntStream
+            .iterate(0, i -> i + 1)
+            .mapToObj(i -> {
+                return "/foo/" + UUID.randomUUID() + "_" + String
+                    .format(Locale.getDefault(), "%02d", i);
+            })
+            .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
+            .limit(numOfDerivFiles);
         String serviceID = "TestService";
         MCRURNGranularRESTRegistrationService testService = new MCRURNGranularRESTRegistrationService(serviceID,
             foo);

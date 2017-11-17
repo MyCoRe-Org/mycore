@@ -9,7 +9,7 @@ public class MCRStoreCenter {
     private static MCRStoreCenter instance = new MCRStoreCenter();
 
     private MCRStoreCenter() {
-        this.storeHeap = new HashMap<String, MCRStore>();
+        this.storeHeap = new HashMap<>();
     }
 
     public static MCRStoreCenter instance() {

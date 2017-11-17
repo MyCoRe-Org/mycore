@@ -20,9 +20,9 @@ public class MCRJSONCategoriesSaveList {
         }
     }
 
-    ArrayList<CategorySaveElement> updateList = new ArrayList<MCRJSONCategoriesSaveList.CategorySaveElement>();
+    ArrayList<CategorySaveElement> updateList = new ArrayList<>();
 
-    ArrayList<CategorySaveElement> deleteList = new ArrayList<MCRJSONCategoriesSaveList.CategorySaveElement>();
+    ArrayList<CategorySaveElement> deleteList = new ArrayList<>();
 
     public void add(MCRCategory categ, MCRCategoryID parentID, int index, String status) throws Exception {
         if ("updated".equals(status)) {

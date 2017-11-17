@@ -63,7 +63,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     boolean disabled = false;
 
-    static Hashtable<String, String> ruleIDTable = new Hashtable<String, String>();
+    static Hashtable<String, String> ruleIDTable = new Hashtable<>();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessControlSystem.class);
 
@@ -78,7 +78,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         accessStore = MCRAccessStore.getInstance();
         ruleStore = MCRRuleStore.getInstance();
 
-        nextFreeRuleID = new HashMap<String, Integer>();
+        nextFreeRuleID = new HashMap<>();
 
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
     }
@@ -187,11 +187,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         try {
             return accessRule.checkAccess(session.getUserInformation().getUserID(), new Date(), new MCRIPAddress(
                 session.getCurrentIP()));
-        } catch (MCRException e) {
-            // only return true if access is allowed, we dont know this
-            LOGGER.debug("Error while checking rule.", e);
-            return false;
-        } catch (UnknownHostException e) {
+        } catch (MCRException | UnknownHostException e) {
             // only return true if access is allowed, we dont know this
             LOGGER.debug("Error while checking rule.", e);
             return false;

@@ -78,8 +78,8 @@ public class MCRObjectStructure {
      * are MCRMetaLink's.
      */
     public MCRObjectStructure() {
-        children = new ArrayList<MCRMetaLinkID>();
-        derivates = new ArrayList<MCRMetaLinkID>();
+        children = new ArrayList<>();
+        derivates = new ArrayList<>();
     }
 
     /**
@@ -404,20 +404,14 @@ public class MCRObjectStructure {
     public JsonObject createJSON() {
         JsonObject structure = new JsonObject();
         // parent
-        Optional.ofNullable(getParent()).ifPresent(link -> {
-            structure.add("parent", link.createJSON());
-        });
+        Optional.ofNullable(getParent()).ifPresent(link -> structure.add("parent", link.createJSON()));
         // children
         JsonArray children = new JsonArray();
-        getChildren().forEach(child -> {
-            children.add(child.createJSON());
-        });
+        getChildren().forEach(child -> children.add(child.createJSON()));
         structure.add("children", children);
         // derivates
         JsonArray derivates = new JsonArray();
-        getDerivates().forEach(derivate -> {
-            derivates.add(derivate.createJSON());
-        });
+        getDerivates().forEach(derivate -> derivates.add(derivate.createJSON()));
         structure.add("derivates", derivates);
         return structure;
     }

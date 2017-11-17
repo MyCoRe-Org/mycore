@@ -19,9 +19,9 @@ public class MCREditorSubmission {
 
     public static final String PREFIX_CHECK_RESUBMISSION = "_xed_check";
 
-    private Set<String> xPaths2CheckResubmission = new LinkedHashSet<String>();
+    private Set<String> xPaths2CheckResubmission = new LinkedHashSet<>();
 
-    private Map<String, String> xPath2DefaultValue = new LinkedHashMap<String, String>();
+    private Map<String, String> xPath2DefaultValue = new LinkedHashMap<>();
 
     private MCREditorSession session;
 
@@ -89,7 +89,7 @@ public class MCREditorSubmission {
 
         xPath2DefaultValue.clear();
 
-        Map<MCRBinding, String[]> valuesToSet = new HashMap<MCRBinding, String[]>();
+        Map<MCRBinding, String[]> valuesToSet = new HashMap<>();
 
         for (String paramName : values.keySet()) {
             if (paramName.startsWith("/")) {

@@ -23,6 +23,7 @@
 package org.mycore.user2.utils;
 
 import java.io.IOException;
+import java.util.Comparator;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -59,7 +60,7 @@ public abstract class MCRUserTransformer {
     }
 
     private static Document getDocument(MCRUser user) {
-        MCRJAXBContent<MCRUser> content = new MCRJAXBContent<MCRUser>(JAXB_CONTEXT, user);
+        MCRJAXBContent<MCRUser> content = new MCRJAXBContent<>(JAXB_CONTEXT, user);
         try {
             Document userXML = content.asXML();
             sortAttributes(userXML);
@@ -75,7 +76,7 @@ public abstract class MCRUserTransformer {
         if (attributes == null) {
             return;
         }
-        attributes.sortChildren((o1, o2) -> o1.getAttributeValue("name").compareTo(o2.getAttributeValue("name")));
+        attributes.sortChildren(Comparator.comparing(o -> o.getAttributeValue("name")));
     }
 
     /**

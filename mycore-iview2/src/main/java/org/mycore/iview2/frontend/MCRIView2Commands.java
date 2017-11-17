@@ -103,7 +103,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     private static List<String> forAllDerivates(String batchCommandSyntax) {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<String>(ids.size());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add(MessageFormat.format(batchCommandSyntax, id));
         }
@@ -134,7 +134,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     private static List<String> forAllDerivatesOfProject(String batchCommandSyntax, String project) {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<String>(ids.size());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             if (id.startsWith(project)) {
                 cmds.add(MessageFormat.format(batchCommandSyntax, id));
@@ -302,13 +302,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         int read;
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            InputStream is = iviewImage.getInputStream(entry);
-            try {
+            try (InputStream is = iviewImage.getInputStream(entry)) {
                 while ((read = is.read(data, 0, data.length)) != -1) {
                     crc.update(data, 0, read);
                 }
-            } finally {
-                is.close();
             }
             if (entry.getCrc() != crc.getValue()) {
                 throw new IOException("CRC32 does not match for entry: " + entry.getName());

@@ -62,7 +62,7 @@ public class MCRTransientUser extends MCRUser {
         if (realmId != null && !MCRRealmFactory.getLocalRealm().equals(MCRRealmFactory.getRealm(realmId))) {
             MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(realmId);
             if (attributeMapper != null) {
-                Map<String, Object> attributes = new HashMap<String, Object>();
+                Map<String, Object> attributes = new HashMap<>();
                 for (String key : attributeMapper.getAttributeNames()) {
                     attributes.put(key, userInfo.getUserAttribute(key));
                 }

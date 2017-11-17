@@ -15,7 +15,7 @@ public class ObservableCommandList extends Observable {
     CopyOnWriteArrayList<String> arrayList;
 
     public ObservableCommandList() {
-        this.arrayList = new CopyOnWriteArrayList<String>();
+        this.arrayList = new CopyOnWriteArrayList<>();
     }
 
     public void add(String text) {
@@ -46,7 +46,7 @@ public class ObservableCommandList extends Observable {
     }
 
     public ArrayList<String> getCopyAsArrayList() {
-        return new ArrayList<String>(arrayList);
+        return new ArrayList<>(arrayList);
     }
 
     public String getAsJSONArrayString() {

@@ -37,7 +37,7 @@ class MCROAIParameterQuerySetResolver extends MCROAISetResolver<String, SolrDocu
     public Collection<Set> getSets(String key) {
         return Optional.ofNullable(resultMap.get(key)
             .getFieldValues(queryField))
-            .orElseGet(() -> Collections.emptySet())
+            .orElseGet(Collections::emptySet)
             .stream()
             .map(getSetMap()::get)
             .collect(Collectors.toSet());

@@ -86,7 +86,7 @@ public class MCRSolrInputDocument {
      */
     public List<Object> getFieldOrDoc() {
         if (fieldOrDoc == null) {
-            fieldOrDoc = new ArrayList<Object>();
+            fieldOrDoc = new ArrayList<>();
         }
         return this.fieldOrDoc;
     }

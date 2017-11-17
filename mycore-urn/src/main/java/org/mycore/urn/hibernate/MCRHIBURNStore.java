@@ -379,7 +379,7 @@ public class MCRHIBURNStore implements MCRURNStore {
             logger.error("Could not execute query", ex);
         }
         // return an empty list
-        return new ArrayList<MCRURN>();
+        return new ArrayList<>();
     }
 
     public void update(MCRURN urn) {
@@ -427,6 +427,6 @@ public class MCRHIBURNStore implements MCRURNStore {
             logger.error("Could not execute query", ex);
         }
         // return an empty list
-        return new ArrayList<MCRURN>();
+        return new ArrayList<>();
     }
 }

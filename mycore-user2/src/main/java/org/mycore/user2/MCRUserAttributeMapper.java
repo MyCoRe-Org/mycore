@@ -87,7 +87,7 @@ public class MCRUserAttributeMapper {
 
     private static Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
 
-    private HashMap<String, List<Attribute>> attributeMapping = new HashMap<String, List<Attribute>>();
+    private HashMap<String, List<Attribute>> attributeMapping = new HashMap<>();
 
     public static MCRUserAttributeMapper instance(Element attributeMapping) {
         try {
@@ -209,7 +209,7 @@ public class MCRUserAttributeMapper {
      * @return a collection of mapped attribute names
      */
     public Set<String> getAttributeNames() {
-        Set<String> mAtt = new HashSet<String>();
+        Set<String> mAtt = new HashSet<>();
 
         for (final String name : attributeMapping.keySet()) {
             attributeMapping.get(name).forEach(a -> mAtt.add(a.mapping));
@@ -219,7 +219,7 @@ public class MCRUserAttributeMapper {
     }
 
     private List<Object> getAnnotated(final Object obj) {
-        List<Object> al = new ArrayList<Object>();
+        List<Object> al = new ArrayList<>();
 
         al.addAll(getAnnotatedFields(obj.getClass()));
         al.addAll(getAnnotatedMethods(obj.getClass()));
@@ -324,7 +324,7 @@ public class MCRUserAttributeMapper {
             if (valueMapping == null)
                 return null;
 
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             for (ValueMapping vm : valueMapping) {
                 map.put(vm.name, vm.mapping);
             }

@@ -109,7 +109,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static final String DEFAULT_TRANSFORMER = "save-object.xsl";
 
     /** static compiled transformer stylesheets */
-    private static Hashtable<String, javax.xml.transform.Transformer> translist = new Hashtable<String, javax.xml.transform.Transformer>();
+    private static Hashtable<String, javax.xml.transform.Transformer> translist = new Hashtable<>();
 
     public static void setSelectedObjectIDs(List<String> selected) {
         LOGGER.info(selected.size() + " objects selected");
@@ -135,7 +135,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "delete all objects of type {0}", help = "Removes MCRObjects of type {0}.", order = 20)
     public static List<String> deleteAllObjects(String type) {
         final List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
-        List<String> cmds = new ArrayList<String>(objectIds.size());
+        List<String> cmds = new ArrayList<>(objectIds.size());
         for (String id : objectIds) {
             cmds.add("delete object " + id);
         }
@@ -157,7 +157,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         ts.prepareMCRObjects(objects);
         int[] order = ts.doTopoSort();
 
-        List<String> cmds = new ArrayList<String>(objectIds.size());
+        List<String> cmds = new ArrayList<>(objectIds.size());
         if (order != null) {
             //delete in reverse order
             for (int o = order.length - 1; o >= 0; o--) {
@@ -208,7 +208,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (from_i > to_i) {
             throw new MCRException("The from-to-interval is false.");
         }
-        List<String> cmds = new ArrayList<String>(to_i - from_i);
+        List<String> cmds = new ArrayList<>(to_i - from_i);
 
         for (int i = from_i; i < to_i + 1; i++) {
             String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
@@ -582,7 +582,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error(dir + " is not a dirctory.");
             return Collections.emptyList();
         }
-        List<String> cmds = new ArrayList<String>(objectIds.size());
+        List<String> cmds = new ArrayList<>(objectIds.size());
         for (String id : objectIds) {
             String command = MessageFormat.format(EXPORT_OBJECT_TO_DIRECTORY_COMMAND, id, dir.getAbsolutePath(), style);
             cmds.add(command);
@@ -1008,7 +1008,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return Collections.emptyList();
         }
 
-        List<String> cmds = new ArrayList<String>(ar.size());
+        List<String> cmds = new ArrayList<>(ar.size());
 
         for (String stid : ar) {
             cmds.add("repair metadata search of ID " + stid);

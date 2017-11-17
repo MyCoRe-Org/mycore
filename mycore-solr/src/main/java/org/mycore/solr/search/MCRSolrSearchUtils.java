@@ -52,9 +52,7 @@ public abstract class MCRSolrSearchUtils {
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", query);
         p.set("fl", "id");
-        return stream(solrClient, p).map(doc -> {
-            return doc.getFieldValue("id").toString();
-        }).collect(Collectors.toList());
+        return stream(solrClient, p).map(doc -> doc.getFieldValue("id").toString()).collect(Collectors.toList());
     }
 
     /**

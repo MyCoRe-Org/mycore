@@ -76,7 +76,7 @@ public class MCRSolrInputDocumentList {
      */
     public List<MCRSolrInputDocument> getDoc() {
         if (doc == null) {
-            doc = new ArrayList<MCRSolrInputDocument>();
+            doc = new ArrayList<>();
         }
         return this.doc;
     }

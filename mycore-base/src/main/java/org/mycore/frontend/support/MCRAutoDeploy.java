@@ -206,15 +206,13 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                     .ifPresent(mapping -> {
                                         LOGGER.info("Register Servlet " + name + " (" + className + ")...");
                                         Optional.ofNullable(servletContext.addServlet(name, className))
-                                            .<Runnable> map(sr -> () -> {
-                                                mapping.getChildren("url-pattern", ns).stream()
-                                                    .forEach(url -> {
-                                                        LOGGER.info("...add url mapping: " + url.getTextTrim());
-                                                        sr.addMapping(url.getTextTrim());
-                                                    });
-                                            }).orElse(() -> LOGGER
+                                            .<Runnable> map(sr -> () -> mapping.getChildren("url-pattern", ns).stream()
+                                                                           .forEach(url -> {
+                                                    LOGGER.info("...add url mapping: " + url.getTextTrim());
+                                                    sr.addMapping(url.getTextTrim());
+                                                })).orElse(() -> LOGGER
                                                 .error("Servlet" + name + " already registered!"))
-                                            .run();
+                                                       .run();
                                     });
                             });
                         } catch (IOException | JDOMException e) {

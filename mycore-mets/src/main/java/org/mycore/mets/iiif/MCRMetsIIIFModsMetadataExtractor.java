@@ -3,6 +3,7 @@ package org.mycore.mets.iiif;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.jdom2.Element;
@@ -32,7 +33,7 @@ public class MCRMetsIIIFModsMetadataExtractor implements MCRMetsIIIFMetadataExtr
             }
             return new MCRIIIFMetadata(entry.getKey(),
                 texts.stream().map(Text::getText).collect(Collectors.joining(", ")));
-        }).filter(e -> e != null)
+        }).filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 

@@ -68,7 +68,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "add")
     public JAXBElement<MCRSolrInputDocumentList> createAdd(MCRSolrInputDocumentList value) {
-        return new JAXBElement<MCRSolrInputDocumentList>(_Add_QNAME, MCRSolrInputDocumentList.class, null, value);
+        return new JAXBElement<>(_Add_QNAME, MCRSolrInputDocumentList.class, null, value);
     }
 
 }

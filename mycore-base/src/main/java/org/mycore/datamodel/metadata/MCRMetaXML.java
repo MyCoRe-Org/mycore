@@ -79,7 +79,7 @@ public class MCRMetaXML extends MCRMetaDefault {
 
     public void addContent(Content content) {
         if (this.content == null) {
-            this.content = new ArrayList<Content>();
+            this.content = new ArrayList<>();
         }
 
         this.content.add(content);
@@ -100,7 +100,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     @Override
     public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
-        List<Content> addedContent = new ArrayList<Content>(content.size());
+        List<Content> addedContent = new ArrayList<>(content.size());
         cloneListContent(addedContent, content);
         elm.addContent(addedContent);
 

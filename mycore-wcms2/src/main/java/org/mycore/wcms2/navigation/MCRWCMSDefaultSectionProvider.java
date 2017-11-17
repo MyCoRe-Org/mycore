@@ -45,7 +45,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private List<String> MYCORE_TAG_LIST = new ArrayList<String>();
+    private List<String> MYCORE_TAG_LIST = new ArrayList<>();
 
     public MCRWCMSDefaultSectionProvider() {
         String mycoreTagListString = CONFIG.getString("MCR.WCMS2.mycoreTagList", "");

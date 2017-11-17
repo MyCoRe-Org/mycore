@@ -85,17 +85,15 @@ public class MCRRequestDebugFilter implements Filter {
         sb.append("Header: \n");
         headerNames
             .sorted(String.CASE_INSENSITIVE_ORDER)
-            .forEachOrdered(header -> {
-                headerValues
-                    .apply(header)
-                    .forEachOrdered(value -> {
-                        sb
-                            .append(header)
-                            .append(": ")
-                            .append(value)
-                            .append("\n");
-                    });
-            });
+            .forEachOrdered(header -> headerValues
+                .apply(header)
+                .forEachOrdered(value -> {
+                    sb
+                        .append(header)
+                        .append(": ")
+                        .append(value)
+                        .append("\n");
+                }));
         sb.append("HEADERS END \n\n");
     }
 
@@ -128,10 +126,8 @@ public class MCRRequestDebugFilter implements Filter {
             MCRStreamUtils
                 .asStream(session.getAttributeNames())
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .forEachOrdered(attrName -> {
-                    sb.append(" " + attrName + ": "
-                        + getValue(attrName, Optional.ofNullable(session.getAttribute(attrName))) + "\n");
-                });
+                .forEachOrdered(attrName -> sb.append(" " + attrName + ": "
+                    + getValue(attrName, Optional.ofNullable(session.getAttribute(attrName))) + "\n"));
             sb.append("SESSION ATTRIBUTES END \n\n");
         }
     }
@@ -171,9 +167,7 @@ public class MCRRequestDebugFilter implements Filter {
         request.getParameterMap()
             .entrySet()
             .stream()
-            .sorted((o1, o2) -> {
-                return String.CASE_INSENSITIVE_ORDER.compare(o1.getKey(), o2.getKey());
-            })
+            .sorted((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getKey(), o2.getKey()))
             .forEachOrdered(entry -> {
                 sb.append(" " + entry.getKey() + ": ");
                 for (String s : entry.getValue()) {

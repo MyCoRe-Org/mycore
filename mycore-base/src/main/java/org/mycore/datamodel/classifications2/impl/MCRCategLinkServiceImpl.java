@@ -160,11 +160,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         for (MCRCategLinkReference ref : ids) {
             if (!currentType.equals(ref.getType())) {
                 currentType = ref.getType();
-                objectIds = typeMap.get(ref.getType());
-                if (objectIds == null) {
-                    objectIds = new LinkedList<>();
-                    typeMap.put(ref.getType(), objectIds);
-                }
+                objectIds = typeMap.computeIfAbsent(ref.getType(), k -> new LinkedList<>());
             }
             objectIds.add(ref.getObjectID());
         }

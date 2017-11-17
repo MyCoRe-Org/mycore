@@ -179,9 +179,7 @@ public class MCROAISearchManager {
         for (int i = 0; i < listSize; i++) {
             Header header = headerList.get(i);
             int resultIndex = i;
-            MCRTransactionableRunnable r = new MCRTransactionableRunnable(() -> {
-                records[resultIndex] = this.objManager.getRecord(header, metadataFormat);
-            }, mcrSession);
+            MCRTransactionableRunnable r = new MCRTransactionableRunnable(() -> records[resultIndex] = this.objManager.getRecord(header, metadataFormat), mcrSession);
             CompletableFuture<Void> future = CompletableFuture.runAsync(r, executorService);
             futures[i] = future;
         }

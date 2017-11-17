@@ -254,7 +254,7 @@ public class MCRCommand {
         if (result instanceof List && !((List) result).isEmpty() && ((List) result).get(0) instanceof String) {
             return (List<String>) result;
         } else {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
     }
 

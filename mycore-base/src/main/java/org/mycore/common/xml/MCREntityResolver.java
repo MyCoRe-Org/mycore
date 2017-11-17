@@ -97,7 +97,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         String[] catalogs = catalogURIs.toArray(new String[catalogURIs.size()]);
         catalogResolver = new XMLCatalogResolver(catalogs);
         int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
-        bytesCache = new MCRCache<String, InputSourceProvider>(cacheSize, "EntityResolver Resources");
+        bytesCache = new MCRCache<>(cacheSize, "EntityResolver Resources");
     }
 
     /* (non-Javadoc)

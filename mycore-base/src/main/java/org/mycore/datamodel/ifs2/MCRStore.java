@@ -217,7 +217,7 @@ public abstract class MCRStore {
             /**
              * List of files or directories in store not yet handled
              */
-            List<FileObject> files = new ArrayList<FileObject>();
+            List<FileObject> files = new ArrayList<>();
 
             /**
              * The next ID to return, when 0, all IDs have been returned

@@ -54,9 +54,7 @@ public class MCRIIIFPresentationManifestQuickAccess {
             idSequenceMap.put(seq.getId(), seq);
         });
 
-        this.manifest.structures.forEach(range -> {
-            idRangeMap.put(range.getId(), range);
-        });
+        this.manifest.structures.forEach(range -> idRangeMap.put(range.getId(), range));
 
     }
 

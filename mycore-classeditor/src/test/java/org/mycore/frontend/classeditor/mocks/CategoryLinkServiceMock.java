@@ -23,7 +23,7 @@ public class CategoryLinkServiceMock implements MCRCategLinkService {
             categories = category.getChildren();
         }
 
-        Map<MCRCategoryID, Boolean> linkMap = new HashMap<MCRCategoryID, Boolean>();
+        Map<MCRCategoryID, Boolean> linkMap = new HashMap<>();
         int i = 0;
         for (MCRCategory mcrCategory : categories) {
             boolean haslink = false;

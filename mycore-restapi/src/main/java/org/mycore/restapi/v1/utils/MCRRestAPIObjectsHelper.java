@@ -306,8 +306,8 @@ public class MCRRestAPIObjectsHelper {
         }
 
         //analyze filter
-        List<String> projectIDs = new ArrayList<String>();
-        List<String> typeIDs = new ArrayList<String>();
+        List<String> projectIDs = new ArrayList<>();
+        List<String> typeIDs = new ArrayList<>();
         String lastModifiedBefore = null;
         String lastModifiedAfter = null;
         if (filter != null) {
@@ -362,7 +362,7 @@ public class MCRRestAPIObjectsHelper {
         //Parameters are validated - continue to retrieve data
 
         //retrieve MCRIDs by Type and Project ID
-        Set<String> mcrIDs = new HashSet<String>();
+        Set<String> mcrIDs = new HashSet<>();
         if (projectIDs.isEmpty()) {
             if (typeIDs.isEmpty()) {
                 mcrIDs = MCRXMLMetadataManager.instance().listIDs().stream().filter(id -> !id.contains("_derivate_"))
@@ -391,9 +391,9 @@ public class MCRRestAPIObjectsHelper {
         }
 
         //Filter by modifiedBefore and modifiedAfter
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         l.addAll(mcrIDs);
-        List<MCRObjectIDDate> objIdDates = new ArrayList<MCRObjectIDDate>();
+        List<MCRObjectIDDate> objIdDates = new ArrayList<>();
         try {
             objIdDates = MCRXMLMetadataManager.instance().retrieveObjectDates(l);
         } catch (IOException e) {
@@ -401,7 +401,7 @@ public class MCRRestAPIObjectsHelper {
         }
         if (lastModifiedAfter != null || lastModifiedBefore != null) {
             List<MCRObjectIDDate> testObjIdDates = objIdDates;
-            objIdDates = new ArrayList<MCRObjectIDDate>();
+            objIdDates = new ArrayList<>();
             for (MCRObjectIDDate oid : testObjIdDates) {
                 String test = SDF_UTC.format(oid.getLastModified());
                 if (lastModifiedAfter != null && test.compareTo(lastModifiedAfter) < 0)
@@ -415,7 +415,7 @@ public class MCRRestAPIObjectsHelper {
 
         //sort if necessary
         if (sortObj != null) {
-            Collections.sort(objIdDates, new MCRRestAPISortObjectComparator(sortObj));
+            objIdDates.sort(new MCRRestAPISortObjectComparator(sortObj));
         }
 
         String authHeader = MCRJSONWebTokenUtil
@@ -520,29 +520,27 @@ public class MCRRestAPIObjectsHelper {
         //Parameters are checked - continue to retrieve data
 
         List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrObjID).getStructure().getDerivates().stream()
-            .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> {
-                return new MCRObjectIDDate() {
-                    long lastModified;
-                    {
-                        try {
-                            lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
-                        } catch (IOException e) {
-                            lastModified = 0;
-                            LOGGER.error("Exception while getting last modified of " + id, e);
-                        }
-                    }
+                                                                      .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> new MCRObjectIDDate() {
+                                                                          long lastModified;
+                                                                          {
+                                                                              try {
+                                                                                  lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+                                                                              } catch (IOException e) {
+                                                                                  lastModified = 0;
+                                                                                  LOGGER.error("Exception while getting last modified of " + id, e);
+                                                                              }
+                                                                          }
 
-                    @Override
-                    public String getId() {
-                        return id.toString();
-                    }
+                                                                          @Override
+                                                                          public String getId() {
+                                                                              return id.toString();
+                                                                          }
 
-                    @Override
-                    public Date getLastModified() {
-                        return new Date(lastModified);
-                    }
-                };
-            }).sorted(new MCRRestAPISortObjectComparator(sortObj)::compare).collect(Collectors.toList());
+                                                                          @Override
+                                                                          public Date getLastModified() {
+                                                                              return new Date(lastModified);
+                                                                          }
+                                                                      }).sorted(new MCRRestAPISortObjectComparator(sortObj)::compare).collect(Collectors.toList());
 
         String authHeader = MCRJSONWebTokenUtil
             .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));

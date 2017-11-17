@@ -105,9 +105,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         }
         final SessionListener sessionListener = new SessionListener(session, this.sender);
         registry.addListener(sessionListener);
-        this.registry.stream().forEach(collection -> {
-            sessionListener.attachCollection(collection);
-        });
+        this.registry.stream().forEach(sessionListener::attachCollection);
         SESSIONS.put(session.getId(), sessionListener);
     }
 
@@ -217,9 +215,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
          */
         public void attachCollection(MCRProcessableCollection collection) {
             collection.addListener(this);
-            collection.stream().forEach(processable -> {
-                attachProcessable(processable);
-            });
+            collection.stream().forEach(this::attachProcessable);
         }
 
         /**

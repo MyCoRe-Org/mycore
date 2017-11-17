@@ -66,7 +66,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         assertNotNull("no attribute mapping defined", attributeMapper);
 
-        HashMap<String, Object> attributes = new HashMap<String, Object>();
+        HashMap<String, Object> attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
         attributes.put("displayName", mcrUser.getRealName());
         attributes.put("mail", mcrUser.getEMailAddress());
@@ -83,7 +83,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
     @Test
     public void testUserInformationMapping() throws Exception {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
         attributes.put("displayName", mcrUser.getRealName());
         attributes.put("mail", mcrUser.getEMailAddress());
@@ -101,7 +101,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
     @Test
     public void testUserCreate() throws Exception {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
         attributes.put("displayName", mcrUser.getRealName());
         attributes.put("mail", mcrUser.getEMailAddress());
@@ -115,7 +115,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         assertEquals(mcrUser.getRealName(), user.getRealName());
         assertTrue(user.isUserInRole("editor"));
 
-        Map<String, String> extraAttribs = new HashMap<String, String>();
+        Map<String, String> extraAttribs = new HashMap<>();
         extraAttribs.put("attrib1", "test123");
         extraAttribs.put("attrib2", "test321");
         user.setAttributes(extraAttribs);
@@ -137,7 +137,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
     @Test
     public void testUserUpdate() throws Exception {
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
         attributes.put("displayName", mcrUser.getRealName());
         attributes.put("mail", mcrUser.getEMailAddress());
@@ -151,7 +151,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         assertEquals(mcrUser.getRealName(), user.getRealName());
         assertTrue(user.isUserInRole("editor"));
 
-        Map<String, String> extraAttribs = new HashMap<String, String>();
+        Map<String, String> extraAttribs = new HashMap<>();
         extraAttribs.put("attrib1", "test123");
         extraAttribs.put("attrib2", "test321");
         user.setAttributes(extraAttribs);
@@ -160,7 +160,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         startNewTransaction();
 
-        attributes = new HashMap<String, Object>();
+        attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
         attributes.put("displayName", mcrUser.getRealName());
         attributes.put("mail", "new@mycore.de");

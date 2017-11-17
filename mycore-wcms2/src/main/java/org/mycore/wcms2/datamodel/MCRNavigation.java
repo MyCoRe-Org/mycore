@@ -42,7 +42,7 @@ public class MCRNavigation implements MCRNavigationItemContainer {
     private List<MCRNavigationBaseItem> children;
 
     public MCRNavigation() {
-        this.children = new ArrayList<MCRNavigationBaseItem>();
+        this.children = new ArrayList<>();
     }
 
     public String getHrefStartingPage() {

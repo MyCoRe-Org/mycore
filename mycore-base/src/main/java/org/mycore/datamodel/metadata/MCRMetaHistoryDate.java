@@ -76,7 +76,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate() {
         super();
-        texts = new ArrayList<MCRMetaHistoryDateText>();
+        texts = new ArrayList<>();
         calendar = MCRCalendar.CALENDARS_LIST.get(0);
         setDefaultVon();
         setDefaultBis();
@@ -100,7 +100,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate(String set_subtag, String set_type, int set_inherted) throws MCRException {
         super(set_subtag, null, set_type, set_inherted);
-        texts = new ArrayList<MCRMetaHistoryDateText>();
+        texts = new ArrayList<>();
         calendar = MCRCalendar.CALENDARS_LIST.get(0);
         setDefaultVon();
         setDefaultBis();

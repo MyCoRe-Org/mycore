@@ -61,7 +61,7 @@ public class MCREditorSession {
 
     private String url;
 
-    private Map<String, String[]> requestParameters = new HashMap<String, String[]>();
+    private Map<String, String[]> requestParameters = new HashMap<>();
 
     private Map<String, Object> variables;
 

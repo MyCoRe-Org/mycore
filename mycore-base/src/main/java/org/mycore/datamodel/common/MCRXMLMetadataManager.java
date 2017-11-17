@@ -635,7 +635,7 @@ public class MCRXMLMetadataManager {
      */
     public List<String> listIDsForBase(String base) {
         MCRMetadataStore store = getStore(base);
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         Iterator<Integer> it = store.listIDs(MCRStore.ASCENDING);
         String[] idParts = MCRObjectID.getIDParts(base);
         while (it.hasNext()) {
@@ -650,7 +650,7 @@ public class MCRXMLMetadataManager {
      * @param type the MCRObject type, e.g. document
      */
     public List<String> listIDsOfType(String type) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         File[] projectDirectories = getProjectDirectories();
         for (File projectDirectory : projectDirectories) {
             String project = projectDirectory.getName();
@@ -670,7 +670,7 @@ public class MCRXMLMetadataManager {
      * Lists all MCRObjectIDs of all types and projects stored in any metadata store
      */
     public List<String> listIDs() {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         File[] projectDirectories = getProjectDirectories();
         for (File projectDirectory : projectDirectories) {
             String project = projectDirectory.getName();
@@ -766,7 +766,7 @@ public class MCRXMLMetadataManager {
      * @throws IOException thrown by {@link MCRObjectIDFileSystemDate}
      */
     public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
-        List<MCRObjectIDDate> objidlist = new ArrayList<MCRObjectIDDate>(ids.size());
+        List<MCRObjectIDDate> objidlist = new ArrayList<>(ids.size());
         for (String id : ids) {
             MCRStoredMetadata sm = this.retrieveStoredMetadata(MCRObjectID.getInstance(id));
             objidlist.add(new MCRObjectIDFileSystemDate(sm, id));

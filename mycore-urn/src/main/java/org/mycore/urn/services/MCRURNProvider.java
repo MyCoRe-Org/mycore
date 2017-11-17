@@ -27,7 +27,7 @@ public class MCRURNProvider extends MCRAbstractURNProvider {
      * @see fsu.archiv.mycore.urn.IURNProvider#generateURN(int)
      */
     public MCRURN[] generateURN(int amount) {
-        List<MCRURN> list = new Vector<MCRURN>(amount);
+        List<MCRURN> list = new Vector<>(amount);
         while (amount != 0) {
             list.add(generateURN());
             amount--;

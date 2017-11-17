@@ -43,7 +43,7 @@ public abstract class Selection {
     public static Selection fromBufferedImage(BufferedImage bufferedImage) {
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
-        final ArrayList<Pixel> p = new ArrayList<Pixel>();
+        final ArrayList<Pixel> p = new ArrayList<>();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

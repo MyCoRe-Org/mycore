@@ -17,7 +17,7 @@ public abstract class MCRNavigationI18nItem implements MCRNavigationBaseItem {
     private HashMap<String, String> labelMap;
 
     public MCRNavigationI18nItem() {
-        this.labelMap = new HashMap<String, String>();
+        this.labelMap = new HashMap<>();
     }
 
     public String getI18n() {

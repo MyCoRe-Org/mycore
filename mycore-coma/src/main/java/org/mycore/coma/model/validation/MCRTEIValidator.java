@@ -29,9 +29,9 @@ public class MCRTEIValidator implements ErrorHandler {
         this.teiSource = teiSource;
 
         this.exceptionMap = new Hashtable<>();
-        this.exceptionMap.put("warning", new ArrayList<SAXParseException>());
-        this.exceptionMap.put("error", new ArrayList<SAXParseException>());
-        this.exceptionMap.put("fatalError", new ArrayList<SAXParseException>());
+        this.exceptionMap.put("warning", new ArrayList<>());
+        this.exceptionMap.put("error", new ArrayList<>());
+        this.exceptionMap.put("fatalError", new ArrayList<>());
     }
 
     private Schema getSchema(String path) {

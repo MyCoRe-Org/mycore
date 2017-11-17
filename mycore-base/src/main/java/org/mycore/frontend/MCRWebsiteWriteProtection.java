@@ -87,10 +87,7 @@ public final class MCRWebsiteWriteProtection {
                     config = builder.build(CONFIG_FILE).getRootElement();
                     // update cache
                     updateCache(config);
-                } catch (JDOMException e) {
-                    e.printStackTrace();
-                    return null;
-                } catch (IOException e) {
+                } catch (JDOMException | IOException e) {
                     e.printStackTrace();
                     return null;
                 }

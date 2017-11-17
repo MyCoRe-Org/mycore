@@ -118,7 +118,7 @@ public class MCREventManager {
     }
 
     private MCREventManager() {
-        handlers = new Hashtable<String, List<MCREventHandler>>();
+        handlers = new Hashtable<>();
 
         MCRConfiguration config = MCRConfiguration.instance();
 
@@ -128,7 +128,7 @@ public class MCREventManager {
             return;
         }
 
-        List<String> propertyKeyList = new ArrayList<String>(props.size());
+        List<String> propertyKeyList = new ArrayList<>(props.size());
         for (Object name : props.keySet()) {
             String key = name.toString();
             if (!key.startsWith(CONFIG_PREFIX + "Mode.")) {
@@ -156,13 +156,7 @@ public class MCREventManager {
     }
 
     private List<MCREventHandler> getOrCreateEventHandlerListOfType(String type) {
-        List<MCREventHandler> eventHandlerList = handlers.get(type);
-        if (eventHandlerList == null) {
-            eventHandlerList = new ArrayList<MCREventHandler>();
-            handlers.put(type, eventHandlerList);
-        }
-
-        return eventHandlerList;
+        return handlers.computeIfAbsent(type, k -> new ArrayList<>());
     }
 
     /**

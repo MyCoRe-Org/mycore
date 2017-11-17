@@ -23,7 +23,7 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRJaxenXPathFactory.class);
 
-    private List<ExtensionFunction> functions = new ArrayList<ExtensionFunction>();
+    private List<ExtensionFunction> functions = new ArrayList<>();
 
     public MCRJaxenXPathFactory() {
         super();

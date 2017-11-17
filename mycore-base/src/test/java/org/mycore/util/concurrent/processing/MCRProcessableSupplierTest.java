@@ -35,13 +35,7 @@ public class MCRProcessableSupplierTest extends MCRTestCase {
 
         // STATUS LISTENER
         STATUS_LISTENER_COUNTER = 0;
-        supplier.addStatusListener(new MCRProcessableStatusListener() {
-            @Override
-            public void onStatusChange(MCRProcessable source, MCRProcessableStatus oldStatus,
-                MCRProcessableStatus newStatus) {
-                STATUS_LISTENER_COUNTER++;
-            }
-        });
+        supplier.addStatusListener((source, oldStatus, newStatus) -> STATUS_LISTENER_COUNTER++);
 
         // PROGRESS LISTENER
         PROGRESS_LISTENER_COUNTER = 0;

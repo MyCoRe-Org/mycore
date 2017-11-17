@@ -79,7 +79,7 @@ public class MCRLayoutUtilities {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
 
-    private static HashMap<String, Element> itemStore = new HashMap<String, Element>();
+    private static HashMap<String, Element> itemStore = new HashMap<>();
 
     public static final String NAV_RESOURCE = MCRConfiguration.instance().getString("MCR.NavigationFile",
         "/config/navigation.xml");

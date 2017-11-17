@@ -41,7 +41,7 @@ public abstract class MCRSetCondition<T> implements MCRCondition<T> {
 
     protected String operator;
 
-    protected List<MCRCondition<T>> children = new LinkedList<MCRCondition<T>>();
+    protected List<MCRCondition<T>> children = new LinkedList<>();
 
     protected MCRSetCondition(String operator) {
         this.operator = operator;

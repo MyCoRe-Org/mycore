@@ -54,7 +54,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
     protected static final Logger LOGGER = LogManager.getLogger(MCRStaticXEditorFileServlet.class);
 
     /** XML document types that may contain editor forms */
-    protected Set<String> docTypesIncludingEditors = new HashSet<String>();
+    protected Set<String> docTypesIncludingEditors = new HashSet<>();
 
     @Override
     public void init() throws ServletException {

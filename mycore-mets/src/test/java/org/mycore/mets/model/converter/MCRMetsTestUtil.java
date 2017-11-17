@@ -55,20 +55,16 @@ public class MCRMetsTestUtil {
     public static <T> T instantiate(final String className, final Class<T> type) {
         try {
             return type.cast(Class.forName(className).newInstance());
-        } catch (final InstantiationException e) {
-            throw new IllegalStateException(e);
-        } catch (final IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        } catch (final ClassNotFoundException e) {
+        } catch (final InstantiationException | ClassNotFoundException | IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public static <T> boolean comparer(Comparator<T> comparator, T object, T... withList) {
+    @SafeVarargs public static <T> boolean comparer(Comparator<T> comparator, T object, T... withList) {
         return Arrays.stream(withList).noneMatch(with -> comparator.compare(object, with) != 0);
     }
 
-    public static <T, R> List<R> bulk(BulkOperation<T, R> op, T... on) {
+    @SafeVarargs public static <T, R> List<R> bulk(BulkOperation<T, R> op, T... on) {
         return Arrays.asList(on).stream().map(op::doOperation).collect(toList());
     }
 

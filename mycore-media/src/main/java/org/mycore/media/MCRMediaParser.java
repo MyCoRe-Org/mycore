@@ -48,7 +48,7 @@ public class MCRMediaParser {
 
     public MCRMediaParser() {
         if (parsers == null) {
-            parsers = new ArrayList<MCRMediaParser>();
+            parsers = new ArrayList<>();
 
             Map<String, String> supportedParsers = config.getPropertiesMap("MCR.Media.Parser.");
             for (String name : supportedParsers.keySet()) {
@@ -193,7 +193,7 @@ public class MCRMediaParser {
      * @see #getThumbnail( MCRMediaObject , long, int, int, boolean )
      */
     public static synchronized ArrayList<byte[]> getThumbnail(MCRMediaObject media, int steps) throws Exception {
-        ArrayList<byte[]> thumbs = new ArrayList<byte[]>();
+        ArrayList<byte[]> thumbs = new ArrayList<>();
 
         for (int c = 0; c < steps; c++) {
             long seek = (media.getMaxSeekPosition() / steps) * c;

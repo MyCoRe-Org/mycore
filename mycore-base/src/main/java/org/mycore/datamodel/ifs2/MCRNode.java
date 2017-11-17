@@ -154,15 +154,12 @@ public abstract class MCRNode {
      * @return the time this node was last modified
      */
     public Date getLastModified() throws IOException {
-        FileContent content = fo.getContent();
-        try {
+        try (FileContent content = fo.getContent()) {
             if (content != null) {
                 return new Date(content.getLastModifiedTime());
             } else {
                 return null;
             }
-        } finally {
-            content.close();
         }
     }
 
@@ -221,7 +218,7 @@ public abstract class MCRNode {
      * @return a List of child nodes, which may be empty, in undefined order
      */
     public List<MCRNode> getChildren() throws IOException {
-        List<MCRNode> children = new ArrayList<MCRNode>();
+        List<MCRNode> children = new ArrayList<>();
         FileObject father = getFather();
         if (father != null) {
             FileObject[] childFos = father.getChildren();

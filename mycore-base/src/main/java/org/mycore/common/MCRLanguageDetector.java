@@ -52,7 +52,7 @@ public class MCRLanguageDetector {
 
     private static Properties endings = new Properties();
 
-    private static Map<Integer, String> code2languageCodes = new HashMap<Integer, String>();
+    private static Map<Integer, String> code2languageCodes = new HashMap<>();
 
     static {
         code2languageCodes.put(UScript.ARABIC, "ar");
@@ -117,11 +117,11 @@ public class MCRLanguageDetector {
         }
         LOGGER.debug("Detecting language of [" + text + "]");
 
-        Map<Integer, AtomicInteger> scores = new HashMap<Integer, AtomicInteger>();
+        Map<Integer, AtomicInteger> scores = new HashMap<>();
         buildScores(text, scores);
         int code = getCodeWithMaxScore(scores);
 
-        return code2languageCodes.containsKey(code) ? code2languageCodes.get(code) : null;
+        return code2languageCodes.getOrDefault(code, null);
     }
 
     private static void buildScores(String text, Map<Integer, AtomicInteger> scores) {
@@ -136,12 +136,7 @@ public class MCRLanguageDetector {
     }
 
     private static void increaseScoreFor(Map<Integer, AtomicInteger> scores, int code) {
-        AtomicInteger score = scores.get(code);
-        if (score == null) {
-            score = new AtomicInteger();
-            scores.put(code, score);
-        }
-        score.incrementAndGet();
+        scores.computeIfAbsent(code, k -> new AtomicInteger()).incrementAndGet();
     }
 
     private static int getCodeWithMaxScore(Map<Integer, AtomicInteger> scores) {
