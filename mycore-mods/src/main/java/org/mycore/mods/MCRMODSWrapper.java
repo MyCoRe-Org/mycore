@@ -113,11 +113,8 @@ public class MCRMODSWrapper {
         if (isSupported(obj.getId())) {
             return true;
         }
-        if (obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
-            && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElementByName(MODS_CONTAINER) != null) {
-            return true;
-        }
-        return false;
+        return obj.getMetadata() != null && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER) != null
+            && obj.getMetadata().getMetadataElement(DEF_MODS_CONTAINER).getElementByName(MODS_CONTAINER) != null;
     }
 
     /**
@@ -203,7 +200,7 @@ public class MCRMODSWrapper {
             if (eMODS != null) {
                 return buildXPath(xPath).evaluate(eMODS);
             } else {
-                return Collections.<Element> emptyList();
+                return Collections.emptyList();
             }
         } catch (JDOMException ex) {
             String msg = "Could not get elements at " + xPath;
@@ -238,11 +235,11 @@ public class MCRMODSWrapper {
         // add attributes to xpath with and operator
         if (isAttributeDataPresent) {
 
-            xPath.append("[");
+            xPath.append('[');
             Iterator<Map.Entry<String, String>> attributeIterator = attributes.entrySet().iterator();
             while (attributeIterator.hasNext()) {
                 Map.Entry<String, String> attribute = attributeIterator.next();
-                xPath.append("@" + attribute.getKey() + "='" + attribute.getValue() + "'");
+                xPath.append('@').append(attribute.getKey()).append("='").append(attribute.getValue()).append('\'');
 
                 if (attributeIterator.hasNext()) {
                     xPath.append(" and ");

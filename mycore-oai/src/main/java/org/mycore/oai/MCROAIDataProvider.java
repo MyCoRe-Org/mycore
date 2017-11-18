@@ -54,7 +54,7 @@ import org.mycore.oai.pmh.dataprovider.jaxb.JAXBOAIProvider;
 public class MCROAIDataProvider extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAIDataProvider.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAIDataProvider.class);
 
     /**
      * Map of all MyCoRe oai adapter.
@@ -64,7 +64,7 @@ public class MCROAIDataProvider extends MCRServlet {
     private String myBaseURL;
 
     static {
-        mcrOAIAdapterMap = new HashMap<String, MCROAIAdapter>();
+        mcrOAIAdapterMap = new HashMap<>();
     }
 
     @Override
@@ -98,10 +98,10 @@ public class MCROAIDataProvider extends MCRServlet {
      */
     @SuppressWarnings("rawtypes")
     private Map<String, List<String>> fixParameterMap(Map pMap) {
-        Map<String, List<String>> rMap = new HashMap<String, List<String>>();
+        Map<String, List<String>> rMap = new HashMap<>();
         for (Object o : pMap.entrySet()) {
             Map.Entry entry = (Map.Entry) o;
-            List<String> valueList = new ArrayList<String>();
+            List<String> valueList = new ArrayList<>();
             Collections.addAll(valueList, (String[]) entry.getValue());
             rMap.put((String) entry.getKey(), valueList);
         }
@@ -125,7 +125,7 @@ public class MCROAIDataProvider extends MCRServlet {
         String styleSheet = MCROAIAdapter.PREFIX + getServletName() + ".ResponseStylesheet";
         String xsl = MCRConfiguration.instance().getString(styleSheet, "oai/oai2.xsl");
         if (!xsl.isEmpty()) {
-            Map<String, String> pairs = new HashMap<String, String>();
+            Map<String, String> pairs = new HashMap<>();
             pairs.put("type", "text/xsl");
             pairs.put("href", MCRFrontendUtil.getBaseURL() + xsl);
             doc.addContent(0, new ProcessingInstruction("xml-stylesheet", pairs));

@@ -22,7 +22,7 @@
 
 package org.mycore.restapi.v1;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.FeatureContext;
@@ -44,7 +44,7 @@ public class MCRRestFeature extends MCRJerseyDefaultFeature {
 
     @Override
     protected List<String> getPackages() {
-        return Arrays.asList("org.mycore.restapi.v1");
+        return Collections.singletonList("org.mycore.restapi.v1");
     }
 
     @Override

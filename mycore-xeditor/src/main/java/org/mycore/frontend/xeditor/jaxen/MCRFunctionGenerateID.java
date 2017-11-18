@@ -9,7 +9,7 @@ import org.jaxen.FunctionCallException;
 
 class MCRFunctionGenerateID implements org.jaxen.Function {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRFunctionGenerateID.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFunctionGenerateID.class);
 
     @Override
     public Object call(Context context, List args) throws FunctionCallException {

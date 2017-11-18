@@ -25,7 +25,7 @@ public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
 
     private List<MCRProcessableCollection> collections;
 
-    private List<MCRProcessableRegistryListener> listenerList;
+    private final List<MCRProcessableRegistryListener> listenerList;
 
     public MCRCentralProcessableRegistry() {
         this.collections = Collections.synchronizedList(new ArrayList<>());

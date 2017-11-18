@@ -243,10 +243,10 @@ public class MCRCommand {
         Object[] commandParameters = parseCommandLine(input);
 
         if (commandParameters == null) {
-            LOGGER.info("No match for syntax: " + getSyntax());
+            LOGGER.info("No match for syntax: {}", getSyntax());
             return null;
         }
-        LOGGER.info("Syntax matched (executed): " + getSyntax());
+        LOGGER.info("Syntax matched (executed): {}", getSyntax());
 
         initMethod(classLoader);
         prepareInvocationParameters(commandParameters);
@@ -254,7 +254,7 @@ public class MCRCommand {
         if (result instanceof List && !((List) result).isEmpty() && ((List) result).get(0) instanceof String) {
             return (List<String>) result;
         } else {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
     }
 

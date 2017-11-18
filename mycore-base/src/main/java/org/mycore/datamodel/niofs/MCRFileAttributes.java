@@ -70,7 +70,7 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
      *
      */
     public static <T> MCRFileAttributes<T> directory(final T filekey, final long size, final FileTime lastModified) {
-        return new MCRFileAttributes<T>(fileType.directory, size, filekey, null, null, lastModified, null);
+        return new MCRFileAttributes<>(fileType.directory, size, filekey, null, null, lastModified, null);
     }
 
     public static <T> MCRFileAttributes<T> file(final T filekey, final long size, final String md5sum,
@@ -80,7 +80,7 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
 
     public static <T> MCRFileAttributes<T> file(final T filekey, final long size, final String md5sum,
         final FileTime creationTime, final FileTime lastModified, final FileTime lastAccessTime) {
-        return new MCRFileAttributes<T>(fileType.file, size, filekey, md5sum, creationTime, lastModified,
+        return new MCRFileAttributes<>(fileType.file, size, filekey, md5sum, creationTime, lastModified,
             lastAccessTime);
     }
 

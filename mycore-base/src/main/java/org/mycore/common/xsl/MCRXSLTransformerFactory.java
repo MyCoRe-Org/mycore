@@ -48,7 +48,7 @@ public class MCRXSLTransformerFactory {
     static {
         int cacheSize = MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 200);
         checkPeriod = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod", 10000);
-        cache = new MCRCache<String, Templates>(cacheSize, MCRXSLTransformerFactory.class.getName());
+        cache = new MCRCache<>(cacheSize, MCRXSLTransformerFactory.class.getName());
     }
 
     /** Returns the compiled XSL templates cached for the given source, if it is up-to-date. 

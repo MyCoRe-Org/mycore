@@ -45,12 +45,12 @@ public class MCRFile extends MCRStoredNode {
 
     private static final MCRDevNull DEV_NULL = new MCRDevNull();
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRFile.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFile.class);
 
     /**
      * The md5 checksum of the empty file
      */
-    public final static String MD5_OF_EMPTY_FILE = "d41d8cd98f00b204e9800998ecf8427e";
+    public static final String MD5_OF_EMPTY_FILE = "d41d8cd98f00b204e9800998ecf8427e";
 
     /**
      * Returns a MCRFile object representing an existing file already stored in
@@ -141,7 +141,7 @@ public class MCRFile extends MCRStoredNode {
         cis.close();
         String md5 = cis.getMD5String();
         if (!md5.equals(data.getAttributeValue("md5"))) {
-            LOGGER.warn("Fixed MD5 of " + getPath() + " to " + md5);
+            LOGGER.warn("Fixed MD5 of {} to {}", getPath(), md5);
             data.setAttribute("md5", md5);
         }
     }

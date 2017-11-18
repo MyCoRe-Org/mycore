@@ -24,7 +24,6 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,7 +75,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate() {
         super();
-        texts = new ArrayList<MCRMetaHistoryDateText>();
+        texts = new ArrayList<>();
         calendar = MCRCalendar.CALENDARS_LIST.get(0);
         setDefaultVon();
         setDefaultBis();
@@ -100,7 +99,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate(String set_subtag, String set_type, int set_inherted) throws MCRException {
         super(set_subtag, null, set_type, set_inherted);
-        texts = new ArrayList<MCRMetaHistoryDateText>();
+        texts = new ArrayList<>();
         calendar = MCRCalendar.CALENDARS_LIST.get(0);
         setDefaultVon();
         setDefaultBis();
@@ -296,8 +295,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             ivon = von.get(Calendar.JULIAN_DAY);
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.warn("The von date " + date_string + " for calendar " + calendar_string
-                + " is false. Set to default!");
+            LOGGER.warn("The von date {} for calendar {} is false. Set to default!", date_string, calendar_string);
             setDefaultVon();
         }
     }
@@ -331,7 +329,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         try {
             c = MCRCalendar.getHistoryDateAsCalendar(set_date, true, calstr);
         } catch (Exception e) {
-            LOGGER.warn("The bis date " + set_date + " for calendar " + calstr + " is false.");
+            LOGGER.warn("The bis date {} for calendar {} is false.", set_date, calstr);
             c = null;
         }
         setBisDate(c);
@@ -412,7 +410,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         super.setFromDOM(element);
         texts.clear(); // clear
 
-        for (Element textElement : (Collection<Element>) element.getChildren("text")) {
+        for (Element textElement : element.getChildren("text")) {
             String text = textElement.getText();
             String lang = textElement.getAttributeValue("lang", Namespace.XML_NAMESPACE);
             if (lang != null) {
@@ -466,6 +464,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * 
      * @throws MCRException the MCRMetaHistoryDate is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         for (int i = 0; i < texts.size(); i++) {
@@ -511,13 +510,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             for (MCRMetaHistoryDateText text : texts) {
-                LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());
+                LOGGER.debug("Text / lang         = {} / {}", text.getText(), text.getLang());
             }
-            LOGGER.debug("Calendar           = " + calendar);
-            LOGGER.debug("Von (String)       = " + getVonToString());
-            LOGGER.debug("Von (JulianDay)    = " + ivon);
-            LOGGER.debug("Bis (String)       = " + getBisToString());
-            LOGGER.debug("Bis (JulianDay)    = " + ibis);
+            LOGGER.debug("Calendar           = {}", calendar);
+            LOGGER.debug("Von (String)       = {}", getVonToString());
+            LOGGER.debug("Von (JulianDay)    = {}", ivon);
+            LOGGER.debug("Bis (String)       = {}", getBisToString());
+            LOGGER.debug("Bis (JulianDay)    = {}", ibis);
             LOGGER.debug("Stop");
             LOGGER.debug("");
         }

@@ -23,7 +23,6 @@
 package org.mycore.mods.rss;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -111,7 +110,7 @@ public class MCRRSSFeedImporter {
 
     private static final String PROPERTY_MAIL_ADDRESS = "MCR.Mail.Address";
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRRSSFeedImporter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRSSFeedImporter.class);
 
     public static void importFromFeed(String sourceSystemID, String projectID) throws Exception {
         MCRRSSFeedImporter importer = new MCRRSSFeedImporter(sourceSystemID);
@@ -144,7 +143,7 @@ public class MCRRSSFeedImporter {
     }
 
     public void importPublications(String projectID) throws Exception {
-        LOGGER.info("Getting new publications from " + sourceSystemID + " RSS feed...");
+        LOGGER.info("Getting new publications from {} RSS feed...", sourceSystemID);
         SyndFeed feed = retrieveFeed();
 
         List<MCRObject> importedObjects = new ArrayList<>();
@@ -156,14 +155,14 @@ public class MCRRSSFeedImporter {
         }
 
         int numPublicationsImported = importedObjects.size();
-        LOGGER.info("imported " + numPublicationsImported + " publications.");
+        LOGGER.info("imported {} publications.", numPublicationsImported);
 
         if ((numPublicationsImported > 0) && (xsl2BuildNotificationMail != null)) {
             sendNotificationMail(importedObjects);
         }
     }
 
-    private SyndFeed retrieveFeed() throws IOException, MalformedURLException, FeedException {
+    private SyndFeed retrieveFeed() throws IOException, FeedException {
         XmlReader feedReader = new XmlReader(new URL(feedURL));
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = input.build(feedReader);
@@ -171,18 +170,18 @@ public class MCRRSSFeedImporter {
     }
 
     private MCRObject handleFeedEntry(SyndEntry entry, String projectID)
-            throws MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException {
         String publicationID = getPublicationID(entry);
         if (publicationID == null) {
             return null;
         }
 
         if (isAlreadyStored(publicationID)) {
-            LOGGER.info("publication with ID " + publicationID + " already existing, will not import.");
+            LOGGER.info("publication with ID {} already existing, will not import.", publicationID);
             return null;
         }
 
-        LOGGER.info("publication with ID " + publicationID + " does not exist yet, retrieving data...");
+        LOGGER.info("publication with ID {} does not exist yet, retrieving data...", publicationID);
         Element publicationXML = retrieveAndConvertPublication(publicationID);
         if (shouldIgnore(publicationXML)) {
             LOGGER.info("publication will be ignored, do not store.");
@@ -205,7 +204,7 @@ public class MCRRSSFeedImporter {
         if (m.matches()) {
             return m.group(1);
         } else {
-            LOGGER.warn("no publication ID found in link " + link);
+            LOGGER.warn("no publication ID found in link {}", link);
             return null;
         }
     }

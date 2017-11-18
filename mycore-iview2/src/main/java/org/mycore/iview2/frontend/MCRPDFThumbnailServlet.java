@@ -63,7 +63,7 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
         try {
             ThumnailInfo thumbnailInfo = getThumbnailInfo(req.getPathInfo());
             MCRPath pdfFile = MCRPath.getPath(thumbnailInfo.derivate, thumbnailInfo.filePath);
-            LOGGER.info("PDF file: " + pdfFile);
+            LOGGER.info("PDF file: {}", pdfFile);
             if (Files.notExists(pdfFile)) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format(
                     "Could not find pdf file for {0}{1}", thumbnailInfo.derivate, thumbnailInfo.filePath));
@@ -79,13 +79,13 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
             if (imageContent != null) {
                 resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
                 Date expires = new Date(System.currentTimeMillis() + MAX_AGE * 1000);
-                LOGGER.debug("Last-Modified: " + new Date(attrs.lastModifiedTime().toMillis()) + ", expire on: "
-                    + expires);
+                LOGGER.debug("Last-Modified: {}, expire on: {}", new Date(attrs.lastModifiedTime().toMillis()),
+                    expires);
                 resp.setDateHeader("Expires", expires.getTime());
             }
             return imageContent;
         } finally {
-            LOGGER.debug("Finished sending " + req.getPathInfo());
+            LOGGER.debug("Finished sending {}", req.getPathInfo());
         }
     }
 
@@ -97,7 +97,7 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
             thumbnailSize = Integer.parseInt(thSize);
         }
         pdfTools = new MCRPDFTools();
-        LOGGER.info(getServletName() + ": setting thumbnail size to " + thumbnailSize);
+        LOGGER.info("{}: setting thumbnail size to {}", getServletName(), thumbnailSize);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
         }
         final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
         String imagePath = pathInfo.substring(derivate.length());
-        LOGGER.debug("derivate: " + derivate + ", image: " + imagePath);
+        LOGGER.debug("derivate: {}, image: {}", derivate, imagePath);
         return new ThumnailInfo(derivate, imagePath);
     }
 

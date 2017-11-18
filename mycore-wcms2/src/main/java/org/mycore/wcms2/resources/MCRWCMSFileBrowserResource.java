@@ -45,7 +45,7 @@ import com.google.gson.JsonObject;
 @MCRRestrictedAccess(MCRWCMSPermission.class)
 public class MCRWCMSFileBrowserResource {
 
-    private ArrayList<String> folderList = new ArrayList<String>();
+    private ArrayList<String> folderList = new ArrayList<>();
 
     private String WCMSDataPath = MCRWebPagesSynchronizer.getWCMSDataDir().getPath();
 
@@ -142,8 +142,8 @@ public class MCRWCMSFileBrowserResource {
         if (fileArray != null) {
             for (File file : fileArray) {
                 String mimetype = Files.probeContentType(file.toPath());
-                if (mimetype != null && ((type.equals("images") && mimetype.split("/")[0].equals("image"))
-                    || (!type.equals("images") && !mimetype.split("/")[1].contains("xml")))) {
+                if (mimetype != null && (type.equals("images") ? mimetype.split("/")[0].equals("image")
+                    : !mimetype.split("/")[1].contains("xml"))) {
                     JsonObject fileJsonObj = new JsonObject();
                     fileJsonObj.addProperty("name", file.getName());
                     fileJsonObj.addProperty("path", context.getContextPath() + path + "/" + file.getName());

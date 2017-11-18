@@ -17,13 +17,13 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeData;
 
 public class MCRSubselectReturnTarget implements MCREditorTarget {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRSubselectReturnTarget.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSubselectReturnTarget.class);
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {
         String baseXPath = getBaseXPathForSubselect(session);
-        LOGGER.info("Returning from subselect for " + baseXPath);
+        LOGGER.info("Returning from subselect for {}", baseXPath);
 
         if ("cancel".equals(parameter)) {
             session.setBreakpoint("After canceling subselect for " + baseXPath);

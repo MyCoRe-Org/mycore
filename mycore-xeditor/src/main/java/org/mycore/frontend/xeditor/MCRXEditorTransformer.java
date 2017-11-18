@@ -125,7 +125,7 @@ public class MCRXEditorTransformer {
         NamedNodeMap attributes = postProcessorNode.getAttributes();
         int attributesLength = attributes.getLength();
         HashMap<String, String> attributeMap = new HashMap<>();
-        for(int i = 0; i < attributesLength; i++){
+        for (int i = 0; i < attributesLength; i++) {
             Attr item = (Attr) attributes.item(i); // this should be save because we called getAttributes earlier
             String attrName = item.getName();
             String attrValue = item.getValue();
@@ -139,11 +139,10 @@ public class MCRXEditorTransformer {
         try {
             MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) Class.forName(clazz).newInstance());
             editorSession.setPostProcessor(instance);
-        } catch (InstantiationException|IllegalAccessException|ClassNotFoundException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             throw new MCRException("Could not initialize Post-Processor with class" + clazz, e);
         }
     }
-
 
     public String replaceParameters(String uri) {
         return getXPathEvaluator().replaceXPaths(uri, false);

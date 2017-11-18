@@ -40,7 +40,7 @@ public abstract class MCRRoleTransformer {
      * Builds an xml element containing all information on the given role.
      */
     public static Document buildExportableXML(MCRRole role) {
-        MCRJAXBContent<MCRRole> content = new MCRJAXBContent<MCRRole>(JAXB_CONTEXT, role);
+        MCRJAXBContent<MCRRole> content = new MCRJAXBContent<>(JAXB_CONTEXT, role);
         try {
             return content.asXML();
         } catch (SAXParseException | JDOMException | IOException e) {

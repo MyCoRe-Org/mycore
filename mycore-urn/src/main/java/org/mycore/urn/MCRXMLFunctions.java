@@ -65,7 +65,7 @@ public class MCRXMLFunctions {
         try {
             return MCRURNManager.hasURNAssigned(objId);
         } catch (Exception ex) {
-            LOGGER.error("Error while retrieving urn from database for object " + objId, ex);
+            LOGGER.error("Error while retrieving urn from database for object {}", objId, ex);
             return false;
         }
     }
@@ -88,12 +88,12 @@ public class MCRXMLFunctions {
      *         in the <code>toAppend</code> parameter is attached
      */
     public static String createAlternativeURN(String urn, String toAppend) {
-        LOGGER.info("Base URN: " + urn + ", adding string '" + toAppend + "'");
+        LOGGER.info("Base URN: {}, adding string '{}'", urn, toAppend);
 
         String[] parts = urn.split("-");
         StringBuilder b = new StringBuilder(parts[0] + "-" + toAppend);
         for (int i = 1; i < parts.length; i++) {
-            b.append("-" + parts[i]);
+            b.append("-").append(parts[i]);
         }
 
         org.mycore.urn.services.MCRURN u = org.mycore.urn.services.MCRURN.create(b.toString());
@@ -120,7 +120,7 @@ public class MCRXMLFunctions {
             Element rootElement = document.createElement("urn");
             document.appendChild(rootElement);
 
-            LOGGER.info("Getting all urns for object " + mcrid);
+            LOGGER.info("Getting all urns for object {}", mcrid);
             long start = System.currentTimeMillis();
             List<MCRURN> results = em
                 .createQuery(
@@ -129,11 +129,11 @@ public class MCRXMLFunctions {
                 .getResultList();
             long temp = start;
 
-            LOGGER.debug("This took " + (System.currentTimeMillis() - start) + " ms");
+            LOGGER.debug("This took {} ms", System.currentTimeMillis() - start);
             LOGGER.debug("Processing the result list");
 
             for (MCRURN result : results) {
-                LOGGER.debug("Processing urn " + result.getURN());
+                LOGGER.debug("Processing urn {}", result.getURN());
                 start = System.currentTimeMillis();
 
                 String path = result.getPath();
@@ -158,9 +158,9 @@ public class MCRXMLFunctions {
                 }
                 em.detach(result);
                 long duration = System.currentTimeMillis() - start;
-                LOGGER.debug("URN processed in " + duration + " ms");
+                LOGGER.debug("URN processed in {} ms", duration);
             }
-            LOGGER.debug("Processing all URN took " + (System.currentTimeMillis() - temp) + " ms");
+            LOGGER.debug("Processing all URN took {} ms", System.currentTimeMillis() - temp);
             return rootElement.getChildNodes();
         } finally {
             MCRDOMUtils.releaseDocumentBuilder(documentBuilder);

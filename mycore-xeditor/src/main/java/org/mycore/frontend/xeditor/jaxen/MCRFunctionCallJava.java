@@ -12,14 +12,14 @@ import org.jaxen.FunctionCallException;
 
 class MCRFunctionCallJava implements org.jaxen.Function {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRFunctionCallJava.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFunctionCallJava.class);
 
     @Override
     public Object call(Context context, List args) throws FunctionCallException {
         try {
             String clazzName = (String) (args.get(0));
             String methodName = (String) (args.get(1));
-            LOGGER.info("XEditor extension function calling " + clazzName + " " + methodName);
+            LOGGER.info("XEditor extension function calling {} {}", clazzName, methodName);
 
             Class[] argTypes = new Class[args.size() - 2];
             Object[] params = new Object[args.size() - 2];

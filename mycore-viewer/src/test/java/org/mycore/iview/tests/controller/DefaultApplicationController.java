@@ -3,7 +3,6 @@ package org.mycore.iview.tests.controller;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +42,7 @@ public class DefaultApplicationController extends ApplicationController {
 
     @Override
     public void init() {
-        DefaultApplicationController.derivateHTMLMapping = new HashMap<TestDerivate, String>();
+        DefaultApplicationController.derivateHTMLMapping = new HashMap<>();
     }
 
     @Override
@@ -89,7 +88,7 @@ public class DefaultApplicationController extends ApplicationController {
     }
 
     protected void download(URL fileLocation, String dest) throws IOException {
-        if (!SKIP_DOWNLOAD.booleanValue()) {
+        if (!SKIP_DOWNLOAD) {
             createTestFolder(webpath);
             InputStream openStream = new BufferedInputStream(fileLocation.openStream(), 1024 * 1024 * 16);
 
@@ -99,18 +98,18 @@ public class DefaultApplicationController extends ApplicationController {
                 String fileName = token[token.length - 1];
                 String destination = dest + "/" + fileName;
 
-                LOGGER.info("Downloading pdf file to " + destination);
+                LOGGER.info("Downloading pdf file to {}", destination);
                 IOUtils.copy(openStream, new FileOutputStream(destination));
             } else {
-                LOGGER.info("Downloading test files to : " + dest);
+                LOGGER.info("Downloading test files to : {}", dest);
                 byte[] bytes = IOUtils.toByteArray(openStream);
-                extractZip(dest, new ArrayList<String>(), new ZipInputStream(new ByteArrayInputStream(bytes)));
+                extractZip(dest, new ArrayList<>(), new ZipInputStream(new ByteArrayInputStream(bytes)));
             }
         }
     }
 
     private void extractZip(String dest, List<String> relativePaths, ZipInputStream zipInputStream)
-        throws IOException, FileNotFoundException {
+        throws IOException {
         ZipEntry nextEntry;
         zipInputStream.available();
         while ((nextEntry = zipInputStream.getNextEntry()) != null) {
@@ -152,7 +151,7 @@ public class DefaultApplicationController extends ApplicationController {
         String path = null;
         path = MCRSeleniumTestBase.getBaseUrl(System.getProperty("BaseUrlPort")) + "/test-classes/testFiles/"
             + DefaultApplicationController.derivateHTMLMapping.get(testDerivate);
-        LOGGER.info("Open Viewer with path : " + path);
+        LOGGER.info("Open Viewer with path : {}", path);
         webdriver.navigate().to(path);
 
         WebDriverWait wait = new WebDriverWait(webdriver, 5000);

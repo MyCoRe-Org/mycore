@@ -2,7 +2,6 @@ package org.mycore.solr.search;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,8 +32,8 @@ public class MCRQLSearchUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
-    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query",
-        "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));
+    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList("search", "query", "maxResults",
+        "numPerPage", "page", "mask", "mode", "redirect"));
 
     @SuppressWarnings("rawtypes")
     public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
@@ -47,9 +46,9 @@ public class MCRQLSearchUtils {
         } else {
             // if there is only one condition its no set condition. we don't need to group
             LOGGER.warn("Condition is not SetCondition.");
-            table = new HashMap<String, List<MCRCondition>>();
+            table = new HashMap<>();
 
-            ArrayList<MCRCondition> conditionList = new ArrayList<MCRCondition>();
+            ArrayList<MCRCondition> conditionList = new ArrayList<>();
             conditionList.add(condition);
 
             table.put("metadata", conditionList);
@@ -75,11 +74,11 @@ public class MCRQLSearchUtils {
         Element conditions = root.getChild("conditions");
 
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
-            Element condition = (Element) conditions.getChildren().get(0);
+            Element condition = conditions.getChildren().get(0);
             renameElements(condition);
 
             // Remove conditions without values
-            List<Element> empty = new ArrayList<Element>();
+            List<Element> empty = new ArrayList<>();
             for (Iterator<Element> it = conditions.getDescendants(new ElementFilter("condition")); it.hasNext();) {
                 Element cond = it.next();
                 if (cond.getAttribute("value") == null) {
@@ -90,8 +89,7 @@ public class MCRQLSearchUtils {
             // Remove empty sort conditions
             Element sortBy = root.getChild("sortBy");
             if (sortBy != null) {
-                for (Iterator<Element> iterator = sortBy.getChildren("field").iterator(); iterator.hasNext();) {
-                    Element field = iterator.next();
+                for (Element field : sortBy.getChildren("field")) {
                     if (field.getAttributeValue("name", "").length() == 0) {
                         empty.add(field);
                     }
@@ -120,7 +118,7 @@ public class MCRQLSearchUtils {
             String field = new StringTokenizer(element.getAttributeValue("field"), " -,").nextToken();
             String operator = element.getAttributeValue("operator");
             if (operator == null) {
-                LOGGER.warn("No operator defined for field: " + field);
+                LOGGER.warn("No operator defined for field: {}", field);
                 operator = "=";
             }
             element.setAttribute("operator", operator);
@@ -221,21 +219,21 @@ public class MCRQLSearchUtils {
         String maxResults = getReqParameter(req, "maxResults", "0");
         query.setMaxResults(Integer.parseInt(maxResults));
 
-        List<String> sortFields = new ArrayList<String>();
+        List<String> sortFields = new ArrayList<>();
         for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
-            String name = (String) names.nextElement();
+            String name = names.nextElement();
             if (name.contains(".sortField")) {
                 sortFields.add(name);
             }
         }
 
         if (sortFields.size() > 0) {
-            Collections.sort(sortFields, (arg0, arg1) -> {
+            sortFields.sort((arg0, arg1) -> {
                 String s0 = arg0.substring(arg0.indexOf(".sortField"));
                 String s1 = arg1.substring(arg1.indexOf(".sortField"));
                 return s0.compareTo(s1);
             });
-            List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
+            List<MCRSortBy> sortBy = new ArrayList<>();
             for (String name : sortFields) {
                 String sOrder = getReqParameter(req, name, "ascending");
                 boolean order = "ascending".equals(sOrder) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;

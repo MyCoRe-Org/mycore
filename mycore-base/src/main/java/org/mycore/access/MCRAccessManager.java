@@ -67,7 +67,7 @@ public class MCRAccessManager {
     }
 
     public static MCRAccessInterface getAccessImpl() {
-        return MCRConfiguration.instance().<MCRAccessInterface> getSingleInstanceOf("MCR.Access.Class",
+        return MCRConfiguration.instance().getSingleInstanceOf("MCR.Access.Class",
             MCRAccessBaseImpl.class.getName());
     }
 
@@ -229,7 +229,7 @@ public class MCRAccessManager {
             ACCESS_CACHE.cachePermission(id, permission, value);
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("checkPermission id:" + id + " permission:" + permission + " --> " + value);
+            LOGGER.debug("checkPermission id:{} permission:{} --> {}", id, permission, value);
         }
         return value;
     }
@@ -248,7 +248,7 @@ public class MCRAccessManager {
             ACCESS_CACHE.cachePermission(null, permission, value);
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("checkPermission permission:" + permission + " --> " + value);
+            LOGGER.debug("checkPermission permission:{} --> {}", permission, value);
         }
         return value;
     }
@@ -289,7 +289,7 @@ public class MCRAccessManager {
             accessAllowed = checkPermission(objectId, PERMISSION_READ) && checkPermission(derID, PERMISSION_READ);
         } else {
             accessAllowed = checkPermission(derID, PERMISSION_READ);
-            LogManager.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
+            LogManager.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: {}", derID);
         }
         return accessAllowed;
     }
@@ -379,7 +379,7 @@ public class MCRAccessManager {
             try {
                 return mcrFixedUserCallable.call();
             } catch (Exception e) {
-                LOGGER.error("Exception while running ACL check for user: " + user.getUserID(), e);
+                LOGGER.error("Exception while running ACL check for user: {}", user.getUserID(), e);
                 return false;
             }
         };

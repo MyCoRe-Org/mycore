@@ -52,7 +52,7 @@ public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
 
     private static Logger LOGGER = LogManager.getLogger(MCRJobThread.class);
 
-    protected MCRJobQueue queue = null;
+    protected final MCRJobQueue queue;
 
     protected MCRJob job = null;
 

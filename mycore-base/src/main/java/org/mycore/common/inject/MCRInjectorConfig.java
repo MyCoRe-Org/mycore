@@ -20,7 +20,7 @@ import com.google.inject.Module;
  */
 public class MCRInjectorConfig {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRInjectorConfig.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRInjectorConfig.class);
 
     private static Injector INJECTOR;
 
@@ -33,7 +33,7 @@ public class MCRInjectorConfig {
             Module module = MCRConfiguration.instance().getInstanceOf(propertyName);
             return module;
         }).forEach(MODULES::add);
-        LOGGER.info("Using guice modules: " + MODULES);
+        LOGGER.info("Using guice modules: {}", MODULES);
         INJECTOR = Guice.createInjector(MODULES);
     }
 

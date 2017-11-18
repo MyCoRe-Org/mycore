@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -142,13 +143,13 @@ public class MCRSassCompilerManager {
     private String compile(String name, List<Importer> importer) throws CompilationException, IOException {
         Options options = new Options();
         Collection<Importer> importerList = options.getImporters();
-        importer.forEach(importerList::add);
+        importerList.addAll(importer);
 
         String realFileName = name.replace(".min.css", ".scss").replace(".css", ".scss");
 
         Optional<Import> importedStartStylesheet = importer.stream()
             .map(i -> i.apply(realFileName, null))
-            .filter(i -> i != null)
+            .filter(Objects::nonNull)
             .map(i -> i.stream().findFirst())
             .filter(Optional::isPresent)
             .map(Optional::get)

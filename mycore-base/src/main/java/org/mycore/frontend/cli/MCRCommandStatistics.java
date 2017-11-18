@@ -30,15 +30,10 @@ import java.util.Map.Entry;
  */
 public class MCRCommandStatistics {
 
-    private static Map<MCRCommand, StatisticsEntry> entries = new HashMap<MCRCommand, StatisticsEntry>();
+    private static Map<MCRCommand, StatisticsEntry> entries = new HashMap<>();
 
     private static StatisticsEntry getEntry(MCRCommand command) {
-        StatisticsEntry entry = entries.get(command);
-        if (entry == null) {
-            entry = new StatisticsEntry();
-            entries.put(command, entry);
-        }
-        return entry;
+        return entries.computeIfAbsent(command, k -> new StatisticsEntry());
     }
 
     public static void commandInvoked(MCRCommand command, long timeNeeded) {
@@ -55,7 +50,7 @@ public class MCRCommandStatistics {
         System.out.println();
         for (Entry<MCRCommand, StatisticsEntry> entry : entries.entrySet()) {
             System.out.println(entry.getKey().getSyntax());
-            System.out.println(entry.getValue().toString());
+            System.out.println(entry.getValue());
         }
     }
 }

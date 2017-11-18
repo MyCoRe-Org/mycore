@@ -36,7 +36,7 @@ public class MCRIPClause implements MCRIPCondition {
     private MCRIPAddress ip;
 
     public MCRIPClause() {
-    };
+    }
 
     public MCRIPClause(String ip) throws MCRParseException {
         set(ip);
@@ -58,7 +58,7 @@ public class MCRIPClause implements MCRIPCondition {
 
     @Override
     public String toString() {
-        return "ip " + ip.toString() + " ";
+        return "ip " + ip + " ";
     }
 
     @Override

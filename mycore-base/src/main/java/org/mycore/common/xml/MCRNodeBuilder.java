@@ -52,7 +52,7 @@ import org.mycore.common.MCRConstants;
  */
 public class MCRNodeBuilder {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRNodeBuilder.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRNodeBuilder.class);
 
     private Map<String, Object> variables;
 
@@ -80,7 +80,7 @@ public class MCRNodeBuilder {
     public Object buildNode(String xPath, String value, Parent parent) throws JaxenException {
         BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
         if (LOGGER.isDebugEnabled())
-            LOGGER.debug("start building " + simplify(xPath) + " relative to " + MCRXPathBuilder.buildXPath(parent));
+            LOGGER.debug("start building {} relative to {}", simplify(xPath), MCRXPathBuilder.buildXPath(parent));
         return buildExpression(baseXPath.getRootExpr(), value, parent);
     }
 
@@ -113,7 +113,7 @@ public class MCRNodeBuilder {
                     LOGGER.debug("attribute already existing");
                 break;
             } else if (LOGGER.isDebugEnabled())
-                LOGGER.debug(xPath + " does not exist or is not a node, will try to build it");
+                LOGGER.debug("{} does not exist or is not a node, will try to build it", xPath);
         }
 
         if (i == indexOfLastStep)
@@ -127,7 +127,7 @@ public class MCRNodeBuilder {
     }
 
     private String buildXPath(List<Step> steps) {
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder();
         for (Step step : steps)
             path.append("/").append(step.getText());
         return simplify(path.substring(1));
@@ -157,8 +157,8 @@ public class MCRNodeBuilder {
             return buildNameStep((NameStep) step, value, parent);
         else {
             if (LOGGER.isDebugEnabled())
-                LOGGER.debug(
-                    "ignoring step, can not be built: " + step.getClass().getName() + " " + simplify(step.getText()));
+                LOGGER.debug("ignoring step, can not be built: {} {}", step.getClass().getName(),
+                    simplify(step.getText()));
             return null;
         }
     }
@@ -178,8 +178,8 @@ public class MCRNodeBuilder {
             return buildAttribute(ns, name, value, (Element) parent);
         } else {
             if (LOGGER.isDebugEnabled())
-                LOGGER.debug("ignoring axis, can not be built: " + nameStep.getAxis() + " "
-                    + (prefix.isEmpty() ? "" : prefix + ":") + name);
+                LOGGER.debug("ignoring axis, can not be built: {} {}{}", nameStep.getAxis(),
+                    prefix.isEmpty() ? "" : prefix + ":", name);
             return null;
         }
     }
@@ -252,7 +252,7 @@ public class MCRNodeBuilder {
         if ((value != null) && !value.isEmpty())
             element.setText(value);
         if (LOGGER.isDebugEnabled())
-            LOGGER.debug("building new element " + element.getName());
+            LOGGER.debug("building new element {}", element.getName());
         if (parent != null)
             parent.addContent(element);
         return element;
@@ -261,7 +261,7 @@ public class MCRNodeBuilder {
     private Attribute buildAttribute(Namespace ns, String name, String value, Element parent) {
         Attribute attribute = new Attribute(name, value == null ? "" : value, ns);
         if (LOGGER.isDebugEnabled())
-            LOGGER.debug("building new attribute " + attribute.getName());
+            LOGGER.debug("building new attribute {}", attribute.getName());
         if (parent != null)
             parent.setAttribute(attribute);
         return attribute;
@@ -276,8 +276,8 @@ public class MCRNodeBuilder {
 
     private Object canNotBuild(Expr expression) {
         if (LOGGER.isDebugEnabled())
-            LOGGER.debug("ignoring expression, can not be built: " + expression.getClass().getName() + " "
-                + simplify(expression.getText()));
+            LOGGER.debug("ignoring expression, can not be built: {} {}", expression.getClass().getName(),
+                simplify(expression.getText()));
         return null;
     }
 }

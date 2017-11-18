@@ -111,8 +111,8 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             throw new MCRPersistentIdentifierException("There is more then one identifier with type DOI!");
         } else if (doiList.size() == 1) {
             Element doiElement = doiList.stream().findAny().get();
-            LOGGER.warn("Found existing DOI(" + doiElement.getTextTrim() + ") in Document will be replaced with "
-                + doi.asString());
+            LOGGER.warn("Found existing DOI({}) in Document will be replaced with {}", doiElement.getTextTrim(),
+                doi.asString());
             doiElement.setText(doi.asString());
         } else {
             // must be 0
@@ -194,7 +194,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     }
 
     public URI getRegisteredURI(MCRBase obj) throws URISyntaxException {
-        return new URI(this.registerURL + "/receive/" + obj.getId().toString());
+        return new URI(this.registerURL + "/receive/" + obj.getId());
     }
 
     /**
@@ -214,7 +214,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
                 String contentType = Optional.ofNullable(MCRContentTypes.probeContentType(mainDocumentPath))
                     .orElse("application/octet-stream");
                 entryList.add(new AbstractMap.SimpleEntry<>(contentType, new URI(this.registerURL + MCRXMLFunctions
-                    .encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId.toString() + "/" + mainDoc))));
+                    .encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId + "/" + mainDoc))));
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Error while detecting the file to register!", e);
             }
@@ -243,13 +243,13 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             } catch (SAXException e) {
                 String translatedInformation = MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_1_2);
                 throw new MCRPersistentIdentifierException(
-                    "The document " + id.toString() + " does not generate well formed Datacite!",
+                    "The document " + id + " does not generate well formed Datacite!",
                     translatedInformation, ERR_CODE_1_2, e);
             }
             return dataciteDocument;
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRPersistentIdentifierException(
-                "Could not transform the content of " + id.toString() + " with the transformer " + transformer, e);
+                "Could not transform the content of " + id + " with the transformer " + transformer, e);
         }
     }
 
@@ -258,12 +258,12 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         throws MCRPersistentIdentifierException {
         if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
             .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
-            LOGGER.warn("SuperUser deletes object " + obj.getId().toString() + " with registered doi " + doi.asString()
-                + ". Try to set DOI inactive.");
+            LOGGER.warn("SuperUser deletes object {} with registered doi {}. Try to set DOI inactive.", obj.getId(),
+                doi.asString());
             try {
                 getDataciteClient().deleteMetadata(doi);
             } catch (MCRPersistentIdentifierException e) {
-                LOGGER.error("Error while setting " + doi.asString() + " inactive! Delete of object should continue!");
+                LOGGER.error("Error while setting {} inactive! Delete of object should continue!", doi.asString());
             }
         } else {
             throw new MCRPersistentIdentifierException("Object should not be deleted! (It has a registered DOI)");

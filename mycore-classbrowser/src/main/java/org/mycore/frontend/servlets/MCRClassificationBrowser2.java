@@ -25,7 +25,7 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +70,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         queryAdapter.configure(req);
     }
 
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         long time = System.nanoTime();
 
@@ -84,10 +85,11 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         String el = req.getParameter("emptyleaves");
         boolean emptyLeaves = true;
-        if ((el != null) && (el.trim().length() > 0))
+        if ((el != null) && (el.trim().length() > 0)) {
             emptyLeaves = Boolean.valueOf(el);
+        }
 
-        LOGGER.info("ClassificationBrowser " + classifID + " " + (categID == null ? "" : categID));
+        LOGGER.info("ClassificationBrowser {} {}", classifID, categID == null ? "" : categID);
 
         MCRCategoryID id = new MCRCategoryID(classifID, categID);
         Element xml = new Element("classificationBrowserData");
@@ -111,7 +113,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             xml.setAttribute("parameters", parameters);
         }
 
-        List<Element> data = new ArrayList<Element>();
+        List<Element> data = new ArrayList<>();
         MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 1);
         if (category == null) {
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, "Could not find category: " + id);
@@ -125,22 +127,26 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             }
             if (countResults) {
                 numResults = queryAdapter.getResultCount();
-                if ((!emptyLeaves) && (numResults < 1))
+                if ((!emptyLeaves) && (numResults < 1)) {
                     continue;
+                }
             }
 
             Element categoryE = new Element("category");
             data.add(categoryE);
-            if (countResults)
+            if (countResults) {
                 categoryE.setAttribute("numResults", String.valueOf(numResults));
+            }
 
             categoryE.setAttribute("id", childID);
             categoryE.setAttribute("children", Boolean.toString(child.hasChildren()));
-            if (queryAdapter != null)
+            if (queryAdapter != null) {
                 categoryE.setAttribute("query", queryAdapter.getQueryAsString());
+            }
 
-            if (uri && (child.getURI() != null))
+            if (uri && (child.getURI() != null)) {
                 categoryE.addContent(new Element("uri").setText(child.getURI().toString()));
+            }
 
             addLabel(req, child, categoryE);
         }
@@ -152,7 +158,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         renderToHTML(job, req, xml);
 
         time = (System.nanoTime() - time) / 1000000;
-        LOGGER.info("ClassificationBrowser finished in " + time + " ms");
+        LOGGER.info("ClassificationBrowser finished in {} ms", time);
     }
 
     /**
@@ -167,15 +173,17 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         // if true, add description
         boolean descr = Boolean.valueOf(req.getParameter("adddescription"));
-        if (descr && (label.getDescription() != null))
+        if (descr && (label.getDescription() != null)) {
             category.addContent(new Element("description").setText(label.getDescription()));
+        }
     }
 
     /** Add link count to each category */
     private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category,
         List<Element> data) {
-        if (!Boolean.valueOf(req.getParameter("countlinks")))
+        if (!Boolean.valueOf(req.getParameter("countlinks"))) {
             return;
+        }
         if (objectType != null && objectType.trim().length() == 0) {
             objectType = null;
         }
@@ -188,23 +196,25 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
             int num = (count.containsKey(childID) ? count.get(childID).intValue() : 0);
             child.setAttribute("numLinks", String.valueOf(num));
-            if ((!emptyLeaves) && (num < 1))
+            if ((!emptyLeaves) && (num < 1)) {
                 it.remove();
+            }
         }
     }
 
     /** Sorts by id, by label in current language, or keeps natural order */
     private void sortCategories(HttpServletRequest req, List<Element> data) {
         final String sortBy = req.getParameter("sortby");
-        if (sortBy != null)
-            Collections.sort(data, (a, b) -> {
-                if ("id".equals(sortBy))
-                    return (a.getAttributeValue("id").compareTo(b.getAttributeValue("id")));
-                else if ("label".equals(sortBy))
-                    return (a.getChildText("label").compareToIgnoreCase(b.getChildText("label")));
-                else
-                    return 0;
-            });
+        switch (sortBy) {
+            case "id":
+                data.sort(Comparator.comparing(e -> e.getAttributeValue("id")));
+                break;
+            case "label":
+                data.sort(Comparator.comparing(e -> e.getChildText("label"), String::compareToIgnoreCase));
+                break;
+            default:
+                //no sort;
+        }
     }
 
     /** Sends output to client browser 
@@ -214,8 +224,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         throws IOException, TransformerException,
         SAXException {
         String style = req.getParameter("style"); // XSL.Style, optional
-        if ((style != null) && (style.length() > 0))
+        if ((style != null) && (style.length() > 0)) {
             req.setAttribute("XSL.Style", style);
+        }
 
         MCRServlet.getLayoutService().doLayout(req, job.getResponse(), new MCRJDOMContent(xml));
     }
@@ -225,21 +236,21 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         return true;
     }
 
-    public static interface MCRQueryAdapter {
-        public void setFieldName(String fieldname);
+    public interface MCRQueryAdapter {
+        void setFieldName(String fieldname);
 
-        public void setRestriction(String text);
+        void setRestriction(String text);
 
-        public void setCategory(String text);
+        void setCategory(String text);
 
-        public void setObjectType(String text);
+        void setObjectType(String text);
 
-        public String getObjectType();
+        String getObjectType();
 
-        public long getResultCount();
+        long getResultCount();
 
-        public String getQueryAsString() throws UnsupportedEncodingException;
+        String getQueryAsString() throws UnsupportedEncodingException;
 
-        public void configure(HttpServletRequest request);
+        void configure(HttpServletRequest request);
     }
 }

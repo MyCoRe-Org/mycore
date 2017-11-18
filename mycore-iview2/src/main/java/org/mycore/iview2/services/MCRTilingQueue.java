@@ -42,7 +42,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
         StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime,
             TimeUnit.SECONDS);
-        preFetch = new ConcurrentLinkedQueue<MCRTileJob>();
+        preFetch = new ConcurrentLinkedQueue<>();
         running = true;
         pollLock = new ReentrantLock();
         MCRShutdownHandler.getInstance().addCloseable(this);
@@ -238,7 +238,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     private MCRTileJob getNextPrefetchedElement() {
         MCRTileJob job = preFetch.poll();
-        LOGGER.debug("Fetched job: " + job);
+        LOGGER.debug("Fetched job: {}", job);
         return job;
     }
 
@@ -255,7 +255,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
             preFetch.add(job.clone());
             session.evict(job);
         }
-        LOGGER.debug("prefetched " + i + " tile jobs");
+        LOGGER.debug("prefetched {} tile jobs", i);
         return i;
     }
 

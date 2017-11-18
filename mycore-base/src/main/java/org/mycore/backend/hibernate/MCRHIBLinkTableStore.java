@@ -25,7 +25,6 @@ package org.mycore.backend.hibernate;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -90,7 +89,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             attr = "";
         }
         EntityManager entityMananger = MCREntityManagerProvider.getCurrentEntityManager();
-        LOGGER.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
+        LOGGER.debug("Inserting {}/{}/{} into database MCRLINKHREF", from, to, type);
 
         MCRLINKHREFPK key = getKey(from, to, type);
         MCRLINKHREF linkHref = entityMananger.find(MCRLINKHREF.class, key);
@@ -135,11 +134,10 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         if (type != null && (type = type.trim()).length() > 0) {
             sb.append(" and MCRTYPE = '").append(type).append("'");
         }
-        LOGGER.debug("Deleting " + from + " from database MCRLINKHREF");
+        LOGGER.debug("Deleting {} from database MCRLINKHREF", from);
         Session session = getSession();
-        Iterator<MCRLINKHREF> it = session.createQuery(sb.toString(), MCRLINKHREF.class).getResultList().iterator();
-        while (it.hasNext()) {
-            session.delete(it.next());
+        for (MCRLINKHREF mcrlinkhref : session.createQuery(sb.toString(), MCRLINKHREF.class).getResultList()) {
+            session.delete(mcrlinkhref);
         }
     }
 
@@ -200,9 +198,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         groupQuery.setParameter("like", mcrtoPrefix + '%');
         groupQuery.getResultList()
             .stream()
-            .forEach(row -> {
-                map.put((String) row[1], (Number) row[0]);
-            });
+            .forEach(row -> map.put((String) row[1], (Number) row[0]));
         return map;
     }
 

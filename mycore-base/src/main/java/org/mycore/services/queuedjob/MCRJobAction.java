@@ -52,23 +52,23 @@ public abstract class MCRJobAction {
      * 
      * @return <code>true</code> if activated, <code>false</code> if isn't
      */
-    abstract public boolean isActivated();
+    public abstract boolean isActivated();
 
     /**
      * Returns the name of the action.
      * 
      * @return the name
      */
-    abstract public String name();
+    public abstract String name();
 
     /**
      * Does the work for given {@link MCRJob}.
      */
-    abstract public void execute() throws ExecutionException;
+    public abstract void execute() throws ExecutionException;
 
     /**
      * When errors occurs during executing it can be necessary to rollback
      * performed actions
      */
-    abstract public void rollback();
+    public abstract void rollback();
 }

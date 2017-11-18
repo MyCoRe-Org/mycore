@@ -51,7 +51,7 @@ public class MCRUploadHandlerManager {
     protected static MCRProcessableCollection COLLECTION;
 
     static {
-        HANDLERS = new MCRCache<String, MCRUploadHandlerCacheEntry>(100, "UploadHandlerManager UploadHandlers");
+        HANDLERS = new MCRCache<>(100, "UploadHandlerManager UploadHandlers");
         COLLECTION = new MCRProcessableDefaultCollection("Upload Manager");
         MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
         registry.register(COLLECTION);
@@ -59,7 +59,7 @@ public class MCRUploadHandlerManager {
     }
 
     static void register(MCRUploadHandler handler) {
-        LOGGER.debug("Registering " + handler.getClass().getName() + " with upload ID " + handler.getID());
+        LOGGER.debug("Registering {} with upload ID {}", handler.getClass().getName(), handler.getID());
         String sessionID = MCRSessionMgr.getCurrentSession().getID();
         HANDLERS.put(handler.getID(), new MCRUploadHandlerCacheEntry(sessionID, handler));
         COLLECTION.add(handler);

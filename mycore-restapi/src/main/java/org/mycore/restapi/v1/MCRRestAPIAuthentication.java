@@ -24,8 +24,8 @@ package org.mycore.restapi.v1;
 
 import java.nio.charset.StandardCharsets;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
@@ -64,6 +64,7 @@ public class MCRRestAPIAuthentication {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIAuthentication.class);
 
     private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
     private static final String HEADER_PREFIX_BEARER = "Bearer ";
 
     /**
@@ -73,12 +74,9 @@ public class MCRRestAPIAuthentication {
     @Produces({ MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     public Response initAuthorization() {
         SignedJWT jwt = MCRJSONWebTokenUtil.createEmptyJWTwithPublicKey("http:/localhost:8080");
-        StringBuffer msg = new StringBuffer();
-        msg.append("{");
-        msg.append("\n    \"access_token\": \"" + jwt + "\",");
-        msg.append("\n}");
+        String msg = "{" + "\n    \"access_token\": \"" + jwt + "\"," + "\n}";
 
-        return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
+        return Response.ok(msg).type("application/json; charset=UTF-8")
             .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
     }
 
@@ -124,31 +122,24 @@ public class MCRRestAPIAuthentication {
         }
         //validate username and password
         if (username != null && password != null && MCRUserManager.checkPassword(username, password) != null) {
-            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Arrays.asList("restapi"),
+            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Collections.singletonList("restapi"),
                 MCRFrontendUtil.getBaseURL(), clientPubKey);
             if (jwt != null) {
-                StringBuffer msg = new StringBuffer();
-                msg.append("{");
-                msg.append("\n    \"login_successful\":true,");
-                msg.append("\n    \"access_token\": \"" + jwt.serialize() + "\",");
-                msg.append("\n    \"token_type\": \"Bearer\"");
-                msg.append("\n}");
+                String msg = "{" + "\n    \"login_successful\":true," + "\n    \"access_token\": \"" + jwt.serialize()
+                    + "\","
+                    + "\n    \"token_type\": \"Bearer\"" + "\n}";
 
-                return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
+                return Response.ok(msg).type("application/json; charset=UTF-8")
                     .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
             }
         }
 
-        StringBuffer msg = new StringBuffer();
-        msg.append("{");
-        msg.append("\n    \"login_successful\":false,");
-        msg.append("\n    \"error\": \"login_failed\"");
-        msg.append("\n    \"error_description\": ");
-        msg.append("\"Login failed. Please provider proper user name and password via HTTP Basic Authentication.\"");
-        msg.append("\n}");
+        String msg = "{" + "\n    \"login_successful\":false," + "\n    \"error\": \"login_failed\""
+            + "\n    \"error_description\": "
+            + "\"Login failed. Please provider proper user name and password via HTTP Basic Authentication.\"" + "\n}";
 
         return Response.status(Status.FORBIDDEN).header("WWW-Authenticate", "Basic realm=\"MyCoRe REST API\"")
-            .entity(msg.toString()).type("application/json; charset=UTF-8").build();
+            .entity(msg).type("application/json; charset=UTF-8").build();
     }
 
     @GET
@@ -175,15 +166,11 @@ public class MCRRestAPIAuthentication {
             String authHeader = MCRJSONWebTokenUtil
                 .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
             if (authHeader != null) {
-                StringBuffer msg = new StringBuffer();
-                msg.append("{");
-                msg.append("\n    \"executed\":true,");
-                msg.append("\n    \"access_token\": \"" + authHeader.replace(HEADER_PREFIX_BEARER, "") + "\",");
-                msg.append("\n    \"token_type\": \"Bearer\",");
-                msg.append("\n    \"data\": \"" + data + "\",");
-                msg.append("\n}");
+                String msg = "{" + "\n    \"executed\":true," + "\n    \"access_token\": \"" + authHeader.replace(
+                    HEADER_PREFIX_BEARER, "") + "\"," + "\n    \"token_type\": \"Bearer\"," + "\n    \"data\": \""
+                    + data + "\"," + "\n}";
 
-                return Response.ok(msg.toString()).type("application/json; charset=UTF-8")
+                return Response.ok(msg).type("application/json; charset=UTF-8")
                     .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
         } catch (MCRRestAPIException rae) {

@@ -53,14 +53,14 @@ import com.google.gson.JsonObject;
  */
 public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     // common data
-    protected final static MCRConfiguration CONFIG = MCRConfiguration.instance();
+    protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    public final static String DEFAULT_LANGUAGE = CONFIG.getString("MCR.Metadata.DefaultLang",
+    public static final String DEFAULT_LANGUAGE = CONFIG.getString("MCR.Metadata.DefaultLang",
         MCRConstants.DEFAULT_LANG);
 
-    public final static boolean DEFAULT_HERITABLE = CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", false);
+    public static final boolean DEFAULT_HERITABLE = CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", false);
 
-    public final static boolean DEFAULT_NOT_INHERIT = CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", true);
+    public static final boolean DEFAULT_NOT_INHERIT = CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", true);
 
     private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
@@ -420,7 +420,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             validate();
             return true;
         } catch (MCRException exc) {
-            LOGGER.warn("The '" + getTag() + "' is invalid.", exc);
+            LOGGER.warn("The '{}' is invalid.", getTag(), exc);
         }
         return false;
     }
@@ -464,7 +464,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         out.setNotInherit(notinherit);
 
         for (int i = 0; i < size(); i++) {
-            MCRMetaInterface mif = (MCRMetaInterface) (list.get(i)).clone();
+            MCRMetaInterface mif = (list.get(i)).clone();
             out.addMetaObject(mif);
         }
 
@@ -476,11 +476,11 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      */
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("ClassName          = " + getClassName());
-            LOGGER.debug("Tag                = " + tag);
-            LOGGER.debug("Heritable          = " + String.valueOf(heritable));
-            LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
-            LOGGER.debug("Elements           = " + String.valueOf(list.size()));
+            LOGGER.debug("ClassName          = {}", getClassName());
+            LOGGER.debug("Tag                = {}", tag);
+            LOGGER.debug("Heritable          = {}", String.valueOf(heritable));
+            LOGGER.debug("NotInherit         = {}", String.valueOf(notinherit));
+            LOGGER.debug("Elements           = {}", String.valueOf(list.size()));
             LOGGER.debug(" ");
             for (MCRMetaInterface aList : list) {
                 aList.debug();

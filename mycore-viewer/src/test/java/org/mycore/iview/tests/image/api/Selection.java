@@ -43,7 +43,7 @@ public abstract class Selection {
     public static Selection fromBufferedImage(BufferedImage bufferedImage) {
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
-        final ArrayList<Pixel> p = new ArrayList<Pixel>();
+        final ArrayList<Pixel> p = new ArrayList<>();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -78,8 +78,8 @@ public abstract class Selection {
             }
         }
 
-        LOGGER.debug("upper: " + upper);
-        LOGGER.debug("left: " + left);
+        LOGGER.debug("upper: {}", upper);
+        LOGGER.debug("left: {}", left);
 
         return new Position(left, upper);
     }
@@ -103,8 +103,8 @@ public abstract class Selection {
             }
         }
 
-        LOGGER.debug("lower: " + lower);
-        LOGGER.debug("right: " + right);
+        LOGGER.debug("lower: {}", lower);
+        LOGGER.debug("right: {}", right);
 
         return new Position(right, lower);
     }

@@ -4,8 +4,8 @@ import java.util.Date;
 
 public interface MCRObjectIDDate {
 
-    public abstract String getId();
+    String getId();
 
-    public abstract Date getLastModified();
+    Date getLastModified();
 
 }

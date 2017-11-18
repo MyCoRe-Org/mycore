@@ -26,7 +26,7 @@ public abstract class MCRIFSTest extends MCRStoreTestCase {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.datadir", "%MCR.basedir%/data");
         testProperties
-                .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
+            .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
         testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         testProperties.put("MCR.Access.Strategy.Class", AlwaysTrueStrategy.class.getName());
         testProperties.put("MCR.Metadata.Type.object", "true");

@@ -33,7 +33,7 @@ abstract class MCRFileSystemUtils {
         MCRPath mcrPath = MCRPath.toMCRPath(path);
         if (!(Objects.requireNonNull(mcrPath.getFileSystem(), "'path' requires a associated filesystem.")
             .provider() instanceof MCRFileSystemProvider)) {
-            throw new ProviderMismatchException("Path does not match to this provider: " + path.toString());
+            throw new ProviderMismatchException("Path does not match to this provider: " + path);
         }
         if (!mcrPath.isAbsolute()) {
             throw new InvalidPathException(mcrPath.toString(), "'path' must be absolute.");
@@ -63,11 +63,11 @@ abstract class MCRFileSystemUtils {
             file = getMCRFile(root, relativePath, create, createNew);
         } catch (Exception e) {
             if (rootCreated) {
-                LOGGER.error("Exception while getting MCRFile " + ifsPath + ". Removing created filesystem nodes.");
+                LOGGER.error("Exception while getting MCRFile {}. Removing created filesystem nodes.", ifsPath);
                 try {
                     root.delete();
                 } catch (Exception de) {
-                    LOGGER.fatal("Error while deleting file system node: " + root.getName(), de);
+                    LOGGER.fatal("Error while deleting file system node: {}", root.getName(), de);
                 }
             }
             throw e;
@@ -114,13 +114,13 @@ abstract class MCRFileSystemUtils {
             }
         } catch (Exception e) {
             if (create || createNew) {
-                LOGGER.error("Exception while getting MCRFile " + ifsPath + ". Removing created filesystem nodes.");
+                LOGGER.error("Exception while getting MCRFile {}. Removing created filesystem nodes.", ifsPath);
                 while (created.peekFirst() != null) {
                     MCRFilesystemNode node = created.pollFirst();
                     try {
                         node.delete();
                     } catch (Exception de) {
-                        LOGGER.fatal("Error while deleting file system node: " + node.getName(), de);
+                        LOGGER.fatal("Error while deleting file system node: {}", node.getName(), de);
                     }
                 }
             }

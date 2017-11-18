@@ -58,7 +58,7 @@ public class MCRFrontendUtil {
             MCRSession session = MCRSessionMgr.getCurrentSession();
             Object value = session.get(BASE_URL_ATTRIBUTE);
             if (value != null) {
-                LOGGER.debug("Returning BaseURL " + value.toString() + " from user session.");
+                LOGGER.debug("Returning BaseURL {} from user session.", value);
                 return value.toString();
             }
         }
@@ -103,9 +103,9 @@ public class MCRFrontendUtil {
             InetAddress BASE_HOST = InetAddress.getByName(url.getHost());
             BASE_HOST_IP = BASE_HOST.getHostAddress();
         } catch (MalformedURLException e) {
-            LOGGER.error("Can't create URL from String " + BASE_URL);
+            LOGGER.error("Can't create URL from String {}", BASE_URL);
         } catch (UnknownHostException e) {
-            LOGGER.error("Can't find host IP for URL " + BASE_URL);
+            LOGGER.error("Can't find host IP for URL {}", BASE_URL);
         }
     }
 
@@ -177,12 +177,12 @@ public class MCRFrontendUtil {
         // if so, take last entry, all others are not reliable because
         // any client may have set the header to any value.
 
-        LOGGER.debug("X-Forwarded-For complete: " + xff);
+        LOGGER.debug("X-Forwarded-For complete: {}", xff);
         StringTokenizer st = new StringTokenizer(xff, " ,;");
         while (st.hasMoreTokens()) {
             xff = st.nextToken().trim();
         }
-        LOGGER.debug("X-Forwarded-For last: " + xff);
+        LOGGER.debug("X-Forwarded-For last: {}", xff);
         return xff;
     }
 
@@ -196,8 +196,8 @@ public class MCRFrontendUtil {
                 // parameter is not empty -> store
                 if (!request.getParameter(name).trim().equals("")) {
                     mcrSession.put(key, request.getParameter(name));
-                    LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name)
-                        + " that should be saved in session, safed " + key + "=" + request.getParameter(name));
+                    LOGGER.debug("Found HTTP-Req.-Parameter {}={} that should be saved in session, safed {}={}", name,
+                        request.getParameter(name), key, request.getParameter(name));
                 }
                 // paramter is empty -> do not store and if contained in
                 // session, remove from it
@@ -215,8 +215,8 @@ public class MCRFrontendUtil {
                 // attribute is not empty -> store
                 if (!request.getAttribute(name).toString().trim().equals("")) {
                     mcrSession.put(key, request.getAttribute(name));
-                    LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name)
-                        + " that should be saved in session, safed " + key + "=" + request.getParameter(name));
+                    LOGGER.debug("Found HTTP-Req.-Attribute {}={} that should be saved in session, safed {}={}", name,
+                        request.getParameter(name), key, request.getParameter(name));
                 }
                 // attribute is empty -> do not store and if contained in
                 // session, remove from it
@@ -245,7 +245,7 @@ public class MCRFrontendUtil {
             try {
                 Collections.addAll(trustedProxies, InetAddress.getAllByName(host));
             } catch (UnknownHostException e) {
-                LOGGER.warn("Unknown host: " + host);
+                LOGGER.warn("Unknown host: {}", host);
             }
         }
 
@@ -267,14 +267,12 @@ public class MCRFrontendUtil {
             String host = new java.net.URL(getBaseURL()).getHost();
             Collections.addAll(trustedProxies, InetAddress.getAllByName(host));
         } catch (Exception ex) {
-            LOGGER.warn("Could not determine IP of local host serving:" + getBaseURL(), ex);
+            LOGGER.warn("Could not determine IP of local host serving:{}", getBaseURL(), ex);
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Trusted proxies: " + trustedProxies.stream()
-                .map(InetAddress::toString)
-                .sorted()
-                .collect(Collectors.joining(", ")));
+            LOGGER.debug("Trusted proxies: {}",
+                trustedProxies.stream().map(InetAddress::toString).sorted().collect(Collectors.joining(", ")));
         }
         return trustedProxies.stream()
             .map(InetAddress::getHostAddress)
@@ -296,7 +294,7 @@ public class MCRFrontendUtil {
         response.setDateHeader("Last-Modified", lastModified);
         if (useExpire) {
             Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
-            LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
+            LOGGER.info("Last-Modified: {}, expire on: {}", new Date(lastModified), expires);
             response.setDateHeader("Expires", expires.getTime());
         }
     }

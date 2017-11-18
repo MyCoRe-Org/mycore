@@ -42,7 +42,7 @@ public class MCRHibernateConfigHelper {
             }
         } catch (PersistenceException e) {
             LogManager.getLogger()
-                .warn("Unsupported EntityManagerFactory found: " + entityManagerFactory.getClass().getName());
+                .warn("Unsupported EntityManagerFactory found: {}", entityManagerFactory.getClass().getName());
         }
     }
 
@@ -59,8 +59,7 @@ public class MCRHibernateConfigHelper {
                             idx, getUniqueColumns(MCRCategoryImpl.class, idx))))
                     .collect(Collectors.joining(", ", getAlterTableString(connection) + qualifiedTableName + " ", ""));
                 try (Statement stmt = connection.createStatement()) {
-                    LogManager.getLogger()
-                        .info("Fixing PostgreSQL Schema for " + qualifiedTableName + ":\n" + updateStmt);
+                    LogManager.getLogger().info("Fixing PostgreSQL Schema for {}:\n{}", qualifiedTableName, updateStmt);
                     stmt.execute(updateStmt);
                 }
             });

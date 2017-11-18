@@ -35,16 +35,16 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
 
     static {
         WORD_EXP = XPathFactory.instance()
-                               .compile("alto:Layout/alto:Page/alto:PrintSpace//alto:String", Filters.element(), null,
-                                       MCRConstants.ALTO_NAMESPACE);
+            .compile("alto:Layout/alto:Page/alto:PrintSpace//alto:String", Filters.element(), null,
+                MCRConstants.ALTO_NAMESPACE);
         CONTENT_EXP = XPathFactory.instance()
-                                  .compile("alto:Layout/alto:Page/alto:PrintSpace//alto:TextLine", Filters.element(),
-                                          null, MCRConstants.ALTO_NAMESPACE);
+            .compile("alto:Layout/alto:Page/alto:PrintSpace//alto:TextLine", Filters.element(),
+                null, MCRConstants.ALTO_NAMESPACE);
     }
 
     @Override
     public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)
-            throws IOException {
+        throws IOException {
         String parentPath = MCRPath.toMCRPath(filePath).getParent().getOwnerRelativePath();
         if (!"/alto".equals(parentPath)) {
             return;
@@ -56,7 +56,7 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
             extractWords(rootElement).forEach(value -> document.addField("alto_words", value));
             document.addField("alto_content", extractContent(rootElement));
         } catch (JDOMException e) {
-            LogManager.getLogger().error("Unable to parse " + filePath, e);
+            LogManager.getLogger().error("Unable to parse {}", filePath, e);
         }
     }
 
@@ -73,7 +73,7 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
             }
             String regEx = "\\.0";
             extracted.add(String.join("|", content, hpos.replaceAll(regEx, ""), vpos.replaceAll(regEx, ""),
-                    width.replaceAll(regEx, ""), height.replaceAll(regEx, "")));
+                width.replaceAll(regEx, ""), height.replaceAll(regEx, "")));
         }
         return extracted;
     }

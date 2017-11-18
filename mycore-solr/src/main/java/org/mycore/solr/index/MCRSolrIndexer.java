@@ -87,13 +87,13 @@ public class MCRSolrIndexer {
      * Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is
      * 100.
      */
-    final static int BULK_SIZE = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.BulkSize", 100);
+    static final int BULK_SIZE = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.BulkSize", 100);
 
-    final static MCRProcessableExecutor SOLR_EXECUTOR;
+    static final MCRProcessableExecutor SOLR_EXECUTOR;
 
-    final static ExecutorService SOLR_SUB_EXECUTOR;
+    static final ExecutorService SOLR_SUB_EXECUTOR;
 
-    final static MCRProcessableDefaultCollection SOLR_COLLECTION;
+    static final MCRProcessableDefaultCollection SOLR_COLLECTION;
 
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
@@ -204,7 +204,7 @@ public class MCRSolrIndexer {
      * @throws IOException io exception
      */
     public static UpdateResponse deleteOrphanedNestedDocuments() throws SolrServerException, IOException {
-        if(!MCRSolrUtils.useNestedDocuments()) {
+        if (!MCRSolrUtils.useNestedDocuments()) {
             return null;
         }
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
@@ -225,7 +225,7 @@ public class MCRSolrIndexer {
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
-            LOGGER.debug("Deleting \"" + Arrays.asList(solrIDs) + "\" from solr");
+            LOGGER.debug("Deleting \"{}\" from solr", Arrays.asList(solrIDs));
             UpdateRequest req = new UpdateRequest();
             //delete all documents rooted at this id
             if (MCRSolrUtils.useNestedDocuments()) {
@@ -241,7 +241,7 @@ public class MCRSolrIndexer {
             //for document without nested
             req.deleteById(Arrays.asList(solrIDs));
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Delete request: " + req.getXML());
+                LOGGER.debug("Delete request: {}", req.getXML());
             }
             updateResponse = req.process(solrClient);
             solrClient.commit();
@@ -270,7 +270,7 @@ public class MCRSolrIndexer {
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
-            LOGGER.debug("Deleting derivate \"" + id + "\" from solr");
+            LOGGER.debug("Deleting derivate \"{}\" from solr", id);
             UpdateRequest req = new UpdateRequest();
             StringBuilder deleteQuery = new StringBuilder();
             deleteQuery.append("id:").append(id).append(" ");
@@ -354,7 +354,7 @@ public class MCRSolrIndexer {
         StopWatch swatch = new StopWatch();
         swatch.start();
         int totalCount = list.size();
-        LOGGER.info("Sending " + totalCount + " objects to solr for reindexing");
+        LOGGER.info("Sending {} objects to solr for reindexing", totalCount);
 
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
         MCRSolrIndexStatistic statistic = null;
@@ -363,7 +363,7 @@ public class MCRSolrIndexer {
         for (String id : list) {
             i++;
             try {
-                LOGGER.debug("Preparing \"" + id + "\" for indexing");
+                LOGGER.debug("Preparing \"{}\" for indexing", id);
                 MCRObjectID objId = MCRObjectID.getInstance(id);
                 MCRContent content = metadataMgr.retrieveContent(objId);
                 contentMap.put(objId, content);
@@ -377,7 +377,7 @@ public class MCRSolrIndexer {
                     contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
                 }
             } catch (Exception ex) {
-                LOGGER.error("Error creating index thread for object " + id, ex);
+                LOGGER.error("Error creating index thread for object {}", id, ex);
             }
         }
         long durationInMilliSeconds = swatch.getTime();
@@ -454,7 +454,7 @@ public class MCRSolrIndexer {
         }
         long tStart = System.currentTimeMillis();
         int totalCount = list.size();
-        LOGGER.info("Sending content of " + totalCount + " derivates to solr for reindexing");
+        LOGGER.info("Sending content of {} derivates to solr for reindexing", totalCount);
 
         for (String id : list) {
             MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrClient);
@@ -527,14 +527,14 @@ public class MCRSolrIndexer {
 
     public static void dropIndexByType(String type) throws Exception {
         if (!MCRObjectID.isValidType(type) || "data_file".equals(type)) {
-            LOGGER.warn("The type " + type + " is not a valid type in the actual environment");
+            LOGGER.warn("The type {} is not a valid type in the actual environment", type);
             return;
         }
 
-        LOGGER.info("Dropping solr index for type " + type + "...");
+        LOGGER.info("Dropping solr index for type {}...", type);
         String deleteQuery = MessageFormat.format("objectType:{0} _root_:*_{1}_*", type, type);
         MCRSolrClientFactory.getSolrClient().deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
-        LOGGER.info("Dropping solr index for type " + type + "...done");
+        LOGGER.info("Dropping solr index for type {}...done", type);
     }
 
     /**
@@ -567,16 +567,16 @@ public class MCRSolrIndexer {
      * will be indexed.
      */
     public static void synchronizeMetadataIndex(String objectType) throws IOException, SolrServerException {
-        LOGGER.info("synchronize " + objectType);
+        LOGGER.info("synchronize {}", objectType);
         // get ids from store
         LOGGER.info("fetching mycore store...");
         List<String> storeList = MCRXMLMetadataManager.instance().listIDsOfType(objectType);
-        LOGGER.info("there are " + storeList.size() + " mycore objects");
+        LOGGER.info("there are {} mycore objects", storeList.size());
         // get ids from solr
         LOGGER.info("fetching solr...");
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         List<String> solrList = MCRSolrSearchUtils.listIDs(solrClient, "objectType:" + objectType);
-        LOGGER.info("there are " + solrList.size() + " solr objects");
+        LOGGER.info("there are {} solr objects", solrList.size());
 
         // documents to remove
         List<String> toRemove = new ArrayList<>(1000);
@@ -586,14 +586,14 @@ public class MCRSolrIndexer {
             }
         }
         if (!toRemove.isEmpty()) {
-            LOGGER.info("remove " + toRemove.size() + " zombie objects from solr");
+            LOGGER.info("remove {} zombie objects from solr", toRemove.size());
             deleteById(toRemove.toArray(new String[toRemove.size()]));
         }
         deleteOrphanedNestedDocuments();
         // documents to add
         storeList.removeAll(solrList);
         if (!storeList.isEmpty()) {
-            LOGGER.info("index " + storeList.size() + " mycore objects");
+            LOGGER.info("index {} mycore objects", storeList.size());
             rebuildMetadataIndex(storeList);
         }
     }

@@ -76,7 +76,7 @@ public class MCRURNManager {
     static {
         try {
 
-            store = (MCRURNStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
+            store = MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
         } catch (Throwable t) {
             // TODO: handle exception
             LOGGER.error("Init error: ", t);
@@ -84,7 +84,7 @@ public class MCRURNManager {
     }
 
     /** A map from configID to MCRNissBuilder objects */
-    private static Hashtable<String, MCRNISSBuilder> builders = new Hashtable<String, MCRNISSBuilder>();
+    private static Hashtable<String, MCRNISSBuilder> builders = new Hashtable<>();
 
     /**
      * Builds a URN with a custom, given NISS.
@@ -99,9 +99,7 @@ public class MCRURNManager {
         String base = "MCR.URN.SubNamespace." + configID + ".";
         String prefix = MCRConfiguration.instance().getString(base + "Prefix");
 
-        StringBuilder buffer = new StringBuilder(prefix);
-        buffer.append(niss);
-        return org.mycore.urn.services.MCRURN.create(buffer.toString()).toString();
+        return org.mycore.urn.services.MCRURN.create(prefix + niss).toString();
     }
 
     /**
@@ -218,7 +216,7 @@ public class MCRURNManager {
         int i = path.lastIndexOf("/") + 1;
         String file = path.substring(i);
         String pathDb = path.substring(0, i);
-        String[] pathParts = new String[] { pathDb, file };
+        String[] pathParts = { pathDb, file };
         return pathParts;
     }
 
@@ -263,7 +261,7 @@ public class MCRURNManager {
     public static synchronized String buildAndAssignURN(String documentID, String configID) {
         if (hasURNAssigned(documentID)) {
             String urn = getURNforDocument(documentID);
-            LOGGER.warn("Returning the already assign URN: " + urn + " for document " + documentID + ".");
+            LOGGER.warn("Returning the already assign URN: {} for document {}.", urn, documentID);
             return urn;
         }
         String urn = buildURN(configID);

@@ -17,7 +17,7 @@ import org.mycore.common.config.MCRConfiguration;
 public class MCRSolrFileSizeStrategy implements MCRSolrFileStrategy {
 
     /** the Threshold in bytes */
-    public final static long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong(
+    public static final long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong(
         CONFIG_PREFIX + "FileSizeStrategy.ThresholdInMegaBytes") * 1024 * 1024;
 
     @Override

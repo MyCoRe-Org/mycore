@@ -50,42 +50,45 @@ public final class MCRConstants {
     /** MCR.Metadata.DefaultLang */
     public static final String DEFAULT_LANG = "de";
 
-    public final static Namespace XML_NAMESPACE = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+    /** The default encoding */
+    public static final String DEFAULT_ENCODING = "UTF-8";
 
-    public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
+    public static final Namespace XML_NAMESPACE = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+
+    public static final Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
     /** the MARC 21 namespace */
-    public final static Namespace MARC21_NAMESPACE = Namespace.getNamespace("marc21", "http://www.loc.gov/MARC21/slim");
+    public static final Namespace MARC21_NAMESPACE = Namespace.getNamespace("marc21", "http://www.loc.gov/MARC21/slim");
 
     /** MARC 21 namespace schema location */
-    public final static String MARC21_SCHEMA_LOCATION = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
+    public static final String MARC21_SCHEMA_LOCATION = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
 
-    public final static XPathFactory XPATH_FACTORY = XPathFactory.instance();
+    public static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
 
     /** The URL of the XSI */
-    private final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
+    private static final String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
 
-    public final static Namespace XSI_NAMESPACE = Namespace.getNamespace("xsi", XSI_URL);
+    public static final Namespace XSI_NAMESPACE = Namespace.getNamespace("xsi", XSI_URL);
 
     /** The URL of the XSL */
-    private final static String XSL_URL = "http://www.w3.org/1999/XSL/Transform";
+    private static final String XSL_URL = "http://www.w3.org/1999/XSL/Transform";
 
-    public final static Namespace XSL_NAMESPACE = Namespace.getNamespace("xsl", XSL_URL);
+    public static final Namespace XSL_NAMESPACE = Namespace.getNamespace("xsl", XSL_URL);
 
     /** The URL of the METS */
-    private final static String METS_URL = "http://www.loc.gov/METS/";
+    private static final String METS_URL = "http://www.loc.gov/METS/";
 
-    public final static Namespace METS_NAMESPACE = Namespace.getNamespace("mets", METS_URL);
+    public static final Namespace METS_NAMESPACE = Namespace.getNamespace("mets", METS_URL);
 
     /** The URL of the DV */
-    private final static String DV_URL = "http://dfg-viewer.de/";
+    private static final String DV_URL = "http://dfg-viewer.de/";
 
-    public final static Namespace DV_NAMESPACE = Namespace.getNamespace("dv", DV_URL);
+    public static final Namespace DV_NAMESPACE = Namespace.getNamespace("dv", DV_URL);
 
     /** The URL of the MODS */
-    private final static String MODS_URL = "http://www.loc.gov/mods/v3";
+    private static final String MODS_URL = "http://www.loc.gov/mods/v3";
 
-    public final static Namespace MODS_NAMESPACE = Namespace.getNamespace("mods", MODS_URL);
+    public static final Namespace MODS_NAMESPACE = Namespace.getNamespace("mods", MODS_URL);
 
     public static final Namespace ZS_NAMESPACE = Namespace.getNamespace("zs", "http://www.loc.gov/zing/srw/");
 
@@ -104,17 +107,17 @@ public final class MCRConstants {
         "http://nbn-resolving.org/epicurlite");
 
     /** The URL of the MCR */
-    private final static String MCR_URL = "http://www.mycore.org/";
+    private static final String MCR_URL = "http://www.mycore.org/";
 
-    public final static Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
+    public static final Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
 
-    private final static HashMap<String, Namespace> namespacesByPrefix;
+    private static final HashMap<String, Namespace> namespacesByPrefix;
 
     public static final Namespace ALTO_NAMESPACE = Namespace
         .getNamespace("alto", "http://www.loc.gov/standards/alto/ns-v2#");
 
     static {
-        namespacesByPrefix = new HashMap<String, Namespace>();
+        namespacesByPrefix = new HashMap<>();
 
         Field[] fields = MCRConstants.class.getFields();
         for (Field f : fields) {
@@ -168,8 +171,5 @@ public final class MCRConstants {
     public static Namespace getStandardNamespace(String prefix) {
         return namespacesByPrefix.get(prefix);
     }
-
-    /** The default encoding */
-    public final static String DEFAULT_ENCODING = "UTF-8";
 
 }

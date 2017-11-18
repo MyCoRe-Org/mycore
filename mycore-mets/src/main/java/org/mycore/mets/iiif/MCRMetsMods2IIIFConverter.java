@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -95,7 +96,7 @@ public class MCRMetsMods2IIIFConverter {
             if (this.logicalIdIdentifiersMap.containsKey(logicalId)) {
                 identifiers = this.logicalIdIdentifiersMap.get(logicalId);
             } else {
-                identifiers = new ArrayList<String>();
+                identifiers = new ArrayList<>();
                 this.logicalIdIdentifiersMap.put(logicalId, identifiers);
             }
 
@@ -157,7 +158,7 @@ public class MCRMetsMods2IIIFConverter {
                 LOGGER.warn("User has no access to {}", identifier);
                 return null;
             }
-        }).filter(o -> o != null)
+        }).filter(Objects::nonNull)
             .collect(Collectors.toList());
 
         manifest.sequences.add(sequence);
@@ -180,9 +181,8 @@ public class MCRMetsMods2IIIFConverter {
         complete.add(range);
         range.setLabel(divContainer.getLabel());
 
-        this.logicalIdIdentifiersMap.get(divContainer.getId()).stream().map(refId -> {
-            return refId;
-        }).forEach(canvasRef -> range.canvases.add(canvasRef));
+        this.logicalIdIdentifiersMap.get(divContainer.getId()).stream().map(refId -> refId)
+            .forEach(canvasRef -> range.canvases.add(canvasRef));
 
         divContainer.getChildren().stream()
             .forEach(div -> {
@@ -202,7 +202,7 @@ public class MCRMetsMods2IIIFConverter {
         File file = subDiv.getChildren()
             .stream()
             .map(fptr -> imageGrp.getFileById(fptr.getFileId()))
-            .filter(fileInGrp -> fileInGrp != null)
+            .filter(Objects::nonNull)
             .findAny().get();
 
         String cleanHref = file.getFLocat().getHref();

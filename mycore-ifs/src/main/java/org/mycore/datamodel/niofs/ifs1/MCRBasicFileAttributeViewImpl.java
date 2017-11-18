@@ -44,7 +44,7 @@ abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
                 lastModifiedTime,
                 lastAccessTime, createTime);
         } else if (node instanceof MCRDirectory) {
-            LOGGER.warn("Setting times on directories is not supported: " + node.toPath());
+            LOGGER.warn("Setting times on directories is not supported: {}", node.toPath());
         }
     }
 

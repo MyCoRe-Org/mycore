@@ -58,17 +58,17 @@ import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
  */
 public class MCRBinding {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRBinding.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRBinding.class);
 
     protected String name;
 
     protected String xPath;
 
-    protected List<Object> boundNodes = new ArrayList<Object>();
+    protected List<Object> boundNodes = new ArrayList<>();
 
     protected MCRBinding parent;
 
-    protected List<MCRBinding> children = new ArrayList<MCRBinding>();
+    protected List<MCRBinding> children = new ArrayList<>();
 
     protected MCRChangeTracker tracker;
 
@@ -114,12 +114,12 @@ public class MCRBinding {
                 throw new RuntimeException(
                     "XPath MUST only bind either element, attribute or document nodes: " + xPath);
 
-        LOGGER.debug("Bind to " + xPath + " selected " + boundNodes.size() + " node(s)");
+        LOGGER.debug("Bind to {} selected {} node(s)", xPath, boundNodes.size());
 
         if (boundNodes.isEmpty() && buildIfNotExists) {
             MCRNodeBuilder builder = new MCRNodeBuilder(variables);
             Object built = builder.buildNode(xPath, initialValue, (Parent) (parent.getBoundNode()));
-            LOGGER.debug("Bind to " + xPath + " generated node " + MCRXPathBuilder.buildXPath(built));
+            LOGGER.debug("Bind to {} generated node {}", xPath, MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
             trackNodeCreated(builder.getFirstNodeBuilt());
         }
@@ -128,7 +128,7 @@ public class MCRBinding {
     public MCRBinding(int pos, MCRBinding parent) {
         this(parent);
         boundNodes.add(parent.getBoundNodes().get(pos - 1));
-        LOGGER.debug("Repeater bind to child [" + pos + "]");
+        LOGGER.debug("Repeater bind to child [{}]", pos);
     }
 
     public String getXPath() {
@@ -185,7 +185,7 @@ public class MCRBinding {
     }
 
     public List<MCRBinding> getAncestorsAndSelf() {
-        List<MCRBinding> ancestors = new ArrayList<MCRBinding>();
+        List<MCRBinding> ancestors = new ArrayList<>();
         MCRBinding current = this;
         do {
             ancestors.add(0, current);
@@ -252,7 +252,7 @@ public class MCRBinding {
         else if (parent != null)
             return parent.getVariables();
         else
-            return Collections.<String, Object> emptyMap();
+            return Collections.emptyMap();
     }
 
     public void setVariables(Map<String, Object> variables) {
@@ -260,7 +260,7 @@ public class MCRBinding {
     }
 
     public Map<String, Object> buildXPathVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.putAll(getVariables());
 
         for (MCRBinding ancestor : getAncestorsAndSelf()) {

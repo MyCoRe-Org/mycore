@@ -37,39 +37,23 @@ public class MCRXMLParserFactory {
     private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.XMLParser.ValidateSchema",
         true);
 
-    private final static String XMLREADER_CLASS_NAME = "org.apache.xerces.parsers.SAXParser";
+    private static final String XMLREADER_CLASS_NAME = "org.apache.xerces.parsers.SAXParser";
 
     private static XMLReaderJDOMFactory nonValidatingFactory = new XMLReaderSAX2Factory(false, XMLREADER_CLASS_NAME);
 
     private static XMLReaderJDOMFactory validatingFactory = new XMLReaderSAX2Factory(true, XMLREADER_CLASS_NAME);
 
-    private static ThreadLocal<MCRXMLParserImpl> nonValidating = new ThreadLocal<MCRXMLParserImpl>() {
-        @Override
-        protected MCRXMLParserImpl initialValue() {
-            return new MCRXMLParserImpl(nonValidatingFactory);
-        }
-    };
+    private static ThreadLocal<MCRXMLParserImpl> nonValidating = ThreadLocal.withInitial(
+        () -> new MCRXMLParserImpl(nonValidatingFactory));
 
-    private static ThreadLocal<MCRXMLParserImpl> validating = new ThreadLocal<MCRXMLParserImpl>() {
-        @Override
-        protected MCRXMLParserImpl initialValue() {
-            return new MCRXMLParserImpl(validatingFactory);
-        }
-    };
+    private static ThreadLocal<MCRXMLParserImpl> validating = ThreadLocal.withInitial(
+        () -> new MCRXMLParserImpl(validatingFactory));
 
-    private static ThreadLocal<MCRXMLParserImpl> nonValidatingSilent = new ThreadLocal<MCRXMLParserImpl>() {
-        @Override
-        protected MCRXMLParserImpl initialValue() {
-            return new MCRXMLParserImpl(nonValidatingFactory, true);
-        }
-    };
+    private static ThreadLocal<MCRXMLParserImpl> nonValidatingSilent = ThreadLocal.withInitial(
+        () -> new MCRXMLParserImpl(nonValidatingFactory, true));
 
-    private static ThreadLocal<MCRXMLParserImpl> validatingSilent = new ThreadLocal<MCRXMLParserImpl>() {
-        @Override
-        protected MCRXMLParserImpl initialValue() {
-            return new MCRXMLParserImpl(validatingFactory, true);
-        }
-    };
+    private static ThreadLocal<MCRXMLParserImpl> validatingSilent = ThreadLocal.withInitial(
+        () -> new MCRXMLParserImpl(validatingFactory, true));
 
     /** Returns a validating parser */
     public static MCRXMLParser getValidatingParser() {

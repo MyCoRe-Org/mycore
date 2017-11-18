@@ -110,12 +110,12 @@ public class MCRShutdownHandler {
             cfgSystemName = MCRConfiguration.instance().getString(PROPERTY_SYSTEM_NAME) + ":";
         } catch (MCRConfigurationException e) {
             //may occur early if there is an error starting mycore up or in JUnit tests
-            logger.warn("Error getting '" + PROPERTY_SYSTEM_NAME + "': " + e.getMessage());
+            logger.warn("Error getting '" + PROPERTY_SYSTEM_NAME + "': {}", e.getMessage());
         }
         final String system = cfgSystemName;
         System.out.println(system + " Shutting down system, please wait...\n");
-        logger.debug(() -> "requests: " + requests.toString());
-        Closeable[] closeables = requests.stream().toArray(i -> new Closeable[i]);
+        logger.debug(() -> "requests: " + requests);
+        Closeable[] closeables = requests.stream().toArray(Closeable[]::new);
         Stream.of(closeables)
             .peek(c -> logger.debug("Prepare Closing (1): {}", c))
             .forEach(Closeable::prepareClose);
@@ -156,6 +156,11 @@ public class MCRShutdownHandler {
     @FunctionalInterface
     public interface Closeable extends Comparable<Closeable> {
         /**
+         * The default priority
+         */
+        int DEFAULT_PRIORITY = 5;
+
+        /**
          * prepare for closing this object that implements <code>Closeable</code>. This is the first part of the closing
          * process. As a object may need database access to close cleanly this method can be used to be ahead of
          * database outtake.
@@ -168,7 +173,7 @@ public class MCRShutdownHandler {
          * cleanly closes this object that implements <code>Closeable</code>. You can provide some functionality to
          * close open files and sockets or so.
          */
-        public void close();
+        void close();
 
         /**
          * Returns the priority. A Closeable with a higher priority will be closed before a Closeable with a lower
@@ -182,11 +187,6 @@ public class MCRShutdownHandler {
         default int compareTo(Closeable other) {
             return Integer.compare(other.getPriority(), getPriority());
         }
-
-        /**
-         * The default priority
-         */
-        public static int DEFAULT_PRIORITY = 5;
     }
 
 }

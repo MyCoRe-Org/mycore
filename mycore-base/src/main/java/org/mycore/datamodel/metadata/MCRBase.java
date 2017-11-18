@@ -37,7 +37,6 @@ import org.jdom2.Element;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -56,7 +55,7 @@ public abstract class MCRBase {
     /**
      * constant value for the object id length
      */
-    public final static int MAX_LABEL_LENGTH = 256;
+    public static final int MAX_LABEL_LENGTH = 256;
 
     // from configuration
     protected static final MCRConfiguration mcr_conf;
@@ -99,7 +98,7 @@ public abstract class MCRBase {
         // Default Encoding
         mcr_encoding = mcr_conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Encoding = " + mcr_encoding);
+            LOGGER.debug("Encoding = {}", mcr_encoding);
         }
     }
 
@@ -109,10 +108,8 @@ public abstract class MCRBase {
      * 
      * @exception MCRException
      *                general Exception of MyCoRe
-     * @exception MCRConfigurationException
-     *                a special exception for configuration data
      */
-    public MCRBase() throws MCRException, MCRConfigurationException {
+    public MCRBase() throws MCRException {
         mcr_label = "";
         mcr_version = MCRCoreVersion.getVersion();
         mcr_schema = "";
@@ -328,7 +325,7 @@ public abstract class MCRBase {
             validate();
             return true;
         } catch (MCRException exc) {
-            LOGGER.warn("The content of this object '" + mcr_id + "' is invalid.", exc);
+            LOGGER.warn("The content of this object '{}' is invalid.", mcr_id, exc);
         }
         return false;
     }

@@ -332,7 +332,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             validate();
             return true;
         } catch (MCRException exc) {
-            LOGGER.warn("The the metadata element '" + subtag + "' is invalid.", exc);
+            LOGGER.warn("The the metadata element '{}' is invalid.", subtag, exc);
         }
         return false;
     }
@@ -391,11 +391,11 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      */
     public final void debugDefault() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("SubTag             = " + subtag);
-            LOGGER.debug("Language           = " + lang);
-            LOGGER.debug("Type               = " + type);
-            LOGGER.debug("DataPart           = " + datapart);
-            LOGGER.debug("Inhreited          = " + String.valueOf(inherited));
+            LOGGER.debug("SubTag             = {}", subtag);
+            LOGGER.debug("Language           = {}", lang);
+            LOGGER.debug("Type               = {}", type);
+            LOGGER.debug("DataPart           = {}", datapart);
+            LOGGER.debug("Inhreited          = {}", String.valueOf(inherited));
         }
     }
 

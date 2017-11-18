@@ -218,8 +218,8 @@ public class MCRConfigurationDir {
             try {
                 return resolvedFile.toURI().toURL();
             } catch (MalformedURLException e) {
-                LogManager.getLogger(MCRConfigurationDir.class).warn(
-                    "Exception while returning URL for file: " + resolvedFile, e);
+                LogManager.getLogger(MCRConfigurationDir.class)
+                    .warn("Exception while returning URL for file: {}", resolvedFile, e);
             }
         }
         return getClassPathResource(relativePath, classLoader == null ? MCRConfigurationDir.class.getClassLoader()
@@ -234,7 +234,7 @@ public class MCRConfigurationDir {
                 resources = classLoader.getResources(relativePath);
             } catch (IOException e) {
                 LogManager.getLogger(MCRConfigurationDir.class)
-                    .error("Error while retrieving resource: " + relativePath, e);
+                    .error("Error while retrieving resource: {}", relativePath, e);
             }
             if (resources != null) {
                 File configDir = getConfigurationDirectory();

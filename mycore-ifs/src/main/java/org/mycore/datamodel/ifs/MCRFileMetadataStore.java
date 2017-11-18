@@ -49,7 +49,7 @@ public interface MCRFileMetadataStore {
      * @param node
      *            the MCRFilesystemNode to be stored
      */
-    public void storeNode(MCRFilesystemNode node) throws MCRPersistenceException;
+    void storeNode(MCRFilesystemNode node) throws MCRPersistenceException;
 
     /**
      * Retrieves the MCRFilesystemNode with that ID from the persistent store.
@@ -58,7 +58,7 @@ public interface MCRFileMetadataStore {
      *            unique ID of the MCRFilesystemNode
      * @return the node with that ID, or null if no such node exists
      */
-    public MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException;
+    MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException;
 
     /**
      * Retrieves a child node of an MCRDirectory from the persistent store.
@@ -69,7 +69,7 @@ public interface MCRFileMetadataStore {
      *            the filename of the child node in that directory
      * @return the child MCRFilesystemNode, or null if no such node exists
      */
-    public MCRFilesystemNode retrieveChild(String parentID, String name) throws MCRPersistenceException;
+    MCRFilesystemNode retrieveChild(String parentID, String name) throws MCRPersistenceException;
 
     /**
      * Retrieves the root MCRFilesystemNode that has no parent and is owned by
@@ -80,7 +80,7 @@ public interface MCRFileMetadataStore {
      * @return an MCRFilesystemNode that has no parent and this owner ID, or
      *         null if no such node exists
      */
-    public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException;
+    String retrieveRootNodeID(String ownerID) throws MCRPersistenceException;
 
     /**
      * Returns a list of the children of a given parent MCRDirectory.
@@ -89,7 +89,7 @@ public interface MCRFileMetadataStore {
      *            the ID of the parent MCRDirectory
      * @return a List of child nodes in that directory
      */
-    public List<MCRFilesystemNode> retrieveChildren(String parentID) throws MCRPersistenceException;
+    List<MCRFilesystemNode> retrieveChildren(String parentID) throws MCRPersistenceException;
 
     /**
      * Deletes all data of a given MCRFilesystemNode in the persistent metadata
@@ -98,10 +98,10 @@ public interface MCRFileMetadataStore {
      * @param ID
      *            the unique ID of the MCRFilesystemNode to delete
      */
-    public void deleteNode(String ID) throws MCRPersistenceException;
+    void deleteNode(String ID) throws MCRPersistenceException;
 
     /**
      * Returns an object to iterate over the owner IDs.
      */
-    public Iterable<String> getOwnerIDs() throws MCRPersistenceException;
+    Iterable<String> getOwnerIDs() throws MCRPersistenceException;
 }

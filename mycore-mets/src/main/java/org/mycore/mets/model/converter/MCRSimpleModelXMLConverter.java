@@ -73,7 +73,7 @@ public class MCRSimpleModelXMLConverter {
         List<MCRMetsPage> pageList = msm.getMetsPageList();
         PhysicalStructMap structMap = (PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE);
         structMap.setDivContainer(
-            new PhysicalDiv(PHYSICAL_ID_PREFIX + UUID.randomUUID().toString(), PhysicalDiv.TYPE_PHYS_SEQ));
+            new PhysicalDiv(PHYSICAL_ID_PREFIX + UUID.randomUUID(), PhysicalDiv.TYPE_PHYS_SEQ));
 
         for (MCRMetsPage page : pageList) {
             String id = page.getId();

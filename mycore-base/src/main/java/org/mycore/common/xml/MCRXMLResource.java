@@ -42,23 +42,23 @@ import org.mycore.common.content.MCRURLContent;
 
 /**
  * provides a cache for reading XML resources.
- * 
+ *
  * Cache size can be configured by property
  * <code>MCR.MCRXMLResouce.Cache.Size</code> which defaults to <code>100</code>.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLResource {
 
-    private volatile static MCRCache<String, CacheEntry> resourceCache;
+    private static final MCRCache<String, CacheEntry> resourceCache = new MCRCache<>(
+        MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100),
+        "XML resources");;
 
     private static MCRXMLResource instance = new MCRXMLResource();
 
     private static Logger LOGGER = LogManager.getLogger(MCRXMLResource.class);
 
     private MCRXMLResource() {
-        resourceCache = new MCRCache<String, CacheEntry>(MCRConfiguration.instance().getInt(
-            "MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
     }
 
     /**
@@ -86,7 +86,7 @@ public class MCRXMLResource {
 
     /**
      * Returns MCRContent using ClassLoader of MCRXMLResource class
-     * 
+     *
      * @param name
      *            resource name
      * @see MCRXMLResource#getResource(String, ClassLoader)
@@ -97,7 +97,7 @@ public class MCRXMLResource {
 
     /**
      * returns xml as byte array using ClassLoader of MCRXMLResource class
-     * 
+     *
      * @param name
      *            resource name
      * @see MCRXMLResource#getRawResource(String, ClassLoader)
@@ -108,10 +108,10 @@ public class MCRXMLResource {
 
     /**
      * Returns MCRContent of resource.
-     * 
+     *
      * A cache is used to avoid reparsing if the source of the resource did not
      * change.
-     * 
+     *
      * @param name
      *            the resource name
      * @param classLoader
@@ -126,11 +126,11 @@ public class MCRXMLResource {
         CacheEntry entry = resourceCache.getIfUpToDate(name, modifiedHandle);
         URL resolvedURL = modifiedHandle.getURL();
         if (entry != null && (resolvedURL == null || entry.resourceURL.equals(resolvedURL))) {
-            LOGGER.debug("Using cached resource " + name);
+            LOGGER.debug("Using cached resource {}", name);
             return entry.content;
         }
         if (resolvedURL == null) {
-            LOGGER.warn("Could not resolve resource: " + name);
+            LOGGER.warn("Could not resolve resource: {}", name);
             return null;
         }
         entry = new CacheEntry();
@@ -147,7 +147,7 @@ public class MCRXMLResource {
 
     /**
      * Returns raw XML resource as byte array. Note that no cache will be used.
-     * 
+     *
      * @param name
      *            the resource name
      * @param classLoader
@@ -172,9 +172,9 @@ public class MCRXMLResource {
     }
 
     private static URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
-        LOGGER.debug("Reading xml from classpath resource " + name);
+        LOGGER.debug("Reading xml from classpath resource {}", name);
         URL url = MCRConfigurationDir.getConfigResource(name, classLoader);
-        LOGGER.debug("Resource URL:" + url);
+        LOGGER.debug("Resource URL:{}", url);
         if (url == null) {
             return null;
         }
@@ -245,7 +245,7 @@ public class MCRXMLResource {
             try {
                 long lastModified = con.getLastModified();
                 resolvedURL = con.getURL();
-                LOGGER.debug(name + " last modified: " + lastModified);
+                LOGGER.debug("{} last modified: {}", name, lastModified);
                 return lastModified;
             } finally {
                 closeURLConnection(con);

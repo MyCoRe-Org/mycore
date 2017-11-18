@@ -51,7 +51,7 @@ public abstract class MCRContentTransformer {
     protected String fileExtension;
 
     /** The default MIME type */
-    private final static String defaultMimeType = "application/octet-stream";
+    private static final String defaultMimeType = "application/octet-stream";
 
     /** Called by the factory to initialize configuration of this transformer */
     public void init(String id) {

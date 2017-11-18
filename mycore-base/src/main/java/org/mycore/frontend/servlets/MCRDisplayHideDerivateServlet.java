@@ -41,7 +41,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("Toggling display attribute of " + derivate);
+        LOGGER.info("Toggling display attribute of {}", derivate);
         MCRDerivate obj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
         toggleDisplay(obj);
 
@@ -72,7 +72,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
             String oldVal = displayAttr.getValue();
             String newVal = oldVal.equals(String.valueOf(true)) ? String.valueOf(false) : String.valueOf(true);
             displayAttr.setValue(newVal);
-            LOGGER.info("Setting display attribute of derivate with id " + derObj.getId() + " to " + newVal);
+            LOGGER.info("Setting display attribute of derivate with id {} to {}", derObj.getId(), newVal);
         }
         MCRDerivate updated = new MCRDerivate(xml);
         MCRMetadataManager.updateMCRDerivateXML(updated);

@@ -53,14 +53,14 @@ public class MCRLabelSetTypeAdapter extends MCRJSONTypeAdapter<MCRLabelSetWrappe
     @Override
     public MCRLabelSetWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
-        Set<MCRLabel> labels = new HashSet<MCRLabel>();
+        Set<MCRLabel> labels = new HashSet<>();
         for (JsonElement jsonElement : json.getAsJsonArray()) {
             JsonObject labelJsonObject = jsonElement.getAsJsonObject();
             MCRLabel label = jsonLabelToMCRLabel(labelJsonObject);
             if (label != null) {
                 labels.add(label);
             } else {
-                LOGGER.warn("Unable to add label with empty lang or text: " + labelJsonObject.toString());
+                LOGGER.warn("Unable to add label with empty lang or text: {}", labelJsonObject);
             }
         }
         return new MCRLabelSetWrapper(labels);

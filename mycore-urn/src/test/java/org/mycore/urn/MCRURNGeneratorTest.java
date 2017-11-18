@@ -35,7 +35,7 @@ public class MCRURNGeneratorTest extends MCRJPATestCase {
 
     @Test
     public void testGenerationWithCounter() {
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("MCR.Persistence.URN.Store.Class", "org.mycore.urn.hibernate.MCRHIBURNStore");
         properties.put("MCR.URN.SubNamespace.test.NISSBuilder", "org.mycore.urn.services.MCRNISSBuilderDateCounter");
         properties.put("MCR.URN.SubNamespace.test.Prefix", "urn:nbn:de:test:007-test1-");
@@ -52,7 +52,7 @@ public class MCRURNGeneratorTest extends MCRJPATestCase {
 
     @Test
     public void testDuplicateURN() {
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("MCR.Persistence.URN.Store.Class", "org.mycore.urn.hibernate.MCRHIBURNStore");
         properties.put("MCR.URN.SubNamespace.test2.NISSBuilder", "org.mycore.urn.services.MCRNISSBuilderDateCounter");
         properties.put("MCR.URN.SubNamespace.test2.Prefix", "urn:nbn:de:test:007-test2-");
@@ -71,7 +71,7 @@ public class MCRURNGeneratorTest extends MCRJPATestCase {
 
     @Test
     public void testDuplicateMCRID() {
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("MCR.Persistence.URN.Store.Class", "org.mycore.urn.hibernate.MCRHIBURNStore");
         properties.put("MCR.URN.SubNamespace.test3.NISSBuilder", "org.mycore.urn.services.MCRNISSBuilderDateCounter");
         properties.put("MCR.URN.SubNamespace.test3.Prefix", "urn:nbn:de:test:007-test3-");

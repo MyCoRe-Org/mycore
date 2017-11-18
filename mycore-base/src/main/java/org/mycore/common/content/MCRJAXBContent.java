@@ -58,7 +58,7 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
             throw new IllegalArgumentException("Class " + clazz.getName() + " is not a JAXB annotated.");
         }
         this.docType = getRootTag(jaxbObject);
-        setName(jaxbObject.getClass().getSimpleName() + "-" + jaxbObject.toString() + ".xml");
+        setName(jaxbObject.getClass().getSimpleName() + "-" + jaxbObject + ".xml");
         setSystemId(jaxbObject.toString());
     }
 

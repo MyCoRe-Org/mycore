@@ -40,7 +40,7 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
         Collection<MCRCategory> categoryByURI = MCRAuthorityWithURI.getCategoryByURI(href);
         if (categoryByURI.size() > 1) {
             throw new MCRException(
-                href + " is ambigous: " + categoryByURI.stream().map(c -> c.getId()).collect(Collectors.toList()));
+                href + " is ambigous: " + categoryByURI.stream().map(MCRCategory::getId).collect(Collectors.toList()));
         }
         if (!categoryByURI.isEmpty()) {
             return categoryByURI.iterator().next().getId();
@@ -51,7 +51,7 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
             authorityURI = href.substring(0, href.lastIndexOf("#"));
             categId = href.substring(authorityURI.length() + 1);
         } catch (RuntimeException e) {
-            LOGGER.warn("authorityURI:" + authorityURI + ", valueURI:" + href);
+            LOGGER.warn("authorityURI:{}, valueURI:{}", authorityURI, href);
             return null;
         }
         int internalStylePos = authorityURI.indexOf(MCRAuthorityWithURI.CLASS_URI_PART);

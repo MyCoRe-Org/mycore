@@ -111,12 +111,12 @@ public class MCRCStoreVFS extends MCRContentStore {
     @Override
     protected void doDeleteContent(String storageId) throws Exception {
         FileObject targetObject = fsManager.resolveFile(getBase(), storageId);
-        LOGGER.debug("Delete fired on: " + targetObject);
-        LOGGER.debug("targetObject.class = " + targetObject.getClass().getName());
+        LOGGER.debug("Delete fired on: {}", targetObject);
+        LOGGER.debug("targetObject.class = {}", targetObject.getClass().getName());
         if (targetObject.delete()) {
-            LOGGER.debug("Delete of " + targetObject + " was successful.");
+            LOGGER.debug("Delete of {} was successful.", targetObject);
         } else {
-            LOGGER.warn("Delete of " + targetObject + " was NOT successful (w/o errors given).");
+            LOGGER.warn("Delete of {} was NOT successful (w/o errors given).", targetObject);
         }
     }
 
@@ -148,7 +148,7 @@ public class MCRCStoreVFS extends MCRContentStore {
                 throw new IOException("baseURI for content store " + getID() + " is invalid: " + baseURL, e);
             }
         } else {
-            LOGGER.warn("Base URI is not a file URI: " + baseURL.toString());
+            LOGGER.warn("Base URI is not a file URI: {}", baseURL);
             return null;
         }
     }

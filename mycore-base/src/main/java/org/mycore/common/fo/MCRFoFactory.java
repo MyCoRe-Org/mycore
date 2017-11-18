@@ -38,7 +38,7 @@ import org.mycore.common.config.MCRConfiguration;
 public class MCRFoFactory {
 
     /** The configuration property */
-    private final static String property = "MCR.LayoutService.FoFormatter.class";
+    private static final String property = "MCR.LayoutService.FoFormatter.class";
 
     /** The singleton */
     private static MCRFoFormatterInterface formatter;

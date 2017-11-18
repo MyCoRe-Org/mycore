@@ -26,7 +26,6 @@ package org.mycore.datamodel.ifs2;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -178,8 +177,8 @@ public abstract class MCRStoredNode extends MCRNode {
      * is the label for that language.
      */
     public Map<String, String> getLabels() {
-        Map<String, String> labels = new TreeMap<String, String>();
-        for (Element label : (List<Element>) data.getChildren(LABEL_ELEMENT)) {
+        Map<String, String> labels = new TreeMap<>();
+        for (Element label : data.getChildren(LABEL_ELEMENT)) {
             labels.put(label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE), label.getText());
         }
         return labels;

@@ -47,7 +47,7 @@ import org.mycore.frontend.cli.MCRExternalProcess;
  */
 public class MCRBibUtilsTransformer extends MCRContentTransformer {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRBibUtilsTransformer.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRBibUtilsTransformer.class);
 
     /** The external Bibutils command to invoke */
     private String command;
@@ -107,7 +107,7 @@ public class MCRBibUtilsTransformer extends MCRContentTransformer {
         System.arraycopy(args1, 0, args2, 0, args1.length);
         args2[args1.length] = path;
 
-        LOGGER.info(command + " " + path);
+        LOGGER.info("{} {}", command, path);
         return args2;
     }
 }

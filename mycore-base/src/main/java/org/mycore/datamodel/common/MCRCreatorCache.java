@@ -54,31 +54,29 @@ public class MCRCreatorCache {
                 return Optional.ofNullable(MCRMetadataManager.retrieveMCRObject(objectId).getService()).map(os -> {
                     if (os.isFlagTypeSet("createdby")) {
                         final String creator = os.getFlags("createdby").get(0);
-                        LOGGER.info("Found creator " + creator + " of " + objectId);
+                        LOGGER.info("Found creator {} of {}", creator, objectId);
                         return creator;
                     }
-                    LOGGER.info("Try to get creator information of " + objectId + " from svn history.");
+                    LOGGER.info("Try to get creator information of {} from svn history.", objectId);
                     return null;
                 }).orElseGet(() -> {
                     try {
                         return Optional.ofNullable(MCRXMLMetadataManager.instance().listRevisions(objectId))
-                            .map(versions -> {
-                                return versions.stream()
-                                    .sorted(Comparator.comparingLong(MCRMetadataVersion::getRevision)
-                                        .reversed())
-                                    .filter(v -> v.getType() == MCRMetadataVersion.CREATED).findFirst()
-                                    .map(version -> {
-                                        LOGGER.info(
-                                            "Found creator " + version.getUser() + " in revision "
-                                                + version.getRevision()
-                                                + " of " + objectId);
-                                        return version.getUser();
-                                    }).orElseGet(() -> {
-                                        LOGGER.info(
-                                            "Could not get creator information of " + objectId + ".");
-                                        return null;
-                                    });
-                            }).orElseGet(() -> {
+                            .map(versions -> versions.stream()
+                                .sorted(Comparator.comparingLong(MCRMetadataVersion::getRevision)
+                                    .reversed())
+                                .filter(v -> v.getType() == MCRMetadataVersion.CREATED).findFirst()
+                                .map(version -> {
+                                    LOGGER.info(
+                                        "Found creator {} in revision {} of {}",
+                                        version.getUser(), version.getRevision(),
+                                        objectId);
+                                    return version.getUser();
+                                }).orElseGet(() -> {
+                                    LOGGER.info("Could not get creator information of {}.", objectId);
+                                    return null;
+                                }))
+                            .orElseGet(() -> {
                                 LOGGER.info("Could not get creator information.");
                                 return null;
                             });

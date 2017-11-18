@@ -13,9 +13,9 @@ public class MCRPackerMock extends MCRPacker {
 
     public static final String TEST_PARAMETER_KEY = "testParameter";
 
-    public static final String FINISHED_PROPERTY = MCRPackerMock.class.toString() + ".finished";
+    public static final String FINISHED_PROPERTY = MCRPackerMock.class + ".finished";
 
-    public static final String SETUP_CHECKED_PROPERTY = MCRPackerMock.class.toString() + ".checked";
+    public static final String SETUP_CHECKED_PROPERTY = MCRPackerMock.class + ".checked";
 
     @Override
     public void checkSetup() {

@@ -18,7 +18,7 @@ public class MCRStoreManager {
         T store = storeClass.newInstance();
         store.init(config);
         try {
-            LOGGER.info("Adding instance of " + storeClass.getSimpleName() + " as MCRStore '" + store.getID() + "'.");
+            LOGGER.info("Adding instance of {} as MCRStore '{}'.", storeClass.getSimpleName(), store.getID());
             MCRStoreCenter.instance().addStore(store.getID(), store);
         } catch (Exception e) {
             throw new MCRException("Could not create store with ID " + config.getID() + ", store allready exists");
@@ -42,7 +42,7 @@ public class MCRStoreManager {
     }
 
     public static void removeStore(String id) {
-        LOGGER.info("Remove MCRStore '" + id + "'.");
+        LOGGER.info("Remove MCRStore '{}'.", id);
         MCRStoreCenter.instance().removeStore(id);
     }
 }

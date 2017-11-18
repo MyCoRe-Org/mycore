@@ -103,7 +103,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     private static List<String> forAllDerivates(String batchCommandSyntax) {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<String>(ids.size());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add(MessageFormat.format(batchCommandSyntax, id));
         }
@@ -134,7 +134,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     private static List<String> forAllDerivatesOfProject(String batchCommandSyntax, String project) {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<String>(ids.size());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             if (id.startsWith(project)) {
                 cmds.add(MessageFormat.format(batchCommandSyntax, id));
@@ -185,7 +185,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     private static List<String> forAllImages(String derivateID, String batchCommandSyntax) throws IOException {
         if (!MCRIView2Tools.isDerivateSupported(derivateID)) {
-            LOGGER.info("Skipping tiling of derivate " + derivateID + " as it's main file is not supported by IView2.");
+            LOGGER.info("Skipping tiling of derivate {} as it's main file is not supported by IView2.", derivateID);
             return null;
         }
         MCRPath derivateRoot = MCRPath.getPath(derivateID, "/");
@@ -209,14 +209,13 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         TypedQuery<MCRTileJob> allTileJobQuery = em.createNamedQuery("MCRTileJob.all", MCRTileJob.class);
         List<MCRTileJob> tiles = allTileJobQuery.getResultList();
         tiles.stream()
-            .filter(tj->{
+            .filter(tj -> {
                 MCRPath path = MCRPath.getPath(tj.getDerivate(), tj.getPath());
                 return !Files.exists(path);
             })
-            .peek(tj->LOGGER.info("Delete TileJob {}:{}", tj.getDerivate(), tj.getPath()))
+            .peek(tj -> LOGGER.info("Delete TileJob {}:{}", tj.getDerivate(), tj.getPath()))
             .forEach(em::remove);
     }
-
 
     /**
      * checks and repairs tile of this derivate.
@@ -230,7 +229,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         //file checks
         if (!Files.exists(iviewFile)) {
-            LOGGER.warn("IView2 file does not exist: " + iviewFile);
+            LOGGER.warn("IView2 file does not exist: {}", iviewFile);
             tileImage(derivate, absoluteImagePath);
             return;
         }
@@ -252,7 +251,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             iviewImage = new ZipFile(iviewFile.toFile());
             validateZipFile(iviewImage);
         } catch (Exception e) {
-            LOGGER.warn("Error while reading Iview2 file: " + iviewFile, e);
+            LOGGER.warn("Error while reading Iview2 file: {}", iviewFile, e);
             tileImage(derivate, absoluteImagePath);
             return;
         }
@@ -261,14 +260,14 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             //structure and metadata checks
             int tilesCount = iviewImage.size() - 1; //one for metadata
             if (props.getTilesCount() != tilesCount) {
-                LOGGER.warn("Metadata tile count does not match stored tile count: " + iviewFile);
+                LOGGER.warn("Metadata tile count does not match stored tile count: {}", iviewFile);
                 tileImage(derivate, absoluteImagePath);
                 return;
             }
             int x = props.getWidth();
             int y = props.getHeight();
             if (MCRImage.getTileCount(x, y) != tilesCount) {
-                LOGGER.warn("Calculated tile count does not match stored tile count: " + iviewFile);
+                LOGGER.warn("Calculated tile count does not match stored tile count: {}", iviewFile);
                 tileImage(derivate, absoluteImagePath);
                 return;
             }
@@ -288,7 +287,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                     imageReader.dispose();
                 }
             } catch (IOException | JDOMException e) {
-                LOGGER.warn("Could not read thumbnail of " + iviewFile, e);
+                LOGGER.warn("Could not read thumbnail of {}", iviewFile, e);
                 tileImage(derivate, absoluteImagePath);
                 return;
             }
@@ -302,13 +301,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         int read;
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            InputStream is = iviewImage.getInputStream(entry);
-            try {
+            try (InputStream is = iviewImage.getInputStream(entry)) {
                 while ((read = is.read(data, 0, data.length)) != -1) {
                     crc.update(data, 0, read);
                 }
-            } finally {
-                is.close();
             }
             if (entry.getCrc() != crc.getValue()) {
                 throw new IOException("CRC32 does not match for entry: " + entry.getName());
@@ -344,7 +340,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             job.setDerivate(file.getOwner());
             job.setPath(file.getOwnerRelativePath());
             MCRTilingQueue.getInstance().offer(job);
-            LOGGER.info("Added to TilingQueue: " + file);
+            LOGGER.info("Added to TilingQueue: {}", file);
             startMasterTilingThread();
         }
     }
@@ -383,12 +379,12 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         try {
             mcrobjid = MCRObjectID.getInstance(objectID);
         } catch (Exception e) {
-            LOGGER.error("The object ID " + objectID + " is wrong");
+            LOGGER.error("The object ID {} is wrong", objectID);
             return null;
         }
         List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(mcrobjid, 0, TimeUnit.MILLISECONDS);
         if (derivateIds == null) {
-            LOGGER.error("Object does not exist: " + mcrobjid);
+            LOGGER.error("Object does not exist: {}", mcrobjid);
         }
         ArrayList<String> cmds = new ArrayList<>(derivateIds.size());
         for (MCRObjectID derId : derivateIds) {
@@ -424,7 +420,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         Path tileFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         deleteFileAndEmptyDirectories(tileFile);
         int removed = MCRTilingQueue.getInstance().remove(derivate, absoluteImagePath);
-        LOGGER.info("removed tiles from " + removed + " images");
+        LOGGER.info("removed tiles from {} images", removed);
     }
 
     private static void deleteFileAndEmptyDirectories(Path file) throws IOException {

@@ -42,11 +42,11 @@ public interface MCRNISSBuilder {
      * @param configID
      *            the ID of a subnamespace configuration in mycore.properties
      */
-    public void init(String configID);
+    void init(String configID);
 
     /**
      * Builds a new NISS. No MCRNISSBuilder object must generate the same NISS
      * twice, they must ensure the NISS is unique.
      */
-    public String buildNISS();
+    String buildNISS();
 }

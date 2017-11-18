@@ -63,13 +63,18 @@ public class MCRDerivateServlet extends MCRServlet {
 
     private boolean performTask(MCRServletJob job, String task, String myCoreDerivateId, String file)
         throws IOException {
-        if (task.equals("ssetfile")) {
-            setMainFile(myCoreDerivateId, file, job.getResponse());
-        } else if (task.equals("sdelfile")) {
-            deleteFile(myCoreDerivateId, file, job.getResponse());
-        } else {
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
-                MessageFormat.format("The task \"{0}\" is not supported.", task));
+        switch (task) {
+            case "ssetfile":
+                setMainFile(myCoreDerivateId, file, job.getResponse());
+                break;
+            case "sdelfile":
+                deleteFile(myCoreDerivateId, file, job.getResponse());
+                break;
+            default:
+                job.getResponse()
+                    .sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        MessageFormat.format("The task \"{0}\" is not supported.", task));
+                break;
         }
         return !job.getResponse().isCommitted();
     }

@@ -68,7 +68,7 @@ public abstract class MCRSwordCollectionProvider implements MCRSwordLifecycle {
     public Stream<String> getDerivateIDsofObject(final String mcrObjectId) throws SwordError {
         final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(mcrObjectId),
             10, TimeUnit.SECONDS);
-        return derivateIds.stream().map(oid -> oid.toString());
+        return derivateIds.stream().map(MCRObjectID::toString);
     }
 
     @Override

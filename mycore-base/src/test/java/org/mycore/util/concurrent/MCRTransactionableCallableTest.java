@@ -25,8 +25,8 @@ public class MCRTransactionableCallableTest extends MCRTestCase {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         String sessionID = session.getID();
         TestCallable testCallable = new TestCallable();
-        MCRTransactionableCallable<Boolean> transactionableRunnable = new MCRTransactionableCallable<Boolean>(
-            testCallable, session);
+        MCRTransactionableCallable<Boolean> transactionableRunnable = new MCRTransactionableCallable<>(testCallable,
+            session);
         try {
             assertTrue(transactionableRunnable.call());
         } catch (Exception e) {
@@ -36,7 +36,7 @@ public class MCRTransactionableCallableTest extends MCRTestCase {
         session.close();
 
         // without session
-        transactionableRunnable = new MCRTransactionableCallable<Boolean>(testCallable);
+        transactionableRunnable = new MCRTransactionableCallable<>(testCallable);
         try {
             assertTrue(transactionableRunnable.call());
         } catch (Exception e) {

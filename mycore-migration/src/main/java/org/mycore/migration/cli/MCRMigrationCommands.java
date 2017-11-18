@@ -109,10 +109,10 @@ public class MCRMigrationCommands {
                 modifyUser = lastVersion.getUser();
             }
             service.addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, createUser);
-            LOGGER.info(objectID + ", created by: " + createUser);
+            LOGGER.info("{}, created by: {}", objectID, createUser);
             if (!service.isFlagTypeSet(MCRObjectService.FLAG_TYPE_MODIFIEDBY)) { //the chicken
                 //have to restore also modifiedby from version history.
-                LOGGER.info(objectID + ", modified by: " + modifyUser);
+                LOGGER.info("{}, modified by: {}", objectID, modifyUser);
                 service.addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, modifyUser);
             }
             obj.setImportMode(true);
@@ -171,8 +171,8 @@ public class MCRMigrationCommands {
                     if (tryRawPath(objectID, derivateLinkElement, href, link, owner)) {
                         changedObject = true;
                     } else {
-                        LOGGER.warn(href + " of " + objectID
-                            + "cannot be found on file system. This is most likly a dead link.");
+                        LOGGER.warn("{} of {}cannot be found on file system. This is most likly a dead link.", href,
+                            objectID);
                     }
                 }
             } catch (URISyntaxException uriExc) {
@@ -182,8 +182,9 @@ public class MCRMigrationCommands {
                 if (tryRawPath(objectID, derivateLinkElement, href, link, owner)) {
                     changedObject = true;
                 } else {
-                    LOGGER.warn(href + " of " + objectID
-                        + " isn't URI encoded and cannot be found on file system. This is most likly a dead link.");
+                    LOGGER.warn(
+                        "{} of {} isn't URI encoded and cannot be found on file system. This is most likly a dead link.",
+                        href, objectID);
                 }
             }
         }
@@ -210,7 +211,7 @@ public class MCRMigrationCommands {
                 derivateLinkElement.setAttribute("href", owner + encodedHref, MCRConstants.XLINK_NAMESPACE);
                 return true;
             } catch (URISyntaxException uriEncodeException) {
-                LOGGER.error("Unable to encode " + rawPath + " for object " + objectID, uriEncodeException);
+                LOGGER.error("Unable to encode {} for object {}", rawPath, objectID, uriEncodeException);
                 return false;
             }
         }
@@ -234,7 +235,7 @@ public class MCRMigrationCommands {
             .filter(cid -> !parentStructure.getChildren().stream()
                 .anyMatch(candidate -> candidate.getXLinkHrefID().equals(cid)))
             .sorted().map(MCRMigrationCommands::toLinkId).sequential()
-            .peek(lid -> LOGGER.info("Adding " + lid + " to " + parentId)).forEach(parentStructure::addChild);
+            .peek(lid -> LOGGER.info("Adding {} to {}", lid, parentId)).forEach(parentStructure::addChild);
         if (parentStructure.getChildren().size() != sizeBefore) {
             MCRMetadataManager.fireUpdateEvent(parent);
         }
@@ -293,7 +294,7 @@ public class MCRMigrationCommands {
         String suffix = "-dfg";
 
         return Optional.of(mcrurn)
-            .filter(u -> u.isDfg())
+            .filter(org.mycore.urn.hibernate.MCRURN::isDfg)
             .flatMap(MCRMigrationCommands::parse)
             .map(dnbURN -> dnbURN.withSuffix(suffix))
             .map(MCRDNBURN::asString)

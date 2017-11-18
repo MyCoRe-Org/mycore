@@ -36,7 +36,7 @@ import org.mycore.common.MCRSessionMgr;
 
 public class MCREditorItemComparator implements Comparator<Element> {
 
-    private static final HashMap<String, MCREditorItemComparator> myCollators = new HashMap<String, MCREditorItemComparator>();
+    private static final HashMap<String, MCREditorItemComparator> myCollators = new HashMap<>();
 
     private Collator myCollator;
 

@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRSessionMgr;
@@ -78,7 +77,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
     public List<MCRStoredChangeSet> listBySessionID(String sessionID) {
         List<MCRStoredChangeSet> changeSets = sessionIDChangeSet.get(sessionID);
         if (changeSets != null) {
-            return changeSets.stream().filter(change->change.getApplied()==null).collect(Collectors.toList());
+            return changeSets.stream().filter(change -> change.getApplied() == null).collect(Collectors.toList());
         }
         return Collections.EMPTY_LIST;
     }
@@ -87,7 +86,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
     public List<MCRStoredChangeSet> listByDerivate(String derivateID) {
         List<MCRStoredChangeSet> changeSets = derivateChangeSet.get(derivateID);
         if (changeSets != null) {
-            return changeSets.stream().filter(change->change.getApplied()==null).collect(Collectors.toList());
+            return changeSets.stream().filter(change -> change.getApplied() == null).collect(Collectors.toList());
         }
         return Collections.EMPTY_LIST;
     }
@@ -97,7 +96,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
         return idChangeSet
             .values()
             .stream()
-            .filter(change->change.getApplied()==null)
+            .filter(change -> change.getApplied() == null)
             .skip(start)
             .limit(count)
             .collect(Collectors.toList());
@@ -110,7 +109,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
         if (changeSets != null) {
             return changeSets
                 .stream()
-                .filter(change->change.getApplied()==null)
+                .filter(change -> change.getApplied() == null)
                 .skip(start)
                 .limit(count)
                 .collect(Collectors.toList());
@@ -125,7 +124,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
         if (changeSets != null) {
             return changeSets
                 .stream()
-                .filter(change->change.getApplied()==null)
+                .filter(change -> change.getApplied() == null)
                 .skip(start)
                 .limit(count)
                 .collect(Collectors.toList());

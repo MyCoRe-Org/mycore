@@ -89,7 +89,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
             try {
                 attrs = Files.readAttributes(file, BasicFileAttributes.class);
             } catch (IOException e) {
-                LOGGER.warn("File is linked to category but cannot be read:" + der.getId() + ref.getObjectID(), e);
+                LOGGER.warn("File is linked to category but cannot be read:{}{}", der.getId(), ref.getObjectID(), e);
                 continue;
             }
             MCREvent fileEvent = new MCREvent(MCREvent.PATH_TYPE, MCREvent.INDEX_EVENT);
@@ -113,7 +113,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         MCRPath mcrPath = MCRPath.toMCRPath(path);
         MCRObjectID derivateID = MCRObjectID.getInstance(mcrPath.getOwner());
         if (!MCRMetadataManager.exists(derivateID)) {
-            LOGGER.warn("Derivate " + derivateID + " from file '" + path + "' does not exist.");
+            LOGGER.warn("Derivate {} from file '{}' does not exist.", derivateID, path);
             return;
         }
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);

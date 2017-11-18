@@ -46,8 +46,6 @@ import javax.xml.bind.annotation.XmlValue;
 
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
@@ -66,7 +64,7 @@ public class MCRJobQueueResource {
         try {
             Queues queuesEntity = new Queues();
             queuesEntity.addAll(
-                MCRJobQueue.INSTANCES.keySet().stream().map(n -> new Queue(n)).collect(Collectors.toList()));
+                MCRJobQueue.INSTANCES.keySet().stream().map(Queue::new).collect(Collectors.toList()));
 
             return Response.ok().status(Response.Status.OK).entity(queuesEntity)
                 .build();
@@ -84,7 +82,7 @@ public class MCRJobQueueResource {
         try {
             Queues queuesEntity = new Queues();
             queuesEntity.addAll(
-                MCRJobQueue.INSTANCES.keySet().stream().map(n -> new Queue(n)).collect(Collectors.toList()));
+                MCRJobQueue.INSTANCES.keySet().stream().map(Queue::new).collect(Collectors.toList()));
 
             return Response.ok().status(Response.Status.OK).entity(toJSON(queuesEntity))
                 .build();
@@ -107,7 +105,7 @@ public class MCRJobQueueResource {
 
                     MCRJobQueue jq = e.getValue();
                     Iterable<MCRJob> iterable = () -> jq.iterator(null);
-                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(j -> new Job(j))
+                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(Job::new)
                         .collect(Collectors.toList());
 
                     return q;
@@ -134,7 +132,7 @@ public class MCRJobQueueResource {
 
                     MCRJobQueue jq = e.getValue();
                     Iterable<MCRJob> iterable = () -> jq.iterator(null);
-                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(j -> new Job(j))
+                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(Job::new)
                         .collect(Collectors.toList());
 
                     return q;
@@ -149,7 +147,7 @@ public class MCRJobQueueResource {
         }
     }
 
-    private <T> String toJSON(T entity) throws JsonGenerationException, JsonMappingException, IOException {
+    private <T> String toJSON(T entity) throws IOException {
         StringWriter sw = new StringWriter();
 
         ObjectMapper mapper = new ObjectMapper();

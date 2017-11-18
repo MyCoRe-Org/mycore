@@ -44,8 +44,8 @@ public class URNRegistrationServiceStarter implements MCRStartupHandler.AutoExec
             String s2 = MCRConfiguration.instance().getString("MCR.URN.DNB.Credentials.Password", null);
 
             if (s1 == null || s2 == null || s1.length() == 0 || s2.length() == 0) {
-                LOGGER.warn("Could not instantiate " + URNRegistrationService.class.getName()
-                    + " as required credentials are unset");
+                LOGGER.warn("Could not instantiate {} as required credentials are unset",
+                    URNRegistrationService.class.getName());
                 LOGGER.warn("Please set MCR.URN.DNB.Credentials.Login and MCR.URN.DNB.Credentials.Password");
                 return;
             }
@@ -61,19 +61,19 @@ public class URNRegistrationServiceStarter implements MCRStartupHandler.AutoExec
                 }
 
             } catch (Exception e) {
-                LOGGER.error("Could not instantiate " + URNRegistrationService.class.getName(), e);
+                LOGGER.error("Could not instantiate {}", URNRegistrationService.class.getName(), e);
                 return;
 
             }
             LOGGER.info("Starting executor service...");
             scheduler = Executors.newSingleThreadScheduledExecutor();
 
-            LOGGER.info("Starting " + URNRegistrationService.class.getSimpleName());
+            LOGGER.info("Starting {}", URNRegistrationService.class.getSimpleName());
             // refresh every 60 seconds
             scheduler.scheduleAtFixedRate(urnRegistrationService, 0, 1, TimeUnit.MINUTES);
 
             if (dfgURNRegistrationService != null) {
-                LOGGER.info("Starting " + DFGURNRegistrationService.class.getSimpleName());
+                LOGGER.info("Starting {}", DFGURNRegistrationService.class.getSimpleName());
                 // refresh every 60 seconds
                 scheduler.scheduleAtFixedRate(dfgURNRegistrationService, 0, 1, TimeUnit.MINUTES);
             }

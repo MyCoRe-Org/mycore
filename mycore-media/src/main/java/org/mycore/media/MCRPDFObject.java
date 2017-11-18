@@ -98,9 +98,7 @@ public class MCRPDFObject extends MCRMediaObject {
         throws Exception {
         byte[] imageInByte = null;
 
-        PDDocument pdf = PDDocument.load(new File(media.folderName + media.fileName));
-
-        try {
+        try (PDDocument pdf = PDDocument.load(new File(media.folderName + media.fileName))) {
             PDPageTree pages = pdf.getDocumentCatalog().getPages();
             PDFRenderer pdfRenderer = new PDFRenderer(pdf);
 
@@ -122,8 +120,6 @@ public class MCRPDFObject extends MCRMediaObject {
             baos.close();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
-        } finally {
-            pdf.close();
         }
 
         return imageInByte;

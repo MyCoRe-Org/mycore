@@ -18,7 +18,6 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,7 +100,7 @@ public class MCRBasicCommands {
     }
 
     @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.", order = 30)
-    public static List<String> readCommandsFile(String file) throws IOException, FileNotFoundException {
+    public static List<String> readCommandsFile(String file) throws IOException {
         return MCRCommandLineInterface.readCommandsFile(file);
     }
 
@@ -185,14 +184,14 @@ public class MCRBasicCommands {
 
     private static boolean createDirectory(File directory) {
         if (directory.exists()) {
-            LOGGER.warn("Directory " + directory.getAbsolutePath() + " already exists.");
+            LOGGER.warn("Directory {} already exists.", directory.getAbsolutePath());
             return true;
         }
         if (directory.mkdirs()) {
-            LOGGER.info("Successfully created directory: " + directory.getAbsolutePath());
+            LOGGER.info("Successfully created directory: {}", directory.getAbsolutePath());
             return true;
         } else {
-            LOGGER.warn("Due to unknown error the directory could not be created: " + directory.getAbsolutePath());
+            LOGGER.warn("Due to unknown error the directory could not be created: {}", directory.getAbsolutePath());
             return false;
         }
     }
@@ -202,7 +201,7 @@ public class MCRBasicCommands {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         File targetFile = new File(configurationDirectory, path);
         if (targetFile.exists()) {
-            LOGGER.warn("File " + targetFile.getAbsolutePath() + " already exists.");
+            LOGGER.warn("File {} already exists.", targetFile.getAbsolutePath());
             return;
         }
         if (!targetFile.getParentFile().exists() && !targetFile.getParentFile().mkdirs()) {
@@ -214,7 +213,7 @@ public class MCRBasicCommands {
                 throw new IOException("Could not find template for " + path);
             }
             IOUtils.copy(templateResource, fout);
-            LOGGER.info("Created template for " + path + " in " + configurationDirectory);
+            LOGGER.info("Created template for {} in {}", path, configurationDirectory);
         }
     }
 
@@ -227,7 +226,7 @@ public class MCRBasicCommands {
     @MCRCommand(syntax = "check file {0}", help = "Checks the data file {0} against the XML Schema.", order = 160)
     public static boolean checkXMLFile(String fileName) throws MCRException, SAXParseException, IOException {
         if (!fileName.endsWith(".xml")) {
-            LOGGER.warn(fileName + " ignored, does not end with *.xml");
+            LOGGER.warn("{} ignored, does not end with *.xml", fileName);
 
             return false;
         }
@@ -235,12 +234,12 @@ public class MCRBasicCommands {
         File file = new File(fileName);
 
         if (!file.isFile()) {
-            LOGGER.warn(fileName + " ignored, is not a file.");
+            LOGGER.warn("{} ignored, is not a file.", fileName);
 
             return false;
         }
 
-        LOGGER.info("Reading file " + file + " ...");
+        LOGGER.info("Reading file {} ...", file);
         MCRContent content = new MCRFileContent(file);
 
         MCRXMLParserFactory.getParser().parseXML(content);

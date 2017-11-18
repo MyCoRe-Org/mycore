@@ -125,7 +125,7 @@ public class MCRISO8601Date {
         }
         String formatted = null;
         try {
-            formatted = dt == null ? null : format.indexOf("G") == -1 ? df.format(dt) : df.format(dt).replace("-", "");
+            formatted = dt == null ? null : !format.contains("G") ? df.format(dt) : df.format(dt).replace("-", "");
         } catch (Exception e) {
             LOGGER.error("Could not format date", e);
         }
@@ -247,11 +247,11 @@ public class MCRISO8601Date {
                 result = pDate.toInstant();
                 return result;
             } catch (final ParseException e) {
-                LOGGER.warn("Date guess failed for locale: " + locale);
+                LOGGER.warn("Date guess failed for locale: {}", locale);
                 //we need no big exception in the logs, if we can't guess what it is, a warning should be enough
             }
         }
-        LOGGER.error("Error trying to guess date for string: " + date);
+        LOGGER.error("Error trying to guess date for string: {}", date);
         return null;
     }
 

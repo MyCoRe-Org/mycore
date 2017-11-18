@@ -120,7 +120,7 @@ public class MCRDNBURNRestClient {
         URL url = elp.getUrl();
         switch (putStatus) {
             case HttpStatus.SC_CREATED:
-                LOGGER.info("URN " + identifier + " registered to " + url);
+                LOGGER.info("URN {} registered to {}", identifier, url);
                 return Optional.ofNullable(response.getFirstHeader("Last-Modified"))
                     .map(Header::getValue)
                     .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)

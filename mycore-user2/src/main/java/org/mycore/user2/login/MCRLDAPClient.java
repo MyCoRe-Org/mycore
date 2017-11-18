@@ -136,7 +136,7 @@ public class MCRLDAPClient {
         if (group != null)
             defaultGroup = MCRRoleManager.getRole(group);
 
-        ldapEnv = new Hashtable<String, String>();
+        ldapEnv = new Hashtable<>();
         ldapEnv.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         ldapEnv.put("com.sun.jndi.ldap.read.timeout", readTimeout);
         ldapEnv.put(Context.PROVIDER_URL, providerURL);
@@ -150,7 +150,7 @@ public class MCRLDAPClient {
         boolean userChanged = false;
 
         if ((defaultGroup != null) && (!user.isUserInRole((defaultGroup.getName())))) {
-            LOGGER.info("User " + userName + " add to group " + defaultGroup);
+            LOGGER.info("User {} add to group {}", userName, defaultGroup);
             userChanged = true;
             user.assignRole(defaultGroup.getName());
         }
@@ -174,23 +174,23 @@ public class MCRLDAPClient {
 
                     for (NamingEnumeration<?> values = attribute.getAll(); values.hasMore();) {
                         String attributeValue = values.next().toString();
-                        LOGGER.debug(attributeID + "=" + attributeValue);
+                        LOGGER.debug("{}={}", attributeID, attributeValue);
 
                         if (attributeID.equals(mapName) && (user.getRealName() == null)) {
                             attributeValue = formatName(attributeValue);
-                            LOGGER.info("User " + userName + " name = " + attributeValue);
+                            LOGGER.info("User {} name = {}", userName, attributeValue);
                             user.setRealName(attributeValue);
                             userChanged = true;
                         }
                         if (attributeID.equals(mapEMail) && (user.getEMailAddress() == null)) {
-                            LOGGER.info("User " + userName + " e-mail = " + attributeValue);
+                            LOGGER.info("User {} e-mail = {}", userName, attributeValue);
                             user.setEMail(attributeValue);
                             userChanged = true;
                         }
                         String groupMapping = "MCR.user2.LDAP.Mapping.Group." + attributeID + "." + attributeValue;
                         String group = MCRConfiguration.instance().getString(groupMapping, null);
                         if ((group != null) && (!user.isUserInRole((group)))) {
-                            LOGGER.info("User " + userName + " add to group " + group);
+                            LOGGER.info("User {} add to group {}", userName, group);
                             user.assignRole(group);
                             userChanged = true;
                         }
@@ -236,10 +236,10 @@ public class MCRLDAPClient {
             user = new MCRUser(userName, realmID);
         }
 
-        LOGGER.info("\n"
-            + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
+        LOGGER.info("\n{}",
+            new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
         MCRLDAPClient.instance().updateUserProperties(user);
-        LOGGER.info("\n"
-            + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
+        LOGGER.info("\n{}",
+            new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
     }
 }

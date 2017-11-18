@@ -52,14 +52,9 @@ public class MCRFLURNGenerator extends MCRDNBURNGenerator {
 
         String DDDDD = String.valueOf(yyy * 366 + ddd);
 
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(DDDDD.charAt(4));
-        buffer.append(DDDDD.charAt(2));
-        buffer.append(DDDDD.charAt(1));
-        buffer.append(DDDDD.charAt(3));
-        buffer.append(DDDDD.charAt(0));
-        buffer.append(sss);
-        String niss = buffer.toString();
+        String niss = String.valueOf(DDDDD.charAt(4)) + DDDDD.charAt(2) + DDDDD.charAt(1) + DDDDD.charAt(3)
+            + DDDDD.charAt(0)
+            + sss;
 
         if (niss.equals(last)) {
             try {

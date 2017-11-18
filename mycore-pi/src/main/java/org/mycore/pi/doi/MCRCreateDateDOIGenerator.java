@@ -38,7 +38,7 @@ public class MCRCreateDateDOIGenerator extends MCRPersistentIdentifierGenerator<
             MCRPersistentIdentifier doi = parse.get();
             return (MCRDigitalObjectIdentifier) doi;
         } else {
-            throw new MCRPersistenceException("The object " + mcrID.toString() + " doesn't have a createdate!");
+            throw new MCRPersistenceException("The object " + mcrID + " doesn't have a createdate!");
         }
     }
 }

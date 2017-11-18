@@ -60,7 +60,7 @@ class MCRGenreTransformer {
 
     private static Element getHostGenre(Element mods) {
         XPathExpression<Element> expr = XPathFactory.instance().compile("mods:relatedItem[@type='host']/mods:genre",
-                Filters.element(), null, MCRConstants.getStandardNamespaces());
+            Filters.element(), null, MCRConstants.getStandardNamespaces());
         Element genre = expr.evaluateFirst(mods);
         return genre;
     }

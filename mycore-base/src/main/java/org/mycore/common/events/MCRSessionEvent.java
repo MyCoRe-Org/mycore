@@ -34,7 +34,7 @@ import org.mycore.common.MCRSession;
  */
 public class MCRSessionEvent {
 
-    public static enum Type {
+    public enum Type {
         activated, created, destroyed, passivated
     }
 
@@ -73,15 +73,8 @@ public class MCRSessionEvent {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("MCRSessionEvent['");
-        sb.append(getSession());
-        sb.append("',");
-        sb.append(getType());
-        sb.append(",");
-        sb.append(getConcurrentAccessors());
-        sb.append("]'");
-        return sb.toString();
+        String sb = "MCRSessionEvent['" + getSession() + "'," + getType() + "," + getConcurrentAccessors() + "]'";
+        return sb;
     }
 
 }

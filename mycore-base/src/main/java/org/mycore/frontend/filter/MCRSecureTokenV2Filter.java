@@ -69,7 +69,7 @@ public class MCRSecureTokenV2Filter implements Filter {
             if (pathInfo != null && MCRSecureTokenV2FilterConfig.requireHash(pathInfo)) {
                 if (!validateSecureToken(httpServletRequest)) {
                     ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
-                    LOGGER.warn("Access to " + pathInfo + " forbidden by secure token check.");
+                    LOGGER.warn("Access to {} forbidden by secure token check.", pathInfo);
                     return;
                 }
             }

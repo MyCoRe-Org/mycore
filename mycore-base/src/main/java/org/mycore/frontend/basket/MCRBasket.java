@@ -48,7 +48,7 @@ import org.jdom2.Element;
 public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
 
     /** The internal list of basket entries */
-    private List<MCRBasketEntry> list = new ArrayList<MCRBasketEntry>();
+    private List<MCRBasketEntry> list = new ArrayList<>();
 
     /** The type of basket */
     private String type;

@@ -45,6 +45,39 @@ import org.mycore.datamodel.niofs.MCRPath;
  *          2010) $
  */
 public class MCRDirectory extends MCRFilesystemNode {
+    /** Constant for choosing file nodes * */
+    public static final int FILES = 1;
+
+    /** Constant for choosing directory nodes * */
+    public static final int DIRECTORIES = 2;
+
+    /** Constant for choosing any node type * */
+    public static final int NODES = 3;
+
+    /** Constant for choosing only direct child nodes of this directory * */
+    public static final int HERE = 1;
+
+    /**
+     * Constant for choosing both direct and indirect child nodes contained in
+     * subdirectories of this directory *
+     */
+    public static final int TOTAL = 2;
+
+    /** Sorts children by filename, case insensitive * */
+    public static final Comparator<MCRFilesystemNode> SORT_BY_NAME_IGNORECASE = Comparator
+        .comparing(MCRFilesystemNode::getName, String::compareToIgnoreCase);
+
+    /** Sorts children by filename, case sensitive * */
+    public static final Comparator<MCRFilesystemNode> SORT_BY_NAME = Comparator.comparing(MCRFilesystemNode::getName);
+
+    /** Sorts children by file size or total directory size * */
+    public static final Comparator<MCRFilesystemNode> SORT_BY_SIZE = Comparator
+        .comparingLong(MCRFilesystemNode::getSize);
+
+    /** Sorts children by date of last modification * */
+    public static final Comparator<MCRFilesystemNode> SORT_BY_DATE = Comparator
+        .comparing(MCRFilesystemNode::getLastModified);
+
     /** The child nodes in this directory * */
     private ConcurrentMap<String, MCRFilesystemNode> children;
 
@@ -273,14 +306,15 @@ public class MCRDirectory extends MCRFilesystemNode {
     public MCRFilesystemNode getChild(String name) {
         ensureNotDeleted();
 
-        if (name.equals(".")) {
-            return this;
-        } else if (name.equals("..")) {
-            return hasParent() ? getParent() : null;
-        } else {
-            return Optional.ofNullable(children)
-                .map(m -> m.get(name))
-                .orElseGet(() -> manager.retrieveChild(ID, name));
+        switch (name) {
+            case ".":
+                return this;
+            case "..":
+                return hasParent() ? getParent() : null;
+            default:
+                return Optional.ofNullable(children)
+                    .map(m -> m.get(name))
+                    .orElseGet(() -> manager.retrieveChild(ID, name));
         }
     }
 
@@ -360,24 +394,6 @@ public class MCRDirectory extends MCRFilesystemNode {
         return 0;
     }
 
-    /** Constant for choosing file nodes * */
-    public final static int FILES = 1;
-
-    /** Constant for choosing directory nodes * */
-    public final static int DIRECTORIES = 2;
-
-    /** Constant for choosing any node type * */
-    public final static int NODES = 3;
-
-    /** Constant for choosing only direct child nodes of this directory * */
-    public final static int HERE = 1;
-
-    /**
-     * Constant for choosing both direct and indirect child nodes contained in
-     * subdirectories of this directory *
-     */
-    public final static int TOTAL = 2;
-
     /**
      * Returns the number of child nodes in this directory. The additional
      * parameters control what type of nodes will be counted and if only direct
@@ -450,20 +466,6 @@ public class MCRDirectory extends MCRFilesystemNode {
         numChildFilesTotal = 0;
     }
 
-    /** Sorts children by filename, case insensitive * */
-    public final static Comparator<MCRFilesystemNode> SORT_BY_NAME_IGNORECASE = (a, b) -> a.getName()
-        .compareToIgnoreCase(b.getName());
-
-    /** Sorts children by filename, case sensitive * */
-    public final static Comparator<MCRFilesystemNode> SORT_BY_NAME = (a, b) -> a.getName().compareTo(b.getName());
-
-    /** Sorts children by file size or total directory size * */
-    public final static Comparator<MCRFilesystemNode> SORT_BY_SIZE = (a, b) -> (int) (a.getSize() - b.getSize());
-
-    /** Sorts children by date of last modification * */
-    public final static Comparator<MCRFilesystemNode> SORT_BY_DATE = (a, b) -> a.getLastModified().getTime()
-        .compareTo(b.getLastModified().getTime());
-
     /**
      * Creates a list of all MD5 checksums of all files that are direct or
      * indirect children of this directory and adds them to the given list
@@ -518,13 +520,10 @@ public class MCRDirectory extends MCRFilesystemNode {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(super.toString());
-        sb.append("NumChildDirectoriesHere  = ").append(numChildDirsHere);
-        sb.append("NumChildFilesHere        = ").append(numChildFilesHere);
-        sb.append("NumChildDirectoriesTotal = ").append(numChildDirsTotal);
-        sb.append("NumChildFilesTotal       = ").append(numChildFilesTotal);
+        String sb = super.toString() + "NumChildDirectoriesHere  = " + numChildDirsHere + "NumChildFilesHere        = "
+            + numChildFilesHere + "NumChildDirectoriesTotal = " + numChildDirsTotal + "NumChildFilesTotal       = "
+            + numChildFilesTotal;
 
-        return sb.toString();
+        return sb;
     }
 }

@@ -22,7 +22,6 @@
  */
 package org.mycore.urn.events;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
@@ -114,8 +113,8 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
                         MCRURNManager.assignURN(urn, obj.getId().toString());
                     } else {
                         if (!MCRURNManager.getURNforDocument(obj.getId().toString()).equals(urn)) {
-                            LOGGER.warn("URN in metadata " + urn + "isn't equals with registered URN "
-                                + MCRURNManager.getURNforDocument(obj.getId().toString()) + ", please check!");
+                            LOGGER.warn("URN in metadata {}isn't equals with registered URN {}, please check!", urn,
+                                MCRURNManager.getURNforDocument(obj.getId().toString()));
                         }
                     }
                 } else {
@@ -125,8 +124,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("Could not store / update the urn for object with id " + obj.getId().toString()
-                + " into the database", ex);
+            LOGGER.error("Could not store / update the urn for object with id {} into the database", obj.getId(), ex);
         }
     }
 
@@ -169,12 +167,12 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         try {
             if (MCRURNManager.hasURNAssigned(obj.getId().toString())) {
-                LOGGER.info("Deleting urn from database for object belonging to " + obj.getId().toString());
+                LOGGER.info("Deleting urn from database for object belonging to {}", obj.getId());
                 MCRURNManager.removeURNByObjectID(obj.getId().toString());
             }
 
         } catch (Exception ex) {
-            LOGGER.error("Could not delete the urn from the database for object with id " + obj.getId().toString(), ex);
+            LOGGER.error("Could not delete the urn from the database for object with id {}", obj.getId(), ex);
         }
     }
 
@@ -192,10 +190,10 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         try {
             if (MCRURNManager.hasURNAssigned(der.getId().toString())) {
                 MCRURNManager.removeURNByObjectID(der.getId().toString());
-                LOGGER.info("Deleting urn from database for derivates belonging to " + der.getId().toString());
+                LOGGER.info("Deleting urn from database for derivates belonging to {}", der.getId());
             }
         } catch (Exception ex) {
-            LOGGER.error("Could not delete the urn from the database for object with id " + der.getId().toString(), ex);
+            LOGGER.error("Could not delete the urn from the database for object with id {}", der.getId(), ex);
         }
     }
 
@@ -220,8 +218,8 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         for (MCRFileMetadata metadata : fileMetadata) {
             String fileURN = metadata.getUrn();
             if (fileURN != null) {
-                LOGGER.info(MessageFormat.format("load file urn : %s, %s, %s", fileURN, derivateID, metadata.getName())
-                    .toString());
+                LOGGER
+                    .info(MessageFormat.format("load file urn : %s, %s, %s", fileURN, derivateID, metadata.getName()));
                 MCRURNManager.assignURN(fileURN, derivateID.toString(), metadata.getName());
             }
         }

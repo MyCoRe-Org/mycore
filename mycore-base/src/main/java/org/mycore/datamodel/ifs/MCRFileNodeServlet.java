@@ -79,7 +79,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         }
         String ownerID = getOwnerID(request);
         if (!MCRAccessManager.checkPermissionForReadingDerivate(ownerID)) {
-            LOGGER.info("AccessForbidden to " + request.getPathInfo());
+            LOGGER.info("AccessForbidden to {}", request.getPathInfo());
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return null;
         }
@@ -112,7 +112,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
 
     private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestPath = request.getPathInfo();
-        LOGGER.info("request path = " + requestPath);
+        LOGGER.info("request path = {}", requestPath);
 
         if (requestPath == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error: HTTP request path is null");
@@ -152,7 +152,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         if (path.length() == 0) {
             return "/";
         }
-        return path.toString();
+        return path;
     }
 
     private MCRContent sendFile(HttpServletRequest request, HttpServletResponse response, MCRPath mcrPath) {

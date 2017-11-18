@@ -38,7 +38,7 @@ import com.google.gson.JsonObject;
  * @author J. Vogler
  * @version $Revision$ $Date$
  */
-final public class MCRMetaAddress extends MCRMetaDefault {
+public final class MCRMetaAddress extends MCRMetaDefault {
     // MetaAddress data
     private String country;
 
@@ -188,12 +188,12 @@ final public class MCRMetaAddress extends MCRMetaDefault {
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Country            = " + country);
-            LOGGER.debug("State              = " + state);
-            LOGGER.debug("Zipcode            = " + zipCode);
-            LOGGER.debug("City               = " + city);
-            LOGGER.debug("Street             = " + street);
-            LOGGER.debug("Number             = " + number);
+            LOGGER.debug("Country            = {}", country);
+            LOGGER.debug("State              = {}", state);
+            LOGGER.debug("Zipcode            = {}", zipCode);
+            LOGGER.debug("City               = {}", city);
+            LOGGER.debug("Street             = {}", street);
+            LOGGER.debug("Number             = {}", number);
             LOGGER.debug(" ");
         }
     }

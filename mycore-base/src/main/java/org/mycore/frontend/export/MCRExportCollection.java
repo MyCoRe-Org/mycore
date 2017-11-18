@@ -80,7 +80,7 @@ public class MCRExportCollection {
      * Adds the given XML element, making a clone.
      */
     public void add(Element element) {
-        collection.addContent((Element) (element.clone()));
+        collection.addContent(element.clone());
     }
 
     /**

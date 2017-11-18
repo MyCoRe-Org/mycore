@@ -55,7 +55,7 @@ public class MCRJaxenXPathFactoryTest extends MCRTestCase {
         String builder = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
         Element document = new MCRNodeBuilder().buildElement(builder, null, null);
         new Document(document);
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("CurrentUser", "gast");
         evaluator = new MCRXPathEvaluator(variables, document);
     }

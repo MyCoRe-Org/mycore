@@ -70,7 +70,7 @@ public class MCRUserServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     /** The logger */
-    private final static Logger LOGGER = LogManager.getLogger(MCRUserServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUserServlet.class);
 
     /**
      * Handles requests. The parameter 'action' selects what to do, possible
@@ -190,7 +190,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("show user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
+        LOGGER.info("show user {} {} {}", user.getUserID(), user.getUserName(), user.getRealmID());
         getLayoutService().doLayout(req, res, getContent(user));
     }
 
@@ -264,7 +264,7 @@ public class MCRUserServlet extends MCRServlet {
         boolean userExists = MCRUserManager.exists(userName, realmID);
         if (!userExists) {
             user = new MCRUser(userName, realmID);
-            LOGGER.info("create new user " + userName + " " + realmID);
+            LOGGER.info("create new user {} {}", userName, realmID);
 
             // For new local users, set password
             String pwd = u.getChildText("password");
@@ -329,14 +329,14 @@ public class MCRUserServlet extends MCRServlet {
         if (gs != null) {
             user.getSystemRoleIDs().clear();
             user.getExternalRoleIDs().clear();
-            List<Element> groupList = (List<Element>) gs.getChildren("role");
+            List<Element> groupList = gs.getChildren("role");
             for (Element group : groupList) {
                 String groupName = group.getAttributeValue("name");
                 if (hasAdminPermission || currentUser.isUserInRole(groupName)) {
                     user.assignRole(groupName);
                 } else {
-                    LOGGER.warn("Current user " + currentUser.getUserID()
-                        + " has not the permission to add user to group " + groupName);
+                    LOGGER.warn("Current user {} has not the permission to add user to group {}",
+                        currentUser.getUserID(), groupName);
                 }
             }
         }
@@ -407,7 +407,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("change password of user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
+        LOGGER.info("change password of user {} {} {}", user.getUserID(), user.getUserName(), user.getRealmID());
 
         Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
         String password = doc.getRootElement().getChildText("password");
@@ -432,13 +432,13 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("delete user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
+        LOGGER.info("delete user {} {} {}", user.getUserID(), user.getUserName(), user.getRealmID());
         MCRUserManager.deleteUser(user);
         getLayoutService().doLayout(req, res, getContent(user));
     }
 
     private MCRJAXBContent<MCRUser> getContent(MCRUser user) {
-        return new MCRJAXBContent<MCRUser>(JAXB_CONTEXT, user.getSafeCopy());
+        return new MCRJAXBContent<>(JAXB_CONTEXT, user.getSafeCopy());
     }
 
     /**
@@ -477,7 +477,7 @@ public class MCRUserServlet extends MCRServlet {
                 search = "*" + search + "*";
             }
 
-            LOGGER.info("search users like " + search);
+            LOGGER.info("search users like {}", search);
 
             int max = MCRConfiguration.instance().getInt(MCRUser2Constants.CONFIG_PREFIX + "Users.MaxResults", 100);
             int num = MCRUserManager.countUsers(search, null, search);
@@ -487,7 +487,7 @@ public class MCRUserServlet extends MCRServlet {
             users.setAttribute("num", String.valueOf(num));
             users.setAttribute("max", String.valueOf(max));
         } else {
-            LOGGER.info("list owned users of " + currentUser.getUserName() + " " + currentUser.getRealmID());
+            LOGGER.info("list owned users of {} {}", currentUser.getUserName(), currentUser.getRealmID());
             results = ownUsers;
         }
 

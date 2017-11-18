@@ -49,7 +49,7 @@ public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
         } else
             response.sendRedirect(
                 response.encodeRedirectURL(buildRedirectURL(
-                    MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(),
+                    MCRFrontendUtil.getBaseURL() + "receive/" + returnID,
                     MCRPersistenceHelper.getXSLProperties(request))));
     }
 
@@ -72,7 +72,7 @@ public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
     private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException,
         MCRException, SAXParseException, MCRAccessException {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
-        LogManager.getLogger().info("ID: " + mcrObject.getId());
+        LogManager.getLogger().info("ID: {}", mcrObject.getId());
         try {
             MCRMetadataManager.update(mcrObject);
             return mcrObject.getId();

@@ -7,8 +7,8 @@ package org.mycore.datamodel.classifications2;
  */
 public interface MCRCategoryLink {
 
-    public MCRCategory getCategory();
+    MCRCategory getCategory();
 
-    public MCRCategLinkReference getObjectReference();
+    MCRCategLinkReference getObjectReference();
 
 }

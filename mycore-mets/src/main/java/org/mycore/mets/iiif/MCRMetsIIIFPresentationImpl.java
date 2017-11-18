@@ -84,7 +84,8 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
 
         MCRPathContent source = new MCRPathContent(metsPath);
         MCRContent content = transformer instanceof MCRParameterizedTransformer
-            ? ((MCRParameterizedTransformer) transformer).transform(source, parameter) : transformer.transform(source);
+            ? ((MCRParameterizedTransformer) transformer).transform(source, parameter)
+            : transformer.transform(source);
         return content.asXML();
     }
 }

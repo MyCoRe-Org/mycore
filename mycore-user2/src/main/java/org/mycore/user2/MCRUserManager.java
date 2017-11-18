@@ -117,7 +117,7 @@ public class MCRUserManager {
         return getByNaturalID(em, userName, realmId)
             .map(MCRUserManager::setRoles)
             .orElseGet(() -> {
-                LOGGER.warn("Could not find requested user: " + userName + "@" + realmId);
+                LOGGER.warn("Could not find requested user: {}@{}", userName, realmId);
                 return null;
             });
     }
@@ -446,10 +446,10 @@ public class MCRUserManager {
         }
         if (!user.loginAllowed()) {
             if (user.isDisabled()) {
-                LOGGER.warn("User " + user.getUserID() + " was disabled!");
+                LOGGER.warn("User {} was disabled!", user.getUserID());
             } else {
-                LOGGER.warn("Password expired for user " + user.getUserID() + " on "
-                    + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.COMPLETE_HH_MM_SS.toString()));
+                LOGGER.warn("Password expired for user {} on {}", user.getUserID(),
+                    MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.COMPLETE_HH_MM_SS.toString()));
             }
             return null;
         }

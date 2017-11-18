@@ -78,7 +78,7 @@ public abstract class MCRTransferPackageUtil {
     public static void importTar(Path pathToTar) throws IOException, MCRActiveLinkException, MCRAccessException,
         JDOMException, MCRException, SAXParseException, URISyntaxException {
         if (!Files.exists(pathToTar)) {
-            throw new FileNotFoundException(pathToTar.toAbsolutePath().toString() + " does not exist.");
+            throw new FileNotFoundException(pathToTar.toAbsolutePath() + " does not exist.");
         }
         Path targetDirectory = getTargetDirectory(pathToTar);
         MCRUtils.untar(pathToTar, targetDirectory);
@@ -87,7 +87,7 @@ public abstract class MCRTransferPackageUtil {
         MCRTransferPackageUtil.importFromDirectory(targetDirectory);
 
         // delete the extracted files, but keep the tar
-        LOGGER.info("Deleting expanded tar in " + targetDirectory);
+        LOGGER.info("Deleting expanded tar in {}", targetDirectory);
         Files.walkFileTree(targetDirectory, MCRRecursiveDeleter.instance());
     }
 
@@ -207,7 +207,7 @@ public abstract class MCRTransferPackageUtil {
         MCRObject mcr = new MCRObject(objXML);
         mcr.setImportMode(true);
 
-        List<String> derivates = new LinkedList<String>();
+        List<String> derivates = new LinkedList<>();
         // one must copy the ids before updating the mcr objects
         for (MCRMetaLinkID id : mcr.getStructure().getDerivates()) {
             derivates.add(id.getXLinkHref());
@@ -243,7 +243,7 @@ public abstract class MCRTransferPackageUtil {
 
         MCRDirectory dir = MCRDirectory.getRootDirectory(der.getId().toString());
         if (dir == null) {
-            LOGGER.info("Creating missing " + MCRFilesystemNode.class.getSimpleName() + " " + der.getId().toString());
+            LOGGER.info("Creating missing {} {}", MCRFilesystemNode.class.getSimpleName(), der.getId());
             final MCRDirectory difs = new MCRDirectory(der.getId().toString());
             der.getDerivate().getInternals().setIFSID(difs.getID());
             MCRMetadataManager.update(der);
@@ -256,7 +256,7 @@ public abstract class MCRTransferPackageUtil {
                     Files.copy(in, MCRPath.getPath(derivateId, targetPath), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ioExc) {
                     throw new MCRException(
-                        "Unable to add file " + path.toAbsolutePath().toString() + " to derivate " + derivateId, ioExc);
+                        "Unable to add file " + path.toAbsolutePath() + " to derivate " + derivateId, ioExc);
                 }
             });
         }
@@ -268,10 +268,7 @@ public abstract class MCRTransferPackageUtil {
             if (Files.isDirectory(path)) {
                 return false;
             }
-            if (path.toString().endsWith(".md5")) {
-                return false;
-            }
-            return true;
+            return !path.toString().endsWith(".md5");
         };
     }
 

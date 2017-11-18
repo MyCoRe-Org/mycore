@@ -40,7 +40,7 @@ public class MCRUserInformationLookupTest extends MCRTestCase {
                 return null;
             }
         });
-        String[] testRoles = new String[] { "admin", "editor", "submitter" };
+        String[] testRoles = { "admin", "editor", "submitter" };
         String expRole = testRoles[1];
         assertTrue("Current user should be in role " + expRole, mcrSession.getUserInformation().isUserInRole(expRole));
         assertEquals(expRole,

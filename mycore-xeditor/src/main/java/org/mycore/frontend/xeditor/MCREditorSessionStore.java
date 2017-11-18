@@ -33,13 +33,15 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCREditorSessionStore {
 
+    public static final String XEDITOR_SESSION_PARAM = "_xed_session";
+
     private MCRCache<String, MCREditorSession> cachedSessions;
 
     private AtomicInteger idGenerator = new AtomicInteger(0);
 
     MCREditorSessionStore() {
         int maxEditorsInSession = MCRConfiguration.instance().getInt("MCR.XEditor.MaxEditorsInSession", 50);
-        cachedSessions = new MCRCache<String, MCREditorSession>(maxEditorsInSession, "Stored XEditor Sessions");
+        cachedSessions = new MCRCache<>(maxEditorsInSession, "Stored XEditor Sessions");
     }
 
     public void storeSession(MCREditorSession session) {
@@ -51,6 +53,4 @@ public class MCREditorSessionStore {
     public MCREditorSession getSession(String id) {
         return cachedSessions.get(id);
     }
-
-    public final static String XEDITOR_SESSION_PARAM = "_xed_session";
 }

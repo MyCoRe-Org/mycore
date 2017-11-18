@@ -169,7 +169,7 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
         getMetaDataStore().create(new MCRJDOMContent(xml1));
         getMetaDataStore().create(new MCRJDOMContent(xml1));
         getMetaDataStore().create(new MCRJDOMContent(xml1));
-        ArrayList<Integer> l1 = new ArrayList<Integer>();
+        ArrayList<Integer> l1 = new ArrayList<>();
         IDs = getMetaDataStore().listIDs(true);
         while (IDs.hasNext()) {
             int id = IDs.next();
@@ -179,7 +179,7 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
             l1.add(id);
         }
         assertTrue(l1.size() == 3);
-        ArrayList<Integer> l2 = new ArrayList<Integer>();
+        ArrayList<Integer> l2 = new ArrayList<>();
         IDs = getMetaDataStore().listIDs(false);
         while (IDs.hasNext()) {
             int id = IDs.next();

@@ -49,7 +49,9 @@ public class MCRFileCollection extends MCRDirectory {
     /**
      * The logger
      */
-    private final static Logger LOGGER = LogManager.getLogger(MCRFileCollection.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFileCollection.class);
+
+    private static final String dataFile = "mcrdata.xml";
 
     /**
      * The store this file collection is stored in.
@@ -84,8 +86,6 @@ public class MCRFileCollection extends MCRDirectory {
             saveAdditionalData();
         }
     }
-
-    private final static String dataFile = "mcrdata.xml";
 
     private void readAdditionalData() throws IOException {
         FileObject src = VFS.getManager().resolveFile(fo, dataFile);

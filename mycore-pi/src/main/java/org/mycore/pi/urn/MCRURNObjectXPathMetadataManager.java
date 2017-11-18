@@ -37,7 +37,7 @@ public class MCRURNObjectXPathMetadataManager extends MCRPersistentIdentifierMet
             MCRBase object = new MCRObject(xml);
             MCRMetadataManager.update(object);
         } catch (Exception e) {
-            throw new MCRException("Error while inscribing URN to " + obj.getId().toString(), e);
+            throw new MCRException("Error while inscribing URN to " + obj.getId(), e);
 
         }
     }

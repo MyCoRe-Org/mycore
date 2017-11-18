@@ -70,7 +70,7 @@ public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
 
     @Override
     protected TarArchiveOutputStream createContainer(ServletOutputStream sout, String comment) {
-        LOGGER.info("Constructing tar archive: " + comment);
+        LOGGER.info("Constructing tar archive: {}", comment);
         TarArchiveOutputStream tout = new TarArchiveOutputStream(sout, "UTF8");
         tout.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_POSIX);
         tout.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);

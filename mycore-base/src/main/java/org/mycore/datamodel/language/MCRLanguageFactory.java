@@ -45,27 +45,24 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * are provided as constants. Other languages are read from a classification thats ID can be
  * configured using the property "MCR.LanguageClassification". That classification should use
  * ISO 639-1 code as category ID, where ISO 639-2 codes can be added by extra labels x-term and x-bibl
- * for the category. Unknown languages are created by code as required, but a warning is logged. 
- * 
+ * for the category. Unknown languages are created by code as required, but a warning is logged.
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRLanguageFactory {
 
+    private static final MCRLanguageFactory singleton = new MCRLanguageFactory();
+
+    public static final MCRLanguage GERMAN = MCRLanguageFactory.instance().getLanguage("de");
+
+    public static final MCRLanguage ENGLISH = MCRLanguageFactory.instance().getLanguage("en");
+
     private static Logger LOGGER = LogManager.getLogger();
-
-    private static MCRLanguageFactory singleton = new MCRLanguageFactory();
-
-    /**
-     * Returns the MCRLanguageFactory singleton
-     */
-    public static MCRLanguageFactory instance() {
-        return singleton;
-    }
 
     /**
      * Map of languages by ISO 639-1 or -2 code
      */
-    private Map<String, MCRLanguage> languageByCode = new HashMap<String, MCRLanguage>();
+    private Map<String, MCRLanguage> languageByCode = new HashMap<>();
 
     /**
      * The ID of the classification containing the language codes and labels
@@ -90,8 +87,16 @@ public class MCRLanguageFactory {
         initDefaultLanguages();
 
         String classificationID = config.getString("MCR.LanguageClassification", null);
-        if (classificationID != null)
+        if (classificationID != null) {
             classification = new MCRCategoryID(classificationID, null);
+        }
+    }
+
+    /**
+     * Returns the MCRLanguageFactory singleton
+     */
+    public static MCRLanguageFactory instance() {
+        return singleton;
     }
 
     /**
@@ -101,29 +106,27 @@ public class MCRLanguageFactory {
         return getLanguage(codeOfDefaultLanguage);
     }
 
-    public final static MCRLanguage GERMAN = MCRLanguageFactory.instance().getLanguage("de");
-
-    public final static MCRLanguage ENGLISH = MCRLanguageFactory.instance().getLanguage("en");
-
     /**
      * Returns the language with the given ISO 639-1 or -2 code. When the given code contains a
      * subcode like "en-us", and the main language is configured, that main language is returned.
      * When the given code does not match any language configured, a language is created on-the-fly,
-     * but a warning is logged. 
+     * but a warning is logged.
      */
     public MCRLanguage getLanguage(String code) {
-        if (classificationHasChanged())
+        if (classificationHasChanged()) {
             initLanguages();
+        }
 
         return lookupLanguage(code);
     }
 
     private MCRLanguage lookupLanguage(String code) {
-        if ((!languageByCode.containsKey(code)) && code.contains("-") && !code.startsWith("x-"))
+        if ((!languageByCode.containsKey(code)) && code.contains("-") && !code.startsWith("x-")) {
             code = code.split("-")[0];
+        }
 
         if (!languageByCode.containsKey(code)) {
-            LOGGER.warn("Unknown language: " + code);
+            LOGGER.warn("Unknown language: {}", code);
             buildLanguage(code, code.length() > 2 ? code : null, null);
         }
 
@@ -132,9 +135,9 @@ public class MCRLanguageFactory {
 
     /**
      * This method check the language string base on RFC 1766 to the supported
-     * languages in MyCoRe in a current application environment. Without appending 
-     * this MCRLanguageFactory only ENGLISH and GERMAN are supported. 
-     * 
+     * languages in MyCoRe in a current application environment. Without appending
+     * this MCRLanguageFactory only ENGLISH and GERMAN are supported.
+     *
      * @param code
      *            the language string in RFC 1766 syntax
      * @return true if the language code is supported. It return true too if the code starts
@@ -169,7 +172,7 @@ public class MCRLanguageFactory {
     }
 
     /**
-     * Builds the default languages 
+     * Builds the default languages
      */
     private void initDefaultLanguages() {
         MCRLanguage de = buildLanguage("de", "deu", "ger");
@@ -182,9 +185,9 @@ public class MCRLanguageFactory {
 
     /**
      * Builds a new language object with the given ISO codes.
-     * 
+     *
      * @param xmlCode ISO 639-1 code as used for xml:lang
-     * @param termCode ISO 639-2 terminologic code, may be null 
+     * @param termCode ISO 639-2 terminologic code, may be null
      * @param biblCode ISO 639-2 bibliographical code, may be null
      */
     private MCRLanguage buildLanguage(String xmlCode, String termCode, String biblCode) {
@@ -230,8 +233,9 @@ public class MCRLanguageFactory {
             session.beginTransaction();
             buildLanguagesFromClassification();
             session.commitTransaction();
-        } else
+        } else {
             buildLanguagesFromClassification();
+        }
     }
 
     /**
@@ -242,7 +246,7 @@ public class MCRLanguageFactory {
 
         MCRCategory root = DAO.getCategory(classification, -1);
         if (root == null) {
-            LOGGER.warn("Language classification " + classification.getRootID() + " not found");
+            LOGGER.warn("Language classification {} not found", classification.getRootID());
             return;
         }
 

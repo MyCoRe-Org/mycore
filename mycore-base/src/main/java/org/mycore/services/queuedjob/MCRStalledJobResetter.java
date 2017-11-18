@@ -44,7 +44,7 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRStalledJobResetter implements Runnable {
 
-    private static HashMap<String, MCRStalledJobResetter> INSTANCES = new HashMap<String, MCRStalledJobResetter>();
+    private static HashMap<String, MCRStalledJobResetter> INSTANCES = new HashMap<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRStalledJobResetter.class);
 
@@ -63,11 +63,8 @@ public class MCRStalledJobResetter implements Runnable {
     public static MCRStalledJobResetter getInstance(Class<? extends MCRJobAction> action) {
         String key = action != null && !MCRJobQueue.singleQueue ? action.getName() : "single";
 
-        MCRStalledJobResetter resetter = INSTANCES.get(key);
-        if (resetter == null) {
-            resetter = new MCRStalledJobResetter(MCRJobQueue.singleQueue ? null : action);
-            INSTANCES.put(key, resetter);
-        }
+        MCRStalledJobResetter resetter = INSTANCES.computeIfAbsent(key,
+            k -> new MCRStalledJobResetter(MCRJobQueue.singleQueue ? null : action));
 
         return resetter;
     }
@@ -84,7 +81,7 @@ public class MCRStalledJobResetter implements Runnable {
 
         StringBuilder sb = new StringBuilder("FROM MCRJob WHERE ");
         if (action != null)
-            sb.append("action='" + action.getName() + "' AND ");
+            sb.append("action='").append(action.getName()).append("' AND ");
         sb.append(" status='" + MCRJobStatus.PROCESSING + "' ORDER BY id ASC");
 
         TypedQuery<MCRJob> query = em.createQuery(sb.toString(), MCRJob.class);

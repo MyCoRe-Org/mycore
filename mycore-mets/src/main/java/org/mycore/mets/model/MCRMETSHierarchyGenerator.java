@@ -94,8 +94,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         setup(derivateId);
         try {
             Mets mets = createMets();
-            LOGGER.info("mets creation for derivate " + derivateId + " took " + (System.currentTimeMillis() - startTime)
-                    + "ms!");
+            LOGGER.info("mets creation for derivate {} took {}ms!", derivateId, System.currentTimeMillis() - startTime);
             return mets;
         } catch (Exception exc) {
             throw new MCRException("Unable to create mets.xml of " + derivateId, exc);
@@ -123,7 +122,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
      * @throws IOException files of the path couldn't be read
      */
     protected Mets createMets() throws IOException {
-        LOGGER.info("create mets for derivate " + this.mcrDer.getId().toString() + "...");
+        LOGGER.info("create mets for derivate {}...", this.mcrDer.getId());
 
         this.structLinkMap = new HashMap<>();
 
@@ -167,7 +166,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
      * @return generated amd section.
      */
     protected AmdSec createAmdSection() {
-        String amdId = "amd_" + this.mcrDer.getId().toString();
+        String amdId = "amd_" + this.mcrDer.getId();
         return new AmdSec(amdId);
     }
 
@@ -177,7 +176,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
      * @return generated dmd section.
      */
     protected DmdSec createDmdSection() {
-        String dmdSec = "dmd_" + this.mcrDer.getId().toString();
+        String dmdSec = "dmd_" + this.mcrDer.getId();
         return new DmdSec(dmdSec);
     }
 
@@ -221,11 +220,11 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
             // set fLocat
             String path = file.getKey().getOwnerRelativePath().substring(1);
             try {
-                final String href = MCRXMLFunctions.encodeURIPath(path,true);
+                final String href = MCRXMLFunctions.encodeURIPath(path, true);
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
                 metsFile.setFLocat(fLocat);
             } catch (URISyntaxException uriSyntaxException) {
-                LOGGER.error("invalid href " + path, uriSyntaxException);
+                LOGGER.error("invalid href {}", path, uriSyntaxException);
             }
             fgroup.addFile(metsFile);
         }
@@ -242,7 +241,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
     protected PhysicalStructMap createPhysicalStruct() {
         PhysicalStructMap pstr = new PhysicalStructMap();
         // set main div
-        PhysicalDiv physicalDiv = new PhysicalDiv("phys_" + this.mcrDer.getId().toString(), PhysicalDiv.TYPE_PHYS_SEQ);
+        PhysicalDiv physicalDiv = new PhysicalDiv("phys_" + this.mcrDer.getId(), PhysicalDiv.TYPE_PHYS_SEQ);
         pstr.setDivContainer(physicalDiv);
         // run through files
         FileGrp masterGroup = this.fileSection.getFileGroup(FileGrp.USE_MASTER);
@@ -269,8 +268,8 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
     protected Optional<String> getOrderLabel(String fileId) {
         return getOldMets().map(oldMets -> {
             PhysicalSubDiv subDiv = oldMets.getPhysicalStructMap().getDivContainer().byFileId(fileId);
-            if(subDiv == null) {
-                LOGGER.error("Unable to get @ORDERLABEL of physical div '" + fileId + "'.");
+            if (subDiv == null) {
+                LOGGER.error("Unable to get @ORDERLABEL of physical div '{}'.", fileId);
                 return null;
             }
             return subDiv.getOrderLabel();

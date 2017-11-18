@@ -70,12 +70,12 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      */
     private static boolean checkFilename(String filename) {
         if (!filename.endsWith(".xml")) {
-            LOGGER.warn(filename + " ignored, does not end with *.xml");
+            LOGGER.warn("{} ignored, does not end with *.xml", filename);
             return false;
         }
 
         if (!new File(filename).isFile()) {
-            LOGGER.warn(filename + " ignored, is not a file.");
+            LOGGER.warn("{} ignored, is not a file.", filename);
             return false;
         }
         return true;
@@ -93,7 +93,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         if (!checkFilename(filename)) {
             return;
         }
-        LOGGER.info("Reading file " + filename + " ...");
+        LOGGER.info("Reading file {} ...", filename);
 
         org.jdom2.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(filename));
         org.jdom2.Element rootelm = doc.getRootElement();
@@ -110,7 +110,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             if (ruleDescription == null) {
                 ruleDescription = "";
             }
-            Element rule = (Element) mcrpermission.getChild("condition").clone();
+            Element rule = mcrpermission.getChild("condition").clone();
             String objectid = mcrpermission.getAttributeValue("objectid");
             if (objectid == null) {
                 AI.addRule(permissionName, rule, ruleDescription);
@@ -143,7 +143,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         order = 40)
     public static void deleteAllPermissions() throws Exception {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        for (String permission : (List<String>) AI.getPermissions()) {
+        for (String permission : AI.getPermissions()) {
             AI.removeRule(permission);
         }
     }
@@ -178,11 +178,11 @@ public class MCRAccessCommands extends MCRAbstractCommands {
                 description = "No description";
             }
             org.jdom2.Element rule = AI.getRule(permission);
-            LOGGER.info("       " + permission);
-            LOGGER.info("           " + description);
+            LOGGER.info("       {}", permission);
+            LOGGER.info("           {}", description);
             if (rule != null) {
                 org.jdom2.output.XMLOutputter o = new org.jdom2.output.XMLOutputter();
-                LOGGER.info("           " + o.outputString(rule));
+                LOGGER.info("           {}", o.outputString(rule));
             }
         }
         if (noPermissionsDefined) {
@@ -222,10 +222,10 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         }
         File file = new File(filename);
         if (file.exists()) {
-            LOGGER.warn("File " + filename + " yet exists, overwrite.");
+            LOGGER.warn("File {} yet exists, overwrite.", filename);
         }
         FileOutputStream fos = new FileOutputStream(file);
-        LOGGER.info("Writing to file " + filename + " ...");
+        LOGGER.info("Writing to file {} ...", filename);
         String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));
         out.output(doc, fos);

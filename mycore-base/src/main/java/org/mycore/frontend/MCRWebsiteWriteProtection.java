@@ -23,8 +23,7 @@ public final class MCRWebsiteWriteProtection {
     private static final String CONFIG_FOLDER_PATH = MCRConfiguration.instance().getString("MCR.datadir") + FS
         + "config";
 
-    private static final String CONFIG_FILE_PATH = new String(CONFIG_FOLDER_PATH + FS
-        + "config-writeProtectionWebsite.xml");
+    private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH + FS + "config-writeProtectionWebsite.xml";
 
     private static final File CONFIG_FILE = new File(CONFIG_FILE_PATH);
 
@@ -64,7 +63,7 @@ public final class MCRWebsiteWriteProtection {
             return new DOMOutputter().output(new Document());
         } else {
             Element messageElem = config.getChild("message");
-            Document message = new Document((Element) messageElem.clone());
+            Document message = new Document(messageElem.clone());
             return new DOMOutputter().output(message);
         }
     }
@@ -87,10 +86,7 @@ public final class MCRWebsiteWriteProtection {
                     config = builder.build(CONFIG_FILE).getRootElement();
                     // update cache
                     updateCache(config);
-                } catch (JDOMException e) {
-                    e.printStackTrace();
-                    return null;
-                } catch (IOException e) {
+                } catch (JDOMException | IOException e) {
                     e.printStackTrace();
                     return null;
                 }

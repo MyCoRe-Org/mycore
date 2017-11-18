@@ -84,9 +84,7 @@ public class MCREchoResource {
         List<String> attributes = Collections.list(session.getAttributeNames());
         JsonObject sessionJSON = new JsonObject();
         JsonObject attributesJSON = new JsonObject();
-        attributes.forEach(attr -> {
-            attributesJSON.addProperty(attr, session.getAttribute(attr).toString());
-        });
+        attributes.forEach(attr -> attributesJSON.addProperty(attr, session.getAttribute(attr).toString()));
         sessionJSON.add("attributes", attributesJSON);
         sessionJSON.addProperty("id", session.getId());
         sessionJSON.addProperty("creationTime", session.getCreationTime());

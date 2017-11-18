@@ -48,8 +48,9 @@ public class MCRJDOMContent extends MCRXMLContent {
     public MCRJDOMContent(Document jdom) {
         super();
         this.jdom = jdom;
-        super.docType = jdom.getDocType() == null ? jdom.getRootElement().getName() : jdom.getDocType()
-            .getElementName();
+        super.docType = jdom.getDocType() == null ? jdom.getRootElement().getName()
+            : jdom.getDocType()
+                .getElementName();
     }
 
     /**

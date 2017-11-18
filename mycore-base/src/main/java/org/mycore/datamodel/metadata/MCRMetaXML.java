@@ -79,7 +79,7 @@ public class MCRMetaXML extends MCRMetaDefault {
 
     public void addContent(Content content) {
         if (this.content == null) {
-            this.content = new ArrayList<Content>();
+            this.content = new ArrayList<>();
         }
 
         this.content.add(content);
@@ -100,7 +100,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     @Override
     public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
-        List<Content> addedContent = new ArrayList<Content>(content.size());
+        List<Content> addedContent = new ArrayList<>(content.size());
         cloneListContent(addedContent, content);
         elm.addContent(addedContent);
 
@@ -128,7 +128,7 @@ public class MCRMetaXML extends MCRMetaDefault {
         getContent().forEach(content -> {
             JsonElement jsonContent = MCRXMLHelper.jsonSerialize(content);
             if (jsonContent == null) {
-                LOGGER.warn("Unable to serialize xml content '" + content + "' to json.");
+                LOGGER.warn("Unable to serialize xml content '{}' to json.", content);
                 return;
             }
             jsonContentArray.add(jsonContent);
@@ -140,7 +140,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     private static void cloneListContent(List<Content> dest, List<Content> source) {
         dest.clear();
         for (Content c : source) {
-            dest.add((Content) c.clone());
+            dest.add(c.clone());
         }
     }
 
@@ -179,7 +179,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     public void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Number of contents  = \n" + content.size());
+            LOGGER.debug("Number of contents  = \n{}", content.size());
         }
     }
 

@@ -96,7 +96,8 @@ public class MCRConfigurationInputStream extends InputStream {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         InputStream initStream = null;
         if (configurationDirectory != null) {
-            LogManager.getLogger().info("Current configuration directory: " + configurationDirectory.getAbsolutePath());
+            LogManager.getLogger()
+                .info("Current configuration directory: {}", configurationDirectory.getAbsolutePath());
             //set MCR.basedir, is normally overwritten later
             if (configurationDirectory.isDirectory()) {
                 initStream = getBaseDirInputStream(configurationDirectory);
@@ -139,7 +140,7 @@ public class MCRConfigurationInputStream extends InputStream {
         File localProperties = MCRConfigurationDir.getConfigFile(filename);
         if (localProperties != null && localProperties.canRead()) {
             empty = false;
-            LogManager.getLogger().info("Loading additional properties from " + localProperties.getAbsolutePath());
+            LogManager.getLogger().info("Loading additional properties from {}", localProperties.getAbsolutePath());
             cList.add(new FileInputStream(localProperties));
             cList.add(new ByteArrayInputStream(lbr));
         }

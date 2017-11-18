@@ -31,7 +31,6 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -48,7 +47,7 @@ import com.google.gson.JsonObject;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-final public class MCRObject extends MCRBase {
+public final class MCRObject extends MCRBase {
     // the object content
     private final MCRObjectStructure mcr_struct;
 
@@ -66,10 +65,8 @@ final public class MCRObject extends MCRBase {
      * 
      * @exception MCRException
      *                general Exception of MyCoRe
-     * @exception MCRConfigurationException
-     *                a special exception for configuartion data
      */
-    public MCRObject() throws MCRException, MCRConfigurationException {
+    public MCRObject() throws MCRException {
         super();
         mcr_struct = new MCRObjectStructure();
         mcr_metadata = new MCRObjectMetadata();
@@ -118,6 +115,7 @@ final public class MCRObject extends MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
+    @Override
     protected final void setUp() throws MCRException {
         super.setUp();
 
@@ -170,6 +168,7 @@ final public class MCRObject extends MCRBase {
      * 
      * @return a json gson representation of this object
      */
+    @Override
     public JsonObject createJSON() {
         JsonObject object = super.createJSON();
         object.add("structure", mcr_struct.createJSON());
@@ -191,10 +190,10 @@ final public class MCRObject extends MCRBase {
             if (mcr_id == null) {
                 LOGGER.debug("MCRObject ID : missing");
             } else {
-                LOGGER.debug("MCRObject ID : " + mcr_id.toString());
+                LOGGER.debug("MCRObject ID : {}", mcr_id);
             }
-            LOGGER.debug("MCRObject Label : " + mcr_label);
-            LOGGER.debug("MCRObject Schema : " + mcr_schema);
+            LOGGER.debug("MCRObject Label : {}", mcr_label);
+            LOGGER.debug("MCRObject Schema : {}", mcr_schema);
             LOGGER.debug("");
         }
         mcr_struct.debug();
@@ -213,6 +212,7 @@ final public class MCRObject extends MCRBase {
      * 
      * @throws MCRException the MCRObject is invalid
      */
+    @Override
     public void validate() {
         super.validate();
         MCRObjectStructure structure = getStructure();

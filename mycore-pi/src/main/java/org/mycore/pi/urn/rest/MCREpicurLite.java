@@ -122,6 +122,6 @@ public final class MCREpicurLite {
 
     @Override
     public String toString() {
-        return urn.getIdentifier() + "|" + url.toString();
+        return urn.getIdentifier() + "|" + url;
     }
 }

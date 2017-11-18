@@ -38,7 +38,7 @@ import com.google.gson.JsonObject;
  * @author J. Kupferschmidt
  * @version $Revision$ $Date$
  */
-final public class MCRMetaInstitutionName extends MCRMetaDefault {
+public final class MCRMetaInstitutionName extends MCRMetaDefault {
     // data
     private String fullname;
 

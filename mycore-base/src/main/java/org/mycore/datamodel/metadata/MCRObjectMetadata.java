@@ -302,14 +302,12 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     public final <T extends MCRMetaInterface> Stream<T> stream(String tag) {
         Optional<MCRMetaElement> metadata = Optional.ofNullable(getMetadataElement(tag));
         // waiting for https://bugs.openjdk.java.net/browse/JDK-8050820
-        if (!metadata.isPresent()) {
-            return Stream.empty();
-        }
-        return StreamSupport.stream(metadata.get().spliterator(), false).map(metaInterface -> {
-            @SuppressWarnings("unchecked")
-            T t = (T) metaInterface;
-            return t;
-        });
+        return metadata.map(
+            mcrMetaInterfaces -> StreamSupport.stream(mcrMetaInterfaces.spliterator(), false).map(metaInterface -> {
+                @SuppressWarnings("unchecked")
+                T t = (T) metaInterface;
+                return t;
+            })).orElseGet(Stream::empty);
     }
 
     /**

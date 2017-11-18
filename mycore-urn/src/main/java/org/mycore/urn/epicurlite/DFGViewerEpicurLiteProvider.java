@@ -43,7 +43,7 @@ public class DFGViewerEpicurLiteProvider extends BaseEpicurLiteProvider {
                     + URLEncoder.encode(derivateId.toString(), "UTF-8");
             }
 
-            LOGGER.debug("Generated URL for urn " + urn.getURN() + " is " + spec);
+            LOGGER.debug("Generated URL for urn {} is {}", urn.getURN(), spec);
             url = new URL(spec);
         } catch (UnsupportedEncodingException | MalformedURLException e) {
             LOGGER.error("Could not create dfg viewer url", e);

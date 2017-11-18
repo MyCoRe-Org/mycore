@@ -73,23 +73,21 @@ public class MCRXMLSimpleModelConverter {
         metsSection.setType(current.getType());
         metsSection.setParent(parent);
 
-        current.getFptrList().forEach(fptr -> {
-            fptr.getSeqList().forEach(seq -> {
-                seq.getAreaList().forEach(area -> {
-                    String fileId = area.getFileId();
-                    String begin = area.getBegin();
-                    String end = area.getEnd();
+        current.getFptrList().forEach(fptr -> fptr.getSeqList().forEach(seq -> {
+            seq.getAreaList().forEach(area -> {
+                String fileId = area.getFileId();
+                String begin = area.getBegin();
+                String end = area.getEnd();
 
-                    if (!idFileMap.containsKey(fileId)) {
-                        throw new MCRException("No file with id " + fileId + " found!");
-                    }
+                if (!idFileMap.containsKey(fileId)) {
+                    throw new MCRException("No file with id " + fileId + " found!");
+                }
 
-                    MCRMetsFile file = idFileMap.get(fileId);
-                    MCRMetsAltoLink e = new MCRMetsAltoLink(file, begin, end);
-                    metsSection.addAltoLink(e);
-                });
+                MCRMetsFile file = idFileMap.get(fileId);
+                MCRMetsAltoLink e = new MCRMetsAltoLink(file, begin, end);
+                metsSection.addAltoLink(e);
             });
-        });
+        }));
 
         if (idSectionMap != null) {
             idSectionMap.put(current.getId(), metsSection);
@@ -126,7 +124,7 @@ public class MCRXMLSimpleModelConverter {
                     .forEachOrdered(fileList::add);
 
                 // return a entry of physicalSubDiv.id and MetsPage
-                return new AbstractMap.SimpleEntry<String, MCRMetsPage>(physicalSubDiv.getId(), metsPage);
+                return new AbstractMap.SimpleEntry<>(physicalSubDiv.getId(), metsPage);
             })
             .forEachOrdered((entry) -> {
                 // Put page to list
@@ -151,9 +149,7 @@ public class MCRXMLSimpleModelConverter {
 
     private static Map<String, MCRMetsFile> buildidFileMap(Mets mets) {
         Map<String, MCRMetsFile> idMetsFileMap = new Hashtable<>();
-        mets.getFileSec().getFileGroups().forEach((fileGroup) -> {
-            addFilesFromGroup(idMetsFileMap, fileGroup);
-        });
+        mets.getFileSec().getFileGroups().forEach((fileGroup) -> addFilesFromGroup(idMetsFileMap, fileGroup));
         return idMetsFileMap;
     }
 
@@ -162,7 +158,7 @@ public class MCRXMLSimpleModelConverter {
         fileGroup.getFileList().forEach(file -> {
             MCRMetsFileUse use = Enum.valueOf(MCRMetsFileUse.class, fileGroupUse);
             idPageMap.put(file.getId(), new MCRMetsFile(file.getId(),
-                    file.getFLocat().getHref(), file.getMimeType(), use));
+                file.getFLocat().getHref(), file.getMimeType(), use));
         });
     }
 

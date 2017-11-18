@@ -47,7 +47,7 @@ public interface MCRCategoryDAO {
      *            Category (with children) to be added
      * @return the parent category
      */
-    public abstract MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category);
+    MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category);
 
     /**
      * Adds a category as child of another category.
@@ -61,7 +61,7 @@ public interface MCRCategoryDAO {
      *            insert position
      * @return the parent category
      */
-    public abstract MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category, int position);
+    MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category, int position);
 
     /**
      * Deletes a category with all child categories.
@@ -69,7 +69,7 @@ public interface MCRCategoryDAO {
      * @param id
      *            ID of Category to be removed
      */
-    public abstract void deleteCategory(MCRCategoryID id);
+    void deleteCategory(MCRCategoryID id);
 
     /**
      * Tells if a given category exists.
@@ -78,7 +78,7 @@ public interface MCRCategoryDAO {
      *            ID of Category
      * @return true if category is present
      */
-    public abstract boolean exist(MCRCategoryID id);
+    boolean exist(MCRCategoryID id);
 
     /**
      * Retrieve all Categories tagged by a specific label in a specific lang.
@@ -91,7 +91,7 @@ public interface MCRCategoryDAO {
      *            text of the label
      * @return a collection of MCRCategories with matching labels
      */
-    public abstract List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text);
+    List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text);
 
     /**
      * Retrieve all Categories tagged by a specific label in a specific lang.
@@ -102,7 +102,7 @@ public interface MCRCategoryDAO {
      *            text of the label
      * @return a collection of MCRCategories with matching labels
      */
-    public abstract List<MCRCategory> getCategoriesByLabel(String lang, String text);
+    List<MCRCategory> getCategoriesByLabel(String lang, String text);
 
     /**
      * Returns MCRCategory with this id and childLevel levels of subcategories.
@@ -114,7 +114,7 @@ public interface MCRCategoryDAO {
      *            infinitive)
      * @return MCRCategory with <code>id</code> or null if the category cannot be found
      */
-    public abstract MCRCategory getCategory(MCRCategoryID id, int childLevel);
+    MCRCategory getCategory(MCRCategoryID id, int childLevel);
 
     /**
      * Returns the list of child categories for the specified category.
@@ -123,7 +123,7 @@ public interface MCRCategoryDAO {
      *            ID of category
      * @return list of child category
      */
-    public abstract List<MCRCategory> getChildren(MCRCategoryID id);
+    List<MCRCategory> getChildren(MCRCategoryID id);
 
     /**
      * Returns the parent of the given category and its parent and so on. The
@@ -133,21 +133,21 @@ public interface MCRCategoryDAO {
      *            ID of Category
      * @return list of parents
      */
-    public abstract List<MCRCategory> getParents(MCRCategoryID id);
+    List<MCRCategory> getParents(MCRCategoryID id);
 
     /**
      * Returns all category IDs that do not have a parent category.
      * 
      * @return list of category IDs
      */
-    public abstract List<MCRCategoryID> getRootCategoryIDs();
+    List<MCRCategoryID> getRootCategoryIDs();
 
     /**
      * Returns all categories that do not have a parent category.
      * 
      * @return list of category IDs
      */
-    public abstract List<MCRCategory> getRootCategories();
+    List<MCRCategory> getRootCategories();
 
     /**
      * Returns the root Category with ancestor axis of the specified category
@@ -164,7 +164,7 @@ public interface MCRCategoryDAO {
      * @see #getParents(MCRCategoryID)
      * @see #getCategory(MCRCategoryID, int)
      */
-    public abstract MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel);
+    MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel);
 
     /**
      * Tells if a given category contains subcategories.
@@ -173,7 +173,7 @@ public interface MCRCategoryDAO {
      *            ID of Category
      * @return true if subcategories are present
      */
-    public abstract boolean hasChildren(MCRCategoryID id);
+    boolean hasChildren(MCRCategoryID id);
 
     /**
      * Moves a Category from one subtree in a classification to a new parent.
@@ -185,7 +185,7 @@ public interface MCRCategoryDAO {
      * @param newParentID
      *            ID of the new parent
      */
-    public abstract void moveCategory(MCRCategoryID id, MCRCategoryID newParentID);
+    void moveCategory(MCRCategoryID id, MCRCategoryID newParentID);
 
     /**
      * Moves a Category from one subtree in a classification to a new parent as
@@ -198,7 +198,7 @@ public interface MCRCategoryDAO {
      * @param index
      *            insert category at index in the list of children
      */
-    public abstract void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index);
+    void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index);
 
     /**
      * Removes a label from a Category.
@@ -209,7 +209,7 @@ public interface MCRCategoryDAO {
      *            which language should be removed?
      * @return category where the label was removed
      */
-    public MCRCategory removeLabel(MCRCategoryID id, String lang);
+    MCRCategory removeLabel(MCRCategoryID id, String lang);
 
     /**
      * Replaces a <code>MCRCategory</code> by a new version of the same
@@ -228,7 +228,7 @@ public interface MCRCategoryDAO {
      *             if old version of MCRCategory does not exist
      * @return collection of replaced categories
      */
-    public abstract Collection<? extends MCRCategory> replaceCategory(MCRCategory newCategory)
+    Collection<? extends MCRCategory> replaceCategory(MCRCategory newCategory)
         throws IllegalArgumentException;
 
     /**
@@ -240,7 +240,7 @@ public interface MCRCategoryDAO {
      *            to be set or updated
      * @return category where the label was set
      */
-    public abstract MCRCategory setLabel(MCRCategoryID id, MCRLabel label);
+    MCRCategory setLabel(MCRCategoryID id, MCRLabel label);
 
     /**
      * Sets a new set of labels from a Category.
@@ -251,7 +251,7 @@ public interface MCRCategoryDAO {
      *            to be set
      * @return category where the labels was set
      */
-    public abstract MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels);
+    MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels);
 
     /**
      * Sets or updates the URI from a Category.
@@ -262,13 +262,13 @@ public interface MCRCategoryDAO {
      *            to be set or updated
      * @return category where the uri was set
      */
-    public abstract MCRCategory setURI(MCRCategoryID id, URI uri);
+    MCRCategory setURI(MCRCategoryID id, URI uri);
 
     /**
      * allows to determine when the last change was made to the categories.
      * @return either the last change time or the init time of the DAO class
      */
-    public abstract long getLastModified();
+    long getLastModified();
 
     /**
      * Gets the last modified timestamp for the given root id. If there is no timestamp at the moment -1 is returned.
@@ -277,5 +277,5 @@ public interface MCRCategoryDAO {
      * 
      * @return the last modified timestamp (if any) or -1
      */
-    public long getLastModified(String root);
+    long getLastModified(String root);
 }

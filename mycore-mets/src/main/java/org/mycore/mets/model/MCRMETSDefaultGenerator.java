@@ -96,9 +96,9 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
             MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(getOwner()));
 
             mets.getLogicalStructMap().getDivContainer().setLabel(
-                    MCRTranslation.exists("MCR.Mets.LogicalStructMap.Default.Label") ?
-                            MCRTranslation.translate("MCR.Mets.LogicalStructMap.Default.Label") :
-                            owner.getId().toString());
+                MCRTranslation.exists("MCR.Mets.LogicalStructMap.Default.Label")
+                    ? MCRTranslation.translate("MCR.Mets.LogicalStructMap.Default.Label")
+                    : owner.getId().toString());
 
             Map<String, String> urnFileMap = owner.getUrnMap();
             if (urnFileMap.size() > 0) {
@@ -139,7 +139,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         LogicalStructMap logicalStructMap = new LogicalStructMap();
 
         LogicalDiv logicalDiv = new LogicalDiv("log_" + owner, typeProvider.getType(MCRObjectID.getInstance(owner)),
-                owner, amdSec.getId(), dmdSec.getId());
+            owner, amdSec.getId(), dmdSec.getId());
         logicalDiv.setDmdId(dmdSec.getId());
         logicalStructMap.setDivContainer(logicalDiv);
         // struct Link
@@ -196,13 +196,14 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         }
 
         int beginIndex = href.lastIndexOf("/") == -1 ? 0 : href.lastIndexOf("/") + 1;
-        int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length() : href
+        int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length()
+            : href
                 .lastIndexOf(".");
         String fileName = href.substring(beginIndex, endIndex);
-        LOGGER.debug("Created fileName: " + fileName);
+        LOGGER.debug("Created fileName: {}", fileName);
 
         if (!(hrefIdMap.containsKey(fileName) || hrefIdMap.containsValue(baseID)
-                && isInExcludedRootFolder(dir))) {
+            && isInExcludedRootFolder(dir))) {
             hrefIdMap.put(fileName, baseID);
         }
         FileUse fileUse = getFileUse(href);
@@ -302,7 +303,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         try {
             return (MCRILogicalStructMapTypeProvider) Class.forName(className).newInstance();
         } catch (Exception e) {
-            LOGGER.warn("Could not load class " + className);
+            LOGGER.warn("Could not load class {}", className);
             return new MCRDefaultLogicalStructMapTypeProvider();
         }
     }

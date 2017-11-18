@@ -50,7 +50,7 @@ public class MCRMinDecimalValidator extends MCRDecimalValidator {
         if (d == null) {
             return false;
         } else {
-            return min <= d.doubleValue();
+            return min <= d;
         }
     }
 }

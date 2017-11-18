@@ -17,7 +17,7 @@ public interface MCRProcessableExecutor {
      * @param runnable the runnable to submit
      * @return a {@link MCRProcessableSupplier} with no result
      */
-    public default MCRProcessableSupplier<?> submit(Runnable runnable) {
+    default MCRProcessableSupplier<?> submit(Runnable runnable) {
         return submit(runnable, 0);
     }
 
@@ -27,7 +27,7 @@ public interface MCRProcessableExecutor {
      * @param runnable the runnable to submit
      * @return a {@link MCRProcessableSupplier} with no result
      */
-    public default MCRProcessableSupplier<?> submit(Runnable runnable, int priority) {
+    default MCRProcessableSupplier<?> submit(Runnable runnable, int priority) {
         return submit(MCRProcessableFactory.progressableCallable(runnable), priority);
     }
 
@@ -37,7 +37,7 @@ public interface MCRProcessableExecutor {
      * @param callable the callable to submit
      * @return a {@link MCRProcessableSupplier} with the result of R
      */
-    public default <R> MCRProcessableSupplier<R> submit(Callable<R> callable) {
+    default <R> MCRProcessableSupplier<R> submit(Callable<R> callable) {
         return submit(callable, 0);
     }
 
@@ -47,7 +47,7 @@ public interface MCRProcessableExecutor {
      * @param callable the callable to submit
      * @return a {@link MCRProcessableSupplier} with the result of R
      */
-    public <R> MCRProcessableSupplier<R> submit(Callable<R> callable, int priority);
+    <R> MCRProcessableSupplier<R> submit(Callable<R> callable, int priority);
 
     /**
      * Returns the underlying executor service.
@@ -59,5 +59,5 @@ public interface MCRProcessableExecutor {
      * 
      * @return the thread pool.
      */
-    public ExecutorService getExecutor();
+    ExecutorService getExecutor();
 }

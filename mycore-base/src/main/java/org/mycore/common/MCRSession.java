@@ -92,12 +92,7 @@ public class MCRSession implements Cloneable {
 
     AtomicInteger concurrentAccess;
 
-    ThreadLocal<AtomicInteger> currentThreadCount = new ThreadLocal<AtomicInteger>() {
-        @Override
-        public AtomicInteger initialValue() {
-            return new AtomicInteger();
-        }
-    };
+    ThreadLocal<AtomicInteger> currentThreadCount = ThreadLocal.withInitial(AtomicInteger::new);
 
     /** the logger */
     static Logger LOGGER = LogManager.getLogger(MCRSession.class.getName());
@@ -182,7 +177,7 @@ public class MCRSession implements Cloneable {
         sessionID = buildSessionID();
         MCRSessionMgr.addSession(this);
 
-        LOGGER.debug("MCRSession created " + sessionID);
+        LOGGER.debug("MCRSession created {}", sessionID);
         setLoginTime();
         createTime = loginTime;
         Throwable t = new Throwable();
@@ -252,10 +247,10 @@ public class MCRSession implements Cloneable {
 
     /** Write data to the logger for debugging purposes */
     public final void debug() {
-        LOGGER.debug("SessionID = " + sessionID);
-        LOGGER.debug("UserID    = " + getUserInformation().getUserID());
-        LOGGER.debug("IP        = " + ip);
-        LOGGER.debug("language  = " + language);
+        LOGGER.debug("SessionID = {}", sessionID);
+        LOGGER.debug("UserID    = {}", getUserInformation().getUserID());
+        LOGGER.debug("IP        = {}", ip);
+        LOGGER.debug("language  = {}", language);
     }
 
     /** Stores an object under the given key within the session * */
@@ -291,7 +286,7 @@ public class MCRSession implements Cloneable {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.debug("Exception while parsing new ip " + newip + " using old value.", e);
+                LOGGER.debug("Exception while parsing new ip {} using old value.", newip, e);
                 return;
             }
             ip = newip;
@@ -308,7 +303,7 @@ public class MCRSession implements Cloneable {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.debug("Exception while parsing new ip " + newip + " using old value.", e);
+                LOGGER.debug("Exception while parsing new ip {} using old value.", newip, e);
                 return;
             }
             ip = newip;
@@ -332,15 +327,9 @@ public class MCRSession implements Cloneable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("MCRSession[");
-        sb.append(getID());
-        sb.append(",user:'");
-        sb.append(getUserInformation().getUserID());
-        sb.append("',ip:");
-        sb.append(getCurrentIP());
-        sb.append("]");
-        return sb.toString();
+        String sb = "MCRSession[" + getID() + ",user:'" + getUserInformation().getUserID() + "',ip:" + getCurrentIP()
+            + "]";
+        return sb;
     }
 
     public long getLastAccessedTime() {
@@ -400,7 +389,7 @@ public class MCRSession implements Cloneable {
             lastActivatedStackTrace.set(null);
             fireSessionEvent(passivated, concurrentAccess.decrementAndGet());
         } else {
-            LOGGER.debug("deactivate currentThreadCount: " + currentThreadCount.get().get());
+            LOGGER.debug("deactivate currentThreadCount: {}", currentThreadCount.get().get());
         }
         if (!firstURI.isPresent()) {
             firstURI = Optional.of(defaultURI);

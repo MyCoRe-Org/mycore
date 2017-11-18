@@ -69,7 +69,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Frank L\u00fctzenkirchen
  **/
 public class MCRBasketServlet extends MCRServlet {
-    private final static Logger LOGGER = LogManager.getLogger(MCRBasketServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRBasketServlet.class);
 
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
@@ -83,7 +83,7 @@ public class MCRBasketServlet extends MCRServlet {
         URL referer = getReferer(req);
         boolean resolveContent = "true".equals(req.getParameter("resolve"));
 
-        LOGGER.info(action + " " + type + " " + (ids == null ? "" : ids));
+        LOGGER.info("{} {} {}", action, type, ids == null ? "" : ids);
 
         MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
 

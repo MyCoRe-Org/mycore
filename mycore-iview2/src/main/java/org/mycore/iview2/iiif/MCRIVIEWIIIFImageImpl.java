@@ -234,7 +234,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
             return imageInformation;
         } catch (FileSystemNotFoundException e) {
-            LOGGER.error("Could not find Iview ZIP for " + identifier, e);
+            LOGGER.error("Could not find Iview ZIP for {}", identifier, e);
             throw new MCRIIIFImageNotFoundException(identifier);
         }
     }
@@ -243,7 +243,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     public MCRIIIFImageProfile getProfile() {
         MCRIIIFImageProfile mcriiifImageProfile = new MCRIIIFImageProfile();
 
-        mcriiifImageProfile.formats = this.SUPPORTED_FORMATS.stream().filter(s -> !s.isEmpty())
+        mcriiifImageProfile.formats = SUPPORTED_FORMATS.stream().filter(s -> !s.isEmpty())
             .collect(Collectors.toSet());
 
         mcriiifImageProfile.qualities.add("color");

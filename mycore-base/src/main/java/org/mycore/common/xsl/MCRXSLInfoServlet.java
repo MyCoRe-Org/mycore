@@ -59,7 +59,11 @@ import org.xml.sax.SAXException;
  */
 public final class MCRXSLInfoServlet extends MCRServlet {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRXSLInfoServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXSLInfoServlet.class);
+
+    private Map<String, Stylesheet> stylesheets = new HashMap<>();
+
+    private Set<String> unknown = new HashSet<>();
 
     protected void doGetPost(MCRServletJob job) throws Exception {
         if ("true".equals(job.getRequest().getParameter("reload")))
@@ -83,7 +87,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private void handleUnknownStylesheets() {
         while (!unknown.isEmpty()) {
-            Set<String> list = new HashSet<String>();
+            Set<String> list = new HashSet<>();
             list.addAll(unknown);
             unknown.clear();
 
@@ -111,10 +115,10 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     }
 
     private Set<String> diveInto(String base) {
-        LOGGER.info("Diving into " + base + "...");
+        LOGGER.info("Diving into {}...", base);
         Set<String> paths = getServletContext().getResourcePaths(base);
 
-        Set<String> more = new HashSet<String>();
+        Set<String> more = new HashSet<>();
         more.addAll(paths);
 
         for (String path : paths)
@@ -125,7 +129,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     }
 
     private void findXSLinJar(String pathOfJarFile) throws IOException {
-        LOGGER.info("Diving into " + pathOfJarFile + "...");
+        LOGGER.info("Diving into {}...", pathOfJarFile);
 
         InputStream in = getServletContext().getResourceAsStream(pathOfJarFile);
         ZipInputStream zis = new ZipInputStream(in);
@@ -148,35 +152,26 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private void foundStylesheet(String path, String source) {
         String file = path.substring(path.lastIndexOf("xsl/") + 4);
-        LOGGER.info("Found " + file + " in " + source);
+        LOGGER.info("Found {} in {}", file, source);
         Stylesheet stylesheet = getStylesheet(file);
         source = source.substring(9); // cut off "/WEB-INF/"
         stylesheet.origin.add(source);
     }
 
-    private Map<String, Stylesheet> stylesheets = new HashMap<String, Stylesheet>();
-
-    private Set<String> unknown = new HashSet<String>();
-
     private Stylesheet getStylesheet(String name) {
-        Stylesheet stylesheet = stylesheets.get(name);
-        if (stylesheet == null) {
-            stylesheet = new Stylesheet(name);
-            stylesheets.put(name, stylesheet);
-        }
-        return stylesheet;
+        return stylesheets.computeIfAbsent(name, Stylesheet::new);
     }
 
     class Stylesheet {
         String name;
 
-        Set<String> origin = new HashSet<String>();
+        Set<String> origin = new HashSet<>();
 
-        Set<String> includes = new HashSet<String>();
+        Set<String> includes = new HashSet<>();
 
-        Set<String> imports = new HashSet<String>();
+        Set<String> imports = new HashSet<>();
 
-        List<Element> templates = new ArrayList<Element>();
+        List<Element> templates = new ArrayList<>();
 
         Element xsl;
 
@@ -217,7 +212,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             List<Element> includes = xsl.getChildren(tag, MCRConstants.XSL_NAMESPACE);
             for (Element include : includes) {
                 String href = include.getAttributeValue("href");
-                LOGGER.info(name + " " + tag + "s " + href);
+                LOGGER.info("{} {}s {}", name, tag, href);
                 set.add(href);
                 if (!stylesheets.containsKey(href)) {
                     unknown.add(href);
@@ -229,8 +224,8 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             List<Element> list = xsl.getChildren("template", MCRConstants.XSL_NAMESPACE);
             IteratorIterable<Element> callTemplateElements = xsl
                 .getDescendants(Filters.element("call-template", MCRConstants.XSL_NAMESPACE));
-            LinkedList<Element> templates = new LinkedList<Element>(list);
-            HashSet<String> callNames = new HashSet<String>();
+            LinkedList<Element> templates = new LinkedList<>(list);
+            HashSet<String> callNames = new HashSet<>();
             for (Element callTemplate : callTemplateElements) {
                 String name = callTemplate.getAttributeValue("name");
                 if (callNames.add(name)) {

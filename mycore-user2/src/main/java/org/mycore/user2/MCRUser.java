@@ -167,9 +167,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     public MCRUser(String userName, String realmID) {
         this.userName = userName;
         this.realmID = realmID;
-        this.systemRoles = new HashSet<String>();
-        this.externalRoles = new HashSet<String>();
-        this.attributes = new HashMap<String, String>();
+        this.systemRoles = new HashSet<>();
+        this.externalRoles = new HashSet<>();
+        this.attributes = new HashMap<>();
         this.password = new Password();
     }
 
@@ -712,8 +712,8 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         if (getSystemRoleIDs().isEmpty() && getExternalRoleIDs().isEmpty()) {
             return null;
         }
-        ArrayList<String> roleIds = new ArrayList<String>(getSystemRoleIDs().size() + getExternalRoleIDs().size());
-        Collection<MCRRole> roles = new ArrayList<MCRRole>(roleIds.size());
+        ArrayList<String> roleIds = new ArrayList<>(getSystemRoleIDs().size() + getExternalRoleIDs().size());
+        Collection<MCRRole> roles = new ArrayList<>(roleIds.size());
         roleIds.addAll(getSystemRoleIDs());
         roleIds.addAll(getExternalRoleIDs());
         for (String roleName : roleIds) {
@@ -746,7 +746,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         if (attributes == null) {
             return null;
         }
-        ArrayList<MapEntry> list = new ArrayList<MapEntry>(attributes.size());
+        ArrayList<MapEntry> list = new ArrayList<>(attributes.size());
         for (Entry<String, String> entry : attributes.entrySet()) {
             MapEntry mapEntry = new MapEntry();
             mapEntry.name = entry.getKey();
@@ -842,7 +842,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             copy.password = new Password();
             copy.password.hint = getHint();
         }
-        copy.setAttributes(new HashMap<String, String>());
+        copy.setAttributes(new HashMap<>());
         copy.eMail = this.eMail;
         copy.lastLogin = this.lastLogin;
         copy.validUntil = this.validUntil;

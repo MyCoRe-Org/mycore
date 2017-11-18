@@ -66,7 +66,7 @@ public class MCRVideoObject extends MCRMediaObject {
 
     protected float frameRate;
 
-    protected ArrayList<MCRAudioObject> audioCodes = new ArrayList<MCRAudioObject>();
+    protected ArrayList<MCRAudioObject> audioCodes = new ArrayList<>();
 
     public MCRVideoObject() {
         type = MCRMediaObject.MediaType.VIDEO;
@@ -199,31 +199,44 @@ public class MCRVideoObject extends MCRMediaObject {
 
     @Override
     public String toString() {
-        String out = fileName + " (" + fileSize + ")\n";
-        String _fill = "";
+        StringBuilder out = new StringBuilder(fileName + " (" + fileSize + ")\n");
+        StringBuilder _fill = new StringBuilder();
         for (int c = 0; c < out.length(); c++)
-            _fill += "-";
-        out += _fill + "\n";
-        out += "Type             : " + type.toString() + "\n";
-        out += (mimeType != null ? "mimeType         : " + mimeType + "\n" : "");
-        out += (format != null
-            ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n" : "");
-        out += "Format           : " + subFormat + (subFormatFull != null ? " (" + subFormatFull + ")" : "") + "\n";
-        out += "Codec            : " + codec + (codecFull != null ? " - " + codecFull : "")
-            + (codecURL != null ? " (" + codecURL + ")" : "") + "\n";
-        out += "Duration         : " + duration + "\n";
-        out += "Dimention        : " + width + "x" + height + " @ " + frameRate + "\n";
-        out += (aspectRatio != null ? "Aspect Ratio     : " + aspectRatio + "\n" : "");
-        out += "BitRate          : " + streamBitRate + "\n";
-        out += (encoderStr != null ? "Encoder          : " + encoderStr + "\n" : "");
+            _fill.append("-");
+        out.append(_fill).append("\n");
+        out.append("Type             : ").append(type).append("\n");
+        out.append(mimeType != null ? "mimeType         : " + mimeType + "\n" : "");
+        out.append(
+            format != null ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n"
+                : "");
+        out.append("Format           : ")
+            .append(subFormat)
+            .append(subFormatFull != null ? " (" + subFormatFull + ")" : "")
+            .append("\n");
+        out.append("Codec            : ")
+            .append(codec)
+            .append(codecFull != null ? " - " + codecFull : "")
+            .append(codecURL != null ? " (" + codecURL + ")" : "")
+            .append("\n");
+        out.append("Duration         : ").append(duration).append("\n");
+        out.append("Dimention        : ")
+            .append(width)
+            .append("x")
+            .append(height)
+            .append(" @ ")
+            .append(frameRate)
+            .append("\n");
+        out.append(aspectRatio != null ? "Aspect Ratio     : " + aspectRatio + "\n" : "");
+        out.append("BitRate          : ").append(streamBitRate).append("\n");
+        out.append(encoderStr != null ? "Encoder          : " + encoderStr + "\n" : "");
 
         if (tags != null)
-            out += tags.toString();
+            out.append(tags.toString());
 
         for (MCRAudioObject audio : audioCodes)
-            out += audio.toString();
+            out.append(audio.toString());
 
-        return out;
+        return out.toString();
     }
 
     /**
@@ -324,7 +337,7 @@ public class MCRVideoObject extends MCRMediaObject {
         if (xml.getChild("audioStreams") != null) {
             List<Element> audioStreams = xml.getChild("audioStreams").getChildren("audiostream");
             for (Element audioStream : audioStreams) {
-                Element astream = (Element) audioStream;
+                Element astream = audioStream;
 
                 MCRAudioObject audio = new MCRAudioObject(video);
                 MCRAudioObject.addStreamFromXML(audio, astream);

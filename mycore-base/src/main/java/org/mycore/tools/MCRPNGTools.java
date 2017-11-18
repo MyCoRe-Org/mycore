@@ -24,7 +24,7 @@ public class MCRPNGTools implements AutoCloseable {
 
     private ImageWriteParam imageWriteParam;
 
-    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
+    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
 
     public MCRPNGTools() {
         imageWriteParam = ImageIO.getImageWritersBySuffix("png").next().getDefaultWriteParam();

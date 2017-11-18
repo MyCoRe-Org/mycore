@@ -67,7 +67,7 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
         storeIDs = new String[stores.size() + 1];
 
         for (int i = 0; i < stores.size(); i++) {
-            Element store = (Element) stores.get(i);
+            Element store = stores.get(i);
             String storeID = store.getAttributeValue("ID");
             storeIDs[i] = storeID;
 

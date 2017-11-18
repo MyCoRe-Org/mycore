@@ -44,10 +44,10 @@ public class MCRSword {
                     final String collection = workspaceCollectionEntry[1];
                     final String workspace = workspaceCollectionEntry[0];
 
-                    LOGGER.info("Found collection: " + collection + " in workspace " + workspace);
+                    LOGGER.info("Found collection: {} in workspace {}", collection, workspace);
                     String name = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX + workspace + "." + collection;
 
-                    LOGGER.info("Try to init : " + name);
+                    LOGGER.info("Try to init : {}", name);
                     MCRSwordCollectionProvider collectionProvider = mcrConfiguration.getInstanceOf(name);
                     collections.put(collection, collectionProvider);
                     final MCRSwordLifecycleConfiguration lifecycleConfiguration = new MCRSwordLifecycleConfiguration(
@@ -71,12 +71,9 @@ public class MCRSword {
     }
 
     private static void addCollectionShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                LOGGER.info("Shutdown Sword Collections");
-                collections.values().forEach(MCRSwordCollectionProvider::destroy);
-            }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            LOGGER.info("Shutdown Sword Collections");
+            collections.values().forEach(MCRSwordCollectionProvider::destroy);
         }));
     }
 

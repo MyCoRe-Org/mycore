@@ -67,9 +67,9 @@ public class MCRCommandLineInterface {
     private static String system = null;
 
     /** A queue of commands waiting to be executed */
-    protected static Vector<String> commandQueue = new Vector<String>();
+    protected static Vector<String> commandQueue = new Vector<>();
 
-    protected static Vector<String> failedCommands = new Vector<String>();
+    protected static Vector<String> failedCommands = new Vector<>();
 
     private static boolean interactiveMode = true;
 
@@ -215,7 +215,7 @@ public class MCRCommandLineInterface {
         StrSubstitutor strSubstitutor = new StrSubstitutor(MCRConfiguration.instance().getPropertiesMap());
         String expandedCommand = strSubstitutor.replace(command);
         if (!expandedCommand.equals(command)) {
-            LOGGER.info(command + " --> " + expandedCommand);
+            LOGGER.info("{} --> {}", command, expandedCommand);
         }
         return expandedCommand;
     }
@@ -305,7 +305,7 @@ public class MCRCommandLineInterface {
      */
     public static void getURI(String uri, String file) throws Exception {
         Element resolved = MCRURIResolver.instance().resolve(uri);
-        Element cloned = (Element) resolved.clone();
+        Element cloned = resolved.clone();
         new MCRJDOMContent(cloned).sendTo(new File(file));
     }
 
@@ -321,12 +321,12 @@ public class MCRCommandLineInterface {
      * @throws FileNotFoundException
      *             when the file was not found
      */
-    public static List<String> readCommandsFile(String file) throws IOException, FileNotFoundException {
+    public static List<String> readCommandsFile(String file) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(new File(file).toPath(), Charset.defaultCharset())) {
             output("Reading commands from file " + file);
 
             String line;
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
 

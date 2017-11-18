@@ -46,7 +46,7 @@ public class MCRSolrURL {
         rows = 10;
         q = null;
         wt = null;
-        sortOptions = new String();
+        sortOptions = "";
         returnScore = false;
     }
 

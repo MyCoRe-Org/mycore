@@ -55,8 +55,8 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public void index() throws IOException, SolrServerException {
         MCRObjectID mcrID = MCRObjectID.getInstance(getID());
-        if(!MCRMetadataManager.exists(mcrID)) {
-            LOGGER.warn("Unable to index '" + mcrID + "' cause it doesn't exists anymore!");
+        if (!MCRMetadataManager.exists(mcrID)) {
+            LOGGER.warn("Unable to index '{}' cause it doesn't exists anymore!", mcrID);
             return;
         }
         if (mcrID.getTypeId().equals("derivate")) {
@@ -92,7 +92,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
 
         });
         int fileCount = subHandlerList.size() + docs.size();
-        LOGGER.info("Sending " + fileCount + " file(s) for derivate \"" + derivateID + "\"");
+        LOGGER.info("Sending {} file(s) for derivate \"{}\"", fileCount, derivateID);
         if (!docs.isEmpty()) {
             MCRSolrInputDocumentsHandler subHandler = new MCRSolrInputDocumentsHandler(docs, solrClient);
             subHandler.setCommitWithin(getCommitWithin());

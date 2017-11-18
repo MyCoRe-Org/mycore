@@ -66,7 +66,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         MCRMetaElement elm = null;
         MCRMetaInterface inf = null;
         //use Set for category collection to remove duplicates if there are any
-        Collection<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
+        Collection<MCRCategoryID> categories = new HashSet<>();
         for (int i = 0; i < meta.size(); i++) {
             elm = meta.getMetadataElement(i);
             for (int j = 0; j < elm.size(); j++) {

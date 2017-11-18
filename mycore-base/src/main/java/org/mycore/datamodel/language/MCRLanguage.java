@@ -36,12 +36,12 @@ public class MCRLanguage {
     /**
      * A map from codes used for this language, by code type
      */
-    private Map<MCRLanguageCodeType, String> codesByType = new HashMap<MCRLanguageCodeType, String>();
+    private Map<MCRLanguageCodeType, String> codesByType = new HashMap<>();
 
     /**
      * A map of labels for this language, by language 
      */
-    private Map<MCRLanguage, String> labelsByLanguage = new HashMap<MCRLanguage, String>();
+    private Map<MCRLanguage, String> labelsByLanguage = new HashMap<>();
 
     private Locale locale;
 

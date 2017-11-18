@@ -114,7 +114,7 @@ public class MCRWebCLIContainer {
      *            <code>MCRCommand</code>
      */
     public void addCommand(String cmd) {
-        LOGGER.info("appending command: " + cmd);
+        LOGGER.info("appending command: {}", cmd);
         processCallable.commands.add(cmd);
         if (!isRunning()) {
             curFuture = EXECUTOR.submit(processCallable);
@@ -155,7 +155,7 @@ public class MCRWebCLIContainer {
 
     protected static void initializeCommands() {
         if (knownCommands == null) {
-            knownCommands = new TreeMap<String, List<MCRCommand>>();
+            knownCommands = new TreeMap<>();
             knownCommands.putAll(new MCRWebCLICommandManager().getCommandsMap());
         }
     }
@@ -269,7 +269,7 @@ public class MCRWebCLIContainer {
          * @throws IOException
          */
         private boolean processCommand(String command) throws IOException {
-            LOGGER.info("Processing command:'" + command + "' (" + commands.size() + " left)");
+            LOGGER.info("Processing command:'{}' ({} left)", command, commands.size());
             setCurrentCommand(command);
             long start = System.currentTimeMillis();
             session.beginTransaction();
@@ -284,16 +284,16 @@ public class MCRWebCLIContainer {
                 updateKnownCommandsIfNeeded();
                 session.commitTransaction();
                 if (commandsReturned != null)
-                    LOGGER.info("Command processed (" + (System.currentTimeMillis() - start) + " ms)");
+                    LOGGER.info("Command processed ({} ms)", System.currentTimeMillis() - start);
                 else {
                     throw new MCRUsageException("Command not understood: " + command);
                 }
             } catch (Exception ex) {
-                LOGGER.error("Command '" + command + "' failed. Performing transaction rollback...", ex);
+                LOGGER.error("Command '{}' failed. Performing transaction rollback...", command, ex);
                 try {
                     session.rollbackTransaction();
                 } catch (Exception ex2) {
-                    LOGGER.error("Error while perfoming rollback for command '" + command + "'!", ex2);
+                    LOGGER.error("Error while perfoming rollback for command '{}'!", command, ex2);
                 }
                 if (!continueIfOneFails) {
                     saveQueue(command, null);
@@ -316,7 +316,7 @@ public class MCRWebCLIContainer {
                 {
                     // Add commands to queue
                     if (commandsReturned.size() > 0) {
-                        LOGGER.info("Queueing " + commandsReturned.size() + " commands to process");
+                        LOGGER.info("Queueing {} commands to process", commandsReturned.size());
                         commands.addAll(0, commandsReturned);
                     }
 
@@ -339,7 +339,7 @@ public class MCRWebCLIContainer {
             String unprocessedCommandsFile = MCRConfiguration.instance()
                 .getString("MCR.WebCLI.UnprocessedCommandsFile");
             File file = new File(unprocessedCommandsFile);
-            LOGGER.info("Writing unprocessed commands to file " + file.getAbsolutePath());
+            LOGGER.info("Writing unprocessed commands to file {}", file.getAbsolutePath());
 
             try {
                 PrintWriter pw = new PrintWriter(file, Charset.defaultCharset().name());
@@ -355,7 +355,7 @@ public class MCRWebCLIContainer {
                 }
                 pw.close();
             } catch (IOException ex) {
-                LOGGER.error("Cannot write to " + file.getAbsolutePath(), ex);
+                LOGGER.error("Cannot write to {}", file.getAbsolutePath(), ex);
             }
             setCurrentCommand("");
             commands.clear();
@@ -364,7 +364,7 @@ public class MCRWebCLIContainer {
         protected boolean processCommands() throws IOException {
             final LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
             final AbstractConfiguration logConf = (AbstractConfiguration) logCtx.getConfiguration();
-            LinkedList<String> failedQueue = new LinkedList<String>();
+            LinkedList<String> failedQueue = new LinkedList<>();
             logGrabber.grabCurrentThread();
             logGrabber.setLogEventList(logs);
             // start grabbing logs of this thread

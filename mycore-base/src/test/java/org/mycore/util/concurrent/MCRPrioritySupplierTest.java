@@ -64,7 +64,7 @@ public class MCRPrioritySupplierTest {
         @Override
         public Integer get() {
             try {
-                LOGGER.info("Executing task " + id);
+                LOGGER.info("Executing task {}", id);
                 Thread.sleep(100);
                 return id;
             } catch (Exception exc) {

@@ -43,9 +43,9 @@ public class MCRJerseyDefaultConfiguration implements MCRJerseyConfiguration {
      */
     protected void setupResources(ResourceConfig resourceConfig) {
         String propertyString = MCRConfiguration.instance().getString("MCR.Jersey.Resource.Packages",
-                "org.mycore.frontend.jersey.resources");
+            "org.mycore.frontend.jersey.resources");
         resourceConfig.packages(propertyString.split(","));
-        LogManager.getLogger().info("Scanning jersey resource packages " + propertyString);
+        LogManager.getLogger().info("Scanning jersey resource packages {}", propertyString);
     }
 
     /**

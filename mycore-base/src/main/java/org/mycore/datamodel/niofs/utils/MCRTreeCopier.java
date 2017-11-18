@@ -51,7 +51,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
             // (okay if directory already exists).
             // ignore
         } catch (IOException x) {
-            LOGGER.error("Unable to create: " + newdir, x);
+            LOGGER.error("Unable to create: {}", newdir, x);
             return FileVisitResult.SKIP_SUBTREE;
         }
         return FileVisitResult.CONTINUE;
@@ -73,7 +73,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
             }
             Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {
-            LOGGER.error("Unable to copy: " + source, x);
+            LOGGER.error("Unable to copy: {}", source, x);
         }
     }
 
@@ -97,7 +97,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 FileTime time = Files.getLastModifiedTime(dir);
                 Files.setLastModifiedTime(newdir, time);
             } catch (IOException x) {
-                LOGGER.error("Unable to copy all attributes to: " + newdir, x);
+                LOGGER.error("Unable to copy all attributes to: {}", newdir, x);
             }
         }
         return FileVisitResult.CONTINUE;
@@ -112,9 +112,9 @@ public class MCRTreeCopier implements FileVisitor<Path> {
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) {
         if (exc instanceof FileSystemLoopException) {
-            LOGGER.error("cycle detected: " + file);
+            LOGGER.error("cycle detected: {}", file);
         } else {
-            LOGGER.error("Unable to copy: " + file, exc);
+            LOGGER.error("Unable to copy: {}", file, exc);
         }
         return FileVisitResult.CONTINUE;
     }

@@ -39,7 +39,7 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
 
     protected Map<String, Object> properties;
 
-    protected List<MCRProcessableStatusListener> statusListener;
+    protected final List<MCRProcessableStatusListener> statusListener;
 
     public MCRAbstractProcessable() {
         super();
@@ -157,9 +157,7 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
 
     protected void fireStatusChanged(MCRProcessableStatus oldStatus) {
         synchronized (this.statusListener) {
-            this.statusListener.forEach(listener -> {
-                listener.onStatusChange(this, oldStatus, getStatus());
-            });
+            this.statusListener.forEach(listener -> listener.onStatusChange(this, oldStatus, getStatus()));
         }
     }
 

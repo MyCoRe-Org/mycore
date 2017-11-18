@@ -111,7 +111,7 @@ public class MCRRestAPISearch {
         @QueryParam("facet.field") List<String> facetFields, @QueryParam("json.wrf") String jsonWrf)
         throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/search");
-        StringBuffer url = new StringBuffer(MCRSolrConstants.SERVER_URL);
+        StringBuilder url = new StringBuilder(MCRSolrConstants.SERVER_URL);
         url.append("/select?");
 
         try {
@@ -156,19 +156,19 @@ public class MCRRestAPISearch {
                 String text = scanner.useDelimiter("\\A").next();
 
                 switch (wt) {
-                case FORMAT_XML:
-                    return Response.ok(text).type("application/xml; charset=UTF-8")
-                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
-                //break;
-                case FORMAT_JSON:
-                    return Response.ok(text).type("application/json; charset=UTF-8")
-                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
-                //break;
-                case FORMAT_CSV:
-                    return Response.ok(text).type("text/comma-separated-values; charset=UTF-8")
-                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
-                default:
-                    return Response.ok(text).type("text").header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                    case FORMAT_XML:
+                        return Response.ok(text).type("application/xml; charset=UTF-8")
+                            .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                    //break;
+                    case FORMAT_JSON:
+                        return Response.ok(text).type("application/json; charset=UTF-8")
+                            .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                    //break;
+                    case FORMAT_CSV:
+                        return Response.ok(text).type("text/comma-separated-values; charset=UTF-8")
+                            .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                    default:
+                        return Response.ok(text).type("text").header(HEADER_NAME_AUTHORIZATION, authHeader).build();
                 }
             }
         } catch (IOException e) {

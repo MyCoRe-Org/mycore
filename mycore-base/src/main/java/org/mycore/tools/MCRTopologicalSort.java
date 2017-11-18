@@ -1,6 +1,6 @@
 /*
- * 
- * $Revision: 28695 $ 
+ *
+ * $Revision: 28695 $
  * $Date: 2013-12-19 09:38:31 +0100 (Do, 19 Dez 2013) $
  *
  * This file is part of ***  M y C o R e  ***
@@ -53,7 +53,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 /**
- * This class implements an algorithm for topological ordering. 
+ * This class implements an algorithm for topological ordering.
  * It can be used to retrieve the order in which MyCoRe object can be imported to be
  * sure that parent objects are imported first.
  *
@@ -75,7 +75,7 @@ public class MCRTopologicalSort {
     private static final Logger LOGGER = LogManager.getLogger(MCRTopologicalSort.class);
 
     /** store the edges as adjacent list
-     *  for each target node a list of corresponding source node is stored 
+     *  for each target node a list of corresponding source node is stored
      */
     Map<Integer, TreeSet<Integer>> edgeSources = new TreeMap<>();
 
@@ -150,8 +150,8 @@ public class MCRTopologicalSort {
         if (order == null) {
             System.out.println("An error occured!");
         } else {
-            for (int i = 0; i < order.length; i++) {
-                // System.out.print(order[i] + " <- ");
+            for (int anOrder : order) {
+                System.out.print(anOrder + " <- ");
             }
         }
         System.out.println();
@@ -190,7 +190,7 @@ public class MCRTopologicalSort {
         edgeSources.clear();
 
         String file = null;
-        Map<Integer, List<String>> parentNames = new HashMap<Integer, List<String>>();
+        Map<Integer, List<String>> parentNames = new HashMap<>();
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         for (int i = 0; i < files.length; i++) {
             file = files[i];
@@ -208,14 +208,14 @@ public class MCRTopologicalSort {
                                     .getAttributeValue("http://www.w3.org/1999/xlink", "href");
                                 if (xmlStreamReader.getLocalName().equals("parent")) {
                                     List<String> dependencyList = parentNames.computeIfAbsent(i,
-                                        e -> new ArrayList<String>());
+                                        e -> new ArrayList<>());
                                     dependencyList.add(
                                         href);
                                 } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
                                     if (MCRObjectID.isValid(
                                         href)) {
                                         List<String> dependencyList = parentNames
-                                            .computeIfAbsent(i, e -> new ArrayList<String>());
+                                            .computeIfAbsent(i, e -> new ArrayList<>());
                                         dependencyList.add(
                                             href);
                                     }
@@ -321,12 +321,7 @@ public class MCRTopologicalSort {
      * @param to - the target node
      */
     public void addEdge(Integer from, Integer to) {
-        TreeSet<Integer> ts = edgeSources.get(to);
-        if (ts == null) {
-            ts = new TreeSet<Integer>();
-            edgeSources.put(to, ts);
-        }
-        ts.add(from);
+        edgeSources.computeIfAbsent(to, k -> new TreeSet<>()).add(from);
     }
 
     /**
@@ -385,7 +380,7 @@ public class MCRTopologicalSort {
             // add n to tail of L (we use head, because we need an inverted list !!)
             result[cursor--] = node;
             // for each node m with an edge e from n to m do
-            for (Integer to : new TreeSet<Integer>(edgeSources.keySet())) {
+            for (Integer to : new TreeSet<>(edgeSources.keySet())) {
                 Set<Integer> ts = edgeSources.get(to);
                 if (ts != null && ts.contains(node)) {
                     // remove edge e from the graph
@@ -398,7 +393,7 @@ public class MCRTopologicalSort {
         }
         // if graph has edges then return error (graph has at least one cycle)
         if (!edgeSources.isEmpty()) {
-            LOGGER.error("The input contained circular dependencies: \n" + toString());
+            LOGGER.error("The input contained circular dependencies: \n{}", toString());
             return null;
             // else return L (a topologically sorted order)
         } else {
@@ -409,14 +404,15 @@ public class MCRTopologicalSort {
     /**
      * @return a string representation of the underlying graph
      */
+    @Override
     public String toString() {
-        StringBuffer result = new StringBuffer("[");
+        StringBuilder result = new StringBuilder("[");
         for (Integer to : edgeSources.keySet()) {
             for (Integer from : edgeSources.get(to)) {
-                result.append("[" + nodes.get(from) + "->" + nodes.get(to) + "]");
+                result.append('[').append(nodes.get(from)).append("->").append(nodes.get(to)).append(']');
             }
         }
-        result.append("]");
+        result.append(']');
         return result.toString();
     }
 }

@@ -35,7 +35,7 @@ import org.mycore.common.config.MCRConfiguration;
 public class MCRContentTransformerFactory {
 
     /** Map of transformer instances by ID */
-    private static HashMap<String, MCRContentTransformer> transformers = new HashMap<String, MCRContentTransformer>();
+    private static HashMap<String, MCRContentTransformer> transformers = new HashMap<>();
 
     /** 
      * Returns the transformer with the given ID. If the transformer is not instantiated yet,

@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
 public class MCRXEditorTransformerTest extends MCRTestCase {
 
     private MCREditorSession buildEditorSession(String editedXMLFile) {
-        HashMap<String, String[]> parameters = new HashMap<String, String[]>();
+        HashMap<String, String[]> parameters = new HashMap<>();
         if (editedXMLFile != null) {
             parameters.put("input", new String[] { editedXMLFile });
         }

@@ -109,7 +109,7 @@ public class MCRPersistenceServletFilter implements Filter {
             } else {
                 url = MCRURLRetriever.getURLforID(operation, mcrId, false);
             }
-            LOGGER.info("Matched URL: " + url);
+            LOGGER.info("Matched URL: {}", url);
             return url;
         } finally {
             session.commitTransaction();

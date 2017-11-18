@@ -19,7 +19,7 @@ public class JSONSectionProviderTest {
 
     @Test
     public void toJSON() throws Exception {
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("MCR.WCMS2.mycoreTagList", "");
         MCRConfiguration.instance().initialize(properties, true);
         SAXBuilder builder = new SAXBuilder();

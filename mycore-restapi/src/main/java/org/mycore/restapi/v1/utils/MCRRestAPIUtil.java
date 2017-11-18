@@ -79,11 +79,11 @@ public class MCRRestAPIUtil {
         try {
             String userID = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(request);
             if (userID != null) {
-            	if(MCRSystemUserInformation.getGuestInstance().getUserID().equals(userID)) {
-            		MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
-            	} else {
-            		MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(userID));
-            	}
+                if (MCRSystemUserInformation.getGuestInstance().getUserID().equals(userID)) {
+                    MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
+                } else {
+                    MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(userID));
+                }
             }
             MCRIPAddress theIP = new MCRIPAddress(MCRFrontendUtil.getRemoteAddr(request));
             String thePath = path.startsWith("/") ? path : "/" + path;
@@ -108,6 +108,6 @@ public class MCRRestAPIUtil {
         }
         throw new MCRRestAPIException(Status.FORBIDDEN,
             new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
-                "Check access right '" + permission.toString() + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
+                "Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
     }
 }

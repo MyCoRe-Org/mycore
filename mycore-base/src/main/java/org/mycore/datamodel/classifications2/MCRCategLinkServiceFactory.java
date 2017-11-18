@@ -36,7 +36,7 @@ public class MCRCategLinkServiceFactory {
     private static final String STANDARD_IMPL = MCRCategLinkServiceImpl.class.getCanonicalName();
 
     private static MCRCategLinkService instance = MCRConfiguration.instance()
-        .<MCRCategLinkService> getInstanceOf("MCR.Category.LinkService", STANDARD_IMPL);
+        .getInstanceOf("MCR.Category.LinkService", STANDARD_IMPL);
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.

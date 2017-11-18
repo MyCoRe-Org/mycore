@@ -67,8 +67,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static Element editrule;
     static {
         try {
-            readrule = (Element) new MCRStringContent(strReadRule).asXML().getRootElement().detach();
-            editrule = (Element) new MCRStringContent(strEditRule).asXML().getRootElement().detach();
+            readrule = new MCRStringContent(strReadRule).asXML().getRootElement().detach();
+            editrule = new MCRStringContent(strEditRule).asXML().getRootElement().detach();
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -218,7 +218,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (t2 - t1) / 1000.0;
-        LOGGER.debug("MCRAccessEventHandler create: done in " + diff + " sec.");
+        LOGGER.debug("MCRAccessEventHandler create: done in {} sec.", diff);
     }
 
     private void handleBaseUpdated(MCRBase base, boolean addDefaultRules) {
@@ -251,7 +251,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (t2 - t1) / 1000.0;
-        LOGGER.debug("MCRAccessEventHandler update: done in " + diff + " sec.");
+        LOGGER.debug("MCRAccessEventHandler update: done in {} sec.", diff);
     }
 
     private void handleBaseDeleted(MCRBase base) {
@@ -264,7 +264,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (t2 - t1) / 1000.0;
-        LOGGER.debug("MCRAccessEventHandler delete: done in " + diff + " sec.");
+        LOGGER.debug("MCRAccessEventHandler delete: done in {} sec.", diff);
     }
 
     /**

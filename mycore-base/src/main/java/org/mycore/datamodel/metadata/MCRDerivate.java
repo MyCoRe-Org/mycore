@@ -37,7 +37,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfigurationException;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -49,7 +48,7 @@ import org.xml.sax.SAXParseException;
  * @version $Revision$ $Date: 2010-09-30 17:49:21 +0200 (Thu, 30 Sep
  *          2010) $
  */
-final public class MCRDerivate extends MCRBase {
+public final class MCRDerivate extends MCRBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -62,10 +61,8 @@ final public class MCRDerivate extends MCRBase {
      * 
      * @exception MCRException
      *                general Exception of MyCoRe
-     * @exception MCRConfigurationException
-     *                a special exception for configuartion data
      */
-    public MCRDerivate() throws MCRException, MCRConfigurationException {
+    public MCRDerivate() throws MCRException {
         super();
         mcr_derivate = new MCRObjectDerivate(getId());
     }
@@ -103,6 +100,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
+    @Override
     protected final void setUp() throws MCRException {
         super.setUp();
 
@@ -138,7 +136,7 @@ final public class MCRDerivate extends MCRBase {
      * @return A {@link Map} which contains the files as key and the urns as value. If no URN assigned the map will be empty.
      */
     public Map<String, String> getUrnMap() {
-        Map<String, String> fileUrnMap = new HashMap<String, String>();
+        Map<String, String> fileUrnMap = new HashMap<>();
 
         XPathExpression<Element> filesetPath = XPathFactory.instance().compile("./mycorederivate/derivate/fileset",
             Filters.element());
@@ -169,9 +167,9 @@ final public class MCRDerivate extends MCRBase {
      */
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("MCRDerivate ID : " + mcr_id);
-            LOGGER.debug("MCRDerivate Label : " + mcr_label);
-            LOGGER.debug("MCRDerivate Schema : " + mcr_schema);
+            LOGGER.debug("MCRDerivate ID : {}", mcr_id);
+            LOGGER.debug("MCRDerivate Label : {}", mcr_label);
+            LOGGER.debug("MCRDerivate Schema : {}", mcr_schema);
             LOGGER.debug("");
         }
     }
@@ -187,16 +185,17 @@ final public class MCRDerivate extends MCRBase {
      * 
      * @throws MCRException the MCRDerivate is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         MCRObjectDerivate derivate = getDerivate();
         if (derivate == null) {
-            throw new MCRException("The <derivate> part of '" + getId().toString() + "' is undefined.");
+            throw new MCRException("The <derivate> part of '" + getId() + "' is undefined.");
         }
         try {
             derivate.validate();
         } catch (Exception exc) {
-            throw new MCRException("The <derivate> part of '" + getId().toString() + "' is invalid.", exc);
+            throw new MCRException("The <derivate> part of '" + getId() + "' is invalid.", exc);
         }
     }
 

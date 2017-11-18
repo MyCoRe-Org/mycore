@@ -24,9 +24,8 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,15 +50,15 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCRStaticXEditorFileServlet.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCRStaticXEditorFileServlet.class);
 
     /** XML document types that may contain editor forms */
-    protected Set<String> docTypesIncludingEditors = new HashSet<String>();
+    protected Set<String> docTypesIncludingEditors = new HashSet<>();
 
     @Override
     public void init() throws ServletException {
         super.init();
-        List<String> defaults = Arrays.asList("MyCoReWebPage");
+        List<String> defaults = Collections.singletonList("MyCoReWebPage");
         List<String> docTypes = MCRConfiguration.instance().getStrings("MCR.XEditor.DocTypes", defaults);
         docTypesIncludingEditors.addAll(docTypes);
     }
@@ -71,7 +70,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
     /** For defined document types like static webpages, replace editor elements with complete editor definition */
     @Override
     protected MCRContent getResourceContent(HttpServletRequest request, HttpServletResponse response, URL resource)
-        throws IOException, JDOMException, SAXException, MalformedURLException {
+        throws IOException, JDOMException, SAXException {
         MCRContent content = super.getResourceContent(request, response, resource);
         if (mayContainEditorForm(content)) {
             content = doExpandEditorElements(content, request, response,
@@ -83,7 +82,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
     public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request,
         HttpServletResponse response, String sessionID, String pageURL)
-        throws IOException, JDOMException, SAXException, MalformedURLException {
+        throws IOException, JDOMException, SAXException {
         MCRParameterCollector pc = new MCRParameterCollector(request, false);
         MCREditorSession session = null;
 

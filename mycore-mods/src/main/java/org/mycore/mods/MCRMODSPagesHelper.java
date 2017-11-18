@@ -48,11 +48,11 @@ import org.mycore.common.MCRConstants;
  **/
 public class MCRMODSPagesHelper {
 
-    private final static HyphenNormalizer hyphenNormalizer = new HyphenNormalizer();
+    private static final HyphenNormalizer hyphenNormalizer = new HyphenNormalizer();
 
-    private final static EndPageCompleter endPageNormalizer = new EndPageCompleter();
+    private static final EndPageCompleter endPageNormalizer = new EndPageCompleter();
 
-    private final static ExtentPagesBuilder extentBuilder = new ExtentPagesBuilder();
+    private static final ExtentPagesBuilder extentBuilder = new ExtentPagesBuilder();
 
     public static Element buildExtentPages(String input) {
         input = input.trim();
@@ -78,7 +78,7 @@ public class MCRMODSPagesHelper {
  **/
 class HyphenNormalizer {
 
-    private final static char HYPHEN_NORM = '-';
+    private static final char HYPHEN_NORM = '-';
 
     private char[] HYPHEN_VARIANTS = { '\u002D', '\u2010', '\u2011', '\u2012', '\u2013', '\u2015', '\u2212', '\u2E3B',
         '\uFE58', '\uFE63' };
@@ -122,37 +122,37 @@ class EndPageCompleter {
  **/
 class ExtentPagesBuilder {
 
-    private final static String OPTIONAL = "?";
+    private static final String OPTIONAL = "?";
 
-    private final static String ZERO_OR_MORE = "*";
+    private static final String ZERO_OR_MORE = "*";
 
-    private final static String ONE_OR_MORE = "+";
+    private static final String ONE_OR_MORE = "+";
 
-    private final static String NUMBER = "([0-9]+)";
+    private static final String NUMBER = "([0-9]+)";
 
-    private final static String PAGENR = "([a-zA-Z0-9\\.]+)";
+    private static final String PAGENR = "([a-zA-Z0-9\\.]+)";
 
-    private final static String SPACE = "\\s";
+    private static final String SPACE = "\\s";
 
-    private final static String SPACES = SPACE + ONE_OR_MORE;
+    private static final String SPACES = SPACE + ONE_OR_MORE;
 
-    private final static String SPACES_OPTIONAL = SPACE + ZERO_OR_MORE;
+    private static final String SPACES_OPTIONAL = SPACE + ZERO_OR_MORE;
 
-    private final static String DOT = "\\.";
+    private static final String DOT = "\\.";
 
-    private final static String HYPHEN = SPACES_OPTIONAL + "-" + SPACES_OPTIONAL;
+    private static final String HYPHEN = SPACES_OPTIONAL + "-" + SPACES_OPTIONAL;
 
-    private final static String PAGENR_W_HYPHEN = "([a-zA-Z0-9-\\.]+)";
+    private static final String PAGENR_W_HYPHEN = "([a-zA-Z0-9-\\.]+)";
 
-    private final static String HYPHEN_SEPARATED = SPACES + "-" + SPACES;
+    private static final String HYPHEN_SEPARATED = SPACES + "-" + SPACES;
 
-    private final static String PAGE = "([sSp]{1,2}" + DOT + OPTIONAL + SPACES_OPTIONAL + ")" + OPTIONAL;
+    private static final String PAGE = "([sSp]{1,2}" + DOT + OPTIONAL + SPACES_OPTIONAL + ")" + OPTIONAL;
 
-    private final static String PAGES = "(pages|[Ss]eiten|S\\.)";
+    private static final String PAGES = "(pages|[Ss]eiten|S\\.)";
 
-    private final static String FF = "(" + SPACES + "ff?\\.?)" + OPTIONAL;
+    private static final String FF = "(" + SPACES + "ff?\\.?)" + OPTIONAL;
 
-    private List<PagesPattern> patterns = new ArrayList<PagesPattern>();
+    private List<PagesPattern> patterns = new ArrayList<>();
 
     ExtentPagesBuilder() {
         PagesPattern startEnd = new PagesPattern(PAGE + PAGENR + HYPHEN + PAGENR + DOT + OPTIONAL);
@@ -226,7 +226,7 @@ class PagesPattern {
     private Pattern pattern;
 
     /** Mapping from MODS Element name to group number in the pattern */
-    private Map<String, Integer> mods2group = new LinkedHashMap<String, Integer>();
+    private Map<String, Integer> mods2group = new LinkedHashMap<>();
 
     PagesPattern(String regularExpression) {
         pattern = Pattern.compile(regularExpression);

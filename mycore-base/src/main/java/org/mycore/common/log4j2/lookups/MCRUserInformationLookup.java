@@ -25,7 +25,8 @@ import org.mycore.common.MCRSessionMgr;
  * @author Thomas Scheffler (yagee)
  */
 @Plugin(
-    name = "mcruser", category = StrLookup.CATEGORY)
+    name = "mcruser",
+    category = StrLookup.CATEGORY)
 public class MCRUserInformationLookup implements StrLookup {
 
     private static final Pattern ROLE_SEPARATOR = Pattern.compile(",");

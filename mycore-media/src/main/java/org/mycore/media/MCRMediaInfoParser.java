@@ -173,7 +173,7 @@ public class MCRMediaInfoParser extends MCRMediaParser {
         MCRMediaObject media = new MCRMediaObject();
 
         if (libExporter.isValid() && MI.isValid() && MI.Open(file.getAbsolutePath()) > 0) {
-            LOGGER.info("parse " + file.getName() + "...");
+            LOGGER.info("parse {}...", file.getName());
 
             try {
                 String info = MI.Inform();
@@ -229,134 +229,206 @@ public class MCRMediaInfoParser extends MCRMediaParser {
                             String value = ovalue.toLowerCase();
 
                             if (step == MediaInfo.StreamKind.General) {
-                                if (key.equals("Format"))
-                                    media.format = ovalue;
-                                else if (key.equals("Format/Info"))
-                                    media.formatFull = ovalue;
-                                else if (key.equals("InternetMediaType"))
-                                    media.mimeType = value;
-                                else if (key.equals("Duration"))
-                                    media.duration = Integer.parseInt(value);
-                                else if (key.equals("OverallBitRate"))
-                                    media.bitRate = Integer.parseInt(value);
-                                else if (key.equals("Encoded_Library"))
-                                    media.encoderStr = ovalue;
-                                else if (key.equals("Title") || key.equals("Album") || key.equals("Track")
-                                    || key.equals("Track/Position")
-                                    || key.equals("Performer") || key.equals("Genre") || key.equals("Recorded_Date")
-                                    || key.equals("Comment")) {
+                                switch (key) {
+                                    case "Format":
+                                        media.format = ovalue;
+                                        break;
+                                    case "Format/Info":
+                                        media.formatFull = ovalue;
+                                        break;
+                                    case "InternetMediaType":
+                                        media.mimeType = value;
+                                        break;
+                                    case "Duration":
+                                        media.duration = Integer.parseInt(value);
+                                        break;
+                                    case "OverallBitRate":
+                                        media.bitRate = Integer.parseInt(value);
+                                        break;
+                                    case "Encoded_Library":
+                                        media.encoderStr = ovalue;
+                                        break;
+                                    case "Title":
+                                    case "Album":
+                                    case "Track":
+                                    case "Track/Position":
+                                    case "Performer":
+                                    case "Genre":
+                                    case "Recorded_Date":
+                                    case "Comment":
 
-                                    if (media.tags == null)
-                                        media.tags = new MCRMediaTagObject();
+                                        if (media.tags == null)
+                                            media.tags = new MCRMediaTagObject();
 
-                                    //Container Infos
-                                    if (key.equals("Title"))
-                                        media.tags.title = ovalue;
-                                    else if (key.equals("Album"))
-                                        media.tags.album = ovalue;
-                                    else if (key.equals("Track"))
-                                        media.tags.trackName = ovalue;
-                                    else if (key.equals("Track/Position"))
-                                        media.tags.trackPosition = Integer.parseInt(value);
-                                    else if (key.equals("Performer"))
-                                        media.tags.performer = ovalue;
-                                    else if (key.equals("Genre"))
-                                        media.tags.genre = ovalue;
-                                    else if (key.equals("Recorded_Date"))
-                                        media.tags.recordDate = ovalue;
-                                    else if (key.equals("Comment"))
-                                        media.tags.comment = ovalue;
+                                        //Container Infos
+                                        switch (key) {
+                                            case "Title":
+                                                media.tags.title = ovalue;
+                                                break;
+                                            case "Album":
+                                                media.tags.album = ovalue;
+                                                break;
+                                            case "Track":
+                                                media.tags.trackName = ovalue;
+                                                break;
+                                            case "Track/Position":
+                                                media.tags.trackPosition = Integer.parseInt(value);
+                                                break;
+                                            case "Performer":
+                                                media.tags.performer = ovalue;
+                                                break;
+                                            case "Genre":
+                                                media.tags.genre = ovalue;
+                                                break;
+                                            case "Recorded_Date":
+                                                media.tags.recordDate = ovalue;
+                                                break;
+                                            case "Comment":
+                                                media.tags.comment = ovalue;
+                                                break;
+                                        }
+                                        break;
                                 }
                             } else if (step == MediaInfo.StreamKind.Video) {
-                                if (key.equals("Format")) {
-                                    ((MCRVideoObject) media).subFormat = ovalue;
-                                    ((MCRVideoObject) media).subFormatFull = ovalue;
-                                } else if (key.equals("Format/Info"))
-                                    ((MCRVideoObject) media).subFormatFull = ovalue;
-                                else if (key.equals("Format_Version")) {
-                                    ((MCRVideoObject) media).subFormatVersion = ovalue;
-                                    ((MCRVideoObject) media).subFormatFull += " " + ovalue;
-                                } else if (key.equals("Format_Profile")) {
-                                    ((MCRVideoObject) media).subFormatProfile = ovalue;
-                                    ((MCRVideoObject) media).subFormatFull += " " + ovalue;
-                                } else if (key.equals("CodecID"))
-                                    ((MCRVideoObject) media).codecID = value;
-                                else if (key.equals("Codec"))
-                                    ((MCRVideoObject) media).codec = ovalue;
-                                else if (key.equals("Codec/Info"))
-                                    ((MCRVideoObject) media).codecFull = ovalue;
-                                else if (key.equals("CodecID/Url") || key.equals("Codec/Url"))
-                                    ((MCRVideoObject) media).codecURL = ovalue;
-                                else if (key.equals("Encoded_Library/String"))
-                                    media.encoderStr = ovalue;
-                                else if (key.equals("BitRate") || key.equals("BitRate_Nominal"))
-                                    ((MCRVideoObject) media).streamBitRate = Integer.parseInt(value);
-                                else if (key.equals("Width"))
-                                    ((MCRVideoObject) media).width = Integer.parseInt(value);
-                                else if (key.equals("Height"))
-                                    ((MCRVideoObject) media).height = Integer.parseInt(value);
-                                else if (key.equals("Resolution"))
-                                    ((MCRVideoObject) media).resolution = Integer.parseInt(value);
-                                else if (key.equals("DisplayAspectRatio/String"))
-                                    ((MCRVideoObject) media).aspectRatio = value;
-                                else if (key.equals("FrameRate"))
-                                    ((MCRVideoObject) media).frameRate = Float.parseFloat(value);
+                                switch (key) {
+                                    case "Format":
+                                        ((MCRVideoObject) media).subFormat = ovalue;
+                                        ((MCRVideoObject) media).subFormatFull = ovalue;
+                                        break;
+                                    case "Format/Info":
+                                        ((MCRVideoObject) media).subFormatFull = ovalue;
+                                        break;
+                                    case "Format_Version":
+                                        ((MCRVideoObject) media).subFormatVersion = ovalue;
+                                        ((MCRVideoObject) media).subFormatFull += " " + ovalue;
+                                        break;
+                                    case "Format_Profile":
+                                        ((MCRVideoObject) media).subFormatProfile = ovalue;
+                                        ((MCRVideoObject) media).subFormatFull += " " + ovalue;
+                                        break;
+                                    case "CodecID":
+                                        ((MCRVideoObject) media).codecID = value;
+                                        break;
+                                    case "Codec":
+                                        ((MCRVideoObject) media).codec = ovalue;
+                                        break;
+                                    case "Codec/Info":
+                                        ((MCRVideoObject) media).codecFull = ovalue;
+                                        break;
+                                    case "CodecID/Url":
+                                    case "Codec/Url":
+                                        ((MCRVideoObject) media).codecURL = ovalue;
+                                        break;
+                                    case "Encoded_Library/String":
+                                        media.encoderStr = ovalue;
+                                        break;
+                                    case "BitRate":
+                                    case "BitRate_Nominal":
+                                        ((MCRVideoObject) media).streamBitRate = Integer.parseInt(value);
+                                        break;
+                                    case "Width":
+                                        ((MCRVideoObject) media).width = Integer.parseInt(value);
+                                        break;
+                                    case "Height":
+                                        ((MCRVideoObject) media).height = Integer.parseInt(value);
+                                        break;
+                                    case "Resolution":
+                                        ((MCRVideoObject) media).resolution = Integer.parseInt(value);
+                                        break;
+                                    case "DisplayAspectRatio/String":
+                                        ((MCRVideoObject) media).aspectRatio = value;
+                                        break;
+                                    case "FrameRate":
+                                        ((MCRVideoObject) media).frameRate = Float.parseFloat(value);
+                                        break;
+                                }
                             } else if (step == MediaInfo.StreamKind.Audio && audio != null) {
-                                if (key.equals("Format")) {
-                                    audio.subFormat = ovalue;
-                                    audio.subFormatFull = ovalue;
-                                } else if (key.equals("Format/Info"))
-                                    audio.subFormatFull = ovalue;
-                                else if (key.equals("Format_Version")) {
-                                    audio.subFormatVersion = ovalue;
-                                    audio.subFormatFull += " " + ovalue;
-                                } else if (key.equals("Format_Profile")) {
-                                    audio.subFormatProfile = ovalue;
-                                    audio.subFormatFull += " " + ovalue;
-                                } else if (key.equals("CodecID"))
-                                    audio.codecID = value;
-                                else if (key.equals("Codec"))
-                                    audio.codec = ovalue;
-                                else if (key.equals("Codec/Info"))
-                                    audio.codecFull = ovalue;
-                                else if (key.equals("CodecID/Url") || key.equals("Codec/Url"))
-                                    audio.codecURL = ovalue;
-                                else if (key.equals("Encoded_Library/String"))
-                                    audio.encoderStr = ovalue;
-                                else if (key.equals("Duration"))
-                                    audio.duration = Integer.parseInt(value);
-                                else if (key.equals("BitRate"))
-                                    audio.streamBitRate = Integer.parseInt(value);
-                                else if (key.equals("BitRate_Mode"))
-                                    audio.streamBitRateMode = ovalue;
-                                else if (key.equals("Channel(s)"))
-                                    audio.channels = Integer.parseInt(value);
-                                else if (key.equals("SamplingRate"))
-                                    audio.samplingRate = Integer.parseInt(value);
-                                else if (key.equals("Language"))
-                                    audio.language = value;
+                                switch (key) {
+                                    case "Format":
+                                        audio.subFormat = ovalue;
+                                        audio.subFormatFull = ovalue;
+                                        break;
+                                    case "Format/Info":
+                                        audio.subFormatFull = ovalue;
+                                        break;
+                                    case "Format_Version":
+                                        audio.subFormatVersion = ovalue;
+                                        audio.subFormatFull += " " + ovalue;
+                                        break;
+                                    case "Format_Profile":
+                                        audio.subFormatProfile = ovalue;
+                                        audio.subFormatFull += " " + ovalue;
+                                        break;
+                                    case "CodecID":
+                                        audio.codecID = value;
+                                        break;
+                                    case "Codec":
+                                        audio.codec = ovalue;
+                                        break;
+                                    case "Codec/Info":
+                                        audio.codecFull = ovalue;
+                                        break;
+                                    case "CodecID/Url":
+                                    case "Codec/Url":
+                                        audio.codecURL = ovalue;
+                                        break;
+                                    case "Encoded_Library/String":
+                                        audio.encoderStr = ovalue;
+                                        break;
+                                    case "Duration":
+                                        audio.duration = Integer.parseInt(value);
+                                        break;
+                                    case "BitRate":
+                                        audio.streamBitRate = Integer.parseInt(value);
+                                        break;
+                                    case "BitRate_Mode":
+                                        audio.streamBitRateMode = ovalue;
+                                        break;
+                                    case "Channel(s)":
+                                        audio.channels = Integer.parseInt(value);
+                                        break;
+                                    case "SamplingRate":
+                                        audio.samplingRate = Integer.parseInt(value);
+                                        break;
+                                    case "Language":
+                                        audio.language = value;
+                                        break;
+                                }
                             } else if (step == MediaInfo.StreamKind.Image) {
                                 //TODO: use Sanselan to get metadata like EXIF
-                                if (key.equals("Format"))
-                                    ((MCRImageObject) media).subFormat = ovalue;
-                                else if (key.equals("Format_Settings_Matrix"))
-                                    ((MCRImageObject) media).subFormatFull = ovalue;
-                                else if (key.equals("CodecID"))
-                                    ((MCRImageObject) media).codecID = value;
-                                else if (key.equals("Codec"))
-                                    ((MCRImageObject) media).codec = ovalue;
-                                else if (key.equals("Codec/Info"))
-                                    ((MCRImageObject) media).codecFull = ovalue;
-                                else if (key.equals("CodecID/Url") || key.equals("Codec/Url"))
-                                    ((MCRImageObject) media).codecURL = ovalue;
-                                else if (key.equals("Encoded_Library/String"))
-                                    media.encoderStr = ovalue;
-                                else if (key.equals("Width"))
-                                    ((MCRImageObject) media).width = Integer.parseInt(value);
-                                else if (key.equals("Height"))
-                                    ((MCRImageObject) media).height = Integer.parseInt(value);
-                                else if (key.equals("Resolution"))
-                                    ((MCRImageObject) media).resolution = Integer.parseInt(value);
+                                switch (key) {
+                                    case "Format":
+                                        ((MCRImageObject) media).subFormat = ovalue;
+                                        break;
+                                    case "Format_Settings_Matrix":
+                                        ((MCRImageObject) media).subFormatFull = ovalue;
+                                        break;
+                                    case "CodecID":
+                                        ((MCRImageObject) media).codecID = value;
+                                        break;
+                                    case "Codec":
+                                        ((MCRImageObject) media).codec = ovalue;
+                                        break;
+                                    case "Codec/Info":
+                                        ((MCRImageObject) media).codecFull = ovalue;
+                                        break;
+                                    case "CodecID/Url":
+                                    case "Codec/Url":
+                                        ((MCRImageObject) media).codecURL = ovalue;
+                                        break;
+                                    case "Encoded_Library/String":
+                                        media.encoderStr = ovalue;
+                                        break;
+                                    case "Width":
+                                        ((MCRImageObject) media).width = Integer.parseInt(value);
+                                        break;
+                                    case "Height":
+                                        ((MCRImageObject) media).height = Integer.parseInt(value);
+                                        break;
+                                    case "Resolution":
+                                        ((MCRImageObject) media).resolution = Integer.parseInt(value);
+                                        break;
+                                }
                             }
                         }
                     }

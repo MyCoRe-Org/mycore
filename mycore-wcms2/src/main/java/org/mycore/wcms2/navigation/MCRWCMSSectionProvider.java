@@ -10,17 +10,17 @@ import com.google.gson.JsonArray;
  */
 public interface MCRWCMSSectionProvider extends MCRWCMSJSONProvider<Element, JsonArray> {
 
-    public final static String JSON_TITLE = "title";
+    String JSON_TITLE = "title";
 
-    public final static String JSON_LANG = "lang";
+    String JSON_LANG = "lang";
 
-    public final static String JSON_DATA = "data";
+    String JSON_DATA = "data";
 
     /**
      * 
      */
     @Override
-    public Element fromJSON(JsonArray jsonSection);
+    Element fromJSON(JsonArray jsonSection);
 
     /**
      * Converts a MyCoRe Webpage to a json array. The array contains
@@ -33,6 +33,6 @@ public interface MCRWCMSSectionProvider extends MCRWCMSJSONProvider<Element, Jso
      * </p>
      */
     @Override
-    public JsonArray toJSON(Element object);
+    JsonArray toJSON(Element object);
 
 }

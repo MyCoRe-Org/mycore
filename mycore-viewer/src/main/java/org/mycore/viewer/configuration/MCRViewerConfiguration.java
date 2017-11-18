@@ -52,7 +52,7 @@ public class MCRViewerConfiguration {
 
     private static Logger LOGGER = LogManager.getLogger(MCRViewerConfiguration.class);
 
-    public static enum ResourceType {
+    public enum ResourceType {
         script, css
     }
 
@@ -123,7 +123,7 @@ public class MCRViewerConfiguration {
         try {
             return getFromPath(request.getPathInfo(), 1);
         } catch (Exception exc) {
-            LOGGER.warn("Unable to get the derivate id of request " + request.getRequestURI());
+            LOGGER.warn("Unable to get the derivate id of request {}", request.getRequestURI());
             return null;
         }
     }
@@ -138,7 +138,7 @@ public class MCRViewerConfiguration {
     public static String getFilePath(HttpServletRequest request) {
         try {
             String fromPath = getFromPath(request.getPathInfo(), 2);
-            if(fromPath == null || fromPath.isEmpty() || fromPath.equals("/")){
+            if (fromPath == null || fromPath.isEmpty() || fromPath.equals("/")) {
                 String derivate = getDerivate(request);
                 MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
                 String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();
@@ -146,7 +146,7 @@ public class MCRViewerConfiguration {
             }
             return fromPath;
         } catch (Exception exc) {
-            LOGGER.warn("Unable to get the file path of request " + request.getRequestURI());
+            LOGGER.warn("Unable to get the file path of request {}", request.getRequestURI());
             return null;
         }
     }
@@ -192,7 +192,7 @@ public class MCRViewerConfiguration {
      */
     public void addLocalScript(final String file, final boolean hasMinified) {
         String baseURL = MCRFrontendUtil.getBaseURL();
-        StringBuffer scriptURL = new StringBuffer(baseURL);
+        StringBuilder scriptURL = new StringBuilder(baseURL);
         scriptURL.append("modules/iview2/js/");
         if (isDebugMode() || !hasMinified) {
             scriptURL.append(file);
@@ -217,9 +217,7 @@ public class MCRViewerConfiguration {
      */
     public void addLocalCSS(final String file) {
         String baseURL = MCRFrontendUtil.getBaseURL();
-        StringBuffer cssURL = new StringBuffer(baseURL);
-        cssURL.append("modules/iview2/css/").append(file);
-        addCSS(cssURL.toString());
+        addCSS(baseURL + "modules/iview2/css/" + file);
     }
 
     /**
@@ -257,7 +255,7 @@ public class MCRViewerConfiguration {
      */
     public MCRXMLContent toXML() throws JAXBException {
         MCRIViewClientXMLConfiguration xmlConfig = new MCRIViewClientXMLConfiguration(resources, properties);
-        MCRJAXBContent<MCRIViewClientXMLConfiguration> config = new MCRJAXBContent<MCRIViewClientXMLConfiguration>(
+        MCRJAXBContent<MCRIViewClientXMLConfiguration> config = new MCRJAXBContent<>(
             JAXBContext.newInstance(xmlConfig.getClass()), xmlConfig);
         return config;
     }

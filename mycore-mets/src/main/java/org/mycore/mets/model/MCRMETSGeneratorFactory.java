@@ -35,17 +35,18 @@ public abstract class MCRMETSGeneratorFactory {
 
         // get selector
         String cn = MCRConfiguration.instance().getString("MCR.Component.MetsMods.Generator.Selector",
-                MCRMETSPropertyGeneratorSelector.class.getName());
+            MCRMETSPropertyGeneratorSelector.class.getName());
         try {
             Class<?> classToCheck = Class.forName(cn);
             Class<? extends MCRMETSGeneratorSelector> generatorSelectorClass = classToCheck
-                    .asSubclass(MCRMETSGeneratorSelector.class);
+                .asSubclass(MCRMETSGeneratorSelector.class);
             GENERATOR_SELECTOR = generatorSelectorClass.newInstance();
         } catch (Exception cause) {
             GENERATOR_SELECTOR = new MCRMETSPropertyGeneratorSelector();
             throw new MCRException(
-                    "Unable to instantiate " + cn + ". Please check the 'MCR.Component.MetsMods.Generator.Selector'."
-                            + " Using default MCRMETSPropertyGeneratorSelector.", cause);
+                "Unable to instantiate " + cn + ". Please check the 'MCR.Component.MetsMods.Generator.Selector'."
+                    + " Using default MCRMETSPropertyGeneratorSelector.",
+                cause);
         }
     }
 
@@ -81,7 +82,7 @@ public abstract class MCRMETSGeneratorFactory {
                 getOldMets(derivatePath).ifPresent(abstractGenerator::setOldMets);
             } catch (Exception exc) {
                 // we should not fail if the old mets.xml is broken
-                LogManager.getLogger().error("Unable to read mets.xml of " + derivatePath.getOwner(), exc);
+                LogManager.getLogger().error("Unable to read mets.xml of {}", derivatePath.getOwner(), exc);
             }
         }
         return generator;
@@ -156,7 +157,7 @@ public abstract class MCRMETSGeneratorFactory {
         @Override
         public MCRMETSGenerator get(MCRPath derivatePath) {
             String cn = MCRConfiguration.instance().getString("MCR.Component.MetsMods.Generator",
-                    MCRMETSDefaultGenerator.class.getName());
+                MCRMETSDefaultGenerator.class.getName());
             try {
                 if (METS_GENERATOR_CLASS == null || !cn.equals(METS_GENERATOR_CLASS.getName())) {
                     Class<?> classToCheck = Class.forName(cn);
@@ -165,7 +166,7 @@ public abstract class MCRMETSGeneratorFactory {
                 return METS_GENERATOR_CLASS.newInstance();
             } catch (Exception cause) {
                 throw new MCRException("Unable to instantiate " + cn
-                        + ". Please check the 'MCR.Component.MetsMods.Generator' property'.", cause);
+                    + ". Please check the 'MCR.Component.MetsMods.Generator' property'.", cause);
             }
         }
     }

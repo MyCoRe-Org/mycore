@@ -1,5 +1,11 @@
 package org.mycore.solr.index.handlers.stream;
 
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -10,12 +16,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 
-import java.io.IOException;
-import java.util.Map;
-
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
-import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
-
 /**
  * Base class for stream indexing MCRObject's with the default UPDATE_PATH.
  *
@@ -23,9 +23,9 @@ import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
  */
 public abstract class MCRSolrObjectStreamIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRSolrObjectStreamIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrObjectStreamIndexHandler.class);
 
-    final static String STYLESHEET = MCRConfiguration.instance()
+    static final String STYLESHEET = MCRConfiguration.instance()
         .getString(CONFIG_PREFIX + "IndexHandler.ContentStream.ServerStyleSheet");
 
     public MCRSolrObjectStreamIndexHandler() {
@@ -48,7 +48,7 @@ public abstract class MCRSolrObjectStreamIndexHandler extends MCRSolrAbstractStr
         if (LOGGER.isDebugEnabled()) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("Solr: indexing data of \"");
-            stringBuilder.append(this.toString());
+            stringBuilder.append(this);
             stringBuilder.append("\" (");
             stringBuilder.append((System.currentTimeMillis() - tStart));
             stringBuilder.append("ms)");
@@ -56,7 +56,7 @@ public abstract class MCRSolrObjectStreamIndexHandler extends MCRSolrAbstractStr
                 stringBuilder.append('\n');
                 stringBuilder.append(entry.getKey());
                 stringBuilder.append('=');
-                stringBuilder.append(entry.getValue().toString());
+                stringBuilder.append(entry.getValue());
             }
             LOGGER.debug(stringBuilder.toString());
         }

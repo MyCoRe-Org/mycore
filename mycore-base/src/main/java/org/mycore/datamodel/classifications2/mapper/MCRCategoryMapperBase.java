@@ -40,7 +40,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 public abstract class MCRCategoryMapperBase {
 
     public Set<MCRCategoryID> map(Collection<MCRCategoryID> input) {
-        SortedSet<MCRCategoryID> output = new TreeSet<MCRCategoryID>();
+        SortedSet<MCRCategoryID> output = new TreeSet<>();
 
         for (MCRCategoryID categoryID : input) {
             Set<MCRCategoryID> mapped = collectMappings(categoryID);
@@ -51,7 +51,7 @@ public abstract class MCRCategoryMapperBase {
     }
 
     private Set<MCRCategoryID> collectMappings(MCRCategoryID categoryID) {
-        Set<MCRCategoryID> mapped = new TreeSet<MCRCategoryID>();
+        Set<MCRCategoryID> mapped = new TreeSet<>();
 
         for (MCRCategoryID parent : resolveParentOrSelf(categoryID)) {
             for (MCRCategoryID mapping : getMappings(parent)) {
@@ -86,7 +86,7 @@ public abstract class MCRCategoryMapperBase {
     }
 
     private List<MCRCategoryID> resolveParentOrSelf(MCRCategoryID childID) {
-        List<MCRCategoryID> parentOrSelf = new ArrayList<MCRCategoryID>();
+        List<MCRCategoryID> parentOrSelf = new ArrayList<>();
         parentOrSelf.add(childID);
         addParentsToList(childID, parentOrSelf);
         return parentOrSelf;

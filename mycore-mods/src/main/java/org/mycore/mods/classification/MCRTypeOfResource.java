@@ -16,7 +16,7 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
      * The name of the MODS element typeOfResource, which is same as the classification ID used to map the codes to
      * categories.
      */
-    public final static String TYPE_OF_RESOURCE = "typeOfResource";
+    public static final String TYPE_OF_RESOURCE = "typeOfResource";
 
     /**
      * The mods:typeOfResource code, which is same as the category ID

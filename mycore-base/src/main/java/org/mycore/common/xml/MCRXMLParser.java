@@ -38,7 +38,7 @@ import org.xml.sax.SAXParseException;
  */
 public interface MCRXMLParser {
 
-    public boolean isValidating();
+    boolean isValidating();
 
-    public Document parseXML(MCRContent content) throws MCRException, SAXParseException;
+    Document parseXML(MCRContent content) throws MCRException, SAXParseException;
 }

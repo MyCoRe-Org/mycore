@@ -12,9 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.processing.MCRAbstractProgressable;
-import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableStatus;
-import org.mycore.common.processing.MCRProcessableStatusListener;
 import org.mycore.common.processing.MCRProgressable;
 import org.mycore.common.processing.MCRProgressableListener;
 
@@ -35,13 +33,7 @@ public class MCRProcessableSupplierTest extends MCRTestCase {
 
         // STATUS LISTENER
         STATUS_LISTENER_COUNTER = 0;
-        supplier.addStatusListener(new MCRProcessableStatusListener() {
-            @Override
-            public void onStatusChange(MCRProcessable source, MCRProcessableStatus oldStatus,
-                MCRProcessableStatus newStatus) {
-                STATUS_LISTENER_COUNTER++;
-            }
-        });
+        supplier.addStatusListener((source, oldStatus, newStatus) -> STATUS_LISTENER_COUNTER++);
 
         // PROGRESS LISTENER
         PROGRESS_LISTENER_COUNTER = 0;

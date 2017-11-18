@@ -288,7 +288,7 @@ public class MCRTextResolver {
      * 
      * @author Matthias Eichner
      */
-    protected static abstract class Term {
+    protected abstract static class Term {
         /**
          * The string buffer within the term. For example: {<b>var</b>}. 
          */
@@ -443,7 +443,7 @@ public class MCRTextResolver {
                 if (value == null) {
                     resolved = false;
                     if (getTextResolver().isRetainText()) {
-                        this.valueBuffer.append(getStartEnclosingString()).append(termBuffer.toString())
+                        this.valueBuffer.append(getStartEnclosingString()).append(termBuffer)
                             .append(getEndEnclosingString());
                     }
                     this.untrack();
@@ -471,9 +471,7 @@ public class MCRTextResolver {
         public String getValue() {
             if (!complete) {
                 // assume that the variable is not complete 
-                StringBuffer buf = new StringBuffer();
-                buf.append(getStartEnclosingString()).append(termBuffer.toString());
-                return buf.toString();
+                return getStartEnclosingString() + termBuffer;
             }
             return valueBuffer.toString();
         }
@@ -500,8 +498,7 @@ public class MCRTextResolver {
         }
 
         protected String getTrackID() {
-            return new StringBuffer(getStartEnclosingString()).append(termBuffer.toString())
-                .append(getEndEnclosingString()).toString();
+            return getStartEnclosingString() + termBuffer + getEndEnclosingString();
         }
 
         /**
@@ -626,7 +623,7 @@ public class MCRTextResolver {
      */
     protected static class TermContainer {
 
-        protected Map<String, Class<? extends Term>> termMap = new HashMap<String, Class<? extends Term>>();
+        protected Map<String, Class<? extends Term>> termMap = new HashMap<>();
 
         protected MCRTextResolver textResolver;
 
@@ -669,11 +666,7 @@ public class MCRTextResolver {
         }
 
         public void track(String type, String id) throws CircularDependencyExecption {
-            List<String> idList = trackMap.get(type);
-            if (idList == null) {
-                idList = new ArrayList<>();
-                trackMap.put(type, idList);
-            }
+            List<String> idList = trackMap.computeIfAbsent(type, k -> new ArrayList<>());
             if (idList.contains(id)) {
                 throw new CircularDependencyExecption(idList, id);
             }
@@ -683,7 +676,7 @@ public class MCRTextResolver {
         public void untrack(String type, String id) {
             List<String> idList = trackMap.get(type);
             if (idList == null) {
-                LOGGER.error("text resolver circular dependency tracking error: cannot get type " + type + " of " + id);
+                LOGGER.error("text resolver circular dependency tracking error: cannot get type {} of {}", type, id);
                 return;
             }
             idList.remove(id);
@@ -710,7 +703,7 @@ public class MCRTextResolver {
 
         @Override
         public String getMessage() {
-            StringBuffer msg = new StringBuffer("A circular dependency exception occurred");
+            StringBuilder msg = new StringBuilder("A circular dependency exception occurred");
             msg.append("\n").append("circular path: ");
             for (String dep : dependencyList) {
                 msg.append(dep).append(" > ");

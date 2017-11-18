@@ -120,10 +120,9 @@ public class MCRMediaPDFParser extends MCRMediaParser {
 
         MCRPDFObject media = new MCRPDFObject();
 
-        LOGGER.info("parse " + file.getName() + "...");
+        LOGGER.info("parse {}...", file.getName());
 
-        PDDocument pdf = PDDocument.load(file);
-        try {
+        try (PDDocument pdf = PDDocument.load(file)) {
             media.fileName = file.getName();
             media.fileSize = file.length();
             media.folderName = (file.getAbsolutePath()).replace(file.getName(), "");
@@ -132,7 +131,7 @@ public class MCRMediaPDFParser extends MCRMediaParser {
 
             media.numPages = pdf.getNumberOfPages();
 
-            PDPage page = (PDPage) pages.get(0);
+            PDPage page = pages.get(0);
             PDRectangle rect = page.getMediaBox();
 
             media.width = Math.round(rect.getWidth());
@@ -151,8 +150,6 @@ public class MCRMediaPDFParser extends MCRMediaParser {
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             throw new Exception(e.getMessage());
-        } finally {
-            pdf.close();
         }
 
         return media;

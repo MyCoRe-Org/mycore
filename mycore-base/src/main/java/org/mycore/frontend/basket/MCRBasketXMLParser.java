@@ -23,8 +23,6 @@
 
 package org.mycore.frontend.basket;
 
-import java.util.List;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 
@@ -45,10 +43,11 @@ public class MCRBasketXMLParser {
         MCRBasket basket = new MCRBasket(type);
 
         String derivateID = xml.getAttributeValue("id");
-        if (derivateID != null)
+        if (derivateID != null) {
             basket.setDerivateID(derivateID);
+        }
 
-        for (Element child : (List<Element>) (xml.getChildren())) {
+        for (Element child : xml.getChildren()) {
             MCRBasketEntry entry = parseXML(child);
             basket.add(entry);
         }
@@ -65,8 +64,9 @@ public class MCRBasketXMLParser {
         MCRBasketEntry entry = new MCRBasketEntry(id, uri);
 
         String comment = xml.getChildTextTrim("comment");
-        if (comment != null)
+        if (comment != null) {
             entry.setComment(comment);
+        }
 
         return entry;
     }

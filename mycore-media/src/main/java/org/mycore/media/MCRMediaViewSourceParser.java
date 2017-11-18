@@ -123,9 +123,11 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     public synchronized MCRMediaObject parse(File file) throws Exception {
         throw new Exception("File is'n supported by ViewSource Parser");
     }
+
     public synchronized MCRMediaObject parse(org.mycore.datamodel.ifs.MCRFile file) throws Exception {
         return setFileInfo(parse(buildViewSourceURL(file)), toFile(file));
     }
+
     private MCRMediaObject setFileInfo(MCRMediaObject media, File file) {
         media.fileName = file.getName();
         String path = file.getAbsolutePath();
@@ -144,7 +146,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     private synchronized MCRMediaObject parse(String vsURL) throws Exception {
         MCRMediaObject media = new MCRMediaObject();
 
-        LOGGER.info("parse " + vsURL + "...");
+        LOGGER.info("parse {}...", vsURL);
 
         String data = getMetadata(vsURL);
 
@@ -208,7 +210,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                         }
                     }
 
-                    LOGGER.debug(key + " " + value);
+                    LOGGER.debug("{} {}", key, value);
 
                     if ("general".equals(step)) {
                         if ("MIME type:".equals(key)) {

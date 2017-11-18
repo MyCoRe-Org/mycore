@@ -11,17 +11,17 @@ import com.google.gson.JsonObject;
  */
 public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNavigation, JsonObject> {
 
-    public final static String JSON_HIERARCHY = "hierarchy";
+    String JSON_HIERARCHY = "hierarchy";
 
-    public final static String JSON_ITEMS = "items";
+    String JSON_ITEMS = "items";
 
-    public final static String JSON_CHILDREN = "children";
+    String JSON_CHILDREN = "children";
 
-    public final static String JSON_WCMS_ID = "wcmsId";
+    String JSON_WCMS_ID = "wcmsId";
 
-    public final static String JSON_WCMS_TYPE = "wcmsType";
+    String JSON_WCMS_TYPE = "wcmsType";
 
-    public enum WCMSType {
+    enum WCMSType {
         root, item, insert, menu, group
     }
 
@@ -49,7 +49,7 @@ public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNaviga
      * @return the generated json
      */
     @Override
-    public JsonObject toJSON(MCRNavigation navigation);
+    JsonObject toJSON(MCRNavigation navigation);
 
     /**
      * Converts an WCMS JSON Object to an <code>Navigation</code> object.
@@ -57,6 +57,6 @@ public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNaviga
      * TODO: json data structure
      */
     @Override
-    public MCRNavigation fromJSON(JsonObject jsonNavigation);
+    MCRNavigation fromJSON(JsonObject jsonNavigation);
 
 }

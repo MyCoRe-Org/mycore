@@ -14,5 +14,5 @@ public interface MCRILogicalStructMapTypeProvider {
     /**
      * @return the type depending on metadata given by an object id
      */
-    public String getType(MCRObjectID objectId);
+    String getType(MCRObjectID objectId);
 }

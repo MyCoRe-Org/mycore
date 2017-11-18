@@ -90,7 +90,7 @@ public class MCRMODSEmbargoUtils {
         try {
             embargo = embargoCache.getIfUpToDate(objectId, modifiedHandle);
         } catch (IOException e) {
-            LOGGER.warn("Could not determine last modified timestamp of object " + objectId);
+            LOGGER.warn("Could not determine last modified timestamp of object {}", objectId);
         }
         if (embargo != null) {
             return embargo == EMPTY_VALUE ? null : embargo;

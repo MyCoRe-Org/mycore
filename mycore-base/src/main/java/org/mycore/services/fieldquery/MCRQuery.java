@@ -40,7 +40,7 @@ public class MCRQuery {
     private int maxResults = 0;
 
     /** A list of MCRSortBy criteria, may be empty */
-    private List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
+    private List<MCRSortBy> sortBy = new ArrayList<>();
 
     /** A cached xml representation of the query */
     private Document doc = null;
@@ -122,7 +122,7 @@ public class MCRQuery {
      */
     public void setSortBy(List<MCRSortBy> sortBy) {
         if (sortBy == null) {
-            sortBy = new ArrayList<MCRSortBy>();
+            sortBy = new ArrayList<>();
         }
         this.sortBy = sortBy;
         doc = null;
@@ -135,7 +135,7 @@ public class MCRQuery {
      *            a MCRSortBy object
      */
     public void setSortBy(MCRSortBy sortBy) {
-        this.sortBy = new ArrayList<MCRSortBy>();
+        this.sortBy = new ArrayList<>();
         if (sortBy != null) {
             this.sortBy.add(sortBy);
         }
@@ -184,7 +184,7 @@ public class MCRQuery {
         Element conditions = xml.getChild("conditions");
         MCRQuery query = null;
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
-            Element condElem = (Element) conditions.getChildren().get(0);
+            Element condElem = conditions.getChildren().get(0);
             query = new MCRQuery(new MCRQueryParser().parse(condElem));
         } else {
             String queryString = conditions.getTextTrim();
@@ -201,7 +201,7 @@ public class MCRQuery {
 
         if (sortByElem != null) {
             List children = sortByElem.getChildren();
-            sortBy = new ArrayList<MCRSortBy>(children.size());
+            sortBy = new ArrayList<>(children.size());
 
             for (Object aChildren : children) {
                 Element sortByChild = (Element) aChildren;

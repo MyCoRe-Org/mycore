@@ -34,22 +34,22 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "change log level of {0} to {1}",
         help = "{0} the package or class name for which to change the log level, {1} the log level to set. If the log level cannot be read it is set to DEBUG by default.",
         order = 10)
-    synchronized public static void changeLogLevel(String name, String logLevelToSet) {
-        LOGGER.info("Setting log level for \"" + name + "\" to \"" + logLevelToSet + "\"");
+    public static synchronized void changeLogLevel(String name, String logLevelToSet) {
+        LOGGER.info("Setting log level for \"{}\" to \"{}\"", name, logLevelToSet);
 
         Level newLevel = Level.toLevel(logLevelToSet);
         if (newLevel == null) {
-            LOGGER.error("Unknown log level \"" + logLevelToSet + "\"");
+            LOGGER.error("Unknown log level \"{}\"", logLevelToSet);
             return;
         }
 
         Logger log = LogManager.getLogger(name);
         if (log == null) {
-            LOGGER.error("Could not get logger for \"" + name + "\"");
+            LOGGER.error("Could not get logger for \"{}\"", name);
             return;
         }
 
-        LOGGER.info("Change log level from " + log.getLevel() + " to " + newLevel);
+        LOGGER.info("Change log level from {} to {}", log.getLevel(), newLevel);
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         Configuration config = ctx.getConfiguration();
         LoggerConfig loggerConfig = config.getLoggerConfig(log.getName());

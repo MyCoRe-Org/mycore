@@ -43,7 +43,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-final public class MCRMetaLinkID extends MCRMetaLink {
+public final class MCRMetaLinkID extends MCRMetaLink {
     /**
      * initializes with empty values.
      */

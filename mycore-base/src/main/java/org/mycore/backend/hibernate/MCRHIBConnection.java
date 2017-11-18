@@ -100,7 +100,7 @@ public class MCRHIBConnection {
      * @return Query defined in mapping
      */
     public Query<?> getNamedQuery(String name) {
-        LOGGER.debug("Using query named:" + name);
+        LOGGER.debug("Using query named:{}", name);
         return getSession().getNamedQuery(name);
     }
 

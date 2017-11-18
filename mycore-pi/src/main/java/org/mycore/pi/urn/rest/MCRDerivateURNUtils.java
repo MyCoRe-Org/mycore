@@ -59,9 +59,9 @@ public class MCRDerivateURNUtils {
                 }
 
                 if (!isFileSupported(file)) {
-                    LOGGER.info("File is not displayable within iView2. Use " + MCRFileNodeServlet.class.getSimpleName()
-                        + " as url");
-                    String filePath = "/" + file.getOwner() + "/" + file.getFileName().toString();
+                    LOGGER.info("File is not displayable within iView2. Use {} as url",
+                        MCRFileNodeServlet.class.getSimpleName());
+                    String filePath = "/" + file.getOwner() + "/" + file.getFileName();
                     return new URL(
                         MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
                             + filePath);
@@ -70,7 +70,7 @@ public class MCRDerivateURNUtils {
                 return new URL(getViewerURL(file));
             }
         } catch (MalformedURLException e) {
-            LOGGER.error("Malformed URL for URN " + piInfo.getIdentifier(), e);
+            LOGGER.error("Malformed URL for URN {}", piInfo.getIdentifier(), e);
         }
 
         return null;
@@ -96,7 +96,7 @@ public class MCRDerivateURNUtils {
                 .map(MCRObjectDerivate::getInternals)
                 .map(MCRMetaIFS::getMainDoc)
                 .orElseThrow(() -> new RuntimeException(
-                    "Could not get main doc for " + derivateId.toString()));
+                    "Could not get main doc for " + derivateId));
 
             String spec = null;
             String baseURL = MCRFrontendUtil.getBaseURL();
@@ -111,7 +111,7 @@ public class MCRDerivateURNUtils {
                     + id;
             }
 
-            LOGGER.debug("Generated URL for urn " + urn.getIdentifier() + " is " + spec);
+            LOGGER.debug("Generated URL for urn {} is {}", urn.getIdentifier(), spec);
             url = new URL(spec);
         } catch (UnsupportedEncodingException | MalformedURLException e) {
             LOGGER.error("Could not create dfg viewer url", e);

@@ -42,7 +42,7 @@ import org.swordapp.server.UriRegistry;
  */
 public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCRFileValidator {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCRSwordMediaHandler.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCRSwordMediaHandler.class);
 
     private MCRSwordLifecycleConfiguration configuration;
 
@@ -53,7 +53,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
     protected static void checkFile(MCRPath path) throws SwordError {
         if (!Files.exists(path)) {
             throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND,
-                "The requested file '" + path.toString() + "' does not exists.");
+                "The requested file '" + path + "' does not exists.");
         }
     }
 
@@ -76,7 +76,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                 is = Files.newInputStream(path);
                 resultRessource = new MediaResource(is, Files.probeContentType(path), UriRegistry.PACKAGE_BINARY);
             } catch (IOException e) {
-                LOGGER.error("Error while opening File: " + path, e);
+                LOGGER.error("Error while opening File: {}", path, e);
                 if (is != null) {
                     try {
                         is.close();
@@ -181,16 +181,16 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                         Files.copy(is, ifsRootPath, StandardCopyOption.REPLACE_EXISTING);
                     }
                 } catch (IOException e) {
-                    throw new SwordServerException("Error while adding file " + ifsRootPath.toString(), e);
+                    throw new SwordServerException("Error while adding file " + ifsRootPath, e);
                 }
             }
         } finally {
             if (tempFile != null) {
                 try {
-                    LOGGER.info("Delete temp file: " + tempFile.toString());
+                    LOGGER.info("Delete temp file: {}", tempFile);
                     Files.delete(tempFile);
                 } catch (IOException e) {
-                    LOGGER.error("Could not delete temp file: " + tempFile.toString(), e);
+                    LOGGER.error("Could not delete temp file: {}", tempFile, e);
                 }
             }
         }

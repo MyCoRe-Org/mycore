@@ -27,7 +27,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     /** Constructor initializes the HashMap */
     public MCRMetaDerivateLink() {
         super();
-        map = new HashMap<String, String>();
+        map = new HashMap<>();
     }
 
     public void setLinkToFile(MCRPath file) {
@@ -36,7 +36,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         try {
             path = MCRXMLFunctions.encodeURIPath(path, true);
         } catch (URISyntaxException uriExc) {
-            LOGGER.warn("Unable to encode URI path " + path, uriExc);
+            LOGGER.warn("Unable to encode URI path {}", path, uriExc);
         }
         super.href = owner + '/' + path;
     }
@@ -142,7 +142,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
             }
 
             if (!Files.exists(linkedFile)) {
-                LOGGER.warn(getSubTag() + ": File not found: " + super.href);
+                LOGGER.warn("{}: File not found: {}", getSubTag(), super.href);
             }
 
         } catch (Exception exc) {

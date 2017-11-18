@@ -95,7 +95,7 @@ public class MCRFileSystemPromoter implements AutoExecutable {
             return;
         }
         for (FileSystemProvider provider : detectedProviders) {
-            LOGGER.info("Promoting filesystem " + provider.getScheme() + ": " + provider.getClass().getCanonicalName());
+            LOGGER.info("Promoting filesystem {}: {}", provider.getScheme(), provider.getClass().getCanonicalName());
             MCRPaths.addFileSystemProvider(provider);
         }
     }

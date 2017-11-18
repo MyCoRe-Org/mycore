@@ -75,14 +75,15 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public abstract class MCRStore {
 
-    public interface MCRStoreConfig {
+    /**
+     * Indicates ascending order when listing IDs
+     */
+    public static final boolean ASCENDING = true;
 
-        public String getBaseDir();
-
-        public String getID();
-
-        public String getSlotLayout();
-    }
+    /**
+     * Indicates descending order when listing IDs
+     */
+    public static final boolean DESCENDING = false;
 
     /** The ID of the store */
     protected String id;
@@ -124,16 +125,6 @@ public abstract class MCRStore {
      * The last ID assigned by this store.
      */
     protected int lastID = 0;
-
-    /**
-     * Indicates ascending order when listing IDs
-     */
-    public final static boolean ASCENDING = true;
-
-    /**
-     * Indicates descending order when listing IDs
-     */
-    public final static boolean DESCENDING = false;
 
     /**
      * Deletes the data stored under the given ID from the store
@@ -217,7 +208,7 @@ public abstract class MCRStore {
             /**
              * List of files or directories in store not yet handled
              */
-            List<FileObject> files = new ArrayList<FileObject>();
+            List<FileObject> files = new ArrayList<>();
 
             /**
              * The next ID to return, when 0, all IDs have been returned
@@ -522,5 +513,11 @@ public abstract class MCRStore {
             }
         }
         return null;
+    }
+
+    public interface MCRStoreConfig {
+        String getBaseDir();
+        String getID();
+        String getSlotLayout();
     }
 }

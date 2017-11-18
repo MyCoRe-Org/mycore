@@ -24,9 +24,9 @@ public class MCRXMLCleaner {
     private static final MCRCleaningRule PRESERVE_STRUCTURE_AND_SERVICE = new MCRCleaningRule(
         "/mycoreobject/structure|/mycoreobject/service", "true()");
 
-    private List<MCRCleaningRule> rules = new ArrayList<MCRCleaningRule>();
+    private List<MCRCleaningRule> rules = new ArrayList<>();
 
-    private Map<Object, MCRCleaningRule> nodes2rules = new HashMap<Object, MCRCleaningRule>();
+    private Map<Object, MCRCleaningRule> nodes2rules = new HashMap<>();
 
     public MCRXMLCleaner() {
         addRule(REMOVE_EMPTY_ATTRIBUTES);
@@ -84,7 +84,7 @@ public class MCRXMLCleaner {
 
     private boolean isRelevant(Object node) {
         MCRCleaningRule rule = nodes2rules.get(node);
-        return (rule == null ? true : rule.isRelevant(node));
+        return (rule == null || rule.isRelevant(node));
     }
 }
 
@@ -114,7 +114,7 @@ class MCRCleaningRule {
         if (found == null)
             return false;
         else if (found instanceof Boolean)
-            return ((Boolean) found).booleanValue();
+            return (Boolean) found;
         else
             return true; // something matching found
     }

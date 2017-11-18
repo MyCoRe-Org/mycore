@@ -35,60 +35,60 @@ import org.mycore.urn.hibernate.MCRURN;
  */
 public interface MCRURNStore {
     /** Returns true if the given urn is assigned to a document ID */
-    public boolean isAssigned(String urn);
+    boolean isAssigned(String urn);
 
     /** Assigns the given urn to the given document ID */
-    public void assignURN(String urn, String documentID);
+    void assignURN(String urn, String documentID);
 
     /** Assigns the given urn to the given derivate ID */
-    public void assignURN(String urn, String derivate, String path, String filename);
+    void assignURN(String urn, String derivate, String path, String filename);
 
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 
      * @return the urn, or null if no urn is assigned to this ID
      */
-    public String getURNforDocument(String documentID);
+    String getURNforDocument(String documentID);
 
     /**
      * Retrieves the document ID that is assigned to the given urn
      * 
      * @return the ID, or null if no ID is assigned to this urn
      */
-    public String getDocumentIDforURN(String urn);
+    String getDocumentIDforURN(String urn);
 
     /**
      * Removes the urn (and assigned document ID) from the persistent store
      */
-    public void removeURN(String urn);
+    void removeURN(String urn);
 
     /**
      * Removes the urn (and assigned document ID) from the persistent store by the 
      * given object id
      */
-    public void removeURNByObjectID(String objID);
+    void removeURNByObjectID(String objID);
 
     /**Checks wether an object or derivate has an urn assigned*/
-    public boolean hasURNAssigned(String objId);
+    boolean hasURNAssigned(String objId);
 
-    public String getURNForFile(String derivateId, String path, String fileName);
+    String getURNForFile(String derivateId, String path, String fileName);
 
     /**
      * @return the count of urn matching the given 'registered' attribute
      */
-    public long getCount(boolean registered);
+    long getCount(boolean registered);
 
-    public List<MCRURN> get(boolean registered, int start, int rows);
+    List<MCRURN> get(boolean registered, int start, int rows);
 
-    public void update(MCRURN urn);
+    void update(MCRURN urn);
 
     /**
      * Get all URN for the given object id.
      */
-    public List<MCRURN> get(MCRObjectID id);
+    List<MCRURN> get(MCRObjectID id);
 
     /**
      * @return a {@link List} of {@link MCRURN} where path and file name are just blanks or null;
      */
-    public List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows);
+    List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows);
 }

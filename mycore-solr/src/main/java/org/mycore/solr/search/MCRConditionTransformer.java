@@ -238,7 +238,7 @@ public class MCRConditionTransformer {
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
 
         String sort = q.getSortField();
-        LOGGER.info("Legacy Query transformed to: " + q.getQuery() + (sort != null ? " " + sort : ""));
+        LOGGER.info("Legacy Query transformed to: {}{}", q.getQuery(), sort != null ? " " + sort : "");
         return q;
     }
 
@@ -307,18 +307,13 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     public static HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
-        HashMap<String, List<MCRCondition>> table = new HashMap<String, List<MCRCondition>>();
+        HashMap<String, List<MCRCondition>> table = new HashMap<>();
         @SuppressWarnings("unchecked")
         List<MCRCondition> children = cond.getChildren();
 
         for (MCRCondition child : children) {
             String index = getIndex(child);
-            List<MCRCondition> conditions = table.get(index);
-            if (conditions == null) {
-                conditions = new ArrayList<MCRCondition>();
-                table.put(index, conditions);
-            }
-            conditions.add(child);
+            table.computeIfAbsent(index, k -> new ArrayList<>()).add(child);
         }
         return table;
     }

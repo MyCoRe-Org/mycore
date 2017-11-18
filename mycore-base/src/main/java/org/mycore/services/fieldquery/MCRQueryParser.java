@@ -84,7 +84,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
     private MCRCondition<Object> buildConditions(String field, String oper, String value) {
         if (field.contains(",")) { // Multiple fields in one condition, combine with OR
             StringTokenizer st = new StringTokenizer(field, ", ");
-            MCROrCondition<Object> oc = new MCROrCondition<Object>();
+            MCROrCondition<Object> oc = new MCROrCondition<>();
             while (st.hasMoreTokens()) {
                 oc.addChild(buildConditions(st.nextToken(), oper, value));
             }
@@ -95,7 +95,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             String fieldTo = st.nextToken();
             if (oper.equals("=")) {
                 // von-bis = x --> (von <= x) AND (bis >= x)
-                MCRAndCondition<Object> ac = new MCRAndCondition<Object>();
+                MCRAndCondition<Object> ac = new MCRAndCondition<>();
                 ac.addChild(buildCondition(fieldFrom, "<=", value));
                 ac.addChild(buildCondition(fieldTo, ">=", value));
                 return ac;
@@ -193,7 +193,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         } else if (cond instanceof MCRSetCondition) {
             MCRSetCondition<Object> sc = (MCRSetCondition<Object>) cond;
             List<MCRCondition<Object>> children = sc.getChildren();
-            sc = sc instanceof MCRAndCondition ? new MCRAndCondition<Object>() : new MCROrCondition<Object>();
+            sc = sc instanceof MCRAndCondition ? new MCRAndCondition<>() : new MCROrCondition<>();
             for (MCRCondition<Object> child : children) {
                 child = normalizeCondition(child);
                 if (child == null) {
@@ -221,7 +221,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             } else if (child instanceof MCRNotCondition) {
                 return normalizeCondition(((MCRNotCondition<Object>) child).getChild());
             } else {
-                return new MCRNotCondition<Object>(child);
+                return new MCRNotCondition<>(child);
             }
         } else if (cond instanceof MCRQueryCondition) {
             MCRQueryCondition qc = (MCRQueryCondition) cond;
@@ -231,9 +231,9 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             }
 
             // Normalize value when contains operator is used
-            List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
 
-            String phrase = null;
+            StringBuilder phrase = null;
             StringTokenizer st = new StringTokenizer(qc.getValue(), " ");
             while (st.hasMoreTokens()) {
                 String value = st.nextToken();
@@ -246,7 +246,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                         phrase = null;
                     } else // in middle of phrase
                     {
-                        phrase = phrase + " " + value;
+                        phrase.append(' ').append(value);
                     }
                 } else if (value.startsWith("'")) // begin of phrase
                 {
@@ -254,7 +254,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                     {
                         values.add(value.substring(1, value.length() - 1));
                     } else {
-                        phrase = value;
+                        phrase = new StringBuilder(value);
                     }
                 } else if (value.startsWith("-'")) // begin of NOT phrase
                 {
@@ -262,28 +262,28 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                     {
                         values.add("-" + value.substring(2, value.length() - 1));
                     } else {
-                        phrase = value;
+                        phrase = new StringBuilder(value);
                     }
                 } else {
                     values.add(value);
                 }
             }
 
-            MCRAndCondition<Object> ac = new MCRAndCondition<Object>();
+            MCRAndCondition<Object> ac = new MCRAndCondition<>();
             for (String value : values) {
                 if (value.startsWith("'")) {
                     ac.addChild(new MCRQueryCondition(qc.getFieldName(), "phrase", value.substring(1,
                         value.length() - 1)));
                 } else if (value.startsWith("-'")) {
-                    ac.addChild(new MCRNotCondition<Object>(new MCRQueryCondition(qc.getFieldName(), "phrase", value
-                        .substring(2, value.length() - 1))));
+                    ac.addChild(new MCRNotCondition<>(
+                        new MCRQueryCondition(qc.getFieldName(), "phrase", value.substring(2, value.length() - 1))));
                 } else if (value.contains("*") || value.contains("?")) {
                     ac.addChild(new MCRQueryCondition(qc.getFieldName(), "like", value));
                 } else if (value.startsWith("-")) // -word means "NOT word"
                 {
                     MCRCondition<Object> subCond = new MCRQueryCondition(qc.getFieldName(), "contains",
                         value.substring(1));
-                    ac.addChild(new MCRNotCondition<Object>(subCond));
+                    ac.addChild(new MCRNotCondition<>(subCond));
                 } else {
                     ac.addChild(new MCRQueryCondition(qc.getFieldName(), "contains", value));
                 }

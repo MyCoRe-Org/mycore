@@ -50,7 +50,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 @Deprecated
 public class MCRURNResolver extends MCRServlet {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRURNResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRURNResolver.class);
 
     protected String masterURL;
 
@@ -82,7 +82,7 @@ public class MCRURNResolver extends MCRServlet {
             return;
         }
 
-        LOGGER.info("Resolving URN " + urn);
+        LOGGER.info("Resolving URN {}", urn);
 
         String docID = MCRURNManager.getDocumentIDforURN(urn);
 

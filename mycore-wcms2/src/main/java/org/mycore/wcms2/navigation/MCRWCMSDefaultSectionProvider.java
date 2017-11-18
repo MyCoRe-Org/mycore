@@ -45,7 +45,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private List<String> MYCORE_TAG_LIST = new ArrayList<String>();
+    private List<String> MYCORE_TAG_LIST = new ArrayList<>();
 
     public MCRWCMSDefaultSectionProvider() {
         String mycoreTagListString = CONFIG.getString("MCR.WCMS2.mycoreTagList", "");
@@ -56,7 +56,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
 
     public JsonArray toJSON(Element rootElement) {
         JsonArray sectionArray = new JsonArray();
-        for (Element section : (List<Element>) rootElement.getChildren(MyCoReWebPageProvider.XML_SECTION)) {
+        for (Element section : rootElement.getChildren(MyCoReWebPageProvider.XML_SECTION)) {
             // get infos of element
             String title = section.getAttributeValue(MyCoReWebPageProvider.XML_TITLE);
             String lang = section.getAttributeValue(MyCoReWebPageProvider.XML_LANG, Namespace.XML_NAMESPACE);
@@ -125,7 +125,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
     protected String getContent(Element e) throws IOException {
         XMLOutputter out = new XMLOutputter();
         StringWriter writer = new StringWriter();
-        for (Content child : (List<Content>) e.getContent()) {
+        for (Content child : e.getContent()) {
             if (child instanceof Element) {
                 out.output((Element) child, writer);
             } else if (child instanceof Text) {
@@ -147,7 +147,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
         // parse sections
         for (JsonElement sectionElement : jsonSectionArray) {
             if (!sectionElement.isJsonObject()) {
-                LOGGER.warn("Invalid json element in content array! " + sectionElement);
+                LOGGER.warn("Invalid json element in content array! {}", sectionElement);
                 continue;
             }
             JsonObject sectionObject = sectionElement.getAsJsonObject();

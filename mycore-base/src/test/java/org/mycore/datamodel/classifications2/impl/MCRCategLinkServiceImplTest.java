@@ -72,7 +72,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
         MCRCategoryImpl uk = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(1);
         DAO.addCategory(null, category);
-        testLinks = new ArrayList<MCRCategoryLinkImpl>();
+        testLinks = new ArrayList<>();
         testLinks.add(new MCRCategoryLinkImpl(germany, new MCRCategLinkReference("Jena", "city")));
         testLinks.add(new MCRCategoryLinkImpl(germany, new MCRCategLinkReference("Thüringen", "state")));
         testLinks.add(new MCRCategoryLinkImpl(germany, new MCRCategLinkReference("Hessen", "state")));
@@ -275,7 +275,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
     }
 
     private static Collection<MCRCategoryID> getAllCategIDs(MCRCategory category) {
-        HashSet<MCRCategoryID> ids = new HashSet<MCRCategoryID>();
+        HashSet<MCRCategoryID> ids = new HashSet<>();
         ids.add(category.getId());
         for (MCRCategory cat : category.getChildren()) {
             ids.addAll(getAllCategIDs(cat));

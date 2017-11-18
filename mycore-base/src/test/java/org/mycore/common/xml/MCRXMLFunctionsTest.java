@@ -14,14 +14,14 @@ import org.mycore.common.MCRTestCase;
 
 public class MCRXMLFunctionsTest extends MCRTestCase {
 
-    private final static String[] HTML_STRINGS = new String[] { "<h1>Hello World!</h1>",
+    private static final String[] HTML_STRINGS = { "<h1>Hello World!</h1>",
         "<h1>Hell<i>o</i> World!<br /></h1>", "<h1>Hell<i>o</i> World!<br></h1>",
         "<h1>Hell<i>o</i> World!&lt;br&gt;</h1>", "<h1>Hell<i>&ouml;</i> World!&lt;br&gt;</h1>",
         "<h1>Hello</h1> <h2>World!</h2><br/>", "Hello <a href=\"http://www.mycore.de\">MyCoRe</a>!",
         "Hello <a href='http://www.mycore.de'>MyCoRe</a>!",
         "Gläser und Glaskeramiken im MgO-Al<sub>2</sub>O<sub>3</sub>-SiO<sub>2</sub>-System mit hoher Mikrohärte und hohem Elastizitätsmodul" };
 
-    private final static String[] NON_HTML_STRINGS = new String[] { "Hello MyCoRe!", "a < b > c" };
+    private static final String[] NON_HTML_STRINGS = { "Hello MyCoRe!", "a < b > c" };
 
     /*
      * Test method for 'org.mycore.common.xml.MCRXMLFunctions.formatISODate(String, String, String, String)'

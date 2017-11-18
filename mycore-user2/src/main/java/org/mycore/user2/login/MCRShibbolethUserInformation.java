@@ -30,7 +30,7 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
     @MCRUserAttribute
     private String realName;
 
-    private Set<String> roles = new HashSet<String>();
+    private Set<String> roles = new HashSet<>();
 
     public MCRShibbolethUserInformation(String userId, String realmId, Map<String, Object> attributes)
         throws Exception {

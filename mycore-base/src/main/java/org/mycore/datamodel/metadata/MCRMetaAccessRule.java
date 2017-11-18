@@ -107,7 +107,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if (set_condition == null || !set_condition.getName().equals("condition")) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        condition = (Element) set_condition.clone();
+        condition = set_condition.clone();
     }
 
     /**
@@ -165,7 +165,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         elm.setAttribute("permission", permission);
-        elm.addContent((Element) condition.clone());
+        elm.addContent(condition.clone());
         return elm;
     }
 
@@ -207,7 +207,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("Permission         = " + permission);
+            LOGGER.debug("Permission         = {}", permission);
             LOGGER.debug("Rule               = " + "condition");
             LOGGER.debug(" ");
         }

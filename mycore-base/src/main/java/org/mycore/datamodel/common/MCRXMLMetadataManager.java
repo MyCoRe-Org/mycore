@@ -198,12 +198,12 @@ public class MCRXMLMetadataManager {
                     svnBaseValue += '/';
                 }
                 svnBase = new URI(svnBaseValue);
-                LOGGER.info("SVN Base: " + svnBase);
+                LOGGER.info("SVN Base: {}", svnBase);
                 if (svnBase.getScheme() == null) {
                     String workingDirectory = (new File(".")).getAbsolutePath();
                     URI root = new File(MCRConfiguration.instance().getString("MCR.datadir", workingDirectory)).toURI();
                     URI resolved = root.resolve(svnBase);
-                    LOGGER.warn("Resolved " + svnBase + " to " + resolved);
+                    LOGGER.warn("Resolved {} to {}", svnBase, resolved);
                     svnBase = resolved;
                 }
             } catch (URISyntaxException ex) {
@@ -311,7 +311,7 @@ public class MCRXMLMetadataManager {
             if (svnURL == null) {
                 String relativeURI = MessageFormat.format("{0}/{1}/", project, objectType);
                 URI repURI = svnBase.resolve(relativeURI);
-                LOGGER.info("Resolved " + relativeURI + " to " + repURI.toASCIIString() + " for " + property);
+                LOGGER.info("Resolved {} to {} for {}", relativeURI, repURI.toASCIIString(), property);
                 config.set(property, repURI.toASCIIString());
                 File projectDir = new File(svnDir, project);
                 if (!projectDir.exists() && !projectDir.mkdirs()) {
@@ -528,7 +528,7 @@ public class MCRXMLMetadataManager {
      *         with the given revision
      */
     public MCRContent retrieveContent(MCRObjectID mcrid, long revision) throws IOException {
-        LOGGER.info("Getting object " + mcrid + " in revision " + revision);
+        LOGGER.info("Getting object {} in revision {}", mcrid, revision);
         MCRMetadataVersion version = getMetadataVersion(mcrid, revision);
         if (version != null) {
             return version.retrieve();
@@ -635,7 +635,7 @@ public class MCRXMLMetadataManager {
      */
     public List<String> listIDsForBase(String base) {
         MCRMetadataStore store = getStore(base);
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         Iterator<Integer> it = store.listIDs(MCRStore.ASCENDING);
         String[] idParts = MCRObjectID.getIDParts(base);
         while (it.hasNext()) {
@@ -650,7 +650,7 @@ public class MCRXMLMetadataManager {
      * @param type the MCRObject type, e.g. document
      */
     public List<String> listIDsOfType(String type) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         File[] projectDirectories = getProjectDirectories();
         for (File projectDirectory : projectDirectories) {
             String project = projectDirectory.getName();
@@ -670,7 +670,7 @@ public class MCRXMLMetadataManager {
      * Lists all MCRObjectIDs of all types and projects stored in any metadata store
      */
     public List<String> listIDs() {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         File[] projectDirectories = getProjectDirectories();
         for (File projectDirectory : projectDirectories) {
             String project = projectDirectory.getName();
@@ -766,7 +766,7 @@ public class MCRXMLMetadataManager {
      * @throws IOException thrown by {@link MCRObjectIDFileSystemDate}
      */
     public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
-        List<MCRObjectIDDate> objidlist = new ArrayList<MCRObjectIDDate>(ids.size());
+        List<MCRObjectIDDate> objidlist = new ArrayList<>(ids.size());
         for (String id : ids) {
             MCRStoredMetadata sm = this.retrieveStoredMetadata(MCRObjectID.getInstance(id));
             objidlist.add(new MCRObjectIDFileSystemDate(sm, id));

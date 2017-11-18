@@ -126,8 +126,8 @@ public class MCRRuntimeComponentDetector {
             try (InputStream pi = MCRRuntimeComponentDetector.class.getClassLoader().getResourceAsStream(
                 pomPropertiesPath)) {
                 if (pi == null) {
-                    LOGGER.warn("Manifest entry " + ATT_POM + " set to \"" + pomPropertiesPath
-                        + "\", but resource could not be loaded.");
+                    LOGGER.warn("Manifest entry {} set to \"{}\", but resource could not be loaded.", ATT_POM,
+                        pomPropertiesPath);
                     return null;
                 }
                 Properties pomProperties = new Properties();
@@ -140,10 +140,10 @@ public class MCRRuntimeComponentDetector {
         if (artifactId != null && artifactId.startsWith("mycore-")
             || mainAttributes.containsKey(ATT_MCR_APPLICATION_MODULE)) {
             if (usePomProperties) {
-                LOGGER.warn("No Attribute \"" + ATT_MCR_ARTIFACT_ID + "\" in Manifest of "
-                    + mainAttributes.getValue(ATT_MCR_APPLICATION_MODULE) + ".");
+                LOGGER.warn("No Attribute \"{}\" in Manifest of {}.", ATT_MCR_ARTIFACT_ID,
+                    mainAttributes.getValue(ATT_MCR_APPLICATION_MODULE));
                 LOGGER.warn("Change this in the future, pom.properties path definition is deprecated.");
-                LOGGER.info("Using artifactId in " + pomPropertiesPath + ".");
+                LOGGER.info("Using artifactId in {}.", pomPropertiesPath);
             }
 
             return new MCRComponent(artifactId, manifest, extractJarFile(manifestURL));

@@ -40,7 +40,7 @@ import com.google.gson.JsonStreamParser;
 @MCRRestrictedAccess(MCRWCMSPermission.class)
 public class MCRWCMSNavigationResource {
 
-    private final static XPathExpression<Element> TEMPLATE_PATH;
+    private static final XPathExpression<Element> TEMPLATE_PATH;
 
     static {
         TEMPLATE_PATH = XPathFactory.instance().compile("*[@template]", Filters.element());

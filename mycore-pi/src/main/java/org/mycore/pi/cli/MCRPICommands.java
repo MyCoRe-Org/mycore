@@ -41,7 +41,7 @@ public class MCRPICommands {
                 String mycoreID = registrationInfo.getMycoreID();
                 MCRObjectID objectID = MCRObjectID.getInstance(mycoreID);
                 MCRBase base = MCRMetadataManager.retrieve(objectID);
-                LOGGER.info("Add PI-Flag to " + mycoreID);
+                LOGGER.info("Add PI-Flag to {}", mycoreID);
                 MCRPIRegistrationService.addFlagToObject(base, (MCRPI) registrationInfo);
                 try {
                     MCRMetadataManager.update(base);
@@ -60,16 +60,16 @@ public class MCRPICommands {
 
             String urn = derivate.getDerivate().getURN();
             if (urn != null) {
-                LOGGER.info("Found URN in :" + derivateID);
+                LOGGER.info("Found URN in :{}", derivateID);
                 MCRPI derivatePI = new MCRPI(urn, MCRDNBURN.TYPE, derivateID, "", serviceID, new Date());
                 if (MCRPersistentIdentifierManager.getInstance().exist(derivatePI)) {
-                    LOGGER.warn("PI-Entry for " + urn + " already exist!");
+                    LOGGER.warn("PI-Entry for {} already exist!", urn);
                 } else {
                     session.save(derivatePI);
                     derivate.getUrnMap().forEach((file, fileURN) -> {
                         MCRPI filePI = new MCRPI(fileURN, MCRDNBURN.TYPE, derivateID, file, serviceID, new Date());
                         if (MCRPersistentIdentifierManager.getInstance().exist(filePI)) {
-                            LOGGER.warn("PI-Entry for " + fileURN + " already exist!");
+                            LOGGER.warn("PI-Entry for {} already exist!", fileURN);
                         } else {
                             session.save(fileURN);
                         }
@@ -95,18 +95,18 @@ public class MCRPICommands {
         try {
             identifier = metadataManager.getIdentifier(mcrBase, trimAdditional);
         } catch (MCRPersistentIdentifierException e) {
-            LOGGER.info("Could not detect any identifier with service " + serviceID, e);
+            LOGGER.info("Could not detect any identifier with service {}", serviceID, e);
             return;
         }
 
         if (!identifier.isPresent()) {
-            LOGGER.info("Could not detect any identifier with service " + serviceID);
+            LOGGER.info("Could not detect any identifier with service {}", serviceID);
             return;
         }
 
         MCRPersistentIdentifier persistentIdentifier = identifier.get();
         if (service.isRegistered(objectID, trimAdditional)) {
-            LOGGER.info("Already present in Database: " + serviceID);
+            LOGGER.info("Already present in Database: {}", serviceID);
             return;
         }
         MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, trimAdditional, persistentIdentifier);
@@ -117,7 +117,7 @@ public class MCRPICommands {
     }
 
     @MCRCommand(syntax = "update all PI of object {0}", help = "Triggers the update method of every Object!")
-    public static void updateObject(String objectIDString){
+    public static void updateObject(String objectIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
         MCRPersistentIdentifierEventHandler.updateObject(object);

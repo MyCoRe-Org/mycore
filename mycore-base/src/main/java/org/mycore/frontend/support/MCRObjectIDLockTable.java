@@ -24,7 +24,7 @@ public class MCRObjectIDLockTable implements MCRSessionListener {
     }
 
     private MCRObjectIDLockTable() {
-        this.lockMap = new ConcurrentHashMap<MCRObjectID, MCRSession>();
+        this.lockMap = new ConcurrentHashMap<>();
         MCRSessionMgr.addSessionListener(this);
     }
 
@@ -58,7 +58,7 @@ public class MCRObjectIDLockTable implements MCRSessionListener {
                 clearTable(event.getSession());
                 break;
             default:
-                LOGGER.debug("Skipping event: " + event.getType());
+                LOGGER.debug("Skipping event: {}", event.getType());
                 break;
         }
     }

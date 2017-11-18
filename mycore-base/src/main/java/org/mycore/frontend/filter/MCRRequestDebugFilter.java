@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.frontend.filter;
 
@@ -75,7 +75,7 @@ public class MCRRequestDebugFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         StringBuilder sb = new StringBuilder("RESPONSE (" + req.getMethod() + ") URI: " + req.getRequestURI() + " \n");
         HttpServletResponse res = (HttpServletResponse) response;
-        sb.append("Status: " + res.getStatus() + "\n");
+        sb.append("Status: ").append(res.getStatus()).append('\n');
         logHeader(res.getHeaderNames().stream(), s -> res.getHeaders(s).stream(), sb);
         return sb.append("\n\n").toString();
     }
@@ -85,17 +85,13 @@ public class MCRRequestDebugFilter implements Filter {
         sb.append("Header: \n");
         headerNames
             .sorted(String.CASE_INSENSITIVE_ORDER)
-            .forEachOrdered(header -> {
-                headerValues
-                    .apply(header)
-                    .forEachOrdered(value -> {
-                        sb
-                            .append(header)
-                            .append(": ")
-                            .append(value)
-                            .append("\n");
-                    });
-            });
+            .forEachOrdered(header -> headerValues
+                .apply(header)
+                .forEachOrdered(value -> sb
+                    .append(header)
+                    .append(": ")
+                    .append(value)
+                    .append("\n")));
         sb.append("HEADERS END \n\n");
     }
 
@@ -109,30 +105,38 @@ public class MCRRequestDebugFilter implements Filter {
                 } catch (Exception e) {
                     LOGGER.error("BeanUtils Exception describing cookie", e);
                 }
-                sb.append(" " + description + "\n");
+                sb.append(' ').append(description).append('\n');
             }
         }
         sb.append("COOKIES END \n\n");
     }
 
     private void logSessionAttributes(HttpServletRequest request, StringBuilder sb) {
-        sb.append(
-            "Session " + (request.isRequestedSessionIdFromCookie() ? "is" : "is not") + " requested by cookie.\n");
-        sb.append("Session " + (request.isRequestedSessionIdFromURL() ? "is" : "is not") + " requested by URL.\n");
-        sb.append("Session " + (request.isRequestedSessionIdValid() ? "is" : "is not") + " valid.\n");
+        sb.append("Session ")
+            .append(request.isRequestedSessionIdFromCookie() ? "is" : "is not")
+            .append(" requested by cookie.\n");
+        sb.append("Session ")
+            .append(request.isRequestedSessionIdFromURL() ? "is" : "is not")
+            .append(" requested by URL.\n");
+        sb.append("Session ").append(request.isRequestedSessionIdValid() ? "is" : "is not").append(" valid.\n");
         HttpSession session = request.getSession(false);
         if (session != null) {
-            sb.append("SESSION " + request.getSession().getId() + " created at: " + LocalDateTime
-                .ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()), ZoneId.systemDefault())
-                .toString() + "\n");
+            sb.append("SESSION ")
+                .append(request.getSession().getId())
+                .append(" created at: ")
+                .append(LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getSession().getCreationTime()),
+                    ZoneId.systemDefault()))
+                .append("\n");
             sb.append("SESSION ATTRIBUTES: \n");
             MCRStreamUtils
                 .asStream(session.getAttributeNames())
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .forEachOrdered(attrName -> {
-                    sb.append(" " + attrName + ": "
-                        + getValue(attrName, Optional.ofNullable(session.getAttribute(attrName))) + "\n");
-                });
+                .forEachOrdered(attrName -> sb.append(" ")
+                    .append(attrName)
+                    .append(": ")
+                    .append(getValue(attrName,
+                        Optional.ofNullable(session.getAttribute(attrName))))
+                    .append("\n"));
             sb.append("SESSION ATTRIBUTES END \n\n");
         }
     }
@@ -141,13 +145,12 @@ public class MCRRequestDebugFilter implements Filter {
         String description = value.map(o -> {
             if (!hasSafeToString(o)) {
                 try {
-                    @SuppressWarnings("unchecked")
                     Map<String, String> beanDescription = BeanUtils.describe(value);
                     if (!beanDescription.isEmpty()) {
                         return beanDescription.toString();
                     }
                 } catch (Exception e) {
-                    LOGGER.error("BeanUtils Exception describing attribute " + key, e);
+                    LOGGER.error("BeanUtils Exception describing attribute {}", key, e);
                 }
             }
             return o.toString();
@@ -172,11 +175,9 @@ public class MCRRequestDebugFilter implements Filter {
         request.getParameterMap()
             .entrySet()
             .stream()
-            .sorted((o1, o2) -> {
-                return String.CASE_INSENSITIVE_ORDER.compare(o1.getKey(), o2.getKey());
-            })
+            .sorted((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getKey(), o2.getKey()))
             .forEachOrdered(entry -> {
-                sb.append(" " + entry.getKey() + ": ");
+                sb.append(' ').append(entry.getKey()).append(": ");
                 for (String s : entry.getValue()) {
                     sb.append(s);
                     sb.append(", ");

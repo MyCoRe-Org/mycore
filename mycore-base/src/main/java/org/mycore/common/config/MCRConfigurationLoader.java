@@ -34,5 +34,5 @@ public interface MCRConfigurationLoader {
     /**
      * Returns a Map that should be used with {@link MCRConfiguration#initialize(Map, boolean)}
      */
-    public Map<String, String> load();
+    Map<String, String> load();
 }

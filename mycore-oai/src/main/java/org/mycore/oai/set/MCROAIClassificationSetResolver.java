@@ -48,7 +48,7 @@ class MCROAIClassificationSetResolver extends MCROAISetResolver<String, SolrDocu
             throw new MCRException("Unknown key: " + key);
         }
         return Optional.ofNullable(solrDocument.getFieldValues(classField))
-            .orElseGet(() -> Collections.emptySet())
+            .orElseGet(Collections::emptySet)
             .stream()
             .map(String.class::cast)
             .filter(s -> s.startsWith(classPrefix))

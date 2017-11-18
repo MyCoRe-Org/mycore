@@ -59,7 +59,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 
 /**
- * 
+ *
  * Xalan extention for navigation.xsl
  *
  */
@@ -68,18 +68,18 @@ public class MCRLayoutUtilities {
 
     private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
 
-    final static String OBJIDPREFIX_WEBPAGE = "webpage:";
+    static final String OBJIDPREFIX_WEBPAGE = "webpage:";
 
     // strategies for access verification
-    public final static int ALLTRUE = 1;
+    public static final int ALLTRUE = 1;
 
-    public final static int ONETRUE_ALLTRUE = 2;
+    public static final int ONETRUE_ALLTRUE = 2;
 
-    public final static int ALL2BLOCKER_TRUE = 3;
+    public static final int ALL2BLOCKER_TRUE = 3;
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
 
-    private static HashMap<String, Element> itemStore = new HashMap<String, Element>();
+    private static HashMap<String, Element> itemStore = new HashMap<>();
 
     public static final String NAV_RESOURCE = MCRConfiguration.instance().getString("MCR.NavigationFile",
         "/config/navigation.xml");
@@ -104,7 +104,7 @@ public class MCRLayoutUtilities {
 
         private void parseDocument() throws JDOMException, IOException {
             lastModified = getLastModified();
-            LOGGER.info("Parsing: " + docURL);
+            LOGGER.info("Parsing: {}", docURL);
             parsedDocument = new SAXBuilder(XMLReaders.NONVALIDATING).build(docURL);
         }
 
@@ -136,7 +136,7 @@ public class MCRLayoutUtilities {
             public ListenableFuture<DocumentHolder> reload(final String key, DocumentHolder oldValue) throws Exception {
                 URL url = SERVLET_CONTEXT.getResource(key);
                 if (oldValue.isValid(url)) {
-                    LOGGER.info("Keeping " + url + " in cache");
+                    LOGGER.info("Keeping {} in cache", url);
                     return Futures.immediateFuture(oldValue);
                 }
                 ListenableFutureTask<DocumentHolder> task = ListenableFutureTask.create(() -> load(key));
@@ -155,7 +155,7 @@ public class MCRLayoutUtilities {
      * verified item with read access. So, only items of the ancestor axis till
      * and exclusive $blockerWebpageID are verified. Use this, if you want to
      * speed up the check
-     * 
+     *
      * @param webpageID
      *            any item/@href from navigation.xml
      * @param blockerWebpageID
@@ -166,8 +166,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALL2BLOCKER_TRUE, blockerWebpageID);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID ="
-                + blockerWebpageID + ") => " + access + ": took " + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= {} (with blockerWebpageID ={}) => {}: took {} msec.",
+                webpageID, blockerWebpageID, access, getDuration(startTime));
             return access;
         } else {
             return true;
@@ -178,7 +178,7 @@ public class MCRLayoutUtilities {
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
      * permission, based on ACL-System. To be used by XSL with
      * Xalan-Java-Extension-Call.
-     * 
+     *
      * @param webpageID
      *            any item/@href from navigation.xml
      * @return true if access granted, false if not
@@ -187,8 +187,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALLTRUE);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took "
-                + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= {} => {}: took {} msec.", webpageID, access,
+                getDuration(startTime));
             return access;
         } else {
             return true;
@@ -198,13 +198,13 @@ public class MCRLayoutUtilities {
     /**
      * Returns all labels of the ancestor axis for the given item within
      * navigation.xml
-     * 
+     *
      * @param item a navigation item
      * @return Label as String, like "labelRoot &gt; labelChild &gt;
      *         labelChildOfChild"
      */
     public static String getAncestorLabels(Element item) {
-        String label = "";
+        StringBuilder label = new StringBuilder();
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage().trim();
         XPathExpression<Element> xpath;
         Element ic = null;
@@ -218,19 +218,19 @@ public class MCRLayoutUtilities {
                 Filters.element());
             labelEl = xpath.evaluateFirst(getNavi());
             if (labelEl != null) {
-                if (label.equals("")) {
-                    label = labelEl.getTextTrim();
+                if (label.length() == 0) {
+                    label = new StringBuilder(labelEl.getTextTrim());
                 } else {
-                    label = labelEl.getTextTrim() + " > " + label;
+                    label.insert(0, labelEl.getTextTrim() + " > ");
                 }
             }
         }
-        return label;
+        return label.toString();
     }
 
     /**
      * Verifies, if an item of navigation.xml has a given $permission.
-     * 
+     *
      * @param webpageID
      *            item/@href
      * @param permission
@@ -262,7 +262,7 @@ public class MCRLayoutUtilities {
     /**
      * Verifies, if an item of navigation.xml has a given $permission with a
      * stop item ($blockerWebpageID)
-     * 
+     *
      * @param webpageID
      *            item/@href
      * @param permission
@@ -292,7 +292,7 @@ public class MCRLayoutUtilities {
 
     /**
      * Returns a Element presentation of an item[@href=$webpageID]
-     * 
+     *
      * @param webpageID
      * @return Element
      */
@@ -308,7 +308,7 @@ public class MCRLayoutUtilities {
 
     /**
      * Verifies a single item on access according to $permission
-     * 
+     *
      * @param permission an ACL permission
      * @param item element to check
      * @param access
@@ -325,7 +325,7 @@ public class MCRLayoutUtilities {
     /**
      * Verifies a single item on access according to $permission and for a given
      * user
-     * 
+     *
      * @param permission an ACL permission
      * @param item element to check
      * @param access
@@ -356,7 +356,7 @@ public class MCRLayoutUtilities {
     /**
      * Returns the navigation.xml as org.jdom2.document, using a cache the
      * enhance loading time.
-     * 
+     *
      * @return navigation.xml as org.jdom2.document
      */
     public static Document getNavi() {
@@ -378,7 +378,7 @@ public class MCRLayoutUtilities {
 
     /**
      * Returns the navigation.xml as URL.
-     * 
+     *
      * Use this method if you need to parse it on your own.
      */
     public static URL getNavigationURL() {
@@ -425,7 +425,7 @@ public class MCRLayoutUtilities {
                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 transformer.transform(new DOMSource(personalNavi), new StreamResult(bout));
-                LOGGER.debug("personal navigation: " + bout.toString(encoding));
+                LOGGER.debug("personal navigation: {}", bout.toString(encoding));
             } catch (IllegalArgumentException | TransformerFactoryConfigurationError | TransformerException
                 | UnsupportedEncodingException e) {
                 LOGGER.warn("Error while getting debug information.", e);

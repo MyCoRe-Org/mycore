@@ -60,8 +60,7 @@ public class MCRPackerJobAction extends MCRJobAction {
         LOGGER.info(() -> {
             StringBuilder messageBuilder = new StringBuilder();
             messageBuilder.append(getPackerId()).append(" starts packing with parameters: ");
-            parameters.entrySet().forEach(
-                (entry) -> messageBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append(";"));
+            parameters.forEach((key, value) -> messageBuilder.append(key).append("=").append(value).append(";"));
             return messageBuilder.toString();
         });
         packerInstance.pack();

@@ -25,7 +25,7 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
 
     private Map<String, Object> properties;
 
-    private List<MCRProcessableCollectionListener> listenerList;
+    private final List<MCRProcessableCollectionListener> listenerList;
 
     /**
      * Creates a new collection with the given a human readable name.

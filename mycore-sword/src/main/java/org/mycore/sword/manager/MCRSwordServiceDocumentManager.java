@@ -50,8 +50,7 @@ public class MCRSwordServiceDocumentManager implements ServiceDocumentManager {
         List<SwordCollection> swordCollections = new ArrayList<>();
 
         MCRSword.getCollectionsOfWorkspace(workspaceName).stream()
-            .map(collection -> new AbstractMap.SimpleEntry<String, MCRSwordCollectionProvider>(collection,
-                MCRSword.getCollection(collection)))
+            .map(collection -> new AbstractMap.SimpleEntry<>(collection, MCRSword.getCollection(collection)))
             .filter(collectionEntry -> collectionEntry.getValue().isVisible())
             .forEach(collection -> {
                 SwordCollection swordCollection = new SwordCollection();

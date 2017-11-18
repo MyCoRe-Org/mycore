@@ -39,7 +39,7 @@ public class MCRSecureTokenV2FilterConfig {
         } else {
             enabled = true;
             securedExtensions = getExtensionPattern(propertyValues);
-            LOGGER.info("SecureTokenV2 extension pattern: " + securedExtensions);
+            LOGGER.info("SecureTokenV2 extension pattern: {}", securedExtensions);
             hashParameter = configuration.getString("MCR.SecureTokenV2.ParameterName");
             sharedSecret = configuration.getString("MCR.SecureTokenV2.SharedSecret").trim();
         }

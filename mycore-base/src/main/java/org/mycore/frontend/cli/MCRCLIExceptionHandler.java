@@ -33,7 +33,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
  */
 public class MCRCLIExceptionHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRCLIExceptionHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCLIExceptionHandler.class);
 
     public static void handleException(InvocationTargetException ex) {
         handleException(ex.getTargetException());
@@ -56,7 +56,7 @@ public class MCRCLIExceptionHandler {
         Map<String, Collection<String>> links = activeLinks.getActiveLinks();
 
         for (String curDest : links.keySet()) {
-            LOGGER.debug("Current Destination: " + curDest);
+            LOGGER.debug("Current Destination: {}", curDest);
             Collection<String> sources = links.get(curDest);
             for (String source : sources)
                 MCRCommandLineInterface.output(source + " ==> " + curDest);

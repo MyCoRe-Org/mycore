@@ -48,13 +48,13 @@ import org.xml.sax.ext.EntityResolver2;
  */
 public class MCRXMLParserImpl implements MCRXMLParser {
 
-    private final static String FEATURE_NAMESPACES = "http://xml.org/sax/features/namespaces";
+    private static final String FEATURE_NAMESPACES = "http://xml.org/sax/features/namespaces";
 
-    private final static String FEATURE_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
+    private static final String FEATURE_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema";
 
-    private final static String FEATURE_FULL_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema-full-checking";
+    private static final String FEATURE_FULL_SCHEMA_SUPPORT = "http://apache.org/xml/features/validation/schema-full-checking";
 
-    private final static String msg = "Error while parsing XML document: ";
+    private static final String msg = "Error while parsing XML document: ";
 
     private boolean validate;
 
@@ -133,7 +133,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
                         return resolveEntity(name, publicId, baseDirURI.toString(), relativeURI);
                     }
                 } catch (RuntimeException e) {
-                    LOGGER.debug("Could not separate baseURI from " + systemId, e);
+                    LOGGER.debug("Could not separate baseURI from {}", systemId, e);
                 }
             }
             String relativeSystemId = relativize(baseURI, systemId);
@@ -159,7 +159,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
             LOGGER.debug(MessageFormat.format("systemId: {0} prefixed? {1}", systemId, systemId.startsWith(prefix)));
             if (prefix.length() > 0 && systemId.startsWith(prefix)) {
                 systemId = systemId.substring(prefix.length());
-                LOGGER.debug("new systemId: " + systemId);
+                LOGGER.debug("new systemId: {}", systemId);
                 return systemId;
             }
             return systemId;
@@ -169,7 +169,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
             try {
                 return URI.create(baseURI).normalize().toString();
             } catch (RuntimeException e) {
-                LOGGER.debug("Error while normalizing " + baseURI, e);
+                LOGGER.debug("Error while normalizing {}", baseURI, e);
                 return baseURI;
             }
         }

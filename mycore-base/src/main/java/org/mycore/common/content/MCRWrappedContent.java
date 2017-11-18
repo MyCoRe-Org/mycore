@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.CopyOption;
 import java.nio.file.Path;
@@ -58,7 +57,7 @@ public abstract class MCRWrappedContent extends MCRContent {
     }
 
     protected void setBaseContent(MCRContent baseContent) {
-        LOGGER.debug("Wrapped " + baseContent.getClass().getCanonicalName() + ": " + baseContent.getSystemId());
+        LOGGER.debug("Wrapped {}: {}", baseContent.getClass().getCanonicalName(), baseContent.getSystemId());
         this.baseContent = baseContent;
     }
 
@@ -126,7 +125,7 @@ public abstract class MCRWrappedContent extends MCRContent {
     }
 
     @Override
-    public String asString() throws IOException, UnsupportedEncodingException {
+    public String asString() throws IOException {
         return getBaseContent().asString();
     }
 
@@ -155,50 +154,62 @@ public abstract class MCRWrappedContent extends MCRContent {
         return getBaseContent().getReusableCopy();
     }
 
+    @Override
     public long length() throws IOException {
         return getBaseContent().length();
     }
 
+    @Override
     public long lastModified() throws IOException {
         return getBaseContent().lastModified();
     }
 
+    @Override
     public void setLastModified(long lastModified) {
         getBaseContent().setLastModified(lastModified);
     }
 
+    @Override
     public String getETag() throws IOException {
         return getBaseContent().getETag();
     }
 
+    @Override
     public ReadableByteChannel getReadableByteChannel() throws IOException {
         return getBaseContent().getReadableByteChannel();
     }
 
+    @Override
     public void setDocType(String docType) {
         getBaseContent().setDocType(docType);
     }
 
+    @Override
     public String getMimeType() throws IOException {
         return getBaseContent().getMimeType();
     }
 
+    @Override
     public void setMimeType(String mimeType) {
         getBaseContent().setMimeType(mimeType);
     }
 
+    @Override
     public String getName() {
         return getBaseContent().getName();
     }
 
+    @Override
     public void setName(String name) {
         getBaseContent().setName(name);
     }
 
+    @Override
     public boolean isUsingSession() {
         return getBaseContent().isUsingSession();
     }
 
+    @Override
     public void setUsingSession(boolean usingSession) {
         getBaseContent().setUsingSession(usingSession);
     }

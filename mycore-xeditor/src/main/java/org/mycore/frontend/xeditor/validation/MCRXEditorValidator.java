@@ -39,7 +39,7 @@ public class MCRXEditorValidator {
 
     public static final String XED_VALIDATION_MARKER = "xed-validation-marker";
 
-    private List<MCRValidator> validationRules = new ArrayList<MCRValidator>();
+    private List<MCRValidator> validationRules = new ArrayList<>();
 
     private MCRValidationResults results = new MCRValidationResults();
 

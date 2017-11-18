@@ -80,7 +80,7 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
             req.login(uid, pwd);
             session.setUserInformation(new Servlet3ContainerUserInformation(session, realm));
             req.getSession().setAttribute(MCRRequestAuthenticationFilter.SESSION_KEY, Boolean.TRUE);
-            LOGGER.info("Logged in: " + session.getUserInformation().getUserID());
+            LOGGER.info("Logged in: {}", session.getUserInformation().getUserID());
         }
     }
 

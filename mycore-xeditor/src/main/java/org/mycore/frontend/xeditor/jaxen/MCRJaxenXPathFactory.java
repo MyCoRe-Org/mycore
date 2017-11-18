@@ -21,9 +21,9 @@ import org.mycore.common.MCRConstants;
  */
 public class MCRJaxenXPathFactory extends JaxenXPathFactory {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRJaxenXPathFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRJaxenXPathFactory.class);
 
-    private List<ExtensionFunction> functions = new ArrayList<ExtensionFunction>();
+    private List<ExtensionFunction> functions = new ArrayList<>();
 
     public MCRJaxenXPathFactory() {
         super();

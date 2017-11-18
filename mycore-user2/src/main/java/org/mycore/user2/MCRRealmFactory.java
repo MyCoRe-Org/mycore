@@ -69,12 +69,12 @@ public class MCRRealmFactory {
     private static long lastModified = 0;
 
     /** Map of defined realms, key is the ID of the realm */
-    private static HashMap<String, MCRRealm> realmsMap = new HashMap<String, MCRRealm>();
+    private static HashMap<String, MCRRealm> realmsMap = new HashMap<>();
 
-    private static HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<String, MCRUserAttributeMapper>();
+    private static HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
 
     /** List of defined realms */
-    private static List<MCRRealm> realmsList = new ArrayList<MCRRealm>();
+    private static List<MCRRealm> realmsList = new ArrayList<>();
 
     /** The local realm, which is the default realm */
     private static MCRRealm localRealm;
@@ -92,7 +92,7 @@ public class MCRRealmFactory {
         String dataDirProperty = "MCR.datadir";
         String dataDir = config.getString(dataDirProperty, null);
         if (dataDir == null) {
-            LOGGER.warn(dataDirProperty + " is undefined.");
+            LOGGER.warn("{} is undefined.", dataDirProperty);
             try {
                 realmsURI = new URI(config.getString(REALMS_URI_CFG_KEY, RESOURCE_REALMS_URI));
             } catch (URISyntaxException e) {
@@ -100,15 +100,15 @@ public class MCRRealmFactory {
             }
         } else {
             File dataDirFile = new File(dataDir);
-            String realmsCfg = config.getString(REALMS_URI_CFG_KEY, dataDirFile.toURI().toString() + "realms.xml");
+            String realmsCfg = config.getString(REALMS_URI_CFG_KEY, dataDirFile.toURI() + "realms.xml");
             try {
                 realmsURI = new URI(realmsCfg);
-                LOGGER.info("Using realms defined in " + realmsURI);
+                LOGGER.info("Using realms defined in {}", realmsURI);
                 if ("file".equals(realmsURI.getScheme())) {
                     realmsFile = new File(realmsURI);
-                    LOGGER.info("Loading realms from file: " + realmsFile);
+                    LOGGER.info("Loading realms from file: {}", realmsFile);
                 } else {
-                    LOGGER.info("Try loading realms with URIResolver for scheme " + realmsURI.toString());
+                    LOGGER.info("Try loading realms with URIResolver for scheme {}", realmsURI);
                 }
             } catch (URISyntaxException e) {
                 throw new MCRException(e);
@@ -129,19 +129,19 @@ public class MCRRealmFactory {
         }
         String localRealmID = root.getAttributeValue("local");
         /** Map of defined realms, key is the ID of the realm */
-        HashMap<String, MCRRealm> realmsMap = new HashMap<String, MCRRealm>();
+        HashMap<String, MCRRealm> realmsMap = new HashMap<>();
 
-        HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<String, MCRUserAttributeMapper>();
+        HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
 
         /** List of defined realms */
-        List<MCRRealm> realmsList = new ArrayList<MCRRealm>();
+        List<MCRRealm> realmsList = new ArrayList<>();
 
-        List<Element> realms = (List<Element>) (root.getChildren("realm"));
+        List<Element> realms = root.getChildren("realm");
         for (Element child : realms) {
             String id = child.getAttributeValue("id");
             MCRRealm realm = new MCRRealm(id);
 
-            List<Element> labels = (List<Element>) (child.getChildren("label"));
+            List<Element> labels = child.getChildren("label");
             for (Element label : labels) {
                 String text = label.getTextTrim();
                 String lang = label.getAttributeValue("lang", Namespace.XML_NAMESPACE);
@@ -179,7 +179,7 @@ public class MCRRealmFactory {
             return MCRSourceContent.getInstance(realmsURI.toASCIIString()).asXML();
         }
         if (!realmsFile.exists() || realmsFile.length() == 0) {
-            LOGGER.info("Creating " + realmsFile.getAbsolutePath() + "...");
+            LOGGER.info("Creating {}...", realmsFile.getAbsolutePath());
             MCRSourceContent realmsContent = MCRSourceContent.getInstance(RESOURCE_REALMS_URI);
             realmsContent.sendTo(realmsFile);
         }
@@ -218,7 +218,7 @@ public class MCRRealmFactory {
      */
     public static Document getRealmsDocument() {
         reInitIfNeeded();
-        return (Document) realmsDocument.clone();
+        return realmsDocument.clone();
     }
 
     /**

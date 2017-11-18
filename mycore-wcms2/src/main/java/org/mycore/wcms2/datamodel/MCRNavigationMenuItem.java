@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "menu")
 @XmlAccessorType(XmlAccessType.NONE)
 public class MCRNavigationMenuItem extends MCRNavigationI18nItem
-    implements MCRNavigationBaseItem, MCRNavigationItemContainer {
+    implements MCRNavigationItemContainer {
 
     @XmlAttribute(required = true)
     private String id;
@@ -31,7 +31,7 @@ public class MCRNavigationMenuItem extends MCRNavigationI18nItem
     private List<MCRNavigationBaseItem> children;
 
     public MCRNavigationMenuItem() {
-        this.children = new ArrayList<MCRNavigationBaseItem>();
+        this.children = new ArrayList<>();
     }
 
     public String getId() {

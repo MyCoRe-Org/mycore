@@ -34,20 +34,20 @@ public interface MCRCondition<T> {
      * 
      * @return a condition string that can be parsed
      */
-    public String toString();
+    String toString();
 
     /**
      * Returns this condition as an Element.
      * 
      * @return this condition in XML format
      */
-    public Element toXML();
+    Element toXML();
 
     /**
      * Evalutates this condition.
      * @param o a parameter object
      * @return true if this condition is met
      */
-    public boolean evaluate(T o);
+    boolean evaluate(T o);
 
 }

@@ -49,7 +49,7 @@ public class MCRIIIFPresentationResource {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRCache<String, MCRIIIFPresentationManifestQuickAccess> cache = new MCRCache<>(1000,
-        MCRIIIFPresentationResource.class.getName().toString());
+        MCRIIIFPresentationResource.class.getName());
 
     private static final String IMPL_PARAM = "impl";
 

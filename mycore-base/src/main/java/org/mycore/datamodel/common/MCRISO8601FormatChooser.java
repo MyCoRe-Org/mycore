@@ -24,17 +24,17 @@ import java.util.regex.Pattern;
  */
 public final class MCRISO8601FormatChooser {
 
-    public final static DateTimeFormatter YEAR_FORMAT = ISODateTimeFormat.year();
+    public static final DateTimeFormatter YEAR_FORMAT = ISODateTimeFormat.year();
 
-    public final static DateTimeFormatter YEAR_MONTH_FORMAT = ISODateTimeFormat.yearMonth();
+    public static final DateTimeFormatter YEAR_MONTH_FORMAT = ISODateTimeFormat.yearMonth();
 
-    public final static DateTimeFormatter COMPLETE_FORMAT = ISODateTimeFormat.date();
+    public static final DateTimeFormatter COMPLETE_FORMAT = ISODateTimeFormat.date();
 
-    public final static DateTimeFormatter COMPLETE_HH_MM_FORMAT = ISODateTimeFormat.dateHourMinute();
+    public static final DateTimeFormatter COMPLETE_HH_MM_FORMAT = ISODateTimeFormat.dateHourMinute();
 
-    public final static DateTimeFormatter COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
+    public static final DateTimeFormatter COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
 
-    public final static DateTimeFormatter COMPLETE_HH_MM_SS_SSS_FORMAT = ISODateTimeFormat.dateTime();
+    public static final DateTimeFormatter COMPLETE_HH_MM_SS_SSS_FORMAT = ISODateTimeFormat.dateTime();
 
     private static final Pattern MILLI_CHECK_PATTERN = Pattern.compile("\\.\\d{4,}\\+");
 

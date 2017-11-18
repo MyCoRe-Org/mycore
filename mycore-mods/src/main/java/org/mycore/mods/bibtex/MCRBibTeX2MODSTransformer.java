@@ -24,7 +24,6 @@ package org.mycore.mods.bibtex;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,8 +45,8 @@ import bibtex.parser.ParseException;
  */
 public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
 
-    private final static Pattern MISSING_KEYS_PATTERN = Pattern
-            .compile("(@[a-zA-Z0-9]+\\s*\\{)(\\s*[a-zA-Z0-9]+\\s*\\=)");
+    private static final Pattern MISSING_KEYS_PATTERN = Pattern
+        .compile("(@[a-zA-Z0-9]+\\s*\\{)(\\s*[a-zA-Z0-9]+\\s*\\=)");
 
     @Override
     public MCRJDOMContent transform(MCRContent source) throws IOException {
@@ -72,7 +71,7 @@ public class MCRBibTeX2MODSTransformer extends MCRContentTransformer {
         return sb.toString();
     }
 
-    private BibtexFile parse(String input) throws UnsupportedEncodingException, IOException {
+    private BibtexFile parse(String input) throws IOException {
         BibtexFile bibtexFile = new BibtexFile();
         BibtexParser parser = new BibtexParser(false);
         parser.setMultipleFieldValuesPolicy(BibtexMultipleFieldValuesPolicy.KEEP_ALL);

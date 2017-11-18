@@ -52,10 +52,9 @@ public class MCRTransferPackageCommands {
         if (!(Files.exists(dir) || Files.isDirectory(dir))) {
             throw new FileNotFoundException(directory + " does not exist or is not a directory.");
         }
-        List<String> importStatements = new LinkedList<String>();
-        try (Stream<Path> stream = Files.find(dir, 0, (path, attr) -> {
-            return String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path);
-        })) {
+        List<String> importStatements = new LinkedList<>();
+        try (Stream<Path> stream = Files.find(dir, 0,
+            (path, attr) -> String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
             stream.map(Path::toAbsolutePath).map(Path::toString).forEach(path -> {
                 String subCommand = MessageFormat.format("import transfer package from tar {0}", path);
                 importStatements.add(subCommand);
@@ -69,7 +68,7 @@ public class MCRTransferPackageCommands {
     public static List<String> importTransferPackageFromTar(String pathToTar) throws Exception {
         Path tar = Paths.get(pathToTar);
         if (!Files.exists(tar)) {
-            throw new FileNotFoundException(tar.toAbsolutePath().toString() + " does not exist.");
+            throw new FileNotFoundException(tar.toAbsolutePath() + " does not exist.");
         }
         Path targetDirectory = MCRTransferPackageUtil.getTargetDirectory(tar);
 
@@ -84,13 +83,13 @@ public class MCRTransferPackageCommands {
     public static void _untar(String pathToTar) throws Exception {
         Path tar = Paths.get(pathToTar);
         Path targetDirectory = MCRTransferPackageUtil.getTargetDirectory(tar);
-        LOGGER.info("Untar " + pathToTar + " to " + targetDirectory + "...");
+        LOGGER.info("Untar {} to {}...", pathToTar, targetDirectory);
         MCRUtils.untar(tar, targetDirectory);
     }
 
     @MCRCommand(syntax = "_import transfer package from directory {0}")
     public static List<String> _fromDirectory(String targetDirectoryPath) throws Exception {
-        LOGGER.info("Import transfer package from " + targetDirectoryPath + "...");
+        LOGGER.info("Import transfer package from {}...", targetDirectoryPath);
         Path targetDirectory = Paths.get(targetDirectoryPath);
         List<String> commands = new ArrayList<>();
 
@@ -98,7 +97,7 @@ public class MCRTransferPackageCommands {
         List<Path> classificationPaths = MCRTransferPackageUtil.getClassifications(targetDirectory);
         for (Path pathToClassification : classificationPaths) {
             commands.add(
-                "_import transfer package classification from " + pathToClassification.toAbsolutePath().toString());
+                "_import transfer package classification from " + pathToClassification.toAbsolutePath());
         }
 
         // import objects
@@ -120,9 +119,9 @@ public class MCRTransferPackageCommands {
     public static List<String> _importObject(String objectId, String targetDirectoryPath) throws Exception {
         Path targetDirectory = Paths.get(targetDirectoryPath);
         List<String> derivates = MCRTransferPackageUtil.importObjectCLI(targetDirectory, objectId);
-        return derivates.stream().map(derId -> {
-            return "_import transfer package derivate " + derId + " from " + targetDirectoryPath;
-        }).collect(Collectors.toList());
+        return derivates.stream()
+            .map(derId -> "_import transfer package derivate " + derId + " from " + targetDirectoryPath)
+            .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "_import transfer package derivate {0} from {1}")
@@ -144,7 +143,7 @@ public class MCRTransferPackageCommands {
         MCRSolrIndexer.rebuildMetadataIndex(mcrObjects);
 
         // deleting expanded directory
-        LOGGER.info("Deleting expanded tar in " + targetDirectoryPath + "...");
+        LOGGER.info("Deleting expanded tar in {}...", targetDirectoryPath);
         Files.walkFileTree(Paths.get(targetDirectoryPath), MCRRecursiveDeleter.instance());
     }
 

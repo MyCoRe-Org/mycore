@@ -29,7 +29,7 @@ public interface MCRTriConsumer<T, U, V> {
      * @param v
      *            the third input argument
      */
-    public void accept(T t, U u, V v);
+    void accept(T t, U u, V v);
 
     /**
      * Returns a composed MCRTriConsumer that performs, in sequence, this operation followed by the after operation. If
@@ -42,7 +42,7 @@ public interface MCRTriConsumer<T, U, V> {
      * @throws NullPointerException
      *             if after is null
      */
-    public default MCRTriConsumer<T, U, V> andThen(MCRTriConsumer<? super T, ? super U, ? super V> after) {
+    default MCRTriConsumer<T, U, V> andThen(MCRTriConsumer<? super T, ? super U, ? super V> after) {
         Objects.requireNonNull(after);
         return (a, b, c) -> {
             accept(a, b, c);

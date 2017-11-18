@@ -40,7 +40,7 @@ import org.mycore.solr.MCRSolrUtils;
  */
 public class MCROAISolrSearcher extends MCROAISearcher {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAISolrSearcher.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAISolrSearcher.class);
 
     private MCRSet set;
 

@@ -109,7 +109,7 @@ public class MCRSwordUtil {
 
         derivate.getDerivate().setInternals(ifs);
 
-        LOGGER.debug("Creating new derivate with ID " + derivateID);
+        LOGGER.debug("Creating new derivate with ID {}", derivateID);
         MCRMetadataManager.create(derivate);
 
         if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
@@ -175,7 +175,7 @@ public class MCRSwordUtil {
             final ZipArchiveEntry zipArchiveEntry;
             try {
                 final String fileName = getFilename(p);
-                LOGGER.info("Addding " + fileName + " to zip file!");
+                LOGGER.info("Addding {} to zip file!", fileName);
                 if (isDir) {
                     addDirectoryToZip(zipOutputStream, p);
                 } else {
@@ -190,7 +190,7 @@ public class MCRSwordUtil {
                     zipOutputStream.closeArchiveEntry();
                 }
             } catch (IOException e) {
-                LOGGER.error("Could not add path " + p);
+                LOGGER.error("Could not add path {}", p);
             }
         });
     }
@@ -243,9 +243,8 @@ public class MCRSwordUtil {
 
     public static void extractZipToPath(Path zipFilePath, MCRPath target)
         throws SwordError, IOException, NoSuchAlgorithmException, URISyntaxException {
-        LOGGER.info("Extracting zip: " + zipFilePath.toString());
-        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri().toString()),
-            new HashMap<String, Object>())) {
+        LOGGER.info("Extracting zip: {}", zipFilePath);
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFilePath.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
             Files.walkFileTree(sourcePath,
                 new SimpleFileVisitor<Path>() {
@@ -269,7 +268,7 @@ public class MCRSwordUtil {
                         throws IOException {
                         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
 
-                        LOGGER.info("Extracting: " + file.toString());
+                        LOGGER.info("Extracting: {}", file);
                         Path targetFilePath = target.resolve(sourcePath.relativize(file));
                         // WORKAROUND: copy is bad with IFS because fsnodes is locked until copy is completed
                         // so we end the transaction after we got a byte channel, then we write the data
@@ -301,8 +300,7 @@ public class MCRSwordUtil {
 
     public static List<MCRValidationResult> validateZipFile(final MCRFileValidator validator, Path zipFile)
         throws IOException, URISyntaxException {
-        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri().toString()),
-            new HashMap<String, Object>())) {
+        try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
             ArrayList<MCRValidationResult> validationResults = new ArrayList<>();
             Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
@@ -381,7 +379,7 @@ public class MCRSwordUtil {
             String[] urlParts = editIRI.toString().split(iri);
 
             if (urlParts.length < 2) {
-                final String message = "Invalid " + iri + " : " + editIRI.toString();
+                final String message = "Invalid " + iri + " : " + editIRI;
                 throw new IllegalArgumentException(message);
             }
 
@@ -507,7 +505,7 @@ public class MCRSwordUtil {
         private static Stream<IRI> getEditMediaFileIRIStream(final String collection, final String derivateId) {
             MCRPath derivateRootPath = MCRPath.getPath(derivateId, "/");
             try {
-                List<IRI> iris = new ArrayList<IRI>();
+                List<IRI> iris = new ArrayList<>();
                 Files.walkFileTree(derivateRootPath, new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
@@ -522,7 +520,7 @@ public class MCRSwordUtil {
                 });
                 return iris.stream();
             } catch (IOException e) {
-                LOGGER.error("Error while processing directory stream of " + derivateId, e);
+                LOGGER.error("Error while processing directory stream of {}", derivateId, e);
                 throw new MCRException(e);
             }
         }

@@ -91,12 +91,9 @@ public class MyCoReWebPageProvider {
      */
     public Element addSection(String title, String xmlAsString, String lang) throws IOException, SAXParseException,
         JDOMException {
-        StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-            .append("<!DOCTYPE MyCoReWebPage PUBLIC \"-//MYCORE//DTD MYCOREWEBPAGE 1.0//DE\" ")
-            .append("\"http://www.mycore.org/mycorewebpage.dtd\">")
-            .append("<MyCoReWebPage>")
-            .append(xmlAsString)
-            .append("</MyCoReWebPage>");
+        String sb = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<!DOCTYPE MyCoReWebPage PUBLIC \"-//MYCORE//DTD MYCOREWEBPAGE 1.0//DE\" "
+            + "\"http://www.mycore.org/mycorewebpage.dtd\">" + "<MyCoReWebPage>" + xmlAsString + "</MyCoReWebPage>";
         SAXBuilder saxBuilder = new SAXBuilder();
         saxBuilder.setEntityResolver((publicId, systemId) -> {
             String resource = systemId.substring(systemId.lastIndexOf("/"));
@@ -106,7 +103,7 @@ public class MyCoReWebPageProvider {
             }
             return new InputSource(is);
         });
-        StringReader reader = new StringReader(sb.toString());
+        StringReader reader = new StringReader(sb);
         Document doc = saxBuilder.build(reader);
         return this.addSection(title, doc.getRootElement().cloneContent(), lang);
     }

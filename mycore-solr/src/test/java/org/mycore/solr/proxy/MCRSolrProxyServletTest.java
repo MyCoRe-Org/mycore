@@ -5,6 +5,7 @@ package org.mycore.solr.proxy;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.solr.common.params.ModifiableSolrParams;
@@ -23,11 +24,11 @@ public class MCRSolrProxyServletTest extends MCRTestCase {
     @Test
     public final void testToMultiMap() {
         ModifiableSolrParams params = new ModifiableSolrParams();
-        String[] paramValues = new String[] { "title:junit", "author:john" };
+        String[] paramValues = { "title:junit", "author:john" };
         String paramName = "fq";
         params.add(paramName, paramValues);
         Map<String, String[]> multiMap = MCRSolrProxyServlet.toMultiMap(params);
-        System.out.println(multiMap.get(paramName));
+        System.out.println(Arrays.toString(multiMap.get(paramName)));
         assertEquals("Expected " + paramValues.length + " values", paramValues.length, multiMap.get(paramName).length);
     }
 

@@ -148,12 +148,9 @@ public class MCRStoredMetadata {
      * @return the date this metadata document was last modified
      */
     public Date getLastModified() throws IOException {
-        FileContent fileContent = fo.getContent();
-        try {
+        try (FileContent fileContent = fo.getContent()) {
             long time = fileContent.getLastModifiedTime();
             return new Date(time);
-        } finally {
-            fileContent.close();
         }
     }
 
@@ -165,11 +162,8 @@ public class MCRStoredMetadata {
      */
     public void setLastModified(Date date) throws IOException {
         if (!isDeleted()) {
-            FileContent fileContent = fo.getContent();
-            try {
+            try (FileContent fileContent = fo.getContent()) {
                 fo.getContent().setLastModifiedTime(date.getTime());
-            } finally {
-                fileContent.close();
             }
         }
     }

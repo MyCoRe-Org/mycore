@@ -32,7 +32,7 @@ public class MCRContainerLoginFormServlet extends MCRServlet {
         MCRUserInformation userInformation = mcrSession.getUserInformation();
         MCRLogin login = new MCRLogin(userInformation, getFormAction());
         login.getForm().getInput().addAll(Arrays.asList(getUserNameField(), getPasswordField()));
-        job.getRequest().setAttribute(LOGIN_ATTR, new MCRJAXBContent<MCRLogin>(MCRLogin.getContext(), login));
+        job.getRequest().setAttribute(LOGIN_ATTR, new MCRJAXBContent<>(MCRLogin.getContext(), login));
     }
 
     private String getFormAction() {

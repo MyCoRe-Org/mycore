@@ -51,32 +51,32 @@ public class MCRStartupHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static interface AutoExecutable {
+    public interface AutoExecutable {
         /**
          * returns a name to display on start-up.
          */
-        public String getName();
+        String getName();
 
         /**
          * If order is important returns as 'heigher' priority.
          */
-        public int getPriority();
+        int getPriority();
 
         /**
          * This method get executed by {@link MCRStartupHandler#startUp(ServletContext)}
          */
-        public void startUp(ServletContext servletContext);
+        void startUp(ServletContext servletContext);
     }
 
     public static void startUp(ServletContext servletContext) {
         //setup configuration
         MCRConfigurationDirSetup dirSetup = new MCRConfigurationDirSetup();
         dirSetup.startUp(servletContext);
-        LOGGER.info("I have these components for you: " + MCRRuntimeComponentDetector.getAllComponents());
-        LOGGER.info("I have these mycore components for you: " + MCRRuntimeComponentDetector.getMyCoReComponents());
-        LOGGER.info("I have these app modules for you: " + MCRRuntimeComponentDetector.getApplicationModules());
+        LOGGER.info("I have these components for you: {}", MCRRuntimeComponentDetector.getAllComponents());
+        LOGGER.info("I have these mycore components for you: {}", MCRRuntimeComponentDetector.getMyCoReComponents());
+        LOGGER.info("I have these app modules for you: {}", MCRRuntimeComponentDetector.getApplicationModules());
         if (servletContext != null) {
-            LOGGER.info("Library order: " + servletContext.getAttribute(ServletContext.ORDERED_LIBS));
+            LOGGER.info("Library order: {}", servletContext.getAttribute(ServletContext.ORDERED_LIBS));
         }
 
         MCRConfiguration.instance().getStrings("MCR.Startup.Class", Collections.emptyList()).stream()
@@ -89,7 +89,7 @@ public class MCRStartupHandler {
     }
 
     private static void startExecutable(ServletContext servletContext, AutoExecutable autoExecutable) {
-        LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
+        LOGGER.info("{}: Starting {}", autoExecutable.getPriority(), autoExecutable.getName());
         try {
             autoExecutable.startUp(servletContext);
         } catch (ExceptionInInitializerError | RuntimeException e) {

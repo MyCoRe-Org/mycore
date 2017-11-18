@@ -55,11 +55,11 @@ import org.mycore.oai.set.MCRSet;
  */
 public class MCROAIAdapter implements OAIAdapter {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCROAIAdapter.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCROAIAdapter.class);
 
-    protected final static ZoneId UTC_ZONE = ZoneId.of("UTC");
+    protected static final ZoneId UTC_ZONE = ZoneId.of("UTC");
 
-    public final static String PREFIX = "MCR.OAIDataProvider.";
+    public static final String PREFIX = "MCR.OAIDataProvider.";
 
     public static int DEFAULT_PARTITION_SIZE;
 
@@ -80,7 +80,7 @@ public class MCROAIAdapter implements OAIAdapter {
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
         DEFAULT_PARTITION_SIZE = MCRConfiguration.instance().getInt(prefix + "PartitionSize", 50);
-        LOGGER.info(MCROAIAdapter.PREFIX + "ResumptionTokens.PartitionSize is set to " + DEFAULT_PARTITION_SIZE);
+        LOGGER.info(MCROAIAdapter.PREFIX + "ResumptionTokens.PartitionSize is set to {}", DEFAULT_PARTITION_SIZE);
     }
 
     /**
@@ -201,7 +201,7 @@ public class MCROAIAdapter implements OAIAdapter {
      */
     @Override
     public List<MetadataFormat> getMetadataFormats() {
-        return new ArrayList<MetadataFormat>(getMetadataFormatMap().values());
+        return new ArrayList<>(getMetadataFormatMap().values());
     }
 
     /*
@@ -218,7 +218,7 @@ public class MCROAIAdapter implements OAIAdapter {
     }
 
     protected Map<String, MetadataFormat> getMetadataFormatMap() {
-        Map<String, MetadataFormat> metdataFormatMap = new HashMap<String, MetadataFormat>();
+        Map<String, MetadataFormat> metdataFormatMap = new HashMap<>();
         String formats = this.config.getString(getConfigPrefix() + "MetadataFormats", "");
         StringTokenizer st = new StringTokenizer(formats, ", ");
         while (st.hasMoreTokens()) {

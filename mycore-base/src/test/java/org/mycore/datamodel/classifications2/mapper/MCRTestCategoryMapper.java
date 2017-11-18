@@ -35,9 +35,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  */
 public class MCRTestCategoryMapper extends MCRCategoryMapperBase {
 
-    private Map<MCRCategoryID, MCRCategoryID> parents = new HashMap<MCRCategoryID, MCRCategoryID>();
+    private Map<MCRCategoryID, MCRCategoryID> parents = new HashMap<>();
 
-    private Map<MCRCategoryID, String> mappingRules = new HashMap<MCRCategoryID, String>();
+    private Map<MCRCategoryID, String> mappingRules = new HashMap<>();
 
     public void setParent(MCRCategoryID childID, MCRCategoryID parentID) {
         parents.put(childID, parentID);

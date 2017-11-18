@@ -54,7 +54,7 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
         List<Element> categoryElements = file.getChildren("category");
         this.categories = Collections.emptySet();
         if (!categoryElements.isEmpty()) {
-            categories = new ArrayList<MCRCategoryID>(categoryElements.size());
+            categories = new ArrayList<>(categoryElements.size());
             for (Element categElement : categoryElements) {
                 MCRCategoryID categId = MCRCategoryID.fromString(categElement.getAttributeValue("id"));
                 categories.add(categId);
@@ -108,7 +108,7 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
         if (categories == null || categories.isEmpty()) {
             this.categories = Collections.emptySet();
         } else {
-            this.categories = new ArrayList<MCRCategoryID>(categories);
+            this.categories = new ArrayList<>(categories);
         }
     }
 

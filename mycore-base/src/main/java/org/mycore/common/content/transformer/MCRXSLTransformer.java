@@ -124,7 +124,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     public synchronized void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
         TransformerFactory transformerFactory = Optional.ofNullable(factoryClass)
             .map(c -> TransformerFactory.newInstance(c, null)).orElseGet(TransformerFactory::newInstance);
-        LOGGER.info("Transformerfactory: " + transformerFactory.getClass().getName());
+        LOGGER.info("Transformerfactory: {}", transformerFactory.getClass().getName());
         transformerFactory.setURIResolver(URI_RESOLVER);
         transformerFactory.setErrorListener(MCRErrorListener.getInstance());
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
@@ -215,9 +215,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             XMLReader reader = getXMLReader(transformHandlerList);
             TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
             return transform(source, reader, lastTransformerHandler, parameter);
-        } catch (TransformerException e) {
-            throw new IOException(e);
-        } catch (SAXException e) {
+        } catch (TransformerException | SAXException e) {
             throw new IOException(e);
         }
     }
@@ -238,11 +236,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             StreamResult result = new StreamResult(out);
             lastTransformerHandler.setResult(result);
             reader.parse(source.getInputSource());
-        } catch (TransformerConfigurationException e) {
-            throw new IOException(e);
-        } catch (IllegalArgumentException e) {
-            throw new IOException(e);
-        } catch (SAXException e) {
+        } catch (TransformerConfigurationException | SAXException | IllegalArgumentException e) {
             throw new IOException(e);
         } catch (RuntimeException e) {
             if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
@@ -266,7 +260,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         transformerHandler.setResult(serializer);
         // Parse the source XML, and send the parse events to the
         // TransformerHandler.
-        LOGGER.info("Start transforming: " + (source.getSystemId() == null ? source.getName() : source.getSystemId()));
+        LOGGER.info("Start transforming: {}", source.getSystemId() == null ? source.getName() : source.getSystemId());
         reader.parse(source.getInputSource());
         MCRContent transformedContent = new MCRByteContent(baos.getBuffer(), 0, baos.size());
         return transformedContent;
@@ -379,10 +373,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             this.source = source;
             this.reader = reader;
             this.transformerHandler = transformerHandler;
-            LOGGER.info("Transformer lastModified: " + transformerLastModified);
-            LOGGER.info("Source lastModified     : " + source.lastModified());
+            LOGGER.info("Transformer lastModified: {}", transformerLastModified);
+            LOGGER.info("Source lastModified     : {}", source.lastModified());
             this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0)
-                ? Math.max(transformerLastModified, source.lastModified()) : -1;
+                ? Math.max(transformerLastModified, source.lastModified())
+                : -1;
             this.eTag = generateETag(source, lastModified, parameter.hashCode());
             this.name = fileName;
             this.mimeType = mimeType;
@@ -404,7 +399,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             throws IOException {
             //parameterHashCode is stable for this session and current request URL
             long systemLastModified = MCRConfiguration.instance().getSystemLastModified();
-            StringBuilder b = new StringBuilder('"');
+            StringBuilder b = new StringBuilder("\"");
             byte[] unencodedETag = ByteBuffer.allocate(Long.SIZE / 4).putLong(lastModified ^ parameterHashCode)
                 .putLong(systemLastModified ^ parameterHashCode).array();
             b.append(Base64.getEncoder().encodeToString(unencodedETag));

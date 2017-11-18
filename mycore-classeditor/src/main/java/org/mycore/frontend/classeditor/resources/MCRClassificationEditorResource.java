@@ -5,13 +5,10 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -173,12 +170,8 @@ public class MCRClassificationEditorResource {
     public Response getClassification() {
         Gson gson = MCRJSONManager.instance().createGson();
         List<MCRCategory> rootCategories = new LinkedList<>(CATEGORY_DAO.getRootCategories());
-        for (Iterator<MCRCategory> it = rootCategories.iterator(); it.hasNext();) {
-            MCRCategory category = it.next();
-            if (!MCRAccessManager.checkPermission(category.getId().getRootID(), PERMISSION_WRITE)) {
-                it.remove();
-            }
-        }
+        rootCategories.removeIf(
+            category -> !MCRAccessManager.checkPermission(category.getId().getRootID(), PERMISSION_WRITE));
         if (rootCategories.isEmpty()
             && !MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION)) {
             return Response.status(Status.UNAUTHORIZED).build();
@@ -198,7 +191,7 @@ public class MCRClassificationEditorResource {
     }
 
     interface OperationInSession {
-        public void run();
+        void run();
     }
 
     private class DeleteOp implements OperationInSession {
@@ -282,11 +275,11 @@ public class MCRClassificationEditorResource {
         JsonStreamParser jsonStreamParser = new JsonStreamParser(json);
         if (jsonStreamParser.hasNext()) {
             JsonArray saveObjArray = jsonStreamParser.next().getAsJsonArray();
-            List<JsonObject> saveList = new ArrayList<JsonObject>();
+            List<JsonObject> saveList = new ArrayList<>();
             for (JsonElement jsonElement : saveObjArray) {
                 saveList.add(jsonElement.getAsJsonObject());
             }
-            Collections.sort(saveList, new IndexComperator());
+            saveList.sort(new IndexComperator());
             for (JsonObject jsonObject : saveList) {
                 String status = getStatus(jsonObject);
                 SaveElement categ = getCateg(jsonObject);
@@ -336,7 +329,7 @@ public class MCRClassificationEditorResource {
 
         JsonArray docList = new JsonArray();
         MCRSolrSearchUtils.stream(solrClient, p).flatMap(document -> {
-            List<String> ids = new ArrayList<String>();
+            List<String> ids = new ArrayList<>();
             ids.add(document.getFirstValue("id").toString());
             Collection<Object> fieldValues = document.getFieldValues("ancestors");
             if (fieldValues != null) {
@@ -345,9 +338,7 @@ public class MCRClassificationEditorResource {
                 }
             }
             return ids.stream();
-        }).distinct().map(id -> new JsonPrimitive(id)).forEach(jp -> {
-            docList.add(jp);
-        });
+        }).distinct().map(JsonPrimitive::new).forEach(docList::add);
         return Response.ok().entity(docList.toString()).build();
     }
 
@@ -355,7 +346,7 @@ public class MCRClassificationEditorResource {
     @Path("link/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
-        @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException, IOException {
+        @QueryParam("rows") Integer rows) throws SolrServerException, IOException {
         // do solr query
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         ModifiableSolrParams params = new ModifiableSolrParams();
@@ -428,7 +419,7 @@ public class MCRClassificationEditorResource {
 
     private boolean isAdded(JsonElement jsonElement) {
         JsonElement added = jsonElement.getAsJsonObject().get("added");
-        return added == null ? false : jsonElement.getAsJsonObject().get("added").getAsBoolean();
+        return added != null && jsonElement.getAsJsonObject().get("added").getAsBoolean();
     }
 
     private MCRJSONCategory parseJson(String json) {
@@ -493,7 +484,7 @@ public class MCRClassificationEditorResource {
                 return -1;
             }
             if (depthLevel1.getAsInt() != depthLevel2.getAsInt()) {
-                return new Integer(depthLevel1.getAsInt()).compareTo(depthLevel2.getAsInt());
+                return Integer.compare(depthLevel1.getAsInt(), depthLevel2.getAsInt());
             }
             // compare index
             JsonPrimitive index1 = jsonElement1.getAsJsonObject().getAsJsonPrimitive("index");
@@ -504,7 +495,7 @@ public class MCRClassificationEditorResource {
             if (index2 == null) {
                 return -1;
             }
-            return new Integer(index1.getAsInt()).compareTo(index2.getAsInt());
+            return Integer.compare(index1.getAsInt(), index2.getAsInt());
         }
     }
 

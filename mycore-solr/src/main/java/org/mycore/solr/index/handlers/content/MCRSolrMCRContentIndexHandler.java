@@ -24,7 +24,7 @@
 package org.mycore.solr.index.handlers.content;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -84,7 +84,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
     public List<MCRSolrIndexHandler> getSubHandlers() {
         MCRSolrIndexHandler mcrSolrIndexHandler = new MCRSolrInputDocumentHandler(document, getSolrClient());
         mcrSolrIndexHandler.setCommitWithin(getCommitWithin());
-        return Arrays.asList(mcrSolrIndexHandler);
+        return Collections.singletonList(mcrSolrIndexHandler);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
 
     @Override
     public String toString() {
-        return "index " + id.toString();
+        return "index " + id;
     }
 
 }

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.transform.URIResolver;
 
@@ -95,13 +94,13 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
                 cachedElement = doc.getRootElement();
                 lastModified = System.currentTimeMillis();
             } catch (Exception exc) {
-                LOGGER.error("Error while parsing " + xmlFile + "!", exc);
+                LOGGER.error("Error while parsing {}!", xmlFile, exc);
                 return null;
             }
         }
         // clone it for further replacements
         // TODO: whats faster? cloning or building it new from file
-        return (Element) cachedElement.clone();
+        return cachedElement.clone();
     }
 
     /**
@@ -120,7 +119,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
      * @return a hashtable with all variables from the uri
      */
     protected Hashtable<String, String> createVariablesMap(String uri) {
-        Hashtable<String, String> variablesMap = new Hashtable<String, String>();
+        Hashtable<String, String> variablesMap = new Hashtable<>();
         String uriValue = uri.substring(uri.indexOf(':') + 1);
         String[] variablesArr = uriValue.split(":");
         for (int i = 0; i < variablesArr.length; i++) {
@@ -157,7 +156,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
             }
 
             // attributes
-            for (Attribute attrib : (List<Attribute>) element.getAttributes()) {
+            for (Attribute attrib : element.getAttributes()) {
                 String attribValue = attrib.getValue();
                 if (attribValue.contains("{")) {
                     attrib.setValue(varResolver.resolve(attribValue));

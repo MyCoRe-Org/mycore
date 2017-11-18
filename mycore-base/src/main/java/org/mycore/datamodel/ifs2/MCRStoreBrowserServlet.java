@@ -72,7 +72,7 @@ public class MCRStoreBrowserServlet extends MCRServlet {
 class MCRStoreBrowserRequest {
 
     /** The slot path elements given from request, for example /0041/09/ */
-    private List<String> pathElements = new ArrayList<String>();
+    private List<String> pathElements = new ArrayList<>();
 
     /** The store thats contents should be browsed */
     private MCRMetadataStore store;

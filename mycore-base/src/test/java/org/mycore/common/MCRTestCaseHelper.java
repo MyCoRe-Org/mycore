@@ -51,7 +51,7 @@ public class MCRTestCaseHelper {
     }
 
     public static void after() {
-        MCRConfiguration.instance().initialize(Collections.<String, String> emptyMap(), true);
+        MCRConfiguration.instance().initialize(Collections.emptyMap(), true);
         MCRSessionMgr.releaseCurrentSession();
     }
 

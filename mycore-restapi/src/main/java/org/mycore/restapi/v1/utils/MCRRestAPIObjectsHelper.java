@@ -35,7 +35,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -97,6 +96,7 @@ import com.google.gson.stream.JsonWriter;
  */
 public class MCRRestAPIObjectsHelper {
     private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
     private static final String GENERAL_ERROR_MSG = "A problem occured while fetching the data.";
 
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPIObjectsHelper.class);
@@ -119,7 +119,7 @@ public class MCRRestAPIObjectsHelper {
         if (MCRRestAPIObjects.STYLE_DERIVATEDETAILS.equals(queryParamStyle) && eStructure != null) {
             Element eDerObjects = eStructure.getChild("derobjects");
             if (eDerObjects != null) {
-                for (Element eDer : (List<Element>) eDerObjects.getChildren("derobject")) {
+                for (Element eDer : eDerObjects.getChildren("derobject")) {
                     String derID = eDer.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
                     try {
                         MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID));
@@ -306,8 +306,8 @@ public class MCRRestAPIObjectsHelper {
         }
 
         //analyze filter
-        List<String> projectIDs = new ArrayList<String>();
-        List<String> typeIDs = new ArrayList<String>();
+        List<String> projectIDs = new ArrayList<>();
+        List<String> typeIDs = new ArrayList<>();
         String lastModifiedBefore = null;
         String lastModifiedAfter = null;
         if (filter != null) {
@@ -362,7 +362,7 @@ public class MCRRestAPIObjectsHelper {
         //Parameters are validated - continue to retrieve data
 
         //retrieve MCRIDs by Type and Project ID
-        Set<String> mcrIDs = new HashSet<String>();
+        Set<String> mcrIDs = new HashSet<>();
         if (projectIDs.isEmpty()) {
             if (typeIDs.isEmpty()) {
                 mcrIDs = MCRXMLMetadataManager.instance().listIDs().stream().filter(id -> !id.contains("_derivate_"))
@@ -391,9 +391,9 @@ public class MCRRestAPIObjectsHelper {
         }
 
         //Filter by modifiedBefore and modifiedAfter
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         l.addAll(mcrIDs);
-        List<MCRObjectIDDate> objIdDates = new ArrayList<MCRObjectIDDate>();
+        List<MCRObjectIDDate> objIdDates = new ArrayList<>();
         try {
             objIdDates = MCRXMLMetadataManager.instance().retrieveObjectDates(l);
         } catch (IOException e) {
@@ -401,7 +401,7 @@ public class MCRRestAPIObjectsHelper {
         }
         if (lastModifiedAfter != null || lastModifiedBefore != null) {
             List<MCRObjectIDDate> testObjIdDates = objIdDates;
-            objIdDates = new ArrayList<MCRObjectIDDate>();
+            objIdDates = new ArrayList<>();
             for (MCRObjectIDDate oid : testObjIdDates) {
                 String test = SDF_UTC.format(oid.getLastModified());
                 if (lastModifiedAfter != null && test.compareTo(lastModifiedAfter) < 0)
@@ -415,7 +415,7 @@ public class MCRRestAPIObjectsHelper {
 
         //sort if necessary
         if (sortObj != null) {
-            Collections.sort(objIdDates, new MCRRestAPISortObjectComparator(sortObj));
+            objIdDates.sort(new MCRRestAPISortObjectComparator(sortObj));
         }
 
         String authHeader = MCRJSONWebTokenUtil
@@ -499,9 +499,7 @@ public class MCRRestAPIObjectsHelper {
         try {
             sortObj = createSortObject(sort);
         } catch (MCRRestAPIException rae) {
-            for (MCRRestAPIError fe : rae.getErrors()) {
-                errors.add(fe);
-            }
+            errors.addAll(rae.getErrors());
         }
 
         //analyze format
@@ -520,28 +518,28 @@ public class MCRRestAPIObjectsHelper {
         //Parameters are checked - continue to retrieve data
 
         List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrObjID).getStructure().getDerivates().stream()
-            .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> {
-                return new MCRObjectIDDate() {
-                    long lastModified;
-                    {
-                        try {
-                            lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
-                        } catch (IOException e) {
-                            lastModified = 0;
-                            LOGGER.error("Exception while getting last modified of " + id, e);
-                        }
+            .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> new MCRObjectIDDate() {
+                long lastModified;
+                {
+                    try {
+                        lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+                    } catch (IOException e) {
+                        lastModified = 0;
+                        LOGGER.error(
+                            "Exception while getting last modified of {}",
+                            id, e);
                     }
+                }
 
-                    @Override
-                    public String getId() {
-                        return id.toString();
-                    }
+                @Override
+                public String getId() {
+                    return id.toString();
+                }
 
-                    @Override
-                    public Date getLastModified() {
-                        return new Date(lastModified);
-                    }
-                };
+                @Override
+                public Date getLastModified() {
+                    return new Date(lastModified);
+                }
             }).sorted(new MCRRestAPISortObjectComparator(sortObj)::compare).collect(Collectors.toList());
 
         String authHeader = MCRJSONWebTokenUtil
@@ -652,25 +650,27 @@ public class MCRRestAPIObjectsHelper {
                 return responseBuilder.header(HEADER_NAME_AUTHORIZATION, authHeader).build();
             }
             switch (format) {
-            case MCRRestAPIObjects.FORMAT_XML:
-                Document docOut = listDerivateContentAsXML(derObj, path, depth, info);
-                try (StringWriter sw = new StringWriter()) {
-                    XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-                    xout.output(docOut, sw);
-                    return response(sw.toString(), "application/xml", lastModified, authHeader);
-                } catch (IOException e) {
+                case MCRRestAPIObjects.FORMAT_XML:
+                    Document docOut = listDerivateContentAsXML(derObj, path, depth, info);
+                    try (StringWriter sw = new StringWriter()) {
+                        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+                        xout.output(docOut, sw);
+                        return response(sw.toString(), "application/xml", lastModified, authHeader);
+                    } catch (IOException e) {
+                        throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+                            new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG,
+                                e.getMessage()));
+                    }
+                case MCRRestAPIObjects.FORMAT_JSON:
+                    if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
+                        String result = listDerivateContentAsJson(derObj, path, depth, info);
+                        return response(result, "application/json", lastModified, authHeader);
+                    }
+                default:
                     throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                        new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
-                }
-            case MCRRestAPIObjects.FORMAT_JSON:
-                if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-                    String result = listDerivateContentAsJson(derObj, path, depth, info);
-                    return response(result, "application/json", lastModified, authHeader);
-                }
-            default:
-                throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Unexepected program flow termination.",
-                        "Please contact a developer!"));
+                        new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
+                            "Unexepected program flow termination.",
+                            "Please contact a developer!"));
             }
         } catch (IOException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
@@ -873,7 +873,7 @@ public class MCRRestAPIObjectsHelper {
         if (matchedDerID == null) {
             throw new MCRRestAPIException(Response.Status.NOT_FOUND,
                 new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Derivate " + derIDString + " not found.",
-                    "The MyCoRe Object with id '" + mcrObj.getId().toString()
+                    "The MyCoRe Object with id '" + mcrObj.getId()
                         + "' does not contain a derivate with id '" + derIDString + "'."));
         }
 

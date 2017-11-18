@@ -34,7 +34,7 @@ public class MCRIIIFRange extends MCRIIIFPresentationBase {
     public List<MCRIIIFMetadata> metadata = new ArrayList<>();
 
     // ranges and canvases should be removed!
-    public List<String> ranges = new ArrayList<String>();// = new ArrayList<>();
+    public List<String> ranges = new ArrayList<>();// = new ArrayList<>();
 
     public List<String> canvases = new ArrayList<>();
 

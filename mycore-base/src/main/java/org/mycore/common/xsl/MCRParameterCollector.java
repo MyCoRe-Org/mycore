@@ -49,10 +49,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRParameterCollector {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRParameterCollector.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRParameterCollector.class);
 
     /** The collected parameters */
-    private Map<String, Object> parameters = new HashMap<String, Object>();
+    private Map<String, Object> parameters = new HashMap<>();
 
     /** If true (which is default), only those parameters starting with "XSL." are copied from session and request */
     private boolean onlySetXSLParameters = true;
@@ -284,10 +284,10 @@ public class MCRParameterCollector {
     }
 
     private void debugSessionParameters() {
-        LOGGER.debug("XSL.HttpSession =" + parameters.get("HttpSession"));
-        LOGGER.debug("XSL.JSessionID =" + parameters.get("JSessionID"));
-        LOGGER.debug("XSL.CurrentUser =" + parameters.get("CurrentUser"));
-        LOGGER.debug("XSL.Referer =" + parameters.get("Referer"));
+        LOGGER.debug("XSL.HttpSession ={}", parameters.get("HttpSession"));
+        LOGGER.debug("XSL.JSessionID ={}", parameters.get("JSessionID"));
+        LOGGER.debug("XSL.CurrentUser ={}", parameters.get("CurrentUser"));
+        LOGGER.debug("XSL.Referer ={}", parameters.get("Referer"));
     }
 
     /** Sets the request and referer URL */
@@ -313,7 +313,7 @@ public class MCRParameterCollector {
         }
 
         String url = buffer.toString();
-        LOGGER.debug("Complete request URL : " + url);
+        LOGGER.debug("Complete request URL : {}", url);
         return url;
     }
 

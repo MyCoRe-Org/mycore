@@ -103,8 +103,8 @@ public class MCRVFSContent extends MCRContent {
         return Stream
             .of(stackTrace)
             .skip(i)
-            .filter(s -> !(s.getClassName().equals(getClass()) && s.getMethodName().contains("Debug")))
-            .map(s -> "\tat " + s.toString())
+            .filter(s -> !(s.getClassName().equals(getClass().getName()) && s.getMethodName().contains("Debug")))
+            .map(s -> "\tat " + s)
             .collect(Collectors.joining(System.getProperty("line.separator")));
     }
 
@@ -130,8 +130,7 @@ public class MCRVFSContent extends MCRContent {
 
     @Override
     public String getETag() throws IOException {
-        FileContent content = fo.getContent();
-        try {
+        try (FileContent content = fo.getContent()) {
             String systemId = getSystemId();
             if (systemId == null) {
                 systemId = fo.getName().getURI();
@@ -143,8 +142,6 @@ public class MCRVFSContent extends MCRContent {
                 return null;
             }
             return eTag.substring(2); //remove weak
-        } finally {
-            content.close();
         }
     }
 
@@ -155,11 +152,8 @@ public class MCRVFSContent extends MCRContent {
         }
         FileContentInfoFactory fileContentInfoFactory = fo.getFileSystem().getFileSystemManager()
             .getFileContentInfoFactory();
-        FileContent content = fo.getContent();
-        try {
+        try (FileContent content = fo.getContent()) {
             return fileContentInfoFactory.create(content).getContentType();
-        } finally {
-            content.close();
         }
     }
 }

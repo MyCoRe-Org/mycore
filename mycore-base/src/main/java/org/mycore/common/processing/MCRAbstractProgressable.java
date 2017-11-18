@@ -17,7 +17,7 @@ public class MCRAbstractProgressable implements MCRListenableProgressable {
 
     protected String progressText;
 
-    protected List<MCRProgressableListener> progressListener;
+    protected final List<MCRProgressableListener> progressListener;
 
     public MCRAbstractProgressable() {
         this.progress = null;
@@ -73,17 +73,14 @@ public class MCRAbstractProgressable implements MCRListenableProgressable {
 
     protected void fireProgressChanged(Integer oldProgress) {
         synchronized (this.progressListener) {
-            this.progressListener.forEach(listener -> {
-                listener.onProgressChange(this, oldProgress, getProgress());
-            });
+            this.progressListener.forEach(listener -> listener.onProgressChange(this, oldProgress, getProgress()));
         }
     }
 
     protected void fireProgressTextChanged(String oldProgressText) {
         synchronized (this.progressListener) {
-            this.progressListener.forEach(listener -> {
-                listener.onProgressTextChange(this, oldProgressText, getProgressText());
-            });
+            this.progressListener
+                .forEach(listener -> listener.onProgressTextChange(this, oldProgressText, getProgressText()));
         }
     }
 }

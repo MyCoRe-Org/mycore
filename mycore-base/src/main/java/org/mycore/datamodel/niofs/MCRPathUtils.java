@@ -47,7 +47,7 @@ public abstract class MCRPathUtils {
             //we expect that file may not exist
         } catch (IOException e) {
             //any other IOException is catched
-            LogManager.getLogger(MCRPathUtils.class).info("Error while retrieving attributes of file: " + path, e);
+            LogManager.getLogger(MCRPathUtils.class).info("Error while retrieving attributes of file: {}", path, e);
         }
         return null;
     }

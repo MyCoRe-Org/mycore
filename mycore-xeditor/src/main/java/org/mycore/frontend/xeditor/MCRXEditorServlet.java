@@ -40,7 +40,9 @@ import org.mycore.frontend.xeditor.target.MCREditorTarget;
  */
 public class MCRXEditorServlet extends MCRServlet {
 
-    protected final static Logger LOGGER = LogManager.getLogger(MCRXEditorServlet.class);
+    protected static final Logger LOGGER = LogManager.getLogger(MCRXEditorServlet.class);
+
+    private static final String TARGET_PATTERN = "_xed_submit_";
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
@@ -61,8 +63,6 @@ public class MCRXEditorServlet extends MCRServlet {
         sendToTarget(job, session);
     }
 
-    private final static String TARGET_PATTERN = "_xed_submit_";
-
     private void sendToTarget(MCRServletJob job, MCREditorSession session) throws Exception {
         String targetID = "debug";
         String parameter = "";
@@ -81,7 +81,7 @@ public class MCRXEditorServlet extends MCRServlet {
                 break;
             }
         }
-        LOGGER.info("sending submission to target " + targetID + " " + parameter);
+        LOGGER.info("sending submission to target {} {}", targetID, parameter);
         getTarget(targetID).handleSubmission(getServletContext(), job, session, parameter);
     }
 

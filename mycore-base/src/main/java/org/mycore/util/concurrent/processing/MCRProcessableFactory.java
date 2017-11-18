@@ -119,9 +119,7 @@ public abstract class MCRProcessableFactory {
             MCRProcessableSupplier<R> supplier = MCRProcessableSupplier.of(callable, this.executor, priority);
             if (this.collection != null) {
                 this.collection.add(supplier);
-                supplier.getFuture().whenComplete((result, throwable) -> {
-                    this.collection.remove(supplier);
-                });
+                supplier.getFuture().whenComplete((result, throwable) -> this.collection.remove(supplier));
             }
             return supplier;
         }
@@ -137,7 +135,7 @@ public abstract class MCRProcessableFactory {
      * A callable that runs given task and returns given result
      */
     private static final class RunnableProgressableAdapter<T>
-    implements Callable<T>, MCRListenableProgressable, MCRDecorator<Runnable> {
+        implements Callable<T>, MCRListenableProgressable, MCRDecorator<Runnable> {
         final Runnable task;
 
         RunnableProgressableAdapter(Runnable task) {

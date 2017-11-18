@@ -63,7 +63,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
 
     private ImageWriteParam imageWriteParam;
 
-    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
+    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRMediaThumbnailServlet.class);
 
@@ -72,12 +72,12 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
     /**
      * how long should a tile be cached by the client
      */
-    final static int MAX_AGE = 60 * 60 * 24 * 365; // one year
+    static final int MAX_AGE = 60 * 60 * 24 * 365; // one year
 
     @Override
     public void init() throws ServletException {
         super.init();
-        imageWriters = new ConcurrentLinkedQueue<ImageWriter>();
+        imageWriters = new ConcurrentLinkedQueue<>();
         imageWriteParam = ImageIO.getImageWritersBySuffix("png").next().getDefaultWriteParam();
         try {
             imageWriteParam.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
@@ -88,7 +88,7 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
         if (thSize != null) {
             thumbnailSize = Integer.parseInt(thSize);
         }
-        LOGGER.info(getServletName() + ": setting thumbnail size to " + thumbnailSize);
+        LOGGER.info("{}: setting thumbnail size to {}", getServletName(), thumbnailSize);
     }
 
     @Override
@@ -107,9 +107,9 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
                 pathInfo = pathInfo.substring(1);
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
             String imagePath = pathInfo.substring(derivate.length());
-            LOGGER.info("derivate: " + derivate + ", image: " + imagePath);
+            LOGGER.info("derivate: {}, image: {}", derivate, imagePath);
             MCRFile thumbFile = MCRMediaIFSTools.getThumbnailFromStore(derivate, imagePath);
-            LOGGER.info("Thumbnail file: " + thumbFile.getPath());
+            LOGGER.info("Thumbnail file: {}", thumbFile.getPath());
             BufferedImage thumbnail = getThumbnail(thumbFile);
             if (thumbnail != null) {
                 thumbnail = centerThumbnail(thumbnail);
@@ -117,30 +117,25 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
                 job.getResponse().setContentType("image/png");
                 job.getResponse().setDateHeader("Last-Modified", thumbFile.getLastModified().getTime());
                 Date expires = new Date(System.currentTimeMillis() + MAX_AGE * 1000);
-                LOGGER.info("Last-Modified: " + thumbFile.getLastModified() + ", expire on: " + expires);
+                LOGGER.info("Last-Modified: {}, expire on: {}", thumbFile.getLastModified(), expires);
                 job.getResponse().setDateHeader("Expires", expires.getTime());
-                ServletOutputStream sout = job.getResponse().getOutputStream();
-                try {
-                    ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
+                try (ServletOutputStream sout = job.getResponse().getOutputStream()) {
                     ImageWriter imageWriter = getImageWriter();
-                    try {
+                    try (ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout)) {
                         imageWriter.setOutput(imageOutputStream);
                         IIOImage iioImage = new IIOImage(thumbnail, null, null);
                         imageWriter.write(null, iioImage, imageWriteParam);
                     } finally {
                         imageWriter.reset();
                         imageWriters.add(imageWriter);
-                        imageOutputStream.close();
                     }
-                } finally {
-                    sout.close();
                 }
             } else {
                 job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
         } finally {
-            LOGGER.info("Finished sending " + job.getRequest().getPathInfo());
+            LOGGER.info("Finished sending {}", job.getRequest().getPathInfo());
         }
     }
 
@@ -166,16 +161,13 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
 
     private BufferedImage readThumb(MCRFile thumbFile, ImageReader imageReader) throws IOException {
         try {
-            InputStream zin = thumbFile.getContent().getInputStream();
-            try {
+            try (InputStream zin = thumbFile.getContent().getInputStream()) {
                 ImageInputStream iis = ImageIO.createImageInputStream(zin);
                 imageReader.setInput(iis, false);
                 BufferedImage image = imageReader.read(0);
                 imageReader.reset();
                 iis.close();
                 return image;
-            } finally {
-                zin.close();
             }
         } catch (Exception ex) {
             throw new IOException(ex);

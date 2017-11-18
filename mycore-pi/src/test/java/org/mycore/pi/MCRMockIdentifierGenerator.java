@@ -19,6 +19,6 @@ public class MCRMockIdentifierGenerator extends MCRPersistentIdentifierGenerator
         Assert.assertEquals("Test propterties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
 
         return (MCRMockIdentifier) new MCRMockIdentifierParser()
-            .parse(MCRMockIdentifier.MOCK_SCHEME + mcrID.toString() + ":" + additional).get();
+            .parse(MCRMockIdentifier.MOCK_SCHEME + mcrID + ":" + additional).get();
     }
 }

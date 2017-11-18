@@ -51,7 +51,8 @@ public class MCRJobQueuePermission implements MCRResourceAccessChecker {
     @Override
     public boolean isPermitted(ContainerRequestContext request) {
         String queueName = request.getUriInfo().getPathSegments().size() > 1
-            ? request.getUriInfo().getPathSegments().get(1).getPath() : null;
+            ? request.getUriInfo().getPathSegments().get(1).getPath()
+            : null;
         try {
             if (queueName == null || queueName.isEmpty()) {
                 return MCRAccessManager.checkPermission(PERMISSION_LIST);
@@ -60,7 +61,7 @@ public class MCRJobQueuePermission implements MCRResourceAccessChecker {
             String permissionType = request.getMethod().matches("(?i)(POST|PUT|DELETE)") ? PERMISSION_WRITE
                 : PERMISSION_READ;
             if (!MCRAccessManager.checkPermission(queueName, permissionType)) {
-                LOGGER.info("Permission \"" + permissionType + "\" denied for queue \"" + queueName + "\".");
+                LOGGER.info("Permission \"{}\" denied for queue \"{}\".", permissionType, queueName);
                 return false;
             }
 

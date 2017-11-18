@@ -100,9 +100,9 @@ public class URNServer {
             elp.setPassword(getConfiguration().getPassword());
             String content = new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite());
 
-            LOGGER.debug("EpicurLite \"put\" for urn " + elp.getUrn().toString() + "\n" + content);
+            LOGGER.debug("EpicurLite \"put\" for urn {}\n{}", elp.getUrn(), content);
 
-            put = new PutMethod(getConfiguration().getServiceURL() + elp.getUrn().toString());
+            put = new PutMethod(getConfiguration().getServiceURL() + elp.getUrn());
             put.setDoAuthentication(true);
             StringRequestEntity requestEntity = new StringRequestEntity(content, "application/xml", "UTF-8");
             put.setRequestEntity(requestEntity);
@@ -135,9 +135,9 @@ public class URNServer {
             elp.setPassword(getConfiguration().getPassword());
             String content = new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite());
 
-            LOGGER.debug("EpicurLite \"posted\" for urn " + elp.getUrn().toString() + "\n" + content);
+            LOGGER.debug("EpicurLite \"posted\" for urn {}\n{}", elp.getUrn(), content);
 
-            post = new PostMethod(getConfiguration().getServiceURL() + elp.getUrn().toString() + "/links");
+            post = new PostMethod(getConfiguration().getServiceURL() + elp.getUrn() + "/links");
             post.setDoAuthentication(true);
             StringRequestEntity requestEntity = new StringRequestEntity(content, "application/xml", "UTF-8");
             post.setRequestEntity(requestEntity);

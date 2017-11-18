@@ -52,7 +52,7 @@ public class MCRXMLTransformer {
         setURL(xml.getRootElement(), category);
         //setChildren has to be called before setParent (below) can be called without
         //database access see: org.mycore.datamodel.classifications2.impl.MCRAbstractCategoryImpl.getChildren()
-        category.setChildren(new ArrayList<MCRCategory>());
+        category.setChildren(new ArrayList<>());
         buildChildCategories(classID, xml.getRootElement().getChild("categories").getChildren("category"), category);
         try {
             category.setLabels(getLabels(xml.getRootElement().getChildren("label")));
@@ -67,7 +67,7 @@ public class MCRXMLTransformer {
         //setId must be called before setParent (info important)
         category.setId(new MCRCategoryID(classID, e.getAttributeValue("ID")));
         category.setRoot(parent.getRoot());
-        category.setChildren(new ArrayList<MCRCategory>());
+        category.setChildren(new ArrayList<>());
         category.setParent(parent);
         try {
             category.setLabels(getLabels(e.getChildren("label")));
@@ -82,7 +82,7 @@ public class MCRXMLTransformer {
 
     private static List<MCRCategory> buildChildCategories(String classID, List<Element> elements, MCRCategory parent)
         throws URISyntaxException {
-        List<MCRCategory> children = new ArrayList<MCRCategory>(elements.size());
+        List<MCRCategory> children = new ArrayList<>(elements.size());
         for (Object o : elements) {
             children.add(buildCategory(classID, (Element) o, parent));
         }
@@ -91,7 +91,7 @@ public class MCRXMLTransformer {
 
     public static Set<MCRLabel> getLabels(List<Element> elements)
         throws NullPointerException, IllegalArgumentException {
-        Set<MCRLabel> labels = new HashSet<MCRLabel>(elements.size(), 1l);
+        Set<MCRLabel> labels = new HashSet<>(elements.size(), 1L);
         for (Element labelElement : elements) {
             MCRLabel label = getLabel(labelElement);
             labels.add(label);

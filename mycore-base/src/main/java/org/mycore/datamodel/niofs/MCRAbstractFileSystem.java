@@ -131,12 +131,12 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
         try {
             md5Sum = MCRUtils.getMD5Sum(Files.newInputStream(path));
         } catch (IOException e) {
-            LogManager.getLogger(getClass()).error("Could not verify path: " + path, e);
+            LogManager.getLogger(getClass()).error("Could not verify path: {}", path, e);
             return false;
         }
         boolean returns = md5Sum.matches(attrs.md5sum());
         if (!returns) {
-            LogManager.getLogger(getClass()).warn("MD5sum does not match: " + path);
+            LogManager.getLogger(getClass()).warn("MD5sum does not match: {}", path);
         }
         return returns;
     }

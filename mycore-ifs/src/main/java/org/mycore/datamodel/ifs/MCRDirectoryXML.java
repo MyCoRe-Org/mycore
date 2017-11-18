@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -63,7 +64,7 @@ public class MCRDirectoryXML {
      * 
      * Set with MCR.IFS.IncludeAdditionalDataByDefault, default is false 
      */
-    protected final static boolean WITH_ADDITIONAL_DATA_DEFAULT;
+    protected static final boolean WITH_ADDITIONAL_DATA_DEFAULT;
 
     static {
         WITH_ADDITIONAL_DATA_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.IFS.IncludeAdditionalDataByDefault",
@@ -92,7 +93,7 @@ public class MCRDirectoryXML {
      * Sends the contents of an MCRDirectory as XML data to the client
      */
     protected Document getDirectoryXML(MCRDirectory dir, boolean withAdditionalData) {
-        LOGGER.info("MCRDirectoryXML: start listing of directory " + dir.getName());
+        LOGGER.info("MCRDirectoryXML: start listing of directory {}", dir.getName());
 
         Element root = new Element("mcr_directory");
         Document doc = new org.jdom2.Document(root);
@@ -175,7 +176,7 @@ public class MCRDirectoryXML {
             }
         }
 
-        LOGGER.info("MCRDirectoryXML: end listing of directory " + dir.getName());
+        LOGGER.info("MCRDirectoryXML: end listing of directory {}", dir.getName());
 
         return doc;
 
@@ -223,7 +224,7 @@ public class MCRDirectoryXML {
         parent.addContent(xTime);
 
         GregorianCalendar date = new GregorianCalendar(TimeZone.getDefault(), Locale.ROOT);
-        date.set(2002, 01, 01, hh, mm, ss);
+        date.set(2002, Calendar.FEBRUARY, 1, hh, mm, ss);
         String time = timeFormatter.format(date.getTime());
 
         xTime.setAttribute("format", timeFormat);
@@ -241,7 +242,7 @@ public class MCRDirectoryXML {
      * Handles the HTTP request
      */
     public Document getDirectory(String requestPath, boolean withAdditionalData) {
-        LOGGER.info("MCRDirectoryResolver: request path = " + requestPath);
+        LOGGER.info("MCRDirectoryResolver: request path = {}", requestPath);
 
         if (requestPath == null) {
             String msg = "Error: request path is null";

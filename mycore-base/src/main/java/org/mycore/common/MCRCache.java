@@ -316,20 +316,17 @@ public class MCRCache<K, V> {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Cache capacity:  ").append(capacity).append("\n");
-        sb.append("Cache size:      ").append(backingCache.size()).append("\n");
-        sb.append("Cache fill rate: ").append(getFillRate()).append("\n");
-        sb.append("Cache hit rate:  ").append(getHitRate());
+        String sb = "Cache capacity:  " + capacity + "\n" + "Cache size:      " + backingCache.size() + "\n"
+            + "Cache fill rate: " + getFillRate() + "\n" + "Cache hit rate:  " + getHitRate();
 
-        return sb.toString();
+        return sb;
     }
 
     /**
      * A small sample program for testing this class.
      */
     public static void main(String[] args) {
-        MCRCache<String, String> cache = new MCRCache<String, String>(4, "Small Sample Program");
+        MCRCache<String, String> cache = new MCRCache<>(4, "Small Sample Program");
         System.out.println(cache);
         cache.put("a", "Anton");
         cache.put("b", "Bohnen");

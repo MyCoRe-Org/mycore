@@ -113,7 +113,7 @@ public class MCRBasketPersistence {
         throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateOID);
-        derivate.setLabel("Saved basket data for " + ownerID.toString());
+        derivate.setLabel("Saved basket data for " + ownerID);
 
         String schema = MCRConfiguration.instance().getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml");
         derivate.setSchema(schema.replaceAll(".xml", ".xsd"));

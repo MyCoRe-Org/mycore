@@ -49,7 +49,7 @@ public class MCRContentStoreFactory {
     private static final String CONFIG_PREFIX = "MCR.IFS.ContentStore.";
 
     /** Hashtable StoreID to MCRContentStore instance */
-    protected static Hashtable<String, MCRContentStore> STORES = new Hashtable<String, MCRContentStore>();
+    protected static final Hashtable<String, MCRContentStore> STORES = new Hashtable<>();
 
     /** Hashtable StoreID to Class that implements MCRAudioVideoExtender */
     protected static Hashtable<String, Class<MCRAudioVideoExtender>> EXTENDER_CLASSES;
@@ -109,7 +109,7 @@ public class MCRContentStoreFactory {
     private static void initStore(String storeID) {
         try {
             String storeClass = CONFIG_PREFIX + storeID + CLASS_SUFFIX;
-            LOGGER.debug("getting StoreClass: " + storeClass);
+            LOGGER.debug("getting StoreClass: {}", storeClass);
 
             MCRContentStore s = MCRConfiguration.instance().getInstanceOf(storeClass);
             s.init(storeID);
@@ -163,7 +163,7 @@ public class MCRContentStoreFactory {
             return null;
         }
         if (EXTENDER_CLASSES == null) {
-            EXTENDER_CLASSES = new Hashtable<String, Class<MCRAudioVideoExtender>>();
+            EXTENDER_CLASSES = new Hashtable<>();
         }
 
         String storeClass = "MCR.IFS.AVExtender." + storeID + CLASS_SUFFIX;

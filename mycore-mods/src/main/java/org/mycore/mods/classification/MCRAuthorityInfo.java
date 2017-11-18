@@ -25,6 +25,17 @@ abstract class MCRAuthorityInfo {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     /**
+     * A cache that maps authority information to the category ID that is represented by that info.
+     */
+    private static final MCRCache<String, Object> categoryIDbyAuthorityInfo = new MCRCache<>(1000,
+        "Category ID by authority info");
+
+    /**
+     * Used in the cache to indicate the case when no category ID maps to the given authority info
+     */
+    private static final String NULL = "null";
+
+    /**
      * Returns the label value of the given type ("language"), or the given default if that label does not exist in the
      * category.
      */
@@ -33,28 +44,17 @@ abstract class MCRAuthorityInfo {
     }
 
     /**
-     * A cache that maps authority information to the category ID that is represented by that info.
-     */
-    private final static MCRCache<String, Object> categoryIDbyAuthorityInfo = new MCRCache<String, Object>(1000,
-        "Category ID by authority info");
-
-    /**
-     * Used in the cache to indicate the case when no category ID maps to the given authority info
-     */
-    private final static String NULL = "null";
-
-    /**
      * Returns the category ID that is represented by this authority information.
      * 
      * @return the category ID that maps this authority information, or null if no matching category exists.
      */
     public MCRCategoryID getCategoryID() {
         String key = toString();
-        LOGGER.debug("get categoryID for " + key);
+        LOGGER.debug("get categoryID for {}", key);
 
         Object categoryID = categoryIDbyAuthorityInfo.getIfUpToDate(key, DAO.getLastModified());
         if (categoryID == null) {
-            LOGGER.debug("lookup categoryID for " + key);
+            LOGGER.debug("lookup categoryID for {}", key);
             categoryID = lookupCategoryID();
             if (categoryID == null)
                 categoryID = NULL; // Indicate that no matching category found, null can not be cached directly

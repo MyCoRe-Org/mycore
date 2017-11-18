@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -75,7 +74,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
     private MCRDNBURN registerSingleURN(MCRBase obj, String additional, MCRObjectDerivate derivate)
         throws MCRPersistentIdentifierException {
         MCRDNBURN newURN;
-        LOGGER.info("Add single urn to " + obj.getId().toString() + " / " + additional);
+        LOGGER.info("Add single urn to {} / {}", obj.getId(), additional);
 
         Session session = MCRHIBConnection.instance().getSession();
         MCRPath filePath;
@@ -98,7 +97,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
 
     private MCRDNBURN registerURNsDerivate(MCRBase obj, String additional, MCRObjectDerivate derivate)
         throws MCRPersistentIdentifierException {
-        LOGGER.info("Add URNs to all files of " + obj.getId().toString());
+        LOGGER.info("Add URNs to all files of {}", obj.getId());
 
         Session session = MCRHIBConnection.instance().getSession();
 
@@ -123,7 +122,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
             .getPaths()
             .stream()
             .filter(file -> predicateList.stream()
-                                         .noneMatch(p -> p.test(file.toString().split(":")[1])))
+                .noneMatch(p -> p.test(file.toString().split(":")[1])))
             .map(p -> (MCRPath) p)
             .sorted()
             .collect(Collectors.toList());

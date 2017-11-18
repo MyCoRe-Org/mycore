@@ -23,13 +23,20 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRXPathEvaluator {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRXPathEvaluator.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXPathEvaluator.class);
 
-    private final static Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
+    private static final Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
+
+    private static final XPathFactory factory;
 
     private Map<String, Object> variables;
 
     private List<Object> context;
+
+    static {
+        String factoryClass = MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null);
+        factory = factoryClass == null ? XPathFactory.instance() : XPathFactory.newInstance(factoryClass);
+    }
 
     public MCRXPathEvaluator(Map<String, Object> variables, List<Object> context) {
         this.variables = variables;
@@ -38,7 +45,7 @@ public class MCRXPathEvaluator {
 
     public MCRXPathEvaluator(Map<String, Object> variables, Parent context) {
         this.variables = variables;
-        this.context = new ArrayList<Object>();
+        this.context = new ArrayList<>();
         this.context.add(context);
     }
 
@@ -90,16 +97,9 @@ public class MCRXPathEvaluator {
         if (result == null)
             return false;
         else if (result instanceof Boolean)
-            return ((Boolean) result).booleanValue();
+            return (Boolean) result;
         else
             return true;
-    }
-
-    private final static XPathFactory factory;
-
-    static {
-        String factoryClass = MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null);
-        factory = factoryClass == null ? XPathFactory.instance() : XPathFactory.newInstance(factoryClass);
     }
 
     public Object evaluateFirst(String xPathExpression) {
@@ -108,9 +108,9 @@ public class MCRXPathEvaluator {
                 MCRConstants.getStandardNamespaces());
             return xPath.evaluateFirst(context);
         } catch (Exception ex) {
-            LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
-            LOGGER.warn("XPath factory used is " + factory.getClass().getCanonicalName() + " "
-                + MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null));
+            LOGGER.warn("unable to evaluate XPath: {}", xPathExpression);
+            LOGGER.warn("XPath factory used is {} {}", factory.getClass().getCanonicalName(),
+                MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null));
             LOGGER.warn(ex);
             return null;
         }

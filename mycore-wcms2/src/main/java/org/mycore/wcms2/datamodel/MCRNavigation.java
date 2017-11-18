@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "navigation")
 @XmlAccessorType(XmlAccessType.NONE)
-public class MCRNavigation implements MCRNavigationBaseItem, MCRNavigationItemContainer {
+public class MCRNavigation implements MCRNavigationItemContainer {
 
     // general
     @XmlAttribute
@@ -42,7 +42,7 @@ public class MCRNavigation implements MCRNavigationBaseItem, MCRNavigationItemCo
     private List<MCRNavigationBaseItem> children;
 
     public MCRNavigation() {
-        this.children = new ArrayList<MCRNavigationBaseItem>();
+        this.children = new ArrayList<>();
     }
 
     public String getHrefStartingPage() {

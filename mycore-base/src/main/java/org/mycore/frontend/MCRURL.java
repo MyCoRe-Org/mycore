@@ -36,7 +36,7 @@ public class MCRURL {
     }
 
     private Map<String, List<String>> buildParameterMap(URL url) {
-        Map<String, List<String>> p = new HashMap<String, List<String>>();
+        Map<String, List<String>> p = new HashMap<>();
         String queryString = url.getQuery();
         if (queryString == null) {
             return p;
@@ -72,10 +72,9 @@ public class MCRURL {
         String query = buildQueryString(this.parameterMap);
         try {
             URI uri = this.url.toURI();
-            StringBuffer urlBuffer = new StringBuffer();
+            StringBuilder urlBuffer = new StringBuilder();
             urlBuffer.append(
-                new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), null, null)
-                    .toString());
+                new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), null, null));
             if (query != null) {
                 urlBuffer.append("?").append(query);
             }
@@ -88,7 +87,7 @@ public class MCRURL {
                 this.parameterMap = buildParameterMap(this.url);
             }
         } catch (Exception exc) {
-            LOGGER.error("unable to rebuild url " + this.url.toString());
+            LOGGER.error("unable to rebuild url {}", this.url);
         }
     }
 
@@ -99,7 +98,7 @@ public class MCRURL {
 
     public List<String> getParameterValues(String name) {
         List<String> valueList = getParameterMap().get(name);
-        return valueList != null ? valueList : new ArrayList<String>();
+        return valueList != null ? valueList : new ArrayList<>();
     }
 
     public MCRURL addParameter(String name, String value) {
@@ -113,7 +112,7 @@ public class MCRURL {
                 this.parameterMap = buildParameterMap(this.url);
             }
         } catch (MalformedURLException exc) {
-            LOGGER.error("unable to add parameter (" + name + "=" + value + ") to url" + this.url.toString());
+            LOGGER.error("unable to add parameter ({}={}) to url{}", name, value, this.url);
         }
         return this;
     }

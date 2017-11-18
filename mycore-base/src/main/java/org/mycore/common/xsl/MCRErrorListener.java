@@ -76,7 +76,7 @@ public class MCRErrorListener implements ErrorListener {
             this.lastMessage = messageAndLocation;
             LOGGER.info(messageAndLocation);
         } else {
-            LOGGER.warn("Exception while XSL transformation:" + exception.getMessageAndLocation());
+            LOGGER.warn("Exception while XSL transformation:{}", exception.getMessageAndLocation());
         }
     }
 
@@ -87,7 +87,7 @@ public class MCRErrorListener implements ErrorListener {
     public void error(TransformerException exception) throws TransformerException {
         exception = unwrapException(exception);
         if (triggerException(exception)) {
-            LOGGER.error("Exception while XSL transformation:" + exception.getMessageAndLocation());
+            LOGGER.error("Exception while XSL transformation:{}", exception.getMessageAndLocation());
         }
         throw exception;
     }

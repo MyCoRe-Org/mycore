@@ -48,7 +48,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class MCRTemplatesSource {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRTemplatesSource.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTemplatesSource.class);
 
     /** The path to the XSL resource */
     private String resource;
@@ -86,7 +86,7 @@ public class MCRTemplatesSource {
         try {
             return MCRXMLResource.instance().getURL(resource, MCRXSLTransformerFactory.class.getClassLoader());
         } catch (IOException e) {
-            LOGGER.warn("Could not determine URL of resource " + resource, e);
+            LOGGER.warn("Could not determine URL of resource {}", resource, e);
             return null;
         }
     }
@@ -96,7 +96,7 @@ public class MCRTemplatesSource {
         try {
             return MCRXMLResource.instance().getLastModified(resource, MCRXSLTransformerFactory.class.getClassLoader());
         } catch (IOException e) {
-            LOGGER.warn("Could not determine last modified date of resource " + resource);
+            LOGGER.warn("Could not determine last modified date of resource {}", resource);
             return -1;
         }
     }

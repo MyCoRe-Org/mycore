@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +57,7 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
             .collect(Collectors.toSet());
         ArrayList<MCRObjectID> first = new ArrayList<>(testIds);
         ArrayList<MCRObjectID> test = new ArrayList<>(testIds);
-        first.sort((f, o) -> f.toString().compareTo(o.toString()));
+        first.sort(Comparator.comparing(MCRObjectID::toString));
         test.sort(MCRObjectID::compareTo);
         assertArrayEquals("Order should be the same.", first.toArray(), test.toArray());
     }

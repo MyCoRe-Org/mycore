@@ -45,7 +45,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
@@ -163,7 +163,7 @@ public class MCRUtils {
      */
     public static Path writeTextToFile(String textToWrite, String fileName, Charset cs) throws IOException {
         Path file = Paths.get(fileName);
-        Files.write(file, Arrays.asList(textToWrite), cs, StandardOpenOption.CREATE);
+        Files.write(file, Collections.singletonList(textToWrite), cs, StandardOpenOption.CREATE);
         return file;
     }
 
@@ -175,7 +175,7 @@ public class MCRUtils {
      * @return an ArrayList with file names as pathes
      */
     public static ArrayList<String> getAllFileNames(File basedir) {
-        ArrayList<String> out = new ArrayList<String>();
+        ArrayList<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -201,7 +201,7 @@ public class MCRUtils {
      * @return an ArrayList with file names as pathes
      */
     public static ArrayList<String> getAllFileNames(File basedir, String path) {
-        ArrayList<String> out = new ArrayList<String>();
+        ArrayList<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -225,7 +225,7 @@ public class MCRUtils {
      * @return an ArrayList with directory names as pathes
      */
     public static ArrayList<String> getAllDirectoryNames(File basedir) {
-        ArrayList<String> out = new ArrayList<String>();
+        ArrayList<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -248,7 +248,7 @@ public class MCRUtils {
      * @return an ArrayList with directory names as pathes
      */
     public static ArrayList<String> getAllDirectoryNames(File basedir, String path) {
-        ArrayList<String> out = new ArrayList<String>();
+        ArrayList<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -277,7 +277,7 @@ public class MCRUtils {
         DefaultHandler handler = new DefaultHandler() {
             @Override
             public void startElement(String uri, String localName, String qName, Attributes attributes) {
-                LOGGER.debug("MCRLayoutService detected root element = " + qName);
+                LOGGER.debug("MCRLayoutService detected root element = {}", qName);
                 detected.setProperty("docType", qName);
                 throw new MCRException(forcedInterrupt);
             }
@@ -435,11 +435,11 @@ public class MCRUtils {
                 }
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException ex) {
-                LOGGER.warn("Exception while initializing exception " + mainExceptionClass.getCanonicalName(), ex);
+                LOGGER.warn("Exception while initializing exception {}", mainExceptionClass.getCanonicalName(), ex);
                 return e;
             }
         }
-        LOGGER.warn("Could not instanciate Exception " + mainExceptionClass.getCanonicalName());
+        LOGGER.warn("Could not instanciate Exception {}", mainExceptionClass.getCanonicalName());
         return e;
     }
 

@@ -61,7 +61,7 @@ public class StructureOverviewController extends SideBarController {
                     selector.toString()));
             }
             String text = webElement.getText();
-            if (text != null && text.equalsIgnoreCase("undefined")) {
+            if ("undefined".equalsIgnoreCase(text)) {
                 return true;
             }
         }

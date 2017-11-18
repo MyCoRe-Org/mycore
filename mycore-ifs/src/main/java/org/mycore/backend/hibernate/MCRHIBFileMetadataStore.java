@@ -142,7 +142,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         try {
             return rootQuery.getSingleResult();
         } catch (NoResultException e) {
-            LOGGER.warn("There is no fsnode with OWNER = " + ownerID);
+            LOGGER.warn("There is no fsnode with OWNER = {}", ownerID);
             return null;
         }
     }
@@ -183,7 +183,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         Session session = getSession();
         MCRFSNODES node = session.get(MCRFSNODES.class, ID);
         if (node == null) {
-            LOGGER.warn("There is no FSNODE with ID = " + ID);
+            LOGGER.warn("There is no FSNODE with ID = {}", ID);
             return null;
         }
 

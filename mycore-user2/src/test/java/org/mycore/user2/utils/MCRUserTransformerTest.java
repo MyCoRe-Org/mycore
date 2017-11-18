@@ -83,11 +83,11 @@ public class MCRUserTransformerTest extends MCRUserTestCase {
     @XmlAccessorType(XmlAccessType.NONE)
     public static class HashMapTest2 {
 
-        public Map<String, String> map = new HashMap<String, String>();
+        public Map<String, String> map = new HashMap<>();
 
         @XmlElement(name = "entry")
         public MapEntry[] getMap() {
-            List<MapEntry> list = new ArrayList<MapEntry>();
+            List<MapEntry> list = new ArrayList<>();
             for (Entry<String, String> entry : map.entrySet()) {
                 MapEntry mapEntry = new MapEntry();
                 mapEntry.key = entry.getKey();
@@ -126,7 +126,7 @@ public class MCRUserTransformerTest extends MCRUserTestCase {
 
         Unmarshaller u = jc.createUnmarshaller();
         String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><root><entry key=\"key2\">value2</entry><entry key=\"key1\">value1</entry></root>";
-        HashMapTest2 mp2 = (HashMapTest2) u.unmarshal(new StreamSource(new StringReader(xmlStr.toString())));
+        HashMapTest2 mp2 = (HashMapTest2) u.unmarshal(new StreamSource(new StringReader(xmlStr)));
         m.marshal(mp2, System.out);
     }
 }

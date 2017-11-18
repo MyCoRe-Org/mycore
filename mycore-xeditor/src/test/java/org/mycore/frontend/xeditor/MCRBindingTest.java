@@ -128,7 +128,7 @@ public class MCRBindingTest extends MCRTestCase {
 
     @Test
     public void testCollectorVariables() throws JDOMException, JaxenException {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("type", "main");
 
         binding = new MCRBinding("document", true, binding);

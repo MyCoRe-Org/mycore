@@ -5,10 +5,10 @@ package org.mycore.urn.rest;
  */
 public interface URNServerConfiguration {
 
-    public String getLogin();
+    String getLogin();
 
-    public String getPassword();
+    String getPassword();
 
-    public String getServiceURL();
+    String getServiceURL();
 
 }

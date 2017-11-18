@@ -13,8 +13,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "item")
 @XmlAccessorType(XmlAccessType.NONE)
-public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavigationBaseItem,
-    MCRNavigationItemContainer {
+public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavigationItemContainer {
 
     @XmlType(name = "ItemType")
     public enum Type {
@@ -55,7 +54,7 @@ public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavig
 
     public MCRNavigationItem() {
         super();
-        this.children = new ArrayList<MCRNavigationBaseItem>();
+        this.children = new ArrayList<>();
     }
 
     public String getHref() {

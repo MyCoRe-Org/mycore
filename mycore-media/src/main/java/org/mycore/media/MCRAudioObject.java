@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -27,7 +27,7 @@ import org.jdom2.Element;
 
 /**
  * This Class represents the technical metadata of an Audiostream.
- * 
+ *
  * @author René Adler (Eagle)
  *
  */
@@ -96,7 +96,8 @@ public class MCRAudioObject extends MCRMediaObject {
     public int getStreamBitRate() {
         //currently only video can be a parent
         int calcBitRate = (parentContainer != null
-            ? ((MCRVideoObject) parentContainer).bitRate - ((MCRVideoObject) parentContainer).streamBitRate : 0);
+            ? ((MCRVideoObject) parentContainer).bitRate - ((MCRVideoObject) parentContainer).streamBitRate
+            : 0);
 
         return (streamBitRate != 0 ? streamBitRate : calcBitRate);
     }
@@ -120,17 +121,20 @@ public class MCRAudioObject extends MCRMediaObject {
         if (parentContainer instanceof MCRVideoObject) {
             out += ((MCRVideoObject) parentContainer).fileName + " (" + ((MCRVideoObject) parentContainer).fileSize
                 + ")\n";
-        } else
+        } else {
             out += fileName + " (" + fileSize + ")\n";
+        }
 
-        String _fill = "";
-        for (int c = 0; c < out.length(); c++)
-            _fill += "-";
+        StringBuilder _fill = new StringBuilder();
+        for (int c = 0; c < out.length(); c++) {
+            _fill.append('-');
+        }
         out += _fill + "\n";
-        out += "Type             : " + type.toString() + "\n";
+        out += "Type             : " + type + "\n";
         out += (mimeType != null ? "mimeType         : " + mimeType + "\n" : "");
         out += (format != null
-            ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n" : "");
+            ? "Container Format : " + format + (formatFull != null ? " (" + formatFull + ")" : "") + "\n"
+            : "");
         out += "Format           : " + subFormat + (subFormatFull != null ? " (" + subFormatFull + ")" : "") + "\n";
         out += "Codec            : " + codec + (codecFull != null ? " - " + codecFull : "")
             + (codecURL != null ? " (" + codecURL + ")" : "") + "\n";
@@ -138,20 +142,23 @@ public class MCRAudioObject extends MCRMediaObject {
         out += "Duration         : " + duration + "\n";
 
         int calcBitRate = (parentContainer != null
-            ? ((MCRVideoObject) parentContainer).bitRate - ((MCRVideoObject) parentContainer).streamBitRate : 0);
-        if (streamBitRate != 0)
+            ? ((MCRVideoObject) parentContainer).bitRate - ((MCRVideoObject) parentContainer).streamBitRate
+            : 0);
+        if (streamBitRate != 0) {
             out += "BitRate          : " + streamBitRate + (streamBitRateMode != null ? " @ " + streamBitRateMode : "")
                 + "\n";
-        else
+        } else {
             out += "BitRate (calc.)  : " + calcBitRate + (streamBitRateMode != null ? " @ " + streamBitRateMode : "")
                 + "\n";
+        }
 
         out += "Channel(s)       : " + channels + "\n";
         out += "SamplingRate     : " + samplingRate + "\n";
         out += (language != null ? "Language         : " + language + "\n" : "");
 
-        if (tags != null)
+        if (tags != null) {
             out += tags.toString();
+        }
 
         return out;
     }
@@ -166,7 +173,7 @@ public class MCRAudioObject extends MCRMediaObject {
 
     /**
      * Output metadata as XML.
-     * 
+     *
      * @param withRoot
      *                  complete output or only stream info
      */
@@ -207,10 +214,12 @@ public class MCRAudioObject extends MCRMediaObject {
             createElement(xml, "@overallBitrate", String.valueOf(bitRate));
 
             Element contformat = new Element("format");
-            if (format != null)
+            if (format != null) {
                 contformat.setAttribute("type", format);
-            if (formatFull != null)
+            }
+            if (formatFull != null) {
                 contformat.setAttribute("description", formatFull);
+            }
 
             if (!XMLwithoutFileInfo) {
                 Element file = new Element("file");
@@ -222,10 +231,12 @@ public class MCRAudioObject extends MCRMediaObject {
 
             xml.addContent(stream);
 
-            if (tags != null)
+            if (tags != null) {
                 xml.addContent(tags.toXML());
-        } else
+            }
+        } else {
             xml = stream;
+        }
 
         return xml;
     }

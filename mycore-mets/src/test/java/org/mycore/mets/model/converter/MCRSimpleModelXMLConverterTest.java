@@ -42,15 +42,13 @@ public class MCRSimpleModelXMLConverterTest {
         String documentAsString = new XMLOutputter(Format.getPrettyFormat()).outputString(document);
 
         Arrays.asList(PATHS_TO_CHECK.split(";")).stream()
-            .map((String xpath) -> {
-                return xPathFactory.compile(xpath, Filters.fboolean(), Collections.emptyMap(),
-                    Namespace.getNamespace("mets", "http://www.loc.gov/METS/"));
-            })
+            .map((String xpath) -> xPathFactory.compile(xpath, Filters.fboolean(), Collections.emptyMap(),
+                Namespace.getNamespace("mets", "http://www.loc.gov/METS/")))
             .forEachOrdered(xPath -> {
                 Boolean evaluate = xPath.evaluateFirst(document);
                 Assert.assertTrue(
                     String.format("The xpath : %s is not true! %s %s", xPath, System.lineSeparator(), documentAsString),
-                    evaluate.booleanValue());
+                    evaluate);
             });
     }
 }

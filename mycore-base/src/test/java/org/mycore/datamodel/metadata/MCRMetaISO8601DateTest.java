@@ -86,7 +86,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         LOGGER.debug(timeString);
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
-        ts.setFormat((String) null); // check auto format determination
+        ts.setFormat(null); // check auto format determination
         ts.setDate(timeString);
         assertNotNull("Date is null", ts.getDate());
         // check if shorter format declarations fail if String is longer
@@ -96,12 +96,12 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         assertNull("Date is not null", ts.getDate());
         LOGGER.debug(ts.getISOString());
         timeString = "01.12.1986";
-        ts.setFormat((String) null);
+        ts.setFormat(null);
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
         MCRConfiguration.instance().set("MCR.Metadata.SimpleDateFormat.StrictParsing", "false");
         MCRConfiguration.instance().set("MCR.Metadata.SimpleDateFormat.Locales", "de_DE,en_US");
-        ts.setFormat((String) null);
+        ts.setFormat(null);
         ts.setDate(timeString);
         LOGGER.debug(ts.getISOString());
         timeString = "12/01/1986";

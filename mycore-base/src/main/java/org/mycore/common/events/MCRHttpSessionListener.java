@@ -86,13 +86,13 @@ public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionB
     }
 
     public void valueUnbound(HttpSessionBindingEvent hsbe) {
-        LOGGER.debug("Attribute " + hsbe.getName() + " is beeing unbound from session");
+        LOGGER.debug("Attribute {} is beeing unbound from session", hsbe.getName());
         Object obj = hsbe.getValue();
         if (obj instanceof MCRSession) {
             MCRSession mcrSession = (MCRSession) obj;
             mcrSession.close();
         }
-        LOGGER.debug("Attribute " + hsbe.getName() + " is unbounded from session");
+        LOGGER.debug("Attribute {} is unbounded from session", hsbe.getName());
     }
 
 }

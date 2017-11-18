@@ -42,7 +42,6 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
-import org.mycore.solr.index.cs.MCRSolrPathContentStream;
 import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
@@ -106,7 +105,7 @@ public abstract class MCRSolrIndexHandlerFactory {
     public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient,
         boolean sendContent) throws IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: submitting file \"" + file.toString() + " for indexing");
+            LOGGER.debug("Solr: submitting file \"{} for indexing", file);
         }
         MCRSolrIndexHandler indexHandler;
         long start = System.currentTimeMillis();

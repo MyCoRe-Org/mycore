@@ -92,6 +92,8 @@ public class MCRMailer extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMailer.class);
 
+    private static final String delimiter = "\n--------------------------------------\n";
+
     private static Session mailSession;
 
     protected static final String encoding;
@@ -153,7 +155,7 @@ public class MCRMailer extends MCRServlet {
     public static void send(String sender, String recipient, String subject, String body) {
         LOGGER.debug("Called plaintext send method with single recipient.");
 
-        ArrayList<String> recipients = new ArrayList<String>();
+        ArrayList<String> recipients = new ArrayList<>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, null);
     }
@@ -179,7 +181,7 @@ public class MCRMailer extends MCRServlet {
         List<String> bccList = null;
 
         if (bcc) {
-            bccList = new ArrayList<String>();
+            bccList = new ArrayList<>();
             bccList.add(sender);
         }
 
@@ -203,7 +205,7 @@ public class MCRMailer extends MCRServlet {
     public static void send(String sender, String recipient, String subject, String body, List<String> parts) {
         LOGGER.debug("Called multipart send method with single recipient.");
 
-        ArrayList<String> recipients = new ArrayList<String>();
+        ArrayList<String> recipients = new ArrayList<>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, parts);
     }
@@ -232,7 +234,7 @@ public class MCRMailer extends MCRServlet {
         List<String> bccList = null;
 
         if (bcc) {
-            bccList = new ArrayList<String>();
+            bccList = new ArrayList<>();
             bccList.add(sender);
         }
 
@@ -284,9 +286,7 @@ public class MCRMailer extends MCRServlet {
 
         if (allowException) {
             if (mail.to == null || mail.to.isEmpty()) {
-                StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
-                sb.append(mail.toString()).append('\n');
-                throw new MCRException(sb.toString());
+                throw new MCRException("No receiver defined for mail\n" + mail + '\n');
             }
 
             trySending(mail);
@@ -328,7 +328,7 @@ public class MCRMailer extends MCRServlet {
         mail.bcc = bcc;
         mail.subject = subject;
 
-        mail.msgParts = new ArrayList<MessagePart>();
+        mail.msgParts = new ArrayList<>();
         mail.msgParts.add(new MessagePart(body));
 
         mail.parts = parts;
@@ -345,9 +345,7 @@ public class MCRMailer extends MCRServlet {
      */
     public static void send(EMail mail) {
         if (mail.to == null || mail.to.isEmpty()) {
-            StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
-            sb.append(mail.toString()).append('\n');
-            throw new MCRException(sb.toString());
+            throw new MCRException("No receiver defined for mail\n" + mail + '\n');
         }
 
         try {
@@ -360,23 +358,21 @@ public class MCRMailer extends MCRServlet {
                 return;
             }
 
-            Thread t = new Thread(new Runnable() {
-                public void run() {
-                    for (int i = numTries - 1; i > 0; i--) {
-                        LOGGER.info("Retrying in 5 minutes...");
-                        try {
-                            Thread.sleep(300000);
-                        } // wait 5 minutes
-                        catch (InterruptedException ignored) {
-                        }
+            Thread t = new Thread(() -> {
+                for (int i = numTries - 1; i > 0; i--) {
+                    LOGGER.info("Retrying in 5 minutes...");
+                    try {
+                        Thread.sleep(300000);
+                    } // wait 5 minutes
+                    catch (InterruptedException ignored) {
+                    }
 
-                        try {
-                            trySending(mail);
-                            LOGGER.info("Successfully resended e-mail.");
-                            break;
-                        } catch (Exception ex) {
-                            LOGGER.info("Sending e-mail failed: ", ex);
-                        }
+                    try {
+                        trySending(mail);
+                        LOGGER.info("Successfully resended e-mail.");
+                        break;
+                    } catch (Exception ex1) {
+                        LOGGER.info("Sending e-mail failed: ", ex1);
                     }
                 }
             });
@@ -458,7 +454,7 @@ public class MCRMailer extends MCRServlet {
             }
         }
 
-        LOGGER.info("Sending e-mail to " + mail.to);
+        LOGGER.info("Sending e-mail to {}", mail.to);
         Transport.send(msg);
     }
 
@@ -474,7 +470,7 @@ public class MCRMailer extends MCRServlet {
      * @see org.mycore.common.MCRMailer
      */
     public static Element sendMail(Document input, String stylesheet, Map<String, String> parameters) throws Exception {
-        LOGGER.info("Generating e-mail from " + input.getRootElement().getName() + " using " + stylesheet + ".xsl");
+        LOGGER.info("Generating e-mail from {} using {}.xsl", input.getRootElement().getName(), stylesheet);
         if (LOGGER.isDebugEnabled())
             debug(input.getRootElement());
 
@@ -485,7 +481,7 @@ public class MCRMailer extends MCRServlet {
         if (eMail.getChildren("to").isEmpty())
             LOGGER.warn("Will not send e-mail, no 'to' address specified");
         else {
-            LOGGER.info("Sending e-mail to " + eMail.getChildText("to") + ": " + eMail.getChildText("subject"));
+            LOGGER.info("Sending e-mail to {}: {}", eMail.getChildText("to"), eMail.getChildText("subject"));
             MCRMailer.send(eMail);
         }
 
@@ -503,7 +499,7 @@ public class MCRMailer extends MCRServlet {
      * @see org.mycore.common.MCRMailer
      */
     public static Element sendMail(Document input, String stylesheet) throws Exception {
-        return sendMail(input, stylesheet, Collections.<String, String> emptyMap());
+        return sendMail(input, stylesheet, Collections.emptyMap());
     }
 
     /** 
@@ -524,12 +520,10 @@ public class MCRMailer extends MCRServlet {
         return result.asXML();
     }
 
-    private final static String delimiter = "\n--------------------------------------\n";
-
     /** Outputs xml to the LOGGER for debugging */
     private static void debug(Element xml) {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        LOGGER.debug(delimiter + xout.outputString(xml) + delimiter);
+        LOGGER.debug(delimiter + "{}" + delimiter, xout.outputString(xml));
     }
 
     @XmlRootElement(name = "email")
@@ -648,7 +642,7 @@ public class MCRMailer extends MCRServlet {
          * @return the XML
          */
         public Document toXML() {
-            final MCRJAXBContent<EMail> content = new MCRJAXBContent<EMail>(JAXB_CONTEXT, this);
+            final MCRJAXBContent<EMail> content = new MCRJAXBContent<>(JAXB_CONTEXT, this);
             try {
                 final Document xml = content.asXML();
                 return xml;
@@ -748,7 +742,7 @@ public class MCRMailer extends MCRServlet {
 
         @XmlType(name = "mcrmailer-messagetype")
         @XmlEnum
-        public static enum MessageType {
+        public enum MessageType {
             @XmlEnumValue("text")
             TEXT("text"),
 

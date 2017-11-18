@@ -25,8 +25,10 @@ import com.google.gson.JsonObject;
  * @author Michel Buechner (mcrmibue)
  * 
  */
-@ServerEndpoint(value = "/ws/mycore-webcli/socket", configurator = MCRWebsocketDefaultConfigurator.class, decoders = {
-    MCRWebsocketJSONDecoder.class })
+@ServerEndpoint(value = "/ws/mycore-webcli/socket",
+    configurator = MCRWebsocketDefaultConfigurator.class,
+    decoders = {
+        MCRWebsocketJSONDecoder.class })
 public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
 
     private static final String SESSION_KEY = "MCRWebCLI";
@@ -38,18 +40,18 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
     @OnOpen
     public void open(Session session) {
         sessionized(session, () -> {
-            LOGGER.info("Socket Session ID: " + session.getId());
-            LOGGER.info("MyCore Session ID: " + MCRSessionMgr.getCurrentSessionID());
+            LOGGER.info("Socket Session ID: {}", session.getId());
+            LOGGER.info("MyCore Session ID: {}", MCRSessionMgr.getCurrentSessionID());
             cliCont = getCurrentSessionContainer(true, session);
-            LOGGER.info("Open ThreadID: " + Thread.currentThread().getName());
+            LOGGER.info("Open ThreadID: {}", Thread.currentThread().getName());
         });
     }
 
     @OnMessage
     public void message(Session session, JsonObject request) {
         sessionized(session, () -> {
-            LOGGER.info("Message ThreadID: " + Thread.currentThread().getName());
-            LOGGER.info("MyCore Session ID (message): " + MCRSessionMgr.getCurrentSessionID());
+            LOGGER.info("Message ThreadID: {}", Thread.currentThread().getName());
+            LOGGER.info("MyCore Session ID (message): {}", MCRSessionMgr.getCurrentSessionID());
             if (!MCRAccessManager.checkPermission("use-webcli")) {
                 try {
                     session.getBasicRemote().sendText("noPermission");

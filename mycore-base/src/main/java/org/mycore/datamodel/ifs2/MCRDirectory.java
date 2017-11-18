@@ -24,7 +24,6 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
@@ -86,7 +85,7 @@ public class MCRDirectory extends MCRStoredNode {
 
     @SuppressWarnings("unchecked")
     private Element getChildData(String name) {
-        for (Element child : (List<Element>) data.getChildren()) {
+        for (Element child : data.getChildren()) {
             if (name.equals(child.getAttributeValue("name"))) {
                 return child;
             }
@@ -128,7 +127,7 @@ public class MCRDirectory extends MCRStoredNode {
         data.setName("dir");
         data.setAttribute("name", getName());
 
-        for (Element childEntry : (List<Element>) data.getChildren()) {
+        for (Element childEntry : data.getChildren()) {
             childEntry.setName("node");
         }
 

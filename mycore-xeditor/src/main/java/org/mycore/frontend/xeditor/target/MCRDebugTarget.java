@@ -58,7 +58,7 @@ public class MCRDebugTarget implements MCREditorTarget {
         Document result = session.getEditedXML().clone();
         MCRChangeTracker tracker = session.getChangeTracker().clone();
 
-        List<Step> steps = new ArrayList<Step>();
+        List<Step> steps = new ArrayList<>();
         for (String label; (label = tracker.undoLastBreakpoint(result)) != null;)
             steps.add(0, new Step(label, result.clone()));
 
@@ -86,7 +86,7 @@ public class MCRDebugTarget implements MCREditorTarget {
         out.println("<h3>Submitted parameters:</h3>");
         out.println("<p><pre>");
 
-        List<String> names = new ArrayList<String>(values.keySet());
+        List<String> names = new ArrayList<>(values.keySet());
         Collections.sort(names);
 
         for (String name : names)

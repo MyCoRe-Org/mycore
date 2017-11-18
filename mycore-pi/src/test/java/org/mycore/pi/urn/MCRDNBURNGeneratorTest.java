@@ -28,7 +28,7 @@ public class MCRDNBURNGeneratorTest extends MCRStoreTestCase {
             .generate(getID, "");
 
         String urn = generated.asString();
-        LOGGER.info("THE URN IS: " + urn);
+        LOGGER.info("THE URN IS: {}", urn);
 
         Assert.assertFalse(urn.startsWith("urn:nbn:de:urn:nbn:de"));
     }

@@ -80,14 +80,14 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
             Properties params = MCRPersistenceHelper.getXSLProperties(request);
             if (this.appendDerivate) {
                 params.put("id", returnID.toString());
-                params.put("cancelURL", MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString());
+                params.put("cancelURL", MCRFrontendUtil.getBaseURL() + "receive/" + returnID);
                 response.sendRedirect(
                     response.encodeRedirectURL(
                         buildRedirectURL(MCRFrontendUtil.getBaseURL() + "servlets/derivate/create", params)));
             } else {
                 response.sendRedirect(response
                     .encodeRedirectURL(
-                        buildRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString(), params)));
+                        buildRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID, params)));
             }
         }
     }

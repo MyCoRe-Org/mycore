@@ -54,12 +54,7 @@ import org.apache.logging.log4j.Logger;
 public class MCRURIResolverFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
-    static ThreadLocal<List<String>> uriList = new ThreadLocal<List<String>>() {
-        @Override
-        protected List<String> initialValue() {
-            return new MyLinkedList();
-        }
-    };
+    static ThreadLocal<List<String>> uriList = ThreadLocal.withInitial(MyLinkedList::new);
 
     /**
      * adds debug information from MCRURIResolver to Servlet output.
@@ -97,7 +92,7 @@ public class MCRURIResolverFilter implements Filter {
             if (!uriList.get().isEmpty() && origOutput.length() > 0
                 && (response.getContentType().contains("text/html")
                     || response.getContentType().contains("text/xml"))) {
-                final String insertString = "\n<!-- \n" + uriList.get().toString() + "\n-->";
+                final String insertString = "\n<!-- \n" + uriList.get() + "\n-->";
                 final byte[] insertBytes = insertString.getBytes(characterEncoding);
                 response.setContentLength(origOutput.getBytes(characterEncoding).length + insertBytes.length);
                 int pos = getInsertPosition(origOutput);
@@ -107,7 +102,7 @@ public class MCRURIResolverFilter implements Filter {
                     out.write(origOutput.substring(pos, origOutput.length()).getBytes(characterEncoding));
                     // delete debuglist
                     uriList.remove();
-                    LOGGER.debug("end filter: " + origOutput.substring(origOutput.length() - 10, origOutput.length()));
+                    LOGGER.debug("end filter: {}", origOutput.substring(origOutput.length() - 10, origOutput.length()));
                 }
             } else {
                 LOGGER.debug("Sending original response");
@@ -167,7 +162,7 @@ public class MCRURIResolverFilter implements Filter {
         public String toString() {
             StringBuilder buf = new StringBuilder("The following includes where resolved by MCRURIResolver:\n\n");
             for (String obj : this) {
-                buf.append(obj.toString());
+                buf.append(obj);
                 buf.append('\n');
             }
             buf.deleteCharAt(buf.length() - 1);
@@ -223,7 +218,7 @@ public class MCRURIResolverFilter implements Filter {
         @Override
         public String getCharacterEncoding() {
             final String encoding = super.getCharacterEncoding();
-            LOGGER.debug("Character Encoding: " + encoding);
+            LOGGER.debug("Character Encoding: {}", encoding);
             return encoding;
         }
 

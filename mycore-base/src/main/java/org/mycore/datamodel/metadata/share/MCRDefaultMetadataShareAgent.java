@@ -44,7 +44,7 @@ import org.mycore.datamodel.metadata.MCRObjectMetadata;
  */
 class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
 
-    private final static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /* (non-Javadoc)
      * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
@@ -59,7 +59,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
             oldXML = mdold.createXML();
         } catch (MCRException exc) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("The old metadata of the object " + oldVersion.getId().toString() + " was invalid.", exc);
+                LOGGER.debug("The old metadata of the object {} was invalid.", oldVersion.getId(), exc);
             }
         }
         //simple save without changes, this is also a short-path for mycore-mods
@@ -105,7 +105,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
     @Override
     public void distributeMetadata(MCRObject parent) throws MCRPersistenceException, MCRAccessException {
         for (MCRMetaLinkID childId : parent.getStructure().getChildren()) {
-            LOGGER.debug("Update metadata from Child " + childId);
+            LOGGER.debug("Update metadata from Child {}", childId);
             final MCRObject child = MCRMetadataManager.retrieveMCRObject(childId.getXLinkHrefID());
             MCRMetadataManager.update(child);
         }
@@ -120,7 +120,7 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
         if (parentID == null) {
             return;
         }
-        LOGGER.debug("Parent ID = " + parentID);
+        LOGGER.debug("Parent ID = {}", parentID);
         MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);
         // remove already embedded inherited tags
         child.getMetadata().removeInheritedMetadata();

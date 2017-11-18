@@ -57,10 +57,10 @@ public class MCREventManager {
     private Hashtable<String, List<MCREventHandler>> handlers;
 
     /** Call event handlers in forward direction (create, update) */
-    public final static boolean FORWARD = true;
+    public static final boolean FORWARD = true;
 
     /** Call event handlers in backward direction (delete) */
-    public final static boolean BACKWARD = false;
+    public static final boolean BACKWARD = false;
 
     /**
      * Parse the property key of event handlers, extract type and mode.
@@ -118,7 +118,7 @@ public class MCREventManager {
     }
 
     private MCREventManager() {
-        handlers = new Hashtable<String, List<MCREventHandler>>();
+        handlers = new Hashtable<>();
 
         MCRConfiguration config = MCRConfiguration.instance();
 
@@ -128,7 +128,7 @@ public class MCREventManager {
             return;
         }
 
-        List<String> propertyKeyList = new ArrayList<String>(props.size());
+        List<String> propertyKeyList = new ArrayList<>(props.size());
         for (Object name : props.keySet()) {
             String key = name.toString();
             if (!key.startsWith(CONFIG_PREFIX + "Mode.")) {
@@ -143,7 +143,7 @@ public class MCREventManager {
             String type = eventHandlerProperty.getType();
             String mode = eventHandlerProperty.getMode();
 
-            logger.debug("EventManager instantiating handler " + config.getString(propertyKey) + " for type " + type);
+            logger.debug("EventManager instantiating handler {} for type {}", config.getString(propertyKey), type);
 
             if (propKeyIsSet(propertyKey)) {
                 addEventHandler(type, getEventHandler(mode, propertyKey));
@@ -156,13 +156,7 @@ public class MCREventManager {
     }
 
     private List<MCREventHandler> getOrCreateEventHandlerListOfType(String type) {
-        List<MCREventHandler> eventHandlerList = handlers.get(type);
-        if (eventHandlerList == null) {
-            eventHandlerList = new ArrayList<MCREventHandler>();
-            handlers.put(type, eventHandlerList);
-        }
-
-        return eventHandlerList;
+        return handlers.computeIfAbsent(type, k -> new ArrayList<>());
     }
 
     /**
@@ -195,8 +189,8 @@ public class MCREventManager {
         Exception handleEventExceptionCaught = null;
         for (int i = first; i != last + step; i += step) {
             MCREventHandler eh = list.get(i);
-            logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling handler "
-                + eh.getClass().getName());
+            logger.debug("EventManager {} {} calling handler {}", evt.getObjectType(), evt.getEventType(),
+                eh.getClass().getName());
 
             try {
                 eh.doHandleEvent(evt);
@@ -214,8 +208,8 @@ public class MCREventManager {
         // Rollback by calling undo of successfull handlers
         for (int i = undoPos - step; i != first - step; i -= step) {
             MCREventHandler eh = list.get(i);
-            logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling undo of handler "
-                + eh.getClass().getName());
+            logger.debug("EventManager {} {} calling undo of handler {}", evt.getObjectType(), evt.getEventType(),
+                eh.getClass().getName());
 
             try {
                 eh.undoHandleEvent(evt);
@@ -299,7 +293,7 @@ public class MCREventManager {
         return configuredInitializer.getInstance(propertyValue);
     }
 
-    public static interface MCREventHandlerInitializer {
-        public MCREventHandler getInstance(String propertyValue);
+    public interface MCREventHandlerInitializer {
+        MCREventHandler getInstance(String propertyValue);
     }
 }

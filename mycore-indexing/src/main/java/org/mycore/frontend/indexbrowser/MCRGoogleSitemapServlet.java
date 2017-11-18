@@ -67,11 +67,11 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(MCRFrontendUtil.getBaseURL(job.getRequest()),
             baseDir);
         int number = common.checkSitemapFile();
-        LOGGER.debug("Build Google number of URL files " + Integer.toString(number) + ".");
+        LOGGER.debug("Build Google number of URL files {}.", Integer.toString(number));
         Document jdom = null;
         // check if sitemap_google.xml exist
         String fnsm = common.getFileName(1, true);
-        LOGGER.debug("Build Google check file " + fnsm);
+        LOGGER.debug("Build Google check file {}", fnsm);
         File fi = new File(fnsm);
         if (fi.isFile()) {
             jdom = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fi));
@@ -96,7 +96,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
                 String fn = common.getFileName(i + 2, true);
                 File xml = new File(fn);
                 jdom = common.buildPartSitemap(i);
-                LOGGER.info("Write Google sitemap file " + fn + ".");
+                LOGGER.info("Write Google sitemap file {}.", fn);
                 new MCRJDOMContent(jdom).sendTo(xml);
             }
             jdom = common.buildSitemapIndex(number);

@@ -50,14 +50,13 @@ public class MCRTilingAction implements Runnable {
             image = getMCRImage();
             image.setTileDir(tileDir);
         } catch (IOException e) {
-            LOGGER.error("Error while retrieving image for job: " + tileJob, e);
+            LOGGER.error("Error while retrieving image for job: {}", tileJob, e);
             return;
         }
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        final Session session = MCRHIBConnection.instance().getSession();
         Transaction transaction = null;
-        try {
+        try (Session session = MCRHIBConnection.instance().getSession()) {
             MCRTileEventHandler tileEventHandler = new MCRTileEventHandler() {
                 Transaction transaction;
 
@@ -96,13 +95,12 @@ public class MCRTilingAction implements Runnable {
                 transaction.rollback();
             }
             try {
-                Files.deleteIfExists(MCRImage.getTiledFile(tileDir,tileJob.getDerivate(), tileJob.getPath()));
+                Files.deleteIfExists(MCRImage.getTiledFile(tileDir, tileJob.getDerivate(), tileJob.getPath()));
             } catch (IOException e1) {
                 LOGGER.error("Could not delete tile file after error!", e);
             }
 
         } finally {
-            session.close();
             MCRSessionMgr.releaseCurrentSession();
             mcrSession.close();
         }

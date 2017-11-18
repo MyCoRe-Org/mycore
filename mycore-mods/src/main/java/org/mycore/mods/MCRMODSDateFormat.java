@@ -39,13 +39,24 @@ import org.mycore.datamodel.common.MCRISO8601Date;
  *
  */
 public enum MCRMODSDateFormat {
-    iso8601("iso8601", null), w3cdtf_10("w3cdtf-10", "yyyy-MM-dd"), w3cdtf_19("w3cdtf-19",
-        "yyyy-MM-dd'T'HH:mm:ss"), marc_4("marc-4", "yyyy"), iso8601_4("iso8601-4", "yyyy"), iso8601_7("iso8601-7",
-            "yyyy-MM"), iso8601_8("iso8601-8", "yyyyMMdd"), iso8601_15("iso8601-15", "yyyyMMdd'T'HHmmss"),
+    iso8601("iso8601", null),
+    w3cdtf_10("w3cdtf-10", "yyyy-MM-dd"),
+    w3cdtf_19("w3cdtf-19",
+        "yyyy-MM-dd'T'HH:mm:ss"),
+    marc_4("marc-4", "yyyy"),
+    iso8601_4("iso8601-4", "yyyy"),
+    iso8601_7("iso8601-7",
+        "yyyy-MM"),
+    iso8601_8("iso8601-8", "yyyyMMdd"),
+    iso8601_15("iso8601-15", "yyyyMMdd'T'HHmmss"),
 
     // Try to guess encoding from date length 
-    unknown_4("unknown-4", "yyyy"), unknown_8("unknown-8", "yyyyMMdd"), unknown_10("unknown-10",
-        "yyyy-MM-dd"), unknown_19("unknown-19", "yyyy-MM-dd'T'HH:mm:ss"), unknown_15("unknown-15", "yyyyMMdd'T'HHmmss");
+    unknown_4("unknown-4", "yyyy"),
+    unknown_8("unknown-8", "yyyyMMdd"),
+    unknown_10("unknown-10",
+        "yyyy-MM-dd"),
+    unknown_19("unknown-19", "yyyy-MM-dd'T'HH:mm:ss"),
+    unknown_15("unknown-15", "yyyyMMdd'T'HHmmss");
     private static volatile Map<String, MCRMODSDateFormat> encodingToFormatMap;
 
     private String encoding, attributeValue;
@@ -58,7 +69,7 @@ public enum MCRMODSDateFormat {
 
     static final Locale DATE_LOCALE = Locale.ROOT;
 
-    private MCRMODSDateFormat(String encoding, String dateFormat) {
+    MCRMODSDateFormat(String encoding, String dateFormat) {
         this.encoding = encoding;
         this.attributeValue = encoding == "iso8601" ? encoding : encoding.split("-")[0];
         this.dateFormat = dateFormat;

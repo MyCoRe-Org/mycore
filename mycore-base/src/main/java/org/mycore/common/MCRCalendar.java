@@ -104,9 +104,9 @@ public class MCRCalendar {
 
     /** a list of calendar tags they are supported in this class */
     public static final List<String> CALENDARS_LIST = Collections
-        .unmodifiableList(new ArrayList<String>(Arrays.asList(TAG_GREGORIAN,
-            TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC, TAG_JAPANESE, TAG_ARMENIAN,
-            TAG_EGYPTIAN)));
+        .unmodifiableList(new ArrayList<>(
+            Arrays.asList(TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC,
+                TAG_JAPANESE, TAG_ARMENIAN, TAG_EGYPTIAN)));
 
     /**
      * This method check a ancient date string for the given calendar. For
@@ -130,8 +130,8 @@ public class MCRCalendar {
         throws MCRException {
         Calendar out = null;
         // check date_string
-        LOGGER.debug("Input of getHistoryDateAsCalendar: " + date_string + "  " + calendar_string + "  "
-            + Boolean.toString(last));
+        LOGGER.debug("Input of getHistoryDateAsCalendar: {}  {}  {}", date_string, calendar_string,
+            Boolean.toString(last));
         if (date_string == null || date_string.trim().length() == 0) {
             throw new MCRException("The ancient date string is null or empty");
         }
@@ -189,7 +189,7 @@ public class MCRCalendar {
         if (calendar_string.equals(TAG_HEBREW)) {
             out = getCalendarFromHebrewDate(date_string, last);
         }
-        LOGGER.debug("Output of getHistoryDateAsCalendar: " + getCalendarDateToFormattedString(out));
+        LOGGER.debug("Output of getHistoryDateAsCalendar: {}", getCalendarDateToFormattedString(out));
         return out;
     }
 
@@ -422,38 +422,53 @@ public class MCRCalendar {
             }
             // correct data
             int julian_day = calendar.get(Calendar.JULIAN_DAY);
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 6 && fields[3] == 1)
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 6 && fields[3] == 1) {
                 julian_day = 2299162;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 7 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 7 && fields[3] == 1) {
                 julian_day = 2299163;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 8 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 8 && fields[3] == 1) {
                 julian_day = 2299164;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 9 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 9 && fields[3] == 1) {
                 julian_day = 2299165;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 10 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 10 && fields[3] == 1) {
                 julian_day = 2299166;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 11 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 11 && fields[3] == 1) {
                 julian_day = 2299167;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 12 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 12 && fields[3] == 1) {
                 julian_day = 2299168;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 13 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 13 && fields[3] == 1) {
                 julian_day = 2299169;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 14 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 14 && fields[3] == 1) {
                 julian_day = 2299170;
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 15 && fields[3] == 1)
+            }
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 15 && fields[3] == 1) {
                 julian_day = 2299171;
+            }
             if ((fields[0] > 1582 || (fields[0] == 1582 && fields[1] > 9)
                 || (fields[0] == 1582 && fields[1] == 9 && fields[2] > 15))
-                && fields[3] == 1)
+                && fields[3] == 1) {
                 julian_day += 10;
-            if ((fields[0] > 1700 || (fields[0] == 1700 && fields[1] >= 2)) && fields[3] == 1)
+            }
+            if ((fields[0] > 1700 || (fields[0] == 1700 && fields[1] >= 2)) && fields[3] == 1) {
                 julian_day += 1;
-            if ((fields[0] > 1800 || (fields[0] == 1800 && fields[1] >= 2)) && fields[3] == 1)
+            }
+            if ((fields[0] > 1800 || (fields[0] == 1800 && fields[1] >= 2)) && fields[3] == 1) {
                 julian_day += 1;
-            if ((fields[0] > 1900 || (fields[0] == 1900 && fields[1] >= 2)) && fields[3] == 1)
+            }
+            if ((fields[0] > 1900 || (fields[0] == 1900 && fields[1] >= 2)) && fields[3] == 1) {
                 julian_day += 1;
-            if ((fields[0] > 2100 || (fields[0] == 2100 && fields[1] >= 2)) && fields[3] == 1)
+            }
+            if ((fields[0] > 2100 || (fields[0] == 2100 && fields[1] >= 2)) && fields[3] == 1) {
                 julian_day += 1;
+            }
             calendar.set(Calendar.JULIAN_DAY, julian_day);
             return calendar;
         } catch (Exception e) {
@@ -861,7 +876,6 @@ public class MCRCalendar {
             datestr = datestr.trim();
 
             // boolean bm = false;
-            int era = 0;
             int start = 0;
 
             // german or ISO?
@@ -927,14 +941,22 @@ public class MCRCalendar {
                 }
             }
 
-            if (syear.substring(0, 1).equals("H")) {
-                era = 235;
-            } else if (syear.substring(0, 1).equals("S")) {
-                era = 234;
-            } else if (syear.substring(0, 1).equals("T")) {
-                era = 233;
-            } else if (syear.substring(0, 1).equals("M")) {
-                era = 232;
+            int era;
+            switch (syear.substring(0, 1)) {
+                case "H":
+                    era = 235;
+                    break;
+                case "S":
+                    era = 234;
+                    break;
+                case "T":
+                    era = 233;
+                    break;
+                case "M":
+                    era = 232;
+                    break;
+                default:
+                    era = 0;
             }
             year = Integer.parseInt(syear.substring(1).trim());
             // test of the monthly
@@ -1093,7 +1115,7 @@ public class MCRCalendar {
             }
 
             budcal.set(year, mon, day);
-            return (BuddhistCalendar) budcal;
+            return budcal;
         } catch (Exception e) {
             throw new MCRException("The ancient buddhist date is false.", e);
         }
@@ -1262,7 +1284,7 @@ public class MCRCalendar {
             year = newdate.get(Calendar.YEAR);
             mon = newdate.get(Calendar.MONTH) + 1;
             if (year == 1582 && mon == 10 && day >= 5 && day < 15) {
-                newdate.set(year, mon - 1, 15);
+                newdate.set(1582, mon - 1, 15);
             }
 
             return newdate;

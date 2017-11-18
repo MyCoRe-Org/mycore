@@ -39,7 +39,7 @@ import bibtex.dom.BibtexString;
  */
 class MCRUnsupportedFieldTransformer extends MCRFieldTransformer {
 
-    Set<String> supportedFields = new HashSet<String>();
+    Set<String> supportedFields = new HashSet<>();
 
     MCRUnsupportedFieldTransformer(Collection<MCRFieldTransformer> supportedTransformers) {
         super("*");

@@ -62,7 +62,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRExportServlet extends MCRServlet {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRExportServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRExportServlet.class);
+
+    /** URIs beginning with these prefixes are forbidden for security reasons */
+    private static final String[] forbiddenURIs = { "file", "webapp", "resource" };
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
@@ -89,25 +92,22 @@ public class MCRExportServlet extends MCRServlet {
         if (basketID != null) {
             MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(basketID);
             collection.add(basket);
-            LOGGER.info("exporting basket " + basketID + " via " + req.getParameter("transformer"));
+            LOGGER.info("exporting basket {} via {}", basketID, req.getParameter("transformer"));
         }
 
         if (req.getParameter("uri") != null)
             for (String uri : req.getParameterValues("uri")) {
                 if (isAllowed(uri)) {
                     collection.add(uri);
-                    LOGGER.info("exporting " + uri + " via " + req.getParameter("transformer"));
+                    LOGGER.info("exporting {} via {}", uri, req.getParameter("transformer"));
                 }
             }
     }
 
-    /** URIs beginning with these prefixes are forbidden for security reasons */
-    private final static String[] forbiddenURIs = { "file", "webapp", "resource" };
-
     private boolean isAllowed(String uri) {
         for (String prefix : forbiddenURIs)
             if (uri.startsWith(prefix)) {
-                LOGGER.warn("URI " + uri + " is not allowed for security reasons");
+                LOGGER.warn("URI {} is not allowed for security reasons", uri);
                 return false;
             }
         return true;

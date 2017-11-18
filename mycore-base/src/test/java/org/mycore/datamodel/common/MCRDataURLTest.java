@@ -40,7 +40,7 @@ import org.mycore.common.MCRTestCase;
  */
 public class MCRDataURLTest extends MCRTestCase {
 
-    private final static String[] VALID = new String[] {
+    private static final String[] VALID = {
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC",
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIBAMAAAA2IaO4AAAAFVBMVEXk5OTn5+ft7e319fX29vb5+fn///++GUmVAAAALUlEQVQIHWNICnYLZnALTgpmMGYIFWYIZTA2ZFAzTTFlSDFVMwVyQhmAwsYMAKDaBy0axX/iAAAAAElFTkSuQmCC",
         "   data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIBAMAAAA2IaO4AAAAFVBMVEXk5OTn5+ft7e319fX29vb5+fn///++GUmVAAAALUlEQVQIHWNICnYLZnALTgpmMGYIFWYIZTA2ZFAzTTFlSDFVMwVyQhmAwsYMAKDaBy0axX/iAAAAAElFTkSuQmCC   ",
@@ -50,7 +50,7 @@ public class MCRDataURLTest extends MCRTestCase {
         "data:text/html;charset=US-ASCII;param=extra,%3Ch1%3EHello!%3C%2Fh1%3E",
         "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCBmaWxsPSIjMDBCMUZGIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIvPjwvc3ZnPg==" };
 
-    private final static String[] INVALID = new String[] { " data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D",
+    private static final String[] INVALID = { " data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D",
         "dataxbase64", "data:HelloWorld", "data:text/html;charset=,%3Ch1%3EHello!%3C%2Fh1%3E",
         "data:text/html;charset,%3Ch1%3EHello!%3C%2Fh1%3E",
         "data:base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC",

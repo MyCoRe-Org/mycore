@@ -59,7 +59,7 @@ public class MCRProperties extends Properties {
     private Object putString(String key, String value) {
         String systemProperty = System.getProperties().getProperty(key);
         if (systemProperty != null && !systemProperty.equals(value)) {
-            LogManager.getLogger(getClass()).error("Cannot overwrite system property: " + key + "=" + value);
+            LogManager.getLogger(getClass()).error("Cannot overwrite system property: {}={}", key, value);
             return systemProperty;
         }
         String oldValue = (String) super.get(key);

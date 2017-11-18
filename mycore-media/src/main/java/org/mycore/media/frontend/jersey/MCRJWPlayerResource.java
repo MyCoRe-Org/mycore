@@ -58,7 +58,7 @@ public class MCRJWPlayerResource {
                 Optional.ofNullable(request.getHeader("User-Agent")),
                 () -> Arrays.stream(Optional.ofNullable(request.getQueryString()).orElse("").split("&"))
                     .filter(p -> !p.startsWith("callback="))
-                    .toArray(size -> new String[size]));
+                    .toArray(String[]::new));
             return toJson(formatter.getSources());
         } catch (NoSuchFileException e) {
             LogManager.getLogger().warn("Could not find video file.", e);
@@ -68,7 +68,7 @@ public class MCRJWPlayerResource {
 
     private String toJson(List<MCRMediaSource> sources) {
         return new Gson().toJson(sources.stream().map(s -> new Source(s.getUri(), s.getType().getSimpleType())).toArray(
-            size -> new Source[size]));
+            Source[]::new));
     }
 
     /* simple pojo for json output */
@@ -80,7 +80,7 @@ public class MCRJWPlayerResource {
         private String type;
 
         public Source(String file, String type) {
-            LogManager.getLogger().info("file : " + file);
+            LogManager.getLogger().info("file : {}", file);
             this.file = file;
             this.type = type;
         }

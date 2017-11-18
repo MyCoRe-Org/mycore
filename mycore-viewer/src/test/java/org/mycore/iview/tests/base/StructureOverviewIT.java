@@ -92,7 +92,7 @@ public class StructureOverviewIT extends ViewerTestBase {
         soController.selectImageByOrder(label);
         Thread.sleep(500);
 
-        String message = color.toString() + " schould be selected (class-attribut 'selected' should be set)!";
+        String message = color + " schould be selected (class-attribut 'selected' should be set)!";
         Assert.assertTrue(message, soController.isImageSelected(label));
         String fileName = String.format("%s-%s-%s", this.getClassname(), label, color);
         BufferedImage bImage = ControllerUtil.getScreenshot(getDriver(), fileName);

@@ -57,7 +57,7 @@ public class MCRCombinedResourceBundleControl extends Control {
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
         throws IllegalAccessException, InstantiationException, IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("New bundle: " + baseName + ", locale " + locale);
+            LOGGER.debug("New bundle: {}, locale {}", baseName, locale);
         }
         if (locale.equals(Locale.ROOT)) {
             //MCR-1064 fallback should be default language, if property key does not exist
@@ -65,7 +65,7 @@ public class MCRCombinedResourceBundleControl extends Control {
         }
         String bundleName = baseName.substring(baseName.indexOf(':') + 1);
         String filename = CONTROL_HELPER.toBundleName(bundleName, locale) + ".properties";
-        try (MCRConfigurationInputStream propertyStream = new MCRConfigurationInputStream(filename);) {
+        try (MCRConfigurationInputStream propertyStream = new MCRConfigurationInputStream(filename)) {
             if (propertyStream.isEmpty()) {
                 throw new MissingResourceException(
                     "Can't find bundle for base name " + baseName + ", locale " + locale, bundleName + "_" + locale, // className

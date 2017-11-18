@@ -48,17 +48,17 @@ public class MCRMediaParser {
 
     public MCRMediaParser() {
         if (parsers == null) {
-            parsers = new ArrayList<MCRMediaParser>();
+            parsers = new ArrayList<>();
 
             Map<String, String> supportedParsers = config.getPropertiesMap("MCR.Media.Parser.");
             for (String name : supportedParsers.keySet()) {
                 try {
-                    LOGGER.info("instantiate Parser \"" + config.getString(name) + "\"...");
-                    MCRMediaParser parser = config.getInstanceOf(name, (String) null);
+                    LOGGER.info("instantiate Parser \"{}\"...", config.getString(name));
+                    MCRMediaParser parser = config.getInstanceOf(name, null);
                     parsers.add(parser);
                 } catch (Throwable ex) {
-                    LOGGER.warn("Couldn't instantiate Parser \"" + config.getString(name) + "\" because "
-                        + ex.getMessage() + ".");
+                    LOGGER.warn("Couldn't instantiate Parser \"{}\" because {}.", config.getString(name),
+                        ex.getMessage());
                 }
             }
         }
@@ -161,7 +161,7 @@ public class MCRMediaParser {
      * @return
      *              the snapshot
      */
-    public synchronized static byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight,
+    public static synchronized byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight,
         boolean keepAspect) throws Exception {
         if (media.hasThumbnailSupport()) {
             byte[] thumb = media.getThumbnail(media, seek, maxWidth, maxHeight, keepAspect);
@@ -179,7 +179,7 @@ public class MCRMediaParser {
      *              the snapshot
      * @see #getThumbnail( MCRMediaObject , long, int, int, boolean )
      */
-    public synchronized static byte[] getThumbnail(MCRMediaObject media) throws Exception {
+    public static synchronized byte[] getThumbnail(MCRMediaObject media) throws Exception {
         long seek = media.type == MCRMediaObject.MediaType.VIDEO ? (media.getMaxSeekPosition() / 1000) / 2 : 0;
         return getThumbnail(media, seek, 0, 0, true);
     }
@@ -192,8 +192,8 @@ public class MCRMediaParser {
      * @return an ArrayList of snapshots  
      * @see #getThumbnail( MCRMediaObject , long, int, int, boolean )
      */
-    public synchronized static ArrayList<byte[]> getThumbnail(MCRMediaObject media, int steps) throws Exception {
-        ArrayList<byte[]> thumbs = new ArrayList<byte[]>();
+    public static synchronized ArrayList<byte[]> getThumbnail(MCRMediaObject media, int steps) throws Exception {
+        ArrayList<byte[]> thumbs = new ArrayList<>();
 
         for (int c = 0; c < steps; c++) {
             long seek = (media.getMaxSeekPosition() / steps) * c;

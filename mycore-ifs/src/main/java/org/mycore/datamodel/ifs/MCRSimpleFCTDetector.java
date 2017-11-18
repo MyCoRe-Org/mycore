@@ -253,25 +253,29 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         MCRPatternRule(String pattern, String format, int offset, double score) {
             super(score);
 
-            if (format.equals("text")) {
-                this.pattern = pattern.getBytes(StandardCharsets.ISO_8859_1);
-            } else if (format.equals("hex")) {
-                this.pattern = new byte[pattern.length() / 2];
+            switch (format) {
+                case "text":
+                    this.pattern = pattern.getBytes(StandardCharsets.ISO_8859_1);
+                    break;
+                case "hex":
+                    this.pattern = new byte[pattern.length() / 2];
 
-                for (int i = 0; i < pattern.length(); i += 2) {
-                    String hex = pattern.substring(i, i + 2);
-                    this.pattern[i / 2] = (byte) Integer.parseInt(hex, 16);
-                }
-            } else if (format.equals("bytes")) {
-                StringTokenizer st = new StringTokenizer(pattern, " ,:;\t");
-                this.pattern = new byte[st.countTokens()];
+                    for (int i = 0; i < pattern.length(); i += 2) {
+                        String hex = pattern.substring(i, i + 2);
+                        this.pattern[i / 2] = (byte) Integer.parseInt(hex, 16);
+                    }
+                    break;
+                case "bytes":
+                    StringTokenizer st = new StringTokenizer(pattern, " ,:;\t");
+                    this.pattern = new byte[st.countTokens()];
 
-                for (int i = 0; st.hasMoreTokens(); i++) {
-                    this.pattern[i] = (byte) Integer.parseInt(st.nextToken(), 10);
-                }
-            } else {
-                String msg = "Unsupported pattern format in content type detection rule: " + format;
-                throw new MCRConfigurationException(msg);
+                    for (int i = 0; st.hasMoreTokens(); i++) {
+                        this.pattern[i] = (byte) Integer.parseInt(st.nextToken(), 10);
+                    }
+                    break;
+                default:
+                    String msg = "Unsupported pattern format in content type detection rule: " + format;
+                    throw new MCRConfigurationException(msg);
             }
 
             this.offset = offset;
@@ -376,7 +380,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         DefaultHandler handler = new DefaultHandler() {
             @Override
             public void startElement(String uri, String localName, String qName, Attributes attributes) {
-                logger.debug("MCRSimpleFCTDetector detected root element = " + qName);
+                logger.debug("MCRSimpleFCTDetector detected root element = {}", qName);
                 detected.setProperty("docType", qName);
                 throw new MCRException(forcedInterrupt);
             }

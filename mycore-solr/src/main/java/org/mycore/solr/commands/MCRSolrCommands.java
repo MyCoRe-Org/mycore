@@ -61,19 +61,25 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "rebuild solr metadata index", help = "rebuilds solr's metadata index", order = 20)
+        syntax = "rebuild solr metadata index",
+        help = "rebuilds solr's metadata index",
+        order = 20)
     public static void rebuildMetadataIndex() {
         MCRSolrIndexer.rebuildMetadataIndex();
     }
 
     @MCRCommand(
-        syntax = "rebuild solr content index", help = "rebuilds solr's content index", order = 30)
+        syntax = "rebuild solr content index",
+        help = "rebuilds solr's content index",
+        order = 30)
     public static void rebuildContentIndex() {
         MCRSolrIndexer.rebuildContentIndex();
     }
 
     @MCRCommand(
-        syntax = "rebuild solr classification index", help = "rebuilds solr's classification index", order = 35)
+        syntax = "rebuild solr classification index",
+        help = "rebuilds solr's classification index",
+        order = 35)
     public static void rebuildClassificationIndex() {
         MCRSolrClassificationUtil.rebuildIndex();
     }
@@ -97,7 +103,9 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "drop solr index", help = "Deletes an existing index from solr", order = 90)
+        syntax = "drop solr index",
+        help = "Deletes an existing index from solr",
+        order = 90)
     public static void dropIndex() throws Exception {
         MCRSolrIndexer.dropIndex();
     }
@@ -119,7 +127,9 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "delete from solr index by id {0}", help = "Deletes an document from the index by id", order = 110)
+        syntax = "delete from solr index by id {0}",
+        help = "Deletes an document from the index by id",
+        order = 110)
     public static void deleteByIdFromSolr(String solrID) {
         MCRSolrIndexer.deleteById(solrID);
     }
@@ -178,9 +188,9 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-            syntax = "create solr objecttype {0} at {1}",
-            help = "indexes all objects of an object type (e.g. document) on specific solr server core",
-            order = 125)
+        syntax = "create solr objecttype {0} at {1}",
+        help = "indexes all objects of an object type (e.g. document) on specific solr server core",
+        order = 125)
     public static void createObjectType(String type, String url) throws Exception {
         MCRSolrCore core = new MCRSolrCore(url);
         SolrClient concurrentSolrClient = core.getConcurrentClient();
@@ -189,7 +199,9 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "synchronize metadata index", help = "synchronizes the database and solr server", order = 150)
+        syntax = "synchronize metadata index",
+        help = "synchronizes the database and solr server",
+        order = 150)
     public static void synchronizeMetadataIndex() throws Exception {
         MCRSolrIndexer.synchronizeMetadataIndex();
     }
@@ -203,7 +215,9 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "select objects with solr query {0}", help = "selects mcr objects with a solr query", order = 180)
+        syntax = "select objects with solr query {0}",
+        help = "selects mcr objects with a solr query",
+        order = 180)
     public static void selectObjectsWithSolrQuery(String query) throws Exception {
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         List<String> ids = MCRSolrSearchUtils.listIDs(solrClient, query);

@@ -50,7 +50,7 @@ public class MCRMaxDecimalValidator extends MCRDecimalValidator {
         if (d == null) {
             return false;
         } else {
-            return d.doubleValue() <= max;
+            return d <= max;
         }
     }
 }

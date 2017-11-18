@@ -35,7 +35,7 @@ public class MCRQLSearchUtilsTest extends MCRTestCase {
     }
 
     private MCRQuery getMCRQuery(String mcrql) {
-        LogManager.getLogger(getClass()).info("Building query from condition: " + mcrql);
+        LogManager.getLogger(getClass()).info("Building query from condition: {}", mcrql);
         Element query = new Element("query").setAttribute("numPerPage", "20");
         Element conditions = new Element("conditions").setAttribute("format", "xml");
         MCRCondition<Object> condition = new MCRQueryParser().parse(mcrql);

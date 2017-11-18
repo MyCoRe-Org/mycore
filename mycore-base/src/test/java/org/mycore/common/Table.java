@@ -16,7 +16,7 @@ public class Table {
         currentCol = 0;
         this.columns = columns;
         colSize = new int[columns];
-        values = new Vector<String>();
+        values = new Vector<>();
     }
 
     public void addValue(String value) {
@@ -39,7 +39,7 @@ public class Table {
                 }
                 sb.append(value);
             }
-            out.println(sb.toString());
+            out.println(sb);
         }
     }
 }

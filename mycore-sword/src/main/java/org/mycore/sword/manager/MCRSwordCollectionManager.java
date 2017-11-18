@@ -1,6 +1,7 @@
 package org.mycore.sword.manager;
 
 import java.text.MessageFormat;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,10 +54,10 @@ public class MCRSwordCollectionManager implements CollectionListManager, Collect
                         try {
                             return collectionProvider.getMetadataProvider().provideListMetadata(id);
                         } catch (SwordError swordError) {
-                            LOGGER.warn("Error while creating feed for [" + id + "]! (Will be removed from List)");
+                            LOGGER.warn("Error while creating feed for [{}]! (Will be removed from List)", id);
                             return null;
                         }
-                    }).filter(e -> e != null)
+                    }).filter(Objects::nonNull)
                     .forEach(feed::addEntry);
 
                 MCRSwordUtil.BuildLinkUtil.addPaginationLinks(collectionIRI, collection, feed, collectionProvider);
@@ -73,7 +74,7 @@ public class MCRSwordCollectionManager implements CollectionListManager, Collect
     @Override
     public DepositReceipt createNew(String editIRI, Deposit deposit, AuthCredentials authCredentials,
         SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
-        LOGGER.info("createNew:" + editIRI);
+        LOGGER.info("createNew:{}", editIRI);
         String collection = MCRSwordUtil.ParseLinkUtil.CollectionIRI
             .getCollectionNameFromCollectionIRI(new IRI(editIRI));
         MCRSwordCollectionProvider collectionProvider = MCRSword.getCollection(collection);

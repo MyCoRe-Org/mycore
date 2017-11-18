@@ -40,7 +40,7 @@ public interface MCRExternalCommandInterface {
      * 
      * @return a command pair ArrayList
      */
-    public ArrayList<MCRCommand> getPossibleCommands();
+    ArrayList<MCRCommand> getPossibleCommands();
 
     /**
      * Returns the display name of the external commands. If the display name
@@ -48,10 +48,10 @@ public interface MCRExternalCommandInterface {
      * 
      * @return the display name of the external commands
      */
-    public String getDisplayName();
+    String getDisplayName();
 
     /**
      * Sets the display name.
      */
-    public void setDisplayName(String s);
+    void setDisplayName(String s);
 }

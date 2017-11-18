@@ -71,13 +71,15 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @since 2.0
  */
 @Entity
-@Table(name = "MCRCategory", indexes = {
-    @Index(columnList = "ClassID, leftValue, rightValue", name = "ClassLeftRight"),
-    @Index(columnList = "leftValue", name = "ClassesRoot")
-}, uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "ClassID", "CategID" }, name = "ClassCategUnique"),
-    @UniqueConstraint(columnNames = { "ClassID", "leftValue" }, name = "ClassLeftUnique"),
-    @UniqueConstraint(columnNames = { "ClassID", "rightValue" }, name = "ClassRightUnique") })
+@Table(name = "MCRCategory",
+    indexes = {
+        @Index(columnList = "ClassID, leftValue, rightValue", name = "ClassLeftRight"),
+        @Index(columnList = "leftValue", name = "ClassesRoot")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "ClassID", "CategID" }, name = "ClassCategUnique"),
+        @UniqueConstraint(columnNames = { "ClassID", "leftValue" }, name = "ClassLeftUnique"),
+        @UniqueConstraint(columnNames = { "ClassID", "rightValue" }, name = "ClassRightUnique") })
 @NamedQueries({
     @NamedQuery(name = "MCRCategory.updateLeft",
         query = "UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.id.rootID= :classID AND cat.left >= :left"),
@@ -87,30 +89,39 @@ import org.mycore.datamodel.classifications2.MCRLabel;
         query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:rootID AND cat.left < :left AND cat.right > :right ORDER BY cat.left DESC"),
     @NamedQuery(name = "MCRCategory.byNaturalId",
         query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL)"),
-    @NamedQuery(name = "MCRCategory.byLabelInClass", query = "FROM MCRCategoryImpl as cat "
-        + "INNER JOIN cat.labels as label "
-        + "  WHERE cat.id.rootID=:rootID AND "
-        + "    cat.left BETWEEN :left and :right AND "
-        + "    label.lang=:lang AND "
-        + "    label.text=:text"),
-    @NamedQuery(name = "MCRCategory.byLabel", query = "FROM MCRCategoryImpl as cat "
-        + "  INNER JOIN cat.labels as label "
-        + "  WHERE label.lang=:lang AND "
-        + "    label.text=:text"),
-    @NamedQuery(name = "MCRCategory.prefetchClassQuery", query = MCRCategoryDTO.SELECT
-        + " WHERE cat.id.rootID=:classID ORDER BY cat.left"),
-    @NamedQuery(name = "MCRCategory.prefetchClassLevelQuery", query = MCRCategoryDTO.SELECT
-        + " WHERE cat.id.rootID=:classID AND cat.level <= :endlevel ORDER BY cat.left"),
-    @NamedQuery(name = "MCRCategory.prefetchCategQuery", query = MCRCategoryDTO.SELECT
-        + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) ORDER BY cat.left"),
-    @NamedQuery(name = "MCRCategory.prefetchCategLevelQuery", query = MCRCategoryDTO.SELECT
-        + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) AND cat.level <= :endlevel ORDER BY cat.left"),
-    @NamedQuery(name = "MCRCategory.leftRightLevelQuery", query = MCRCategoryDTO.LRL_SELECT
-        + " WHERE cat.id=:categID "),
-    @NamedQuery(name = "MCRCategory.parentQuery", query = MCRCategoryDTO.SELECT
-        + " WHERE cat.id.rootID=:classID AND (cat.left < :left AND cat.right > :right OR cat.id.ID=:categID) ORDER BY cat.left"),
-    @NamedQuery(name = "MCRCategory.rootCategs", query = MCRCategoryDTO.SELECT
-        + " WHERE cat.left = 0 ORDER BY cat.id.rootID"),
+    @NamedQuery(name = "MCRCategory.byLabelInClass",
+        query = "FROM MCRCategoryImpl as cat "
+            + "INNER JOIN cat.labels as label "
+            + "  WHERE cat.id.rootID=:rootID AND "
+            + "    cat.left BETWEEN :left and :right AND "
+            + "    label.lang=:lang AND "
+            + "    label.text=:text"),
+    @NamedQuery(name = "MCRCategory.byLabel",
+        query = "FROM MCRCategoryImpl as cat "
+            + "  INNER JOIN cat.labels as label "
+            + "  WHERE label.lang=:lang AND "
+            + "    label.text=:text"),
+    @NamedQuery(name = "MCRCategory.prefetchClassQuery",
+        query = MCRCategoryDTO.SELECT
+            + " WHERE cat.id.rootID=:classID ORDER BY cat.left"),
+    @NamedQuery(name = "MCRCategory.prefetchClassLevelQuery",
+        query = MCRCategoryDTO.SELECT
+            + " WHERE cat.id.rootID=:classID AND cat.level <= :endlevel ORDER BY cat.left"),
+    @NamedQuery(name = "MCRCategory.prefetchCategQuery",
+        query = MCRCategoryDTO.SELECT
+            + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) ORDER BY cat.left"),
+    @NamedQuery(name = "MCRCategory.prefetchCategLevelQuery",
+        query = MCRCategoryDTO.SELECT
+            + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) AND cat.level <= :endlevel ORDER BY cat.left"),
+    @NamedQuery(name = "MCRCategory.leftRightLevelQuery",
+        query = MCRCategoryDTO.LRL_SELECT
+            + " WHERE cat.id=:categID "),
+    @NamedQuery(name = "MCRCategory.parentQuery",
+        query = MCRCategoryDTO.SELECT
+            + " WHERE cat.id.rootID=:classID AND (cat.left < :left AND cat.right > :right OR cat.id.ID=:categID) ORDER BY cat.left"),
+    @NamedQuery(name = "MCRCategory.rootCategs",
+        query = MCRCategoryDTO.SELECT
+            + " WHERE cat.left = 0 ORDER BY cat.id.rootID"),
     @NamedQuery(name = "MCRCategory.rootIds", query = "SELECT cat.id FROM MCRCategoryImpl cat WHERE cat.left = 0"),
     @NamedQuery(name = "MCRCategory.childCount",
         query = "SELECT CAST(count(*) AS integer) FROM MCRCategoryImpl children WHERE children.parent=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL))")
@@ -155,7 +166,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     @Transient
     int getPositionInParent() {
-        LOGGER.debug("getposition called for " + getId());
+        LOGGER.debug("getposition called for {}", getId());
         if (parent == null) {
             LOGGER.debug("getposition called with no parent set.");
             return -1;
@@ -182,8 +193,10 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     @Override
-    @OneToMany(targetEntity = MCRCategoryImpl.class, cascade = {
-        CascadeType.ALL }, mappedBy = "parent")
+    @OneToMany(targetEntity = MCRCategoryImpl.class,
+        cascade = {
+            CascadeType.ALL },
+        mappedBy = "parent")
     @OrderColumn(name = "positionInParent")
     @Access(AccessType.FIELD)
     public List<MCRCategory> getChildren() {
@@ -192,8 +205,10 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     @Override
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "MCRCategoryLabels", joinColumns = @JoinColumn(name = "category"), uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "category", "lang" }) })
+    @CollectionTable(name = "MCRCategoryLabels",
+        joinColumns = @JoinColumn(name = "category"),
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = { "category", "lang" }) })
     public Set<MCRLabel> getLabels() {
         return super.getLabels();
     }
@@ -258,7 +273,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      *            the children to set
      */
     public void setChildren(List<MCRCategory> children) {
-        LOGGER.debug("Set children called for " + getId() + "list'" + children.getClass().getName() + "': " + children);
+        LOGGER.debug("Set children called for {}list'{}': {}", getId(), children.getClass().getName(), children);
         childGuard.write(() -> setChildrenUnlocked(children));
     }
 
@@ -311,7 +326,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     static Collection<MCRCategoryImpl> wrapCategories(Collection<? extends MCRCategory> categories, MCRCategory parent,
         MCRCategory root) {
-        List<MCRCategoryImpl> list = new ArrayList<MCRCategoryImpl>(categories.size());
+        List<MCRCategoryImpl> list = new ArrayList<>(categories.size());
         for (MCRCategory category : categories) {
             list.add(wrapCategory(category, parent, root));
         }
@@ -334,11 +349,11 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             if (parent != null) {
                 catImpl.level = parent.getLevel() + 1;
             } else if (category.isCategory()) {
-                LOGGER.warn("Something went wrong here, category has no parent and is no root category: "
-                    + category.getId());
+                LOGGER.warn("Something went wrong here, category has no parent and is no root category: {}",
+                    category.getId());
             }
             // copy children to temporary list
-            List<MCRCategory> children = new ArrayList<MCRCategory>(catImpl.getChildren().size());
+            List<MCRCategory> children = new ArrayList<>(catImpl.getChildren().size());
             children.addAll(catImpl.getChildren());
             // remove old children
             catImpl.getChildren().clear();
@@ -346,7 +361,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             catImpl.getChildren().addAll(children);
             return catImpl;
         }
-        LOGGER.debug("wrap Category: " + category.getId());
+        LOGGER.debug("wrap Category: {}", category.getId());
         catImpl = new MCRCategoryImpl();
         catImpl.setId(category.getId());
         catImpl.labels = category.getLabels();
@@ -356,7 +371,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         }
         catImpl.setRoot(root);
         catImpl.level = parent.getLevel() + 1;
-        catImpl.children = new ArrayList<MCRCategory>(category.getChildren().size());
+        catImpl.children = new ArrayList<>(category.getChildren().size());
         catImpl.getChildren().addAll(category.getChildren());
         return catImpl;
     }
@@ -486,9 +501,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             return false;
         if (level != other.level)
             return false;
-        if (right != other.right)
-            return false;
-        return true;
+        return right == other.right;
     }
 
     @Transient

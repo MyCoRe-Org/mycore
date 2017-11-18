@@ -126,7 +126,7 @@ public class MCRRestAPIUploadHelper {
                 mcrID = MCRObjectID.getNextFreeId(mcrID.getBase());
             }
 
-            fXML = UPLOAD_DIR.resolve(mcrID.toString() + ".xml");
+            fXML = UPLOAD_DIR.resolve(mcrID + ".xml");
 
             docOut.getRootElement().setAttribute("ID", mcrID.toString());
             docOut.getRootElement().setAttribute("label", mcrID.toString());
@@ -143,12 +143,12 @@ public class MCRRestAPIUploadHelper {
             MCRObjectCommands.updateFromFile(fXML.toString(), false); // handles "create" as well
             mcrSession.setUserInformation(currentUser);
 
-            return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID.toString()).build())
+            return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID).build())
                 .type("application/xml; charset=UTF-8")
                 .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
 
         } catch (Exception e) {
-            LOGGER.error("Unable to Upload file: " + String.valueOf(fXML), e);
+            LOGGER.error("Unable to Upload file: {}", String.valueOf(fXML), e);
             throw new MCRRestAPIException(Status.BAD_REQUEST, new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
                 "Unable to Upload file: " + String.valueOf(fXML), e.getMessage()));
         } finally {
@@ -156,7 +156,7 @@ public class MCRRestAPIUploadHelper {
                 try {
                     Files.delete(fXML);
                 } catch (IOException e) {
-                    LOGGER.error("Unable to delete temporary workflow file: " + String.valueOf(fXML), e);
+                    LOGGER.error("Unable to delete temporary workflow file: {}", String.valueOf(fXML), e);
                 }
             }
         }
@@ -276,7 +276,7 @@ public class MCRRestAPIUploadHelper {
 
                 MCRAccessManager.invalidPermissionCache(derID.toString(), PERMISSION_WRITE);
                 if (MCRAccessManager.checkPermission(derID.toString(), PERMISSION_WRITE)) {
-                	
+
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
                     java.nio.file.Path derDir = null;
@@ -307,7 +307,7 @@ public class MCRRestAPIUploadHelper {
                                     new BufferedInputStream(uploadedInputStream))) {
                                     ZipEntry entry;
                                     while ((entry = zis.getNextEntry()) != null) {
-                                        LOGGER.debug("Unzipping: " + entry.getName());
+                                        LOGGER.debug("Unzipping: {}", entry.getName());
                                         java.nio.file.Path target = derDir.resolve(entry.getName());
                                         Files.createDirectories(target.getParent());
                                         Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
@@ -346,7 +346,7 @@ public class MCRRestAPIUploadHelper {
                     session.setUserInformation(currentUser);
                     return Response
                         .created(info.getBaseUriBuilder()
-                            .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
+                            .path("v1/objects/" + objID + "/derivates/" + derID + "/contents")
                             .build())
                         .type("application/xml; charset=UTF-8")
                         .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
@@ -410,7 +410,7 @@ public class MCRRestAPIUploadHelper {
                 session.setUserInformation(currentUser);
                 response = Response
                     .created(info.getBaseUriBuilder()
-                        .path("v1/objects/" + objID.toString() + "/derivates/" + derID.toString() + "/contents")
+                        .path("v1/objects/" + objID + "/derivates/" + derID + "/contents")
                         .build())
                     .type("application/xml; charset=UTF-8")
                     .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
@@ -438,9 +438,6 @@ public class MCRRestAPIUploadHelper {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
         SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
-        SortedMap<String, String> parameter = new TreeMap<>();
-        parameter.put("mcrObjectID", pathParamMcrObjID);
-        parameter.put("mcrDerivateID", pathParamMcrDerID);
 
         String base64Signature = request.getHeader("X-MyCoRe-RestAPI-Signature");
         if (base64Signature == null) {
@@ -468,7 +465,7 @@ public class MCRRestAPIUploadHelper {
             }
             session.setUserInformation(currentUser);
             response = Response
-                .created(info.getBaseUriBuilder().path("v1/objects/" + objID.toString() + "/derivates").build())
+                .created(info.getBaseUriBuilder().path("v1/objects/" + objID + "/derivates").build())
                 .type("application/xml; charset=UTF-8").header(HEADER_NAME_AUTHORIZATION,
                     "Bearer " + MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
                 .build();

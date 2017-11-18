@@ -22,17 +22,17 @@ import org.w3c.dom.NodeList;
 
 public class MCRIncludeHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRIncludeHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRIncludeHandler.class);
 
-    private final static Map<String, Node> includesPerApplication = new ConcurrentHashMap<String, Node>();
+    private static final Map<String, Node> includesPerApplication = new ConcurrentHashMap<>();
 
-    private Map<String, Node> includesPerTransformation = new HashMap<String, Node>();
+    private Map<String, Node> includesPerTransformation = new HashMap<>();
 
     public XNodeSet resolve(ExpressionContext context, String uri, String sStatic) throws TransformerException {
         boolean bStatic = "true".equals(sStatic) || includesPerApplication.containsKey(uri);
         Map<String, Node> includes = bStatic ? includesPerApplication : includesPerTransformation;
 
-        LOGGER.debug("Including " + uri + " static=" + bStatic + " cached=" + includes.containsKey(uri));
+        LOGGER.debug("Including {} static={} cached={}", uri, bStatic, includes.containsKey(uri));
 
         Node node = includes.get(uri);
         if (node == null) {

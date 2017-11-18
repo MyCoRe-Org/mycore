@@ -78,8 +78,8 @@ public class MCRObjectStructure {
      * are MCRMetaLink's.
      */
     public MCRObjectStructure() {
-        children = new ArrayList<MCRMetaLinkID>();
-        derivates = new ArrayList<MCRMetaLinkID>();
+        children = new ArrayList<>();
+        derivates = new ArrayList<>();
     }
 
     /**
@@ -179,7 +179,7 @@ public class MCRObjectStructure {
      */
     public final boolean removeChild(MCRObjectID href) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Remove child ID " + href);
+            LOGGER.debug("Remove child ID {}", href);
         }
         return removeMetaLink(getChildren().iterator(), href);
     }
@@ -195,7 +195,7 @@ public class MCRObjectStructure {
      */
     public final boolean removeDerivate(MCRObjectID href) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Remove derivate ID " + href);
+            LOGGER.debug("Remove derivate ID {}", href);
         }
         return removeMetaLink(getDerivates().iterator(), href);
     }
@@ -238,7 +238,7 @@ public class MCRObjectStructure {
             return false;
         }
         if (!MCRMetadataManager.exists(href)) {
-            LOGGER.warn("Cannot find derivate " + href.toString() + ", will add it anyway.");
+            LOGGER.warn("Cannot find derivate {}, will add it anyway.", href);
         }
         derivates.add(add_derivate);
         return true;
@@ -404,20 +404,14 @@ public class MCRObjectStructure {
     public JsonObject createJSON() {
         JsonObject structure = new JsonObject();
         // parent
-        Optional.ofNullable(getParent()).ifPresent(link -> {
-            structure.add("parent", link.createJSON());
-        });
+        Optional.ofNullable(getParent()).ifPresent(link -> structure.add("parent", link.createJSON()));
         // children
         JsonArray children = new JsonArray();
-        getChildren().forEach(child -> {
-            children.add(child.createJSON());
-        });
+        getChildren().forEach(child -> children.add(child.createJSON()));
         structure.add("children", children);
         // derivates
         JsonArray derivates = new JsonArray();
-        getDerivates().forEach(derivate -> {
-            derivates.add(derivate.createJSON());
-        });
+        getDerivates().forEach(derivate -> derivates.add(derivate.createJSON()));
         structure.add("derivates", derivates);
         return structure;
     }

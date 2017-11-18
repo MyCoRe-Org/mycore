@@ -541,17 +541,11 @@ public abstract class MCRFilesystemNode {
     public String toString() {
         String date = formatter.format(lastModified.getTime());
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("ID          = ").append(ID).append("\n");
-        sb.append("Name        = ").append(name).append("\n");
-        sb.append("Label       = ").append(label).append("\n");
-        sb.append("Type        = ").append(this.getClass().getName()).append("\n");
-        sb.append("ParentID    = ").append(parentID).append("\n");
-        sb.append("OwnerID     = ").append(ownerID).append("\n");
-        sb.append("Size        = ").append(size).append("\n");
-        sb.append("Modified    = ").append(date).append("\n");
+        String sb = "ID          = " + ID + "\n" + "Name        = " + name + "\n" + "Label       = " + label + "\n"
+            + "Type        = " + this.getClass().getName() + "\n" + "ParentID    = " + parentID + "\n"
+            + "OwnerID     = " + ownerID + "\n" + "Size        = " + size + "\n" + "Modified    = " + date + "\n";
 
-        return sb.toString();
+        return sb;
     }
 
     @Override

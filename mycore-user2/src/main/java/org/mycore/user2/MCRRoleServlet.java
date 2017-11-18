@@ -68,7 +68,7 @@ public class MCRRoleServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
         roleClassificationsDefined = false;
-        roleCategories = new ArrayList<MCRCategoryID>();
+        roleCategories = new ArrayList<>();
         roleCategories.add(MCRUser2Constants.ROLE_CLASSID);
         MCRConfiguration config = MCRConfiguration.instance();
         String roleCategoriesValue = config.getString(MCRUser2Constants.CONFIG_PREFIX + "RoleCategories", null);
@@ -107,7 +107,7 @@ public class MCRRoleServlet extends MCRServlet {
     }
 
     private Collection<Element> getRoleElements() {
-        ArrayList<Element> list = new ArrayList<Element>(roleCategories.size());
+        ArrayList<Element> list = new ArrayList<>(roleCategories.size());
         for (MCRCategoryID categID : roleCategories) {
             Element role = new Element("role");
             role.setAttribute("categID", categID.toString());

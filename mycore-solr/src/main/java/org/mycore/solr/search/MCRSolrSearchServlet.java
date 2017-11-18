@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -70,7 +69,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     static final List<String> RESERVED_PARAMETER_KEYS;
 
     static {
-        String[] parameter = new String[] { "q", "qt", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache",
+        String[] parameter = { "q", "qt", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache",
             "fl", "glob",
             "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt", "qf", "q.alt",
             "mm", "pf",
@@ -124,11 +123,11 @@ public class MCRSolrSearchServlet extends MCRServlet {
     protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
         Map<String, String[]> typeParameters,
         Map<String, String[]> sortParameters, Set<String> phraseQuery) throws ServletException {
-        HashMap<String, String[]> queryParameterMap = new HashMap<String, String[]>();
+        HashMap<String, String[]> queryParameterMap = new HashMap<>();
 
         HashMap<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
 
-        HashMap<String, StringBuilder> filterQueryMap = new HashMap<String, StringBuilder>();
+        HashMap<String, StringBuilder> filterQueryMap = new HashMap<>();
         StringBuilder query = new StringBuilder();
         for (Entry<String, String[]> queryParameter : queryParameters.entrySet()) {
             String fieldName = queryParameter.getKey();
@@ -167,8 +166,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private String buildSolrSortParameter(Map<String, String[]> sortParameters) {
         Set<Entry<String, String[]>> sortParameterEntrys = sortParameters.entrySet();
-        Map<Integer, String> positionOrderMap = new HashMap<Integer, String>();
-        Map<Integer, String> positionFieldMap = new HashMap<Integer, String>();
+        Map<Integer, String> positionOrderMap = new HashMap<>();
+        Map<Integer, String> positionFieldMap = new HashMap<>();
 
         for (Entry<String, String[]> sortParameterEntry : sortParameterEntrys) {
             StringTokenizer st = new StringTokenizer(sortParameterEntry.getKey(), ".");
@@ -186,14 +185,13 @@ public class MCRSolrSearchServlet extends MCRServlet {
             }
         }
 
-        ArrayList<Integer> sortedPositions = new ArrayList<Integer>();
+        ArrayList<Integer> sortedPositions = new ArrayList<>();
 
         sortedPositions.addAll(positionFieldMap.keySet());
         Collections.sort(sortedPositions);
 
         StringBuilder sortBuilder = new StringBuilder();
-        for (Iterator<Integer> positionIterator = sortedPositions.iterator(); positionIterator.hasNext();) {
-            Integer position = (Integer) positionIterator.next();
+        for (Integer position : sortedPositions) {
             sortBuilder.append(",");
             sortBuilder.append(positionFieldMap.get(position));
             String order = positionOrderMap.get(position);
@@ -201,8 +199,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             if (order == null) {
                 order = "asc";
                 LOGGER.warn(MessageFormat.format(
-                    "No sort order found for field with number ''{0}'' use default value : ''{1}''", position,
-                    order));
+                    "No sort order found for field with number ''{0}'' use default value : ''{1}''", position, order));
             }
             sortBuilder.append(order);
         }
@@ -221,7 +218,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @return
      */
     private HashMap<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
-        HashMap<String, String> fieldTypeMap = new HashMap<String, String>();
+        HashMap<String, String> fieldTypeMap = new HashMap<>();
 
         for (Entry<String, String[]> currentType : typeParameters.entrySet()) {
             for (String typeMember : currentType.getValue()) {
@@ -253,7 +250,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         buildedSolrParameters.putAll(solrParameters);
 
         request.setAttribute(MCRSolrProxyServlet.MAP_KEY, buildedSolrParameters);
-        LOGGER.info("Forward SOLR Parameters: " + buildedSolrParameters);
+        LOGGER.info("Forward SOLR Parameters: {}", buildedSolrParameters);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }

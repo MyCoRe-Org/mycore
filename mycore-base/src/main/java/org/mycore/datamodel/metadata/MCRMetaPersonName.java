@@ -35,7 +35,7 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date: 2013-01-23 14:55:57 +0100 (Mi, 23. Jan
  *          2013) $
  */
-final public class MCRMetaPersonName extends MCRMetaDefault {
+public final class MCRMetaPersonName extends MCRMetaDefault {
     // MetaPerson data
     private String firstname;
 
@@ -407,10 +407,8 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
             callname = firstname;
         }
         if ((fullname = fullname.trim()).length() == 0) {
-            StringBuilder sb = new StringBuilder(128);
-            sb.append(academic).append(' ').append(peerage).append(' ').append(firstname).append(' ').append(prefix)
-                .append(' ').append(surname);
-            fullname = sb.toString().trim();
+            String sb = academic + ' ' + peerage + ' ' + firstname + ' ' + prefix + ' ' + surname;
+            fullname = sb.trim();
             if (fullname.length() == 0) {
                 throw new MCRException(getSubTag() + ": full name / first name or surname is empty");
             }
@@ -432,16 +430,16 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     public final void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
-            LOGGER.debug("First name         = " + firstname);
-            LOGGER.debug("Call name          = " + callname);
-            LOGGER.debug("Surname            = " + surname);
-            LOGGER.debug("Full name          = " + fullname);
-            LOGGER.debug("Academic           = " + academic);
-            LOGGER.debug("Peerage            = " + peerage);
-            LOGGER.debug("Numeration         = " + numeration);
-            LOGGER.debug("Title              = " + title);
-            LOGGER.debug("Prefix             = " + prefix);
-            LOGGER.debug("Affix              = " + affix);
+            LOGGER.debug("First name         = {}", firstname);
+            LOGGER.debug("Call name          = {}", callname);
+            LOGGER.debug("Surname            = {}", surname);
+            LOGGER.debug("Full name          = {}", fullname);
+            LOGGER.debug("Academic           = {}", academic);
+            LOGGER.debug("Peerage            = {}", peerage);
+            LOGGER.debug("Numeration         = {}", numeration);
+            LOGGER.debug("Title              = {}", title);
+            LOGGER.debug("Prefix             = {}", prefix);
+            LOGGER.debug("Affix              = {}", affix);
             LOGGER.debug("");
         }
     }

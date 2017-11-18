@@ -38,5 +38,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MCRRestrictedAccess {
 
-    public Class<? extends MCRResourceAccessChecker> value();
+    Class<? extends MCRResourceAccessChecker> value();
 }

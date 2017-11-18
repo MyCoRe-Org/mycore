@@ -233,7 +233,7 @@ public class MCRJob implements Cloneable {
      */
     public void setParameter(String key, String value) {
         if (parameters == null)
-            parameters = new HashMap<String, String>();
+            parameters = new HashMap<>();
 
         parameters.put(key, value);
     }
@@ -251,7 +251,7 @@ public class MCRJob implements Cloneable {
         clone.setStart(getStart());
         clone.setStatus(getStatus());
 
-        Map<String, String> map = new HashMap<String, String>(getParameters());
+        Map<String, String> map = new HashMap<>(getParameters());
         clone.setParameters(map);
 
         return clone;

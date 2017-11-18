@@ -10,6 +10,7 @@ public class MCRAltoChange {
     }
 
     private String file;
+
     private String type;
 
     public String getFile() {

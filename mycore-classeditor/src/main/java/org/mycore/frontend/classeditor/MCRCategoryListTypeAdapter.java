@@ -72,7 +72,7 @@ public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryLi
     @Override
     public MCRCategoryListWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
-        List<MCRCategory> categList = new ArrayList<MCRCategory>();
+        List<MCRCategory> categList = new ArrayList<>();
 
         for (JsonElement categRef : json.getAsJsonArray()) {
             JsonObject categRefJsonObject = categRef.getAsJsonObject();

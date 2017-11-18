@@ -38,9 +38,10 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "MCRSolrInputDocumentList", propOrder = {
-    "doc"
-})
+@XmlType(name = "MCRSolrInputDocumentList",
+    propOrder = {
+        "doc"
+    })
 @XmlRootElement(name = "add")
 public class MCRSolrInputDocumentList {
 
@@ -76,7 +77,7 @@ public class MCRSolrInputDocumentList {
      */
     public List<MCRSolrInputDocument> getDoc() {
         if (doc == null) {
-            doc = new ArrayList<MCRSolrInputDocument>();
+            doc = new ArrayList<>();
         }
         return this.doc;
     }

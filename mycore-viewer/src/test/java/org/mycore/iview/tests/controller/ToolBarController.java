@@ -103,7 +103,7 @@ public class ToolBarController extends WebDriverController {
                 return element;
             } catch (StaleElementReferenceException e) {
                 sere = e;
-                LOGGER.debug("Stale check failed! [" + trys + "]");
+                LOGGER.debug("Stale check failed! [{}]", trys);
             }
         }
         throw new RuntimeException(sere);

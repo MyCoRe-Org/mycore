@@ -27,7 +27,7 @@ public class MCRDeleteFileOnCloseFilterInputStream extends FilterInputStream {
         } catch (IOException e) {
             throw e;
         } finally {
-            LOGGER.info("Delete File : " + fileToDelete.toString());
+            LOGGER.info("Delete File : {}", fileToDelete);
             Files.delete(fileToDelete);
         }
     }

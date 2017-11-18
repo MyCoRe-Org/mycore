@@ -53,8 +53,8 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
         url = getURL(urn);
         elp.setUrl(url);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Generated Epicur Lite for urn " + urn + " is \n"
-                + new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite()));
+            LOGGER.debug("Generated Epicur Lite for urn {} is \n{}", urn,
+                new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite()));
         }
         return elp;
     }
@@ -77,14 +77,14 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
                 MCRFile file = MCRFile.getMCRFile(MCRObjectID.getInstance(urn.getId()),
                     urn.getPath() + urn.getFilename());
                 if (file == null) {
-                    LOGGER.warn("File " + urn.getFilename() + " in object " + urn.getId() + " could NOT be found");
+                    LOGGER.warn("File {} in object {} could NOT be found", urn.getFilename(), urn.getId());
                     return null;
                 }
 
                 String spec = BaseEpicurLiteProvider.getViewerURL(file.toPath());
                 if (spec == null) {
-                    LOGGER.info("File is not displayable within iView2. Use " + MCRFileNodeServlet.class.getSimpleName()
-                        + " as url");
+                    LOGGER.info("File is not displayable within iView2. Use {} as url",
+                        MCRFileNodeServlet.class.getSimpleName());
                     String derivateId = file.getOwnerID();
                     String filePath = "/" + derivateId + file.getAbsolutePath();
                     spec = MCRServlet.getServletBaseURL() + MCRFileNodeServlet.class.getSimpleName() + filePath;
@@ -133,6 +133,6 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
      * @see MCRContentTypes#probeContentType(Path)
      */
     public static boolean isFileSupported(Path file) throws IOException {
-        return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
+        return file != null && SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
     }
 }

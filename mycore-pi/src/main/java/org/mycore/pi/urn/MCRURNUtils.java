@@ -20,9 +20,7 @@ public class MCRURNUtils {
     public static Optional<Date> getDNBRegisterDate(MCRPIRegistrationInfo dnburn) {
         try {
             return Optional.of(getDNBRegisterDate(dnburn.getIdentifier()));
-        } catch (MCRIdentifierUnresolvableException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (MCRIdentifierUnresolvableException | ParseException e) {
             e.printStackTrace();
         }
 

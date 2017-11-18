@@ -23,7 +23,7 @@ public class GsonSerializationTest {
         MCRCategoryImpl mcrCategoryImpl = new MCRCategoryImpl();
         MCRCategoryID id = new MCRCategoryID(rootID, id2);
         mcrCategoryImpl.setId(id);
-        Set<MCRLabel> labels = new HashSet<MCRLabel>();
+        Set<MCRLabel> labels = new HashSet<>();
         labels.add(new MCRLabel("de", text + "_de", "desc_" + text + "_de"));
         labels.add(new MCRLabel("en", text + "_en", "desc_" + text + "_en"));
         mcrCategoryImpl.setLabels(labels);

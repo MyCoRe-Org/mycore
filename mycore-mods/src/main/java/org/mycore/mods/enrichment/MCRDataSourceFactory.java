@@ -32,11 +32,11 @@ class MCRDataSourceFactory {
 
     private static MCRDataSourceFactory INSTANCE = new MCRDataSourceFactory();
 
+    private MCRCache<String, MCRDataSource> dataSources = new MCRCache<>(30, "data sources");
+
     public static MCRDataSourceFactory instance() {
         return INSTANCE;
     }
-
-    private MCRCache<String, MCRDataSource> dataSources = new MCRCache<String, MCRDataSource>(30, "data sources");
 
     private MCRDataSourceFactory() {
     }

@@ -9,7 +9,7 @@ public class MCRMediaSource {
     private MCRMediaSourceType type;
 
     public MCRMediaSource(String file, MCRMediaSourceType type) {
-        LogManager.getLogger().info("uri : " + file);
+        LogManager.getLogger().info("uri : {}", file);
         this.uri = file;
         this.type = type;
     }

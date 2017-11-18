@@ -131,17 +131,17 @@ public class MCRXMLFunctions {
 
     private static final String DEFAULT_PORT = "80";
 
-    private final static String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)\\>";
+    private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)\\>";
 
-    private final static String TAG_END = "\\</\\w+\\>";
+    private static final String TAG_END = "\\</\\w+\\>";
 
-    private final static String TAG_SELF_CLOSING = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)/\\>";
+    private static final String TAG_SELF_CLOSING = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)/\\>";
 
-    private final static String HTML_ENTITY = "&[a-zA-Z][a-zA-Z0-9]+;";
+    private static final String HTML_ENTITY = "&[a-zA-Z][a-zA-Z0-9]+;";
 
-    private final static Pattern TAG_PATTERN = Pattern.compile(TAG_START + "((.*?[^\\<]))" + TAG_END, Pattern.DOTALL);
+    private static final Pattern TAG_PATTERN = Pattern.compile(TAG_START + "((.*?[^\\<]))" + TAG_END, Pattern.DOTALL);
 
-    private final static Pattern HTML_MATCH_PATTERN = Pattern
+    private static final Pattern HTML_MATCH_PATTERN = Pattern
         .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")",
             Pattern.DOTALL);
 
@@ -238,7 +238,7 @@ public class MCRXMLFunctions {
         throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             String sb = "isoDate=" + isoDate + ", simpleFormat=" + simpleFormat + ", isoFormat=" + isoFormat
-                    + ", iso649Language=" + iso639Language + ", timeZone=" + timeZone;
+                + ", iso649Language=" + iso639Language + ", timeZone=" + timeZone;
             LOGGER.debug(sb);
         }
         Locale locale = new Locale(iso639Language);
@@ -249,10 +249,8 @@ public class MCRXMLFunctions {
             String formatted = mcrdate.format(simpleFormat, locale, timeZone);
             return formatted == null ? "?" + isoDate + "?" : formatted;
         } catch (RuntimeException iae) {
-            LOGGER.error(
-                "Unable to format date " + mcrdate.getISOString() + " to " + simpleFormat + " with locale " + locale
-                    + " and timezone " + timeZone,
-                iae);
+            LOGGER.error("Unable to format date {} to {} with locale {} and timezone {}", mcrdate.getISOString(),
+                simpleFormat, locale, timeZone, iae);
             return "?";
         }
     }
@@ -292,7 +290,7 @@ public class MCRXMLFunctions {
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
     public static String getISODateFromMCRHistoryDate(String date_value, String field_name, String calendar_name)
-            throws ParseException {
+        throws ParseException {
         String formatted_date;
         if (field_name == null || field_name.trim().length() == 0) {
             return "";
@@ -310,7 +308,7 @@ public class MCRXMLFunctions {
             }
         } catch (Exception e) {
             String errorMsg = "Error while converting date string : " + date_value + " - " + use_last_value +
-                    " - " + calendar_name;
+                " - " + calendar_name;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(errorMsg, e);
             }
@@ -359,7 +357,7 @@ public class MCRXMLFunctions {
         try {
             return source.replaceAll(regex, replace);
         } catch (Exception e) {
-            LOGGER.warn("Could not apply regular expression. Returning source string (" + source + ").");
+            LOGGER.warn("Could not apply regular expression. Returning source string ({}).", source);
             return source;
         }
     }
@@ -367,10 +365,10 @@ public class MCRXMLFunctions {
     public static boolean classAvailable(String className) {
         try {
             Class.forName(className);
-            LOGGER.debug("found class: " + className);
+            LOGGER.debug("found class: {}", className);
             return true;
         } catch (ClassNotFoundException e) {
-            LOGGER.debug("did not find class: " + className);
+            LOGGER.debug("did not find class: {}", className);
             return false;
         }
     }
@@ -378,7 +376,7 @@ public class MCRXMLFunctions {
     public static boolean resourceAvailable(String resourceName) {
         URL resource = MCRConfigurationDir.getConfigResource(resourceName);
         if (resource == null) {
-            LOGGER.debug("did not find resource: " + resourceName);
+            LOGGER.debug("did not find resource: {}", resourceName);
             return false;
         }
         if (LOGGER.isDebugEnabled()) {
@@ -457,7 +455,7 @@ public class MCRXMLFunctions {
         try {
             result = DISPLAY_DERIVATE_CACHE.getIfUpToDate(derivateId, modifiedHandle);
         } catch (IOException e) {
-            LOGGER.warn("Error while determining when " + derId + " was last modified.", e);
+            LOGGER.warn("Error while determining when {} was last modified.", derId, e);
             return false;
         }
         if (result != null) {
@@ -467,12 +465,12 @@ public class MCRXMLFunctions {
         try {
             org.jdom2.Document derDoc = MCRXMLMetaDataManagerHolder.instance.retrieveXML(derId);
             if (derDoc == null) {
-                LOGGER.error("Derivate \"" + derId + "\" does not exist");
+                LOGGER.error("Derivate \"{}\" does not exist", derId);
                 return false;
             }
             der = new MCRDerivate(derDoc);
         } catch (SAXException | JDOMException | IOException | RuntimeException e) {
-            LOGGER.warn("Error while loading derivate: " + derId, e);
+            LOGGER.warn("Error while loading derivate: {}", derId, e);
             return false;
         }
         org.jdom2.Element derivateElem = der.getDerivate().createXML();
@@ -491,7 +489,7 @@ public class MCRXMLFunctions {
      * @see #isWorldReadable(String)
      */
     public static boolean isWorldReadableComplete(String objId) {
-        LOGGER.info("World completely readable: " + objId);
+        LOGGER.info("World completely readable: {}", objId);
         if (objId == null || !MCRObjectID.isValid(objId)) {
             return false;
         }
@@ -499,11 +497,11 @@ public class MCRXMLFunctions {
         CompletableFuture<Boolean> permission = MCRAccessManager.checkPermission(
             MCRSystemUserInformation.getGuestInstance(),
             () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ)
-                    && checkReadPermissionOfDerivates(mcrObjectID));
+                && checkReadPermissionOfDerivates(mcrObjectID));
         try {
             return permission.join();
         } catch (CancellationException | CompletionException e) {
-            LOGGER.error("Error while retriving ACL information for Object " + objId, e);
+            LOGGER.error("Error while retriving ACL information for Object {}", objId, e);
             return false;
         }
     }
@@ -534,7 +532,7 @@ public class MCRXMLFunctions {
         try {
             return permission.join();
         } catch (CancellationException | CompletionException e) {
-            LOGGER.error("Error while retriving ACL information for Object " + objId, e);
+            LOGGER.error("Error while retriving ACL information for Object {}", objId, e);
             return false;
         }
     }
@@ -552,7 +550,7 @@ public class MCRXMLFunctions {
             return isAllowedObject(type);
 
         } catch (Exception ex) {
-            LOGGER.error("Error while checking object " + objId + " is allowed for urn assignment");
+            LOGGER.error("Error while checking object {} is allowed for urn assignment", objId);
             return false;
         }
     }
@@ -573,7 +571,7 @@ public class MCRXMLFunctions {
         String propertyName = "MCR.URN.Enabled.Objects";
         String propertyValue = MCRConfiguration.instance().getString(propertyName, null);
         if (propertyValue == null || propertyValue.length() == 0) {
-            LOGGER.info("URN assignment disabled as the property \"" + propertyName + "\" is not set");
+            LOGGER.info("URN assignment disabled as the property \"{}\" is not set", propertyName);
             return false;
         }
 
@@ -583,9 +581,9 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER.info("URN assignment disabled as the object type " + givenType
-            + " is not in the list of allowed objects. See property \""
-            + propertyName + "\"");
+        LOGGER.info(
+            "URN assignment disabled as the object type {} is not in the list of allowed objects. See property \"{}\"",
+            givenType, propertyName);
         return false;
     }
 
@@ -741,7 +739,7 @@ public class MCRXMLFunctions {
             }
             n = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
         } catch (Exception e) {
-            LOGGER.error("Error while getting tree by path " + path, e);
+            LOGGER.error("Error while getting tree by path {}", path, e);
         } finally {
             MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
         }
@@ -819,8 +817,7 @@ public class MCRXMLFunctions {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-            MCRCategory
-                category = dao.getCategory(categID, 0);
+            MCRCategory category = dao.getCategory(categID, 0);
             return Optional.ofNullable(category)
                 .map(MCRCategory::getCurrentLabel)
                 .filter(Optional::isPresent)
@@ -828,8 +825,8 @@ public class MCRXMLFunctions {
                 .map(MCRLabel::getText)
                 .orElse("");
         } catch (Throwable e) {
-            LOGGER.error("Could not determine display name for classification id " + classificationId
-                + " and category id " + categoryId, e);
+            LOGGER.error("Could not determine display name for classification id {} and category id {}",
+                classificationId, categoryId, e);
             return "";
         }
     }
@@ -846,8 +843,8 @@ public class MCRXMLFunctions {
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             category = dao.getCategory(categID, 0);
         } catch (Throwable e) {
-            LOGGER.error("Could not determine state for classification id " + classificationId + " and category id "
-                + categoryId, e);
+            LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId,
+                categoryId, e);
         }
 
         return category != null;
@@ -916,13 +913,13 @@ public class MCRXMLFunctions {
             includePart = includePart.substring(0, border);
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("get next import step for " + includePart);
+            LOGGER.debug("get next import step for {}", includePart);
         }
         // get the parameters from mycore.properties
         List<String> importList = Collections.emptyList();
         importList = MCRConfiguration.instance().getStrings("MCR.URIResolver.xslImports." + includePart, importList);
         if (importList.isEmpty()) {
-            LOGGER.info("MCR.URIResolver.xslImports." + includePart + " has no Stylesheets defined");
+            LOGGER.info("MCR.URIResolver.xslImports.{} has no Stylesheets defined", includePart);
         } else {
             ListIterator<String> listIterator = importList.listIterator(importList.size());
 
@@ -936,20 +933,20 @@ public class MCRXMLFunctions {
                     if (listIterator.hasPrevious()) {
                         return listIterator.previous();
                     } else {
-                        LOGGER.debug("xslImport reached end of chain:" + importList);
+                        LOGGER.debug("xslImport reached end of chain:{}", importList);
                         return "";
                     }
                 }
                 //continue;
             }
-            LOGGER.warn("xslImport could not find " + selfName + " in " + importList);
+            LOGGER.warn("xslImport could not find {} in {}", selfName, importList);
         }
         return "";
     }
 
     public static boolean hasNextImportStep(String uri) {
         boolean returns = !nextImportStep(uri).isEmpty();
-        LOGGER.debug("hasNextImportStep('" + uri + "') -> " + returns);
+        LOGGER.debug("hasNextImportStep('{}') -> {}", uri, returns);
         return returns;
     }
 

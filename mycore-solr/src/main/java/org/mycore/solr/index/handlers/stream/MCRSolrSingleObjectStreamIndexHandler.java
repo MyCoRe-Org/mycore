@@ -1,5 +1,8 @@
 package org.mycore.solr.index.handlers.stream;
 
+import java.io.IOException;
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -10,9 +13,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.cs.MCRSolrAbstractContentStream;
 import org.mycore.solr.index.cs.MCRSolrContentStream;
 
-import java.io.IOException;
-import java.util.Objects;
-
 /**
  * Index one mycore object with a MCRSolrContentStream.
  *
@@ -20,7 +20,7 @@ import java.util.Objects;
  */
 public class MCRSolrSingleObjectStreamIndexHandler extends MCRSolrObjectStreamIndexHandler {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRSolrSingleObjectStreamIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrSingleObjectStreamIndexHandler.class);
 
     protected MCRObjectID id;
 
@@ -45,8 +45,8 @@ public class MCRSolrSingleObjectStreamIndexHandler extends MCRSolrObjectStreamIn
      * Invokes an index request for the current content stream.
      */
     public void index() throws IOException, SolrServerException {
-        if(!MCRMetadataManager.exists(id)) {
-            LOGGER.warn("Unable to index '" + id + "' cause it doesn't exists anymore!");
+        if (!MCRMetadataManager.exists(id)) {
+            LOGGER.warn("Unable to index '{}' cause it doesn't exists anymore!", id);
             return;
         }
         super.index();
@@ -54,7 +54,7 @@ public class MCRSolrSingleObjectStreamIndexHandler extends MCRSolrObjectStreamIn
 
     @Override
     public String toString() {
-        return "index " + id.toString();
+        return "index " + id;
     }
 
 }

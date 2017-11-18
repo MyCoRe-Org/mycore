@@ -97,9 +97,9 @@ public class MCRImageTiler implements Runnable, Closeable {
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         boolean activated = MCRConfiguration.instance().getBoolean(
             MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true) && MCRHIBConnection.isEnabled();
-        LOGGER.info("Local Tiling is " + (activated ? "activated" : "deactivated"));
+        LOGGER.info("Local Tiling is {}", activated ? "activated" : "deactivated");
         ImageIO.scanForPlugins();
-        LOGGER.info("Supported image file types for reading: " + Arrays.toString(ImageIO.getReaderFormatNames()));
+        LOGGER.info("Supported image file types for reading: {}", Arrays.toString(ImageIO.getReaderFormatNames()));
 
         MCRProcessableDefaultCollection imageTilerCollection = new MCRProcessableDefaultCollection("Image Tiler");
         MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
@@ -118,7 +118,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                 }
             };
             final AtomicInteger activeThreads = new AtomicInteger();
-            final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
+            final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
             ThreadPoolExecutor baseExecutor = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1,
                 TimeUnit.DAYS, workQueue, slaveFactory) {
 
@@ -145,10 +145,9 @@ public class MCRImageTiler implements Runnable, Closeable {
                             if (!running) {
                                 break;
                             }
-                            Session session = MCRHIBConnection.instance().getSession();
                             Transaction transaction = null;
                             MCRTileJob job = null;
-                            try {
+                            try (Session session = MCRHIBConnection.instance().getSession()) {
                                 transaction = session.beginTransaction();
                                 job = tq.poll();
                                 imageTilerCollection.setProperty("queue",
@@ -163,11 +162,9 @@ public class MCRImageTiler implements Runnable, Closeable {
                                         LOGGER.warn("Could not rollback transaction.", re);
                                     }
                                 }
-                            } finally {
-                                session.close();
                             }
                             if (job != null && !tilingServe.getExecutor().isShutdown()) {
-                                LOGGER.info("Creating:" + job.getPath());
+                                LOGGER.info("Creating:{}", job.getPath());
                                 tilingServe.submit(getTilingAction(job));
                             } else {
                                 try {
@@ -261,13 +258,13 @@ public class MCRImageTiler implements Runnable, Closeable {
         }
         if (waiter != null && waiter.isAlive()) {
             //thread still running
-            LOGGER.info(waiter.getName() + " is still running.");
+            LOGGER.info("{} is still running.", waiter.getName());
             Thread masterThread = waiter;
             waiter = null;
             masterThread.interrupt();
             try {
                 masterThread.join();
-                LOGGER.info(masterThread.getName() + " has died.");
+                LOGGER.info("{} has died.", masterThread.getName());
             } catch (InterruptedException e) {
                 e.printStackTrace(System.err);
             }

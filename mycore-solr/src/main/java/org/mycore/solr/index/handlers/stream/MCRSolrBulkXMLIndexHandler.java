@@ -1,5 +1,11 @@
 package org.mycore.solr.index.handlers.stream;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -12,12 +18,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.cs.MCRSolrBulkXMLStream;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * This class index a {@link MCRSolrBulkXMLStream}. The stream contains a list of xml elements (mycore objects)
@@ -51,9 +51,8 @@ public class MCRSolrBulkXMLIndexHandler extends MCRSolrObjectStreamIndexHandler 
         contentMap = contentMap.entrySet().stream().filter(entry -> {
             MCRObjectID id = entry.getKey();
             boolean exists = MCRMetadataManager.exists(id);
-            LOGGER.info(exists ?
-                "Submitting data of \"" + id + "\" for indexing" :
-                "Cannot submit \"" + id + "\" cause it does not exists anymore.");
+            LOGGER.info(exists ? "Submitting data of \"" + id + "\" for indexing"
+                : "Cannot submit \"" + id + "\" cause it does not exists anymore.");
             return exists;
         }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         contentMap.forEach((id, content) -> {
@@ -61,7 +60,7 @@ public class MCRSolrBulkXMLIndexHandler extends MCRSolrObjectStreamIndexHandler 
                 Document mcrObjXML = content.asXML();
                 elementList.add(mcrObjXML.getRootElement().detach());
             } catch (Exception e) {
-                LOGGER.error("Cannot submit \"" + id + "\" cause content couldn't be parsed.", e);
+                LOGGER.error("Cannot submit \"{}\" cause content couldn't be parsed.", id, e);
             }
         });
         return contentStream;

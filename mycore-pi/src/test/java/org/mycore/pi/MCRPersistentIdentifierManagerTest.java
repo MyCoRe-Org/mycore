@@ -94,10 +94,9 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
 
         Assert.assertTrue("There should be one resolver", MCRPersistentIdentifierManager.getInstance()
             .getResolvers().stream()
-            .filter(r -> {
-                return r.getName()
-                    .equals(MCRMockResolver.NAME);
-            }).count() > 0);
+            .filter(r -> r.getName()
+                .equals(MCRMockResolver.NAME))
+            .count() > 0);
 
     }
 
@@ -106,11 +105,9 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
 
-        long numOfUnregisteredPI = MCRPersistentIdentifierManager
-            .getInstance()
+        long numOfUnregisteredPI = (long) MCRPersistentIdentifierManager.getInstance()
             .getUnregisteredIdentifiers("Unregistered")
-            .stream()
-            .count();
+            .size();
 
         Assert.assertEquals("Wrong number of unregistered PI: ", 2, numOfUnregisteredPI);
     }
@@ -132,9 +129,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
             Field instance = MCRPersistentIdentifierManager.class.getDeclaredField("instance");
             instance.setAccessible(true);
             instance.set(null, null);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }

@@ -24,7 +24,6 @@
 package org.mycore.common.config;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -144,12 +143,12 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                     try {
                         addUrlMethod.invoke(classLoader, u);
                     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                        LOGGER.error("Could not add " + u + " to current classloader.", e);
+                        LOGGER.error("Could not add {} to current classloader.", u, e);
                     }
                 });
         } catch (NoSuchMethodException | SecurityException e) {
             LogManager.getLogger(MCRConfigurationInputStream.class)
-                .warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
+                .warn("{} does not support adding additional JARs at runtime", classLoaderClass, e);
         }
     }
 
@@ -157,7 +156,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         Stream<File> toClassPath = Stream.of(resourceDir);
         if (libDir.isDirectory()) {
             File[] listFiles = libDir
-                .listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
+                .listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
             if (listFiles.length != 0) {
                 toClassPath = Stream.concat(toClassPath, Stream.of(listFiles));
             }
