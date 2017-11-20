@@ -143,7 +143,7 @@ public class MCROAISetManager {
             .map(setId -> new MCROAISolrSetConfiguration(this.configPrefix, setId))
             .collect(Collectors.toMap(c -> c.getId(), c -> c));
         setConfigurationMap.entrySet().removeIf(c -> !newVersion.containsKey(c.getKey()));
-        setConfigurationMap.replaceAll((k, v) -> newVersion.get(k));
+        setConfigurationMap.putAll(newVersion);
     }
 
     public List<String> getDefinedSetIds() {
