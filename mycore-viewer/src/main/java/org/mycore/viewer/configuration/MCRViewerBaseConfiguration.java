@@ -1,12 +1,9 @@
 package org.mycore.viewer.configuration;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -76,11 +73,9 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
                 addLocalScript("iview-client-frame.js", developerMode);
             } else if (this.getEmbeddedParameter(request) != null) {
                 addLocalScript("iview-client-frame.js", developerMode);
-                try {
-                    setProperty("embedded", URLEncoder.encode(getEmbeddedParameter(request), "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    throw new MCRException(e);
-                }
+                setProperty("embedded", "true");
+                setProperty("permalink.updateHistory", false);
+                setProperty("chapter.showOnStart", false);
             } else {
                 addLocalScript("iview-client-desktop.js", developerMode);
             }
