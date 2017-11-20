@@ -1,5 +1,5 @@
 /**
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of the MILESS repository software.
@@ -15,7 +15,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
@@ -45,9 +45,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -73,7 +76,7 @@ import org.mycore.user2.utils.MCRUserNameConverter;
  * Each user belongs to a realm. The user name must be unique within a realm.
  * Any changes made to an instance of this class does not persist automatically.
  * Use {@link MCRUserManager#updateUser(MCRUser)} to achieve this.
- * 
+ *
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  * @author Ren\u00E9 Adler (eagle)
@@ -81,6 +84,8 @@ import org.mycore.user2.utils.MCRUserNameConverter;
 @Entity
 @Access(AccessType.PROPERTY)
 @Table(name = "MCRUser", uniqueConstraints = @UniqueConstraint(columnNames = { "userName", "realmID" }))
+@NamedQueries(@NamedQuery(name = "MCRUser.byPropertyValue",
+    query = "SELECT u FROM MCRUser u JOIN FETCH u.attributes ua WHERE KEY(ua) = :name  AND :value IN (VALUE(ua))"))
 // TODO use @Cacheable instead
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @XmlRootElement(name = "user")
@@ -134,7 +139,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     private Date validUntil;
 
     /**
-     * 
+     *
      */
     private Map<String, String> attributes;
 
@@ -150,7 +155,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Creates a new user.
-     * 
+     *
      * @param userName the login user name
      * @param mcrRealm the realm this user belongs to
      */
@@ -160,7 +165,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Creates a new user.
-     * 
+     *
      * @param userName the login user name
      * @param realmID the ID of the realm this user belongs to
      */
@@ -175,7 +180,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Creates a new user in the default realm.
-     * 
+     *
      * @param userName the login user name
      */
     public MCRUser(String userName) {
@@ -226,7 +231,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * Returns the login user name. The user name is
      * unique within its realm.
-     *  
+     *
      * @return the login user name.
      */
     @Column(name = "userName", nullable = false)
@@ -238,7 +243,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * Sets the login user name. The login user name
      * can be changed as long as it is unique within
      * its realm and the user ID is not changed.
-     * 
+     *
      * @param userName the new login user name
      */
     void setUserName(String userName) {
@@ -247,7 +252,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns the realm the user belongs to.
-     * 
+     *
      * @return the realm the user belongs to.
      */
     @Transient
@@ -257,7 +262,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns the ID of the realm the user belongs to.
-     * 
+     *
      * @return the ID of the realm the user belongs to.
      */
     @Column(name = "realmID", length = 128, nullable = false)
@@ -266,10 +271,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * Sets the realm this user belongs to. 
+     * Sets the realm this user belongs to.
      * The realm can be changed as long as the login user name
      * is unique within the new realm.
-     * 
+     *
      * @param realmID the ID of the realm the user belongs to.
      */
     void setRealmID(String realmID) {
@@ -281,10 +286,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * Sets the realm this user belongs to. 
+     * Sets the realm this user belongs to.
      * The realm can be changed as long as the login user name
      * is unique within the new realm.
-     * 
+     *
      * @param realm the realm the user belongs to.
      */
     void setRealm(MCRRealm realm) {
@@ -338,9 +343,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * Returns the user that owns this user, or null 
+     * Returns the user that owns this user, or null
      * if the user is independent and has no owner.
-     *  
+     *
      * @return the user that owns this user.
      */
     @ManyToOne
@@ -351,10 +356,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns true if this user has no owner and therefore
-     * is independent. Independent users may change their passwords 
+     * is independent. Independent users may change their passwords
      * etc., owned users may not, they are created to limit read access
      * in general.
-     * 
+     *
      * @return true if this user has no owner
      */
     public boolean hasNoOwner() {
@@ -363,7 +368,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns the name of the person this login user represents.
-     * 
+     *
      * @return the name of the person this login user represents.
      */
     @Column(name = "realName", nullable = true)
@@ -373,7 +378,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns the E-Mail address of the person this login user represents.
-     * 
+     *
      * @return the E-Mail address of the person this login user represents.
      */
     @Transient
@@ -388,7 +393,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns a hint the user has stored in case of forgotten hash.
-     * 
+     *
      * @return a hint the user has stored in case of forgotten hash.
      */
     @Column(name = "hint", nullable = true)
@@ -398,7 +403,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns the last time the user has logged in.
-     * 
+     *
      * @return the last time the user has logged in.
      */
     @Column(name = "lastLogin", nullable = true)
@@ -410,9 +415,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * Sets the user that owns this user. 
+     * Sets the user that owns this user.
      * Setting this to null makes the user independent.
-     * 
+     *
      * @param owner the owner of the user.
      */
     public void setOwner(MCRUser owner) {
@@ -421,7 +426,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Sets the name of the person this login user represents.
-     * 
+     *
      * @param realName the name of the person this login user represents.
      */
     public void setRealName(String realName) {
@@ -430,7 +435,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Sets a hint to store in case of hash loss.
-     * 
+     *
      * @param hint a hint for the user in case hash is forgotten.
      */
     public void setHint(String hint) {
@@ -439,7 +444,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Sets the E-Mail address of the person this user represents.
-     * 
+     *
      * @param eMail the E-Mail address
      */
     public void setEMail(String eMail) {
@@ -455,7 +460,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Sets the time of last login.
-     * 
+     *
      * @param lastLogin the last time the user logged in.
      */
     public void setLastLogin(Date lastLogin) {
@@ -510,8 +515,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Override
     public String getUserID() {
         String cuid = this.getUserName();
-        if (!getRealm().equals(MCRRealmFactory.getLocalRealm()))
+        if (!getRealm().equals(MCRRealmFactory.getLocalRealm())) {
             cuid += "@" + getRealmID();
+        }
 
         return cuid;
     }
@@ -546,7 +552,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return the attributes
      */
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "MCRUserAttr", joinColumns = @JoinColumn(name = "id"))
+    @CollectionTable(name = "MCRUserAttr",
+        joinColumns = @JoinColumn(name = "id"),
+        indexes = { @Index(name = "MCRUserAttributes", columnList = "name, value"),
+            @Index(name = "MCRUserValues", columnList = "value") })
     @MapKeyColumn(name = "name", length = 128)
     @Column(name = "value", length = 255)
     public Map<String, String> getAttributes() {
