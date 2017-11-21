@@ -18,9 +18,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -36,11 +38,13 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
@@ -439,6 +443,64 @@ public class MCRFile extends MCRFilesystemNode {
 
     public void storeContentChange(long sizeDiff) throws IOException {
         adjustMetadata(FileTime.fromMillis(System.currentTimeMillis()), md5, size + sizeDiff);
+    }
+
+    /**
+     * Moves this file to a new content store.
+     * @param target new ContentStore where this file should be stored
+     * @throws IOException underlying Exception
+     * @throws NullPointerException if target is null
+     */
+    public synchronized void moveTo(MCRContentStore target) throws IOException {
+        Objects.requireNonNull(target);
+        if (this.getStoreID().equals(target.getID())) {
+            return;
+        }
+        LogManager.getLogger().info(() -> "Move " + toPath() + " to new store " + target.getID() + ".");
+        Path localFile = getLocalFile().toPath();
+        if (!Files.isReadable(localFile)) {
+            throw new NoSuchFileException(localFile.toString(), null, "File is not readable.");
+        }
+        String oldID = getID();
+        String parentID = getParentID();
+        String ownerID = getOwnerID();
+        String fileName = getName();
+        long oldSize = getSize();
+        GregorianCalendar lastModified = getLastModified();
+        String newStoreID = target.getID();
+        String oldContentTypeID = getContentTypeID();
+        String oldMD5 = getMD5();
+        MCRFile targetDummy = new MCRFile(oldID, parentID, ownerID, fileName, "", oldSize, lastModified, newStoreID,
+            "", oldContentTypeID, oldMD5);
+        try (InputStream fileIS = Files.newInputStream(localFile)) {
+            MCRContentInputStream ins = new MCRContentInputStream(fileIS);
+            String newStorageID = target.storeContent(targetDummy, ins);
+            long newSize = ins.getLength();
+            String newMD5 = ins.getMD5String();
+            LogManager.getLogger().debug("Copied to new store {} as STORAGEID {} with MD5 {} and file size {}",
+                newStoreID,
+                newStorageID, newMD5, newSize);
+            if (oldSize != newSize || !oldMD5.equals(newMD5)) {
+                Path newLocalFile = target.getLocalFile(newStorageID).toPath();
+                Files.delete(newLocalFile);
+                throw new IOException("File does not match recorded values for size and MD5 sum: " + toPath());
+            }
+            String newContentTypeID = MCRFileContentTypeFactory.detectType(fileName, ins.getHeader()).getID();
+            this.storeID = newStoreID;
+            this.storageID = newStorageID;
+            this.contentTypeID = newContentTypeID;
+            manager.storeNode(this);
+            LogManager.getLogger().info("Move was successful");
+        }
+        //if commit is successful: delete old local file
+        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            try {
+                LogManager.getLogger().info("Delete moved file '{}' from old store.", localFile);
+                Files.delete(localFile);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        });
     }
 
     public synchronized void adjustMetadata(FileTime lastModified, String md5, long newSize) throws IOException {

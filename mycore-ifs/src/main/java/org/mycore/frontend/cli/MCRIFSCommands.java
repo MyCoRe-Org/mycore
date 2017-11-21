@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
@@ -57,7 +59,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -626,119 +627,56 @@ public class MCRIFSCommands {
 
     @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for owner {2}",
         help = "moves all files of derivates from content store {0} to content store {1} for defined owner {2}")
-    public static void moveContentOfOwnerToNewStore(String source_store, String target_store, String owner) {
+    public static List<String> moveContentOfOwnerToNewStore(String source_store, String target_store, String owner) {
         LOGGER.info("Start move data from content store {} to store {} for owner {}", source_store, target_store,
             owner);
-        moveContentToNewStore(source_store, target_store, "owner", owner, 0);
+        return moveContentToNewStore(source_store, target_store, "owner", owner);
     }
 
     @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for filetype {2}",
         help = "moves all files of derivates from content store {0} to content store {1} for defined file type {2} - delimiting number of moved files with property MCR.IFS.ContentStore.MoveCounter")
-    public static void moveContentOfFiletypeToNewStore(String source_store, String target_store, String file_type) {
+    public static List<String> moveContentOfFiletypeToNewStore(String source_store, String target_store,
+        String file_type) {
         LOGGER.info("Start move data from content store {} to store {} for file type {}", source_store, target_store,
             file_type);
-        int max_counter = MCRConfiguration.instance().getInt("MCR.IFS.ContentStore.MoveCounter", MAX_COUNTER);
-        moveContentToNewStore(source_store, target_store, "fctid", file_type, max_counter);
+        return moveContentToNewStore(source_store, target_store, "fctid", file_type);
     }
 
-    private static void moveContentToNewStore(String source_store, String target_store, String select_key,
-        String select_value, int max_counter) {
+    private static List<String> moveContentToNewStore(String source_store, String target_store, String select_key,
+        String select_value) {
         // check stores
-        Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
-        MCRContentStore from_store = availableStores.get(source_store);
-        if (from_store == null) {
-            LOGGER.error("Can't find content store {}", source_store);
-            return;
-        }
-        MCRContentStore to_store = availableStores.get(target_store);
-        if (to_store == null) {
-            LOGGER.error("Can't find content store {}", target_store);
-            return;
-        }
-        LOGGER.info("Running for {} entries", Integer.toString(max_counter));
+        MCRContentStore from_store = MCRContentStoreFactory.getStore(source_store);
+        @SuppressWarnings("unused")
+        MCRContentStore to_store = MCRContentStoreFactory.getStore(target_store);
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        int counter = 0;
 
-        try {
-            MCRStreamQuery<MCRFSNODES> streamQuery = MCRStreamQuery
-                .getInstance(em,
-                    "from MCRFSNODES where storeid=:storeid and :selectKey=:selectValue order by owner",
-                    MCRFSNODES.class)
-                .setParameter("storeid", source_store)
-                .setParameter("selectKey", select_key)
-                .setParameter("selectValue", select_value)
-                .setMaxResults(max_counter);
-            try (Stream<MCRFSNODES> resultStream = streamQuery.getResultStream()) {
-                Iterator<MCRFSNODES> fsnodes = resultStream.iterator();
-                while (fsnodes.hasNext()) {
-                    MCRFSNODES fsNode = fsnodes.next();
-                    String id = fsNode.getId();
-                    String pid = fsNode.getPid();
-                    String owner = fsNode.getOwner();
-                    String name = fsNode.getName();
-                    long size = fsNode.getSize();
-                    Date date = fsNode.getDate();
-                    GregorianCalendar datecal = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
-                    datecal.setTime(date);
-                    String storageid = fsNode.getStorageid();
-                    String fctid = fsNode.getFctid();
-                    String md5 = fsNode.getMd5();
-                    em.detach(fsNode);
-                    LOGGER.info(
-                        "File for [id] {} [pid] {} [owner] {} [name] {} [size] {} [storageid] {} [fctid] {} [md5] {}",
-                        id, pid, owner, name, size, storageid, fctid, md5);
-                    // get input
-                    MCRFile file_reader_from = new MCRFile(id, pid, owner, name, "", size, datecal, source_store,
-                        storageid, fctid, md5);
-                    File file_from = from_store.getLocalFile(file_reader_from);
-                    LOGGER.debug("File in source under store {} with path {}", source_store,
-                        file_from.getAbsolutePath());
-                    // copy file
-                    MCRFile file_reader_to = new MCRFile(id, pid, owner, name, "", size, datecal, target_store, "",
-                        fctid,
-                        md5);
-                    MCRContentInputStream ins = new MCRContentInputStream(new FileInputStream(file_from));
-                    String new_storageid = to_store.storeContent(file_reader_to, ins);
-                    LOGGER.debug("Copied to new store {} as STORAGEID {} with MD5 {} and file size {}", target_store,
-                        new_storageid, file_reader_to.getMD5(), file_reader_to.getSize());
-                    if (new_storageid != null && new_storageid.length() != 0 && md5.equals(file_reader_to.getMD5())) {
-                        // update database
-                        String queryString = "UPDATE MCRFSNODES SET pid = :pid , storeid = :storeid , storageid = :storageid WHERE md5 like :md5 AND owner LIKE :owner";
-                        javax.persistence.Query query = em.createQuery(queryString);
-                        query.setParameter("pid", pid);
-                        query.setParameter("storeid", target_store);
-                        query.setParameter("storageid", new_storageid);
-                        query.setParameter("md5", md5);
-                        query.setParameter("owner", owner);
-                        int result = query.executeUpdate();
-                        LOGGER.debug("Update MCRFSNODES entry for OWNER {} AND MD5 {} to STORAGEID {} for {} entries",
-                            owner, md5, new_storageid, Integer.toBinaryString(result));
-                        if (result == 1) {
-                            // remove old file
-                            file_from.delete();
-                            LOGGER.debug("Delete file from {}", file_from.getAbsolutePath());
-                            LOGGER.info("Move was successful");
-                        } else {
-                            // remove new file
-                            to_store.getLocalFile(file_reader_to).delete();
-                        }
-                    } else {
-                        LOGGER.error("Error while copy storageid {} to new file store {}", storageid, target_store);
-                        // remove new file
-                        to_store.getLocalFile(file_reader_to).delete();
-                    }
-                    counter++;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            em.clear();
+        MCRStreamQuery<MCRFSNODES> streamQuery = MCRStreamQuery
+            .getInstance(em,
+                "from MCRFSNODES where storeid=:storeid and " + select_key + "=:selectValue order by owner",
+                MCRFSNODES.class)
+            .setParameter("storeid", from_store.getID())
+            .setParameter("selectValue", select_value);
+        try (Stream<MCRFSNODES> resultStream = streamQuery.getResultStream()) {
+            return resultStream
+                .peek(em::detach)
+                .map(MCRFSNODES::getId)
+                .map(ifsId -> String.format(Locale.ROOT, "move ifs node %s to store %s", ifsId, target_store))
+                .collect(Collectors.toList());
         }
-        // continue
-        if (max_counter != 0 && counter == max_counter) {
-            LOGGER.info("{} entries finished, for continue restart this command!", max_counter);
-        }
+    }
+
+    @MCRCommand(syntax = "move ifs node {0} to store {1}",
+        help = "Moves the MCRFile with IFSID {0} to a new MCRContentStore with ID {1}")
+    public static void moveFile(String ifsId, String storeID) throws IOException {
+        MCRContentStore store = MCRContentStoreFactory.getStore(storeID);
+        String storageID = moveFile(ifsId, store);
+        LOGGER.debug("File id={} has storage ID {} in store {}.",ifsId,storageID, store);
+    }
+
+    private static String moveFile(String ifsId, MCRContentStore target) throws IOException {
+        MCRFile sourceFile = MCRFile.getFile(Objects.requireNonNull(ifsId));
+        sourceFile.moveTo(target);
+        return sourceFile.getStorageID();
     }
 
     @MCRCommand(syntax = "check derivates of mcrfsnodes with project id {0}",
