@@ -50,14 +50,13 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRLanguageFactory {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRLanguageFactory singleton = new MCRLanguageFactory();
 
     public static final MCRLanguage GERMAN = MCRLanguageFactory.instance().getLanguage("de");
 
     public static final MCRLanguage ENGLISH = MCRLanguageFactory.instance().getLanguage("en");
-
-    private static Logger LOGGER = LogManager.getLogger();
 
     /**
      * Map of languages by ISO 639-1 or -2 code
