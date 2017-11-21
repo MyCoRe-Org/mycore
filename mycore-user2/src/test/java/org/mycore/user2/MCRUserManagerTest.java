@@ -49,12 +49,14 @@ import org.mycore.user2.utils.MCRUserTransformer;
 public class MCRUserManagerTest extends MCRUserTestCase {
     MCRUser user;
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
         user = new MCRUser("junit");
         user.setRealName("Test Case");
         user.setPassword("test");
+        user.getAttributes().put("junit", "test");
         MCRUserManager.createUser(user);
     }
 
@@ -67,6 +69,23 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), MCRRealmFactory.getLocalRealm());
         assertNotNull("Could not load user.", user);
         assertEquals("Password hash is not as expected", "test", user.getPassword());
+    }
+
+    @Test
+    public final void testGetUsersByProperty() {
+        MCRUser user2 = new MCRUser("junit2");
+        user2.setRealName("Test Case II");
+        user2.getAttributes().put("junit", "foo");
+        user2.getAttributes().put("bar", "test");
+        MCRUserManager.createUser(user2);
+        MCRUser user3 = new MCRUser("junit3");
+        user3.setRealName("Test Case III");
+        user3.getAttributes().put("junit", "foo");
+        user3.getAttributes().put("bar", "test failed");
+        MCRUserManager.createUser(user3);
+        startNewTransaction();
+        assertEquals(1, MCRUserManager.getUsers("junit", "test").count());
+        assertEquals(0, MCRUserManager.getUsers("junit", "test failed").count());
     }
 
     /**

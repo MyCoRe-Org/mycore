@@ -1,5 +1,5 @@
 /**
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of the MILESS repository software.
@@ -15,7 +15,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
@@ -29,9 +29,11 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.JoinType;
@@ -54,8 +56,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Format;
 
 /**
- * Manages all users using a database table. 
- * 
+ * Manages all users using a database table.
+ *
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  */
@@ -81,14 +83,14 @@ public class MCRUserManager {
 
     /**
      * Returns the user with the given userName, in the default realm
-     * 
-     * @param userName the unique userName within the default realm 
+     *
+     * @param userName the unique userName within the default realm
      * @return the user with the given login name, or null
      */
     public static MCRUser getUser(String userName) {
-        if (!userName.contains("@"))
+        if (!userName.contains("@")) {
             return getUser(userName, MCRRealmFactory.getLocalRealm());
-        else {
+        } else {
             String[] parts = userName.split("@");
             return getUser(parts[0], parts[1]);
         }
@@ -96,9 +98,9 @@ public class MCRUserManager {
 
     /**
      * Returns the user with the given userName, in the given realm
-     * 
+     *
      * @param userName the unique userName within the given realm
-     * @param realm the realm the user belongs to 
+     * @param realm the realm the user belongs to
      * @return the user with the given login name, or null
      */
     public static MCRUser getUser(String userName, MCRRealm realm) {
@@ -107,9 +109,9 @@ public class MCRUserManager {
 
     /**
      * Returns the user with the given userName, in the given realm
-     * 
+     *
      * @param userName the unique userName within the given realm
-     * @param realmId the ID of the realm the user belongs to 
+     * @param realmId the ID of the realm the user belongs to
      * @return the user with the given login name, or null
      */
     public static MCRUser getUser(String userName, String realmId) {
@@ -120,6 +122,21 @@ public class MCRUserManager {
                 LOGGER.warn("Could not find requested user: {}@{}", userName, realmId);
                 return null;
             });
+    }
+
+    /**
+     * Returns a Stream of users where the user has a given attribute.
+     * @param attrName name of the user attribute
+     * @param attrValue value of the user attribute
+     */
+    public static Stream<MCRUser> getUsers(String attrName, String attrValue) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRUser> propertyQuery = em.createNamedQuery("MCRUser.byPropertyValue", MCRUser.class);
+        propertyQuery.setParameter("name", attrName);
+        propertyQuery.setParameter("value", attrValue);
+        return propertyQuery.getResultList()
+            .stream()
+            .filter(u -> u.getAttributes().get(attrName).equals(attrValue));
     }
 
     private static MCRUser setRoles(MCRUser mcrUser) {
@@ -138,7 +155,7 @@ public class MCRUserManager {
 
     /**
      * Checks if a user with the given login name exists in the default realm.
-     * 
+     *
      * @param userName the login user name.
      * @return true, if a user with the given login name exists.
      */
@@ -148,7 +165,7 @@ public class MCRUserManager {
 
     /**
      * Checks if a user with the given login name exists in the given realm.
-     * 
+     *
      * @param userName the login user name.
      * @param realm the realm the user belongs to
      * @return true, if a user with the given login name exists.
@@ -159,7 +176,7 @@ public class MCRUserManager {
 
     /**
      * Checks if a user with the given login name exists in the given realm.
-     * 
+     *
      * @param userName the login user name.
      * @param realm the ID of the realm the user belongs to
      * @return true, if a user with the given login name exists.
@@ -176,10 +193,10 @@ public class MCRUserManager {
             .getSingleResult().intValue() > 0;
     }
 
-    /** 
+    /**
      * Creates and stores a new login user in the database.
      * This will also store role membership information.
-     *  
+     *
      * @param user the user to create in the database.
      */
     public static void createUser(MCRUser user) {
@@ -201,7 +218,7 @@ public class MCRUserManager {
     /**
      * Creates and store a new login user in the database, do also attribute mapping is needed.
      * This will also store role membership information.
-     * 
+     *
      * @param user the user to create in the database.
      */
     public static void createUser(MCRTransientUser user) {
@@ -214,7 +231,7 @@ public class MCRUserManager {
 
     /**
      * Checks whether the user is invalid.
-     * 
+     *
      * MCRUser is not allowed to overwrite information returned by {@link MCRSystemUserInformation#getGuestInstance()} or {@link MCRSystemUserInformation#getSystemUserInstance()}.
      * @return true if {@link #createUser(MCRUser)} or {@link #updateUser(MCRUser)} would reject the given user
      */
@@ -225,10 +242,10 @@ public class MCRUserManager {
         return MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(user.getUserID());
     }
 
-    /** 
+    /**
      * Updates an existing login user in the database.
      * This will also update role membership information.
-     *  
+     *
      * @param user the user to update in the database.
      */
     public static void updateUser(MCRUser user) {
@@ -252,13 +269,13 @@ public class MCRUserManager {
 
     /**
      * Deletes a user from the given database
-     * 
-     * @param userName the login name of the user to delete, in the default realm. 
+     *
+     * @param userName the login name of the user to delete, in the default realm.
      */
     public static void deleteUser(String userName) {
-        if (!userName.contains("@"))
+        if (!userName.contains("@")) {
             deleteUser(userName, MCRRealmFactory.getLocalRealm());
-        else {
+        } else {
             String[] parts = userName.split("@");
             deleteUser(parts[0], parts[1]);
         }
@@ -266,9 +283,9 @@ public class MCRUserManager {
 
     /**
      * Deletes a user from the given database
-     * 
+     *
      * @param userName the login name of the user to delete, in the given realm.
-     * @param realm the realm the user belongs to 
+     * @param realm the realm the user belongs to
      */
     public static void deleteUser(String userName, MCRRealm realm) {
         deleteUser(userName, realm.getID());
@@ -276,9 +293,9 @@ public class MCRUserManager {
 
     /**
      * Deletes a user from the given database
-     * 
+     *
      * @param userName the login name of the user to delete, in the given realm.
-     * @param realmId the ID of the realm the user belongs to 
+     * @param realmId the ID of the realm the user belongs to
      */
     public static void deleteUser(String userName, String realmId) {
         MCRUser user = getUser(userName, realmId);
@@ -289,7 +306,7 @@ public class MCRUserManager {
 
     /**
      * Deletes a user from the given database
-     * 
+     *
      * @param user the user to delete
      */
     public static void deleteUser(MCRUser user) {
@@ -298,7 +315,7 @@ public class MCRUserManager {
 
     /**
      * Returns a list of all users the given user is owner of.
-     * 
+     *
      * @param owner the user that owns other users
      */
     public static List<MCRUser> listUsers(MCRUser owner) {
@@ -349,10 +366,10 @@ public class MCRUserManager {
      * Searches for users in the database and returns a list of matching users.
      * Wildcards containing * and ? for single character may be used for searching
      * by login user name or real name.
-     * 
+     *
      * Pay attention that no role information is attached to user data. If you need
      * this information call {@link MCRUserManager#getUser(String, String)}.
-     * 
+     *
      * @param userPattern a wildcard pattern for the login user name, may be null
      * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param realm the realm the user belongs to, may be null
@@ -376,7 +393,7 @@ public class MCRUserManager {
      * Counts users in the database that match the given criteria.
      * Wildcards containing * and ? for single character may be used for searching
      * by login user name or real name.
-     * 
+     *
      * @param userPattern a wildcard pattern for the login user name, may be null
      * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param realm the realm the user belongs to, may be null
@@ -399,7 +416,7 @@ public class MCRUserManager {
 
     /**
      * Checks the password of a login user in the default realm.
-     * 
+     *
      * @param userName the login user name
      * @param password the password entered in the GUI
      * @return true, if the password matches.
@@ -509,7 +526,7 @@ public class MCRUserManager {
 
     /**
      * Sets password of 'user' to 'password'.
-     * 
+     *
      * Automatically updates the user in database.
      */
     public static void setPassword(MCRUser user, String password) {
