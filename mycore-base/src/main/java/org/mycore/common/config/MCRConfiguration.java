@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -53,21 +53,21 @@ import org.mycore.common.MCRPropertiesResolver;
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
  * The Properties used by this class are initialized via {@link MCRConfigurationLoaderFactory}.
  * The class is implemented using the singleton pattern. Using this class is very easy, here is an example:
- * 
+ *
  * <PRE>
- * // Get a configuration property as a String: 
+ * // Get a configuration property as a String:
  * String driver = MCRConfiguration.instance().getString("MCR.JDBC.Driver");
- * 
- * // Get a configuration property as an int, use 500 as default if not set: 
+ *
+ * // Get a configuration property as an int, use 500 as default if not set:
  * int max = MCRConfiguration.instance().getInt("MCR.Cache.Size", 500);
  * </PRE>
- * 
+ *
  * As you see, the class provides methods to get configuration properties as different data types and allows you to
  * specify defaults. All MyCoRe configuration properties should start with "<CODE>MCR.</CODE>"
  *
  * The class also provides methods for <B>listing and saving</B> all properties to an <CODE>OutputStream</CODE>.
  * Using the <CODE>set</CODE> methods allows
- * client code to set new configuration properties or overwrite existing ones with new values. 
+ * client code to set new configuration properties or overwrite existing ones with new values.
  * @see #list(PrintStream)
  * @see #store
  * @author Frank Lützenkirchen
@@ -108,7 +108,7 @@ public class MCRConfiguration {
 
     /**
      * Returns the single instance of this class that can be used to read and manage the configuration properties.
-     * 
+     *
      * @return the single instance of <CODE>MCRConfiguration</CODE> to be used
      */
     public static MCRConfiguration instance() {
@@ -117,7 +117,7 @@ public class MCRConfiguration {
 
     /**
      * Use this method as a default value for {@link #getStrings(String, List)}.
-     * 
+     *
      * @return an empty list of Strings
      * @see Collections#emptyList()
      */
@@ -161,7 +161,7 @@ public class MCRConfiguration {
     /**
      * returns the last point in time when the MyCoRe system was last modified. This method can help you to validate
      * caches not under your controll, e.g. client caches.
-     * 
+     *
      * @see System#currentTimeMillis()
      */
     public final long getSystemLastModified() {
@@ -345,7 +345,7 @@ public class MCRConfiguration {
 
     /**
      * Returns all the properties beginning with the specified string
-     * 
+     *
      * @param startsWith
      *            the string all the returned properties start with
      * @return the list of properties
@@ -359,7 +359,7 @@ public class MCRConfiguration {
 
     /**
      * Returns a new instance of the class specified in the configuration property with the given name.
-     * 
+     *
      * @param name
      *            the non-null and non-empty qualified name of the configuration property
      * @param defaultname
@@ -425,7 +425,7 @@ public class MCRConfiguration {
 
     /**
      * Returns a new instance of the class specified in the configuration property with the given name.
-     * 
+     *
      * @param name
      *            the non-null and non-empty qualified name of the configuration property
      * @param defaultObj
@@ -445,7 +445,7 @@ public class MCRConfiguration {
 
     /**
      * Returns a new instance of the class specified in the configuration property with the given name.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a String, or null
@@ -459,7 +459,7 @@ public class MCRConfiguration {
     /**
      * Returns a instance of the class specified in the configuration property with the given name. If the class was
      * previously instantiated by this method this instance is returned.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the instance of the class named by the value of the configuration property
@@ -482,7 +482,7 @@ public class MCRConfiguration {
     /**
      * Returns a instance of the class specified in the configuration property with the given name. If the class was
      * prevously instantiated by this method this instance is returned.
-     * 
+     *
      * @param name
      *            non-null and non-empty name of the configuration property
      * @return the instance of the class named by the value of the configuration property
@@ -495,7 +495,7 @@ public class MCRConfiguration {
 
     /**
      * Returns the configuration property with the specified name as a String.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a String
@@ -515,7 +515,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a list of strings. Values should be delimited by
      * ','
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a unmodifiable list of strings.
@@ -537,7 +537,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a list of strings. Values should be delimited by
      * ','
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param defaultValue
@@ -552,7 +552,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a String, or returns a given default value if the
      * property is not set.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param defaultValue
@@ -570,7 +570,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as an <CODE>
      * int</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as an <CODE>int</CODE> value
@@ -586,7 +586,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as an <CODE>
      * int</CODE> value, or returns a given default value if the property is not set.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property /** Returns the configuration property
      *            with the specified name as an <CODE>int</CODE> value, or returns a given default value if the property
@@ -607,7 +607,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * long</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a <CODE>long</CODE> value
@@ -623,7 +623,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * long</CODE> value, or returns a given default value if the property is not set.
-     * 
+     *
      * @return the value of the specified property as a <CODE>long</CODE> value
      * @param name
      *            the non-null and non-empty name of the configuration property
@@ -642,7 +642,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * float</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a <CODE>float</CODE> value
@@ -658,7 +658,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * float</CODE> value, or returns a given default value if the property is not set.
-     * 
+     *
      * @return the value of the specified property as a <CODE>float</CODE> value
      * @param name
      *            the non-null and non-empty name of the configuration property
@@ -677,7 +677,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * double</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a <CODE>double
@@ -694,7 +694,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * double</CODE> value, or returns a given default value if the property is not set.
-     * 
+     *
      * @return the value of the specified property as a <CODE>double</CODE> value
      * @param name
      *            the non-null and non-empty name of the configuration property
@@ -713,7 +713,7 @@ public class MCRConfiguration {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * boolean</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return <CODE>true</CODE>, if and only if the specified property has the value <CODE>true</CODE>
@@ -731,7 +731,7 @@ public class MCRConfiguration {
      * boolean</CODE> value, or returns a given default value if the property is not set. If the property is set and its
      * value is not <CODE>true
      * </CODE>, then <code>false</code> is returned.
-     * 
+     *
      * @return the value of the specified property as a <CODE>boolean</CODE> value
      * @param name
      *            the non-null and non-empty name of the configuration property
@@ -748,7 +748,7 @@ public class MCRConfiguration {
      * Sets the configuration property with the specified name to a new <CODE>
      * String</CODE> value. If the parameter <CODE>value</CODE> is <CODE>
      * null</CODE>, the property will be deleted.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param value
@@ -770,7 +770,8 @@ public class MCRConfiguration {
         if (clear) {
             getBaseProperties().clear();
         } else {
-            getPropertiesMap().entrySet().removeIf(e -> props.get(e.getKey()) == null);
+            getBaseProperties().entrySet()
+                .removeIf(e -> props.containsKey(e.getKey()) && props.get(e.getKey()) == null);
         }
         getBaseProperties().putAll(
             props.entrySet()
@@ -785,7 +786,7 @@ public class MCRConfiguration {
     /**
      * Sets the configuration property with the specified name to a new <CODE>
      * int</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param value
@@ -798,7 +799,7 @@ public class MCRConfiguration {
     /**
      * Sets the configuration property with the specified name to a new <CODE>
      * long</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param value
@@ -811,7 +812,7 @@ public class MCRConfiguration {
     /**
      * Sets the configuration property with the specified name to a new <CODE>
      * float</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param value
@@ -824,7 +825,7 @@ public class MCRConfiguration {
     /**
      * Sets the configuration property with the specified name to a new <CODE>
      * double</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param value
@@ -837,7 +838,7 @@ public class MCRConfiguration {
     /**
      * Sets the configuration property with the specified name to a new <CODE>
      * boolean</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param value
@@ -852,7 +853,7 @@ public class MCRConfiguration {
      * <P>
      * <CODE>MCRConfiguration.instance().list( System.out );</CODE>
      * </P>
-     * 
+     *
      * @see java.util.Properties#list( PrintStream )
      * @param out
      *            the PrintStream to list the configuration properties on
@@ -863,7 +864,7 @@ public class MCRConfiguration {
 
     /**
      * Lists all configuration properties currently set to a PrintWriter. Useful for debugging.
-     * 
+     *
      * @see java.util.Properties#list( PrintWriter )
      * @param out
      *            the PrintWriter to list the configuration properties on
@@ -874,7 +875,7 @@ public class MCRConfiguration {
 
     /**
      * Stores all configuration properties currently set to an OutputStream.
-     * 
+     *
      * @see java.util.Properties#store
      * @param out
      *            the OutputStream to write the configuration properties to
@@ -893,7 +894,7 @@ public class MCRConfiguration {
      * <P>
      * <CODE>System.out.println( MCRConfiguration.instance() );</CODE>
      * </P>
-     * 
+     *
      * @return a String containing the configuration properties currently set
      */
     @Override
