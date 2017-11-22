@@ -23,16 +23,32 @@
 
 package org.mycore.datamodel.common;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
+import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
+import org.mycore.datamodel.metadata.MCRMetaElement;
+import org.mycore.datamodel.metadata.MCRMetaLink;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectMetadata;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 
 /**
  * This class manage all accesses to the link table database. This database
@@ -47,6 +63,8 @@ public class MCRLinkTableManager {
 
     public static final String ENTRY_TYPE_DERIVATE = "derivate";
 
+    public static final String ENTRY_TYPE_DERIVATE_LINK = "derivate_link";
+
     public static final String ENTRY_TYPE_PARENT = "parent";
 
     public static final String ENTRY_TYPE_REFERENCE = "reference";
@@ -55,7 +73,7 @@ public class MCRLinkTableManager {
     protected static MCRLinkTableManager singleton;
 
     // logger
-    static Logger logger = LogManager.getLogger(MCRLinkTableManager.class.getName());
+    static Logger LOGGER = LogManager.getLogger();
 
     private MCRLinkTableInterface persistenceclass = null;
 
@@ -81,9 +99,8 @@ public class MCRLinkTableManager {
         // Load the persistence class
         String persistclassname = config.getString("MCR.Persistence.LinkTable.Store.Class");
 
-        Object obj = new Object();
         try {
-            obj = Class.forName(persistclassname).newInstance();
+            persistenceclass = (MCRLinkTableInterface) Class.forName(persistclassname).newInstance();
         } catch (ClassNotFoundException e) {
             throw new MCRException(persistclassname + " ClassNotFoundException");
         } catch (IllegalAccessException e) {
@@ -91,24 +108,6 @@ public class MCRLinkTableManager {
         } catch (InstantiationException e) {
             throw new MCRException(persistclassname + " InstantiationException");
         }
-
-        persistenceclass = (MCRLinkTableInterface) obj;
-    }
-
-    /**
-     * This method check the type of link.
-     * 
-     * @param type
-     * @return true if it is a defined type, else return false and send a
-     *         warning to the logger.
-     */
-    private boolean checkType(String type) {
-        if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT)
-            || type.equals(ENTRY_TYPE_REFERENCE)) {
-            return true;
-        }
-        logger.warn("The value {} is not a defined type for the link table.", type);
-        return false;
     }
 
     /**
@@ -141,17 +140,17 @@ public class MCRLinkTableManager {
      */
     public void addReferenceLink(String from, String to, String type, String attr) {
         if (from == null || (from = from.trim()).length() == 0) {
-            logger.warn("The from value of a reference link is false, the link was not added to the link table");
+            LOGGER.warn("The from value of a reference link is false, the link was not added to the link table");
             return;
         }
 
         if (to == null || (to = to.trim()).length() == 0) {
-            logger.warn("The to value of a reference link is false, the link was not added to the link table");
+            LOGGER.warn("The to value of a reference link is false, the link was not added to the link table");
             return;
         }
 
         if (type == null || (type = type.trim()).length() == 0) {
-            logger.warn("The type value of a reference link is false, the link was not added to the link table");
+            LOGGER.warn("The type value of a reference link is false, the link was not added to the link table");
             return;
         }
 
@@ -159,13 +158,12 @@ public class MCRLinkTableManager {
             attr = "";
         }
 
-        String sb = "Link in table " + type + " add for " + from + "<-->" + to + " with " + type + " and " + attr;
-        logger.debug(sb);
+        LOGGER.debug("Link in table {} add for {}<-->{} with {} and {}", type, from, to, type, attr);
 
         try {
             persistenceclass.create(from, to, type, attr);
         } catch (Exception e) {
-            logger.warn("An error occured while adding a dataset from the reference link table, adding not succesful.",
+            LOGGER.warn("An error occured while adding a dataset from the reference link table, adding not succesful.",
                 e);
         }
     }
@@ -188,7 +186,7 @@ public class MCRLinkTableManager {
      */
     public void deleteReferenceLink(String from) {
         if (from == null || (from = from.trim()).length() == 0) {
-            logger
+            LOGGER
                 .warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
         }
@@ -196,9 +194,8 @@ public class MCRLinkTableManager {
         try {
             persistenceclass.delete(from, null, null);
         } catch (Exception e) {
-            logger.warn(
-                "An error occured while deleting a dataset from the{} reference link table, deleting could be not succesful.",
-                from, e);
+            LOGGER.warn("An error occured while deleting a dataset from the" + from
+                    + " reference link table, deleting could be not succesful.", e);
         }
     }
 
@@ -214,14 +211,14 @@ public class MCRLinkTableManager {
      */
     public void deleteReferenceLink(String from, String to, String type) {
         if (from == null || (from = from.trim()).length() == 0) {
-            logger
+            LOGGER
                 .warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
         }
         try {
             persistenceclass.delete(from, to, type);
         } catch (Exception e) {
-            logger.warn("An error occured while deleting a dataset from the"
+            LOGGER.warn("An error occured while deleting a dataset from the"
                 + " reference link table, deleting is not succesful.", e);
         }
     }
@@ -246,7 +243,7 @@ public class MCRLinkTableManager {
      */
     public int countReferenceLinkTo(String to) {
         if (to == null || (to = to.trim()).length() == 0) {
-            logger.warn("The to value of a reference link is false, the link was " + "not added to the link table");
+            LOGGER.warn("The to value of a reference link is false, the link was " + "not added to the link table");
 
             return 0;
         }
@@ -254,7 +251,7 @@ public class MCRLinkTableManager {
         try {
             return persistenceclass.countTo(null, to, null, null);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references of {}.", to, e);
+            LOGGER.warn("An error occured while searching for references of " + to + ".", e);
         }
 
         return 0;
@@ -270,30 +267,22 @@ public class MCRLinkTableManager {
      * @return the number of references
      */
     public int countReferenceLinkTo(String to, String[] types, String restriction) {
-        if (to == null || (to = to.trim()).length() == 0) {
-            logger.warn("The to value of a reference link is false, the link was " + "not added to the link table");
+        Optional<String> myTo = Optional.ofNullable(to).map(String::trim).filter(s -> !s.isEmpty());
+        if (!myTo.isPresent()) {
+            LOGGER.warn("The to value of a reference link is false, the link was " + "not added to the link table");
             return 0;
         }
 
         try {
             if (types != null && types.length > 0) {
-                String mydoctype = "";
-                int cnt = 0;
-                int idt = 0;
-
-                for (idt = 0; idt < types.length; idt++) {
-                    mydoctype = types[idt];
-                    cnt += persistenceclass.countTo(null, to, mydoctype, restriction);
-                }
-
-                return cnt;
+                return Stream.of(types).mapToInt(type -> persistenceclass.countTo(null, myTo.get(), type, restriction))
+                             .sum();
             }
-            return persistenceclass.countTo(null, to, null, restriction);
+            return persistenceclass.countTo(null, myTo.get(), null, restriction);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references of {}.", to, e);
+            LOGGER.warn("An error occured while searching for references of " + to + ".", e);
+            return 0;
         }
-
-        return 0;
     }
 
     /**
@@ -343,14 +332,14 @@ public class MCRLinkTableManager {
      */
     public Collection<String> getSourceOf(String to) {
         if (to == null || to.length() == 0) {
-            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+            LOGGER.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
 
         try {
             return persistenceclass.getSourcesOf(to, null);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references to {}.", to, e);
+            LOGGER.warn("An error occured while searching for references to " + to + ".", e);
             return Collections.emptyList();
         }
     }
@@ -381,19 +370,18 @@ public class MCRLinkTableManager {
      */
     public Collection<String> getSourceOf(String to, String type) {
         if (to == null || to.length() == 0) {
-            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+            LOGGER.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
         if (type == null || type.length() == 0) {
-            logger.warn("The type value of a reference link is false, the link was not found in the link table");
+            LOGGER.warn("The type value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
-        checkType(type);
 
         try {
             return persistenceclass.getSourcesOf(to, type);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references to {} with {}.", to, type, e);
+            LOGGER.warn("An error occured while searching for references to " + to + " with " + type + ".", e);
             return Collections.emptyList();
         }
     }
@@ -410,7 +398,7 @@ public class MCRLinkTableManager {
      */
     public Collection<String> getSourceOf(String[] to, String type) {
         if (to == null || to.length == 0) {
-            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+            LOGGER.warn("The to value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
         LinkedList<String> ll = new LinkedList<>();
@@ -420,7 +408,7 @@ public class MCRLinkTableManager {
             }
             return ll;
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references to {}.", to, e);
+            LOGGER.warn("An error occured while searching for references to " + Arrays.toString(to) + ".", e);
             return ll;
         }
     }
@@ -452,21 +440,86 @@ public class MCRLinkTableManager {
      */
     public Collection<String> getDestinationOf(String from, String type) {
         if (from == null || from.length() == 0) {
-            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+            LOGGER.warn("The from value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
         if (type == null || type.length() == 0) {
-            logger.warn("The type value of a reference link is false, the link was not found in the link table");
+            LOGGER.warn("The type value of a reference link is false, the link was not found in the link table");
             return Collections.emptyList();
         }
-        checkType(type);
 
         try {
             return persistenceclass.getDestinationsOf(from, type);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references from {}.", from, e);
+            LOGGER.warn("An error occured while searching for references from " + from + ".", e);
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Creates all references for the given object. You should call {@link #delete(MCRObjectID)} before using this
+     * method otherwise doublets could occur.
+     *
+     * @param obj the object to create the references
+     */
+    public void create(MCRObject obj) {
+        MCRObjectID mcrId = obj.getId();
+        // set new entries
+        MCRObjectMetadata meta = obj.getMetadata();
+        //use Set for category collection to remove duplicates if there are any
+        Collection<MCRCategoryID> categories = new HashSet<>();
+        meta.stream().flatMap(MCRMetaElement::stream).forEach(inf -> {
+            if (inf instanceof MCRMetaClassification) {
+                String classId = ((MCRMetaClassification) inf).getClassId();
+                String categId = ((MCRMetaClassification) inf).getCategId();
+                categories.add(new MCRCategoryID(classId, categId));
+            } else if (inf instanceof MCRMetaLinkID) {
+                addReferenceLink(mcrId.toString(), ((MCRMetaLink) inf).getXLinkHref(),
+                        MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
+            } else if (inf instanceof MCRMetaDerivateLink) {
+                addReferenceLink(mcrId.toString(), ((MCRMetaLink) inf).getXLinkHref(),
+                        MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK, "");
+            }
+        });
+        MCRCategoryID state = obj.getService().getState();
+        if (state != null) {
+            categories.add(state);
+        }
+        if (categories.size() > 0) {
+            MCRCategLinkReference objectReference = new MCRCategLinkReference(mcrId);
+            MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
+        }
+        // add derivate reference
+        MCRObjectStructure structure = obj.getStructure();
+        for (int i = 0; i < structure.getDerivates().size(); i++) {
+            MCRMetaLinkID lid = structure.getDerivates().get(i);
+            addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE, "");
+        }
+        // add parent reference
+        if (structure.getParentID() != null) {
+            addReferenceLink(mcrId, structure.getParentID(), MCRLinkTableManager.ENTRY_TYPE_PARENT, "");
+        }
+    }
+
+    /**
+     * Removes all references of this object.
+     *
+     * @param id the object where all references should be removed
+     */
+    public void delete(MCRObjectID id) {
+        deleteReferenceLink(id);
+        MCRCategLinkReference reference = new MCRCategLinkReference(id);
+        MCRCategLinkServiceFactory.getInstance().deleteLink(reference);
+    }
+
+    /**
+     * Updates all references of this object. Old ones will be removed and new links will be created.
+     *
+     * @param id the mycore object identifer
+     */
+    public void update(MCRObjectID id) {
+        delete(id);
+        create(MCRMetadataManager.retrieveMCRObject(id));
     }
 
 }

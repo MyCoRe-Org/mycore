@@ -16,6 +16,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 /**
@@ -127,6 +128,24 @@ public abstract class MCRObjectUtils {
     }
 
     /**
+     * Returns all derivates connected with this object. This includes derivates which are defined in the
+     * structure part and also derivate links.
+     *
+     * @param mcrObjectID object identifier to get the root node
+     * @return set of derivates
+     */
+    public static List<MCRObjectID> getDerivates(MCRObjectID mcrObjectID) {
+        MCRLinkTableManager linkTableManager = MCRLinkTableManager.instance();
+        Stream<String> derivateStream = linkTableManager
+                .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE).stream();
+        Stream<String> derivateLinkStream = linkTableManager
+                .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK).stream()
+                .map(link -> link.substring(0, link.indexOf("/")));
+        return Stream.concat(derivateStream, derivateLinkStream).distinct().map(MCRObjectID::getInstance)
+                     .collect(Collectors.toList());
+    }
+
+    /**
      * Returns a list of {@link MCRObject}s which are linked in the given object
      * by an {@link MCRMetaLinkID}. This does not return any {@link MCRObjectStructure}
      * links or any {@link MCRMetaDerivateLink}s.
@@ -175,12 +194,8 @@ public abstract class MCRObjectUtils {
      */
     public static <T extends MCRBase> T restore(MCRObjectID mcrId, Long revision) throws IOException,
         MCRPersistenceException {
-        T mcrObj;
-        if (mcrId.getTypeId().equals("derivate")) {
-            mcrObj = (T) new MCRDerivate();
-        } else {
-            mcrObj = (T) new MCRObject();
-        }
+        @SuppressWarnings("unchecked")
+        T mcrBase = (T) (mcrId.getTypeId().equals("derivate") ? new MCRDerivate() : new MCRObject());
 
         // get content
         MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
@@ -188,19 +203,20 @@ public abstract class MCRObjectUtils {
         if (content == null) {
             throw new MCRPersistenceException("No such object " + mcrId + " with revision " + revision + ".");
         }
+
         // store it
         try {
-            mcrObj.setFromJDOM(content.asXML());
+            mcrBase.setFromJDOM(content.asXML());
             if (MCRMetadataManager.exists(mcrId)) {
-                MCRMetadataManager.update(mcrObj);
+                MCRMetadataManager.update(mcrBase);
             } else {
-                if (mcrObj instanceof MCRObject) {
-                    MCRMetadataManager.create((MCRObject) mcrObj);
+                if (mcrBase instanceof MCRObject) {
+                    MCRMetadataManager.create((MCRObject) mcrBase);
                 } else {
-                    MCRMetadataManager.create((MCRDerivate) mcrObj);
+                    MCRMetadataManager.create((MCRDerivate) mcrBase);
                 }
             }
-            return mcrObj;
+            return mcrBase;
         } catch (Exception exc) {
             throw new MCRException("Unable to get object " + mcrId + " with revision " + revision + ".", exc);
         }

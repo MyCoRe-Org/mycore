@@ -46,9 +46,8 @@ public abstract class MCRSolrSearchUtils {
      * @param solrClient solr server connection
      * @param query solr query
      * @return list of id's
-     * @throws SolrServerException communication with the solr server failed in any way
      */
-    public static List<String> listIDs(SolrClient solrClient, String query) throws SolrServerException {
+    public static List<String> listIDs(SolrClient solrClient, String query) {
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", query);
         p.set("fl", "id");
