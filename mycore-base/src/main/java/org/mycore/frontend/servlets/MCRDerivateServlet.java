@@ -80,8 +80,6 @@ public class MCRDerivateServlet extends MCRServlet {
      * The method set the main file of a derivate object that is stored in the
      * server. The method use the input parameter: <b>type</b>,<b>step</b>
      * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'writedb'.
-     * @param job
-     *            the MCRServletJob instance
      */
     private void setMainFile(String derivateId, String file, HttpServletResponse response) throws IOException {
         if (MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
@@ -99,8 +97,6 @@ public class MCRDerivateServlet extends MCRServlet {
      * The method delete a file from a derivate object that is stored in the
      * server. The method use the input parameter: <b>type</b>,<b>step</b>
      * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'deletedb'.
-     * @param job
-     *            the MCRServletJob instance
      */
     private void deleteFile(String derivateId, String file, HttpServletResponse response) throws IOException {
         if (MCRAccessManager.checkPermission(derivateId, PERMISSION_DELETE)) {

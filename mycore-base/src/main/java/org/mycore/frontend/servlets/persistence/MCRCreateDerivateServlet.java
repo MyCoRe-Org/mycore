@@ -41,10 +41,6 @@ public class MCRCreateDerivateServlet extends MCRPersistenceServlet {
      *   <dt>id</dt>
      *   <dd>object ID of the parent mycore object (required)</dd>
      * </dl>
-     * @param job
-     * @throws IOException
-     * @throws ServletException 
-     * @throws MCRAccessException 
      */
     @Override
     void displayResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

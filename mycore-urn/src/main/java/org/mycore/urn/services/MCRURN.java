@@ -38,7 +38,7 @@ public class MCRURN {
     private int checksum = -1;
 
     /**
-     * @param the subnamespace
+     * @param subNamespaces subnamespace
      *            after urn:nbn:de till first "-"
      * @param namespaceSpecificString
      *            after first "-"

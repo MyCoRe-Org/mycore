@@ -146,9 +146,6 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
      *   <dt>layout</dt>
      *   <dd>special editor form layout</dd>
      * </dl>
-     * @param job
-     * @throws IOException
-     * @throws ServletException 
      */
     private void redirectToCreateObject(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {

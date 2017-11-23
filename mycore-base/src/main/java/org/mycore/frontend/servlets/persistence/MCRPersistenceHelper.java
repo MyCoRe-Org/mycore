@@ -61,7 +61,6 @@ class MCRPersistenceHelper {
 
     /**
      * returns a jdom document representing the output of a mycore editor form.
-     * @param job
      * @param failOnMissing
      *  if not editor submission is present, should we throw an exception (true) or just return null (false)
      * @return

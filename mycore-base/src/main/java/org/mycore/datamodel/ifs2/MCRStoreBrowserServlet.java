@@ -140,7 +140,7 @@ class MCRStoreBrowserRequest {
     /** 
      * Builds the xml output of a single child slot directory below the current slot to browse
      * 
-     * @param child the file name of the slot directory in store
+     * @param slot the file name of the slot directory in store
      */
     private Element buildSlotXML(String slot) {
         Element xml = new Element("slot");

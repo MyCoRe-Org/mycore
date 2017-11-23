@@ -67,12 +67,6 @@ public abstract class MCRWCMSUtil {
 
     /**
      * Converts the navigation.xml to the old format.
-     * 
-     * @param outputStream
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     * @throws TransformerException
      */
     private static byte[] convertToOldFormat(byte[] xml) throws JDOMException, IOException {
         SAXBuilder builder = new SAXBuilder();

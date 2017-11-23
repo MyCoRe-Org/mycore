@@ -603,7 +603,7 @@ public class MCRMailer extends MCRServlet {
          * 
          * @param addresses the list with email addresses
          * @return a list of {@link InternetAddress}s
-         * @see Mailer.EMail#buildAddress(String)
+         * @see MCRMailer.EMail#buildAddress(String)
          */
         private static Optional<List<InternetAddress>> buildAddressList(final List<String> addresses) {
             return addresses != null ? Optional.ofNullable(addresses.stream().map(address -> {

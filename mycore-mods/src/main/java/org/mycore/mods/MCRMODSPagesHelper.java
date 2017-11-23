@@ -236,7 +236,7 @@ class PagesPattern {
      * Add a mapping from MODS Element name to group number in the pattern.
      * 
      * @param modsElement the name of the MODS element mapped, e.g. "start"
-     * @param the number of the group in the regular expression pattern
+     * @param groupNumber number of the group in the regular expression pattern
      **/
     void addMapping(String modsElement, int groupNumber) {
         mods2group.put(modsElement, groupNumber);

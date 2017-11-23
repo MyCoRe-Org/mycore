@@ -647,9 +647,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * This is a recursive method to start an event handler for each file.
      *
-     * @param thisnode
-     *            a IFS nod (file or directory)
-     * @throws IOException
+     * @param rootPath
+     *            a IFS node (file or directory)
      */
     private static void doForChildren(Path rootPath) throws IOException {
         Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {

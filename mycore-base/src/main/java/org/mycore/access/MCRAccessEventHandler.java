@@ -248,9 +248,6 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * This method sets Default Rules to all permissions that are configured. if
      * <i>overwrite</i> = true, then the old permission entries that are in the
      * database are overwritten, else not.
-     * 
-     * @param obj
-     * @param overwrite
      */
     private void setDefaultPermissions(String id, boolean overwrite) {
         Collection<String> savedPermissions = MCRAccessManager.getPermissionsForID(id);

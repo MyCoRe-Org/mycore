@@ -55,7 +55,7 @@ class MCRTokenRequest {
     /**
      * Posts the request and returns the response.
      *
-     * @throws MCRConfiguratonException if request fails, e.g. because of misconfigured client ID and secret
+     * @throws MCRConfigurationException if request fails, e.g. because of misconfigured client ID and secret
      */
     public MCRTokenResponse post() throws MCRConfigurationException, JsonProcessingException, IOException {
         Entity<Form> formEntity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);

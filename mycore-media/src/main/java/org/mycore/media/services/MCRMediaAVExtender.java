@@ -208,7 +208,7 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     /**
      * Returns the ID of the content type witch detected by parsing format string.
      * 
-     * @param can be the format of the media container or the subformat of stream.
+     * @param format be the format of the media container or the subformat of stream.
      * @return the ID of the content type
      */
     private String detectContentTypeIDByFormat(String format) {

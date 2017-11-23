@@ -104,11 +104,6 @@ public class MCRJPAAccessStore extends MCRAccessStore {
 
     /**
      * internal helper method to check existance of object
-     * 
-     * @param ruleid
-     * @param pool
-     * @param objid
-     * @return boolean value
      */
     private boolean existAccessDefinition(String pool, String objid) {
         MCRACCESSPK key = new MCRACCESSPK(pool, objid);

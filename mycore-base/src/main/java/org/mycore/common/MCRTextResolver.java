@@ -351,7 +351,6 @@ public class MCRTextResolver {
          * Returns a new term in dependence of the current character (position of the text).
          * If no term is defined null is returned.
          * 
-         * @param c character to check the dependency
          * @return a term or null if no one found
          */
         private Term getTerm(String text, int pos) {
