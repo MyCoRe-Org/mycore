@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.frontend.servlets.persistence;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;

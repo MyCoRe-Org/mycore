@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.solr;
 
 import java.io.IOException;

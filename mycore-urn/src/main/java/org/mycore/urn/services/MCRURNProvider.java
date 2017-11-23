@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.urn.services;
 
 import java.util.List;

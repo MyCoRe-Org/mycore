@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.util.concurrent;
 
 import java.util.concurrent.locks.Lock;

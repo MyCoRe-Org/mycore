@@ -385,9 +385,6 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     @Override
-    /**
-     * Returns 0 as number of bytes for a directory
-     */
     public long getSize() {
         ensureNotDeleted();
 

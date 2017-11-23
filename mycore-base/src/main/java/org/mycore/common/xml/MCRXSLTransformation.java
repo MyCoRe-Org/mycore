@@ -94,9 +94,6 @@ public class MCRXSLTransformation {
 
     private static MCRXSLTransformation singleton = null;
 
-    /**
-     * Method MCRXSLTransformation.
-     */
     static {
         factory.setURIResolver(MCRURIResolver.instance());
         try {

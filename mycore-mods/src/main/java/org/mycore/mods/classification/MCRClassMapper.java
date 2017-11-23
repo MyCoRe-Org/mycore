@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.mods.classification;
 
 import java.io.IOException;

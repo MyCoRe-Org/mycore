@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.tools;
 
 import java.io.FileNotFoundException;

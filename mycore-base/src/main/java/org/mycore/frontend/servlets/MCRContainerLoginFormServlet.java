@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.frontend.servlets;
 
 import java.util.Arrays;

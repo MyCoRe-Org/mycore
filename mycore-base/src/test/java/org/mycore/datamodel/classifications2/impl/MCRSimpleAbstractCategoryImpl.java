@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.datamodel.classifications2.impl;
 
 import java.util.HashSet;

@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.mycore.frontend.filter;
 
 import java.io.IOException;

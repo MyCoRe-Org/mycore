@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.backend.hibernate;
 
 import java.util.HashMap;

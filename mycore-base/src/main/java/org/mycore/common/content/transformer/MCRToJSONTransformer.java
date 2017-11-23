@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.common.content.transformer;
 
 import java.io.IOException;

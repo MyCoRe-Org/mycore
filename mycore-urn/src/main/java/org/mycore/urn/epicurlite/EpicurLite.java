@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.urn.epicurlite;
 
 import static org.mycore.common.MCRConstants.EPICURLITE_NAMESPACE;

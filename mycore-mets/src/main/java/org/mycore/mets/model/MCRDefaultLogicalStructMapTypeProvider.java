@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.mets.model;
 
 import org.mycore.datamodel.metadata.MCRObjectID;

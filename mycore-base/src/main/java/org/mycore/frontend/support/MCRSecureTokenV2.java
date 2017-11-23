@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.mycore.frontend.support;
 
 import java.net.URI;

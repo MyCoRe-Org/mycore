@@ -1,7 +1,4 @@
 /**
- * 
- */
-/**
  * Classes for video (streaming).
  * @author Thomas Scheffler
  *

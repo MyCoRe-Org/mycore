@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.mycore.common.log4j2;
 
 import org.apache.logging.log4j.ThreadContext;

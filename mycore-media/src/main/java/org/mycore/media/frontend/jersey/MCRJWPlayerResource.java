@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.media.frontend.jersey;
 
 import java.io.IOException;

@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.datamodel.metadata.history;
 
 import java.time.Instant;

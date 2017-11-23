@@ -128,12 +128,10 @@ public class MCRRealmFactory {
             throw new MCRException("Could not load realms from URI: " + realmsURI);
         }
         String localRealmID = root.getAttributeValue("local");
-        /** Map of defined realms, key is the ID of the realm */
         HashMap<String, MCRRealm> realmsMap = new HashMap<>();
 
         HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
 
-        /** List of defined realms */
         List<MCRRealm> realmsList = new ArrayList<>();
 
         List<Element> realms = root.getChildren("realm");

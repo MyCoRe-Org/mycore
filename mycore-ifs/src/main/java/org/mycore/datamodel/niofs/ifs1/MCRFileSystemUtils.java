@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.datamodel.niofs.ifs1;
 
 import java.io.ByteArrayInputStream;

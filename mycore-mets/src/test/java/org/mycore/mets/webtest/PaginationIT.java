@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.mets.webtest;
 
 import org.junit.Assert;
@@ -59,33 +56,6 @@ public class PaginationIT extends MetsEditorTestBase {
         Assert.assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("18r")));
     }
 
-    /**
-     * Does not work (Actions) not supported
-     @Test
-     @Ignore
-    public void autoPaginationFew() throws InterruptedException {
-        WebDriver webDriver = getDriver();
-        WebElement row1 = webDriver.findElement(MCRBy.partialText("perthes_1855_0001.jpg")).findElement(
-            By.xpath("ancestor::td"));
-        Actions shift = new Actions(webDriver);
-        WebElement row15 = webDriver.findElement(MCRBy.partialText("perthes_1855_0015.jpg")).findElement(
-            By.xpath("ancestor::td"));
-        shift.click(row1).click(row1).keyDown(Keys.SHIFT).click(row15).keyUp(Keys.SHIFT).perform();
-        webDriver.findElement(By.xpath("//button[@title=\"autoPagination\"]")).click();
-        // wait for the Pagination-Dialog
-        waitForElement(MCRBy.partialText("???paginationValue???"));
-        webDriver.findElement(MCRBy.partialText("undefined(1)"));
-        webDriver.findElement(MCRBy.partialText("undefined(15)"));
-        if (!webDriver.findElements(MCRBy.partialText("undefined(34)")).isEmpty())
-            throw new AssertionError("to much elements for pagination selected!");
-        webDriver.findElement(By.xpath("//input[@type=\"text\"]")).sendKeys("1v");
-        Select select = new Select(webDriver.findElement(By.tagName("select")));
-        select.selectByVisibleText("???rectoVerso_lowercase???");
-        webDriver.findElement(By.xpath("//button[contains(text(),\"???paginationChange???\")]")).click();
-        webDriver.findElement(MCRBy.partialText("1v"));
-        webDriver.findElement(MCRBy.partialText("8v"));
-    }
-     */
     /* @Test
     public void deletePaginationFew() throws InterruptedException {
         WebDriver webDriver = getDriver();

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.backend.jpa;
 
 import java.util.stream.Stream;

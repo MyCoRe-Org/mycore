@@ -114,7 +114,6 @@ public class MCRMailer extends MCRServlet {
         job.getResponse().sendRedirect(goTo);
     }
 
-    /** Initializes the class */
     static {
         MCRConfiguration config = MCRConfiguration.instance();
         encoding = config.getString("MCR.Mail.Encoding");

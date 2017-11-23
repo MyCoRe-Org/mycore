@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.solr.search;
 
 import static org.mycore.solr.MCRSolrConstants.QUERY_PATH;

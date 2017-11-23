@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.mycore.datamodel.niofs;
 
 import java.nio.file.FileSystem;

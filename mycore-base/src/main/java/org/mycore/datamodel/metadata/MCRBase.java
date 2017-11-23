@@ -86,9 +86,6 @@ public abstract class MCRBase {
     // logger
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /**
-     * Load static data for all MCRObjects
-     */
     static {
         NL = System.getProperty("line.separator");
         SLASH = System.getProperty("file.separator");

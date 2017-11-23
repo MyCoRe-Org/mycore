@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.oai.set;
 
 import java.util.Collection;

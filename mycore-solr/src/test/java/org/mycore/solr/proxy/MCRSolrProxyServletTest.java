@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.solr.proxy;
 
 import static org.junit.Assert.assertEquals;

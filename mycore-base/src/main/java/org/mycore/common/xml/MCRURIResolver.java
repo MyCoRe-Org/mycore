@@ -319,9 +319,6 @@ public final class MCRURIResolver implements URIResolver {
             content = MCRSourceContent.getInstance(uri);
             return content == null ? null : content.asXML().getRootElement().detach();
         } catch (Exception e) {
-            /**
-             * rethrow Exception as RuntimException TODO: need to refactor this and declare throw in method signature
-             */
             throw new MCRException("Error while resolving " + uri, e);
         }
     }

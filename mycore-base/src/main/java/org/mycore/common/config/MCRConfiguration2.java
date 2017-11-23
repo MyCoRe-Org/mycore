@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.common.config;
 
 import java.util.List;

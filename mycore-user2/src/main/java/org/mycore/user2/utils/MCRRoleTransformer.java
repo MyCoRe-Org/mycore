@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.user2.utils;
 
 import java.io.IOException;

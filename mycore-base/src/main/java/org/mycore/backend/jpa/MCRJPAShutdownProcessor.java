@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.backend.jpa;
 
 import org.mycore.common.events.MCRShutdownHandler.Closeable;

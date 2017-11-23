@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.user2.login;
 
 import javax.xml.bind.annotation.XmlAccessType;

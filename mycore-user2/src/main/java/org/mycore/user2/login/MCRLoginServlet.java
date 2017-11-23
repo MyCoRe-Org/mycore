@@ -1,25 +1,3 @@
-/**
- * $Revision: 23428 $ 
- * $Date: 2012-02-03 08:53:51 +0100 (Fr, 03 Feb 2012) $
- *
- * This file is part of the MILESS repository software.
- * Copyright (C) 2011 MILESS/MyCoRe developer team
- * See http://duepublico.uni-duisburg-essen.de/ and http://www.mycore.de/
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- **/
-
 package org.mycore.user2.login;
 
 import java.io.IOException;

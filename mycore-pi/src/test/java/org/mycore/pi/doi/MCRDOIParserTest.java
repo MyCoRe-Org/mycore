@@ -48,9 +48,6 @@ public class MCRDOIParserTest {
     }
 
     @Test
-    /**
-     * MCR-1562
-     */
     public void parseRegistrantCodeDOI() {
         testDOI(EXAMPLE_DOI2, EXAMPLE_DOI2_PREFIX, EXAMPLE_DOI2_SUFFIX);
     }

@@ -92,10 +92,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     public static final String DEFAULT_TRANSFORMER = "save-derivate.xsl";
 
     /**
-     * The constructor.
-     */
-
-    /**
      * deletes all MCRDerivate from the datastore.
      */
     @MCRCommand(syntax = "delete all derivates", help = "Removes all derivates from the repository", order = 10)

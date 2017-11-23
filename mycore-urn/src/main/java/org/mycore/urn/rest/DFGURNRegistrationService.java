@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.urn.rest;
 
 import java.util.List;

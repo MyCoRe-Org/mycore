@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.mods;
 
 import java.io.IOException;

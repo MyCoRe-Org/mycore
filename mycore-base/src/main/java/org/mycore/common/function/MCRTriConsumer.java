@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.common.function;
 
 import java.util.Objects;

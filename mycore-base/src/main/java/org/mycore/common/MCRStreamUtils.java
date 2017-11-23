@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.mycore.common;
 
 import java.util.Collection;

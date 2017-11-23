@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.mycore.frontend.cli;
 
 import org.apache.logging.log4j.Level;

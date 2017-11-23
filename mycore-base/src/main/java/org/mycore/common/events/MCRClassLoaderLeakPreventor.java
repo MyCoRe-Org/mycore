@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.common.events;
 
 import java.util.Iterator;

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.solr.index.cs;
 
 import java.io.IOException;

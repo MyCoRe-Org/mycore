@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.common.xsl;
 
 import java.io.IOException;

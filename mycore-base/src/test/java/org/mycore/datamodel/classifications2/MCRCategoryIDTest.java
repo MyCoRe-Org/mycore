@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.datamodel.classifications2;
 
 import static org.junit.Assert.assertEquals;

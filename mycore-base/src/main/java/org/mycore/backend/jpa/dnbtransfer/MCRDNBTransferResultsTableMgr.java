@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.backend.jpa.dnbtransfer;
 
 import java.util.Date;

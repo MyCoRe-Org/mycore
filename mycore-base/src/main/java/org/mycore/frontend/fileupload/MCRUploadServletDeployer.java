@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.frontend.fileupload;
 
 import java.io.IOException;

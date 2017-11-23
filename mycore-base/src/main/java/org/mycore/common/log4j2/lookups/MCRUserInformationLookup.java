@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.mycore.common.log4j2.lookups;
 
 import java.util.Optional;

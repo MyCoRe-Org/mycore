@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.solr.search;
 
 import static org.junit.Assert.assertEquals;

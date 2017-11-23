@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.pi.doi;
 
 import org.mycore.common.config.MCRConfiguration2;

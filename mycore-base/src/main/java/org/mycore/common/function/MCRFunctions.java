@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.common.function;
 
 import java.nio.file.FileSystem;

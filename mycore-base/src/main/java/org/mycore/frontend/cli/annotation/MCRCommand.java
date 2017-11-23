@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.frontend.cli.annotation;
 
 import java.lang.annotation.Documented;

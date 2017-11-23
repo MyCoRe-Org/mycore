@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.mycore.urn.epicurlite;
 
 import java.io.UnsupportedEncodingException;

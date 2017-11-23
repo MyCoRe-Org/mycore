@@ -441,7 +441,6 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             elmt.setAttribute("lang", text.getLang(), Namespace.XML_NAMESPACE);
             elm.addContent(elmt);
         }
-        /** use gregorian for claendar string; wrong output; ToDo : get function for calendar string */
         elm.addContent(new org.jdom2.Element("calendar").addContent(calendar));
 
         elm.addContent(new org.jdom2.Element("ivon").addContent(Integer.toString(ivon)));
