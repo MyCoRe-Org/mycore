@@ -34,7 +34,7 @@ import org.mycore.mods.merger.MCRMergeTool;
  */
 public class MCRGroupOfWorks {
 
-    private List<MCRWork> works = new ArrayList<MCRWork>();
+    private List<MCRWork> works = new ArrayList<>();
 
     void add(MCRWork work) {
         works.add(work);

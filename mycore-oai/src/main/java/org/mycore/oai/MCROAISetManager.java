@@ -141,7 +141,7 @@ public class MCROAISetManager {
         Map<String, MCROAISolrSetConfiguration> newVersion = getDefinedSetIds().stream()
             .map(String::trim)
             .map(setId -> new MCROAISolrSetConfiguration(this.configPrefix, setId))
-            .collect(Collectors.toMap(c -> c.getId(), c -> c));
+            .collect(Collectors.toMap(MCROAISolrSetConfiguration::getId, c -> c));
         setConfigurationMap.entrySet().removeIf(c -> !newVersion.containsKey(c.getKey()));
         setConfigurationMap.putAll(newVersion);
     }

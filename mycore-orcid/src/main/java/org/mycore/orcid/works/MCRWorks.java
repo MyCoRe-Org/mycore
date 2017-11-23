@@ -61,11 +61,11 @@ public class MCRWorks {
     private MCRORCIDProfile profile;
 
     /** The groups of works this ORCID profile contains */
-    private List<MCRGroupOfWorks> groups = new ArrayList<MCRGroupOfWorks>();
+    private List<MCRGroupOfWorks> groups = new ArrayList<>();
 
-    private Map<String, MCRWork> putCode2work = new HashMap<String, MCRWork>();
+    private Map<String, MCRWork> putCode2work = new HashMap<>();
 
-    private List<String> putCodes = new ArrayList<String>();
+    private List<String> putCodes = new ArrayList<>();
 
     /** Creates a new works representation for the given ORCID profile */
     public MCRWorks(MCRORCIDProfile profile) {
