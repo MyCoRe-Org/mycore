@@ -75,8 +75,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                         handleObjectIndex(evt, obj);
                         break;
                     default:
-                        logger.warn(
-                            "Can't find method for an object data handler for event type " + evt.getEventType());
+                        logger
+                            .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
                         break;
                 }
                 return;
@@ -106,8 +106,9 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                         updateDerivateFileIndex(evt, der);
                         break;
                     default:
-                        logger.warn(
-                            "Can't find method for a derivate data handler for event type " + evt.getEventType());
+                        logger
+                            .warn("Can't find method for a derivate data handler for event type {}",
+                                evt.getEventType());
                         break;
                 }
                 return;
@@ -149,7 +150,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                         updatePathIndex(evt, path, attrs);
                         break;
                     default:
-                        logger.warn("Can't find method for Path data handler for event type " + evt.getEventType());
+                        logger.warn("Can't find method for Path data handler for event type {}", evt.getEventType());
                         break;
                 }
                 return;
@@ -176,8 +177,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                         handleClassificationRepaired(evt, cl);
                         break;
                     default:
-                        logger.warn(
-                            "Can't find method for a classification data handler for event type " + evt.getEventType());
+                        logger.warn("Can't find method for a classification data handler for event type {}",
+                            evt.getEventType());
                         break;
                 }
                 return;
@@ -215,8 +216,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                         undoObjectRepaired(evt, obj);
                         break;
                     default:
-                        logger.warn(
-                            "Can't find method for an object data handler for event type " + evt.getEventType());
+                        logger
+                            .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
                         break;
                 }
                 return;
@@ -243,8 +244,9 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                         undoDerivateRepaired(evt, der);
                         break;
                     default:
-                        logger.warn(
-                            "Can't find method for a derivate data handler for event type " + evt.getEventType());
+                        logger
+                            .warn("Can't find method for a derivate data handler for event type {}",
+                                evt.getEventType());
                         break;
                 }
                 return;
@@ -283,7 +285,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                         undoPathRepaired(evt, path, attrs);
                         break;
                     default:
-                        logger.warn("Can't find method for Path data handler for event type " + evt.getEventType());
+                        logger.warn("Can't find method for Path data handler for event type {}", evt.getEventType());
                         break;
                 }
                 return;
@@ -310,8 +312,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                         undoClassificationRepaired(evt, obj);
                         break;
                     default:
-                        logger.warn("Can't find method for an classification data handler for event type "
-                            + evt.getEventType());
+                        logger.warn("Can't find method for an classification data handler for event type {}",
+                            evt.getEventType());
                         break;
                 }
                 return;

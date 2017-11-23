@@ -111,7 +111,7 @@ public class URNProcessor {
                     LOGGER.warn("Could not handle request for urn {} Status code {}", urn, headStatus);
             }
         } catch (Exception ex) {
-            LOGGER.error("Error while registering urn{}", ex);
+            LOGGER.error("Error while registering urn {}", urn, ex);
             session.rollbackTransaction();
         } finally {
             if (session.isTransactionActive()) {

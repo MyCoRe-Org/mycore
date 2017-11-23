@@ -76,6 +76,6 @@ public class MCRReadPublicTokenFactory {
         }
 
         LOGGER.warn("You should set the access token in mycore.properties:");
-        LOGGER.warn(CONFIG_PROPERTY + "=" + token);
+        LOGGER.warn(CONFIG_PROPERTY + "={}", token);
     }
 }

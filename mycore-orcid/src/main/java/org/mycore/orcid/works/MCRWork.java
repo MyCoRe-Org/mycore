@@ -97,7 +97,7 @@ public class MCRWork {
                 MCRMergeTool.merge(this.mods, modsFromBibTeX);
             } catch (Exception ex) {
                 String msg = "Exception parsing BibTeX: " + bibTeX;
-                LOGGER.warn(msg + " " + ex.getMessage());
+                LOGGER.warn("{} {}", msg, ex.getMessage());
             }
         }
     }

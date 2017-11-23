@@ -69,7 +69,7 @@ public class MCRORCIDClient {
      */
     public MCRContent get(String path) {
         WebTarget target = baseTarget.path(path);
-        LOGGER.info("get " + target.getUri());
+        LOGGER.info("get {}", target.getUri());
 
         Builder b = target.request().accept(ORCID_XML_MEDIA_TYPE);
         b = b.header("Authorization", "Bearer " + MCRReadPublicTokenFactory.getToken());

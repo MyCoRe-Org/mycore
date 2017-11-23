@@ -50,7 +50,7 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
                         updateFileIndex(evt, file);
                         break;
                     default:
-                        LOGGER.warn("Can't find method for file data handler for event type " + evt.getEventType());
+                        LOGGER.warn("Can't find method for file data handler for event type {}", evt.getEventType());
                         break;
                 }
                 return;
@@ -86,7 +86,7 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
                         undoFileRepaired(evt, file);
                         break;
                     default:
-                        LOGGER.warn("Can't find method for file data handler for event type " + evt.getEventType());
+                        LOGGER.warn("Can't find method for file data handler for event type {}", evt.getEventType());
                         break;
                 }
                 return;
