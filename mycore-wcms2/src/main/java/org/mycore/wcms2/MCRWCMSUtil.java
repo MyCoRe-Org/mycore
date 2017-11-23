@@ -29,8 +29,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -41,7 +39,6 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.util.MCRServletContentHelper;
 import org.mycore.wcms2.datamodel.MCRNavigation;
-import org.xml.sax.SAXException;
 
 public abstract class MCRWCMSUtil {
 

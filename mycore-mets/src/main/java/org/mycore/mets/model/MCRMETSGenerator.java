@@ -18,10 +18,7 @@
 
 package org.mycore.mets.model;
 
-import java.io.IOException;
-
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Base interface to create a mets.xml.

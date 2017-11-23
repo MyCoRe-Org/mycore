@@ -49,7 +49,6 @@ import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.MCRTestCaseHelper;
 import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
-import org.mycore.frontend.jersey.MCRJerseyResourceConfig;
 
 /**
  * Jersey base test class. Overwrite this class and add a 
