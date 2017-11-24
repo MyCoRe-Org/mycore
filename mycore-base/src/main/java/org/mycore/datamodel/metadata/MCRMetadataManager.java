@@ -31,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -119,8 +118,7 @@ public final class MCRMetadataManager {
         } else {
             //one expensive process
             if (exists(derivateID)) {
-                MCRDerivate d = MCRMetadataManager.retrieveMCRDerivate(derivateID);
-                mcrObjectID = d.getOwnerID();
+                mcrObjectID = MCRMetadataManager.retrieveMCRDerivate(derivateID).getOwnerID();
             }
         }
         if (mcrObjectID == null) {
@@ -151,18 +149,13 @@ public final class MCRMetadataManager {
         if (derivateIds != null) {
             return derivateIds;
         }
-        Collection<String> destinationOf = MCRLinkTableManager.instance().getDestinationOf(objectId,
-            MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
-        if (!(destinationOf == null || destinationOf.isEmpty())) {
-            derivateIds = new ArrayList<>(destinationOf.size());
-            for (String strId : destinationOf) {
-                derivateIds.add(MCRObjectID.getInstance(strId));
-            }
+        derivateIds = MCRObjectUtils.getDerivates(objectId);
+        if (!derivateIds.isEmpty()) {
+            return derivateIds;
         } else {
             if (exists(objectId)) {
                 MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectId);
                 List<MCRMetaLinkID> derivates = mcrObject.getStructure().getDerivates();
-                derivateIds = new ArrayList<>(derivates.size());
                 for (MCRMetaLinkID der : derivates) {
                     derivateIds.add(der.getXLinkHrefID());
                 }

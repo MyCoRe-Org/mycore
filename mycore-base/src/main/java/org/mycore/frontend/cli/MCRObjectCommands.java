@@ -28,7 +28,6 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -37,10 +36,8 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -57,6 +54,7 @@ import org.mycore.backend.jpa.MCRStreamQuery;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xml.MCREntityResolver;
@@ -65,6 +63,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -174,14 +173,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *
      * @param ID
      *            the ID of the MCRObject that should be deleted
+     * @throws MCRPersistenceException  if a persistence problem is occurred
      * @throws MCRAccessException see {@link MCRMetadataManager#deleteMCRObject(MCRObjectID)}
-     * @throws MCRPersistenceException
+     * @throws MCRActiveLinkException if object is referenced by other objects
      */
     @MCRCommand(
         syntax = "delete object {0}",
         help = "Removes a MCRObject with the MCRObjectID {0}",
         order = 40)
-    public static void delete(String ID) throws MCRActiveLinkException, MCRPersistenceException, MCRAccessException {
+    public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRObjectID mcrId = MCRObjectID.getInstance(ID);
         MCRMetadataManager.deleteMCRObject(mcrId);
         LOGGER.info("{} deleted.", mcrId);
@@ -194,20 +194,17 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the start ID for deleting the MCRObjects
      * @param IDto
      *            the stop ID for deleting the MCRObjects
-     * @return
+     * @return list of delete commands
      */
     @MCRCommand(
         syntax = "delete object from {0} to {1}",
         help = "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.",
         order = 30)
     public static List<String> deleteFromTo(String IDfrom, String IDto) {
-        int from_i = 0;
-        int to_i = 0;
-
         MCRObjectID from = MCRObjectID.getInstance(IDfrom);
         MCRObjectID to = MCRObjectID.getInstance(IDto);
-        from_i = from.getNumberAsInteger();
-        to_i = to.getNumberAsInteger();
+        int from_i = from.getNumberAsInteger();
+        int to_i = to.getNumberAsInteger();
 
         if (from_i > to_i) {
             throw new MCRException("The from-to-interval is false.");
@@ -288,10 +285,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @param update
      *            if true, object will be updated, else object is created
-     * @throws MCRActiveLinkException
      */
-    private static List<String> processFromDirectory(boolean topological, String directory, boolean update)
-        throws MCRActiveLinkException {
+    private static List<String> processFromDirectory(boolean topological, String directory, boolean update) {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
@@ -300,8 +295,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
 
         String[] list = dir.list();
-
-        if (list.length == 0) {
+        if (list == null || list.length == 0) {
             LOGGER.warn("No files found in directory {}", directory);
             return null;
         }
@@ -397,13 +391,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, object will be updated, else object is created
      * @param importMode
      *            if true, servdates are taken from xml file
-     * @throws MCRActiveLinkException
      * @throws SAXParseException
+     *            unable to build the mycore object from the file's URI
      * @throws MCRException
+     *            the parent of the given object does not exists
      * @throws MCRAccessException
+     *            if write permission is missing
      */
     private static boolean processFromFile(File file, boolean update, boolean importMode)
-        throws MCRActiveLinkException, MCRException, SAXParseException, IOException, MCRAccessException {
+        throws MCRException, SAXParseException, IOException, MCRAccessException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn("{} ignored, does not end with *.xml", file);
             return false;
@@ -416,23 +412,22 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         LOGGER.info("Reading file {} ...", file);
 
-        MCRObject mycore_obj = new MCRObject(file.toURI());
-        if (mycore_obj.hasParent()) {
-            MCRObjectID parentID = mycore_obj.getStructure().getParentID();
-            if (!MCRMetadataManager.exists(mycore_obj.getStructure().getParentID())) {
-                throw new MCRException("The parent object " + parentID + "does not exist for " + mycore_obj
-                    + ".");
+        MCRObject mcrObject = new MCRObject(file.toURI());
+        if (mcrObject.hasParent()) {
+            MCRObjectID parentID = mcrObject.getStructure().getParentID();
+            if (!MCRMetadataManager.exists(mcrObject.getStructure().getParentID())) {
+                throw new MCRException("The parent object " + parentID + "does not exist for " + mcrObject + ".");
             }
         }
-        mycore_obj.setImportMode(importMode);
-        LOGGER.debug("Label --> {}", mycore_obj.getLabel());
+        mcrObject.setImportMode(importMode);
+        LOGGER.debug("Label --> {}", mcrObject.getLabel());
 
         if (update) {
-            MCRMetadataManager.update(mycore_obj);
-            LOGGER.info("{} updated.", mycore_obj.getId());
+            MCRMetadataManager.update(mcrObject);
+            LOGGER.info("{} updated.", mcrObject.getId());
         } else {
-            MCRMetadataManager.create(mycore_obj);
-            LOGGER.info("{} loaded.", mycore_obj.getId());
+            MCRMetadataManager.create(mcrObject);
+            LOGGER.info("{} loaded.", mcrObject.getId());
         }
 
         return true;
@@ -603,11 +598,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param style
      *            the style attribute for the transformer stylesheet
      * @return the transformer
-     * @throws TransformerFactoryConfigurationError
-     * @throws TransformerConfigurationException
      */
-    private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
-        TransformerConfigurationException {
+    private static Transformer getTransformer(String style) {
         String xslfile = DEFAULT_TRANSFORMER;
         if (style != null && style.trim().length() != 0) {
             xslfile = style + "-object.xsl";
@@ -663,11 +655,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param nid
      *            the MCRObjectID
      * @return true if the store was okay (see description), else return false
-     * @throws FileNotFoundException
      * @throws TransformerException
      * @throws IOException
-     * @throws SAXParseException
      * @throws MCRException
+     * @throws SAXParseException
      */
     private static boolean exportMCRObject(File dir, Transformer trans, String nid)
         throws TransformerException, IOException, MCRException, SAXParseException {
@@ -981,17 +972,18 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "execute for selected {0}",
-        help = "Calls the given command multiple times for all selected objects. The replacement is defined by an {x}. E.g. 'execute for selected set parent of {x} to myapp_container_00000001'",
+        help = "Calls the given command multiple times for all selected objects." +
+                " The replacement is defined by an {x}.E.g. 'execute for selected set" +
+                " parent of {x} to myapp_container_00000001'",
         order = 450)
     public static List<String> executeForSelected(String command) throws Exception {
         if (!command.contains("{x}")) {
-            LOGGER
-                .info(
-                    "No replacement defined. Use the {x} variable in order to execute your command with all selected objects.");
+            LOGGER.info("No replacement defined. Use the {x} variable in order to execute your command with all "
+                    + "selected objects.");
             return Collections.emptyList();
         }
         return getSelectedObjectIDs().stream()
-            .map(objID -> command.replaceAll("\\{x\\}", objID))
+            .map(objID -> command.replaceAll("\\{x}", objID))
             .collect(Collectors.toList());
     }
 
@@ -1039,16 +1031,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 180)
     public static void repairMetadataSearchForID(String id) {
         LOGGER.info("Start the repair for the ID {}", id);
-
-        MCRObjectID mid = null;
-
-        try {
-            mid = MCRObjectID.getInstance(id);
-        } catch (Exception e) {
+        if(!MCRObjectID.isValid(id)) {
             LOGGER.error("The String {} is not a MCRObjectID.", id);
             return;
         }
-
+        MCRObjectID mid = MCRObjectID.getInstance(id);
         MCRBase obj = MCRMetadataManager.retrieve(mid);
         MCRMetadataManager.fireRepairEvent(obj);
         LOGGER.info("Repaired {}", mid);
@@ -1061,34 +1048,33 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static void repairMCRLinkHrefTable() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         MCRStreamQuery<String> fromQuery = MCRStreamQuery
-            .getInstance(em,
-                "SELECT DISTINCT m.key.mcrfrom FROM MCRLINKHREF m",
-                String.class);
+                .getInstance(em, "SELECT DISTINCT m.key.mcrfrom FROM MCRLINKHREF m", String.class);
         MCRStreamQuery<String> toQuery = MCRStreamQuery
-            .getInstance(em,
-                "SELECT DISTINCT m.key.mcrto FROM MCRLINKHREF m",
-                String.class);
+                .getInstance(em, "SELECT DISTINCT m.key.mcrto FROM MCRLINKHREF m", String.class);
+        String query = "DELETE FROM MCRLINKHREF m WHERE m.key.mcrfrom IN (:invalidIds) or m.key.mcrto IN (:invalidIds)";
         // open streams
-        Set<String> idSet;
         try (Stream<String> fromStream = fromQuery.getResultStream()) {
             try (Stream<String> toStream = toQuery.getResultStream()) {
-                // build list and close db stream
-                idSet = Stream.concat(fromStream, toStream).collect(Collectors.toSet());
+                List<String> invalidIds = Stream.concat(fromStream, toStream)
+                                                .distinct()
+                                                .filter(MCRObjectID::isValid)
+                                                .map(MCRObjectID::getInstance)
+                                                .filter(MCRStreamUtils.not(MCRMetadataManager::exists))
+                                                .map(MCRObjectID::toString)
+                                                .collect(Collectors.toList());
+                // delete
+                em.createQuery(query).setParameter("invalidIds", invalidIds).executeUpdate();
             }
         }
+    }
 
-        // collect invalid identifiers and join them with comma
-        List<String> invalidIds = idSet.stream()
-            .filter(MCRObjectID::isValid)
-            .map(MCRObjectID::getInstance)
-            .filter(id -> !MCRMetadataManager.exists(id))
-            .map(MCRObjectID::toString)
-            .collect(Collectors.toList());
-
-        // delete
-        em.createQuery("DELETE FROM MCRLINKHREF m WHERE m.key.mcrfrom IN (:invalidIds) or m.key.mcrto IN (:invalidIds)")
-            .setParameter("invalidIds", invalidIds)
-            .executeUpdate();
+    @MCRCommand(
+            syntax = "rebuild mcrlinkhref table for object {0}",
+            help = "Rebuilds (remove/create) all entries of the link href table for the given object id.",
+            order = 188
+    )
+    public static void rebuildMCRLinkHrefTableForObject(String objectId) {
+        MCRLinkTableManager.instance().update(MCRObjectID.getInstance(objectId));
     }
 
     @MCRCommand(syntax = "merge derivates of object {0}",
