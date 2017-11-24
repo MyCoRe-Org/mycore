@@ -36,10 +36,10 @@ import org.mycore.orcid.MCRORCIDNamespaces;
  */
 public class MCRWork {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRWork.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRWork.class);
 
     /** Transformer used to parse bibTeX to MODS */
-    private final static MCRContentTransformer T_BIBTEX2MODS = new MCRBibTeX2MODSTransformer();
+    private static final MCRContentTransformer T_BIBTEX2MODS = new MCRBibTeX2MODSTransformer();
 
     private String putCode;
 

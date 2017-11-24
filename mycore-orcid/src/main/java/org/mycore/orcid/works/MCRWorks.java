@@ -45,15 +45,15 @@ import org.xml.sax.SAXException;
  */
 public class MCRWorks {
 
-    private final static String CFG_PREFIX = "MCR.ORCID.Works.";
+    private static final String CFG_PREFIX = "MCR.ORCID.Works.";
 
-    private final static String WORK2MODS_XSL = MCRConfiguration.instance().getString(CFG_PREFIX + "XSL.Works2MODS");
+    private static final String WORK2MODS_XSL = MCRConfiguration.instance().getString(CFG_PREFIX + "XSL.Works2MODS");
 
     /** Transformer used to transform the ORCID response with one or more works or work summaries to MODS */
-    private final static MCRContentTransformer T_WORKXML2MODS = new MCRXSLTransformer("xsl/" + WORK2MODS_XSL);
+    private static final MCRContentTransformer T_WORKXML2MODS = new MCRXSLTransformer("xsl/" + WORK2MODS_XSL);
 
     /** The maximum number of works to fetch at once in a bulk request */
-    private final static int BULK_FETCH_SIZE = MCRConfiguration.instance().getInt(CFG_PREFIX + "BulkFetchSize");
+    private static final int BULK_FETCH_SIZE = MCRConfiguration.instance().getInt(CFG_PREFIX + "BulkFetchSize");
 
     /** The ORCID profile these works belongs to */
     private MCRORCIDProfile profile;

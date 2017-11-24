@@ -226,10 +226,10 @@ public class MCRVideoObject extends MCRMediaObject {
         out.append(encoderStr != null ? "Encoder          : " + encoderStr + "\n" : "");
 
         if (tags != null)
-            out.append(tags.toString());
+            out.append(tags);
 
         for (MCRAudioObject audio : audioCodes)
-            out.append(audio.toString());
+            out.append(audio);
 
         return out.toString();
     }

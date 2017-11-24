@@ -62,8 +62,6 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
 
     protected static final Logger LOGGER = LogManager.getLogger(MCRSwordMediaHandler.class);
 
-    private MCRSwordLifecycleConfiguration configuration;
-
     protected static boolean isValidFilePath(String filePath) {
         return filePath != null && filePath.length() > 1;
     }
@@ -262,7 +260,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
 
     @Override
     public void init(MCRSwordLifecycleConfiguration lifecycleConfiguration) {
-        this.configuration = lifecycleConfiguration;
+        MCRSwordLifecycleConfiguration configuration = lifecycleConfiguration;
     }
 
     @Override

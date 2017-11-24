@@ -23,7 +23,7 @@ import java.util.Locale;
 public enum MCRIIIFImageQuality {
     color, gray, bitonal;
 
-    public static final MCRIIIFImageQuality fromString(String str) {
+    public static MCRIIIFImageQuality fromString(String str) {
         switch (str.toLowerCase(Locale.ENGLISH)) {
             case "color":
             case "default":

@@ -88,7 +88,7 @@ public class MCRPackerJobAction extends MCRJobAction {
         return this.job.getParameters();
     }
 
-    public static final Map<String, String> getConfiguration(String packerId) {
+    public static Map<String, String> getConfiguration(String packerId) {
         String packerConfigPrefix = MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".";
         return MCRConfiguration
             .instance()

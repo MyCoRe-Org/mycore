@@ -27,9 +27,9 @@ import org.jdom2.Namespace;
  */
 public class MCRORCIDNamespaces {
 
-    public final static Namespace NS_ACTIVITIES = buildNamespace("activities");
+    public static final Namespace NS_ACTIVITIES = buildNamespace("activities");
 
-    public final static Namespace NS_WORK = buildNamespace("work");
+    public static final Namespace NS_WORK = buildNamespace("work");
 
     private static Namespace buildNamespace(String prefix) {
         return Namespace.getNamespace(prefix, "http://www.orcid.org/ns/" + prefix);

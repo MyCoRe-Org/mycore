@@ -42,11 +42,11 @@ import org.mycore.orcid.oauth.MCRReadPublicTokenFactory;
  */
 public class MCRORCIDClient {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRORCIDProfile.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRORCIDProfile.class);
 
-    public final static MediaType ORCID_XML_MEDIA_TYPE = MediaType.valueOf("application/vnd.orcid+xml");
+    public static final MediaType ORCID_XML_MEDIA_TYPE = MediaType.valueOf("application/vnd.orcid+xml");
 
-    private final static MCRORCIDClient SINGLETON = new MCRORCIDClient();
+    private static final MCRORCIDClient SINGLETON = new MCRORCIDClient();
 
     private WebTarget baseTarget;
 

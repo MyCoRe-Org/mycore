@@ -33,16 +33,12 @@ import org.swordapp.server.ServiceDocumentAPI;
  */
 public class MCRSwordServiceDocumentServlet extends MCRSwordServlet {
 
-    private MCRSwordConfigurationDefault swordConfiguration;
-
-    private MCRSwordServiceDocumentManager sdMgr;
-
     private ServiceDocumentAPI api;
 
     @Override
     public void init() throws ServletException {
-        swordConfiguration = new MCRSwordConfigurationDefault();
-        sdMgr = new MCRSwordServiceDocumentManager();
+        MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
+        MCRSwordServiceDocumentManager sdMgr = new MCRSwordServiceDocumentManager();
         api = new ServiceDocumentAPI(sdMgr, swordConfiguration);
     }
 

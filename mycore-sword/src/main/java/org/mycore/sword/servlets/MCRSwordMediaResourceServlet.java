@@ -30,14 +30,12 @@ import org.swordapp.server.MediaResourceAPI;
 
 public class MCRSwordMediaResourceServlet extends MCRSwordServlet {
 
-    private MCRSwordConfigurationDefault swordConfiguration;
-
     private MCRSwordMediaManager mrm;
 
     private MediaResourceAPI api;
 
     public void init() throws ServletException {
-        swordConfiguration = new MCRSwordConfigurationDefault();
+        MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
         mrm = new MCRSwordMediaManager();
         api = new MediaResourceAPI(mrm, swordConfiguration);
     }

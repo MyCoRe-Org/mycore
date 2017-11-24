@@ -61,7 +61,7 @@ public class MCRPIRegistrationServiceManager {
             Class<MCRPIRegistrationService<T>> piClass = (Class<MCRPIRegistrationService<T>>) Class.forName(className);
             Constructor<MCRPIRegistrationService<T>> constructor = piClass.getConstructor(String.class);
 
-            return (MCRPIRegistrationService<T>) constructor.newInstance(registrationServiceID);
+            return constructor.newInstance(registrationServiceID);
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException("The property : " + propertyName + " points to not existing class!", e);
         } catch (NoSuchMethodException e) {

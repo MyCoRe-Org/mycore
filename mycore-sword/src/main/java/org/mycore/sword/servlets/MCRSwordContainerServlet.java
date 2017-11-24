@@ -34,18 +34,12 @@ import org.swordapp.server.ContainerAPI;
  */
 public class MCRSwordContainerServlet extends MCRSwordServlet {
 
-    private MCRSwordConfigurationDefault swordConfiguration;
-
-    private MCRSwordContainerManager containerManager;
-
-    private MCRSwordStatementManager statementManager;
-
     private ContainerAPI api;
 
     public void init() {
-        swordConfiguration = new MCRSwordConfigurationDefault();
-        containerManager = new MCRSwordContainerManager();
-        statementManager = new MCRSwordStatementManager();
+        MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
+        MCRSwordContainerManager containerManager = new MCRSwordContainerManager();
+        MCRSwordStatementManager statementManager = new MCRSwordStatementManager();
         api = new ContainerAPI(containerManager, statementManager, swordConfiguration);
     }
 

@@ -527,7 +527,7 @@ public class MCRSession implements Cloneable {
             .join();
     }
 
-    private static CompletableFuture<? extends Object> toCompletableFuture(MCRTransactionableRunnable r) {
+    private static CompletableFuture<?> toCompletableFuture(MCRTransactionableRunnable r) {
         try {
             return CompletableFuture.runAsync(r, COMMIT_SERVICE);
         } catch (RuntimeException e) {

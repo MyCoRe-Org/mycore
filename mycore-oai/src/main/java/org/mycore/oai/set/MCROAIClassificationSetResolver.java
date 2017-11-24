@@ -42,8 +42,6 @@ class MCROAIClassificationSetResolver extends MCROAISetResolver<String, SolrDocu
 
     Map<String, SolrDocument> setMap;
 
-    private String classId;
-
     private String classField;
 
     private String classPrefix;
@@ -53,7 +51,7 @@ class MCROAIClassificationSetResolver extends MCROAISetResolver<String, SolrDocu
         Function<SolrDocument, String> identifier) {
         super.init(configPrefix, setId, setMap, result, identifier);
         this.setMap = result.stream().collect(Collectors.toMap(getIdentifier(), d -> d));
-        classId = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, setId);
+        String classId = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, setId);
         classField = MCRConfiguration.instance().getString(getConfigPrefix() + "Sets." + setId + "SetSolrField",
             "category.top");
         classPrefix = classId + ":";

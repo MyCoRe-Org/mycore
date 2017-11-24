@@ -47,7 +47,7 @@ public class MCRXMLResource {
 
     private static final MCRCache<String, CacheEntry> resourceCache = new MCRCache<>(
         MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100),
-        "XML resources");;
+        "XML resources");
 
     private static MCRXMLResource instance = new MCRXMLResource();
 

@@ -141,8 +141,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         MCRFileContentType detected = null;
 
         for (int i = 0; i < typesList.size() && maxScore < 1.0; i++) {
-            MCRFileContentType type = (MCRFileContentType) typesList.get(i);
-            Vector rules = (Vector) rulesTable.get(type);
+            MCRFileContentType type = typesList.get(i);
+            Vector rules = rulesTable.get(type);
 
             double score = 0.0;
 

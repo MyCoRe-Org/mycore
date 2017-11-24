@@ -21,7 +21,6 @@ package org.mycore.common.fo;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -72,8 +71,6 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final String BASE_URI = "resource:/";
-
     private FopFactory fopFactory;
 
     final ResourceResolver resolver = new ResourceResolver() {
@@ -99,46 +96,41 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         final MCRConfiguration mcrcfg = MCRConfiguration.instance();
 
         FopFactoryBuilder fopFactoryBuilder;
-        try {
-            // use restricted io to prevent issues with font caching on some systems 
-            fopFactoryBuilder = new FopFactoryBuilder(
-                EnvironmentalProfileFactory.createRestrictedIO(new URI(BASE_URI), resolver));
-            final String fo_cfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
-            if (!fo_cfg.isEmpty()) {
-                try {
-                    final DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-                    final Configuration cfg = cfgBuilder
-                        .build(MCRConfigurationDir.getConfigResource(fo_cfg).toString());
-                    fopFactoryBuilder.setConfiguration(cfg);
+        // use restricted io to prevent issues with font caching on some systems
+        fopFactoryBuilder = new FopFactoryBuilder(
+            EnvironmentalProfileFactory.createRestrictedIO(URI.create("resource:/"), resolver));
+        final String fo_cfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
+        if (!fo_cfg.isEmpty()) {
+            try {
+                final DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
+                final Configuration cfg = cfgBuilder.build(MCRConfigurationDir.getConfigResource(fo_cfg).toString());
+                fopFactoryBuilder.setConfiguration(cfg);
 
-                    // FIXME Workaround to get hyphenation work in FOP.
-                    // FOP should use "hyphenation-base" to get base URI for patterns 
-                    Optional<Configuration[]> hyphPat = Optional.ofNullable(cfg.getChildren("hyphenation-pattern"));
-                    hyphPat.ifPresent(configurations -> {
-                        Map<String, String> hyphPatMap = new HashMap<>();
-                        Arrays.stream(configurations).forEach(c -> {
-                            try {
-                                String lang = c.getAttribute("lang");
-                                String file = c.getValue();
+                // FIXME Workaround to get hyphenation work in FOP.
+                // FOP should use "hyphenation-base" to get base URI for patterns
+                Optional<Configuration[]> hyphPat = Optional.ofNullable(cfg.getChildren("hyphenation-pattern"));
+                hyphPat.ifPresent(configurations -> {
+                    Map<String, String> hyphPatMap = new HashMap<>();
+                    Arrays.stream(configurations).forEach(c -> {
+                        try {
+                            String lang = c.getAttribute("lang");
+                            String file = c.getValue();
 
-                                if ((lang != null && !lang.isEmpty()) && (file != null && !file.isEmpty())) {
-                                    hyphPatMap.put(lang, file);
-                                }
-                            } catch (Exception e) {
+                            if ((lang != null && !lang.isEmpty()) && (file != null && !file.isEmpty())) {
+                                hyphPatMap.put(lang, file);
                             }
-                        });
-                        fopFactoryBuilder.setHyphPatNames(hyphPatMap);
+                        } catch (Exception e) {
+                        }
                     });
+                    fopFactoryBuilder.setHyphPatNames(hyphPatMap);
+                });
 
-                } catch (ConfigurationException | SAXException | IOException e) {
-                    LOGGER.error("Exception while loading FOP configuration from {}.", fo_cfg, e);
-                }
+            } catch (ConfigurationException | SAXException | IOException e) {
+                LOGGER.error("Exception while loading FOP configuration from {}.", fo_cfg, e);
             }
-            fopFactory = fopFactoryBuilder.build();
-            getTransformerFactory();
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException("Illegal baseURI: " + BASE_URI, ex);
         }
+        fopFactory = fopFactoryBuilder.build();
+        getTransformerFactory();
     }
 
     private static TransformerFactory getTransformerFactory() throws TransformerFactoryConfigurationError {

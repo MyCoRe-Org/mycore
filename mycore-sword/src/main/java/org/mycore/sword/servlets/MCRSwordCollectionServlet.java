@@ -33,15 +33,11 @@ import org.swordapp.server.CollectionAPI;
  */
 public class MCRSwordCollectionServlet extends MCRSwordServlet {
 
-    private MCRSwordConfigurationDefault swordConfiguration;
-
-    private MCRSwordCollectionManager colMgr;
-
     private CollectionAPI api;
 
     public void init() {
-        swordConfiguration = new MCRSwordConfigurationDefault();
-        colMgr = new MCRSwordCollectionManager();
+        MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
+        MCRSwordCollectionManager colMgr = new MCRSwordCollectionManager();
         api = new CollectionAPI(colMgr, colMgr, swordConfiguration);
     }
 
