@@ -111,7 +111,6 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
 
         if ("connect".equals(type)) {
             connect(session);
-            return;
         }
 
     }

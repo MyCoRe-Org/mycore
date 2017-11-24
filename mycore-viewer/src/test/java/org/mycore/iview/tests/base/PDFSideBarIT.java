@@ -30,7 +30,6 @@ public class PDFSideBarIT extends SideBarIT {
 
     @Override
     public void testOverviewLayout() throws InterruptedException {
-        return;
     }
 
     @Override

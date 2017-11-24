@@ -223,12 +223,14 @@ public class MCRBinding {
     }
 
     private void setValue(Object node, String value) {
-        if (value.equals(getValue(node)))
+        if (value.equals(getValue(node))) {
             return;
-        else if (node instanceof Attribute)
+        }
+        if (node instanceof Attribute) {
             track(MCRSetAttributeValue.setValue((Attribute) node, value));
-        else
+        } else {
             track(MCRSetElementText.setText((Element) node, value));
+        }
     }
 
     public String getName() {
@@ -242,12 +244,13 @@ public class MCRBinding {
     private Map<String, Object> staticVariables = null;
 
     private Map<String, Object> getVariables() {
-        if (staticVariables != null)
+        if (staticVariables != null) {
             return staticVariables;
-        else if (parent != null)
+        }
+        if (parent != null) {
             return parent.getVariables();
-        else
-            return Collections.emptyMap();
+        }
+        return Collections.emptyMap();
     }
 
     public void setVariables(Map<String, Object> variables) {

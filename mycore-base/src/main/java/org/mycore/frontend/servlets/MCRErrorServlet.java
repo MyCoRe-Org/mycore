@@ -232,7 +232,6 @@ public class MCRErrorServlet extends HttpServlet {
                     if (!openTransaction)
                         session.commitTransaction();
                 }
-                return;
             } finally {
                 if (exceptionThrown || !currentSessionActive) {
                     MCRSessionMgr.releaseCurrentSession();

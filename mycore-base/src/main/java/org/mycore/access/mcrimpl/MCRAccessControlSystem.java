@@ -111,7 +111,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         } else {
             accessStore.updateAccessDefinition(ruleMapping);
         }
-        return;
     }
 
     @Override
@@ -149,7 +148,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         } else {
             accessStore.updateAccessDefinition(ruleMapping);
         }
-        return;
     }
 
     @Override

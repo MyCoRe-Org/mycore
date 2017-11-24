@@ -284,7 +284,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             } catch (IOException | JDOMException e) {
                 LOGGER.warn("Could not read thumbnail of {}", iviewFile, e);
                 tileImage(derivate, absoluteImagePath);
-                return;
             }
         }
     }

@@ -179,7 +179,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 return;
             }
             logger.warn("Can't find method for " + MCREvent.CLASS_TYPE + " for event type {}", evt.getEventType());
-            return;
         }
 
     }
@@ -314,7 +313,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 return;
             }
             logger.warn("Can't find method for " + MCREvent.CLASS_TYPE + " for event type {}", evt.getEventType());
-            return;
         }
 
     }

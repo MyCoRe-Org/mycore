@@ -127,7 +127,6 @@ public class MCRMediaThumbnailServlet extends MCRServlet {
                 }
             } else {
                 job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
             }
         } finally {
             LOGGER.info("Finished sending {}", job.getRequest().getPathInfo());

@@ -284,7 +284,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             return;
         }
         AI.addRule(id, permission, rule, description);
-        return;
     }
 
     /**
@@ -347,7 +346,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     public static void permissionDeleteForID(String permission, String id) {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         AI.removeRule(id, permission);
-        return;
     }
 
     /**
@@ -362,7 +360,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     public static void permissionDeleteAllForID(String id) {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         AI.removeAllRules(id);
-        return;
     }
 
     /**
@@ -380,7 +377,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
             AI.removeRule(id, permission);
         }
-        return;
     }
 
     /**
@@ -397,7 +393,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
             AI.removeAllRules(id);
         }
-        return;
     }
 
     @MCRCommand(

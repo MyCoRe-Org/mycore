@@ -191,7 +191,6 @@ public class MCRTileCombineServlet extends MCRServlet {
                         request.setAttribute(IMAGE_KEY, combinedImage);
                     } else {
                         response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                        return;
                     }
                 } finally {
                     reader.dispose();
@@ -280,7 +279,6 @@ public class MCRTileCombineServlet extends MCRServlet {
                 }
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
             }
         }
     }
