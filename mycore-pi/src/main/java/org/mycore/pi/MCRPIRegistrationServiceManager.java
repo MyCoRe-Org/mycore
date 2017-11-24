@@ -57,7 +57,9 @@ public class MCRPIRegistrationServiceManager {
         String className = MCRConfiguration.instance().getString(propertyName);
 
         try {
-            Constructor<?> constructor = Class.forName(className).getConstructor(String.class);
+            @SuppressWarnings("unchecked")
+            Class<MCRPIRegistrationService<T>> piClass = (Class<MCRPIRegistrationService<T>>) Class.forName(className);
+            Constructor<MCRPIRegistrationService<T>> constructor = piClass.getConstructor(String.class);
 
             return (MCRPIRegistrationService<T>) constructor.newInstance(registrationServiceID);
         } catch (ClassNotFoundException e) {

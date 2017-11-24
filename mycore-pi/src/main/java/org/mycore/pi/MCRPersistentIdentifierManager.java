@@ -86,6 +86,7 @@ public class MCRPersistentIdentifierManager {
         Stream.of(MCRConfiguration.instance().getString(RESOLVER_CONFIGURATION).split(","))
             .forEach(className -> {
                 try {
+                    @SuppressWarnings("unchecked")
                     Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClass = (Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>>) Class
                         .forName(className);
                     Constructor<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClassConstructor = resolverClass

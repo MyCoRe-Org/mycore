@@ -25,11 +25,11 @@ import org.jdom2.Element;
  * 
  * @author Matthias Kramm
  */
-public class MCRFalseCondition implements MCRCondition<Object> {
+public class MCRFalseCondition<T> implements MCRCondition<T> {
     public MCRFalseCondition() {
     }
 
-    public boolean evaluate(Object o) {
+    public boolean evaluate(T o) {
         return false;
     }
 

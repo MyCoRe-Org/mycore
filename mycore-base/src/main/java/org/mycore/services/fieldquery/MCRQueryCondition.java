@@ -27,7 +27,7 @@ import org.mycore.parsers.bool.MCRCondition;
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRQueryCondition extends MCRFieldBaseValue implements MCRCondition<Object> {
+public class MCRQueryCondition extends MCRFieldBaseValue implements MCRCondition<Void> {
 
     /** The comparison operator used in this condition */
     private String operator;
@@ -60,7 +60,8 @@ public class MCRQueryCondition extends MCRFieldBaseValue implements MCRCondition
         return condition;
     }
 
-    public boolean evaluate(Object o) {
-        return false;
+    public boolean evaluate(Void o) {
+        //there is no 'void' instance
+        throw new UnsupportedOperationException();
     }
 }

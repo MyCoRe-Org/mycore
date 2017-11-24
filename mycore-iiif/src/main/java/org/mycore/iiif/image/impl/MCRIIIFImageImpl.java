@@ -56,6 +56,7 @@ public abstract class MCRIIIFImageImpl {
         String className = MCRConfiguration.instance().getString(classPropertyName);
 
         try {
+            @SuppressWarnings("unchecked")
             Class<MCRIIIFImageImpl> classObject = (Class<MCRIIIFImageImpl>) Class.forName(className);
             Constructor<MCRIIIFImageImpl> constructor = classObject.getConstructor(String.class);
             MCRIIIFImageImpl imageImpl = constructor.newInstance(implName);

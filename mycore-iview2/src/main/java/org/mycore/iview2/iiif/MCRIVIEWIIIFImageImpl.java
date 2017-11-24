@@ -89,6 +89,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         }
 
         try {
+            @SuppressWarnings("unchecked")
             Class<MCRTileFileProvider> classObject = (Class<MCRTileFileProvider>) Class
                 .forName(tileFileProviderClassName);
             Constructor<MCRTileFileProvider> constructor = classObject.getConstructor();

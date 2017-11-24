@@ -67,6 +67,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
         updateObject(obj);
     }
 
+    @SuppressWarnings("unchecked")
     public static void updateObject(MCRObject obj) {
         detectServices(obj, (service, registrationInfo) -> {
             try {
@@ -78,6 +79,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         detectServices(obj, (service, registrationInfo) -> {
             try {

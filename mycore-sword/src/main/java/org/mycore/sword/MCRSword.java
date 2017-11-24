@@ -45,7 +45,7 @@ public class MCRSword {
 
     private static void initConfig() {
         if (collections == null) {
-            collections = new Hashtable();
+            collections = new Hashtable<>();
             workspaceCollectionTable = new Hashtable<>();
             final MCRConfiguration mcrConfiguration = MCRConfiguration.instance();
             Map<String, String> propertiesMap = mcrConfiguration.getPropertiesMap();

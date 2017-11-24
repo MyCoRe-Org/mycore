@@ -153,6 +153,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         className = repairDeprecatedClassNames(className, metadataManagerPropertyKey);
 
         try {
+            @SuppressWarnings("unchecked")
             Class<MCRPersistentIdentifierMetadataManager<T>> classObject = (Class<MCRPersistentIdentifierMetadataManager<T>>) Class
                 .forName(className);
             Constructor<MCRPersistentIdentifierMetadataManager<T>> constructor = classObject
@@ -181,6 +182,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         String className = MCRConfiguration.instance().getString(inscriberPropertyKey);
 
         try {
+            @SuppressWarnings("unchecked")
             Class<MCRPersistentIdentifierGenerator<T>> classObject = (Class<MCRPersistentIdentifierGenerator<T>>) Class
                 .forName(className);
             Constructor<MCRPersistentIdentifierGenerator<T>> constructor = classObject.getConstructor(String.class);

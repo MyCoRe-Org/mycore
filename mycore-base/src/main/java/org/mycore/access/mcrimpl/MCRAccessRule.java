@@ -33,19 +33,19 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
 
 public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
-    String id = "";
+    private String id = "";
 
-    String creator = "";
+    private String creator = "";
 
-    Date creationTime = new Date();
+    private Date creationTime = new Date();
 
     String rule = "";
 
-    String description = "";
+    private String description = "";
 
-    MCRCondition parsedRule;
+    private MCRCondition<MCRAccessData> parsedRule;
 
-    static MCRRuleParser parser = new MCRRuleParser();
+    private static MCRRuleParser parser = new MCRRuleParser();
 
     public MCRAccessRule(String id, String creator, Date creationTime, String rule, String description)
         throws MCRParseException {
@@ -75,7 +75,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
         return returns;
     }
 
-    public MCRCondition getRule() {
+    public MCRCondition<MCRAccessData> getRule() {
         return parsedRule;
     }
 

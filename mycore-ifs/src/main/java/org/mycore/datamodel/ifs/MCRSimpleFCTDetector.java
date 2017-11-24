@@ -57,10 +57,10 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
     /** List of file content types we have rules for */
-    private List typesList = new Vector();
+    private List<MCRFileContentType> typesList = new Vector<>();
 
     /** Keys are file content types, values are vectors of MCRDetectionRule */
-    private Hashtable rulesTable = new Hashtable();
+    private Hashtable<MCRFileContentType, Vector> rulesTable = new Hashtable<>();
 
     private static Logger logger = LogManager.getLogger(MCRSimpleFCTDetector.class);
 
@@ -80,7 +80,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
      *            type
      */
     public void addRule(MCRFileContentType type, Element xRules) {
-        Vector rules = new Vector();
+        Vector<MCRDetectionRule> rules = new Vector<>();
         rulesTable.put(type, rules);
         typesList.add(type);
 

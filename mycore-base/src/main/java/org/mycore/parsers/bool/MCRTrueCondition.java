@@ -25,11 +25,11 @@ import org.jdom2.Element;
  * 
  * @author Matthias Kramm
  */
-public class MCRTrueCondition implements MCRCondition<Object> {
+public class MCRTrueCondition<T> implements MCRCondition<T> {
     public MCRTrueCondition() {
     }
 
-    public boolean evaluate(Object o) {
+    public boolean evaluate(T o) {
         return true;
     }
 

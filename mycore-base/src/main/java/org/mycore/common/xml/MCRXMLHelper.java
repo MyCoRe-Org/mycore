@@ -398,7 +398,7 @@ public class MCRXMLHelper {
             // - build child map of <name,namespace> pair with their respective elements
             Map<Pair<String, Namespace>, List<Element>> childContentMap = new HashMap<>();
             for (Element child : element.getChildren()) {
-                Pair key = new Pair<>(child.getName(), child.getNamespace());
+                Pair<String, Namespace> key = new Pair<>(child.getName(), child.getNamespace());
                 List<Element> contentList = childContentMap.computeIfAbsent(key, k -> new ArrayList<>());
                 contentList.add(child);
             }

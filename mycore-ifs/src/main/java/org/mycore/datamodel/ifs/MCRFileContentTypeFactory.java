@@ -131,7 +131,7 @@ public class MCRFileContentTypeFactory {
      *             if no such file content type is known in the system
      */
     public static MCRFileContentType getTypeByMimeType(String mimeType) throws MCRConfigurationException {
-        HashSet<String> types = new HashSet(typesTable.keySet());
+        HashSet<String> types = new HashSet<>(typesTable.keySet());
 
         for (String key : types) {
             MCRFileContentType contentType = typesTable.get(key);

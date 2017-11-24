@@ -170,7 +170,7 @@ public class MCRDOICommands {
             LOGGER.error("Error while receiving DOI list from Registration-Service!", e);
         }
 
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @MCRCommand(syntax = REPAIR_MEDIALIST_OF_0_AND_SERVICE_1,

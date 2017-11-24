@@ -49,6 +49,7 @@ public abstract class MCRIIIFPresentationImpl {
         String className = MCRConfiguration.instance().getString(classPropertyName);
 
         try {
+            @SuppressWarnings("unchecked")
             Class<MCRIIIFPresentationImpl> classObject = (Class<MCRIIIFPresentationImpl>) Class.forName(className);
             Constructor<MCRIIIFPresentationImpl> constructor = classObject.getConstructor(String.class);
             MCRIIIFPresentationImpl presentationImpl = constructor.newInstance(implName);

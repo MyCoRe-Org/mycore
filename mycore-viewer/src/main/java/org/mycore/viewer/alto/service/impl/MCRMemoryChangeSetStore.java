@@ -97,7 +97,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
         if (changeSets != null) {
             return changeSets.stream().filter(change -> change.getApplied() == null).collect(Collectors.toList());
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
@@ -106,7 +106,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
         if (changeSets != null) {
             return changeSets.stream().filter(change -> change.getApplied() == null).collect(Collectors.toList());
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
@@ -132,7 +132,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
                 .limit(count)
                 .collect(Collectors.toList());
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
@@ -147,7 +147,7 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
                 .limit(count)
                 .collect(Collectors.toList());
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override

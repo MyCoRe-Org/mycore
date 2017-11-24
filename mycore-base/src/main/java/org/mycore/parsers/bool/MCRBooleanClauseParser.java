@@ -31,7 +31,7 @@ import org.jdom2.Element;
  * 
  * @author Matthias Kramm
  */
-public class MCRBooleanClauseParser {
+public class MCRBooleanClauseParser<T> {
     private static Pattern bracket = Pattern.compile("\\([^)(]*\\)");
 
     private static Pattern and = Pattern.compile("[)\\s]+[aA][nN][dD][\\s(]+");
@@ -56,9 +56,7 @@ public class MCRBooleanClauseParser {
         return s;
     }
 
-    //---------------------------------------------
-
-    public MCRCondition parse(Element condition) {
+    public MCRCondition<T> parse(Element condition) {
         if (condition == null) {
             return defaultRule();
         }
@@ -68,13 +66,13 @@ public class MCRBooleanClauseParser {
 
             if (operator.equalsIgnoreCase("not")) {
                 Element child = condition.getChildren().get(0);
-                return new MCRNotCondition(parse(child));
+                return new MCRNotCondition<>(parse(child));
             } else if (operator.equalsIgnoreCase("and") || operator.equalsIgnoreCase("or")) {
                 List children = condition.getChildren();
-                MCRCondition cond;
+                MCRCondition<T> cond;
 
                 if (operator.equalsIgnoreCase("and")) {
-                    MCRAndCondition acond = new MCRAndCondition();
+                    MCRAndCondition<T> acond = new MCRAndCondition<>();
 
                     for (Object aChildren : children) {
                         Element child = (Element) aChildren;
@@ -83,7 +81,7 @@ public class MCRBooleanClauseParser {
 
                     cond = acond;
                 } else {
-                    MCROrCondition ocond = new MCROrCondition();
+                    MCROrCondition<T> ocond = new MCROrCondition<>();
 
                     for (Object aChildren : children) {
                         Element child = (Element) aChildren;
@@ -101,9 +99,7 @@ public class MCRBooleanClauseParser {
         return parseSimpleCondition(condition);
     }
 
-    //---------------------------------------------
-
-    public MCRCondition parse(String s) throws MCRParseException {
+    public MCRCondition<T> parse(String s) throws MCRParseException {
         s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
 
         if (s.trim().length() == 0 || s.equals("()")) {
@@ -113,11 +109,9 @@ public class MCRBooleanClauseParser {
         return parse(s, null);
     }
 
-    //---------------------------------------------
-
-    private MCRCondition parse(String s, List l) throws MCRParseException {
+    private MCRCondition<T> parse(String s, List<String> l) throws MCRParseException {
         if (l == null) {
-            l = new ArrayList();
+            l = new ArrayList<>();
         }
 
         s = s.trim();
@@ -150,18 +144,18 @@ public class MCRBooleanClauseParser {
         /* handle OR */
         Matcher m = or.matcher(s);
         int last = 0;
-        MCROrCondition orclause = new MCROrCondition();
+        MCROrCondition<T> orclause = new MCROrCondition<>();
         while (m.find()) {
             int l1 = m.start();
             if (last >= l1) {
                 throw new MCRParseException("subclause of OR missing while parsing \"" + s + "\"");
             }
-            MCRCondition c = parse(extendClauses(s.substring(last, l1), l), l);
+            MCRCondition<T> c = parse(extendClauses(s.substring(last, l1), l), l);
             last = m.end();
             orclause.addChild(c);
         }
         if (last != 0) {
-            MCRCondition c = parse(extendClauses(s.substring(last), l), l);
+            MCRCondition<T> c = parse(extendClauses(s.substring(last), l), l);
             orclause.addChild(c);
             return orclause;
         }
@@ -169,18 +163,18 @@ public class MCRBooleanClauseParser {
         /* handle AND */
         m = and.matcher(s);
         last = 0;
-        MCRAndCondition andclause = new MCRAndCondition();
+        MCRAndCondition<T> andclause = new MCRAndCondition<>();
         while (m.find()) {
             int l1 = m.start();
             if (last >= l1) {
                 throw new MCRParseException("subclause of AND missing while parsing \"" + s + "\"");
             }
-            MCRCondition c = parse(extendClauses(s.substring(last, l1), l), l);
+            MCRCondition<T> c = parse(extendClauses(s.substring(last, l1), l), l);
             last = m.end();
             andclause.addChild(c);
         }
         if (last != 0) {
-            MCRCondition c = parse(extendClauses(s.substring(last), l), l);
+            MCRCondition<T> c = parse(extendClauses(s.substring(last), l), l);
             andclause.addChild(c);
             return andclause;
         }
@@ -189,9 +183,9 @@ public class MCRBooleanClauseParser {
         s = s.trim();
 
         if (s.toLowerCase(Locale.ROOT).startsWith("not ")) {
-            MCRCondition inverse = parse(extendClauses(s.substring(4), l), l);
+            MCRCondition<T> inverse = parse(extendClauses(s.substring(4), l), l);
 
-            return new MCRNotCondition(inverse);
+            return new MCRNotCondition<>(inverse);
         }
 
         s = extendClauses(s, l); // expands tokens with previously analysed expressions
@@ -204,14 +198,14 @@ public class MCRBooleanClauseParser {
 
     //---------------------------------------------
 
-    protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
+    protected MCRCondition<T> parseSimpleCondition(String s) throws MCRParseException {
         /* handle specific rules */
         if (s.equalsIgnoreCase("true")) {
-            return new MCRTrueCondition();
+            return new MCRTrueCondition<>();
         }
 
         if (s.equalsIgnoreCase("false")) {
-            return new MCRFalseCondition();
+            return new MCRFalseCondition<>();
         }
 
         throw new MCRParseException("syntax error: " + s); // extendClauses(s,
@@ -220,31 +214,27 @@ public class MCRBooleanClauseParser {
 
     //---------------------------------------------
 
-    protected MCRCondition parseSimpleCondition(Element e) throws MCRParseException {
+    protected MCRCondition<T> parseSimpleCondition(Element e) throws MCRParseException {
         // <boolean operator="true|false" />
         String name = e.getAttributeValue("operator").toLowerCase(Locale.ROOT);
 
         if (name.equals("true")) {
-            return new MCRTrueCondition();
+            return new MCRTrueCondition<>();
         }
 
         if (name.equals("false")) {
-            return new MCRFalseCondition();
+            return new MCRFalseCondition<>();
         }
 
         throw new MCRParseException("syntax error: <" + name + ">");
     }
 
-    //---------------------------------------------
-
-    protected MCRCondition defaultRule() {
-        return new MCRTrueCondition();
+    protected MCRCondition<T> defaultRule() {
+        return new MCRTrueCondition<>();
     }
 
-    //---------------------------------------------
-
     public static void main(String[] args) {
-        MCRBooleanClauseParser p = new MCRBooleanClauseParser();
+        MCRBooleanClauseParser<Object> p = new MCRBooleanClauseParser<>();
 
         System.out.println("-------------");
         System.out.println("Positive test cases");
