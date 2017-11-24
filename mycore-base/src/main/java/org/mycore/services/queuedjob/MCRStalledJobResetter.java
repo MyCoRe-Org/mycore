@@ -58,10 +58,8 @@ public class MCRStalledJobResetter implements Runnable {
     public static MCRStalledJobResetter getInstance(Class<? extends MCRJobAction> action) {
         String key = action != null && !MCRJobQueue.singleQueue ? action.getName() : "single";
 
-        MCRStalledJobResetter resetter = INSTANCES.computeIfAbsent(key,
+        return INSTANCES.computeIfAbsent(key,
             k -> new MCRStalledJobResetter(MCRJobQueue.singleQueue ? null : action));
-
-        return resetter;
     }
 
     /**

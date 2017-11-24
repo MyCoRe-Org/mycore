@@ -53,10 +53,9 @@ public final class MCRURLRetriever {
     private static Map<String, MCRCollection> initActionsMappings() {
         try {
             MCRActionMappings actionMappings = MCRActionMappingsManager.getActionMappings();
-            Map<String, MCRCollection> collectionMap = Arrays
+            return Arrays
                 .stream(actionMappings.getCollections())
                 .collect(Collectors.toMap(MCRCollection::getName, c -> c));
-            return collectionMap;
         } catch (Exception e) {
             throw new MCRException(e);
         }

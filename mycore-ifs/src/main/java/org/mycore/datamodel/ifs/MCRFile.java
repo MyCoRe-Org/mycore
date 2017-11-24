@@ -717,11 +717,10 @@ public class MCRFile extends MCRFilesystemNode {
 
     @Override
     public String toString() {
-        String sb = super.toString() + "ContentType = " + contentTypeID + " " + "MD5         = " + md5 + " "
+
+        return super.toString() + "ContentType = " + contentTypeID + " " + "MD5         = " + md5 + " "
             + "StoreID     = "
             + storeID + " " + "StorageID   = " + storageID;
-
-        return sb;
     }
 
     /**
@@ -786,16 +785,14 @@ public class MCRFile extends MCRFilesystemNode {
             return null;
         }
         try {
-            MCRFile f = (MCRFile) ((MCRDirectory) node).getChildByPath(path);
-            return f;
+            return (MCRFile) ((MCRDirectory) node).getChildByPath(path);
         } catch (Exception ex) {
             return null;
         }
     }
 
     public static MCRCategLinkReference getCategLinkReference(MCRObjectID derivateID, String path) {
-        MCRCategLinkReference ref = new MCRCategLinkReference(path, derivateID.toString());
-        return ref;
+        return new MCRCategLinkReference(path, derivateID.toString());
     }
 
     public boolean isNew() {

@@ -178,8 +178,7 @@ public class MCRJSONWebTokenUtil {
             RSAKey serverPublicKey = RSAKey.parse(signedJWT.getHeader().getJWK().toJSONObject());
             if (signedJWT.verify(new RSASSAVerifier(serverPublicKey))) {
                 //Token is valid
-                String username = signedJWT.getJWTClaimsSet().getSubject();
-                return username;
+                return signedJWT.getJWTClaimsSet().getSubject();
             }
         } catch (ParseException | JOSEException e) {
             LOGGER.error(e);

@@ -62,7 +62,6 @@ class MCRPersonTransformer extends MCRFieldTransformer {
         if (person.getPreLast() != null) {
             first.append(' ').append(person.getPreLast());
         }
-        String firstName = normalizeValue(first.toString().trim());
-        return firstName;
+        return normalizeValue(first.toString().trim());
     }
 }

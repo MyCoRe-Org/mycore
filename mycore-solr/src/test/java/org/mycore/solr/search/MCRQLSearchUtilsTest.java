@@ -57,8 +57,7 @@ public class MCRQLSearchUtilsTest extends MCRTestCase {
         query.addContent(conditions);
         conditions.addContent(condition.toXML());
         Document queryDoc = new Document(query);
-        MCRQuery orQuery = MCRQLSearchUtils.buildFormQuery(queryDoc.getRootElement());
-        return orQuery;
+        return MCRQLSearchUtils.buildFormQuery(queryDoc.getRootElement());
     }
 
 }

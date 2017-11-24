@@ -95,13 +95,12 @@ public class MCRUploadServletDeployer implements AutoExecutable {
     private MultipartConfigElement getMultipartConfig() {
         String location = MCRConfiguration2.getStringOrThrow(MCR_FILE_UPLOAD_TEMP_STORAGE_PATH);
         long maxFileSize = MCRConfiguration2.getLong("MCR.FileUpload.MaxSize").orElse(5000000L);
-        long maxRequestSize = maxFileSize;
         int fileSizeThreshold = MCRConfiguration2.getInt("MCR.FileUpload.MemoryThreshold").orElse(1000000);
         LogManager.getLogger()
             .info(() -> MCRUploadViaFormServlet.class.getSimpleName() + " accept files and requests up to "
-                + maxRequestSize + " bytes and uses " + location + " as tempory storage for files larger "
+                + maxFileSize + " bytes and uses " + location + " as tempory storage for files larger "
                 + fileSizeThreshold + " bytes.");
-        return new MultipartConfigElement(location, maxFileSize, maxRequestSize,
+        return new MultipartConfigElement(location, maxFileSize, maxFileSize,
             fileSizeThreshold);
     }
 

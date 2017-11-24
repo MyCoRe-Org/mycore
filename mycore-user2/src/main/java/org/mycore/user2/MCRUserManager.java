@@ -553,8 +553,7 @@ public class MCRUserManager {
     }
 
     private static byte[] generateSalt() {
-        byte[] salt = SECURE_RANDOM.generateSeed(8);
-        return salt;
+        return SECURE_RANDOM.generateSeed(8);
     }
 
     private static Optional<MCRUser> getByNaturalID(EntityManager em, String userName, String realmId) {

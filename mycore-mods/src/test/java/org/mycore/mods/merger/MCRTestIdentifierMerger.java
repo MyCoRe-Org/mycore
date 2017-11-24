@@ -35,7 +35,6 @@ public class MCRTestIdentifierMerger extends MCRTestCase {
     public void testMergeSame() throws Exception {
         String a = "[mods:identifier[@type='issn']='12345678']";
         String b = "[mods:identifier[@type='issn']='1234-5678']";
-        String e = b;
-        MCRTestMerger.test(a, b, e);
+        MCRTestMerger.test(a, b, b);
     }
 }

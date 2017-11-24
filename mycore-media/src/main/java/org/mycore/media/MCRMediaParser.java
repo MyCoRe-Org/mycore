@@ -159,9 +159,8 @@ public class MCRMediaParser {
     public static synchronized byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight,
         boolean keepAspect) throws Exception {
         if (media.hasThumbnailSupport()) {
-            byte[] thumb = media.getThumbnail(media, seek, maxWidth, maxHeight, keepAspect);
 
-            return thumb;
+            return media.getThumbnail(media, seek, maxWidth, maxHeight, keepAspect);
         } else {
             throw new Exception("The " + media.getClass().getName() + " hasn't support for getThumbnail");
         }

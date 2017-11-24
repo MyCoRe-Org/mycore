@@ -114,8 +114,7 @@ public class MCRRoleManager {
             LOGGER.debug("Category does not exist: {}", categoryID);
             return null;
         }
-        MCRRole role = new MCRRole(name, category.getLabels());
-        return role;
+        return new MCRRole(name, category.getLabels());
     }
 
     /**

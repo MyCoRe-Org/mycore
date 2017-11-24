@@ -59,8 +59,7 @@ public class MCRSecureTokenV2Test {
         String ipAddress = "192.168.1.2";
         String[] parameters = { "myTokenPrefixstarttime=1395230400", "myTokenPrefixendtime=1500000000",
             "myTokenPrefixCustomParameter=abcdef" };
-        MCRSecureTokenV2 token = new MCRSecureTokenV2(contentPath, ipAddress, sharedSecret, parameters);
-        return token;
+        return new MCRSecureTokenV2(contentPath, ipAddress, sharedSecret, parameters);
     }
 
 }

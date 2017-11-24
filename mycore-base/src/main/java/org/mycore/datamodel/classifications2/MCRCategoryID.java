@@ -209,8 +209,7 @@ public class MCRCategoryID implements Serializable {
         if (ID == null || ID.length() == 0) {
             return rootID;
         }
-        String str = rootID + ':' + ID;
-        return str;
+        return rootID + ':' + ID;
     }
 
 }

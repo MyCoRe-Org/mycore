@@ -49,11 +49,10 @@ public class MCRHttpUtils {
             .format("MyCoRe/{0} ({1}; java {2})", MCRCoreVersion.getCompleteVersion(), MCRConfiguration.instance()
                 .getString("MCR.NameOfProject", "undefined"), System.getProperty("java.version"));
         //setup http client
-        CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(connectionManager)
+        return HttpClients.custom().setConnectionManager(connectionManager)
             .setUserAgent(userAgent).setRetryHandler(new MCRRetryHandler(maxConnections))
             .setDefaultRequestConfig(requestConfig).setDefaultConnectionConfig(connectionConfig)
             .setDefaultSocketConfig(socketConfig).build();
-        return httpClient;
     }
 
     public static PoolingHttpClientConnectionManager getConnectionManager(int maxConnections) {

@@ -143,7 +143,6 @@ public class MCRErrorListener implements ErrorListener {
         }
         msg.append(": ");
         msg.append(exception.getMessage());
-        String message = msg.toString();
-        return message;
+        return msg.toString();
     }
 }

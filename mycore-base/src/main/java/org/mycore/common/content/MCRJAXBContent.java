@@ -78,8 +78,7 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
     public Source getSource() throws IOException {
         try {
             Marshaller marshaller = getMarshaller();
-            JAXBSource jaxbSource = new JAXBSource(marshaller, jaxbObject);
-            return jaxbSource;
+            return new JAXBSource(marshaller, jaxbObject);
         } catch (JAXBException e) {
             throw new IOException(e);
         }

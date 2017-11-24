@@ -257,8 +257,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         // TransformerHandler.
         LOGGER.info("Start transforming: {}", source.getSystemId() == null ? source.getName() : source.getSystemId());
         reader.parse(source.getInputSource());
-        MCRContent transformedContent = new MCRByteContent(baos.getBuffer(), 0, baos.size());
-        return transformedContent;
+        return new MCRByteContent(baos.getBuffer(), 0, baos.size());
     }
 
     private String getFileName(MCRContent content) throws TransformerException, SAXException {

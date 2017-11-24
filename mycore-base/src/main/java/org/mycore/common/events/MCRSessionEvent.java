@@ -68,8 +68,7 @@ public class MCRSessionEvent {
 
     @Override
     public String toString() {
-        String sb = "MCRSessionEvent['" + getSession() + "'," + getType() + "," + getConcurrentAccessors() + "]'";
-        return sb;
+        return "MCRSessionEvent['" + getSession() + "'," + getType() + "," + getConcurrentAccessors() + "]'";
     }
 
 }

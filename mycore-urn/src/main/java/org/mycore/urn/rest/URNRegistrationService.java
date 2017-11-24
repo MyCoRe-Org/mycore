@@ -83,8 +83,7 @@ public class URNRegistrationService extends TimerTask implements Closeable {
     }
 
     List<MCRURN> getURNList() {
-        List<MCRURN> list = MCRURNManager.get(false, 0, 16384);
-        return list;
+        return MCRURNManager.get(false, 0, 16384);
     }
 
     @Override

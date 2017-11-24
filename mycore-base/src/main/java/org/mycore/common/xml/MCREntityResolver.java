@@ -205,8 +205,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         if (baseURI == null || isAbsoluteURL(systemId)) {
             return URI.create(systemId);
         }
-        URI resolved = URI.create(baseURI).resolve(systemId);
-        return resolved;
+        return URI.create(baseURI).resolve(systemId);
     }
 
     @Override

@@ -327,8 +327,7 @@ public class MCRURNAdder {
         String className = MCRConfiguration.instance().getString("MCR.URN.Provider.Class");
         LOGGER.info("Loading class {} as IURNProvider", className);
         Class<MCRIURNProvider> c = (Class<MCRIURNProvider>) Class.forName(className);
-        MCRIURNProvider provider = c.newInstance();
-        return provider;
+        return c.newInstance();
     }
 
     /**

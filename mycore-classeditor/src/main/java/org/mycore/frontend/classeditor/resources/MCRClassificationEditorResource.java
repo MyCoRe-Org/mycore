@@ -411,8 +411,7 @@ public class MCRClassificationEditorResource {
         }
         Gson gson = MCRJSONManager.instance().createGson();
 
-        String json = gson.toJson(category);
-        return json;
+        return gson.toJson(category);
     }
 
     private SaveElement getCateg(JsonElement jsonElement) {
@@ -442,8 +441,7 @@ public class MCRClassificationEditorResource {
 
     private MCRJSONCategory parseJson(String json) {
         Gson gson = MCRJSONManager.instance().createGson();
-        MCRJSONCategory category = gson.fromJson(json, MCRJSONCategory.class);
-        return category;
+        return gson.fromJson(json, MCRJSONCategory.class);
     }
 
     protected String buildJsonError(String errorType, MCRCategoryID mcrCategoryID) {

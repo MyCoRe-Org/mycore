@@ -695,8 +695,7 @@ public abstract class MCRServletContentHelper {
      * Returns the request path for debugging purposes.
      */
     private static String getRequestPath(final HttpServletRequest request) {
-        final String result = request.getServletPath() + (request.getPathInfo() == null ? "" : request.getPathInfo());
-        return result;
+        return request.getServletPath() + (request.getPathInfo() == null ? "" : request.getPathInfo());
     }
 
     /**

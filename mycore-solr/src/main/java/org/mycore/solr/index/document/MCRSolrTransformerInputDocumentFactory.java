@@ -122,9 +122,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
 
             @Override
             public SolrInputDocument next() {
-                SolrInputDocument solrInputDocument = MCRSolrInputDocumentGenerator.getSolrInputDocument(delegate
+                return MCRSolrInputDocumentGenerator.getSolrInputDocument(delegate
                     .next());
-                return solrInputDocument;
             }
 
             @Override

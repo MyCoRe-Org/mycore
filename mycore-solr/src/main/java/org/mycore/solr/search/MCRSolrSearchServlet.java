@@ -336,8 +336,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         if (!filterQueryMap.containsKey(fieldType)) {
             filterQueryMap.put(fieldType, new StringBuilder(JOIN_PATTERN));
         }
-        StringBuilder filterQueryBuilder = filterQueryMap.get(fieldType);
-        return filterQueryBuilder;
+        return filterQueryMap.get(fieldType);
     }
 
     /**

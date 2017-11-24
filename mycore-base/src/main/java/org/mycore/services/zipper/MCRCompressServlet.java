@@ -198,8 +198,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         } else {
             contentTransformer.transform(content, out);
         }
-        byte[] metaDataContent = out.toByteArray();
-        return metaDataContent;
+        return out.toByteArray();
     }
 
     private void sendDerivate(MCRObjectID id, String path, T container) throws IOException {

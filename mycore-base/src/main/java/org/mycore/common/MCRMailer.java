@@ -638,8 +638,7 @@ public class MCRMailer extends MCRServlet {
         public Document toXML() {
             final MCRJAXBContent<EMail> content = new MCRJAXBContent<>(JAXB_CONTEXT, this);
             try {
-                final Document xml = content.asXML();
-                return xml;
+                return content.asXML();
             } catch (final SAXParseException | JDOMException | IOException e) {
                 throw new MCRException("Exception while transforming EMail to JDOM document.", e);
             }

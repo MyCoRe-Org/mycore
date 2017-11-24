@@ -131,8 +131,7 @@ class MCRPersistenceHelper {
             xout.output(jdom_out, swClean);
             LOGGER.debug("Results in \n{}", swClean);
         }
-        MCRObject mcrObject = new MCRObject(jdom_out);
-        return mcrObject;
+        return new MCRObject(jdom_out);
     }
 
     protected static String getWebPage(ServletContext context, String modernPage, String deprecatedPage)

@@ -40,9 +40,8 @@ public class MCRMetadataShareAgentFactory {
         String propertyValue = MCRConfiguration.instance().getString(propertyName, null);
         if (propertyValue != null) {
             //we will not get undefined problems here
-            MCRMetadataShareAgent metadataShareAgent = MCRConfiguration.instance()
+            return MCRConfiguration.instance()
                 .getSingleInstanceOf(propertyName, null);
-            return metadataShareAgent;
         }
         return getDefaultAgent();
 

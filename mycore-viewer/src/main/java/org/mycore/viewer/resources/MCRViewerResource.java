@@ -111,8 +111,7 @@ public class MCRViewerResource {
         startIviewClientElement.addContent(configElement);
         startIviewClientElement.addContent(config.toXML().asXML().getRootElement().detach());
         configElement.addContent(configJson);
-        Document startIviewClientDocument = new Document(startIviewClientElement);
-        return startIviewClientDocument;
+        return new Document(startIviewClientElement);
     }
 
     protected MCRContent getContent(final HttpServletRequest req)

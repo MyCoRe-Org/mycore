@@ -505,8 +505,7 @@ public class MCRRestAPIUploadHelper {
             signature.initVerify(((RSAKey) jwk).toRSAPublicKey());
             signature.update(message.getBytes(StandardCharsets.ISO_8859_1));
 
-            boolean x = signature.verify(Base64.getDecoder().decode(base64Signature));
-            return x;
+            return signature.verify(Base64.getDecoder().decode(base64Signature));
 
         } catch (Exception e) {
             LOGGER.error(e);

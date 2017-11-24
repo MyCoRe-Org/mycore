@@ -100,8 +100,7 @@ public class MCRTestNameMerger extends MCRTestCase {
     public void testMergeDisplayForm() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:displayForm='Tommy']]";
         String b = "[mods:name[@type='personal'][mods:namePart='Mueller, T'][mods:displayForm='Tom']]";
-        String e = a;
-        MCRTestMerger.test(a, b, e);
+        MCRTestMerger.test(a, b, a);
     }
 
     @Test
@@ -116,16 +115,14 @@ public class MCRTestNameMerger extends MCRTestCase {
     public void testMergeFirstLastVsLastFirst() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']]";
         String b = "[mods:name[@type='personal'][mods:namePart='Mueller, T']]";
-        String e = a;
-        MCRTestMerger.test(a, b, e);
+        MCRTestMerger.test(a, b, a);
     }
 
     @Test
     public void testPreferFamilyGiven() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']]";
         String b = "[mods:name[@type='personal'][mods:namePart[@type='family']='Müller'][mods:namePart[@type='given']='T.']]";
-        String e = b;
-        MCRTestMerger.test(a, b, e);
+        MCRTestMerger.test(a, b, b);
     }
 
     private MCRNameMerger buildNameEntry(String predicates) throws JaxenException {

@@ -88,8 +88,7 @@ public class MCRFunctions {
             throw new PatternSyntaxException("Missing '}'.", globPattern, nextPos - 1);
         }
 
-        final String regExp = regex.append('$').toString();
-        return regExp;
+        return regex.append('$').toString();
     }
 
     private static int addCharacterClass(final StringBuilder regex, final String globPattern, int nextPos) {

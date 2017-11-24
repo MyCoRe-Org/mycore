@@ -69,8 +69,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
 
     private Document loadMODSDocument() throws SAXParseException, IOException {
         URL worldClassUrl = this.getClass().getResource("/mods80700998.xml");
-        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(worldClassUrl));
-        return xml;
+        return MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(worldClassUrl));
     }
 
     @Test

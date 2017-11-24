@@ -501,9 +501,9 @@ public class MCRSwordUtil {
             throws SwordError {
             return MCRSword.getCollection(collection).getDerivateIDsofObject(mcrObjId).map(derivateId -> {
                 final Factory abderaFactory = Abdera.getNewFactory();
-                final String id = derivateId;
-                final Stream<IRI> editMediaFileIRIStream = getEditMediaFileIRIStream(collection, id);
-                return Stream.concat(Stream.of(getEditMediaHrefOfDerivate(collection, id)), editMediaFileIRIStream)
+                final Stream<IRI> editMediaFileIRIStream = getEditMediaFileIRIStream(collection, derivateId);
+                return Stream
+                    .concat(Stream.of(getEditMediaHrefOfDerivate(collection, derivateId)), editMediaFileIRIStream)
                     .map(link -> {
                         final Link newLinkElement = abderaFactory.newLink();
                         newLinkElement.setHref(link.toString());

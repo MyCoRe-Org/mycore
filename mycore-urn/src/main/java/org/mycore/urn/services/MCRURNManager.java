@@ -211,8 +211,7 @@ public class MCRURNManager {
         int i = path.lastIndexOf("/") + 1;
         String file = path.substring(i);
         String pathDb = path.substring(0, i);
-        String[] pathParts = { pathDb, file };
-        return pathParts;
+        return new String[] { pathDb, file };
     }
 
     public static String getURNForFile(String derivateId, String path, String fileName) {

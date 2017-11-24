@@ -174,8 +174,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             cgi.append("end=").append(stopPos);
         }
 
-        String url = cgi.toString();
-        return url;
+        return cgi.toString();
     }
 
     @Override

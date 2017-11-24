@@ -155,9 +155,8 @@ public class MCRMetadataHistoryCommands {
     }
 
     private static Stream<MCRMetaHistoryItem> getHistoryItems(MCRObjectID objId) {
-        Stream<MCRMetaHistoryItem> items = objId.getTypeId().equals("derivate") ? buildDerivateHistory(objId)
+        return objId.getTypeId().equals("derivate") ? buildDerivateHistory(objId)
             : buildObjectHistory(objId);
-        return items;
     }
 
     private static Stream<MCRMetaHistoryItem> buildDerivateHistory(MCRObjectID derId) {

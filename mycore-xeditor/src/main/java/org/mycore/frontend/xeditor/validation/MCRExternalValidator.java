@@ -107,8 +107,7 @@ public class MCRExternalValidator extends MCRValidator {
         try {
             Object[] params = { param };
             Object result = method.invoke(null, params);
-            Boolean b = (Boolean) result;
-            return b;
+            return (Boolean) result;
         } catch (Exception ex) {
             throw new MCRException(ex);
         }

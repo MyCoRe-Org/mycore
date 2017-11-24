@@ -161,8 +161,7 @@ public class MCRRSSFeedImporter {
     private SyndFeed retrieveFeed() throws IOException, FeedException {
         XmlReader feedReader = new XmlReader(new URL(feedURL));
         SyndFeedInput input = new SyndFeedInput();
-        SyndFeed feed = input.build(feedReader);
-        return feed;
+        return input.build(feedReader);
     }
 
     private MCRObject handleFeedEntry(SyndEntry entry, String projectID)

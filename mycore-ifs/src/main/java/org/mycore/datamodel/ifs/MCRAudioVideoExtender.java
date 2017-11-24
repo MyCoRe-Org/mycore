@@ -253,10 +253,10 @@ public abstract class MCRAudioVideoExtender {
         NumberFormat formatter = NumberFormat.getIntegerInstance(Locale.ROOT);
         formatter.setGroupingUsed(false);
         formatter.setMinimumIntegerDigits(2);
-        String sb = formatter.format(durationHours) + ":" + formatter.format(durationMinutes) + ":" + formatter.format(
-            durationSeconds);
 
-        return sb;
+        return formatter.format(durationHours) + ":" + formatter.format(durationMinutes) + ":"
+            + formatter.format(
+            durationSeconds);
     }
 
     /**

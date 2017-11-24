@@ -159,8 +159,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (!running) {
             return null;
         }
-        MCRJob job = getElement();
-        return job;
+        return getElement();
     }
 
     /**

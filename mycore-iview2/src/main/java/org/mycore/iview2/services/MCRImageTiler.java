@@ -131,8 +131,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                 ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
 
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
-                    return t;
+                    return new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
                 }
             };
             final AtomicInteger activeThreads = new AtomicInteger();
@@ -224,8 +223,7 @@ public class MCRImageTiler implements Runnable, Closeable {
 
     private MCRTilingAction getTilingAction(MCRTileJob job) {
         try {
-            MCRTilingAction tilingAction = tilingActionConstructor.newInstance(job);
-            return tilingAction;
+            return tilingActionConstructor.newInstance(job);
         } catch (Exception e) {
             throw new MCRException(e);
         }

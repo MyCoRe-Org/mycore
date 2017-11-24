@@ -119,8 +119,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     public MCRTileJob peek() {
         if (!running)
             return null;
-        MCRTileJob job = getElement();
-        return job;
+        return getElement();
     }
 
     /**

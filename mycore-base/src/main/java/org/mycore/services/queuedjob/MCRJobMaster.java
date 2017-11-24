@@ -157,8 +157,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                 ThreadGroup tg = new ThreadGroup("MCRJob slave job thread group");
 
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(tg, r, getPreLabel() + "Slave#" + tNum.incrementAndGet());
-                    return t;
+                    return new Thread(tg, r, getPreLabel() + "Slave#" + tNum.incrementAndGet());
                 }
             };
             final AtomicInteger activeThreads = new AtomicInteger();
@@ -347,9 +346,8 @@ public class MCRJobMaster implements Runnable, Closeable {
     private static MCRJobAction toMCRJobAction(Class<? extends MCRJobAction> actionClass) {
         try {
             Constructor<? extends MCRJobAction> actionConstructor = actionClass.getConstructor();
-            MCRJobAction action = actionConstructor.newInstance();
 
-            return action;
+            return actionConstructor.newInstance();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

@@ -149,8 +149,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         if (localSchemaURL == null) {
             throw new MCRException(DATACITE_SCHEMA_PATH + " was not found!");
         }
-        Schema schema = schemaFactory.newSchema(localSchemaURL);
-        return schema;
+        return schemaFactory.newSchema(localSchemaURL);
     }
 
     public boolean usesTestPrefix() {

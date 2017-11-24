@@ -137,8 +137,7 @@ public class MCRCStoreVFS extends MCRContentStore {
         URL baseURL = getBase().getURL();
         if ("file".equals(baseURL.getProtocol())) {
             try {
-                File baseDir = new File(baseURL.toURI());
-                return baseDir;
+                return new File(baseURL.toURI());
             } catch (URISyntaxException e) {
                 throw new IOException("baseURI for content store " + getID() + " is invalid: " + baseURL, e);
             }

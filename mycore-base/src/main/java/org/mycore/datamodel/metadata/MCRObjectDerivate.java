@@ -290,8 +290,7 @@ public class MCRObjectDerivate {
         if (!Files.exists(mcrFile)) {
             throw new MCRPersistenceException("File does not exist: " + mcrFile);
         }
-        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, urn, handle, null);
-        return newFileMetadata;
+        return new MCRFileMetadata(path, urn, handle, null);
     }
 
     public List<MCRFileMetadata> getFileMetadata() {

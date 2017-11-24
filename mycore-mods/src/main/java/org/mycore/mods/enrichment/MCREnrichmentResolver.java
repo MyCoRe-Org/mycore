@@ -96,8 +96,7 @@ public class MCREnrichmentResolver implements URIResolver {
                 LOGGER.debug("Skipping data source {}", token);
                 continue;
             } else {
-                String dataSourceID = token;
-                MCRDataSource dataSource = MCRDataSourceFactory.instance().getDataSource(dataSourceID);
+                MCRDataSource dataSource = MCRDataSourceFactory.instance().getDataSource(token);
 
                 dataSourceLoop: for (MCRIdentifierResolver resolver : dataSource.getResolvers()) {
                     MCRIdentifierType idType = resolver.getType();

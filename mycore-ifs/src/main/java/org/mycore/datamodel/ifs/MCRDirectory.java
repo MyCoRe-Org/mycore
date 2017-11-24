@@ -520,10 +520,9 @@ public class MCRDirectory extends MCRFilesystemNode {
 
     @Override
     public String toString() {
-        String sb = super.toString() + "NumChildDirectoriesHere  = " + numChildDirsHere + "NumChildFilesHere        = "
+
+        return super.toString() + "NumChildDirectoriesHere  = " + numChildDirsHere + "NumChildFilesHere        = "
             + numChildFilesHere + "NumChildDirectoriesTotal = " + numChildDirsTotal + "NumChildFilesTotal       = "
             + numChildFilesTotal;
-
-        return sb;
     }
 }

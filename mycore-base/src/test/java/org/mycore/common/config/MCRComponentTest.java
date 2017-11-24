@@ -87,8 +87,7 @@ public class MCRComponentTest extends MCRTestCase {
     }
 
     private static Manifest getSimpleManifest() {
-        Manifest m = new Manifest();
-        return m;
+        return new Manifest();
     }
 
 }

@@ -89,8 +89,7 @@ public class URNServer {
     public int head(MCRURN urn) {
         HeadMethod headMethod = new HeadMethod(getConfiguration().getServiceURL() + urn);
         try {
-            int status = getHttpClient().executeMethod(headMethod);
-            return status;
+            return getHttpClient().executeMethod(headMethod);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

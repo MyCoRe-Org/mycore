@@ -210,12 +210,11 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
         if (type == null) {
             throw new NullPointerException();
         }
-        Class<?> c = type;
         //must support BasicFileAttributeView
-        if (c == BasicFileAttributeView.class) {
+        if (type == BasicFileAttributeView.class) {
             return (V) new BasicFileAttributeViewImpl(this, path);
         }
-        if (c == MCRMD5AttributeView.class) {
+        if (type == MCRMD5AttributeView.class) {
             return (V) new MD5FileAttributeViewImpl(this, path);
         }
         return null;

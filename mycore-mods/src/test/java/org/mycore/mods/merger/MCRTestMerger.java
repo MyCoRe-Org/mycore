@@ -38,8 +38,7 @@ public class MCRTestMerger extends MCRTestCase {
     public void testAddingNew() throws Exception {
         String a = "[mods:note[@xml:lang='de']='deutsch']";
         String b = "[mods:note[@xml:lang='de']='deutsch'][mods:note[@xml:lang='en']='english']";
-        String e = b;
-        test(a, b, e);
+        test(a, b, b);
     }
 
     @Test

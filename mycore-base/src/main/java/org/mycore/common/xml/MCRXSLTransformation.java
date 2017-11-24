@@ -162,9 +162,8 @@ public class MCRXSLTransformation {
      */
     public Templates getStylesheet(Source stylesheet) {
         try {
-            Templates out = saxFactory.newTemplates(stylesheet);
 
-            return out;
+            return saxFactory.newTemplates(stylesheet);
         } catch (TransformerConfigurationException tcx) {
             LOGGER.fatal(tcx.getMessageAndLocation());
 
@@ -180,9 +179,8 @@ public class MCRXSLTransformation {
      */
     public TransformerHandler getTransformerHandler(Templates stylesheet) {
         try {
-            TransformerHandler handler = saxFactory.newTransformerHandler(stylesheet);
 
-            return handler;
+            return saxFactory.newTransformerHandler(stylesheet);
         } catch (TransformerConfigurationException tcx) {
             LOGGER.fatal(tcx.getMessageAndLocation());
 

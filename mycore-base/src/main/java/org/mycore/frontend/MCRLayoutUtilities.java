@@ -128,8 +128,7 @@ public class MCRLayoutUtilities {
 
         private long getLastModified() throws IOException {
             URLConnection urlConnection = docURL.openConnection();
-            long modified = urlConnection.getLastModified();
-            return modified;
+            return urlConnection.getLastModified();
         }
     }
 
@@ -142,8 +141,7 @@ public class MCRLayoutUtilities {
             public DocumentHolder load(String key) throws Exception {
                 URL url = SERVLET_CONTEXT.getResource(key);
                 try {
-                    DocumentHolder holder = new DocumentHolder(url);
-                    return holder;
+                    return new DocumentHolder(url);
                 } finally {
                     itemStore.clear();
                 }

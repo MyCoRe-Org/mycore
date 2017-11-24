@@ -66,9 +66,8 @@ public class MCRCORSFilter implements Filter {
             LOGGER.info("initializing {}", MCRCORSFilter.class.getSimpleName());
             LOGGER.info(String.format(Locale.ROOT, "%s is %s", CORS_FILTER_NAME, filterName));
             String propertyName = String.format(Locale.ROOT, "%s.%s", CONFIGURATION_PREFIX, filterName);
-            String allowOriginValue = MCRConfiguration.instance().getString(propertyName);
 
-            this.allowOriginValue = allowOriginValue;
+            this.allowOriginValue = MCRConfiguration.instance().getString(propertyName);
         } else {
             throw new MCRConfigurationException(String.format(Locale.ROOT, "No %s is set!", CORS_FILTER_NAME));
         }

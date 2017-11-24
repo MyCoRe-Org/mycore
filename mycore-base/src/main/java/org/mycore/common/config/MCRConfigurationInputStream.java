@@ -148,8 +148,7 @@ public class MCRConfigurationInputStream extends InputStream {
         dataProp.setProperty("MCR.basedir", configurationDirectory.getAbsolutePath().replace('\\', '/'));
         ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
         dataProp.store(out, null);
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(out.toByteArray());
-        return inputStream;
+        return new ByteArrayInputStream(out.toByteArray());
     }
 
     private static InputStream getPropertyStream(String filename) throws IOException {

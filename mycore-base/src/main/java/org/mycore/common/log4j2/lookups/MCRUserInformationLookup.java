@@ -50,8 +50,7 @@ public class MCRUserInformationLookup implements StrLookup {
 
     @Override
     public String lookup(String key) {
-        String value = getValue(key);
-        return value;
+        return getValue(key);
     }
 
     @Override

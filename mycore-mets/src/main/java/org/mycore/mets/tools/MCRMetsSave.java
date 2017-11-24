@@ -635,15 +635,13 @@ public class MCRMetsSave {
                                 return mets;
                             }
 
-                            LogicalDiv logicalSubDiv = logicalDiv;
-
                             // there are still files for this logical sub div, nothing to do
-                            if (modifiedMets.getStructLink().getSmLinkByFrom(logicalSubDiv.getId()).size() > 0) {
+                            if (modifiedMets.getStructLink().getSmLinkByFrom(logicalDiv.getId()).size() > 0) {
                                 continue;
                             }
 
                             // the logical div has other divs included, nothing to do
-                            if (logicalSubDiv.getChildren().size() > 0) {
+                            if (logicalDiv.getChildren().size() > 0) {
                                 continue;
                             }
 
@@ -652,9 +650,9 @@ public class MCRMetsSave {
                              * (only containing empty directories), if so the parent of the log div
                              * must be deleted
                              * */
-                            handleParents(logicalSubDiv, modifiedMets);
+                            handleParents(logicalDiv, modifiedMets);
 
-                            logicalStructMap.getDivContainer().remove(logicalSubDiv);
+                            logicalStructMap.getDivContainer().remove(logicalDiv);
                         }
                         divContainer.remove(physicalSubDivToRemove);
                     }

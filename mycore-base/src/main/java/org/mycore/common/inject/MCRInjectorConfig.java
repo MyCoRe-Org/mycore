@@ -48,8 +48,7 @@ public class MCRInjectorConfig {
         Map<String, String> moduleMap = MCRConfiguration.instance().getPropertiesMap("MCR.inject.module");
         MODULES = Lists.newArrayList();
         moduleMap.keySet().stream().map(propertyName -> {
-            Module module = MCRConfiguration.instance().getInstanceOf(propertyName);
-            return module;
+            return MCRConfiguration.instance().<Module> getInstanceOf(propertyName);
         }).forEach(MODULES::add);
         LOGGER.info("Using guice modules: {}", MODULES);
         INJECTOR = Guice.createInjector(MODULES);

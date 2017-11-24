@@ -84,8 +84,7 @@ public class MCRTestCase {
 
     protected static String getCurrentComponentName() {
         String userDir = System.getProperty("user.dir");
-        String currentComponent = Paths.get(userDir).getFileName().toString();
-        return currentComponent;
+        return Paths.get(userDir).getFileName().toString();
     }
 
     protected boolean isDebugEnabled() {

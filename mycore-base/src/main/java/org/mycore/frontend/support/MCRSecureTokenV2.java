@@ -128,10 +128,9 @@ public class MCRSecureTokenV2 {
             throw new IllegalArgumentException("'hashParameterName' may not be empty");
         }
         URI context = new URI(baseURL);
-        URI completeURI = context.resolve(Stream
+        return context.resolve(Stream
             .concat(Arrays.stream(queryParameters).filter(Objects::nonNull), Stream.of(hashParameterName + "=" + hash))
             .collect(Collectors.joining("&", baseURL + contentPath + suffix + "?", "")));
-        return completeURI;
     }
 
     @Override

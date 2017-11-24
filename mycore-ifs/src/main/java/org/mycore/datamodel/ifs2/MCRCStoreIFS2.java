@@ -269,8 +269,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
     private String toPath(String storageID) {
         int pos = storageID.indexOf("/") + 1;
-        String path = storageID.substring(pos);
-        return path;
+        return storageID.substring(pos);
     }
 
     private MCRFile getFile(String storageID) throws IOException {

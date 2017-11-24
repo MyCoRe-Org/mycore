@@ -95,8 +95,7 @@ public abstract class MCRProcessableFactory {
      * @return a newly created thread pool
      */
     public static MCRProcessableExecutor newPool(ExecutorService delegate, MCRProcessableCollection collection) {
-        MCRProcessableExecutor threadPool = new MCRProcessableThreadPoolExecutorHelper(delegate, collection);
-        return threadPool;
+        return new MCRProcessableThreadPoolExecutorHelper(delegate, collection);
     }
 
     /**

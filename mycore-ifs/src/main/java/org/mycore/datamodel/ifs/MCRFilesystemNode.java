@@ -550,11 +550,9 @@ public abstract class MCRFilesystemNode {
     public String toString() {
         String date = formatter.format(lastModified.getTime());
 
-        String sb = "ID          = " + ID + "\n" + "Name        = " + name + "\n" + "Label       = " + label + "\n"
+        return "ID          = " + ID + "\n" + "Name        = " + name + "\n" + "Label       = " + label + "\n"
             + "Type        = " + this.getClass().getName() + "\n" + "ParentID    = " + parentID + "\n"
             + "OwnerID     = " + ownerID + "\n" + "Size        = " + size + "\n" + "Modified    = " + date + "\n";
-
-        return sb;
     }
 
     @Override

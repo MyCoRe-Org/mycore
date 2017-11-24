@@ -76,8 +76,7 @@ public abstract class MCRCategoryMapperBase {
         int pos = mapping.indexOf(":");
         String mappedClassificationID = mapping.substring(0, pos);
         String mappedCategoryID = mapping.substring(pos + 1);
-        MCRCategoryID mappedID = new MCRCategoryID(mappedClassificationID, mappedCategoryID);
-        return mappedID;
+        return new MCRCategoryID(mappedClassificationID, mappedCategoryID);
     }
 
     private List<MCRCategoryID> resolveParentOrSelf(MCRCategoryID childID) {

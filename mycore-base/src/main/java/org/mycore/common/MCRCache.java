@@ -311,10 +311,9 @@ public class MCRCache<K, V> {
      */
     @Override
     public String toString() {
-        String sb = "Cache capacity:  " + capacity + "\n" + "Cache size:      " + backingCache.size() + "\n"
-            + "Cache fill rate: " + getFillRate() + "\n" + "Cache hit rate:  " + getHitRate();
 
-        return sb;
+        return "Cache capacity:  " + capacity + "\n" + "Cache size:      " + backingCache.size() + "\n"
+            + "Cache fill rate: " + getFillRate() + "\n" + "Cache hit rate:  " + getHitRate();
     }
 
     /**

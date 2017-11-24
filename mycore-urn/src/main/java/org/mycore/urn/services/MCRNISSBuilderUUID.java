@@ -40,8 +40,7 @@ public class MCRNISSBuilderUUID implements MCRNISSBuilder {
 
     public String buildNISS() {
         UUID u = UUID.randomUUID();
-        String niss = u.toString();
 
-        return niss;
+        return u.toString();
     }
 }

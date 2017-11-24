@@ -136,8 +136,7 @@ public class MCRXMLResource {
     }
 
     public ResourceModifiedHandle getModifiedHandle(String name, ClassLoader classLoader, long checkPeriod) {
-        ResourceModifiedHandle modifiedHandle = new ResourceModifiedHandle(name, classLoader, checkPeriod);
-        return modifiedHandle;
+        return new ResourceModifiedHandle(name, classLoader, checkPeriod);
     }
 
     /**
@@ -173,13 +172,11 @@ public class MCRXMLResource {
         if (url == null) {
             return null;
         }
-        URLConnection con = url.openConnection();
-        return con;
+        return url.openConnection();
     }
 
     private static MCRContent getDocument(URL url) {
-        MCRContent content = new MCRURLContent(url);
-        return content;
+        return new MCRURLContent(url);
     }
 
     public long getLastModified(String name, ClassLoader classLoader) throws IOException {

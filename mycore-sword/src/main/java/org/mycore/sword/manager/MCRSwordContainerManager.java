@@ -83,9 +83,8 @@ public class MCRSwordContainerManager implements ContainerManager {
         checkIsObject(retrievedMCRBase);
 
         final Optional<Map<String, String>> accept = Optional.of(map);
-        final DepositReceipt metadata = collectionProvider.getContainerHandler().getMetadata(collection,
+        return collectionProvider.getContainerHandler().getMetadata(collection,
             (MCRObject) retrievedMCRBase, accept);
-        return metadata;
     }
 
     @Override

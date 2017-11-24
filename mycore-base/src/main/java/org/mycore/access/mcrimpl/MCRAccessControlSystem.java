@@ -222,8 +222,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     @Override
     public Collection<String> getPermissionsForID(String objid) {
-        Collection<String> ret = accessStore.getPoolsForObject(objid);
-        return ret;
+        return accessStore.getPoolsForObject(objid);
     }
 
     @Override

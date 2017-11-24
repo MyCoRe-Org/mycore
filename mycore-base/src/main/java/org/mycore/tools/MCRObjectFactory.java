@@ -79,8 +79,7 @@ public class MCRObjectFactory {
 
     /***/
     private static Element createMetadataElement(MCRObjectID id) {
-        Element inner = "derivate".equals(id.getTypeId()) ? new Element("derivate") : new Element("metadata");
-        return inner;
+        return "derivate".equals(id.getTypeId()) ? new Element("derivate") : new Element("metadata");
     }
 
     /**

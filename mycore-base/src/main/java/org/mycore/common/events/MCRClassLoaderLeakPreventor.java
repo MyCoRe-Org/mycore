@@ -50,8 +50,7 @@ class MCRClassLoaderLeakPreventor extends ClassLoaderLeakPreventor {
         final ClassLoader webClassLoader = getWebApplicationClassLoader();
         ServiceRegistry.Filter classLoaderFilter = provider -> {
             //remove all service provider loaded by the current ClassLoader
-            boolean loadedByWebApp = webClassLoader.equals(provider.getClass().getClassLoader());
-            return loadedByWebApp;
+            return webClassLoader.equals(provider.getClass().getClassLoader());
         };
         while (categories.hasNext()) {
             @SuppressWarnings("unchecked")

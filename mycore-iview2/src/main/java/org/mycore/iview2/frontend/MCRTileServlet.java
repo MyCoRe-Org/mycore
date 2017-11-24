@@ -149,8 +149,7 @@ public class MCRTileServlet extends HttpServlet {
             tile = imagePath.substring(pos + 2);
             imagePath = imagePath.substring(0, ++pos);
         }
-        final TileInfo tileInfo = new TileInfo(derivate, imagePath, tile);
-        return tileInfo;
+        return new TileInfo(derivate, imagePath, tile);
     }
 
     private static Path getTileFile(TileInfo tileInfo) {

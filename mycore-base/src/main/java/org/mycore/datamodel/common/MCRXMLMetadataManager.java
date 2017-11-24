@@ -579,8 +579,7 @@ public class MCRXMLMetadataManager {
             return null;
         }
         MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
-        MCRVersionedMetadata vm = verStore.retrieve(id.getNumberAsInteger());
-        return vm;
+        return verStore.retrieve(id.getNumberAsInteger());
     }
 
     /**

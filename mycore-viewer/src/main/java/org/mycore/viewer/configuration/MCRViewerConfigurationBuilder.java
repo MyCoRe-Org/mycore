@@ -90,8 +90,7 @@ public class MCRViewerConfigurationBuilder {
      * @return a new configuration builder instance.
      */
     public static MCRViewerConfigurationBuilder build(HttpServletRequest request) {
-        MCRViewerConfigurationBuilder builder = new MCRViewerConfigurationBuilder(request);
-        return builder;
+        return new MCRViewerConfigurationBuilder(request);
     }
 
     /**

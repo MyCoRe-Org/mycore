@@ -157,7 +157,8 @@ public class MCRRequestDebugFilter implements Filter {
     }
 
     private String getValue(String key, Optional<Object> value) {
-        String description = value.map(o -> {
+
+        return value.map(o -> {
             if (!hasSafeToString(o)) {
                 try {
                     Map<String, String> beanDescription = BeanUtils.describe(value);
@@ -170,8 +171,6 @@ public class MCRRequestDebugFilter implements Filter {
             }
             return o.toString();
         }).orElse("<null>");
-
-        return description;
     }
 
     private static boolean hasSafeToString(Object o) {

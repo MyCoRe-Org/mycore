@@ -470,8 +470,7 @@ public abstract class MCRStore {
         final NumberFormat numWithLeadingZerosFormat = NumberFormat.getIntegerInstance(Locale.ROOT);
         numWithLeadingZerosFormat.setMinimumIntegerDigits(idLength);
         numWithLeadingZerosFormat.setGroupingUsed(false);
-        final String id = numWithLeadingZerosFormat.format(ID);
-        return id;
+        return numWithLeadingZerosFormat.format(ID);
     }
 
     /**

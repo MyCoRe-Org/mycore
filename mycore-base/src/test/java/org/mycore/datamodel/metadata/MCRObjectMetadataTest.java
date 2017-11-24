@@ -204,8 +204,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
     private static Document loadResourceDocument(String resource) throws URISyntaxException, MCRException,
         SAXParseException, IOException {
         URL mcrTestUrl = MCRObjectMetadataTest.class.getResource(resource);
-        Document xml = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRVFSContent(mcrTestUrl));
-        return xml;
+        return MCRXMLParserFactory.getValidatingParser().parseXML(new MCRVFSContent(mcrTestUrl));
     }
 
     @Override

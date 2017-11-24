@@ -136,8 +136,7 @@ public class MCRLayoutService {
             String style = parameter.getParameter("Style", "default");
             transformerId = MessageFormat.format("{0}-{1}", docType, style);
         }
-        MCRContentTransformer transformer = MCRLayoutTransformerFactory.getTransformer(transformerId);
-        return transformer;
+        return MCRLayoutTransformerFactory.getTransformer(transformerId);
     }
 
     private String getFileName(HttpServletRequest req, MCRParameterCollector parameter) {

@@ -48,8 +48,7 @@ public class MCRSolrInputDocumentHandlerFactory extends MCRSolrIndexHandlerFacto
     @Override
     public MCRSolrIndexHandler getIndexHandler(MCRContent content, MCRObjectID id) {
         SolrInputDocument document = getDocument(id, content);
-        MCRSolrIndexHandler indexHandler = new MCRSolrInputDocumentHandler(document);
-        return indexHandler;
+        return new MCRSolrInputDocumentHandler(document);
     }
 
     private SolrInputDocument getDocument(MCRObjectID id, MCRContent content) {
@@ -75,8 +74,7 @@ public class MCRSolrInputDocumentHandlerFactory extends MCRSolrIndexHandlerFacto
             SolrInputDocument document = getDocument(entry.getKey(), entry.getValue());
             documents.add(document);
         }
-        MCRSolrIndexHandler indexHandler = new MCRSolrInputDocumentsHandler(documents);
-        return indexHandler;
+        return new MCRSolrInputDocumentsHandler(documents);
     }
 
 }

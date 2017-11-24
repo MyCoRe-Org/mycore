@@ -139,8 +139,7 @@ public class MCRLabel implements Cloneable, Serializable {
 
     @Override
     public String toString() {
-        String sb = getLang() + '(' + getText() + ')';
-        return sb;
+        return getLang() + '(' + getText() + ')';
     }
 
     /*

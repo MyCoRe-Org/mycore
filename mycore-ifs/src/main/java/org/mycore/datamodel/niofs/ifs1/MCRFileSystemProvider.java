@@ -508,12 +508,11 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (type == null) {
             throw new NullPointerException();
         }
-        Class<?> c = type;
         //must support BasicFileAttributeView
-        if (c == BasicFileAttributeView.class) {
+        if (type == BasicFileAttributeView.class) {
             return (V) new BasicFileAttributeViewImpl(mcrPath);
         }
-        if (c == MCRMD5AttributeView.class) {
+        if (type == MCRMD5AttributeView.class) {
             return (V) new MD5FileAttributeViewImpl(mcrPath);
         }
         return null;
@@ -528,9 +527,8 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         throws IOException {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         MCRFilesystemNode node = resolvePath(mcrPath);
-        Class<?> c = type;
         //must support BasicFileAttributeView
-        if (c == BasicFileAttributes.class || c == MCRFileAttributes.class) {
+        if (type == BasicFileAttributes.class || type == MCRFileAttributes.class) {
             return (A) MCRBasicFileAttributeViewImpl.readAttributes(node);
         }
         return null;

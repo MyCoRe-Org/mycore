@@ -66,8 +66,7 @@ public class MCRMD5InputStream extends DigestInputStream {
         for (byte b : digest) {
             md5SumBuilder.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
         }
-        String md5Sum = md5SumBuilder.toString();
-        return md5Sum;
+        return md5SumBuilder.toString();
     }
 
     /**

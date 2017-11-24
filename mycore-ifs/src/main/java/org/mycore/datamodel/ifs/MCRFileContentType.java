@@ -104,10 +104,9 @@ public class MCRFileContentType {
 
     @Override
     public String toString() {
-        String sb = "ID    = " + getID() + "\n" + "label = " + getLabel() + "\n" + "mime  = " + getMimeType() + "\n"
-            + "url   = " + getURL();
 
-        return sb;
+        return "ID    = " + getID() + "\n" + "label = " + getLabel() + "\n" + "mime  = " + getMimeType() + "\n"
+            + "url   = " + getURL();
     }
 
     @Override

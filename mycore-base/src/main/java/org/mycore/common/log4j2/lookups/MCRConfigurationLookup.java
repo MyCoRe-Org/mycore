@@ -35,8 +35,7 @@ public class MCRConfigurationLookup implements StrLookup {
 
     @Override
     public String lookup(String key) {
-        String value = MCRConfiguration.instance().getString(key, null);
-        return value;
+        return MCRConfiguration.instance().getString(key, null);
     }
 
     @Override

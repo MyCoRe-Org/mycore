@@ -189,10 +189,9 @@ public class MCRMediaObject implements Cloneable {
      */
     public String getDurationTimecode() {
         DecimalFormat formatter = new DecimalFormat("00");
-        String sb = formatter.format(getDurationHours()) + ":" + formatter.format(getDurationMinutes()) + ":"
-            + formatter.format(getDurationSeconds());
 
-        return sb;
+        return formatter.format(getDurationHours()) + ":" + formatter.format(getDurationMinutes()) + ":"
+            + formatter.format(getDurationSeconds());
     }
 
     /**

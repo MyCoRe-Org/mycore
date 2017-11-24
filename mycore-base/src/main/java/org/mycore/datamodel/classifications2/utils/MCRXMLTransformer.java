@@ -96,9 +96,8 @@ public class MCRXMLTransformer {
 
     public static MCRLabel getLabel(Element labelElement) throws NullPointerException, IllegalArgumentException {
         String lang = labelElement.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-        MCRLabel label = new MCRLabel(lang, labelElement.getAttributeValue("text"),
+        return new MCRLabel(lang, labelElement.getAttributeValue("text"),
             labelElement.getAttributeValue("description"));
-        return label;
     }
 
     private static void setURL(Element e, MCRCategory category) throws URISyntaxException {

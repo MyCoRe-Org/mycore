@@ -35,16 +35,14 @@ public class MCRTestAbstractMerger extends MCRTestCase {
     public void testXLink() throws Exception {
         String a = "[mods:abstract[@xlink:href='foo']]";
         String b = "[mods:abstract[@xml:lang='de'][@xlink:href='foo']][mods:abstract[@xml:lang='en'][@xlink:href='bar']]";
-        String e = b;
-        MCRTestMerger.test(a, b, e);
+        MCRTestMerger.test(a, b, b);
     }
 
     @Test
     public void testSimilar() throws Exception {
         String a = "[mods:abstract[@xml:lang='de']='Dies ist der deutsche Abstract']";
         String b = "[mods:abstract='Dies ist der deitsche Abstract']";
-        String e = a;
-        MCRTestMerger.test(a, b, e);
+        MCRTestMerger.test(a, b, a);
 
         String a2 = "[mods:abstract[@xml:lang='de']='Dies ist der deutsche Abstract']";
         String b2 = "[mods:abstract='Dieses ist der doitsche Äbschträkt']";

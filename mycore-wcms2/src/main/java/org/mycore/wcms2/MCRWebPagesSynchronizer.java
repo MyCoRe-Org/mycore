@@ -105,8 +105,7 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         if (realPath == null) {
             throw new IOException("Could not get webapp base path.");
         }
-        File webappBasePath = new File(realPath);
-        return webappBasePath;
+        return new File(realPath);
     }
 
     /**

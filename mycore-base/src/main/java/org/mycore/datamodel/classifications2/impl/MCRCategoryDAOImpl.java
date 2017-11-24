@@ -224,8 +224,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             LOGGER.warn("Could not load category: {}", id);
             return null;
         }
-        MCRCategoryImpl categoryImpl = buildCategoryFromPrefetchedList(result, id);
-        return categoryImpl;
+        return buildCategoryFromPrefetchedList(result, id);
     }
 
     /*

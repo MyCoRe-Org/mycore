@@ -329,9 +329,8 @@ public class MCRHIBURNStore implements MCRURNStore {
         if (returns.size() != 1) {
             logger.warn("There are more than just one urn for file \"{}\" in derivate \"{}\"", fileName, derivateId);
         }
-        String urn = returns.get(0);
 
-        return urn;
+        return returns.get(0);
     }
 
     /**

@@ -167,8 +167,7 @@ public final class MCRURIResolver implements URIResolver {
         }
         try {
             Class<?> cl = Class.forName(externalClassName);
-            final MCRResolverProvider resolverProvider = (MCRResolverProvider) cl.newInstance();
-            return resolverProvider;
+            return (MCRResolverProvider) cl.newInstance();
         } catch (ClassNotFoundException e) {
             LOGGER.warn("Could not find external Resolver class", e);
             return emptyResolver;
@@ -369,11 +368,10 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     static URI resolveURI(String href, String base) {
-        URI hrefURI = Optional.ofNullable(base)
+        return Optional.ofNullable(base)
             .map(URI::create)
             .map(u -> u.resolve(href))
             .orElse(URI.create(href));
-        return hrefURI;
     }
 
     /**

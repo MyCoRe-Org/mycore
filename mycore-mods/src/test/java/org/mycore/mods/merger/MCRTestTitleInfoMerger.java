@@ -38,16 +38,14 @@ public class MCRTestTitleInfoMerger extends MCRTestCase {
     public void testLongerWins() throws Exception {
         String a = "[mods:titleInfo[mods:title='Applied Physics A']]";
         String b = "[mods:titleInfo[mods:title='Applied Physics A : Materials Science & Processing']]";
-        String e = b;
-        MCRTestMerger.test(a, b, e);
+        MCRTestMerger.test(a, b, b);
     }
 
     @Test
     public void testMergingTitleSubtitle() throws JaxenException, IOException {
         String a = "[mods:titleInfo[mods:title='testing: all you have to know about']]";
         String b = "[mods:titleInfo[mods:title='Testing'][mods:subTitle='All You have to know about']]";
-        String e = b;
-        MCRTestMerger.test(a, b, e);
+        MCRTestMerger.test(a, b, b);
     }
 
     @Test
@@ -71,8 +69,6 @@ public class MCRTestTitleInfoMerger extends MCRTestCase {
     @Test
     public void testMergingIdentical() throws JaxenException, IOException {
         String a = "[mods:titleInfo[mods:title='test']]";
-        String b = a;
-        String e = a;
-        MCRTestMerger.test(a, b, e);
+        MCRTestMerger.test(a, a, a);
     }
 }
