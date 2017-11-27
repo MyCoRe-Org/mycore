@@ -125,7 +125,6 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
         }
 
         final boolean pathIsDirectory = Files.isDirectory(path);
-        final String depositFilename = deposit.getFilename();
 
         if (pathIsDirectory) {
             throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_METHOD_NOT_ALLOWED,
@@ -260,7 +259,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
 
     @Override
     public void init(MCRSwordLifecycleConfiguration lifecycleConfiguration) {
-        MCRSwordLifecycleConfiguration configuration = lifecycleConfiguration;
+        //lifecycleConfiguration is not used here;
     }
 
     @Override
