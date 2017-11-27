@@ -1,24 +1,19 @@
 /*
- * 
- * $Revision$ $Date$
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.access.mcrimpl;
@@ -38,19 +33,19 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
 
 public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
-    String id = "";
+    private String id = "";
 
-    String creator = "";
+    private String creator = "";
 
-    Date creationTime = new Date();
+    private Date creationTime = new Date();
 
     String rule = "";
 
-    String description = "";
+    private String description = "";
 
-    MCRCondition parsedRule;
+    private MCRCondition<MCRAccessData> parsedRule;
 
-    static MCRRuleParser parser = new MCRRuleParser();
+    private static MCRRuleParser parser = new MCRRuleParser();
 
     public MCRAccessRule(String id, String creator, Date creationTime, String rule, String description)
         throws MCRParseException {
@@ -80,7 +75,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
         return returns;
     }
 
-    public MCRCondition getRule() {
+    public MCRCondition<MCRAccessData> getRule() {
         return parsedRule;
     }
 

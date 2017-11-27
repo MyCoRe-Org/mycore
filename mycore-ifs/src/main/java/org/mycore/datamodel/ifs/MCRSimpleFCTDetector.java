@@ -1,24 +1,19 @@
 /*
- * 
- * $Revision$ $Date$
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.datamodel.ifs;
@@ -62,10 +57,10 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
     /** List of file content types we have rules for */
-    private List typesList = new Vector();
+    private List<MCRFileContentType> typesList = new Vector<>();
 
     /** Keys are file content types, values are vectors of MCRDetectionRule */
-    private Hashtable rulesTable = new Hashtable();
+    private Hashtable<MCRFileContentType, Vector> rulesTable = new Hashtable<>();
 
     private static Logger logger = LogManager.getLogger(MCRSimpleFCTDetector.class);
 
@@ -85,7 +80,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
      *            type
      */
     public void addRule(MCRFileContentType type, Element xRules) {
-        Vector rules = new Vector();
+        Vector<MCRDetectionRule> rules = new Vector<>();
         rulesTable.put(type, rules);
         typesList.add(type);
 
@@ -146,8 +141,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         MCRFileContentType detected = null;
 
         for (int i = 0; i < typesList.size() && maxScore < 1.0; i++) {
-            MCRFileContentType type = (MCRFileContentType) typesList.get(i);
-            Vector rules = (Vector) rulesTable.get(type);
+            MCRFileContentType type = typesList.get(i);
+            Vector rules = rulesTable.get(type);
 
             double score = 0.0;
 

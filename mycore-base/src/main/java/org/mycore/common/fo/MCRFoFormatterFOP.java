@@ -1,23 +1,19 @@
-/**
- * $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
- *
+/*
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.common.fo;
@@ -25,7 +21,6 @@ package org.mycore.common.fo;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -76,8 +71,6 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final String BASE_URI = "resource:/";
-
     private FopFactory fopFactory;
 
     final ResourceResolver resolver = new ResourceResolver() {
@@ -103,46 +96,41 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         final MCRConfiguration mcrcfg = MCRConfiguration.instance();
 
         FopFactoryBuilder fopFactoryBuilder;
-        try {
-            // use restricted io to prevent issues with font caching on some systems 
-            fopFactoryBuilder = new FopFactoryBuilder(
-                EnvironmentalProfileFactory.createRestrictedIO(new URI(BASE_URI), resolver));
-            final String fo_cfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
-            if (!fo_cfg.isEmpty()) {
-                try {
-                    final DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-                    final Configuration cfg = cfgBuilder
-                        .build(MCRConfigurationDir.getConfigResource(fo_cfg).toString());
-                    fopFactoryBuilder.setConfiguration(cfg);
+        // use restricted io to prevent issues with font caching on some systems
+        fopFactoryBuilder = new FopFactoryBuilder(
+            EnvironmentalProfileFactory.createRestrictedIO(URI.create("resource:/"), resolver));
+        final String fo_cfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
+        if (!fo_cfg.isEmpty()) {
+            try {
+                final DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
+                final Configuration cfg = cfgBuilder.build(MCRConfigurationDir.getConfigResource(fo_cfg).toString());
+                fopFactoryBuilder.setConfiguration(cfg);
 
-                    // FIXME Workaround to get hyphenation work in FOP.
-                    // FOP should use "hyphenation-base" to get base URI for patterns 
-                    Optional<Configuration[]> hyphPat = Optional.ofNullable(cfg.getChildren("hyphenation-pattern"));
-                    hyphPat.ifPresent(configurations -> {
-                        Map<String, String> hyphPatMap = new HashMap<>();
-                        Arrays.stream(configurations).forEach(c -> {
-                            try {
-                                String lang = c.getAttribute("lang");
-                                String file = c.getValue();
+                // FIXME Workaround to get hyphenation work in FOP.
+                // FOP should use "hyphenation-base" to get base URI for patterns
+                Optional<Configuration[]> hyphPat = Optional.ofNullable(cfg.getChildren("hyphenation-pattern"));
+                hyphPat.ifPresent(configurations -> {
+                    Map<String, String> hyphPatMap = new HashMap<>();
+                    Arrays.stream(configurations).forEach(c -> {
+                        try {
+                            String lang = c.getAttribute("lang");
+                            String file = c.getValue();
 
-                                if ((lang != null && !lang.isEmpty()) && (file != null && !file.isEmpty())) {
-                                    hyphPatMap.put(lang, file);
-                                }
-                            } catch (Exception e) {
+                            if ((lang != null && !lang.isEmpty()) && (file != null && !file.isEmpty())) {
+                                hyphPatMap.put(lang, file);
                             }
-                        });
-                        fopFactoryBuilder.setHyphPatNames(hyphPatMap);
+                        } catch (Exception e) {
+                        }
                     });
+                    fopFactoryBuilder.setHyphPatNames(hyphPatMap);
+                });
 
-                } catch (ConfigurationException | SAXException | IOException e) {
-                    LOGGER.error("Exception while loading FOP configuration from {}.", fo_cfg, e);
-                }
+            } catch (ConfigurationException | SAXException | IOException e) {
+                LOGGER.error("Exception while loading FOP configuration from {}.", fo_cfg, e);
             }
-            fopFactory = fopFactoryBuilder.build();
-            getTransformerFactory();
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException("Illegal baseURI: " + BASE_URI, ex);
         }
+        fopFactory = fopFactoryBuilder.build();
+        getTransformerFactory();
     }
 
     private static TransformerFactory getTransformerFactory() throws TransformerFactoryConfigurationError {

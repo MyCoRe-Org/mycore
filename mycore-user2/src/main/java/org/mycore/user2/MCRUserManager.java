@@ -1,24 +1,20 @@
-/**
- * $Revision$
- * $Date$
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
- * This file is part of the MILESS repository software.
- * Copyright (C) 2011 MILESS/MyCoRe developer team
- * See http://duepublico.uni-duisburg-essen.de/ and http://www.mycore.de/
- *
- * This program is free software: you can redistribute it and/or modify
+ * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * MyCoRe is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- **/
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package org.mycore.user2;
 
@@ -557,8 +553,7 @@ public class MCRUserManager {
     }
 
     private static byte[] generateSalt() {
-        byte[] salt = SECURE_RANDOM.generateSeed(8);
-        return salt;
+        return SECURE_RANDOM.generateSeed(8);
     }
 
     private static Optional<MCRUser> getByNaturalID(EntityManager em, String userName, String realmId) {

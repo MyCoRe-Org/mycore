@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.util.concurrent.processing;
 
 import java.time.Instant;
@@ -52,9 +70,8 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     public static <T> MCRProcessableSupplier<T> of(Callable<T> task, ExecutorService executorService,
         Integer priority) {
         MCRProcessableSupplier<T> ps = new MCRProcessableSupplier<>(task);
-        CompletableFuture<T> future = CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(ps, priority),
+        ps.future = CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(ps, priority),
             executorService);
-        ps.future = future;
         return ps;
     }
 

@@ -1,24 +1,19 @@
 /*
- *
- * $Revision$ $Date$
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.services.fieldquery;
@@ -46,7 +41,7 @@ import com.ibm.icu.util.GregorianCalendar;
  *
  * @author Frank Lützenkirchen
  */
-public class MCRQueryParser extends MCRBooleanClauseParser {
+public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
 
     /**
      * Parses XML element containing a simple query condition
@@ -56,7 +51,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return the parsed MCRQueryCondition object
      */
     @Override
-    protected MCRCondition<Object> parseSimpleCondition(Element e) throws MCRParseException {
+    protected MCRCondition<Void> parseSimpleCondition(Element e) throws MCRParseException {
         String name = e.getName();
 
         if (!name.equals("condition")) {
@@ -81,10 +76,10 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      *            the condition value
      * @return
      */
-    private MCRCondition<Object> buildConditions(String field, String oper, String value) {
+    private MCRCondition<Void> buildConditions(String field, String oper, String value) {
         if (field.contains(",")) { // Multiple fields in one condition, combine with OR
             StringTokenizer st = new StringTokenizer(field, ", ");
-            MCROrCondition<Object> oc = new MCROrCondition<>();
+            MCROrCondition<Void> oc = new MCROrCondition<>();
             while (st.hasMoreTokens()) {
                 oc.addChild(buildConditions(st.nextToken(), oper, value));
             }
@@ -95,7 +90,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             String fieldTo = st.nextToken();
             if (oper.equals("=")) {
                 // von-bis = x --> (von <= x) AND (bis >= x)
-                MCRAndCondition<Object> ac = new MCRAndCondition<>();
+                MCRAndCondition<Void> ac = new MCRAndCondition<>();
                 ac.addChild(buildCondition(fieldFrom, "<=", value));
                 ac.addChild(buildCondition(fieldTo, ">=", value));
                 return ac;
@@ -148,7 +143,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return the parsed MCRQueryCondition object
      */
     @Override
-    protected MCRCondition<Object> parseSimpleCondition(String s) throws MCRParseException {
+    protected MCRCondition<Void> parseSimpleCondition(String s) throws MCRParseException {
         Matcher m = pattern.matcher(s);
 
         if (!m.find()) {
@@ -167,14 +162,14 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
     }
 
     @Override
-    public MCRCondition<Object> parse(Element condition) throws MCRParseException {
-        MCRCondition<Object> cond = super.parse(condition);
+    public MCRCondition<Void> parse(Element condition) throws MCRParseException {
+        MCRCondition<Void> cond = super.parse(condition);
         return normalizeCondition(cond);
     }
 
     @Override
-    public MCRCondition<Object> parse(String s) throws MCRParseException {
-        MCRCondition<Object> cond = super.parse(s);
+    public MCRCondition<Void> parse(String s) throws MCRParseException {
+        MCRCondition<Void> cond = super.parse(s);
         return normalizeCondition(cond);
     }
 
@@ -187,20 +182,20 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * simpler conditions if the condition value contains phrases surrounded
      * by '...' or wildcard search with * or ?.
      */
-    public static MCRCondition<Object> normalizeCondition(MCRCondition<Object> cond) {
+    public static MCRCondition<Void> normalizeCondition(MCRCondition<Void> cond) {
         if (cond == null) {
             return null;
         } else if (cond instanceof MCRSetCondition) {
-            MCRSetCondition<Object> sc = (MCRSetCondition<Object>) cond;
-            List<MCRCondition<Object>> children = sc.getChildren();
+            MCRSetCondition<Void> sc = (MCRSetCondition<Void>) cond;
+            List<MCRCondition<Void>> children = sc.getChildren();
             sc = sc instanceof MCRAndCondition ? new MCRAndCondition<>() : new MCROrCondition<>();
-            for (MCRCondition<Object> child : children) {
+            for (MCRCondition<Void> child : children) {
                 child = normalizeCondition(child);
                 if (child == null) {
                 } else if (child instanceof MCRSetCondition
                     && sc.getOperator().equals(((MCRSetCondition) child).getOperator())) {
                     // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
-                    sc.addAll(((MCRSetCondition<Object>) child).getChildren());
+                    sc.addAll(((MCRSetCondition<Void>) child).getChildren());
                 } else {
                     sc.addChild(child);
                 }
@@ -214,12 +209,12 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 return sc;
             }
         } else if (cond instanceof MCRNotCondition) {
-            MCRNotCondition<Object> nc = (MCRNotCondition<Object>) cond;
-            MCRCondition<Object> child = normalizeCondition(nc.getChild());
+            MCRNotCondition<Void> nc = (MCRNotCondition<Void>) cond;
+            MCRCondition<Void> child = normalizeCondition(nc.getChild());
             if (child == null) {
                 return null; // Remove empty NOT
             } else if (child instanceof MCRNotCondition) {
-                return normalizeCondition(((MCRNotCondition<Object>) child).getChild());
+                return normalizeCondition(((MCRNotCondition<Void>) child).getChild());
             } else {
                 return new MCRNotCondition<>(child);
             }
@@ -269,7 +264,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 }
             }
 
-            MCRAndCondition<Object> ac = new MCRAndCondition<>();
+            MCRAndCondition<Void> ac = new MCRAndCondition<>();
             for (String value : values) {
                 if (value.startsWith("'")) {
                     ac.addChild(new MCRQueryCondition(qc.getFieldName(), "phrase", value.substring(1,
@@ -281,7 +276,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                     ac.addChild(new MCRQueryCondition(qc.getFieldName(), "like", value));
                 } else if (value.startsWith("-")) // -word means "NOT word"
                 {
-                    MCRCondition<Object> subCond = new MCRQueryCondition(qc.getFieldName(), "contains",
+                    MCRCondition<Void> subCond = new MCRQueryCondition(qc.getFieldName(), "contains",
                         value.substring(1));
                     ac.addChild(new MCRNotCondition<>(subCond));
                 } else {
@@ -302,7 +297,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
     /** Used for input validation in editor search form */
     public static boolean validateQueryExpression(String query) {
         try {
-            MCRCondition<Object> cond = new MCRQueryParser().parse(query);
+            MCRCondition<Void> cond = new MCRQueryParser().parse(query);
             return cond != null;
         } catch (Throwable t) {
             return false;

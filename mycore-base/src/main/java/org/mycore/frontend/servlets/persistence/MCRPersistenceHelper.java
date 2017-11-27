@@ -1,6 +1,21 @@
-/**
- * 
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
@@ -64,7 +79,6 @@ class MCRPersistenceHelper {
 
     /**
      * returns a jdom document representing the output of a mycore editor form.
-     * @param job
      * @param failOnMissing
      *  if not editor submission is present, should we throw an exception (true) or just return null (false)
      * @return
@@ -117,8 +131,7 @@ class MCRPersistenceHelper {
             xout.output(jdom_out, swClean);
             LOGGER.debug("Results in \n{}", swClean);
         }
-        MCRObject mcrObject = new MCRObject(jdom_out);
-        return mcrObject;
+        return new MCRObject(jdom_out);
     }
 
     protected static String getWebPage(ServletContext context, String modernPage, String deprecatedPage)

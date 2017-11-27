@@ -1,24 +1,19 @@
 /*
- * $Revision$ 
- * $Date$
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.frontend.xeditor;
@@ -228,12 +223,14 @@ public class MCRBinding {
     }
 
     private void setValue(Object node, String value) {
-        if (value.equals(getValue(node)))
+        if (value.equals(getValue(node))) {
             return;
-        else if (node instanceof Attribute)
+        }
+        if (node instanceof Attribute) {
             track(MCRSetAttributeValue.setValue((Attribute) node, value));
-        else
+        } else {
             track(MCRSetElementText.setText((Element) node, value));
+        }
     }
 
     public String getName() {
@@ -247,12 +244,13 @@ public class MCRBinding {
     private Map<String, Object> staticVariables = null;
 
     private Map<String, Object> getVariables() {
-        if (staticVariables != null)
+        if (staticVariables != null) {
             return staticVariables;
-        else if (parent != null)
+        }
+        if (parent != null) {
             return parent.getVariables();
-        else
-            return Collections.emptyMap();
+        }
+        return Collections.emptyMap();
     }
 
     public void setVariables(Map<String, Object> variables) {

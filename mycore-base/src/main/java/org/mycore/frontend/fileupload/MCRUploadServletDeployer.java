@@ -1,6 +1,21 @@
-/**
- * 
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.frontend.fileupload;
 
 import java.io.IOException;
@@ -80,13 +95,12 @@ public class MCRUploadServletDeployer implements AutoExecutable {
     private MultipartConfigElement getMultipartConfig() {
         String location = MCRConfiguration2.getStringOrThrow(MCR_FILE_UPLOAD_TEMP_STORAGE_PATH);
         long maxFileSize = MCRConfiguration2.getLong("MCR.FileUpload.MaxSize").orElse(5000000L);
-        long maxRequestSize = maxFileSize;
         int fileSizeThreshold = MCRConfiguration2.getInt("MCR.FileUpload.MemoryThreshold").orElse(1000000);
         LogManager.getLogger()
             .info(() -> MCRUploadViaFormServlet.class.getSimpleName() + " accept files and requests up to "
-                + maxRequestSize + " bytes and uses " + location + " as tempory storage for files larger "
+                + maxFileSize + " bytes and uses " + location + " as tempory storage for files larger "
                 + fileSizeThreshold + " bytes.");
-        return new MultipartConfigElement(location, maxFileSize, maxRequestSize,
+        return new MultipartConfigElement(location, maxFileSize, maxFileSize,
             fileSizeThreshold);
     }
 

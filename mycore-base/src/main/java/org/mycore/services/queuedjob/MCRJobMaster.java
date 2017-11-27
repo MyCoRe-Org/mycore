@@ -1,26 +1,21 @@
-/**
- * 
- * $Revision$ $Date$
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.services.queuedjob;
 
 import java.lang.reflect.Constructor;
@@ -162,8 +157,7 @@ public class MCRJobMaster implements Runnable, Closeable {
                 ThreadGroup tg = new ThreadGroup("MCRJob slave job thread group");
 
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(tg, r, getPreLabel() + "Slave#" + tNum.incrementAndGet());
-                    return t;
+                    return new Thread(tg, r, getPreLabel() + "Slave#" + tNum.incrementAndGet());
                 }
             };
             final AtomicInteger activeThreads = new AtomicInteger();
@@ -352,9 +346,8 @@ public class MCRJobMaster implements Runnable, Closeable {
     private static MCRJobAction toMCRJobAction(Class<? extends MCRJobAction> actionClass) {
         try {
             Constructor<? extends MCRJobAction> actionConstructor = actionClass.getConstructor();
-            MCRJobAction action = actionConstructor.newInstance();
 
-            return action;
+            return actionConstructor.newInstance();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

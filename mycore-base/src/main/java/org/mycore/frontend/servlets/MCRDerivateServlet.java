@@ -1,6 +1,21 @@
-/**
- * 
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.frontend.servlets;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
@@ -83,8 +98,6 @@ public class MCRDerivateServlet extends MCRServlet {
      * The method set the main file of a derivate object that is stored in the
      * server. The method use the input parameter: <b>type</b>,<b>step</b>
      * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'writedb'.
-     * @param job
-     *            the MCRServletJob instance
      */
     private void setMainFile(String derivateId, String file, HttpServletResponse response) throws IOException {
         if (MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
@@ -102,8 +115,6 @@ public class MCRDerivateServlet extends MCRServlet {
      * The method delete a file from a derivate object that is stored in the
      * server. The method use the input parameter: <b>type</b>,<b>step</b>
      * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'deletedb'.
-     * @param job
-     *            the MCRServletJob instance
      */
     private void deleteFile(String derivateId, String file, HttpServletResponse response) throws IOException {
         if (MCRAccessManager.checkPermission(derivateId, PERMISSION_DELETE)) {

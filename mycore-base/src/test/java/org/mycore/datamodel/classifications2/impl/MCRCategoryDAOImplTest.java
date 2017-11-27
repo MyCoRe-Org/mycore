@@ -687,8 +687,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         URISyntaxException {
         URL classResourceUrl = MCRCategoryDAOImplTest.class.getResource(resourceName);
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(classResourceUrl));
-        MCRCategory category = MCRXMLTransformer.getCategory(xml);
-        return category;
+        return MCRXMLTransformer.getCategory(xml);
     }
 
     private void loadWorldClassification2() throws URISyntaxException, MCRException, SAXParseException, IOException {

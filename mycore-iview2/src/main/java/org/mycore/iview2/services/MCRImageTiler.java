@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.iview2.services;
 
 import java.lang.reflect.Constructor;
@@ -113,8 +131,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                 ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
 
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
-                    return t;
+                    return new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
                 }
             };
             final AtomicInteger activeThreads = new AtomicInteger();
@@ -206,8 +223,7 @@ public class MCRImageTiler implements Runnable, Closeable {
 
     private MCRTilingAction getTilingAction(MCRTileJob job) {
         try {
-            MCRTilingAction tilingAction = tilingActionConstructor.newInstance(job);
-            return tilingAction;
+            return tilingActionConstructor.newInstance(job);
         } catch (Exception e) {
             throw new MCRException(e);
         }

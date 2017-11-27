@@ -1,17 +1,19 @@
 /*
- * $Revision$ $Date$
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
- * This file is part of M y C o R e See http://www.mycore.de/ for details. This
- * program is free software; you can use it, redistribute it and / or modify it
- * under the terms of the GNU General Public License (GPL) as published by the
- * Free Software Foundation; either version 2 of the License or (at your option)
- * any later version. This program is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details. You should have received a copy of the GNU
- * General Public License along with this program, in a file called gpl.txt or
- * license.txt. If not, write to the Free Software Foundation Inc., 59 Temple
- * Place - Suite 330, Boston, MA 02111-1307 USA
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.frontend.cli;
@@ -90,10 +92,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /** Default transformer script */
     public static final String DEFAULT_TRANSFORMER = "save-derivate.xsl";
-
-    /**
-     * The constructor.
-     */
 
     /**
      * deletes all MCRDerivate from the datastore.
@@ -651,9 +649,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * This is a recursive method to start an event handler for each file.
      *
-     * @param thisnode
-     *            a IFS nod (file or directory)
-     * @throws IOException
+     * @param rootPath
+     *            a IFS node (file or directory)
      */
     private static void doForChildren(Path rootPath) throws IOException {
         Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {

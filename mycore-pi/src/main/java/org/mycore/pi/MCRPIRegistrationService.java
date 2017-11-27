@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.pi;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
@@ -135,6 +153,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         className = repairDeprecatedClassNames(className, metadataManagerPropertyKey);
 
         try {
+            @SuppressWarnings("unchecked")
             Class<MCRPersistentIdentifierMetadataManager<T>> classObject = (Class<MCRPersistentIdentifierMetadataManager<T>>) Class
                 .forName(className);
             Constructor<MCRPersistentIdentifierMetadataManager<T>> constructor = classObject
@@ -163,6 +182,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         String className = MCRConfiguration.instance().getString(inscriberPropertyKey);
 
         try {
+            @SuppressWarnings("unchecked")
             Class<MCRPersistentIdentifierGenerator<T>> classObject = (Class<MCRPersistentIdentifierGenerator<T>>) Class
                 .forName(className);
             Constructor<MCRPersistentIdentifierGenerator<T>> constructor = classObject.getConstructor(String.class);

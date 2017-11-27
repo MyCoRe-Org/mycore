@@ -1,24 +1,19 @@
 /*
- * 
- * $Revision$ $Date$
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.common;
@@ -114,7 +109,6 @@ public class MCRMailer extends MCRServlet {
         job.getResponse().sendRedirect(goTo);
     }
 
-    /** Initializes the class */
     static {
         MCRConfiguration config = MCRConfiguration.instance();
         encoding = config.getString("MCR.Mail.Encoding");
@@ -604,7 +598,7 @@ public class MCRMailer extends MCRServlet {
          * 
          * @param addresses the list with email addresses
          * @return a list of {@link InternetAddress}s
-         * @see Mailer.EMail#buildAddress(String)
+         * @see MCRMailer.EMail#buildAddress(String)
          */
         private static Optional<List<InternetAddress>> buildAddressList(final List<String> addresses) {
             return addresses != null ? Optional.ofNullable(addresses.stream().map(address -> {
@@ -644,8 +638,7 @@ public class MCRMailer extends MCRServlet {
         public Document toXML() {
             final MCRJAXBContent<EMail> content = new MCRJAXBContent<>(JAXB_CONTEXT, this);
             try {
-                final Document xml = content.asXML();
-                return xml;
+                return content.asXML();
             } catch (final SAXParseException | JDOMException | IOException e) {
                 throw new MCRException("Exception while transforming EMail to JDOM document.", e);
             }

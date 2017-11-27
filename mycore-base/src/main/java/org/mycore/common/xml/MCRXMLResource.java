@@ -1,26 +1,21 @@
-/**
- * $RCSfile: MCRXMLResource.java,v $
- * $Revision: 1.0 $ $Date: 01.07.2008 06:12:32 $
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.common.xml;
 
 import java.io.BufferedInputStream;
@@ -52,7 +47,7 @@ public class MCRXMLResource {
 
     private static final MCRCache<String, CacheEntry> resourceCache = new MCRCache<>(
         MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100),
-        "XML resources");;
+        "XML resources");
 
     private static MCRXMLResource instance = new MCRXMLResource();
 
@@ -141,8 +136,7 @@ public class MCRXMLResource {
     }
 
     public ResourceModifiedHandle getModifiedHandle(String name, ClassLoader classLoader, long checkPeriod) {
-        ResourceModifiedHandle modifiedHandle = new ResourceModifiedHandle(name, classLoader, checkPeriod);
-        return modifiedHandle;
+        return new ResourceModifiedHandle(name, classLoader, checkPeriod);
     }
 
     /**
@@ -178,13 +172,11 @@ public class MCRXMLResource {
         if (url == null) {
             return null;
         }
-        URLConnection con = url.openConnection();
-        return con;
+        return url.openConnection();
     }
 
     private static MCRContent getDocument(URL url) {
-        MCRContent content = new MCRURLContent(url);
-        return content;
+        return new MCRURLContent(url);
     }
 
     public long getLastModified(String name, ClassLoader classLoader) throws IOException {

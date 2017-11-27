@@ -1,22 +1,20 @@
 /*
-* This file is part of *** M y C o R e ***
-* See http://www.mycore.de/ for details.
-*
-* This program is free software; you can use it, redistribute it
-* and / or modify it under the terms of the GNU General Public License
-* (GPL) as published by the Free Software Foundation; either version 2
-* of the License or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but
-* WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program, in a file called gpl.txt or license.txt.
-* If not, write to the Free Software Foundation Inc.,
-* 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
-*/
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package org.mycore.orcid.works;
 
@@ -47,25 +45,25 @@ import org.xml.sax.SAXException;
  */
 public class MCRWorks {
 
-    private final static String CFG_PREFIX = "MCR.ORCID.Works.";
+    private static final String CFG_PREFIX = "MCR.ORCID.Works.";
 
-    private final static String WORK2MODS_XSL = MCRConfiguration.instance().getString(CFG_PREFIX + "XSL.Works2MODS");
+    private static final String WORK2MODS_XSL = MCRConfiguration.instance().getString(CFG_PREFIX + "XSL.Works2MODS");
 
     /** Transformer used to transform the ORCID response with one or more works or work summaries to MODS */
-    private final static MCRContentTransformer T_WORKXML2MODS = new MCRXSLTransformer("xsl/" + WORK2MODS_XSL);
+    private static final MCRContentTransformer T_WORKXML2MODS = new MCRXSLTransformer("xsl/" + WORK2MODS_XSL);
 
     /** The maximum number of works to fetch at once in a bulk request */
-    private final static int BULK_FETCH_SIZE = MCRConfiguration.instance().getInt(CFG_PREFIX + "BulkFetchSize");
+    private static final int BULK_FETCH_SIZE = MCRConfiguration.instance().getInt(CFG_PREFIX + "BulkFetchSize");
 
     /** The ORCID profile these works belongs to */
     private MCRORCIDProfile profile;
 
     /** The groups of works this ORCID profile contains */
-    private List<MCRGroupOfWorks> groups = new ArrayList<MCRGroupOfWorks>();
+    private List<MCRGroupOfWorks> groups = new ArrayList<>();
 
-    private Map<String, MCRWork> putCode2work = new HashMap<String, MCRWork>();
+    private Map<String, MCRWork> putCode2work = new HashMap<>();
 
-    private List<String> putCodes = new ArrayList<String>();
+    private List<String> putCodes = new ArrayList<>();
 
     /** Creates a new works representation for the given ORCID profile */
     public MCRWorks(MCRORCIDProfile profile) {

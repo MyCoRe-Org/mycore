@@ -1,26 +1,21 @@
-/**
- * 
- * $Revision$ $Date$
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
- **/
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.common.xml;
 
 import java.io.ByteArrayOutputStream;
@@ -84,11 +79,6 @@ public class MCRURIResolverFilter implements Filter {
             filterChain.doFilter(request, wrapper);
             final String origOutput = wrapper.toString();
             final String characterEncoding = wrapper.getCharacterEncoding();
-            /**
-             * NOTE: jetty doesn't correctly implement
-             * ServletOutputStream.print(String). So we must encode it ourself
-             * to byte arrays.
-             */
             if (!uriList.get().isEmpty() && origOutput.length() > 0
                 && (response.getContentType().contains("text/html")
                     || response.getContentType().contains("text/xml"))) {
@@ -184,13 +174,6 @@ public class MCRURIResolverFilter implements Filter {
             try {
                 return output.toString(getCharacterEncoding());
             } catch (UnsupportedEncodingException e) {
-                /**
-                 * Definitely this Exception should not occur because we get the
-                 * character encoding from the HttpResponse object where it was
-                 * previously set or it defaults to the system or ISO-8859-1.
-                 * Either way for this rare circumstance we return the String in
-                 * system default encoding here.
-                 */
                 LOGGER.error("Fall back to DEFAULT encoding.");
                 try {
                     return output.toString(Charset.defaultCharset().name());

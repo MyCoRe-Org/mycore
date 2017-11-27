@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.pi.doi;
 
 import java.io.ByteArrayOutputStream;
@@ -275,9 +293,8 @@ public class MCRDataciteClient {
     }
 
     public URI resolveDOI(final MCRDigitalObjectIdentifier doiParam) throws MCRPersistentIdentifierException {
-        MCRDigitalObjectIdentifier doi = doiParam;
 
-        URI requestURI = getRequestURI("/doi/" + doi.asString());
+        URI requestURI = getRequestURI("/doi/" + doiParam.asString());
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
             CloseableHttpResponse response = httpClient.execute(get);
@@ -289,24 +306,25 @@ public class MCRDataciteClient {
                     String uriString = scanner.nextLine();
                     return new URI(uriString);
                 case HttpStatus.SC_NO_CONTENT:
-                    throw new MCRIdentifierUnresolvableException(doi.asString(),
-                        "The identifier " + doi.asString() + " is currently not resolvable");
+                    throw new MCRIdentifierUnresolvableException(doiParam.asString(),
+                        "The identifier " + doiParam.asString() + " is currently not resolvable");
                 case HttpStatus.SC_NOT_FOUND:
-                    throw new MCRIdentifierUnresolvableException(doi.asString(),
-                        "The identifier " + doi.asString() + " was not found in the Datacenter!");
+                    throw new MCRIdentifierUnresolvableException(doiParam.asString(),
+                        "The identifier " + doiParam.asString() + " was not found in the Datacenter!");
                 case HttpStatus.SC_UNAUTHORIZED:
                     throw new MCRDatacenterAuthenticationException();
                 case HttpStatus.SC_INTERNAL_SERVER_ERROR:
                     throw new MCRDatacenterException(
                         String.format(Locale.ENGLISH, "Datacenter error while resolving doi: \"%s\" : %s",
-                            doi.asString(), getStatusString(response)));
+                            doiParam.asString(), getStatusString(response)));
                 default:
                     throw new MCRDatacenterException(String.format(Locale.ENGLISH,
-                        "Unknown error while resolving doi: \"%s\" : %s", doi.asString(), getStatusString(response)));
+                        "Unknown error while resolving doi: \"%s\" : %s", doiParam.asString(),
+                        getStatusString(response)));
             }
         } catch (IOException | URISyntaxException ex) {
             throw new MCRDatacenterException(
-                String.format(Locale.ENGLISH, "Unknown error while resolving doi: \"%s\"", doi.asString()), ex);
+                String.format(Locale.ENGLISH, "Unknown error while resolving doi: \"%s\"", doiParam.asString()), ex);
         }
     }
 

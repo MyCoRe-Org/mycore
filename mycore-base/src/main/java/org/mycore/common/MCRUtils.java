@@ -494,6 +494,7 @@ public class MCRUtils {
      * @throws NullPointerException if either <code>first</code> or <code>other</code> is null
      */
     @SafeVarargs
+    @SuppressWarnings("unchecked")
     public static <T> int compareParts(T first, T other, Function<T, Comparable>... part) {
         return Stream.of(part)
             .mapToInt(f -> f.apply(first).compareTo(f.apply(other)))

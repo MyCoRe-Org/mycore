@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.frontend.classeditor.resources;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
@@ -393,8 +411,7 @@ public class MCRClassificationEditorResource {
         }
         Gson gson = MCRJSONManager.instance().createGson();
 
-        String json = gson.toJson(category);
-        return json;
+        return gson.toJson(category);
     }
 
     private SaveElement getCateg(JsonElement jsonElement) {
@@ -424,8 +441,7 @@ public class MCRClassificationEditorResource {
 
     private MCRJSONCategory parseJson(String json) {
         Gson gson = MCRJSONManager.instance().createGson();
-        MCRJSONCategory category = gson.fromJson(json, MCRJSONCategory.class);
-        return category;
+        return gson.fromJson(json, MCRJSONCategory.class);
     }
 
     protected String buildJsonError(String errorType, MCRCategoryID mcrCategoryID) {
