@@ -20,36 +20,31 @@
 
 package org.mycore.orcid;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.mycore.common.config.MCRConfiguration;
+import javax.ws.rs.core.MediaType;
+
+import org.jdom2.Namespace;
 
 /**
- * Utility class to work with the REST API of orcid.org.
- * By setting MCR.ORCID.BaseURL, application can choose to work
- * against the production registry or the sandbox of orcid.org.
+ * Utility class to hold constants and namespace representation used in the XML of the ORCID API.
  *
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRORCIDClient {
+public abstract class MCRORCIDConstants {
 
-    private final static MCRORCIDClient SINGLETON = new MCRORCIDClient();
+    public final static MediaType ORCID_XML_MEDIA_TYPE = MediaType.valueOf("application/vnd.orcid+xml");
 
-    private WebTarget baseTarget;
+    public final static List<Namespace> NAMESPACES = new ArrayList<Namespace>();
 
-    public static MCRORCIDClient instance() {
-        return SINGLETON;
-    }
+    public final static Namespace NS_ACTIVITIES = buildNamespace("activities");
 
-    private MCRORCIDClient() {
-        String baseURL = MCRConfiguration.instance().getString("MCR.ORCID.BaseURL");
-        Client client = ClientBuilder.newClient();
-        baseTarget = client.target(baseURL);
-    }
+    public final static Namespace NS_WORK = buildNamespace("work");
 
-    public WebTarget getBaseTarget() {
-        return baseTarget;
+    private static Namespace buildNamespace(String prefix) {
+        Namespace namespace = Namespace.getNamespace(prefix, "http://www.orcid.org/ns/" + prefix);
+        NAMESPACES.add(namespace);
+        return namespace;
     }
 }
