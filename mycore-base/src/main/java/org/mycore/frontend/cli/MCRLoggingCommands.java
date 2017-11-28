@@ -6,9 +6,7 @@ package org.mycore.frontend.cli;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
@@ -20,7 +18,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 @MCRCommandGroup(name = "Logging Commands")
 public class MCRLoggingCommands extends MCRAbstractCommands {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRLoggingCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * @param name
@@ -32,28 +30,21 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
      *            level
      */
     @MCRCommand(syntax = "change log level of {0} to {1}",
-        help = "{0} the package or class name for which to change the log level, {1} the log level to set. If the log level cannot be read it is set to DEBUG by default.",
+        help = "{0} the package or class name for which to change the log level, {1} the log level to set.",
         order = 10)
-    synchronized public static void changeLogLevel(String name, String logLevelToSet) {
-        LOGGER.info("Setting log level for \"" + name + "\" to \"" + logLevelToSet + "\"");
-
-        Level newLevel = Level.toLevel(logLevelToSet);
+    public static synchronized void changeLogLevel(String name, String logLevelToSet) {
+        LOGGER.info("Setting log level for \"{}\" to \"{}\"", name, logLevelToSet);
+        Level newLevel = Level.getLevel(logLevelToSet);
         if (newLevel == null) {
             LOGGER.error("Unknown log level \"" + logLevelToSet + "\"");
             return;
         }
-
-        Logger log = LogManager.getLogger(name);
+        Logger log = "ROOT".equals(name) ? LogManager.getRootLogger() : LogManager.getLogger(name);
         if (log == null) {
             LOGGER.error("Could not get logger for \"" + name + "\"");
             return;
         }
-
-        LOGGER.info("Change log level from " + log.getLevel() + " to " + newLevel);
-        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        Configuration config = ctx.getConfiguration();
-        LoggerConfig loggerConfig = config.getLoggerConfig(log.getName());
-        loggerConfig.setLevel(newLevel);
-        ctx.updateLoggers();
+        LOGGER.info("Change log level from {} to {}", log.getLevel(), newLevel);
+        Configurator.setLevel(log.getName(), newLevel);
     }
 }
