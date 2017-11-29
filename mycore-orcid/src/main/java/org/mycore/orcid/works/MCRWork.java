@@ -28,8 +28,6 @@ import org.mycore.orcid.MCRORCIDException;
 import org.mycore.orcid.MCRORCIDProfile;
 import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 /**
  * Represents a single "work", that means a publication within the "works" section of an ORCID profile,
  * from a single source.

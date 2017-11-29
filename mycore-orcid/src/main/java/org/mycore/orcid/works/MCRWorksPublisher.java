@@ -45,8 +45,6 @@ import org.mycore.orcid.MCRORCIDProfile;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 /**
  * Provides functionality to create, update and delete works in the remote ORCID profile
  *
