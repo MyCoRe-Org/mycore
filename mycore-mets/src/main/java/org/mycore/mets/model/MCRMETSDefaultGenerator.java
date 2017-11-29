@@ -19,6 +19,20 @@
 
 package org.mycore.mets.model;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -35,6 +49,7 @@ import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
+import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
@@ -47,21 +62,6 @@ import org.mycore.mets.model.struct.StructLink;
 import org.mycore.mets.tools.MCRMetsSave;
 import org.mycore.services.i18n.MCRTranslation;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 /**
  * @author Thomas Scheffler (yagee)
  * @author Matthias Eichner
@@ -70,24 +70,11 @@ import java.util.TreeMap;
  */
 public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
-    private static final String TRANSCRIPTION = "transcription";
-
-    private static final String TRANSLATION = "translation";
-
     private static final Logger LOGGER = LogManager.getLogger(MCRMETSGenerator.class);
 
     private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList("alto", "tei");
 
     private HashMap<String, String> hrefIdMap = new HashMap<>();
-
-    /**
-     * This enum is used to create fileGroups in the File and 
-     * @author Sebastian Röher (basti890)
-     *
-     */
-    private enum FileUse {
-        MASTER, ALTO, TRANSCRIPTION, TRANSLATION
-    }
 
     @Override
     public Mets generate() throws MCRException {
@@ -124,7 +111,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         AmdSec amdSec = new AmdSec("amd_" + owner);
         // file sec
         FileSec fileSec = new FileSec();
-        for (FileUse fileUse : FileUse.values()) {
+        for (MCRMetsFileUse fileUse : MCRMetsFileUse.values()) {
             FileGrp fileGrp = new FileGrp(fileUse.toString());
             fileSec.addFileGrp(fileGrp);
         }
@@ -186,19 +173,18 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         StructLink structLink, Map.Entry<MCRPath, BasicFileAttributes> file) throws IOException {
         String baseID = MCRMetsSave.getFileBase(file.getKey());
         final String physicalID = "phys_" + baseID;
-        final String fileID;
         final String href;
+        String path = file.getKey().getOwnerRelativePath().substring(1);
         try {
-            href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1), true);
+            href = MCRXMLFunctions.encodeURIPath(path, true);
         } catch (URISyntaxException uriSyntaxException) {
-            LOGGER.error("invalid href ", uriSyntaxException);
+            LOGGER.error("invalid href {}", path, uriSyntaxException);
             return;
         }
-
         int beginIndex = href.lastIndexOf("/") == -1 ? 0 : href.lastIndexOf("/") + 1;
-        int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length()
-            : href
-                .lastIndexOf(".");
+        int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ?
+                href.length() :
+                href.lastIndexOf(".");
         String fileName = href.substring(beginIndex, endIndex);
         LOGGER.debug("Created fileName: {}", fileName);
 
@@ -206,9 +192,10 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
             && isInExcludedRootFolder(dir))) {
             hrefIdMap.put(fileName, baseID);
         }
-        FileUse fileUse = getFileUse(href);
-        fileID = fileUse.toString().toLowerCase(Locale.ROOT) + "_" + baseID;
+
         //files
+        MCRMetsFileUse fileUse = MCRMetsFileUse.get(href);
+        String fileID = MCRMetsFileUse.getIdPrefix(href) + "_" + baseID;
         sortFileToGrp(fileSec, file, fileID, href, fileUse);
 
         // physical
@@ -259,7 +246,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
     }
 
     private void sortFileToGrp(FileSec fileSec, Map.Entry<MCRPath, BasicFileAttributes> file, String fileID,
-        final String href, FileUse fileUse) throws IOException {
+            final String href, MCRMetsFileUse fileUse) throws IOException {
         // file
         File metsFile = new File(fileID, MCRContentTypes.probeContentType(file.getKey()));
         FLocat fLocat = new FLocat(LOCTYPE.URL, href);
@@ -269,17 +256,6 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
             if (fileGrp.getUse().equalsIgnoreCase(fileUse.toString()))
                 fileGrp.addFile(metsFile);
         }
-    }
-
-    private FileUse getFileUse(final String href) {
-        if (href.startsWith("tei/" + TRANSLATION)) {
-            return FileUse.TRANSLATION;
-        } else if (href.startsWith("tei/" + TRANSCRIPTION)) {
-            return FileUse.TRANSCRIPTION;
-        } else if (href.startsWith("alto/")) {
-            return FileUse.ALTO;
-        }
-        return FileUse.MASTER;
     }
 
     /**

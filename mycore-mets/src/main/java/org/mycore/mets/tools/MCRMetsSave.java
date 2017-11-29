@@ -32,12 +32,15 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -68,6 +71,7 @@ import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
+import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
@@ -91,14 +95,6 @@ import org.xml.sax.SAXException;
 public class MCRMetsSave {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMetsSave.class);
-
-    public static final String ALTO_FILE_GROUP_USE = "ALTO";
-
-    public static final String DEFAULT_FILE_GROUP_USE = "MASTER";
-
-    public static final String TRANSCRIPTION_FILE_GROUP_USE = "TRANSCRIPTION";
-
-    public static final String TRANSLATION_FILE_GROUP_USE = "TRANSLATION";
 
     public static final String ALTO_FOLDER_PREFIX = "alto/";
 
@@ -253,7 +249,7 @@ public class MCRMetsSave {
             Element fileSec = getFileGroup(mets, fileGrpUSE);
             fileSec.addContent(fileAsMetsFile.asElement());
 
-            if (fileGrpUSE.equals(DEFAULT_FILE_GROUP_USE)) {
+            if (fileGrpUSE.equals(MCRMetsFileUse.DEFAULT.toString())) {
                 updateOnImageFile(mets, fileId, relPath);
             } else {
                 updateOnCustomFile(mets, fileId, relPath);
@@ -269,7 +265,8 @@ public class MCRMetsSave {
     private static void updateOnImageFile(Document mets, String fileId, String path) {
         LOGGER.debug("FILE is a image!");
         //check if custom files are present and save the ids
-        String[] customFileGroups = { TRANSCRIPTION_FILE_GROUP_USE, ALTO_FILE_GROUP_USE, TRANSLATION_FILE_GROUP_USE };
+        String[] customFileGroups = { MCRMetsFileUse.TRANSCRIPTION.toString(), MCRMetsFileUse.ALTO.toString(),
+                MCRMetsFileUse.TRANSLATION.toString() };
 
         // add to structMap physical
         PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE);
@@ -295,7 +292,7 @@ public class MCRMetsSave {
     private static void updateOnCustomFile(Document mets, String fileId, String path) {
         LOGGER.debug("FILE is a custom file (ALTO/TEI)!");
 
-        String matchId = searchFileInGroup(mets, path, DEFAULT_FILE_GROUP_USE);
+        String matchId = searchFileInGroup(mets, path, MCRMetsFileUse.DEFAULT.toString());
 
         if (matchId == null) {
             // there is no file wich belongs to the alto xml so just return
@@ -400,22 +397,7 @@ public class MCRMetsSave {
      * @return the id of the filegGroup
      */
     public static String getFileGroupUse(MCRPath file) {
-        String filePath = file.getOwnerRelativePath();
-        String teiFolder = "/" + TEI_FOLDER_PREFIX;
-        String altoFolder = "/" + ALTO_FOLDER_PREFIX;
-
-        if (filePath.startsWith(altoFolder) && filePath.endsWith(".xml")) {
-            return ALTO_FILE_GROUP_USE;
-        } else if (filePath.startsWith(teiFolder)) {
-            // translations have to start with TRANSLATION_FOLDER_PREFIX
-            String pathInTeiFolder = filePath.substring(teiFolder.length());
-            if (pathInTeiFolder.startsWith(TRANSLATION_FOLDER_PREFIX)) {
-                return TRANSLATION_FILE_GROUP_USE;
-            }
-            return TRANSCRIPTION_FILE_GROUP_USE;
-        } else {
-            return DEFAULT_FILE_GROUP_USE;
-        }
+        return MCRMetsFileUse.get(file).toString();
     }
 
     /**
@@ -746,8 +728,8 @@ public class MCRMetsSave {
      * group and ALTO files to the ALTO group. It will also bundle files with the same name e.g. sample1.tiff and
      * alto/sample1.xml to the same physical struct map div.</p>
      *
-     * <p><b>Important:</b> This method does not update the mets.xml in the derivate, the given java mets object will
-     * be.</p>
+     * <p><b>Important:</b> This method does not update the mets.xml in the derivate, its just updating the given mets
+     * instance.</p>
      *
      * @param mets the mets to update
      * @param derivatePath path to the derivate -&gt; required for looking up new files
@@ -865,6 +847,56 @@ public class MCRMetsSave {
     }
 
     /**
+     * Returns a list of files in the given path. This does not return directories!
+     *
+     * @param path the path to list
+     * @param ignore paths which should be ignored
+     * @return list of <code>MCRPath's</code> files
+     * @throws IOException if an I/O error is thrown when accessing the starting file.
+     */
+    public static List<MCRPath> listFiles(MCRPath path, Collection<MCRPath> ignore) throws IOException {
+        return Files.walk(path)
+                    .filter(Files::isRegularFile)
+                    .map(MCRPath::toMCRPath)
+                    .filter(MCRStreamUtils.not(ignore::contains))
+                    .collect(Collectors.toList());
+    }
+
+    /**
+     * Builds new mets:fileGrp's based on the given paths using the mycore derivate convetions.
+     *
+     * <ul>
+     *     <li><b>root folder</b> -&gt; mets:fileGrp[@USE=MASTER]</li>
+     *     <li><b>alto/ folder</b> -&gt; mets:fileGrp[@USE=ALTO]</li>
+     *     <li><b>tei/translation folder</b> -&gt; mets:fileGrp[@USE=TRANSLATION</li>
+     *     <li><b>tei/transcription folder</b> -&gt; mets:fileGrp[@USE=TRANSCRIPTION</li>
+     * </ul>
+     *
+     * @param paths the paths to check for the groups
+     * @return a list of new created <code>FileGrp</code> objects
+     */
+    public static List<FileGrp> buildFileGroups(List<MCRPath> paths) {
+        return listFileUse(paths).stream()
+                                 .map(MCRMetsFileUse::toString)
+                                 .map(FileGrp::new)
+                                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a list of all <code>MCRMetsFileUse</code> in the given paths.
+     *
+     * @param paths paths to check
+     * @return list of <code>MCRMetsFileUse</code>
+     */
+    public static List<MCRMetsFileUse> listFileUse(List<MCRPath> paths) {
+        Set<MCRMetsFileUse> fileUseSet = new HashSet<>();
+        for (MCRPath path : paths) {
+            fileUseSet.add(MCRMetsFileUse.get(path));
+        }
+        return new ArrayList<>(fileUseSet);
+    }
+
+    /**
      * Returns the name without any path information or file extension. Usable to create mets ID's.
      *
      * <ul>
@@ -894,6 +926,18 @@ public class MCRMetsSave {
      */
     public static String getFileBase(MCRPath path) {
         return getFileBase(path.getOwnerRelativePath().substring(1));
+    }
+
+    /**
+     * Returns the mets:file/@ID for the given path.
+     *
+     * @param path path to the file
+     * @return mets:file ID
+     */
+    public static String getFileId(MCRPath path) {
+        String prefix = MCRMetsFileUse.getIdPrefix(path);
+        String base = getFileBase(path);
+        return prefix + "_" + base;
     }
 
 }

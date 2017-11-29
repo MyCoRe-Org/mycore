@@ -18,7 +18,12 @@
 
 package org.mycore.mets.model.simple;
 
+import java.util.Locale;
+
+import org.mycore.datamodel.niofs.MCRPath;
+
 public enum MCRMetsFileUse {
+
     ALTO("ALTO"), TRANSLATION("TRANSLATION"), TRANSCRIPTION("TRANSCRIPTION"), MASTER("MASTER"), DEFAULT("DEFAULT");
 
     MCRMetsFileUse(final String use) {
@@ -31,4 +36,71 @@ public enum MCRMetsFileUse {
     public String toString() {
         return this.use;
     }
+
+    public static MCRMetsFileUse of(final String value) {
+        try {
+            return MCRMetsFileUse.valueOf(value.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException iae) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the @USE for mets:fileGrp for the given path.
+     *
+     * @param path the path to the file
+     * @return the mets file use
+     */
+    public static MCRMetsFileUse get(MCRPath path) {
+        String href = path.subpathComplete().toString();
+        return get(href);
+    }
+
+    /**
+     * Returns the @USE for mets:fileGrp for the given href.
+     *
+     * @param href the path to the file
+     * @return the mets file use
+     */
+    public static MCRMetsFileUse get(final String href) {
+        if (href.startsWith("tei/" + TRANSLATION.toLowercase())) {
+            return MCRMetsFileUse.TRANSLATION;
+        } else if (href.startsWith("tei/" + TRANSCRIPTION.toLowercase())) {
+            return MCRMetsFileUse.TRANSCRIPTION;
+        } else if (href.startsWith("alto/")) {
+            return MCRMetsFileUse.ALTO;
+        }
+        return MCRMetsFileUse.MASTER;
+    }
+
+    /**
+     * Returns the mets:file/@ID prefix for the given path. The prefix is determined by the folder the file is stored.
+     *
+     * @param path the path to get the prefix of
+     * @return the id prefix
+     */
+    public static String getIdPrefix(final MCRPath path) {
+        String href = path.subpathComplete().toString();
+        return getIdPrefix(href);
+    }
+
+    /**
+     * Returns the mets:file/@ID prefix for the given href. The prefix is determined by the folder the file is stored.
+     *
+     * @param href the href to get the prefix of
+     * @return the id prefix
+     */
+    public static String getIdPrefix(final String href) {
+        MCRMetsFileUse fileUse = get(href);
+        if (MCRMetsFileUse.TRANSLATION.equals(fileUse)) {
+            String lang = href.replaceAll("tei/" + TRANSLATION.toLowercase() + ".", "").substring(0, 2);
+            return TRANSLATION.toLowercase() + "_" + lang;
+        }
+        return fileUse.toLowercase();
+    }
+
+    private String toLowercase() {
+        return this.use.toLowerCase(Locale.ROOT);
+    }
+
 }
