@@ -31,17 +31,12 @@ import org.mycore.orcid.oauth.MCROAuthClient;
  */
 public class MCRWorkSource {
 
-    private static Map<String, MCRWorkSource> sources = new HashMap<String, MCRWorkSource>();
+    private static Map<String, MCRWorkSource> sources = new HashMap<>();
 
     private String sourceID;
 
     static MCRWorkSource getInstance(String sourceID) {
-        MCRWorkSource source = sources.get(sourceID);
-        if (source == null) {
-            source = new MCRWorkSource(sourceID);
-            sources.put(sourceID, source);
-        }
-        return source;
+        return sources.computeIfAbsent(sourceID, MCRWorkSource::new);
     }
 
     private MCRWorkSource(String sourceID) {
@@ -55,8 +50,6 @@ public class MCRWorkSource {
     /**
      * Returns true, if this is our client application, that means
      * the source's ID is our MCR.ORCID.OAuth.ClientID
-     *
-     * @return
      */
     public boolean isThisApplication() {
         return MCROAuthClient.instance().getClientID().equals(sourceID);

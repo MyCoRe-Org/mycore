@@ -54,10 +54,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public class MCRWorksPublisher {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRWorksPublisher.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRWorksPublisher.class);
 
     /** Transformer used to transform a MyCoRe object with MODS to ORCID's work XML schema */
-    private final static MCRContentTransformer T_MCR2WORK = MCRContentTransformerFactory.getTransformer("MyCoRe2Work");
+    private static final MCRContentTransformer T_MCR2WORK = MCRContentTransformerFactory.getTransformer("MyCoRe2Work");
 
     private MCRORCIDProfile orcid;
 
@@ -74,7 +74,7 @@ public class MCRWorksPublisher {
         Document workXML = buildWorkXMLFrom(objectID);
         Entity<InputStream> input = buildRequestEntity(workXML);
 
-        LOGGER.info("post (create)" + objectID + " at " + target.getUri());
+        LOGGER.info("post (create){} at {}", objectID, target.getUri());
         Response response = builder.post(input);
         expect(response, Response.Status.CREATED);
 
@@ -84,7 +84,7 @@ public class MCRWorksPublisher {
         return work;
     }
 
-    void update(MCRWork work) throws IOException, SAXException, JDOMException {
+    void update(MCRWork work) throws IOException, SAXException {
         WebTarget target = orcid.getWebTarget().path("work").path(work.getPutCode());
         Builder builder = buildInvocation(target);
 
@@ -92,15 +92,15 @@ public class MCRWorksPublisher {
         workXML.getRootElement().setAttribute("put-code", work.getPutCode());
         Entity<InputStream> input = buildRequestEntity(workXML);
 
-        LOGGER.info("put (update) " + work.getObjectID() + " to " + target.getUri());
+        LOGGER.info("put (update) {} to {}", work.getObjectID(), target.getUri());
         Response response = builder.put(input);
         expect(response, Response.Status.OK);
     }
 
-    void delete(MCRWork work) throws JsonProcessingException, IOException, JDOMException, SAXException {
+    void delete(MCRWork work) throws IOException, JDOMException, SAXException {
         WebTarget target = orcid.getWebTarget().path("work").path(work.getPutCode());
         Builder builder = buildInvocation(target);
-        LOGGER.info("delete " + work.getObjectID() + " from " + target.getUri());
+        LOGGER.info("delete {} from {}", work.getObjectID(), target.getUri());
         Response response = builder.delete();
         expect(response, Response.Status.NO_CONTENT);
         orcid.getWorksSection().removeWork(work);
@@ -138,7 +138,7 @@ public class MCRWorksPublisher {
      * @throws MCRORCIDException if the ORCID API returned error information
      */
     private void expect(Response response, Response.Status expectedStatus)
-        throws MCRORCIDException, JsonProcessingException, IOException {
+        throws IOException {
         StatusType status = response.getStatusInfo();
         if (status.getStatusCode() != expectedStatus.getStatusCode()) {
             throw new MCRORCIDException(response);

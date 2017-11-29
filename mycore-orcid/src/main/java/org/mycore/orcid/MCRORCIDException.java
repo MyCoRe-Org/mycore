@@ -42,7 +42,7 @@ public class MCRORCIDException extends IOException {
         super(message);
     }
 
-    public MCRORCIDException(Response response) throws JsonProcessingException, IOException {
+    public MCRORCIDException(Response response) throws IOException {
         StatusType status = response.getStatusInfo();
         String responseBody = response.readEntity(String.class);
 

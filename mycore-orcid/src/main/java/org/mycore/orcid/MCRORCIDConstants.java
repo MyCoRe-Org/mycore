@@ -32,13 +32,13 @@ import org.jdom2.Namespace;
  */
 public abstract class MCRORCIDConstants {
 
-    public final static MediaType ORCID_XML_MEDIA_TYPE = MediaType.valueOf("application/vnd.orcid+xml");
+    public static final MediaType ORCID_XML_MEDIA_TYPE = MediaType.valueOf("application/vnd.orcid+xml");
 
-    public final static List<Namespace> NAMESPACES = new ArrayList<Namespace>();
+    public static final List<Namespace> NAMESPACES = new ArrayList<>();
 
-    public final static Namespace NS_ACTIVITIES = buildNamespace("activities");
+    public static final Namespace NS_ACTIVITIES = buildNamespace("activities");
 
-    public final static Namespace NS_WORK = buildNamespace("work");
+    public static final Namespace NS_WORK = buildNamespace("work");
 
     private static Namespace buildNamespace(String prefix) {
         Namespace namespace = Namespace.getNamespace(prefix, "http://www.orcid.org/ns/" + prefix);

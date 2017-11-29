@@ -55,16 +55,16 @@ import org.xml.sax.SAXException;
  */
 public class MCRWorksFetcher {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRWorksFetcher.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRWorksFetcher.class);
 
     /** The maximum number of works to fetch at once in a bulk request */
-    private final static int BULK_FETCH_SIZE = MCRConfiguration.instance().getInt("MCR.ORCID.Works.BulkFetchSize");
+    private static final int BULK_FETCH_SIZE = MCRConfiguration.instance().getInt("MCR.ORCID.Works.BulkFetchSize");
 
     /** Transformer used to convert ORCID's work XML schema to MODS and a representation we use here */
-    private final static MCRContentTransformer T_WORK2MCR = MCRContentTransformerFactory.getTransformer("Work2MyCoRe");
+    private static final MCRContentTransformer T_WORK2MCR = MCRContentTransformerFactory.getTransformer("Work2MyCoRe");
 
     /** Transformer used to parse bibTeX to MODS */
-    private final static MCRContentTransformer T_BIBTEX2MODS = new MCRBibTeX2MODSTransformer();
+    private static final MCRContentTransformer T_BIBTEX2MODS = new MCRBibTeX2MODSTransformer();
 
     private MCRORCIDProfile orcid;
 
@@ -77,7 +77,7 @@ public class MCRWorksFetcher {
         WebTarget target = orcid.getWebTarget().path("works");
         Element worksXML = fetchWorksXML(target);
 
-        List<MCRGroupOfWorks> groups = new ArrayList<MCRGroupOfWorks>();
+        List<MCRGroupOfWorks> groups = new ArrayList<>();
         for (Element groupXML : worksXML.getChildren("group", MCRORCIDConstants.NS_ACTIVITIES)) {
             MCRGroupOfWorks group = new MCRGroupOfWorks();
             groups.add(group);
@@ -96,7 +96,7 @@ public class MCRWorksFetcher {
     }
 
     void fetchDetails(MCRWorksSection worksSection) throws IOException, JDOMException, SAXException {
-        List<String> putCodes = new ArrayList<String>();
+        List<String> putCodes = new ArrayList<>();
         worksSection.getWorks().forEach(work -> putCodes.add(work.getPutCode()));
 
         for (int offset = 0; offset < putCodes.size(); offset += BULK_FETCH_SIZE) {
@@ -120,7 +120,7 @@ public class MCRWorksFetcher {
     }
 
     private Element fetchWorksXML(WebTarget target) throws JDOMException, IOException, SAXException {
-        LOGGER.info("get " + target.getUri());
+        LOGGER.info("get {}", target.getUri());
         Builder b = target.request().accept(MCRORCIDConstants.ORCID_XML_MEDIA_TYPE)
             .header("Authorization", "Bearer " + MCRReadPublicTokenFactory.getToken());
         MCRContent response = new MCRStreamContent(b.get(InputStream.class));
@@ -161,7 +161,7 @@ public class MCRWorksFetcher {
                 return Optional.of(modsFromBibTeX);
             } catch (Exception ex) {
                 String msg = "Exception parsing BibTeX: " + bibTeX;
-                LOGGER.warn(msg + " " + ex.getMessage());
+                LOGGER.warn("{} {}", msg, ex.getMessage());
             }
         }
         return Optional.empty();

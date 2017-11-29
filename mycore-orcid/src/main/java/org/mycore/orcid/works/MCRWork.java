@@ -117,7 +117,7 @@ public class MCRWork {
     }
 
     /** Deletes this work from the remote ORCID profile */
-    public void delete() throws JsonProcessingException, IOException, JDOMException, SAXException {
+    public void delete() throws IOException, JDOMException, SAXException {
         if (!source.isThisApplication()) {
             throw new MCRORCIDException("can not delete that work, is not from us");
         }

@@ -33,7 +33,7 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRORCIDClient {
 
-    private final static MCRORCIDClient SINGLETON = new MCRORCIDClient();
+    private static final MCRORCIDClient SINGLETON = new MCRORCIDClient();
 
     private WebTarget baseTarget;
 

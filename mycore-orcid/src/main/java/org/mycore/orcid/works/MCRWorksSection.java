@@ -45,13 +45,13 @@ public class MCRWorksSection {
     private MCRORCIDProfile orcid;
 
     /** The groups of works this ORCID profile contains */
-    private List<MCRGroupOfWorks> groups = new ArrayList<MCRGroupOfWorks>();
+    private List<MCRGroupOfWorks> groups = new ArrayList<>();
 
     /** All works (not grouped) */
-    private List<MCRWork> works = new ArrayList<MCRWork>();
+    private List<MCRWork> works = new ArrayList<>();
 
     /** Lookup table to get work by it's put code */
-    private Map<String, MCRWork> putCode2Work = new HashMap<String, MCRWork>();
+    private Map<String, MCRWork> putCode2Work = new HashMap<>();
 
     /**
      * Creates a representation of the ORCID's works section and
@@ -67,7 +67,7 @@ public class MCRWorksSection {
     }
 
     public List<MCRWork> getWorks() {
-        return new ArrayList<MCRWork>(works);
+        return new ArrayList<>(works);
     }
 
     void addWork(MCRWork work) {

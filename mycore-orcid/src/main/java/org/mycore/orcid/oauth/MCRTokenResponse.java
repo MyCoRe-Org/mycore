@@ -40,7 +40,7 @@ public class MCRTokenResponse {
 
     private JsonNode responseData;
 
-    MCRTokenResponse(Response response) throws JsonProcessingException, IOException {
+    MCRTokenResponse(Response response) throws IOException {
         this.status = response.getStatusInfo();
         String jsonTree = response.readEntity(String.class);
         ObjectMapper objectMapper = new ObjectMapper();

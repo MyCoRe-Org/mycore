@@ -37,9 +37,9 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public class MCRReadPublicTokenFactory {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCRReadPublicTokenFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRReadPublicTokenFactory.class);
 
-    private final static String CONFIG_PROPERTY = "MCR.ORCID.OAuth.ReadPublicToken";
+    private static final String CONFIG_PROPERTY = "MCR.ORCID.OAuth.ReadPublicToken";
 
     private static String token = MCRConfiguration.instance().getString(CONFIG_PROPERTY, null);
 
@@ -74,6 +74,6 @@ public class MCRReadPublicTokenFactory {
         }
 
         LOGGER.warn("You should set the access token in mycore.properties:");
-        LOGGER.warn(CONFIG_PROPERTY + "=" + token);
+        LOGGER.warn(CONFIG_PROPERTY + "={}", token);
     }
 }
