@@ -43,12 +43,16 @@ import com.google.gson.JsonObject;
  * @version $Revision$ $Date$
  */
 public final class MCRObject extends MCRBase {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String ROOT_NAME = "mycoreobject";
+
     // the object content
     private final MCRObjectStructure mcr_struct;
 
     private final MCRObjectMetadata mcr_metadata;
 
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor of the MCRObject class. It creates an instance of
@@ -174,7 +178,7 @@ public final class MCRObject extends MCRBase {
 
     @Override
     protected String getRootTagName() {
-        return "mycoreobject";
+        return ROOT_NAME;
     }
 
     /**

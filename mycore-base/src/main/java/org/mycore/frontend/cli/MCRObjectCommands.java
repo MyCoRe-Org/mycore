@@ -19,7 +19,6 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -76,6 +75,7 @@ import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -837,7 +837,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param xslFilePath
      *            path to xsl file
      * @throws URISyntaxException if xslFilePath is not a valid file or URL
-     * @throws MCRActiveLinkException see {@link MCRMetadataManager#update(MCRObject)}
      * @throws MCRPersistenceException see {@link MCRMetadataManager#update(MCRObject)}
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
@@ -846,7 +845,35 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "transforms a mycore object {0} with the given file or URL {1}",
         order = 280)
     public static void xslt(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException,
-        URISyntaxException, TransformerException, MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+        URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException {
+        xslt(objectId, xslFilePath, false);
+    }
+
+    /**
+     * @see #xslt(String, String)
+     *
+     * Forces the xml to overwrite even if the root name of the original and the result differs.
+     *
+     * @param objectId
+     *            object to transform
+     * @param xslFilePath
+     *            path to xsl file
+     * @throws URISyntaxException if xslFilePath is not a valid file or URL
+     * @throws MCRPersistenceException see {@link MCRMetadataManager#update(MCRObject)}
+     * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
+     */
+    @MCRCommand(
+            syntax = "force xslt {0} with file {1}",
+            help = "transforms a mycore object {0} with the given file or URL {1}. Overwrites anyway if original "
+                    + "root name and result root name are different.",
+            order = 285)
+    public static void forceXSLT(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException,
+            URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException {
+        xslt(objectId, xslFilePath, true);
+    }
+
+    private static void xslt(String objectId, String xslFilePath, boolean force) throws IOException, JDOMException, SAXException,
+            URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException {
         File xslFile = new File(xslFilePath);
         URL xslURL;
         if (!xslFile.exists()) {
@@ -877,10 +904,24 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         JDOMResult result = new JDOMResult();
         transformer.transform(new JDOMSource(document), result);
         Document resultDocument = Objects.requireNonNull(result.getDocument(), "Could not get transformation result");
-        // update on diff
-        if (!MCRXMLHelper.deepEqual(document, resultDocument)) {
-            MCRMetadataManager.update(new MCRObject(resultDocument));
+
+        String originalName = document.getRootElement().getName();
+        String resultName = resultDocument.getRootElement().getName();
+        if (!force && !originalName.equals(resultName)) {
+            LOGGER.error("{}: root name '{}' does not match result name '{}'.", objectId, originalName, resultName);
+            return;
         }
+
+        // update on diff
+        if (MCRXMLHelper.deepEqual(document, resultDocument)) {
+            return;
+        }
+        if(resultName.equals(MCRObject.ROOT_NAME)) {
+            MCRMetadataManager.update(new MCRObject(resultDocument));
+        } else if(resultName.equals(MCRDerivate.ROOT_NAME)) {
+            MCRMetadataManager.update(new MCRDerivate(resultDocument));
+        }
+        LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
     }
 
     /**

@@ -52,6 +52,8 @@ public final class MCRDerivate extends MCRBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    public static final String ROOT_NAME = "mycorederivate";
+
     // the object content
     private MCRObjectDerivate mcr_derivate;
 
@@ -127,7 +129,7 @@ public final class MCRDerivate extends MCRBase {
 
     @Override
     protected String getRootTagName() {
-        return "mycorederivate";
+        return ROOT_NAME;
     }
 
     /**
