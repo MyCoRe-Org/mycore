@@ -18,40 +18,67 @@
 
 package org.mycore.orcid.works;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.io.IOException;
+
 import org.jdom2.Element;
-import org.mycore.common.MCRConstants;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRStringContent;
-import org.mycore.common.content.transformer.MCRContentTransformer;
-import org.mycore.mods.bibtex.MCRBibTeX2MODSTransformer;
-import org.mycore.mods.merger.MCRMergeTool;
-import org.mycore.orcid.MCRORCIDNamespaces;
+import org.jdom2.JDOMException;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.orcid.MCRORCIDException;
+import org.mycore.orcid.MCRORCIDProfile;
+import org.xml.sax.SAXException;
 
 /**
- * Represents a single "work", that means a publication within the "works" section of an ORCID profile.
+ * Represents a single "work", that means a publication within the "works" section of an ORCID profile,
+ * from a single source.
  *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRWork {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRWork.class);
-
-    /** Transformer used to parse bibTeX to MODS */
-    private static final MCRContentTransformer T_BIBTEX2MODS = new MCRBibTeX2MODSTransformer();
+    private MCRORCIDProfile orcid;
 
     private String putCode;
 
     private Element mods;
 
+    private MCRWorkSource source;
+
+    private MCRObjectID objectID;
+
+    MCRWork(MCRORCIDProfile orcid, String putCode) {
+        this.orcid = orcid;
+        this.putCode = putCode;
+    }
+
     /**
      * Returns the put code, which is the unique identifier of this work within the ORCID profile
-     *
-     * @return the put code of the work
      */
     public String getPutCode() {
         return putCode;
+    }
+
+    /**
+     * Returns the client application that created this work entry.
+     */
+    public MCRWorkSource getSource() {
+        return source;
+    }
+
+    void setSource(MCRWorkSource source) {
+        this.source = source;
+    }
+
+    /**
+     * If this work's source is this MyCoRe application,
+     * returns the MCRObjectID of the publication the work was created from.
+     */
+    public MCRObjectID getObjectID() {
+        return objectID;
+    }
+
+    void setObjectID(MCRObjectID objectID) {
+        this.objectID = objectID;
     }
 
     /**
@@ -61,42 +88,37 @@ public class MCRWork {
         return mods;
     }
 
-    void setFromWorkXML(Element workXML) {
-        this.putCode = workXML.getAttributeValue("put-code");
-        this.mods = workXML.getChild("mods", MCRConstants.MODS_NAMESPACE).detach();
-        mergeMODSfromBibTeX(workXML);
+    void setMODS(Element mods) {
+        this.mods = mods;
     }
 
     /**
-     * Parses the bibTeX that may be present at the XPath
-     * work:citation[work:citation-type='bibtex']/work:citation-value/
-     * and merges the resulting MODS into the MODS we already got from the rest of the XML
-     *
-     * @param workXML the work:work element from the ORCID response
+     * Fetches the work's details with the complete publication data from the ORCID profile.
+     * Initially, only the work summary was fetched.
      */
-    private void mergeMODSfromBibTeX(Element workXML) {
-        for (Element citation : workXML.getChildren("citation", MCRORCIDNamespaces.NS_WORK)) {
-            String type = citation.getChildTextTrim("citation-type", MCRORCIDNamespaces.NS_WORK);
-            if (!"bibtex".equals(type)) {
-                continue;
-            }
+    void fetchDetails() throws JDOMException, IOException, SAXException {
+        orcid.getFetcher().fetchDetails(this);
+    }
 
-            String bibTeX = citation.getChildTextTrim("citation-value", MCRORCIDNamespaces.NS_WORK);
-            if (bibTeX.isEmpty()) {
-                continue;
-            }
-
-            try {
-                MCRContent result = T_BIBTEX2MODS.transform(new MCRStringContent(bibTeX));
-                Element modsCollection = result.asXML().getRootElement();
-                Element modsFromBibTeX = modsCollection.getChild("mods", MCRConstants.MODS_NAMESPACE);
-                // Remove mods:extension containing the original BibTeX:
-                modsFromBibTeX.removeChildren("extension", MCRConstants.MODS_NAMESPACE);
-                MCRMergeTool.merge(this.mods, modsFromBibTeX);
-            } catch (Exception ex) {
-                String msg = "Exception parsing BibTeX: " + bibTeX;
-                LOGGER.warn("{} {}", msg, ex.getMessage());
-            }
+    /**
+     * If this work's source is this MyCoRe application,
+     * updates the work in the remote ORCID profile from the local MyCoRe object
+     */
+    public void update() throws IOException, SAXException, JDOMException {
+        if (!source.isThisApplication()) {
+            throw new MCRORCIDException("can not update that work, is not from us");
         }
+        if (!MCRMetadataManager.exists(objectID)) {
+            throw new MCRORCIDException("can not update that work, object " + objectID + " does not exist locally");
+        }
+        orcid.getPublisher().update(this);
+    }
+
+    /** Deletes this work from the remote ORCID profile */
+    public void delete() throws IOException, JDOMException, SAXException {
+        if (!source.isThisApplication()) {
+            throw new MCRORCIDException("can not delete that work, is not from us");
+        }
+        orcid.getPublisher().delete(this);
     }
 }

@@ -18,33 +18,20 @@
 
 package org.mycore.orcid;
 
-import java.io.InputStream;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.core.MediaType;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRStreamContent;
-import org.mycore.orcid.oauth.MCRReadPublicTokenFactory;
 
 /**
- * Utility class working as a client for the REST API of orcid.org.
+ * Utility class to work with the REST API of orcid.org.
  * By setting MCR.ORCID.BaseURL, application can choose to work
  * against the production registry or the sandbox of orcid.org.
  *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRORCIDClient {
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRORCIDProfile.class);
-
-    public static final MediaType ORCID_XML_MEDIA_TYPE = MediaType.valueOf("application/vnd.orcid+xml");
 
     private static final MCRORCIDClient SINGLETON = new MCRORCIDClient();
 
@@ -60,19 +47,7 @@ public class MCRORCIDClient {
         baseTarget = client.target(baseURL);
     }
 
-    /**
-     * Does a GET request against the REST API of orcid.org and returns the response as MCRContent.
-     *
-     * @param path the path of the resource to get, relative to the API's base URL.
-     */
-    public MCRContent get(String path) {
-        WebTarget target = baseTarget.path(path);
-        LOGGER.info("get {}", target.getUri());
-
-        Builder b = target.request().accept(ORCID_XML_MEDIA_TYPE);
-        b = b.header("Authorization", "Bearer " + MCRReadPublicTokenFactory.getToken());
-
-        InputStream in = b.get(InputStream.class);
-        return new MCRStreamContent(in);
+    public WebTarget getBaseTarget() {
+        return baseTarget;
     }
 }

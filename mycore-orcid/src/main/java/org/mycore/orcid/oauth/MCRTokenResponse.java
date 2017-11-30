@@ -22,10 +22,8 @@ import java.io.IOException;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
-
 import javax.ws.rs.core.Response.StatusType;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,7 +38,7 @@ public class MCRTokenResponse {
 
     private JsonNode responseData;
 
-    MCRTokenResponse(Response response) throws JsonProcessingException, IOException {
+    MCRTokenResponse(Response response) throws IOException {
         this.status = response.getStatusInfo();
         String jsonTree = response.readEntity(String.class);
         ObjectMapper objectMapper = new ObjectMapper();

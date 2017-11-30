@@ -9,13 +9,36 @@
     MCR.ORCID.OAuth.ClientSecret
     MCR.ORCID.OAuth.ReadPublicToken
 
-## Usage
+## Fetching publications from an ORCID profile 
 
     MCRORCIDProfile orcid = new MCRORCIDProfile("0000-0001-5065-6970");
-    MCRWorks works = orcid.getWorks();
+    
+    MCRWorksSection worksSection = orcid.getWorksSection();
+    Element modsCollectionWithSummaries = worksSection.buildMODSCollection();
 
-    works.fetchSummaries();
-    Element modsCollectionWithSummaries = works.buildMODSCollection();
+    worksSection.fetchDetails();
+    Element modsCollectionWithDetails = worksSection.buildMODSCollection();
 
-    works.fetchDetails();
-    Element modsCollectionWithDetails = works.buildMODSCollection();
+    # Iterate through all grouped works:
+    for (MCRGroupOfWorks group : worksSection) {
+        for (MCRWork work : group.getWorks()) {
+            String putCode = work.getPutCode();
+            Element mods = work.getMODS();
+        }
+    }
+
+## Publishing works into an ORCID profile
+
+    MCRORCIDProfile orcid = new MCRORCIDProfile("0000-0001-5065-6970");
+    orcid.setAccessToken("xxxxxx-xxxx-xxxxxxx-xxxx-xxxx"); // Token for scope /activities/update, get that from user
+    
+    MCRWorksSection worksSection = orcid.getWorksSection();
+    
+    # create publication:
+    MCRWork work = worksSection.addWorkFrom(MCRObjectID.getInstance("mir_mods_00000001"));
+    
+    # update publication:
+    work.update();
+    
+    # delete publication:
+    work.delete();

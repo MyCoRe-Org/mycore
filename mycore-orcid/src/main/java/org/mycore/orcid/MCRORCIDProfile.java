@@ -18,7 +18,15 @@
 
 package org.mycore.orcid;
 
-import org.mycore.orcid.works.MCRWorks;
+import java.io.IOException;
+
+import javax.ws.rs.client.WebTarget;
+
+import org.jdom2.JDOMException;
+import org.mycore.orcid.works.MCRWorksFetcher;
+import org.mycore.orcid.works.MCRWorksPublisher;
+import org.mycore.orcid.works.MCRWorksSection;
+import org.xml.sax.SAXException;
 
 /**
  * Represents the profile of a given ORCID ID.
@@ -29,21 +37,55 @@ public class MCRORCIDProfile {
 
     private String orcid;
 
-    private MCRWorks works = new MCRWorks(this);
+    /** The base target of the REST api for this ORCID profile */
+    private WebTarget target;
+
+    private MCRWorksSection worksSection;
+
+    private MCRWorksPublisher publisher = new MCRWorksPublisher(this);
+
+    private MCRWorksFetcher fetcher = new MCRWorksFetcher(this);
+
+    /** The access token required to modify entries in this ORCID profile */
+    private String accessToken;
 
     public MCRORCIDProfile(String orcid) {
         this.orcid = orcid;
+        this.target = MCRORCIDClient.instance().getBaseTarget().path(orcid);
     }
 
     public String getORCID() {
         return orcid;
     }
 
-    /**
-     * Returns a representation of the "works" section within the ORCID profile,
-     * which contains the publications stored there
-     */
-    public MCRWorks getWorks() {
-        return works;
+    public MCRWorksPublisher getPublisher() {
+        return publisher;
+    }
+
+    public MCRWorksFetcher getFetcher() {
+        return fetcher;
+    }
+
+    /** Returns the base web target of the REST API for this ORCID profile */
+    public WebTarget getWebTarget() {
+        return target;
+    }
+
+    /** Sets the access token required to modify entries in this ORCID profile */
+    public void setAccessToken(String token) {
+        this.accessToken = token;
+    }
+
+    /** Returns the access token required to modify entries in this ORCID profile */
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    /** Returns the "works" section of the ORCID profile, which holds the publication data */
+    public synchronized MCRWorksSection getWorksSection() throws JDOMException, IOException, SAXException {
+        if (worksSection == null) {
+            worksSection = new MCRWorksSection(this);
+        }
+        return worksSection;
     }
 }

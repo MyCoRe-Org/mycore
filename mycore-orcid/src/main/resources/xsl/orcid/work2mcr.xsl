@@ -21,7 +21,9 @@
   <!-- Transforms the work to MODS and adds a mods:mods node to the work, which is copied 1:1 -->
   <xsl:template match="work:work|work:work-summary">
     <xsl:copy>
-      <xsl:copy-of select="@*|*" />
+      <xsl:copy-of select="@put-code" />
+      <xsl:apply-templates select="common:source/common:*/common:path" />
+      <xsl:apply-templates select="common:external-ids/common:external-id[common:external-id-type='source-work-id']" />
       <mods:mods>
         <xsl:apply-templates select="work:type" />
         <xsl:apply-templates select="work:title" />
@@ -34,7 +36,31 @@
         <xsl:apply-templates select="common:external-ids/common:external-id[common:external-id-relationship='self']" />
         <xsl:apply-templates select="common:language-code" />
       </mods:mods>
+      <xsl:apply-templates select="work:citation[work:citation-type='bibtex']" />
     </xsl:copy>
+  </xsl:template>
+
+  <!-- MyCoRe Object ID -->  
+  <xsl:template match="common:external-ids/common:external-id[common:external-id-type='source-work-id']">
+    <xsl:attribute name="oid">
+      <xsl:value-of select="substring-before(common:external-id-value,':')" />
+      <xsl:text>_mods_</xsl:text>
+      <xsl:value-of select="substring-after(common:external-id-value,':')" />
+    </xsl:attribute>
+  </xsl:template>
+  
+  <!-- BibTeX -->
+  <xsl:template match="work:citation[work:citation-type='bibtex']">
+    <bibTeX>
+      <xsl:value-of select="work:citation-value" />
+    </bibTeX>
+  </xsl:template>
+  
+  <!-- Source -->
+  <xsl:template match="common:source/common:*/common:path">
+    <xsl:attribute name="source">
+      <xsl:value-of select="." />
+    </xsl:attribute>
   </xsl:template>
   
   <xsl:template match="work:type">
@@ -189,6 +215,13 @@
     </mods:identifier>
   </xsl:template>
   
+  <!-- ISBN, ISSN, URN to mods:identifier -->
+  <xsl:template match="common:external-id[contains('isbn issn urn',common:external-id-type)]">
+    <mods:identifier type="{common:external-id-type}">
+      <xsl:value-of select="common:external-id-value" />
+    </mods:identifier>
+  </xsl:template>
+
   <xsl:template match="common:language-code">
     <mods:language>
       <mods:languageTerm authority="rfc4646" type="code">

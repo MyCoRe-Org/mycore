@@ -18,15 +18,20 @@
 
 package org.mycore.orcid.oauth;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Utility class working as a client for the OAuth2 API of orcid.org.
  * Used to get access tokens. Minimum configuration requires to set
  *
+ * MCR.ORCID.OAuth.BaseURL
  * MCR.ORCID.OAuth.ClientID
  * MCR.ORCID.OAuth.ClientSecret
  *
@@ -59,6 +64,10 @@ public class MCROAuthClient {
         client = ClientBuilder.newClient();
     }
 
+    public String getClientID() {
+        return clientID;
+    }
+
     /**
      * Builds am OAuth2 token request.
      */
@@ -67,5 +76,21 @@ public class MCROAuthClient {
         req.set("client_id", clientID);
         req.set("client_secret", clientSecret);
         return req;
+    }
+
+    /**
+     * Builds the URL where to redirect the user's browser to initiate a three-way authorization
+     * and request permission to access the given scopes
+     *
+     * @param redirectURL The URL to redirect back to after the user has granted permission
+     * @param scopes the scope(s) to request permission for, if multiple separate by blanks
+     */
+    String getCodeRequestURL(String redirectURL, String scopes) throws URISyntaxException, MalformedURLException {
+        URIBuilder builder = new URIBuilder(baseURL + "/authorize");
+        builder.addParameter("client_id", clientID);
+        builder.addParameter("response_type", "code");
+        builder.addParameter("redirect_uri", redirectURL);
+        builder.addParameter("scope", scopes.trim().replace(" ", "%20"));
+        return builder.build().toURL().toExternalForm();
     }
 }

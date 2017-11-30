@@ -26,7 +26,7 @@ import org.mycore.mods.merger.MCRMergeTool;
 
 /**
  * Represents a group of works as the activities:group element returned in the ORCID response to fetch work summaries.
- * ORCID groups mulitple works from different sources that are assumed to represent the same publication.
+ * ORCID groups multiple works from different sources that are assumed to represent the same publication.
  *
  * @author Frank L\u00FCtzenkirchen
  */
@@ -48,7 +48,7 @@ public class MCRGroupOfWorks {
 
     /**
      * Returns a single mods:mods representation of the publication represented by this group.
-     * The MODS from each work are merged together.
+     * The MODS from each is merged together.
      */
     public Element buildMergedMODS() {
         Element mods = works.get(0).getMODS().clone();

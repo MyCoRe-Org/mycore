@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+  <systemSuffix systemIdSuffix="work-2.1.xsd" uri="xsd/work-2.1.xsd" />
+  <systemSuffix systemIdSuffix="common-2.1.xsd" uri="xsd/common-2.1.xsd" />
+  <systemSuffix systemIdSuffix="error-2.1.xsd" uri="xsd/error-2.1.xsd" />
+
+</catalog>

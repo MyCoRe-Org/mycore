@@ -18,20 +18,31 @@
 
 package org.mycore.orcid;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.core.MediaType;
+
 import org.jdom2.Namespace;
 
 /**
- * Utility class to hold namespace representation used in the XML of the ORCID API.
+ * Utility class to hold constants and namespace representation used in the XML of the ORCID API.
  *
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRORCIDNamespaces {
+public abstract class MCRORCIDConstants {
+
+    public static final MediaType ORCID_XML_MEDIA_TYPE = MediaType.valueOf("application/vnd.orcid+xml");
+
+    public static final List<Namespace> NAMESPACES = new ArrayList<>();
 
     public static final Namespace NS_ACTIVITIES = buildNamespace("activities");
 
     public static final Namespace NS_WORK = buildNamespace("work");
 
     private static Namespace buildNamespace(String prefix) {
-        return Namespace.getNamespace(prefix, "http://www.orcid.org/ns/" + prefix);
+        Namespace namespace = Namespace.getNamespace(prefix, "http://www.orcid.org/ns/" + prefix);
+        NAMESPACES.add(namespace);
+        return namespace;
     }
 }
