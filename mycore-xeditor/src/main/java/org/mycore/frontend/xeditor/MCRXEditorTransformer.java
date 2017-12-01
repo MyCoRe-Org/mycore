@@ -73,9 +73,12 @@ public class MCRXEditorTransformer {
 
     private boolean withinSelectElement = false;
 
+    private boolean buildFilterXSL;
+
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
         this.transformationParameters = transformationParameters;
+        this.buildFilterXSL = "true".equals(transformationParameters.getParameter("buildFilterXSL", "false"));
     }
 
     public static MCRXEditorTransformer getTransformer(String key) {
@@ -145,11 +148,13 @@ public class MCRXEditorTransformer {
     }
 
     public void bind(String xPath, String initialValue, String name) throws JDOMException, JaxenException {
-        if (editorSession.getEditedXML() == null)
+        if (editorSession.getEditedXML() == null) {
             createEmptyDocumentFromXPath(xPath);
+        }
 
-        if (currentBinding == null)
+        if (currentBinding == null) {
             currentBinding = editorSession.getRootBinding();
+        }
 
         setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
     }
@@ -178,9 +183,19 @@ public class MCRXEditorTransformer {
         currentBinding.setValues(value);
     }
 
-    public void setDefault(String value) {
+    public void setDefault(String value) throws JaxenException, JDOMException {
+        if (buildFilterXSL) {
+            storeValueForFilterBuilder(value);
+        }
+
         currentBinding.setDefault(value);
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
+    }
+
+    private void storeValueForFilterBuilder(String value) throws JDOMException, JaxenException {
+        String xPath = currentBinding.getAbsoluteXPath();
+        String suffix = (currentBinding.getBoundNode() instanceof Element ? "/@" : "") + "_values_";
+        new MCRBinding(xPath + suffix, value, null, editorSession.getRootBinding());
     }
 
     public void unbind() {
@@ -225,23 +240,26 @@ public class MCRXEditorTransformer {
     }
 
     public MCRXPathEvaluator getXPathEvaluator() {
-        if (currentBinding != null)
+        if (currentBinding != null) {
             return currentBinding.getXPathEvaluator();
-        else
+        } else {
             return new MCRXPathEvaluator(editorSession.getVariables(), (Parent) null);
+        }
     }
 
     public String repeat(String xPath, int minRepeats, int maxRepeats, String method)
         throws JDOMException, JaxenException {
-        MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
+        int numRepeatsToBuild = buildFilterXSL ? 1 : minRepeats;
+        MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, numRepeatsToBuild, maxRepeats, method);
         setCurrentBinding(repeat);
         return StringUtils.repeat("a ", repeat.getBoundNodes().size());
     }
 
     private MCRRepeatBinding getCurrentRepeat() {
         MCRBinding binding = currentBinding;
-        while (!(binding instanceof MCRRepeatBinding))
+        while (!(binding instanceof MCRRepeatBinding)) {
             binding = binding.getParent();
+        }
         return (MCRRepeatBinding) binding;
     }
 
@@ -302,8 +320,9 @@ public class MCRXEditorTransformer {
 
     public NodeSet getFailedValidationRules() {
         NodeSet nodeSet = new NodeSet();
-        for (MCRValidator failedRule : editorSession.getValidator().getFailedRules())
+        for (MCRValidator failedRule : editorSession.getValidator().getFailedRules()) {
             nodeSet.addNode(failedRule.getRuleElement());
+        }
         return nodeSet;
     }
 
@@ -316,20 +335,25 @@ public class MCRXEditorTransformer {
         NodeSet nodeSet = new NodeSet();
 
         Map<String, String[]> parameters = editorSession.getRequestParameters();
-        for (String name : parameters.keySet())
-            for (String value : parameters.get(name))
-                if ((value != null) && !value.isEmpty())
+        for (String name : parameters.keySet()) {
+            for (String value : parameters.get(name)) {
+                if ((value != null) && !value.isEmpty()) {
                     nodeSet.addNode(buildAdditionalParameterElement(dom, name, value));
+                }
+            }
+        }
 
         String xPaths2CheckResubmission = editorSession.getSubmission().getXPaths2CheckResubmission();
-        if (!xPaths2CheckResubmission.isEmpty())
+        if (!xPaths2CheckResubmission.isEmpty()) {
             nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
                 xPaths2CheckResubmission));
+        }
 
         Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();
-        for (String xPath : defaultValues.keySet())
+        for (String xPath : defaultValues.keySet()) {
             nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
                 defaultValues.get(xPath)));
+        }
 
         editorSession.setBreakpoint("After transformation to HTML");
         nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSessionStore.XEDITOR_SESSION_PARAM,
@@ -352,7 +376,8 @@ public class MCRXEditorTransformer {
     public void declareParameter(String name, String defaultValue) {
         Object currentValue = editorSession.getVariables().get(name);
 
-        if ((currentValue == null) || "".equals(currentValue))
+        if ((currentValue == null) || "".equals(currentValue)) {
             editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
+        }
     }
 }
