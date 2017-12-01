@@ -18,9 +18,16 @@
 
 package org.mycore.frontend.xeditor.target;
 
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 
+import org.jdom2.Attribute;
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.output.Format;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -29,8 +36,12 @@ import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+import org.xml.sax.SAXException;
 
 /**
+ * Builds an XSL template that can be used to filter the XML content to
+ * the schema that can be edited by this form.
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRBuildFilterXSLTarget implements MCREditorTarget {
@@ -44,7 +55,28 @@ public class MCRBuildFilterXSLTarget implements MCREditorTarget {
         String servletNameOrPath) throws Exception {
         Document result = session.getEditedXML();
         result = MCRChangeTracker.removeChangeTracking(result);
+
         MCRContent xsl = transformer.transform(new MCRJDOMContent(result));
+        xsl = removeDummyAttributes(xsl);
+
         MCRLayoutService.instance().sendXML(job.getRequest(), job.getResponse(), xsl);
+    }
+
+    /**
+     * There are dummy attributes in the root element of the XSL, which are removed here.
+     * Those attributes were generated during transformation to force passing through namespace nodes.
+     */
+    private MCRContent removeDummyAttributes(MCRContent xsl) throws JDOMException, IOException, SAXException {
+        Document doc = xsl.asXML();
+        List<Attribute> attributes = doc.getRootElement().getAttributes();
+
+        for (Iterator<Attribute> iter = attributes.iterator(); iter.hasNext();) {
+            if ("dummy".equals(iter.next().getName())) {
+                iter.remove();
+            }
+        }
+        MCRJDOMContent out = new MCRJDOMContent(doc);
+        out.setFormat(Format.getPrettyFormat().setIndent("  "));
+        return out;
     }
 }
