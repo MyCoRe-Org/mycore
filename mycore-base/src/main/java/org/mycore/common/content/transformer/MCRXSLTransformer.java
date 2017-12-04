@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.TooManyListenersException;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -190,12 +191,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     @Override
     public String getEncoding() throws TransformerException, SAXException {
-        return getOutputProperty("encoding", "UTF-8");
+        return getOutputProperties().getProperty("encoding", "UTF-8");
     }
 
     @Override
     public String getMimeType() throws TransformerException, SAXException {
-        return getOutputProperty("media-type", "text/xml");
+        return getOutputProperties().getProperty("media-type", "text/xml");
     }
 
     @Override
@@ -314,19 +315,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return reader;
     }
 
-    private String getOutputProperty(String propertyName, String defaultValue)
-        throws TransformerException, SAXException {
+    public Properties getOutputProperties() throws TransformerConfigurationException, SAXException {
         checkTemplateUptodate();
         Templates lastTemplate = templates[templates.length - 1];
         Properties outputProperties = lastTemplate.getOutputProperties();
-        if (outputProperties == null) {
-            return defaultValue;
-        }
-        String value = outputProperties.getProperty(propertyName);
-        if (value == null) {
-            return defaultValue;
-        }
-        return value;
+        return outputProperties;
     }
 
     /* (non-Javadoc)
@@ -338,11 +331,13 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         if (fileExtension != null && !getDefaultExtension().equals(fileExtension)) {
             return fileExtension;
         }
+        Properties outputProperties = getOutputProperties();
         //until we have a better solution
-        if ("text/html".equals(getMimeType())) {
+        String definedMimeType = getMimeType();
+        if ("text/html".equals(definedMimeType) || "html".equals(outputProperties.getProperty(OutputKeys.METHOD))) {
             return "html";
         }
-        if ("text/xml".equals(getMimeType())) {
+        if ("text/xml".equals(definedMimeType)) {
             return "xml";
         }
         return getDefaultExtension();

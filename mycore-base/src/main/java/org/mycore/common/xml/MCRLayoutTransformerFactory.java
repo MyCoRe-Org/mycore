@@ -23,6 +23,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -33,8 +36,10 @@ import org.mycore.common.content.transformer.MCRFopper;
 import org.mycore.common.content.transformer.MCRIdentityTransformer;
 import org.mycore.common.content.transformer.MCRTransformerPipe;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
+import com.google.common.net.MediaType;
 
 /**
  * This class acts as a {@link MCRContentTransformer} factory for {@link MCRLayoutService}.
@@ -51,7 +56,7 @@ public class MCRLayoutTransformerFactory {
 
     private static final MCRIdentityTransformer NOOP_TRANSFORMER = new MCRIdentityTransformer("text/xml", "xml");
 
-    /** 
+    /**
      * Returns the transformer with the given ID. If the transformer is not instantiated yet,
      * it is created and initialized.
      */
@@ -80,7 +85,8 @@ public class MCRLayoutTransformerFactory {
         }
         String[] stylesheets = getStylesheets(idStripped, stylesheet);
         MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheets);
-        if ("application/pdf".equals(transformer.getMimeType())) {
+        String mimeType = transformer.getMimeType();
+        if (isPDF(mimeType)) {
             transformer = new MCRTransformerPipe(transformer, fopper);
             LOGGER.info("Using stylesheet '{}' for {} and MCRFopper for PDF output.", Lists.newArrayList(stylesheets),
                 idStripped);
@@ -91,16 +97,21 @@ public class MCRLayoutTransformerFactory {
         return transformer;
     }
 
-    @SuppressWarnings("unchecked")
-    private static String[] getStylesheets(String id, String stylesheet) {
+    private static boolean isPDF(String mimeType) {
+        return MediaType.parse(mimeType).is(MediaType.PDF);
+    }
+
+    private static String[] getStylesheets(String id, String stylesheet) throws TransformerException, SAXException {
         List<String> ignore = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Ignore",
             Collections.emptyList());
-        List<String> defaults;
-        if (ignore.contains(id)) {
-            defaults = Collections.emptyList();
-        } else {
-            defaults = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Stylesheets",
-                (List<String>) Collections.EMPTY_LIST);
+        List<String> defaults = Collections.emptyList();
+        if (!ignore.contains(id)) {
+            MCRXSLTransformer transformerTest = MCRXSLTransformer.getInstance(stylesheet);
+            String outputMethod = transformerTest.getOutputProperties().getProperty(OutputKeys.METHOD, "xml");
+            if ("xml".equals(outputMethod) && !isPDF(transformerTest.getMimeType())) {
+                defaults = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Stylesheets",
+                    Collections.emptyList());
+            }
         }
         String[] stylesheets = new String[1 + defaults.size()];
         stylesheets[0] = stylesheet;
