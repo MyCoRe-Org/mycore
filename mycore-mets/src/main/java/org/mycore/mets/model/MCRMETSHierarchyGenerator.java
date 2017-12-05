@@ -253,10 +253,13 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         pstr.setDivContainer(physicalDiv);
         // run through file references
         for (FileRef ref : this.files) {
-            PhysicalSubDiv page = new PhysicalSubDiv(ref.toPhysId(), PhysicalSubDiv.TYPE_PAGE);
-            getOrderLabel(ref.toId()).ifPresent(page::setOrderLabel);
-            physicalDiv.add(page);
-            // add file pointers
+            String physId = ref.toPhysId();
+            PhysicalSubDiv page = physicalDiv.get(physId);
+            if(page == null) {
+                page = new PhysicalSubDiv(physId, PhysicalSubDiv.TYPE_PAGE);
+                getOrderLabel(ref.toId()).ifPresent(page::setOrderLabel);
+                physicalDiv.add(page);
+            }
             page.add(new Fptr(ref.toId()));
         }
         return pstr;

@@ -859,6 +859,7 @@ public class MCRMetsSave {
                     .filter(Files::isRegularFile)
                     .map(MCRPath::toMCRPath)
                     .filter(MCRStreamUtils.not(ignore::contains))
+                    .sorted()
                     .collect(Collectors.toList());
     }
 
