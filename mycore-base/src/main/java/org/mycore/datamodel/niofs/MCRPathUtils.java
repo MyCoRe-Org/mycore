@@ -21,12 +21,15 @@ package org.mycore.datamodel.niofs;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -75,6 +78,27 @@ public abstract class MCRPathUtils {
             return targetFS.getPath(nameComps[0], Arrays.copyOfRange(nameComps, 1, nameComps.length));
         }
 
+    }
+
+    /**
+     * Returns the size of the path.
+     *
+     * If the path is a directory the size returned is the sum of all files found recursivly
+     * in this directory.
+     * @param p path of a file or directory
+     * @return the size of p in bytes
+     * @throws IOException underlaying IOException
+     */
+    public static long getSize(Path p) throws IOException {
+        AtomicLong size = new AtomicLong();
+        Files.walkFileTree(p, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                size.addAndGet(attrs.size());
+                return super.visitFile(file, attrs);
+            }
+        });
+        return size.get();
     }
 
 }
