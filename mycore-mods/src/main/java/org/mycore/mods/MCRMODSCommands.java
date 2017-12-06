@@ -50,6 +50,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.mods.rss.MCRRSSFeedImporter;
 import org.xml.sax.SAXException;
 
 /**
@@ -153,6 +154,13 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         mcrObject.setId(MCRObjectID.getNextFreeId(mcrObject.getId().getBase()));
         MCRMetadataManager.create(mcrObject);
         return mcrObject.getId();
+    }
+
+    @MCRCommand(syntax = "import publications from {0} RSS feed for project {1}",
+        help = "Read RSS feed from data source {0}, convert and save new publications as MyCoRe Object for project {1}",
+        order = 30)
+    public static void importFromRSSFeed(String sourceSystemID, String projectID) throws Exception {
+        MCRRSSFeedImporter.importFromFeed(sourceSystemID, projectID);
     }
 
     private static MCRDerivate createDerivate(MCRObjectID documentID, File fileDir)
