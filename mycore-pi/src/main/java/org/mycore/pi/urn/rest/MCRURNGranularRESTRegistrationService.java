@@ -73,6 +73,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
         try {
             return Files.walk(derivRoot)
                 .map(MCRPath::toMCRPath)
+                .filter(p -> !Files.isDirectory(p))
                 .filter(p -> !p.equals(derivRoot));
         } catch (IOException e) {
             LOGGER.error("I/O error while access the starting file of derivate " + derivateId.toString() + "!", e);
