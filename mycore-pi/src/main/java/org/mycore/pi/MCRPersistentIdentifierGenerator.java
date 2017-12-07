@@ -29,19 +29,19 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public abstract class MCRPersistentIdentifierGenerator<T extends MCRPersistentIdentifier> {
 
+    private String generatorID;
+
     public MCRPersistentIdentifierGenerator(String generatorID) {
         this.generatorID = generatorID;
     }
 
-    private String generatorID;
-
     protected final Map<String, String> getProperties() {
-        Map<String, String> propertiesMap = MCRConfiguration.instance()
-            .getPropertiesMap(GENERATOR_CONFIG_PREFIX + generatorID + ".");
+        Map<String, String> propertiesMap = MCRConfiguration.instance().getPropertiesMap(
+                GENERATOR_CONFIG_PREFIX + generatorID + ".");
 
         Map<String, String> shortened = new HashMap<>();
 
-        propertiesMap.keySet().stream().forEach(key -> {
+        propertiesMap.keySet().forEach(key -> {
             String newKey = key.substring(GENERATOR_CONFIG_PREFIX.length() + generatorID.length() + 1);
             shortened.put(newKey, propertiesMap.get(key));
         });

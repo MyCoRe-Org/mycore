@@ -50,7 +50,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
     public TemporaryFolder baseDir = new TemporaryFolder();
 
     @Test
-    public void testGet() {
+    public void testGet() throws Exception {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
 
         Optional<? extends MCRPersistentIdentifier> mockIdentifierOptional = MCRPersistentIdentifierManager
@@ -60,6 +60,19 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
 
         Assert.assertTrue(mockIdentifierOptional.isPresent());
         Assert.assertEquals(mockIdentifierOptional.get().asString(), mockString);
+
+        // test get(service, id, additional)
+        MockMetadataManager mockMetadataManager = new MockMetadataManager();
+        MCRPIRegistrationService<MCRMockIdentifier> registrationService = MCRPIRegistrationServiceManager
+                .getInstance()
+                .getRegistrationService(MOCK_SERVICE);
+
+        MCRObject mcrObject = buildMockObject();
+        mockMetadataManager.put(mcrObject.getId(), mcrObject);
+        registrationService.fullRegister(mcrObject, null);
+
+        MCRPI mcrpi = MCRPersistentIdentifierManager.getInstance().get(MOCK_SERVICE, mcrObject.getId().toString(), null);
+        Assert.assertNotNull(mcrpi);
     }
 
     @Test
@@ -83,23 +96,19 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
             .getInstance()
             .getRegistrationService(MOCK_SERVICE);
 
-        MCRObject mcrObject = new MCRObject();
-        MCRObjectID id = MCRObjectID.getNextFreeId("test", "mock");
-        mcrObject.setId(id);
-        mcrObject.setSchema("http://www.w3.org/2001/XMLSchema");
-        mockMetadataManager.put(id, mcrObject);
-
         MCRMockIdentifierRegistrationService casted = (MCRMockIdentifierRegistrationService) registrationService;
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertFalse("Register should not have been called!", casted.isRegisterCalled());
         Assert.assertFalse("Update should not have been called!", casted.isUpdatedCalled());
 
+        MCRObject mcrObject = buildMockObject();
+        mockMetadataManager.put(mcrObject.getId(), mcrObject);
         MCRMockIdentifier identifier = registrationService.fullRegister(mcrObject, "");
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertTrue("The identifier " + identifier.asString() + " should be registered now!",
-            registrationService.isCreated(id, ""));
+            registrationService.isCreated(mcrObject.getId(), ""));
 
         registrationService.onUpdate(identifier, mcrObject, "");
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
@@ -108,14 +117,13 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
 
         registrationService.onDelete(identifier, mcrObject, "");
         Assert.assertFalse("The identifier " + identifier.asString() + " should not be registered now!",
-            registrationService.isCreated(id, ""));
+            registrationService.isCreated(mcrObject.getId(), ""));
 
         Assert.assertTrue("There should be one resolver", MCRPersistentIdentifierManager.getInstance()
             .getResolvers().stream()
             .filter(r -> r.getName()
                 .equals(MCRMockResolver.NAME))
             .count() > 0);
-
     }
 
     @Test
@@ -133,7 +141,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
     private MCRPI generateMCRPI() throws MCRPersistentIdentifierException {
         MCRObjectID mycoreID = MCRObjectID.getNextFreeId("test_unregisterd");
         return new MCRPI(generatePIFor(mycoreID).asString(), "Unregistered",
-            mycoreID.toString(), null);
+            mycoreID.toString(), null, MOCK_SERVICE, null);
     }
 
     private MCRMockIdentifier generatePIFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {
@@ -180,4 +188,13 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
 
         return configuration;
     }
+
+    private MCRObject buildMockObject() {
+        MCRObject mcrObject = new MCRObject();
+        MCRObjectID id = MCRObjectID.getNextFreeId("test", "mock");
+        mcrObject.setId(id);
+        mcrObject.setSchema("http://www.w3.org/2001/XMLSchema");
+        return mcrObject;
+    }
+
 }

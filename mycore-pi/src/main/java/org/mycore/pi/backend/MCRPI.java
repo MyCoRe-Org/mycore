@@ -25,6 +25,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -38,20 +39,25 @@ import org.mycore.common.MCRCoreVersion;
         query = "select count(u) from MCRPI u "
             + "where u.mycoreID = :mcrId "
             + "and u.type = :type "
-            + "and u.additional = :additional "
+            + "and (u.additional = :additional OR (u.additional IS NULL AND :additional IS NULL))"
             + "and u.service = :service"),
     @NamedQuery(name = "Count.PI.Registered",
         query = "select count(u) from MCRPI u "
             + "where u.mycoreID = :mcrId "
             + "and u.type = :type "
-            + "and u.additional = :additional "
+            + "and (u.additional = :additional OR (u.additional IS NULL AND :additional IS NULL))"
             + "and u.service = :service "
             + "and u.registered is not null"),
     @NamedQuery(name = "Get.PI.Created",
         query = "select u from MCRPI u "
             + "where u.mycoreID = :mcrId "
             + "and u.type = :type "
-            + "and u.additional != '' "
+            + "and (u.additional != '' OR u.additional IS NOT NULL)"
+            + "and u.service = :service"),
+    @NamedQuery(name = "Get.PI.Additional",
+        query = "select u from MCRPI u "
+            + "where u.mycoreID = :mcrId "
+            + "and (u.additional = :additional OR (u.additional IS NULL AND :additional IS NULL))"
             + "and u.service = :service"),
     @NamedQuery(name = "Get.PI.Unregistered",
         query = "select u from MCRPI u "
@@ -61,9 +67,16 @@ import org.mycore.common.MCRCoreVersion;
         query = "update from MCRPI u "
             + "set u.registered = :date "
             + "where u.id = :id")
-
 })
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "identifier", "type" }) })
+@Table(
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "identifier", "type" })
+    },
+    indexes = {
+        @Index(name = "Identifier", columnList = "identifier"),
+        @Index(name = "MCRIdentifierService", columnList = "mycoreid, service")
+    }
+)
 public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
 
     private static final long serialVersionUID = 234168232792525611L;
@@ -102,10 +115,6 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     private int mcrRevision;
 
     private MCRPI() {
-    }
-
-    public MCRPI(String identifier, String type, String mycoreID, String additional) {
-        this(identifier, type, mycoreID, additional, null, null);
     }
 
     public MCRPI(String identifier, String type, String mycoreID, String additional, String service, Date registered) {
