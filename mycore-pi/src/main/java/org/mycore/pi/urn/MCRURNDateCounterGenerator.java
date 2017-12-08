@@ -26,6 +26,8 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 /**
  * Builds a new, unique NISS based on the current date and/or time
  * in combination with a counter. The date/time can be formatted with
@@ -98,7 +100,7 @@ public class MCRURNDateCounterGenerator extends MCRDNBURNGenerator {
     }
 
     @Override
-    protected String buildNISS() {
+    protected String buildNISS(MCRObjectID mcrID, String additional) {
         String niss;
 
         StringBuilder sb = new StringBuilder();

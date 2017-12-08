@@ -34,15 +34,16 @@ public abstract class MCRDNBURNGenerator extends MCRPersistentIdentifierGenerato
         super(generatorID);
     }
 
-    protected abstract String buildNISS();
+    protected abstract String buildNISS(MCRObjectID mcrID, String additional);
 
-    public MCRDNBURN generate(@NotNull String namespace, String additional) throws MCRPersistentIdentifierException {
+    public MCRDNBURN generate(@NotNull String namespace, MCRObjectID mcrID, String additional)
+        throws MCRPersistentIdentifierException {
         Objects.requireNonNull(namespace, "Namespace for an URN must not be null!");
-        return new MCRDNBURN(namespace, buildNISS());
+        return new MCRDNBURN(namespace, buildNISS(mcrID, additional));
     }
 
     public MCRDNBURN generate(MCRObjectID mcrID, String additional) throws MCRPersistentIdentifierException {
-        return generate(getNamespace(), additional);
+        return generate(getNamespace(), mcrID, additional);
     }
 
     public String getNamespace() {
