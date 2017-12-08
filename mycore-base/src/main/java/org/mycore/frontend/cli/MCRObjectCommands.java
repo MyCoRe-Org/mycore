@@ -920,8 +920,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             MCRMetadataManager.update(new MCRObject(resultDocument));
         } else if(resultName.equals(MCRDerivate.ROOT_NAME)) {
             MCRMetadataManager.update(new MCRDerivate(resultDocument));
+        } else {
+            LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
         }
-        LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
     }
 
     /**
