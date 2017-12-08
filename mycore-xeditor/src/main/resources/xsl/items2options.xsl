@@ -69,7 +69,7 @@
           <xsl:value-of select="label[lang($DefaultLang)]" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="." />
+          <xsl:value-of select="label[1]" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>

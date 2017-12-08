@@ -96,9 +96,11 @@ return declare("mycore.classification.SettingsDialog", [Dialog, _Templated, _Set
 		this.inherited(arguments);
     },
 
-    updateClassInput: function() {
-        this.importInput.set("value", this.hiddenFileDialog.value);
-        this.importStartButton.set("disabled", this.hiddenFileDialog.value == "");
+    updateClassInput: function () {
+        let value = this.hiddenFileDialog.value;
+        value = value !== null ? value.replace(/^.*\\/, "") : null;
+        this.importInput.set("value", value);
+        this.importStartButton.set("disabled", value === "");
     },
 
     onOpenFileDialog: function() {
@@ -120,7 +122,7 @@ return declare("mycore.classification.SettingsDialog", [Dialog, _Templated, _Set
 			handleAs: "html",
 			url: this.settings.resourceURL + "import"
 		}).then(lang.hitch(this, function(data) {
-			var status = data.body.children[0].value;
+			let status = data.body.children[0].value;
 			if(status == "200") {
 				alert(i18n.getFromCache("component.classeditor.settings.importsuccessful"));
 				this.classificationImported = true;
