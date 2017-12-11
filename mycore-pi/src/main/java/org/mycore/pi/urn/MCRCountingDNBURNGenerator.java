@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPersistentIdentifierManager;
 
+/**
+ * A Generator which helps to generate a URN with a counter inside.
+ */
 public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
 
     private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
@@ -22,6 +25,15 @@ public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
         super(generatorID);
     }
 
+    /**
+     * Gets the count for a specific pattern and increase the internal counter. If there is no internal counter it will
+     * look into the Database and detect the highest count with the pattern. <br/>
+     *
+     * @param pattern a reg exp pattern which will be used to detect the highest count. The first group is the count.
+     *                e.G. [0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9] will match 31-mods-2017-0003-3 and the returned
+     *                count will be 4 (3+1).
+     * @return the next count
+     */
     public final synchronized int getCount(String pattern) {
         AtomicInteger count = PATTERN_COUNT_MAP.computeIfAbsent(pattern, (pattern_) -> {
             Pattern regExpPattern = Pattern.compile(pattern_);
