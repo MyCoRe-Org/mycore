@@ -177,9 +177,9 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
             persistURNStr(deriv, new Date()).accept(derivURN::asString, "");
 
             if (Boolean.valueOf(getProperties().getOrDefault("supportDfgViewerURN", "false"))) {
-                String suffix = "-dfg";
-                persistURNStr(deriv, null, getRegistrationServiceID() + suffix)
-                    .accept(() -> derivURN.withSuffix(suffix).asString(), "");
+                String suffix = "dfg";
+                persistURNStr(deriv, null, getRegistrationServiceID() + "-" + suffix)
+                    .accept(() -> derivURN.withNamespaceSuffix(suffix + "-").asString(), "");
             }
 
             return derivURN;

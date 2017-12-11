@@ -196,6 +196,10 @@ public class MCRDNBURN extends MCRUniformResourceName {
     public MCRDNBURN withSuffix(String suffix) {
         return new MCRDNBURN(getSubNamespace(), getNamespaceSpecificString() + suffix);
     }
+    
+    public MCRDNBURN withNamespaceSuffix(String suffix) {
+        return new MCRDNBURN(getSubNamespace() + suffix, super.getNamespaceSpecificString());
+    }
 
     public MCRDNBURN toGranular(String setID, int i, int max) {
         return toGranular(setID, addLeadingZeroes(max, i));
