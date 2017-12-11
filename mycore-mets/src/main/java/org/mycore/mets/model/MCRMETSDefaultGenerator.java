@@ -158,7 +158,6 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         }
         for (Map.Entry<MCRPath, BasicFileAttributes> directory : directories.entrySet()) {
             String dirName = directory.getKey().getFileName().toString();
-
             if (isInExcludedRootFolder(directory.getKey())) {
                 structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, logOrder);
             } else {
@@ -228,13 +227,10 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
     private void buildPhysDivs(MCRPath dir, PhysicalDiv physicalDiv, String fileID, final String physicalID,
         String fileName) {
-        if (!fileName.isEmpty() && hrefIdMap.containsKey(fileName) && (isInExcludedRootFolder(dir))) {
+        if (!fileName.isEmpty() && hrefIdMap.containsKey(fileName) && isInExcludedRootFolder(dir)) {
             for (PhysicalSubDiv physSubDiv : physicalDiv.getChildren()) {
                 if (physSubDiv.getId().contains(hrefIdMap.get(fileName))) {
-                    physicalDiv.remove(physSubDiv);
-                    Fptr fptr = new Fptr(fileID);
-                    physSubDiv.add(fptr);
-                    physicalDiv.add(physSubDiv);
+                    physSubDiv.add(new Fptr(fileID));
                 }
             }
         } else {
@@ -253,8 +249,9 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         metsFile.setFLocat(fLocat);
 
         for (FileGrp fileGrp : fileSec.getFileGroups()) {
-            if (fileGrp.getUse().equalsIgnoreCase(fileUse.toString()))
+            if (fileGrp.getUse().equalsIgnoreCase(fileUse.toString())) {
                 fileGrp.addFile(metsFile);
+            }
         }
     }
 
