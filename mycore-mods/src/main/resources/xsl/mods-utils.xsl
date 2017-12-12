@@ -44,13 +44,13 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="$mods-type='confpro' or $mods-type='proceedings'">
+      <xsl:when test="string-length($type) = 0 and ($mods-type='confpro' or $mods-type='proceedings')">
         <xsl:apply-templates select="." mode="mods.title.confpro">
           <xsl:with-param name="asHTML" select="$asHTML" />
           <xsl:with-param name="withSubtitle" select="$withSubtitle" />
         </xsl:apply-templates>
       </xsl:when>
-      <xsl:when test="$mods-type='issue'">
+      <xsl:when test="string-length($type) = 0 and $mods-type='issue'">
         <xsl:apply-templates select="." mode="mods.title.issue">
           <xsl:with-param name="asHTML" select="$asHTML" />
           <xsl:with-param name="withSubtitle" select="$withSubtitle" />
