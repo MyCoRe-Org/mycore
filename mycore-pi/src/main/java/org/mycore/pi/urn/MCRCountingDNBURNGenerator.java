@@ -25,6 +25,32 @@ public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
         super(generatorID);
     }
 
+    protected AtomicInteger readCountFromDatabase(String countPattern) {
+        Pattern regExpPattern = Pattern.compile(countPattern);
+        Predicate<String> matching = regExpPattern.asPredicate();
+
+        List<MCRPIRegistrationInfo> list = MCRPersistentIdentifierManager.getInstance()
+            .getList(MCRDNBURN.TYPE, -1, -1);
+
+        Optional<Integer> highestNumber = list.stream()
+            .map(MCRPIRegistrationInfo::getIdentifier)
+            .filter(matching)
+            .map(pi -> {
+                // extract the number of the PI
+                Matcher matcher = regExpPattern.matcher(pi);
+                if (matcher.find() && matcher.groupCount() == 1) {
+                    String group = matcher.group(1);
+                    return Integer.parseInt(group, 10);
+                } else {
+                    return null;
+                }
+            }).filter(Objects::nonNull)
+            .sorted(Comparator.reverseOrder())
+            .findFirst()
+            .map(n -> n + 1);
+        return new AtomicInteger(highestNumber.orElse(0));
+    }
+
     /**
      * Gets the count for a specific pattern and increase the internal counter. If there is no internal counter it will
      * look into the Database and detect the highest count with the pattern.
@@ -35,32 +61,8 @@ public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
      * @return the next count
      */
     public final synchronized int getCount(String pattern) {
-        AtomicInteger count = PATTERN_COUNT_MAP.computeIfAbsent(pattern, (pattern_) -> {
-            Pattern regExpPattern = Pattern.compile(pattern_);
-            Predicate<String> matching = regExpPattern.asPredicate();
-
-            List<MCRPIRegistrationInfo> list = MCRPersistentIdentifierManager.getInstance()
-                .getList(MCRDNBURN.TYPE, -1, -1);
-
-            Comparator<Integer> integerComparator = Integer::compareTo;
-            Optional<Integer> highestNumber = list.stream()
-                .map(MCRPIRegistrationInfo::getIdentifier)
-                .filter(matching)
-                .map(pi -> {
-                    // extract the number of the PI
-                    Matcher matcher = regExpPattern.matcher(pi);
-                    if (matcher.find() && matcher.groupCount() == 1) {
-                        String group = matcher.group(1);
-                        return Integer.parseInt(group, 10);
-                    } else {
-                        return null;
-                    }
-                }).filter(Objects::nonNull)
-                .sorted(integerComparator.reversed())
-                .findFirst()
-                .map(n -> n + 1);
-            return new AtomicInteger(highestNumber.orElse(0));
-        });
+        AtomicInteger count = PATTERN_COUNT_MAP
+            .computeIfAbsent(pattern, this::readCountFromDatabase);
 
         return count.getAndIncrement();
     }
