@@ -27,7 +27,7 @@ public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
 
     /**
      * Gets the count for a specific pattern and increase the internal counter. If there is no internal counter it will
-     * look into the Database and detect the highest count with the pattern. <br/>
+     * look into the Database and detect the highest count with the pattern.
      *
      * @param pattern a reg exp pattern which will be used to detect the highest count. The first group is the count.
      *                e.G. [0-9]+-mods-2017-([0-9][0-9][0-9][0-9])-[0-9] will match 31-mods-2017-0003-3 and the returned
