@@ -100,7 +100,7 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
             .setParameter("service", serviceID)
             .getResultList();
 
-        Assert.assertEquals("Wrong number of registered URNs: ", numOfDerivFiles, registeredURNs.size());
+        Assert.assertEquals("Wrong number of registered URNs: ", numOfDerivFiles + 1, registeredURNs.size());
     }
 
     public void timerTask() throws Exception {

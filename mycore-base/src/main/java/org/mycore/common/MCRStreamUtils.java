@@ -117,7 +117,7 @@ public class MCRStreamUtils {
      * @return the negated predicate
      */
     public static <T> Predicate<T> not(Predicate<T> predicate) {
-        return t -> !predicate.test(t);
+        return predicate.negate();
     }
 
 }

@@ -151,19 +151,13 @@ public class MCRPersistentIdentifierManager {
     }
 
     public MCRPI get(String service, String mycoreID, String additional) {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Number> rowCountQuery = cb.createQuery(Number.class);
-        CriteriaQuery<MCRPI> getQuery = cb.createQuery(MCRPI.class);
-        Root<MCRPI> pi = getQuery.from(MCRPI.class);
-        return em.createQuery(
-            getQuery
-                .where(
-                    cb.equal(pi.get(MCRPI_.additional), additional),
-                    cb.equal(pi.get(MCRPI_.mycoreID), mycoreID),
-                    cb.equal(pi.get(MCRPI_.service), service)))
+        return MCREntityManagerProvider
+            .getCurrentEntityManager()
+            .createNamedQuery("Get.PI.Additional", MCRPI.class)
+            .setParameter(MCRID, mycoreID)
+            .setParameter(ADDITIONAL, additional)
+            .setParameter(SERVICE, service)
             .getSingleResult();
-
     }
 
     public List<MCRPIRegistrationInfo> getCreatedIdentifiers(MCRObjectID id, String type,
@@ -254,8 +248,7 @@ public class MCRPersistentIdentifierManager {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRPIRegistrationInfo> getQuery = cb.createQuery(MCRPIRegistrationInfo.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
-        CriteriaQuery<MCRPIRegistrationInfo> all = getQuery
-            .select(pi);
+        CriteriaQuery<MCRPIRegistrationInfo> all = getQuery.select(pi);
 
         if (type != null) {
             all = all.where(cb.equal(pi.get(MCRPI_.type), type));
@@ -271,8 +264,7 @@ public class MCRPersistentIdentifierManager {
             typedQuery = typedQuery.setMaxResults(count);
         }
 
-        return typedQuery
-            .getResultList();
+        return typedQuery.getResultList();
     }
 
     public Integer setRegisteredDateForUnregisteredIdenifiers(

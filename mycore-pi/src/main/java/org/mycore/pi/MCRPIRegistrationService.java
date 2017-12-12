@@ -270,6 +270,23 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
+    public T fullRegister(MCRBase obj)
+            throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        return this.fullRegister(obj, null);
+    }
+
+    /**
+     * Validates everything, registers a new Identifier, inserts the identifier to object metadata and writes a
+     * information to the Database.
+     *
+     * @param obj the object which has to be identified
+*      @param additional additional information for the persistent identifier
+     * @return the assigned Identifier
+     * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
+     * @throws MCRActiveLinkException           the {@link MCRPersistentIdentifierMetadataManager} lets
+     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
+     * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
+     */
     public T fullRegister(MCRBase obj, String additional)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
