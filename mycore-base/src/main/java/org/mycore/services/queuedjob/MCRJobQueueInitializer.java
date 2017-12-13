@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRStartupHandler;
 
 public class MCRJobQueueInitializer implements MCRStartupHandler.AutoExecutable {
