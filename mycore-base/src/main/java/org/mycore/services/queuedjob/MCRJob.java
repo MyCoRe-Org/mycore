@@ -36,6 +36,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -45,6 +47,9 @@ import javax.persistence.Transient;
  * @author Ren\u00E9 Adler
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "mcrjob.classes",
+        query = "select DISTINCT(o.action) from MCRJob o")})
 @Table(name = "MCRJob")
 public class MCRJob implements Cloneable {
     private long id;
