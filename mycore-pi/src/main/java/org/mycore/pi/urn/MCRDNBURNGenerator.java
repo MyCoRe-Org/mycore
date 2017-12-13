@@ -36,12 +36,21 @@ public abstract class MCRDNBURNGenerator extends MCRPersistentIdentifierGenerato
 
     protected abstract String buildNISS(MCRObjectID mcrID, String additional);
 
-    public MCRDNBURN generate(@NotNull String namespace, MCRObjectID mcrID, String additional)
+    /**
+     * Allows the generation of a URN with a specific Namespace
+     * @param namespace the namespace of the generated URN
+     * @param mcrID the mycore object for which the identifier is generated
+     * @param additional additional information dedicated to the object like a mcrpath
+     * @return a unique persistence identifier
+     * @throws MCRPersistentIdentifierException if something goes wrong while generating
+     */
+    protected MCRDNBURN generate(@NotNull String namespace, MCRObjectID mcrID, String additional)
         throws MCRPersistentIdentifierException {
         Objects.requireNonNull(namespace, "Namespace for an URN must not be null!");
         return new MCRDNBURN(namespace, buildNISS(mcrID, additional));
     }
 
+    @Override
     public MCRDNBURN generate(MCRObjectID mcrID, String additional) throws MCRPersistentIdentifierException {
         return generate(getNamespace(), mcrID, additional);
     }
