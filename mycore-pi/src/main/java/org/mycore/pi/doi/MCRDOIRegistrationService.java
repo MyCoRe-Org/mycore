@@ -19,15 +19,20 @@
 package org.mycore.pi.doi;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
@@ -44,9 +49,11 @@ import org.jdom2.transform.JDOMSource;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -59,15 +66,38 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.pi.MCRPIJobRegistrationService;
 import org.mycore.pi.MCRPIRegistrationService;
+import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.condition.MCRPIObjectRegistrationConditionProvider;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 
 /**
+ * Registers {@link MCRDigitalObjectIdentifier} at Datacite.
  *
+ * Properties:
+ * <dl>
+ *     <dt>MetadataManager</dt>
+ *     <dd>A metadata manager which inserts the {@link MCRDigitalObjectIdentifier} to a object</dd>
+ *     <dt>Generator</dt>
+ *     <dd>A {@link org.mycore.pi.MCRPersistentIdentifierGenerator} which generates {@link MCRDigitalObjectIdentifier}</dd>
+ *     <dt>Username</dt>
+ *     <dd>The username which will be used for authentication </dd>
+ *     <dt>Password</dt>
+ *     <dd>The password which will be used for authentication</dd>
+ *     <dt>RegisterBaseURL</dt>
+ *     <dd>The BaseURL (everything before /receive/mcr_object_0000000) which will be send to Datacite.</dd>
+ *     <dt>UseTestPrefix</dt>
+ *     <dd>If true the prefix of the created {@link MCRDigitalObjectIdentifier} will be replaced with the Datacite test
+ *     prefix</dd>
+ *     <dt>RegistrationConditionProvider</dt>
+ *     <dd>Used to detect if the registration should happen. DOI will be created but the real registration will if the
+ *     Condition is true. The Parameter is optional and the default condition is always true.</dd>
+ * </dl>
  */
-public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigitalObjectIdentifier> {
+public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDigitalObjectIdentifier> {
 
     private static final String KERNEL_3_NAMESPACE_URI = "http://datacite.org/schema/kernel-3";
 
@@ -94,6 +124,12 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     private static final String TRANSLATE_PREFIX = "component.pi.register.error.";
 
     private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
+
+    private static final String CONTEXT_OBJ = "obj";
+
+    private static final String CONTEXT_DOI = "doi";
+
+    private static final String REGISTRATION_CONDITION_PROVIDER = "RegistrationConditionProvider";
 
     private String username;
 
@@ -193,6 +229,11 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     }
 
     @Override
+    protected Date provideRegisterDate(MCRBase obj, String additional) {
+        return null;
+    }
+
+    @Override
     public MCRDigitalObjectIdentifier registerIdentifier(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
@@ -205,23 +246,31 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             newDOI = newDOI.toTestPrefix();
         }
 
-        Document dataciteDocument = transformToDatacite(newDOI, obj);
-
-        MCRDataciteClient dataciteClient = getDataciteClient();
-        dataciteClient.storeMetadata(dataciteDocument);
-
-        URI registeredURI;
-        try {
-            registeredURI = getRegisteredURI(obj);
-            dataciteClient.mintDOI(newDOI, registeredURI);
-        } catch (URISyntaxException e) {
-            throw new MCRException("Base-URL seems to be invalid!", e);
-        }
-
-        List<Map.Entry<String, URI>> entryList = getMediaList((MCRObject) obj);
-        dataciteClient.setMediaList(newDOI, entryList);
+        // just to check if valid
+        transformToDatacite(newDOI, obj);
 
         return newDOI;
+    }
+
+    @Override
+    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, MCRDigitalObjectIdentifier identifier) {
+        Date registrationStarted = null;
+        if (getRegistrationCondition(obj.getId().getTypeId()).test(obj)) {
+            registrationStarted = new Date();
+            startRegisterJob(obj, identifier);
+        }
+
+        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
+            this.getRegistrationServiceID(), provideRegisterDate(obj, additional), registrationStarted);
+        MCRHIBConnection.instance().getSession().save(databaseEntry);
+        return databaseEntry;
+    }
+
+    private void startRegisterJob(MCRBase obj, MCRDigitalObjectIdentifier newDOI) {
+        HashMap<String, String> contextParameters = new HashMap<>();
+        contextParameters.put(CONTEXT_DOI, newDOI.asString());
+        contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
+        this.addRegisterJob(contextParameters);
     }
 
     public URI getRegisteredURI(MCRBase obj) throws URISyntaxException {
@@ -287,29 +336,66 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
     @Override
     public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
-            LOGGER.warn("SuperUser deletes object {} with registered doi {}. Try to set DOI inactive.", obj.getId(),
-                doi.asString());
-            try {
-                getDataciteClient().deleteMetadata(doi);
-            } catch (MCRPersistentIdentifierException e) {
-                LOGGER.error("Error while setting {} inactive! Delete of object should continue!", doi.asString());
+        if (hasRegistrationStarted(obj.getId(), additional) || this.isRegistered(obj.getId(), additional)) {
+            if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+                .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
+                LOGGER.warn("SuperUser deletes object {} with registered doi {}. Try to set DOI inactive.", obj.getId(),
+                    doi.asString());
+                if (this.isRegistered(obj.getId(), additional)) {
+                    HashMap<String, String> contextParameters = new HashMap<>();
+                    contextParameters.put(CONTEXT_DOI, doi.asString());
+                    contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
+                    this.addDeleteJob(contextParameters);
+                }
+            } else {
+                throw new MCRPersistentIdentifierException("Object should not be deleted! (It has a registered DOI)");
             }
-        } else {
-            throw new MCRPersistentIdentifierException("Object should not be deleted! (It has a registered DOI)");
         }
+        // just delete
     }
 
     @Override
     public void update(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        Document newDataciteMetadata = transformToDatacite(doi, obj);
+        if (isRegistered(obj.getId(), additional)) {
+            HashMap<String, String> contextParameters = new HashMap<>();
+            contextParameters.put(CONTEXT_DOI, doi.asString());
+            contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
+            this.addUpdateJob(contextParameters);
+        } else if (!hasRegistrationStarted(obj.getId(), additional)) {
+            Predicate<MCRBase> registrationCondition = getRegistrationCondition(obj.getId().getTypeId());
+            if (registrationCondition.test(obj)) {
+                this.updateStartRegistrationDate(obj.getId(), "", new Date());
+                startRegisterJob(obj, doi);
+            }
+        }
+    }
+
+    @Override
+    public void deleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+        MCRDigitalObjectIdentifier doi = getDOIFromJob(parameters);
+
+        try {
+            getDataciteClient().deleteMetadata(doi);
+        } catch (MCRPersistentIdentifierException e) {
+            LOGGER.error("Error while setting {} inactive! Delete of object should continue!", doi.asString());
+        }
+    }
+
+    @Override
+    public void updateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+        MCRDigitalObjectIdentifier doi = getDOIFromJob(parameters);
+        String idString = parameters.get(CONTEXT_OBJ);
+
+        MCRObjectID objectID = MCRObjectID.getInstance(idString);
+        MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
+
+        Document newDataciteMetadata = transformToDatacite(doi, object);
         MCRDataciteClient dataciteClient = getDataciteClient();
 
         try {
             URI uri = dataciteClient.resolveDOI(doi);
-            URI registeredURI = getRegisteredURI(obj);
+            URI registeredURI = getRegisteredURI(object);
             if (!uri.equals(registeredURI)) {
                 LOGGER.info("Sending new URL({}) to Datacite!", registeredURI);
                 dataciteClient.mintDOI(doi, registeredURI);
@@ -320,10 +406,96 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
 
         Document oldDataciteMetadata = dataciteClient.resolveMetadata(doi);
         if (!MCRXMLHelper.deepEqual(newDataciteMetadata, oldDataciteMetadata)) {
-            LOGGER.info("Sending new Metadata of {} to Datacite!", obj.getId().toString());
+            LOGGER.info("Sending new Metadata of {} to Datacite!", idString);
             dataciteClient.deleteMetadata(doi);
             dataciteClient.storeMetadata(newDataciteMetadata);
         }
     }
 
+    @Override
+    public void registerJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+        MCRDigitalObjectIdentifier doi = getDOIFromJob(parameters);
+        String idString = parameters.get(CONTEXT_OBJ);
+
+        MCRObjectID objectID = MCRObjectID.getInstance(idString);
+        MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
+
+        MCRObject mcrBase = MCRMetadataManager.retrieveMCRObject(objectID);
+        Document dataciteDocument = transformToDatacite(doi, mcrBase);
+
+        MCRDataciteClient dataciteClient = getDataciteClient();
+        dataciteClient.storeMetadata(dataciteDocument);
+
+        URI registeredURI;
+        try {
+            registeredURI = getRegisteredURI(object);
+            dataciteClient.mintDOI(doi, registeredURI);
+        } catch (URISyntaxException e) {
+            throw new MCRException("Base-URL seems to be invalid!", e);
+        }
+
+        List<Map.Entry<String, URI>> entryList = getMediaList((MCRObject) object);
+        dataciteClient.setMediaList(doi, entryList);
+        this.updateRegistrationDate(objectID, "", new Date());
+    }
+
+    /**
+     * Gets the {@link MCRDigitalObjectIdentifier} from the job parameters. This method does not ensure that the
+     * returned {@link MCRDigitalObjectIdentifier} object instance is the same as the generated one.
+     * @param parameters the job parameters
+     * @return the parsed DOI
+     * @throws MCRPersistentIdentifierException
+     */
+    private MCRDigitalObjectIdentifier getDOIFromJob(Map<String, String> parameters)
+        throws MCRPersistentIdentifierException {
+        String doiString = parameters.get(CONTEXT_DOI);
+        return parseIdentifier(doiString)
+            .orElseThrow(
+                () -> new MCRPersistentIdentifierException("The String " + doiString + " can not be parsed to a DOI!"));
+    }
+
+    @Override
+    protected Optional<String> getContextInformation(Map<String, String> contextParameters) {
+        String pattern = "{0} DOI: {1} for object: {2}";
+        return Optional.of(MessageFormat
+            .format(pattern, getAction(contextParameters).toString(), contextParameters.get(CONTEXT_DOI),
+                contextParameters.get(CONTEXT_OBJ)));
+    }
+
+    protected Predicate<MCRBase> getRegistrationCondition(String objectType) {
+        return Optional.ofNullable(getProperties().get(REGISTRATION_CONDITION_PROVIDER))
+            .map(clazz -> {
+                String errorMessageBegin =
+                    "Configured class " + clazz + "(" + MCRPIRegistrationService.REGISTRATION_CONFIG_PREFIX
+                        + getRegistrationServiceID() + "." + REGISTRATION_CONDITION_PROVIDER + ")";
+                try {
+                    return ((Class<? extends MCRPIObjectRegistrationConditionProvider>) Class.forName(clazz))
+                        .getConstructor()
+                        .newInstance();
+                } catch (ClassNotFoundException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " was not found!", e);
+                } catch (IllegalAccessException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " has no public constructor!", e);
+                } catch (InstantiationException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " seems to be abstract!", e);
+                } catch (NoSuchMethodException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " has no default constructor!", e);
+                } catch (InvocationTargetException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " could not be initialized", e);
+                } catch (ClassCastException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " needs to extend " + MCRPIObjectRegistrationConditionProvider.class
+                            .getName(), e);
+                }
+            })
+            .map(instance -> instance.provideRegistrationCondition(objectType))
+            .orElseGet(() -> MCRPIObjectRegistrationConditionProvider.ALWAYS_REGISTER_CONDITION_PROVIDER
+                .provideRegistrationCondition(objectType));
+
+    }
 }

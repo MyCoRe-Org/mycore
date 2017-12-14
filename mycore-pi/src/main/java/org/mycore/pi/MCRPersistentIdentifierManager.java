@@ -120,8 +120,9 @@ public class MCRPersistentIdentifierManager {
         return instance;
     }
 
-    private static MCRPersistentIdentifierParser getParserInstance(
-        Class<? extends MCRPersistentIdentifierParser> detectorClass) {
+    @SuppressWarnings("unchecked")
+    private static <T extends MCRPersistentIdentifier> MCRPersistentIdentifierParser<T> getParserInstance(
+        Class<? extends MCRPersistentIdentifierParser> detectorClass) throws ClassCastException {
         try {
             return detectorClass.getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
@@ -195,6 +196,23 @@ public class MCRPersistentIdentifierManager {
         return MCREntityManagerProvider
             .getCurrentEntityManager()
             .createNamedQuery("Count.PI.Registered", Number.class)
+            .setParameter(MCRID, mcrId)
+            .setParameter(TYPE, type)
+            .setParameter(ADDITIONAL, additional)
+            .setParameter(SERVICE, registrationServiceID)
+            .getSingleResult()
+            .shortValue() > 0;
+    }
+
+    public boolean hasRegistrationStarted(MCRObjectID mcrId, String additional, String type,
+        String registrationServiceID) {
+        return hasRegistrationStarted(mcrId.toString(), additional, type, registrationServiceID);
+    }
+
+    public boolean hasRegistrationStarted(String mcrId, String additional, String type, String registrationServiceID) {
+        return MCREntityManagerProvider
+            .getCurrentEntityManager()
+            .createNamedQuery("Count.PI.RegistrationStarted", Number.class)
             .setParameter(MCRID, mcrId)
             .setParameter(TYPE, type)
             .setParameter(ADDITIONAL, additional)
@@ -326,10 +344,25 @@ public class MCRPersistentIdentifierManager {
             .getResultList();
     }
 
-    public MCRPersistentIdentifierParser getParserForType(String type) {
+    /**
+     * Returns a parser for a specific type of persistent identifier.
+     * @param type the type which should be parsed
+     * @param <T> the type of {@link MCRPersistentIdentifierParser} which should be returned.
+     * @return a MCRPersistentIdentifierParser
+     * @throws ClassCastException when the wrong type is passed
+     */
+    @SuppressWarnings("WeakerAccess")
+    public <T extends MCRPersistentIdentifier> MCRPersistentIdentifierParser<T> getParserForType(String type)
+        throws ClassCastException {
         return getParserInstance(typeParserMap.get(type));
     }
 
+    /**
+     * Registers a parser for a specific type of persistent identifier.
+     * @param type the type of the parser
+     * @param parserClass the class of the parser
+     */
+    @SuppressWarnings("WeakerAccess")
     public void registerParser(
         String type,
         Class<? extends MCRPersistentIdentifierParser<? extends MCRPersistentIdentifier>> parserClass) {

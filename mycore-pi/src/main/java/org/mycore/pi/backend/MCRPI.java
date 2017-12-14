@@ -48,6 +48,13 @@ import org.mycore.common.MCRCoreVersion;
             + "and (u.additional = :additional OR (u.additional IS NULL AND :additional IS NULL))"
             + "and u.service = :service "
             + "and u.registered is not null"),
+    @NamedQuery(name = "Count.PI.RegistrationStarted",
+        query = "select count(u) from MCRPI u "
+            + "where u.mycoreID = :mcrId "
+            + "and u.type = :type "
+            + "and u.additional = :additional "
+            + "and u.service = :service "
+            + "and u.registrationStarted is not null"),
     @NamedQuery(name = "Get.PI.Created",
         query = "select u from MCRPI u "
             + "where u.mycoreID = :mcrId "
@@ -105,6 +112,9 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
     private Date created;
 
     @Column()
+    private Date registrationStarted;
+
+    @Column()
     private Date registered;
 
     @Column(nullable = false)
@@ -129,6 +139,30 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
         //        this.mcrRevision = MCRCoreVersion.getRevision();
         this.mcrVersion = MCRCoreVersion.getVersion();
         this.created = new Date();
+    }
+
+    public MCRPI(String identifier, String type, String mycoreID, String additional, String service, Date registered,
+        Date registrationStarted) {
+        this();
+        this.identifier = identifier;
+        this.type = type;
+        this.mycoreID = mycoreID;
+        this.additional = additional;
+        this.service = service;
+        this.registered = registered;
+        this.registrationStarted = registrationStarted;
+        //TODO: disabled by MCR-1393
+        //        this.mcrRevision = MCRCoreVersion.getRevision();
+        this.mcrVersion = MCRCoreVersion.getVersion();
+        this.created = new Date();
+    }
+
+    public Date getRegistrationStarted() {
+        return registrationStarted;
+    }
+
+    public void setRegistrationStarted(Date registrationStarted) {
+        this.registrationStarted = registrationStarted;
     }
 
     @Override

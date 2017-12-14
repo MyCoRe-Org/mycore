@@ -18,6 +18,8 @@
 
 package org.mycore.pi;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
@@ -52,8 +54,6 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier> {
 
@@ -317,7 +317,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier) {
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getRegistrationServiceID(), provideRegisterDate(obj, additional));
+            this.getRegistrationServiceID(), provideRegisterDate(obj, additional), null);
         MCRHIBConnection.instance().getSession().save(databaseEntry);
         return databaseEntry;
     }
@@ -369,6 +369,11 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     public boolean isRegistered(MCRObjectID id, String additional) {
         return MCRPersistentIdentifierManager.getInstance().isRegistered(id, additional, type, registrationServiceID);
+    }
+
+    public boolean hasRegistrationStarted(MCRObjectID id, String additional) {
+        return MCRPersistentIdentifierManager.getInstance()
+            .hasRegistrationStarted(id, additional, type, registrationServiceID);
     }
 
     protected final Map<String, String> getProperties() {

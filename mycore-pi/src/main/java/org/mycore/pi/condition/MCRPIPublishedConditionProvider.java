@@ -16,29 +16,22 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi;
+package org.mycore.pi.condition;
 
-import java.io.Serializable;
-import java.util.Date;
+import java.util.Optional;
+import java.util.function.Predicate;
 
-public interface MCRPIRegistrationInfo extends Serializable {
-    String getIdentifier();
+import org.mycore.datamodel.metadata.MCRBase;
 
-    String getType();
+public class MCRPIPublishedConditionProvider extends MCRPIObjectRegistrationConditionProvider {
+    public MCRPIPublishedConditionProvider() {
+    }
 
-    String getMycoreID();
-
-    String getAdditional();
-
-    String getMcrVersion();
-
-    int getMcrRevision();
-
-    Date getRegistrationStarted();
-
-    Date getRegistered();
-
-    Date getCreated();
-
-    String getService();
+    @Override public Predicate<MCRBase> provideRegistrationCondition(String type) {
+        return (MCRBase base) -> {
+            return Optional.ofNullable(base.getService().getState())
+                .map(state -> state.getID().equals("published"))
+                .orElse(false);
+        };
+    }
 }
