@@ -72,7 +72,16 @@
   </xsl:template>
 
   <xsl:template match="doc">
-    <xsl:variable name="objId" select="str[@name='id']" />
+    <xsl:variable name="objId">
+      <xsl:choose>
+        <xsl:when test="contains(str[@name='id'], '_derivate_')">
+          <xsl:value-of select="str[@name='returnId']" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="str[@name='id']" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="staticUrl" select="concat($WebApplicationBaseURL, 'receive/', $objId)" />
     <div id="permalink">
       <span class="linklabel">
