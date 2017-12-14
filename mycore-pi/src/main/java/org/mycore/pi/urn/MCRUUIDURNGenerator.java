@@ -20,6 +20,8 @@ package org.mycore.pi.urn;
 
 import java.util.UUID;
 
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 /**
  * Builds a new, unique NISS using Java implementation of the UUID
  * specification. java.util.UUID creates 'only' version 4 UUIDs.
@@ -40,7 +42,7 @@ public class MCRUUIDURNGenerator extends MCRDNBURNGenerator {
     }
 
     @Override
-    protected String buildNISS() {
+    protected String buildNISS(MCRObjectID mcrID, String additional) {
         return UUID.randomUUID().toString();
     }
 }
