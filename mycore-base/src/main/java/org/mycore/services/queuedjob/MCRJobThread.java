@@ -56,6 +56,7 @@ public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
         setName(this.job.getId() + " - " + this.job.getAction().getSimpleName());
         setStatus(MCRProcessableStatus.created);
         this.queue = MCRJobQueue.getInstance(job.getAction());
+        job.getParameters().forEach((k, v) -> this.getProperties().put(k, v));
     }
 
     public void run() {

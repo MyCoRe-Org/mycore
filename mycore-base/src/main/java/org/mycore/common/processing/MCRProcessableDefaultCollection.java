@@ -93,7 +93,7 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
         }
         if (propertyValue == null) {
             this.properties.remove(propertyName);
-            firePropertyChanged(propertyName, oldValue, propertyValue);
+            firePropertyChanged(propertyName, oldValue, null);
             return;
         }
         if (propertyValue.equals(oldValue)) {

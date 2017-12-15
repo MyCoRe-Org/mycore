@@ -16,37 +16,37 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, SimpleChanges } from '@angular/core';
-import { Collection } from '../model/model';
-import { HtmlService } from './../service/html.service';
-import { JsonStringPipe } from './../pipe/json.pipe';
+import {Component, Input, SimpleChanges} from '@angular/core';
+import {Collection} from '../model/model';
+import {HtmlService} from './../service/html.service';
+import {JsonStringPipe} from './../pipe/json.pipe';
 
-@Component( {
-    selector: 'collection',
-    templateUrl: 'html/collection.html',
-    styleUrls: ['css/collection.css'],
+@Component({
+    selector: "collection",
+    templateUrl: "html/collection.html",
+    styleUrls: ["css/collection.css"],
     providers: [HtmlService]
 })
 export class CollectionComponent {
 
     @Input() model: Collection;
 
-    private _showAllProcessables: boolean;
+    private _showAllCreatedProcessables: boolean;
 
-    constructor( private html: HtmlService ) {
-        this._showAllProcessables = false;
+    constructor(private html: HtmlService) {
+        this._showAllCreatedProcessables = false;
     }
 
-    get showAllProcessables() {
-        return this._showAllProcessables;
+    get showAllCreatedProcessables() {
+        return this._showAllCreatedProcessables;
     }
 
-    showProcessables() {
-        this._showAllProcessables = true;
+    showCreatedProcessables() {
+        this._showAllCreatedProcessables = true;
     }
 
-    hideProcessables() {
-        this._showAllProcessables = false;
+    hideCreatedProcessables() {
+        this._showAllCreatedProcessables = false;
     }
 
 }

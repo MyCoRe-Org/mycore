@@ -56,6 +56,6 @@
       "check-typecast",
       "check-preblock"
     ],
-    "triple-equals": true
+    "triple-equals": [true, "allow-null-check", "allow-undefined-check"]
   }
 }

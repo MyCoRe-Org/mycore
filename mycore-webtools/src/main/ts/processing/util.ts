@@ -16,13 +16,27 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Injectable } from "@angular/core";
+export class Util {
 
-@Injectable()
-export class HtmlService {
+    public static mixin(source: any, target: any) {
+        for (let prop in source) {
+            if (source.hasOwnProperty(prop)) {
+                target[prop] = source[prop];
+            }
+        }
+    }
 
-    keys( object: {}) {
-        return Object.keys( object );
+    public static remove(array: Array<any>, element: any) {
+        let index = array.indexOf(element);
+        if (index > -1) {
+            array.splice(index, 1);
+        }
+    }
+
+    public static getBasePath( path: String ) {
+        let pathArray = location.pathname.split( "/" );
+        pathArray.splice( -4 );
+        return pathArray.join( "/" );
     }
 
 }
