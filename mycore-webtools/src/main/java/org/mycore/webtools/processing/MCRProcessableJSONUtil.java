@@ -20,12 +20,11 @@ package org.mycore.webtools.processing;
 
 import java.util.Map;
 
-import org.mycore.common.MCRJSONManager;
-import org.mycore.common.processing.MCRProcessable;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.mycore.common.MCRJSONManager;
+import org.mycore.common.processing.MCRProcessable;
 
 /**
  * Utility methods for processable API.
@@ -64,6 +63,9 @@ public abstract class MCRProcessableJSONUtil {
         if (processable.getProgressText() != null) {
             processableJSON.addProperty("progressText", processable.getProgressText());
         }
+        JsonObject propertiesJSON = new JsonObject();
+        processable.getProperties().forEach((k, v) -> propertiesJSON.addProperty(k, v.toString()));
+        processableJSON.add("properties", propertiesJSON);
         return processableJSON;
     }
 

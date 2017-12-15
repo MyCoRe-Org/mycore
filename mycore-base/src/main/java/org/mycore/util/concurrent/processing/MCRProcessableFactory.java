@@ -25,6 +25,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.processing.MCRListenableProgressable;
+import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProgressable;
 import org.mycore.common.processing.MCRProgressableListener;
@@ -135,7 +136,16 @@ public abstract class MCRProcessableFactory {
         public <R> MCRProcessableSupplier<R> submit(Callable<R> callable, int priority) {
             MCRProcessableSupplier<R> supplier = MCRProcessableSupplier.of(callable, this.executor, priority);
             if (this.collection != null) {
-                this.collection.add(supplier);
+                MCRProcessable processable = supplier;
+                if(callable instanceof MCRProcessable) {
+                    processable = (MCRProcessable) callable;
+                } else if(callable instanceof RunnableProgressableAdapter) {
+                    Runnable task = ((RunnableProgressableAdapter) callable).get();
+                    if(task instanceof MCRProcessable) {
+                        processable = (MCRProcessable) task;
+                    }
+                }
+                this.collection.add(processable);
                 supplier.getFuture().whenComplete((result, throwable) -> this.collection.remove(supplier));
             }
             return supplier;

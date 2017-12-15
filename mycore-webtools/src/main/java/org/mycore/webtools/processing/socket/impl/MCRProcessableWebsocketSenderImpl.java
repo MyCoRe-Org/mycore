@@ -41,18 +41,30 @@ import com.google.gson.JsonObject;
 
 /**
  * Websocket implementation of sending processable objects.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocketSender {
+
+    enum Type {
+        error,
+        registry,
+        addCollection,
+        removeCollection,
+        updateProcessable,
+        updateCollectionProperty
+    }
 
     private static final AtomicInteger ID_GENERATOR;
 
     private static final Map<Object, Integer> ID_MAP;
 
+    private static final Map<Integer, Integer> PROCESSABLE_COLLECTION_MAP;
+
     static {
         ID_GENERATOR = new AtomicInteger();
         ID_MAP = Collections.synchronizedMap(new HashMap<>());
+        PROCESSABLE_COLLECTION_MAP = Collections.synchronizedMap(new HashMap<>());
     }
 
     @Override
@@ -76,7 +88,6 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
         addCollectionMessage.addProperty("name", collection.getName());
         addCollectionMessage.add("properties", MCRProcessableJSONUtil.toJSON(collection.getProperties()));
         send(session, addCollectionMessage, Type.addCollection);
-
         collection.stream().forEach(processable -> addProcessable(session, collection, processable));
     }
 
@@ -94,28 +105,30 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
 
     @Override
     public void addProcessable(Session session, MCRProcessableCollection collection, MCRProcessable processable) {
-        JsonObject addProcessableMessage = MCRProcessableJSONUtil.toJSON(processable);
-        addProcessableMessage.addProperty("id", getId(processable));
-        addProcessableMessage.addProperty("collectionId", getId(collection));
-        send(session, addProcessableMessage, Type.addProcessable);
-    }
-
-    @Override
-    public void removeProcessable(Session session, MCRProcessable processable) {
-        Integer id = remove(processable);
-        if (id == null) {
-            return;
-        }
-        JsonObject removeProcessableMessage = new JsonObject();
-        removeProcessableMessage.addProperty("id", id);
-        send(session, removeProcessableMessage, Type.removeProcessable);
+        Integer processableId = getId(processable);
+        Integer collectionId = getId(collection);
+        PROCESSABLE_COLLECTION_MAP.put(processableId, collectionId);
+        updateProcessable(session, processable, processableId, collectionId);
     }
 
     @Override
     public void updateProcessable(Session session, MCRProcessable processable) {
+        Integer processableId = getId(processable);
+        Integer collectionId = PROCESSABLE_COLLECTION_MAP.get(processableId);
+        updateProcessable(session, processable, processableId, collectionId);
+    }
+
+    protected void updateProcessable(Session session, MCRProcessable processable, Integer processableId,
+            Integer collectionId) {
         JsonObject addProcessableMessage = MCRProcessableJSONUtil.toJSON(processable);
-        addProcessableMessage.addProperty("id", getId(processable));
+        addProcessableMessage.addProperty("id", processableId);
+        addProcessableMessage.addProperty("collectionId", collectionId);
         send(session, addProcessableMessage, Type.updateProcessable);
+    }
+
+    @Override
+    public void removeProcessable(Session session, MCRProcessable processable) {
+        remove(processable);
     }
 
     @Override
@@ -137,6 +150,11 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
             return null;
         }
         ID_MAP.remove(id);
+        if (object instanceof MCRProcessable) {
+            PROCESSABLE_COLLECTION_MAP.remove(id);
+        } else if (object instanceof MCRProcessableCollection) {
+            PROCESSABLE_COLLECTION_MAP.values().removeIf(id::equals);
+        }
         return id;
     }
 
@@ -149,7 +167,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
     /**
      * Tomcat does not support async sending of messages. We have to implement
      * our own sender.
-     * 
+     *
      * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=56026">tomcat bug</a>
      */
     private static class AsyncSender {
@@ -182,13 +200,13 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
 
         /**
          * Sends a text to the session
-         * 
+         *
          * @param session session to send to
          * @param msg the message
          */
         public static void send(Session session, String msg) {
             SERVICE.submit(() -> {
-                if (session != null && !session.isOpen()) {
+                if (session == null || !session.isOpen()) {
                     return;
                 }
                 try {

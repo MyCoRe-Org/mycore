@@ -18,13 +18,12 @@
 
 package org.mycore.webtools.session;
 
-import java.awt.Color;
+import java.awt.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -37,14 +36,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 /**
  * Resource which provides information about mycore sessions. 
@@ -69,14 +67,10 @@ public class MCRSessionResource {
         MCRJerseyUtil.checkPermission("manage-sessions");
 
         // get all sessions
-        JsonArray rootJSON = MCRSessionMgr
-            .getAllSessions()
-            .values()
-            .stream()
-            .collect(Collectors.toCollection(ArrayList::new)) //copy to work on
-            .parallelStream()
-            .map(s -> generateSessionJSON(s, resolveHostname))
-            .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+        JsonArray rootJSON = new ArrayList<>(MCRSessionMgr.getAllSessions().values())
+                                  .parallelStream()
+                                  .map(s -> generateSessionJSON(s, resolveHostname))
+                                  .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
         return Response.status(Status.OK).entity(rootJSON.toString()).build();
     }
 

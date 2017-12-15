@@ -16,10 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform } from "@angular/core";
 
 @Pipe( {
-    name: 'jsonString',
+    name: "jsonString",
     pure: false
 })
 export class JsonStringPipe implements PipeTransform {

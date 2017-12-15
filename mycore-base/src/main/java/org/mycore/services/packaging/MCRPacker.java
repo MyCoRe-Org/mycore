@@ -45,10 +45,13 @@ public abstract class MCRPacker {
     public abstract void checkSetup() throws MCRUsageException, MCRAccessException;
 
     /**
-     * This method will be called and the MCRPacker should start packing according to the {@link #getConfiguration()} and {@link #getParameters()}!<br>
-     * <b>WARNING: do all checks for parameters and user access in {@link #checkSetup()}, because the packer is already stored in the DB if
-     * {@link #pack()} is called and the pack JOB runs a System-User instead of the User who produces the call.</b>
-     * @throws ExecutionException
+     * This method will be called and the MCRPacker should start packing according to the {@link #getConfiguration()}
+     * and {@link #getParameters()}!<br>
+     * <b>WARNING: do all checks for parameters and user access in {@link #checkSetup()}, because the packer is already
+     * stored in the DB if <code>pack</code> is called and the pack JOB runs a System-User instead of the User who
+     * produces the call.</b>
+     *
+     * @throws ExecutionException Unable to pack
      */
     public abstract void pack() throws ExecutionException;
 

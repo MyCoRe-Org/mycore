@@ -16,8 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Injectable } from '@angular/core';
-import { Observable, Observer } from 'rxjs/Rx';
+import { Injectable } from "@angular/core";
+import { Observable, Observer } from "rxjs/Rx";
+import { Util } from "../util";
 
 @Injectable()
 export class ProcessingService {
@@ -31,12 +32,12 @@ export class ProcessingService {
     observable: Observable<MessageEvent> = null;
 
     constructor() {
-        var loc = window.location;
-        var protocol = "ws://";
+        let loc = window.location;
+        let protocol = "ws://";
         if ( location.protocol == "https:" ) {
             protocol = "wss://";
         }
-        this.socketURL = protocol + loc.host + this.getBasePath( loc.pathname ) + this.path;
+        this.socketURL = protocol + loc.host + Util.getBasePath( loc.pathname ) + this.path;
     }
 
     public send( message: String ) {
@@ -64,12 +65,6 @@ export class ProcessingService {
         }
     }
 
-    private getBasePath( path: String ) {
-        var pathArray = location.pathname.split( "/" )
-        pathArray.splice( -4 );
-        return pathArray.join( "/" );
-    }
-
     public connect() {
         this.retryCounter = 0;
         this.socket = new WebSocket( this.socketURL );
@@ -82,9 +77,9 @@ export class ProcessingService {
         });
 
         this.socket.onopen = () => {
-            var message = {
+            let message = {
                 type: "connect"
-            }
+            };
             this.send( JSON.stringify( message ) );
         }
     }

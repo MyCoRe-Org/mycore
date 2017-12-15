@@ -16,13 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Injectable } from "@angular/core";
+export class Settings {
 
-@Injectable()
-export class HtmlService {
+    private static PREFIX: string = "mcr.processables.";
 
-    keys( object: {}) {
-        return Object.keys( object );
+    public static set(name: string, value: any) {
+        localStorage.setItem(Settings.PREFIX + name, value);
+    }
+
+    public static get(name: string, optionalDefault?: any): any {
+        let value = localStorage.getItem(Settings.PREFIX + name);
+        return value == null ? optionalDefault : value;
     }
 
 }
