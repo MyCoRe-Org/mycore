@@ -175,6 +175,8 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
             case DELETE:
                 deleteJob(contextParameters);
                 break;
+            default:
+                throw new MCRPersistentIdentifierException("Unhandled action type!");
         }
     }
 
@@ -189,6 +191,8 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
             case DELETE:
                 rollbackDeleteJob(contextParameters);
                 break;
+            default:
+                throw new MCRPersistentIdentifierException("Unhandled action type!");
         }
     }
 

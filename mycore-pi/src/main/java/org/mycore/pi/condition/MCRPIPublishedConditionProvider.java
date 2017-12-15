@@ -24,8 +24,6 @@ import java.util.function.Predicate;
 import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRPIPublishedConditionProvider extends MCRPIObjectRegistrationConditionProvider {
-    public MCRPIPublishedConditionProvider() {
-    }
 
     @Override public Predicate<MCRBase> provideRegistrationCondition(String type) {
         return (MCRBase base) -> {
