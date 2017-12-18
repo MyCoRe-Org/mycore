@@ -36,6 +36,7 @@
     <changelog.since>2017-06-20</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2017.07</changes.version>
+    <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
     <frontend.maven.plugin.version>1.4</frontend.maven.plugin.version>
     <guice.version>4.1.0</guice.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
@@ -51,12 +52,9 @@
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <node.version>v6.9.1</node.version>
-    <pmd.version>5.7.0</pmd.version>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
     <selenium.version>3.6.0</selenium.version>
     <site.suffix />
-    <sortpom.sortDeps>scope,groupId,artifactId</sortpom.sortDeps>
-    <sortpom.sortFile>https://gist.githubusercontent.com/yagee-de/dfd3698c1b49173dbf251f74eb6a9297/raw/406460c088ff3cb6354e4ae6b40535e6f841607d/mycore_sort.xml</sortpom.sortFile>
-    <sortpom.sortProps>true</sortpom.sortProps>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
     <yarn.version>v0.24.6</yarn.version>
@@ -65,107 +63,9 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <configuration>
-            <configLocation>${session.executionRootDirectory}/checkstyle.xml</configLocation>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-pmd-plugin</artifactId>
-          <configuration>
-            <targetJdk>${java.target.version}</targetJdk>
-            <rulesets>
-              <ruleset>${session.executionRootDirectory}/ruleset.xml</ruleset>
-            </rulesets>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>net.sourceforge.pmd</groupId>
-              <artifactId>pmd-core</artifactId>
-              <version>${pmd.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>net.sourceforge.pmd</groupId>
-              <artifactId>pmd-java</artifactId>
-              <version>${pmd.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>net.sourceforge.pmd</groupId>
-              <artifactId>pmd-javascript</artifactId>
-              <version>${pmd.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>net.sourceforge.pmd</groupId>
-              <artifactId>pmd-xml</artifactId>
-              <version>${pmd.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
           <groupId>org.mycore.plugins</groupId>
           <artifactId>datamodel-plugin</artifactId>
           <version>0.6</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>org.commonjava.maven.enforcer</groupId>
-              <artifactId>enforce-managed-deps-rule</artifactId>
-              <version>1.0</version>
-            </dependency>
-          </dependencies>
-          <executions>
-            <execution>
-              <id>enforce</id>
-              <goals>
-                <goal>enforce</goal>
-              </goals>
-              <configuration>
-                <rules>
-                  <requireManagedDeps implementation="org.commonjava.maven.enforcer.rule.EnforceManagedDepsRule">
-                    <checkProfiles>true</checkProfiles>
-                    <failOnViolation>true</failOnViolation>
-                  </requireManagedDeps>
-                  <!-- Disabled, https://issues.apache.org/jira/browse/MENFORCER-189 -->
-                  <!--
-                  <reactorModuleConvergence />
-                  -->
-                  <bannedDependencies>
-                    <excludes>
-                      <exclude>log4j</exclude>
-                      <exclude>org.slf4j</exclude>
-                      <exclude>javax.servlet:servlet-api</exclude>
-                    </excludes>
-                    <includes>
-                      <include>org.slf4j:slf4j-api</include>
-                      <include>org.slf4j:slf4j-ext</include>
-                      <include>org.slf4j:jcl-over-slf4j</include>
-                    </includes>
-                  </bannedDependencies>
-                </rules>
-                <fail>true</fail>
-              </configuration>
-            </execution>
-            <execution>
-              <id>enforce LOG4J-2.x API</id>
-              <goals>
-                <goal>enforce</goal>
-              </goals>
-              <configuration>
-                <rules>
-                  <bannedDependencies>
-                    <searchTransitive>false</searchTransitive>
-                    <excludes>
-                      <exclude>org.apache.logging.log4j:log4j-1.2-api</exclude>
-                    </excludes>
-                    <message>MCR-1509: Do not use LOG4J 1.2 API anymore</message>
-                  </bannedDependencies>
-                </rules>
-                <fail>true</fail>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -282,39 +182,6 @@
           </configuration>
         </plugin>
         <plugin>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>analyze</id>
-              <goals>
-                <goal>analyze-only</goal>
-              </goals>
-              <inherited>true</inherited>
-              <configuration>
-                <failOnWarning>true</failOnWarning>
-                <ignoreNonCompile>true</ignoreNonCompile>
-                <outputXML>true</outputXML>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>de.thetaphi</groupId>
-          <artifactId>forbiddenapis</artifactId>
-          <version>1.7</version>
-          <configuration>
-            <failOnUnsupportedJava>false</failOnUnsupportedJava>
-            <!-- compile would fail anyway and this is required for MCR-873 -->
-            <failOnMissingClasses>false</failOnMissingClasses>
-            <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
-            <bundledSignatures>
-              <bundledSignature>jdk-unsafe</bundledSignature>
-              <bundledSignature>jdk-deprecated</bundledSignature>
-              <bundledSignature>commons-io-unsafe-2.4</bundledSignature>
-            </bundledSignatures>
-          </configuration>
-        </plugin>
-        <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <argLine>${env.MAVEN_OPTS}</argLine>
@@ -386,130 +253,24 @@
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>com.github.ekryd.sortpom</groupId>
-        <artifactId>sortpom-maven-plugin</artifactId>
-        <version>2.4.0</version>
-        <executions>
-          <execution>
-            <id>sort-pom</id>
-            <goals>
-              <goal>sort</goal>
-            </goals>
-            <phase>verify</phase>
-            <configuration>
-              <expandEmptyElements>false</expandEmptyElements>
-              <keepBlankLines>true</keepBlankLines>
-              <sortDependencies>${sortpom.sortDeps}</sortDependencies>
-              <sortOrderFile>${sortpom.sortFile}</sortOrderFile>
-              <sortProperties>${sortpom.sortProps}</sortProperties>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
+          <useIncrementalCompilation>true</useIncrementalCompilation>
           <compilerArgs>
             <arg>${maven.compiler.arg}</arg>
+            <arg>-Xpkginfo:always</arg>
           </compilerArgs>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.hibernate</groupId>
+              <artifactId>hibernate-jpamodelgen</artifactId>
+              <version>${hibernate.version}</version>
+            </path>
+          </annotationProcessorPaths>
+          <annotationProcessors>
+            <annotationProcessor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</annotationProcessor>
+          </annotationProcessors>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.bsc.maven</groupId>
-        <artifactId>maven-processor-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>21.0</version>
-          </dependency>
-          <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>${hibernate.version}</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <id>process</id>
-            <goals>
-              <goal>process</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <processors>
-                <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
-              </processors>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>1.9</version>
-        <configuration>
-          <verbose>false</verbose>
-          <addSvnKeyWords>true</addSvnKeyWords>
-          <licenseName>gpl_v3</licenseName>
-        </configuration>
-        <executions>
-          <execution>
-            <id>download-licenses</id>
-            <goals>
-              <goal>update-project-license</goal>
-            </goals>
-            <phase>process-sources</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar-no-fork</goal>
-              <goal>test-jar-no-fork</goal>
-            </goals>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-enforcer-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>de.thetaphi</groupId>
-        <artifactId>forbiddenapis</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>report</id>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <phase>test</phase>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -601,57 +362,10 @@
   </distributionManagement>
   <profiles>
     <profile>
-      <id>ci</id>
-      <activation>
-        <property>
-          <name>env.CI</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.github.ekryd.sortpom</groupId>
-            <artifactId>sortpom-maven-plugin</artifactId>
-            <version>2.4.0</version>
-            <executions>
-              <execution>
-                <id>sort-pom</id>
-                <phase>none</phase>
-              </execution>
-              <execution>
-                <goals>
-                  <goal>verify</goal>
-                </goals>
-                <phase>validate</phase>
-                <configuration>
-                  <expandEmptyElements>false</expandEmptyElements>
-                  <keepBlankLines>true</keepBlankLines>
-                  <sortDependencies>${sortpom.sortDeps}</sortDependencies>
-                  <sortOrderFile>${sortpom.sortFile}</sortOrderFile>
-                  <sortProperties>${sortpom.sortProps}</sortProperties>
-                  <verifyFail>stop</verifyFail>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>release-profile</id>
       <properties>
         <site.suffix>-${project.version}</site.suffix>
       </properties>
-    </profile>
-    <profile>
-      <id>development</id>
-      <activation>
-        <property>
-          <name>env</name>
-          <value>dev</value>
-        </property>
-      </activation>
     </profile>
     <profile>
       <id>deployment</id>
@@ -686,18 +400,6 @@
               <!-- due to: http://jira.codehaus.org/browse/MCHANGES-333 -->
               <maxEntries>1000</maxEntries>
             </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>pmd</goal>
-                  <goal>cpd</goal>
-                </goals>
-                <phase>verify</phase>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>
