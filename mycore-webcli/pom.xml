@@ -11,6 +11,8 @@
   <name>MyCoRe Web CLI</name>
   <properties>
     <manifest.priority>67</manifest.priority>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>

@@ -53,13 +53,11 @@ public class LogEventDequeObserver implements Observer {
     }
 
     public void update(Observable observable, Object obj) {
-        if (observable == obLogEventDeque) {
-            if (sendMessages && session.isOpen()) {
-                try {
-                    sendAsMessage(obLogEventDeque);
-                } catch (IOException ex) {
-                    LOGGER.error("Cannot send message to client.", ex);
-                }
+        if (observable.equals(obLogEventDeque) && sendMessages && session.isOpen()) {
+            try {
+                sendAsMessage(obLogEventDeque);
+            } catch (IOException ex) {
+                LOGGER.error("Cannot send message to client.", ex);
             }
         }
     }

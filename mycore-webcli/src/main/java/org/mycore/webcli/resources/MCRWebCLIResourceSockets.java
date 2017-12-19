@@ -87,31 +87,21 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
         if ("run".equals(type)) {
             String command = request.get("command").getAsString();
             cliCont.addCommand(command);
-        }
-
-        else if ("getKnownCommands".equals(type)) {
+        } else if ("getKnownCommands".equals(type)) {
             request.addProperty("return", MCRWebCLIContainer.getKnownCommands().toString());
             try {
                 session.getBasicRemote().sendText(request.toString());
             } catch (IOException ex) {
                 LOGGER.error("Cannot send message to client.", ex);
             }
-        }
-
-        else if ("stopLog".equals(type)) {
+        } else if ("stopLog".equals(type)) {
             cliCont.stopLogging();
-        }
-
-        else if ("startLog".equals(type)) {
+        } else if ("startLog".equals(type)) {
             cliCont.startLogging();
-        }
-
-        else if ("continueIfOneFails".equals(type)) {
+        } else if ("continueIfOneFails".equals(type)) {
             boolean value = request.get("value").getAsBoolean();
             cliCont.setContinueIfOneFails(value);
-        }
-
-        else if ("clearCommandList".equals(type)) {
+        } else if ("clearCommandList".equals(type)) {
             cliCont.clearCommandList();
         }
     }
@@ -135,8 +125,9 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
         synchronized (MCRSessionMgr.getCurrentSession()) {
             sessionValue = MCRSessionMgr.getCurrentSession().get(SESSION_KEY);
             if (sessionValue == null) {
-                if (!create)
+                if (!create) {
                     return null;
+                }
                 // create object
                 sessionValue = new MCRWebCLIContainer(session);
                 MCRSessionMgr.getCurrentSession().put(SESSION_KEY, sessionValue);
