@@ -122,8 +122,8 @@ public class MCRWCMSNavigationResource {
         Set<String> resourcePaths = servletContext.getResourcePaths(templatePath);
         if (resourcePaths != null) {
             for (String resourcepath : resourcePaths) {
-                resourcepath = resourcepath.substring(templatePath.length(), resourcepath.length() - 1);
-                entries.add(resourcepath);
+                String newResourcepath = resourcepath.substring(templatePath.length(), resourcepath.length() - 1);
+                entries.add(newResourcepath);
             }
         }
 

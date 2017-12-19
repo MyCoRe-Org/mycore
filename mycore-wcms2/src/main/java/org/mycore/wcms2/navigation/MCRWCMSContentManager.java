@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -152,40 +153,50 @@ public class MCRWCMSContentManager {
     public void save(JsonArray items) {
         XMLOutputter out = new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
         for (JsonElement e : items) {
-            if (!e.isJsonObject()) {
-                LOGGER.warn("Invalid json element in items {}", e);
-                continue;
-            }
-            JsonObject item = e.getAsJsonObject();
-            if (!item.has("dirty") || !item.get("dirty").getAsBoolean()) {
-                continue;
-            }
-
-            JsonElement webpageIdElement = item.has("href") ? item.get("href")
-                : (item.has("hrefStartingPage") ? item
-                    .get("hrefStartingPage") : null);
-            if (webpageIdElement == null || !webpageIdElement.isJsonPrimitive()) {
-                continue;
-            }
-            //TODO wenn man nur den href ändert und nicht den content muss die datei
-            // trotzdem umgeschrieben werden -> check auf file exists
-            if (!item.has("content") || !item.get("content").isJsonArray()) {
-                continue;
-            }
-            String webpageId = webpageIdElement.getAsString();
-            if (!webpageId.endsWith(".xml")) {
-                throwError(ErrorType.invalidFile, webpageId);
-            }
-            JsonArray content = item.get("content").getAsJsonArray();
-            Element mycoreWebpage = this.sectionProvider.fromJSON(content);
-            // save
-            try (OutputStream fout = MCRWebPagesSynchronizer.getOutputStream(webpageId)) {
-                out.output(new Document(mycoreWebpage), fout);
-            } catch (Exception exc) {
-                LOGGER.error("Error while saving {}", webpageId, exc);
-                throwError(ErrorType.couldNotSave, webpageId);
-            }
+            validateContent(e).ifPresent(item -> {
+                String webpageId = getWebPageId(item).get();
+                if (!webpageId.endsWith(".xml")) {
+                    throwError(ErrorType.invalidFile, webpageId);
+                }
+                JsonArray content = item.get("content").getAsJsonArray();
+                Element mycoreWebpage = this.sectionProvider.fromJSON(content);
+                // save
+                try (OutputStream fout = MCRWebPagesSynchronizer.getOutputStream(webpageId)) {
+                    out.output(new Document(mycoreWebpage), fout);
+                } catch (IOException | RuntimeException exc) {
+                    LOGGER.error("Error while saving {}", webpageId, exc);
+                    throwError(ErrorType.couldNotSave, webpageId);
+                }
+            });
         }
+    }
+
+    private Optional<String> getWebPageId(JsonObject item) {
+        JsonElement webpageIdElement = item.has("href") ? item.get("href")
+            : (item.has("hrefStartingPage") ? item
+            .get("hrefStartingPage") : null);
+        if (webpageIdElement == null || !webpageIdElement.isJsonPrimitive()) {
+            return Optional.empty();
+        }
+        return Optional.of(webpageIdElement)
+            .map(JsonElement::getAsString);
+    }
+
+    private Optional<JsonObject> validateContent(JsonElement e) {
+        if (!e.isJsonObject()) {
+            LOGGER.warn("Invalid json element in items {}", e);
+            return Optional.empty();
+        }
+        JsonObject item = e.getAsJsonObject();
+        if (!item.has("dirty") || !item.get("dirty").getAsBoolean()) {
+            return Optional.empty();
+        }
+        //TODO wenn man nur den href ändert und nicht den content muss die datei
+        // trotzdem umgeschrieben werden -> check auf file exists
+        if (!getWebPageId(item).isPresent() || !item.has("content") || !item.get("content").isJsonArray()) {
+            return Optional.empty();
+        }
+        return Optional.of(item);
     }
 
     public void move(String from, String to) {

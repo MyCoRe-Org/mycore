@@ -75,7 +75,8 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
     public void startUp(ServletContext servletContext) {
         if (servletContext != null) {
             SERVLET_CONTEXT = servletContext;
-            File wcmsDataDir = null, webappBasePath = null;
+            File wcmsDataDir = null;
+            File webappBasePath = null;
             try {
                 //we are running in a servlet container
                 webappBasePath = getWebAppBaseDir();
@@ -129,10 +130,8 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
 
     private static void createDirectoryIfNeeded(File targetFile) throws IOException {
         File targetDirectory = targetFile.getParentFile();
-        if (!targetDirectory.isDirectory()) {
-            if (!targetDirectory.mkdirs()) {
-                throw new IOException(String.format(Locale.ROOT, "Could not create directory: %s", targetDirectory));
-            }
+        if (!targetDirectory.isDirectory() && !targetDirectory.mkdirs()) {
+            throw new IOException(String.format(Locale.ROOT, "Could not create directory: %s", targetDirectory));
         }
     }
 
@@ -163,10 +162,11 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         synchronize(wcmsDataDir, webappBasePath, DEFAULT_COPY_BUFFER_SIZE);
     }
 
-    private static void synchronize(File source, File destination, long chunkSize) throws IOException {
-        if (chunkSize <= 0) {
+    private static void synchronize(File source, File destination, long chuckSize) throws IOException {
+        long newChuckSize = chuckSize;
+        if (newChuckSize <= 0) {
             LOGGER.error("Chunk size must be positive: using default value.");
-            chunkSize = DEFAULT_COPY_BUFFER_SIZE;
+            newChuckSize = DEFAULT_COPY_BUFFER_SIZE;
         }
         if (source.isDirectory()) {
             if (!destination.exists()) {
@@ -182,7 +182,7 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
             //copy each file from source
             for (File srcFile : sources) {
                 File destFile = new File(destination, srcFile.getName());
-                synchronize(srcFile, destFile, chunkSize);
+                synchronize(srcFile, destFile, newChuckSize);
             }
         } else {
             if (destination.exists() && destination.isDirectory()) {
@@ -193,10 +193,10 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
                 long dts = destination.lastModified() / FAT_PRECISION;
                 //do not copy same timestamp and same length
                 if (sts == 0 || sts != dts || source.length() != destination.length()) {
-                    copyFile(source, destination, chunkSize);
+                    copyFile(source, destination, newChuckSize);
                 }
             } else {
-                copyFile(source, destination, chunkSize);
+                copyFile(source, destination, newChuckSize);
             }
         }
     }
@@ -232,10 +232,8 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
                 delete(subFile);
             }
         }
-        if (file.exists()) {
-            if (!file.delete()) {
-                LOGGER.warn(String.format(Locale.ROOT, "Could not delete %s.", file));
-            }
+        if (file.exists() && !file.delete()) {
+            LOGGER.warn(String.format(Locale.ROOT, "Could not delete %s.", file));
         }
     }
 

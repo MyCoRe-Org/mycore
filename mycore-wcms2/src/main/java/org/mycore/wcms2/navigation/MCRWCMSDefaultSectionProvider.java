@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.Text;
 import org.jdom2.filter.ElementFilter;
@@ -40,6 +41,9 @@ import org.mycore.tools.MyCoReWebPageProvider;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.xml.sax.SAXParseException;
+
+import javax.ws.rs.WebApplicationException;
 
 /**
  * The default implementation to convert MyCoRe Webpage sections
@@ -63,12 +67,12 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private List<String> MYCORE_TAG_LIST = new ArrayList<>();
+    private List<String> mycoreTagList = new ArrayList<>();
 
     public MCRWCMSDefaultSectionProvider() {
         String mycoreTagListString = CONFIG.getString("MCR.WCMS2.mycoreTagList", "");
         for (String tag : mycoreTagListString.split(",")) {
-            MYCORE_TAG_LIST.add(tag.trim());
+            mycoreTagList.add(tag.trim());
         }
     }
 
@@ -121,7 +125,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
      */
     private String validateElement(Element element) {
         String elementName = element.getName().toLowerCase(Locale.ROOT);
-        if (!(HTML_TAG_LIST.contains(elementName) || MYCORE_TAG_LIST.contains(elementName))) {
+        if (!(HTML_TAG_LIST.contains(elementName) || mycoreTagList.contains(elementName))) {
             return elementName;
         }
         for (Element el : element.getChildren()) {
@@ -149,7 +153,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
             } else if (child instanceof Text) {
                 Text t = (Text) child;
                 String trimmedText = t.getTextTrim();
-                if (!trimmedText.equals("")) {
+                if (!"".equals(trimmedText)) {
                     Text newText = new Text(trimmedText);
                     out.output(newText, writer);
                 }
@@ -180,8 +184,8 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
             String xmlAsString = sectionObject.get(JSON_DATA).getAsJsonPrimitive().getAsString();
             try {
                 wp.addSection(title, xmlAsString, lang);
-            } catch (Exception exc) {
-                throw new RuntimeException("unable to add section " + title, exc);
+            } catch (IOException | SAXParseException | JDOMException exc) {
+                throw new WebApplicationException("unable to add section " + title, exc);
             }
         }
         wp.updateMeta(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), null);

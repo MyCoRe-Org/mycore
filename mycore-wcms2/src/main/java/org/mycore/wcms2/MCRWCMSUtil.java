@@ -88,7 +88,7 @@ public abstract class MCRWCMSUtil {
         Document doc = builder.build(new ByteArrayInputStream(xml));
         Element rootElement = doc.getRootElement();
         rootElement.setAttribute("href", rootElement.getName());
-        List<org.jdom2.Element> children = rootElement.getChildren();
+        List<Element> children = rootElement.getChildren();
         for (Element menu : children) {
             String id = menu.getAttributeValue("id");
             menu.setName(id);
