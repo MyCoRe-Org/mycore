@@ -10,8 +10,8 @@
   <artifactId>mycore-acl-editor2</artifactId>
   <name>MyCoRe ACL editor2</name>
   <properties>
-    <manifest.priority>0</manifest.priority>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <manifest.priority>0</manifest.priority>
     <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <build>
