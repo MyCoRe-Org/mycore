@@ -10,7 +10,9 @@
   <artifactId>mycore-classeditor</artifactId>
   <name>MyCoRe Classification Editor</name>
   <properties>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>18</manifest.priority>
+    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>

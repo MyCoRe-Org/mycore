@@ -45,7 +45,8 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
     private static Logger LOGGER = LogManager.getLogger(MCRClassificationWritePermission.class);
 
     /* (non-Javadoc)
-     * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker#isPermitted(com.sun.jersey.spi.container.ContainerRequest)
+     * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker
+     *  #isPermitted(com.sun.jersey.spi.container.ContainerRequest)
      */
     @Override
     public boolean isPermitted(ContainerRequestContext request) {
@@ -77,7 +78,7 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
     }
 
     private boolean hasPermission(MCRCategoryID category, String state) {
-        if (state.equals("new")) {
+        if ("new".equals(state)) {
             return MCRAccessManager.checkPermission(PERMISSION_CREATE);
         }
         return MCRAccessManager.checkPermission(category.getRootID(), PERMISSION_WRITE);
