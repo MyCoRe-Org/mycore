@@ -18,7 +18,6 @@
 
 package org.mycore.iiif.presentation.model.attributes;
 
-import org.mycore.iiif.image.model.MCRIIIFImageProfile;
 import org.mycore.iiif.model.MCRIIIFBase;
 
 /**

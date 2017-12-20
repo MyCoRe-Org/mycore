@@ -39,7 +39,7 @@ public abstract class MCRIIIFImageImpl {
 
     private static final String MCR_IIIF_IMAGE_CONFIG_PREFIX = "MCR.IIIFImage.";
 
-    private static final Map<String, MCRIIIFImageImpl> implHolder = new HashMap<>();
+    private static final Map<String, MCRIIIFImageImpl> IMPLHOLDER = new HashMap<>();
 
     private final String implName;
 
@@ -48,8 +48,8 @@ public abstract class MCRIIIFImageImpl {
     }
 
     public static synchronized MCRIIIFImageImpl getInstance(String implName) {
-        if (implHolder.containsKey(implName)) {
-            return implHolder.get(implName);
+        if (IMPLHOLDER.containsKey(implName)) {
+            return IMPLHOLDER.get(implName);
         }
 
         String classPropertyName = MCR_IIIF_IMAGE_CONFIG_PREFIX + implName;
@@ -58,7 +58,7 @@ public abstract class MCRIIIFImageImpl {
         try {
             Constructor<? extends MCRIIIFImageImpl> constructor = classObject.getConstructor(String.class);
             MCRIIIFImageImpl imageImpl = constructor.newInstance(implName);
-            implHolder.put(implName, imageImpl);
+            IMPLHOLDER.put(implName, imageImpl);
             return imageImpl;
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException(

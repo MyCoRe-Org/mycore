@@ -32,7 +32,7 @@ public abstract class MCRIIIFPresentationImpl {
 
     private static final String MCR_IIIF_PRESENTATION_CONFIG_PREFIX = "MCR.IIIFPresentation.";
 
-    private static final Map<String, MCRIIIFPresentationImpl> implHolder = new HashMap<>();
+    private static final Map<String, MCRIIIFPresentationImpl> IMPLHOLDER = new HashMap<>();
 
     private final String implName;
 
@@ -41,8 +41,8 @@ public abstract class MCRIIIFPresentationImpl {
     }
 
     public static synchronized MCRIIIFPresentationImpl getInstance(String implName) {
-        if (implHolder.containsKey(implName)) {
-            return implHolder.get(implName);
+        if (IMPLHOLDER.containsKey(implName)) {
+            return IMPLHOLDER.get(implName);
         }
 
         String classPropertyName = MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName;
@@ -51,7 +51,7 @@ public abstract class MCRIIIFPresentationImpl {
         try {
             Constructor<? extends MCRIIIFPresentationImpl> constructor = classObject.getConstructor(String.class);
             MCRIIIFPresentationImpl presentationImpl = constructor.newInstance(implName);
-            implHolder.put(implName, presentationImpl);
+            IMPLHOLDER.put(implName, presentationImpl);
             return presentationImpl;
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException(

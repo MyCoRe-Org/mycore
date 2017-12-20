@@ -54,7 +54,8 @@ public class MCRIIIFSequence extends MCRIIIFPresentationBase {
     }
 
     public void setStartCanvas(MCRIIIFCanvas startCanvas) {
-        this.startCanvas = new MCRIIIFReference(this.origStartCanvas = startCanvas);
+        this.origStartCanvas = startCanvas;
+        this.startCanvas = new MCRIIIFReference(startCanvas);
     }
 
     public String getDescription() {

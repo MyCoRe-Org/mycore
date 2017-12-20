@@ -47,15 +47,19 @@ public class MCRIIIFScaleParser {
     }
 
     public MCRIIIFImageTargetSize parseTargetScale() {
-        if (isFull())
+        if (isFull()) {
             return new MCRIIIFImageTargetSize(sourceRegionWidth, sourceRegionHeight);
+        }
 
-        if (isPercent())
+        if (isPercent()) {
             return parsePercentValue();
+        }
 
-        StringBuilder wBuilder = new StringBuilder(), hBuilder = new StringBuilder();
+        StringBuilder wBuilder = new StringBuilder();
+        StringBuilder hBuilder = new StringBuilder();
         getWidthAndHeightStrings(wBuilder, hBuilder);
-        String w = wBuilder.toString(), h = hBuilder.toString();
+        String w = wBuilder.toString();
+        String h = hBuilder.toString();
 
         try {
             if (w.length() == 0) {
