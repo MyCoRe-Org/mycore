@@ -98,7 +98,7 @@ public class MCRTransferPackageCommands {
     }
 
     @MCRCommand(syntax = "_import transfer package untar {0}")
-    public static void _untar(String pathToTar) throws Exception {
+    public static void untar(String pathToTar) throws Exception {
         Path tar = Paths.get(pathToTar);
         Path targetDirectory = MCRTransferPackageUtil.getTargetDirectory(tar);
         LOGGER.info("Untar {} to {}...", pathToTar, targetDirectory);
@@ -106,7 +106,7 @@ public class MCRTransferPackageCommands {
     }
 
     @MCRCommand(syntax = "_import transfer package from directory {0}")
-    public static List<String> _fromDirectory(String targetDirectoryPath) throws Exception {
+    public static List<String> fromDirectory(String targetDirectoryPath) throws Exception {
         LOGGER.info("Import transfer package from {}...", targetDirectoryPath);
         Path targetDirectory = Paths.get(targetDirectoryPath);
         List<String> commands = new ArrayList<>();
@@ -129,12 +129,12 @@ public class MCRTransferPackageCommands {
     }
 
     @MCRCommand(syntax = "_import transfer package classification from {0}")
-    public static void _importObject(String pathToClassification) throws Exception {
+    public static void importObject(String pathToClassification) throws Exception {
         MCRClassificationUtils.fromPath(Paths.get(pathToClassification));
     }
 
     @MCRCommand(syntax = "_import transfer package object {0} from {1}")
-    public static List<String> _importObject(String objectId, String targetDirectoryPath) throws Exception {
+    public static List<String> importObject(String objectId, String targetDirectoryPath) throws Exception {
         Path targetDirectory = Paths.get(targetDirectoryPath);
         List<String> derivates = MCRTransferPackageUtil.importObjectCLI(targetDirectory, objectId);
         return derivates.stream()
@@ -143,13 +143,13 @@ public class MCRTransferPackageCommands {
     }
 
     @MCRCommand(syntax = "_import transfer package derivate {0} from {1}")
-    public static void _importDerivate(String derivateId, String targetDirectoryPath) throws Exception {
+    public static void importDerivate(String derivateId, String targetDirectoryPath) throws Exception {
         Path targetDirectory = Paths.get(targetDirectoryPath);
         MCRTransferPackageUtil.importDerivate(targetDirectory, derivateId);
     }
 
     @MCRCommand(syntax = "_import transfer package clean up {0}")
-    public static void _cleanUp(String targetDirectoryPath) throws Exception {
+    public static void cleanUp(String targetDirectoryPath) throws Exception {
         Path targetDirectory = Paths.get(targetDirectoryPath);
         // delete mark of imported object
         List<String> mcrObjects = MCRTransferPackageUtil.getMCRObjects(targetDirectory);

@@ -18,7 +18,6 @@
 
 package org.mycore.impex;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,12 +25,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -72,7 +69,7 @@ public abstract class MCRTransferPackageUtil {
 
     /**
      * The default lookup path appendix (the subdirectory in the tar where the metadata resides).
-     * With leading and trailing {@link File#separator} 
+     * With leading and trailing {@link java.io.File#separator}
      */
     public static final String CONTENT_DIRECTORY = "content";
 
@@ -164,7 +161,8 @@ public abstract class MCRTransferPackageUtil {
         List<Path> classificationPaths = new ArrayList<>();
         Path classPath = targetDirectory.resolve(MCRTransferPackage.CLASS_PATH);
         if (Files.exists(classPath)) {
-            try (Stream<Path> stream = Files.find(classPath, 2, filterClassifications())) {
+            try (Stream<Path> stream = Files.find(classPath, 2,
+                (path, attr) -> path.toString().endsWith(".xml") && !Files.isRegularFile(path))) {
                 stream.forEach(classificationPaths::add);
             }
         }
@@ -267,7 +265,7 @@ public abstract class MCRTransferPackageUtil {
             MCRMetadataManager.update(der);
         }
         try (Stream<Path> stream = Files.find(derivateDirectory, 5,
-            filterDerivateDirectory(derivateId, derivateDirectory))) {
+            (path, attr) -> !path.toString().endsWith(".md5") && Files.isRegularFile(path))) {
             stream.forEach(path -> {
                 String targetPath = derivateDirectory.relativize(path).toString();
                 try (InputStream in = Files.newInputStream(path)) {
@@ -278,25 +276,6 @@ public abstract class MCRTransferPackageUtil {
                 }
             });
         }
-    }
-
-    private static BiPredicate<Path, BasicFileAttributes> filterDerivateDirectory(String derivateId,
-        Path derivateDirectory) {
-        return (path, attr) -> {
-            if (Files.isDirectory(path)) {
-                return false;
-            }
-            return !path.toString().endsWith(".md5");
-        };
-    }
-
-    private static BiPredicate<Path, BasicFileAttributes> filterClassifications() {
-        return (path, attr) -> {
-            if (Files.isDirectory(path)) {
-                return false;
-            }
-            return path.toString().endsWith(".xml");
-        };
     }
 
     /**
