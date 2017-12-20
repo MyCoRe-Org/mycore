@@ -43,6 +43,10 @@ public class MCRTEIValidator implements ErrorHandler {
 
     public static final String WARNING = "warning";
 
+    private Hashtable<String, List<SAXParseException>> exceptionMap;
+
+    private Source teiSource;
+
     public MCRTEIValidator(Source teiSource) {
         this.teiSource = teiSource;
 
@@ -52,32 +56,19 @@ public class MCRTEIValidator implements ErrorHandler {
         this.exceptionMap.put("fatalError", new ArrayList<>());
     }
 
-    private Schema getSchema(String path) {
-        try {
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
-            schemaFactory.setErrorHandler(this);
-            return schemaFactory.newSchema(MCRTEIValidator.class.getClassLoader().getResource(
-                path));
-        } catch (SAXException e) {
-            throw new RuntimeException(e);
-        }
+    private Schema getSchema(String path) throws SAXException {
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
+        schemaFactory.setErrorHandler(this);
+        return schemaFactory.newSchema(MCRTEIValidator.class.getClassLoader().getResource(
+            path));
     }
 
     public void validate() throws IOException, SAXException {
         Validator validator = this.getSchema(MCR_TRANSCRIPTION_SCHEMA).newValidator();
         validator.setErrorHandler(this);
-
-        try {
-            validator.validate(this.teiSource);
-        } catch (SAXException e) {
-            throw e;
-        }
+        validator.validate(this.teiSource);
     }
-
-    private Hashtable<String, List<SAXParseException>> exceptionMap;
-
-    private Source teiSource;
 
     @Override
     public void warning(SAXParseException exception) throws SAXException {
