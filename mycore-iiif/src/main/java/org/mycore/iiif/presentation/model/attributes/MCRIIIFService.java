@@ -32,7 +32,7 @@ import org.mycore.iiif.model.MCRIIIFBase;
 public class MCRIIIFService extends MCRIIIFBase {
 
     /**
-     * This can be a String or also @link {@link MCRIIIFImageProfile}
+     * This can be a String or also @link {@link org.mycore.iiif.image.model.MCRIIIFImageProfile}
      **/
     public String profile;
 
