@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitOption;
@@ -52,6 +53,16 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamSource;
+import java.io.InputStream;
+import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.common.MCRLinkTableManager;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -61,6 +72,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Comment;
 import org.jdom2.Document;
+import org.jdom2.transform.JDOMSource;
+import org.jdom2.transform.JDOMResult;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.output.Format;
@@ -69,7 +82,9 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -109,6 +124,7 @@ public class MCRRestAPIObjectsHelper {
         MCRObject mcrObj = retrieveMCRObject(pathParamId);
         Document doc = mcrObj.createXML();
         Element eStructure = doc.getRootElement().getChild("structure");
+
         if (queryParamStyle != null && !MCRRestAPIObjects.STYLE_DERIVATEDETAILS.equals(queryParamStyle)) {
             throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
                 new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
@@ -143,14 +159,40 @@ public class MCRRestAPIObjectsHelper {
             }
         }
 
+        String xslfile = MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.XML", "");
+        
         StringWriter sw = new StringWriter();
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         try {
+            if (xslfile.length() > 0) {
+                InputStream in = MCRRestAPIObjectsHelper.class.getResourceAsStream("/" + xslfile);
+                if (in == null) {
+                    throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
+                        MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to transform XML via XSL file", "XSL file " + xslfile + 
+                        " specified in property MCR.RestAPI.v1.Filter.XML doesn't exist."));
+                }
+                JDOMSource is = new JDOMSource(doc);
+                JDOMResult os = new JDOMResult();
+                StreamSource source = new StreamSource(in);
+                TransformerFactory transfakt = TransformerFactory.newInstance();
+                transfakt.setURIResolver(MCRURIResolver.instance());
+                Transformer trans = transfakt.newTransformer(source);
+                trans.transform(is, os);
+                doc = os.getDocument();
+            }
+            
             outputter.output(doc, sw);
         } catch (IOException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
                 MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to retrieve MyCoRe object", e.getMessage()));
+        } catch (TransformerConfigurationException e) {
+        	throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
+                MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to transform XML via XSL file", "Error while loading transformer ressource " + xslfile + "."));
+        } catch (TransformerException e) {
+        	throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
+                MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to transform XML via XSL file", "Error while transforming ressource " + pathParamId + "."));
         }
+
         String authHeader = MCRJSONWebTokenUtil
             .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         return Response.ok(sw.toString()).type("application/xml").header(HEADER_NAME_AUTHORIZATION, authHeader).build();
@@ -161,6 +203,8 @@ public class MCRRestAPIObjectsHelper {
 
         MCRObject mcrObj = retrieveMCRObject(pathParamMcrID);
         MCRDerivate derObj = retrieveMCRDerivate(mcrObj, pathParamDerID);
+        
+        //MCR.RestAPI.v1.Filter.XML
 
         try {
             Document doc = derObj.createXML();
@@ -172,7 +216,7 @@ public class MCRRestAPIObjectsHelper {
             StringWriter sw = new StringWriter();
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(doc, sw);
-
+            
             String authHeader = MCRJSONWebTokenUtil
                 .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
             return Response.ok(sw.toString()).type("application/xml").header(HEADER_NAME_AUTHORIZATION, authHeader)
