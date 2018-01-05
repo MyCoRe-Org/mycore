@@ -152,8 +152,9 @@ public class MCRRestAPIObjectsHelper {
         StringWriter sw = new StringWriter();
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         try {
-            if (MCRConfiguration.instance().getString("MCR.ContentTransformer.RestApiXmlFilter.Stylesheet", "").length() > 0) {
-                MCRContentTransformer trans = MCRContentTransformerFactory.getTransformer("RestApiXmlFilter");
+            String filter_id = MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.XML","");
+            if (filter_id.length() > 0) {
+                MCRContentTransformer trans = MCRContentTransformerFactory.getTransformer(filter_id);
                 Document filtered_doc = trans.transform(new MCRJDOMContent(doc)).asXML();
                 outputter.output(filtered_doc, sw);
             } else {
