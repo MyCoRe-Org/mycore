@@ -96,7 +96,16 @@ import com.google.gson.stream.JsonWriter;
 /**
  * main utility class that handles REST requests
  * 
+ * to filter the XML output of showMCRObject, set the properties:
+ * MCR.RestAPI.v1.Filter.XML
+ *   to your ContentTransformer-ID,
+ * MCR.ContentTransformer.[your ContentTransformer-ID here].Class
+ *   to your ContentTransformer's class and
+ * MCR.ContentTransformer.[your ContentTransformer-ID here].Stylesheet
+ *   to your filtering stylesheet.
+ * 
  * @author Robert Stephan
+ * @author Christoph Neidahl
  * 
  * @version $Revision: $ $Date: $
  */
