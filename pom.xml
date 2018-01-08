@@ -381,6 +381,13 @@
         <plugins>
           <plugin>
             <artifactId>maven-enforcer-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.commonjava.maven.enforcer</groupId>
+                <artifactId>enforce-managed-deps-rule</artifactId>
+                <version>1.0</version>
+              </dependency>
+            </dependencies>
             <executions>
               <execution>
                 <id>enforce LOG4J-2.x API</id>
@@ -396,6 +403,21 @@
                       </excludes>
                       <message>MCR-1509: Do not use LOG4J 1.2 API anymore</message>
                     </bannedDependencies>
+                  </rules>
+                  <fail>true</fail>
+                </configuration>
+              </execution>
+              <execution>
+                <id>enforce-managed-deps</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireManagedDeps implementation="org.commonjava.maven.enforcer.rule.EnforceManagedDepsRule">
+                      <checkProfiles>true</checkProfiles>
+                      <failOnViolation>true</failOnViolation>
+                    </requireManagedDeps>
                   </rules>
                   <fail>true</fail>
                 </configuration>
