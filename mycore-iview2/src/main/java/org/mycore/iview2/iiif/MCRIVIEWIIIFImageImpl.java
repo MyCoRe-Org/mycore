@@ -289,7 +289,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         MCRTiledPictureProps tiledPictureProps = null;
         try (FileSystem fileSystem = MCRIView2Tools.getFileSystem(tiledFile)) {
             tiledPictureProps = MCRTiledPictureProps.getInstanceFromDirectory(fileSystem.getPath("/"));
-        } catch (IOException | JDOMException e) {
+        } catch (IOException e) {
             throw new MCRIIIFImageProvidingException("Could not provide image information!", e);
         }
         return tiledPictureProps;
