@@ -57,7 +57,7 @@ public class MCRPIRegisterJobAction extends MCRJobAction {
     @Override
     public void rollback() {
         try {
-            getRegistrationService().delegateAction(this.job.getParameters());
+            getRegistrationService().delegateRollback(this.job.getParameters());
         } catch (MCRPersistentIdentifierException e) {
             throw new MCRException(e);
         }

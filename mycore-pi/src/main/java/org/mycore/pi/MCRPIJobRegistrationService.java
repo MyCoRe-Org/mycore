@@ -7,12 +7,18 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
 import org.mycore.services.queuedjob.MCRJobQueue;
+import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserManager;
 
 /**
  * Implementation of a {@link MCRPIRegistrationService} which helps to outsource a registration task to a {@link MCRJob}
@@ -25,6 +31,7 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRJobQueue REGISTER_JOB_QUEUE = initializeJobQueue();
+    public static final String JOB_API_USER_PROPERTY = "jobApiUser";
 
     public MCRPIJobRegistrationService(String registrationServiceID, String identType) {
         super(registrationServiceID, identType);
@@ -164,36 +171,75 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
      */
     protected abstract Optional<String> getContextInformation(Map<String, String> contextParameters);
 
-    void delegateAction(Map<String, String> contextParameters) throws MCRPersistentIdentifierException {
-        switch (getAction(contextParameters)) {
-            case REGISTER:
-                registerJob(contextParameters);
-                break;
-            case UPDATE:
-                updateJob(contextParameters);
-                break;
-            case DELETE:
-                deleteJob(contextParameters);
-                break;
-            default:
-                throw new MCRPersistentIdentifierException("Unhandled action type!");
+    public void runAsJobUser(PIRunnable task) throws MCRPersistentIdentifierException {
+        boolean jobUserPresent = this.getProperties().containsKey(JOB_API_USER_PROPERTY);
+        String jobUser = this.getProperties().get(JOB_API_USER_PROPERTY);
+        MCRSession session = null;
+        MCRUserInformation savedUserInformation = null;
+
+
+        if (jobUserPresent) {
+            session = MCRSessionMgr.getCurrentSession();
+            savedUserInformation = session.getUserInformation();
+            MCRUser user = MCRUserManager.getUser(jobUser);
+
+            /* workaround https://mycore.atlassian.net/browse/MCR-1400*/
+            session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
+
+            session.setUserInformation(user);
+            LOGGER.info("Continue as User {}", jobUser);
+        }
+
+
+        try {
+            task.run();
+        } finally {
+            if (jobUserPresent) {
+                LOGGER.info("Continue as User {}", savedUserInformation.getUserID());
+
+                /* workaround https://mycore.atlassian.net/browse/MCR-1400*/
+                session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
+
+                session.setUserInformation(savedUserInformation);
+            }
         }
     }
 
-    void delegateRollback(Map<String, String> contextParameters) throws MCRPersistentIdentifierException {
-        switch (getAction(contextParameters)) {
-            case REGISTER:
-                rollbackRegisterJob(contextParameters);
-                break;
-            case UPDATE:
-                rollbackUpdateJob(contextParameters);
-                break;
-            case DELETE:
-                rollbackDeleteJob(contextParameters);
-                break;
-            default:
-                throw new MCRPersistentIdentifierException("Unhandled action type!");
-        }
+    void delegateAction(final Map<String, String> contextParameters) throws MCRPersistentIdentifierException {
+        runAsJobUser(() -> {
+            switch (getAction(contextParameters)) {
+                case REGISTER:
+                    registerJob(contextParameters);
+                    break;
+                case UPDATE:
+                    updateJob(contextParameters);
+                    break;
+                case DELETE:
+                    deleteJob(contextParameters);
+                    break;
+                default:
+                    throw new MCRPersistentIdentifierException("Unhandled action type!");
+            }
+        });
+    }
+
+
+    void delegateRollback(final Map<String, String> contextParameters) throws MCRPersistentIdentifierException {
+        runAsJobUser(() -> {
+            switch (getAction(contextParameters)) {
+                case REGISTER:
+                    rollbackRegisterJob(contextParameters);
+                    break;
+                case UPDATE:
+                    rollbackUpdateJob(contextParameters);
+                    break;
+                case DELETE:
+                    rollbackDeleteJob(contextParameters);
+                    break;
+                default:
+                    throw new MCRPersistentIdentifierException("Unhandled action type!");
+            }
+        });
     }
 
     protected PiJobAction getAction(Map<String, String> contextParameters) {
@@ -213,6 +259,10 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
             return action;
         }
 
+    }
+
+    private interface PIRunnable {
+        public void run() throws MCRPersistentIdentifierException;
     }
 
 }
