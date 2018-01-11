@@ -3,7 +3,6 @@ package org.mycore.pi;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -82,7 +81,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         Assert.assertFalse("Register should not have been called!", casted.isRegisterCalled());
         Assert.assertFalse("Update should not have been called!", casted.isUpdatedCalled());
 
-        MCRMockIdentifier identifier = registrationService.fullRegister(mcrObject, "");
+        MCRMockIdentifier identifier = registrationService.register(mcrObject, "");
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertTrue("The identifier " + identifier.asString() + " should be registered now!",

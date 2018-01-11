@@ -228,9 +228,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
                 String name = fieldAttributes.getName();
 
                 return Stream.of("mcrRevision", "mycoreID", "id", "mcrVersion")
-                    .filter(field -> field.equals(name))
-                    .findFirst()
-                    .isPresent();
+                    .anyMatch(field -> field.equals(name));
             }
 
             @Override
@@ -242,9 +240,9 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
     }
 
     /**
+     * Adds a identifier to the object.
      * Validates everything, registers a new Identifier, inserts the identifier to object metadata and writes a
      * information to the Database.
-     *
      * @param obj the object which has to be identified
      * @return the assigned Identifier
      * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
@@ -252,7 +250,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
-    public T fullRegister(MCRBase obj, String additional)
+    public T register(MCRBase obj, String additional)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
         T identifier = this.registerIdentifier(obj, additional);

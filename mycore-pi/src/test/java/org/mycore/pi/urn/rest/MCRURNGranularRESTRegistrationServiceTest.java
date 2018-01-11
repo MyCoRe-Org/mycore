@@ -80,7 +80,7 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
         String serviceID = "TestService";
         MCRURNGranularRESTRegistrationService testService = new MCRURNGranularRESTRegistrationService(serviceID,
             foo);
-        testService.fullRegister(derivate, "");
+        testService.register(derivate, "");
         timerTask();
 
         List<MCRPIRegistrationInfo> registeredURNs = MCREntityManagerProvider

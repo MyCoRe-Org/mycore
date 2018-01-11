@@ -85,7 +85,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     }
 
     @Override
-    public MCRDNBURN fullRegister(MCRBase obj, String filePath)
+    public MCRDNBURN register(MCRBase obj, String filePath)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, filePath);
 

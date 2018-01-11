@@ -46,7 +46,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
     }
 
     @Override
-    public MCRDNBURN fullRegister(MCRBase obj, String additional)
+    public MCRDNBURN register(MCRBase obj, String additional)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
 
