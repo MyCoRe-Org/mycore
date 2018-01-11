@@ -1,9 +1,16 @@
 package org.mycore.pi.cli;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.file.*;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.Optional;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -50,7 +57,8 @@ public class MCRPICommands {
         });
     }
 
-    @MCRCommand(syntax = "migrate urn granular to service id {0}", help = "")
+    @MCRCommand(syntax = "migrate urn granular to service id {0}", help = "Used to migrate urn granular to MyCoRe-PI. " +
+            "{0} should be your granular service id.")
     public static void migrateURNGranularToServiceID(String serviceID) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRXMLMetadataManager.instance().listIDsOfType("derivate").stream().forEach(derivateID -> {
@@ -77,8 +85,10 @@ public class MCRPICommands {
         });
     }
 
-    @MCRCommand(syntax = "try to control {0} with service {1} with additional {2}", help = "")
-    public static void migrateURNGranularToServiceID(String objectIDString, String serviceID, final String additional)
+    @MCRCommand(syntax = "try to control {0} with service {1} with additional {2}", help = "This command tries to" +
+            " read a pi from the object {0} with the MetadataManager from the specified service {1}." +
+            " If the service configuration is right then the pi is under control of MyCoRe.")
+    public static void controlObjectWithServiceAndAdditional(String objectIDString, String serviceID, final String additional)
         throws MCRAccessException, MCRActiveLinkException, IOException {
         String trimAdditional = additional.trim();
         MCRPIRegistrationService<MCRPersistentIdentifier> service = MCRPIRegistrationServiceManager
@@ -111,7 +121,6 @@ public class MCRPICommands {
         MCRPIRegistrationService.addFlagToObject(mcrBase, mcrpi);
         MCRMetadataManager.update(mcrBase);
         LOGGER.info("{}:{} is now under control of {}", objectID, trimAdditional, serviceID);
-
     }
 
 }

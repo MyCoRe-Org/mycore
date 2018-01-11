@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,6 +35,11 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
     public static final int BATCH_SIZE = 20;
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     @Ignore
     @Test
@@ -84,5 +90,10 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
         testProperties.put("MCR.PI.Generator.testGenerator.Namespace", "frontend-");
         return testProperties;
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 }

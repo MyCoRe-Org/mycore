@@ -15,6 +15,7 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.access.MCRAccessManager;
@@ -44,6 +45,11 @@ import mockit.MockUp;
  */
 public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase {
     private int numOfDerivFiles = 15;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     @Test
     public void fullRegister() throws Exception {
@@ -171,5 +177,10 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
         testProperties.put("MCR.URN.DNB.Credentials.Login", "test");
         testProperties.put("MCR.URN.DNB.Credentials.Password", "test");
         return testProperties;
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 }
