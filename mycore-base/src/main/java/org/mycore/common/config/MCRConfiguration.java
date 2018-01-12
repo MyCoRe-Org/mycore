@@ -361,38 +361,64 @@ public class MCRConfiguration {
     }
 
     /**
+     * Returns a new class object specified in the configuration property with the given name.
+     * 
+     * @param name
+     *            the non-null and non-empty qualified name of the configuration property
+     * @param defaultname
+     *            the qualified default class name
+     * @return Class of the value of the configuration property
+     * @throws MCRConfigurationException
+     *             if the property is not set or the class can not be loaded or instantiated
+     */
+    public Class<?> getClassOf(String name, String defaultname) throws MCRConfigurationException {
+        String classname = getString(name, defaultname);
+        if (classname == null || classname.trim().length() == 0) {
+            throw new MCRConfigurationException("Configuration property is missing or empty : " + name);
+        }
+        LogManager.getLogger().debug("Load class: " + classname);
+        Class<?> cl;
+        try {
+            cl = Class.forName(classname);
+        } catch (ClassNotFoundException ex) {
+            throw new MCRConfigurationException("Could not load class " + classname, ex);
+        }
+        return cl;
+    }
+
+    /**
+     * Returns a new class object specified in the configuration property with the given name.
+     * 
+     * @param name
+     *            the non-null and non-empty qualified name of the configuration property
+     * @return Class of the value of the configuration property
+     * @throws MCRConfigurationException
+     *             if the property is not set or the class can not be loaded or instantiated
+     */
+    public Class<?> getClassOf(String name) throws MCRConfigurationException {
+        return getClassOf(name, (String) null);
+    }
+    
+  /**
      * Returns a new instance of the class specified in the configuration property with the given name.
      * 
      * @param name
      *            the non-null and non-empty qualified name of the configuration property
      * @param defaultname
-     *            the qualified class name
+     *            the qualified default class name
      * @return Instance of the value of the configuration property
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        String classname = getString(name, defaultname);
-        if (classname == null) {
-            throw new MCRConfigurationException("Configuration property missing: " + name);
-        }
-
-        return this.<T> loadClass(classname);
+        Class<? extends T> cl = (Class<? extends T>)getClassOf(name, defaultname);
+        return this.<T> getInstanceOfClass(cl);
     }
 
-    <T> T loadClass(String classname) {
-        LogManager.getLogger().debug("Loading Class: " + classname);
+    <T> T getInstanceOfClass(Class<? extends T> cl) {
+        LogManager.getLogger().debug("Instantiate class: " + cl.getName());
 
         T o = null;
-        Class<? extends T> cl;
-        try {
-            @SuppressWarnings("unchecked")
-            Class<? extends T> forName = (Class<? extends T>) Class.forName(classname);
-            cl = forName;
-        } catch (ClassNotFoundException ex) {
-            throw new MCRConfigurationException("Could not load class " + classname, ex);
-        }
-
         try {
             try {
                 o = cl.newInstance();
@@ -415,7 +441,7 @@ public class MCRConfiguration {
                 }
             }
         } catch (Throwable t) {
-            String msg = "Could not instantiate class " + classname;
+            String msg = "Could not instantiate class " + cl.getName();
             if (t instanceof ExceptionInInitializerError) {
                 Throwable t2 = ((ExceptionInInitializerError) t).getException();
                 throw new MCRConfigurationException(msg, t2);
@@ -443,7 +469,7 @@ public class MCRConfiguration {
             return defaultObj;
         }
 
-        return this.<T> loadClass(classname);
+        return this.<T> getInstanceOf(classname, null);
     }
 
     /**

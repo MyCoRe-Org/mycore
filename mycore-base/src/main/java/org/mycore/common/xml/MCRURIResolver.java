@@ -84,6 +84,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
@@ -152,31 +153,23 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Creates a new MCRURIResolver
+     * Creates a new MCRURIResolver. The resolver is configured by the property
+     * <ul>
+     * <li><code>MCR.URIResolver.ExternalResolver.Class</code></li>
+     * </ul>
      */
     private MCRURIResolver() {
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
     }
 
     private static MCRResolverProvider getExternalResolverProvider() {
-        String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class",
-            null);
         final MCRResolverProvider emptyResolver = () -> new HashMap<String, URIResolver>();
-        if (externalClassName == null) {
-            return emptyResolver;
-        }
         try {
-            Class<?> cl = Class.forName(externalClassName);
-            final MCRResolverProvider resolverProvider = (MCRResolverProvider) cl.newInstance();
+            final MCRResolverProvider resolverProvider = MCRConfiguration.instance().getInstanceOf(
+                CONFIG_PREFIX + "ExternalResolver.Class", null);
             return resolverProvider;
-        } catch (ClassNotFoundException e) {
+        } catch (MCRConfigurationException e) {
             LOGGER.warn("Could not find external Resolver class", e);
-            return emptyResolver;
-        } catch (InstantiationException e) {
-            LOGGER.warn("Could not instantiate external Resolver class", e);
-            return emptyResolver;
-        } catch (IllegalAccessException e) {
-            LOGGER.warn("Could not instantiate external Resolver class", e);
             return emptyResolver;
         }
     }

@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -73,25 +74,18 @@ public class MCRLinkTableManager {
     }
 
     /**
-     * The constructor of this class.
+     * The constructor of this class. It use the persistence class of the property
+     * <ul>
+     * <li><code>MCR.Persistence.LinkTable.Store.Class</code></li>
+     * </ul>
      */
     protected MCRLinkTableManager() {
-        MCRConfiguration config = MCRConfiguration.instance();
-
-        // Load the persistence class
-        String persistclassname = config.getString("MCR.Persistence.LinkTable.Store.Class");
-
         Object obj = new Object();
         try {
-            obj = Class.forName(persistclassname).newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new MCRException(persistclassname + " ClassNotFoundException");
-        } catch (IllegalAccessException e) {
-            throw new MCRException(persistclassname + " IllegalAccessException");
-        } catch (InstantiationException e) {
-            throw new MCRException(persistclassname + " InstantiationException");
+            obj = MCRConfiguration.instance().getInstanceOf("MCR.Persistence.LinkTable.Store.Class");
+        } catch (MCRConfigurationException e) {
+            throw new MCRException("Error while load persitence class of MCR.Persistence.LinkTable.Store.Class ", e);
         }
-
         persistenceclass = (MCRLinkTableInterface) obj;
     }
 
