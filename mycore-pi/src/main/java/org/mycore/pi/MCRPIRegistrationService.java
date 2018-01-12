@@ -240,9 +240,18 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
     }
 
     /**
+     * shorthand for {@link #register(MCRBase, String, boolean)} with update = true
+     */
+    public T register(MCRBase obj, String additional)
+        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        return register(obj,additional,true);
+    }
+
+    /**
      * Adds a identifier to the object.
      * Validates everything, registers a new Identifier, inserts the identifier to object metadata and writes a
      * information to the Database.
+     * @param updateObject if true this method calls {@link MCRMetadataManager#update(MCRBase)}
      * @param obj the object which has to be identified
      * @return the assigned Identifier
      * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
@@ -250,7 +259,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
-    public T register(MCRBase obj, String additional)
+    public T register(MCRBase obj, String additional, boolean updateObject)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
         T identifier = this.registerIdentifier(obj, additional);
@@ -260,15 +269,18 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
         addFlagToObject(obj, databaseEntry);
 
-        if (obj instanceof MCRObject) {
-            MCRMetadataManager.update((MCRObject) obj);
-        } else if (obj instanceof MCRDerivate) {
-            try {
-                MCRMetadataManager.update((MCRDerivate) obj);
-            } catch (IOException e) {
-                throw new MCRPersistentIdentifierException("Error while saving derivate!", e);
+        if(updateObject){
+            if (obj instanceof MCRObject) {
+                MCRMetadataManager.update((MCRObject) obj);
+            } else if (obj instanceof MCRDerivate) {
+                try {
+                    MCRMetadataManager.update((MCRDerivate) obj);
+                } catch (IOException e) {
+                    throw new MCRPersistentIdentifierException("Error while saving derivate!", e);
+                }
             }
         }
+
         return identifier;
     }
 

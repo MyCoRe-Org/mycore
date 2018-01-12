@@ -111,7 +111,7 @@ public class MCRPersistentIdentifierRegistrationResource {
         MCRPersistentIdentifier identifier;
         MCRBase object = MCRMetadataManager.retrieve(mycoreIDObject);
         try {
-            identifier = registrationService.register(object, additional);
+            identifier = registrationService.register(object, additional, true);
         } catch (MCRPersistentIdentifierException | MCRActiveLinkException e) {
             LOGGER.error(e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

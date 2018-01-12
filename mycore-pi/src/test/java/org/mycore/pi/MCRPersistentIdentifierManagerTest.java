@@ -81,7 +81,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         Assert.assertFalse("Register should not have been called!", casted.isRegisterCalled());
         Assert.assertFalse("Update should not have been called!", casted.isUpdatedCalled());
 
-        MCRMockIdentifier identifier = registrationService.register(mcrObject, "");
+        MCRMockIdentifier identifier = registrationService.register(mcrObject, "", true);
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertTrue("The identifier " + identifier.asString() + " should be registered now!",
