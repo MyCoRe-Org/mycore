@@ -62,6 +62,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Comment;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -70,6 +71,9 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -85,13 +89,23 @@ import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.xml.sax.SAXException;
 
 import com.google.gson.stream.JsonWriter;
 
 /**
  * main utility class that handles REST requests
  * 
+ * to filter the XML output of showMCRObject, set the properties:
+ * MCR.RestAPI.v1.Filter.XML
+ *   to your ContentTransformer-ID,
+ * MCR.ContentTransformer.[your ContentTransformer-ID here].Class
+ *   to your ContentTransformer's class and
+ * MCR.ContentTransformer.[your ContentTransformer-ID here].Stylesheet
+ *   to your filtering stylesheet.
+ * 
  * @author Robert Stephan
+ * @author Christoph Neidahl
  * 
  * @version $Revision: $ $Date: $
  */
@@ -109,6 +123,7 @@ public class MCRRestAPIObjectsHelper {
         MCRObject mcrObj = retrieveMCRObject(pathParamId);
         Document doc = mcrObj.createXML();
         Element eStructure = doc.getRootElement().getChild("structure");
+
         if (queryParamStyle != null && !MCRRestAPIObjects.STYLE_DERIVATEDETAILS.equals(queryParamStyle)) {
             throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
                 new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
@@ -146,11 +161,22 @@ public class MCRRestAPIObjectsHelper {
         StringWriter sw = new StringWriter();
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         try {
-            outputter.output(doc, sw);
+            String filter_id = MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.XML","");
+            if (filter_id.length() > 0) {
+                MCRContentTransformer trans = MCRContentTransformerFactory.getTransformer(filter_id);
+                Document filtered_doc = trans.transform(new MCRJDOMContent(doc)).asXML();
+                outputter.output(filtered_doc, sw);
+            } else {
+                outputter.output(doc, sw);
+            }
+        } catch (SAXException | JDOMException e) {
+            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
+                MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to transform MCRContent to XML document", e.getMessage()));
         } catch (IOException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
-                MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to retrieve MyCoRe object", e.getMessage()));
+                MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to retrieve/transform MyCoRe object", e.getMessage()));
         }
+
         String authHeader = MCRJSONWebTokenUtil
             .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         return Response.ok(sw.toString()).type("application/xml").header(HEADER_NAME_AUTHORIZATION, authHeader).build();
@@ -172,7 +198,7 @@ public class MCRRestAPIObjectsHelper {
             StringWriter sw = new StringWriter();
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(doc, sw);
-
+            
             String authHeader = MCRJSONWebTokenUtil
                 .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
             return Response.ok(sw.toString()).type("application/xml").header(HEADER_NAME_AUTHORIZATION, authHeader)
