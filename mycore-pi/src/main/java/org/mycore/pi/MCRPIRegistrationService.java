@@ -229,9 +229,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      */
     public void validateRegistration(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException, MCRAccessException {
-        String type = getType();
-        MCRObjectID id = obj.getId();
-        validateAlreadyCreated(id, additional);
+        validateAlreadyCreated(obj.getId(), additional);
         validatePermission(obj);
     }
 
