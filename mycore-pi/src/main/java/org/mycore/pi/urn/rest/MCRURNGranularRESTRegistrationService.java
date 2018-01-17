@@ -212,13 +212,6 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
             .test(path.getOwnerRelativePath());
     }
 
-    @Override
-    protected void validateAlreadyInscribed(MCRBase obj, String additional, String identType, MCRObjectID id)
-        throws MCRPersistentIdentifierException {
-        //TODO: improve API, don't override method to do nothing
-        LOGGER.info("No incriber in this implementation");
-    }
-
     private List<String> getIgnoreFileList() {
         List<String> ignoreFileNamesList = new ArrayList<>();
         String ignoreFileNames = getProperties().get("IgnoreFileNames");

@@ -178,20 +178,9 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         }
     }
 
-    /**
-     * Validates if a object can get a Identifier assigned from this service! <b>Better call super when overwrite!</b>
-     *
-     * @param obj
-     * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
-     * @throws MCRAccessException               if the user does not have the rights to assign a pi to the specific object
-     */
-    public void validateRegistration(MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException, MCRAccessException {
-        String type = getType();
-        MCRObjectID id = obj.getId();
-        validateAlreadyCreated(id, additional);
-        validateAlreadyInscribed(obj, additional, type, id);
-        validatePermission(obj);
+    public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
+        String json = getGson().toJson(databaseEntry);
+        obj.getService().addFlag(PI_FLAG, json);
     }
 
     protected void validatePermission(MCRBase obj) throws MCRAccessException {
@@ -205,15 +194,6 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         }
     }
 
-    protected void validateAlreadyInscribed(MCRBase obj, String additional, String identType, MCRObjectID id)
-        throws MCRPersistentIdentifierException {
-
-        if (getMetadataManager().getIdentifier(obj, additional).isPresent()) {
-            throw new MCRPersistentIdentifierException(
-                "There is already a " + identType + " in the Object " + id.toString());
-        }
-    }
-
     protected void validateAlreadyCreated(MCRObjectID id, String additional) throws MCRPersistentIdentifierException {
         if (isCreated(id, additional)) {
             throw new MCRPersistentIdentifierException("There is already a registered " + getType() + " for Object "
@@ -221,8 +201,10 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         }
     }
 
-    public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
-        String json = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+    private static Gson getGson() {
+        return new GsonBuilder()
+            .registerTypeAdapter(Date.class, new MCRGsonUTCDateAdapter())
+            .setExclusionStrategies(new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes) {
                 String name = fieldAttributes.getName();
@@ -235,8 +217,22 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
             public boolean shouldSkipClass(Class<?> aClass) {
                 return false;
             }
-        }).create().toJson(databaseEntry);
-        obj.getService().addFlag(PI_FLAG, json);
+            }).create();
+    }
+
+    /**
+     * Validates if an object can get an Identifier assigned from this service! <b>Better call super when overwrite!</b>
+     *
+     * @param obj
+     * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
+     * @throws MCRAccessException               if the user does not have the rights to assign a pi to the specific object
+     */
+    public void validateRegistration(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException, MCRAccessException {
+        String type = getType();
+        MCRObjectID id = obj.getId();
+        validateAlreadyCreated(id, additional);
+        validatePermission(obj);
     }
 
     /**
@@ -373,7 +369,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         MCRBase obj = MCRMetadataManager.retrieve(id);
         MCRObjectService service = obj.getService();
         ArrayList<String> flags = service.getFlags(MCRPIRegistrationService.PI_FLAG);
-        Gson gson = new Gson();
+        Gson gson = getGson();
         String stringFlag = flags.stream().filter(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
             return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());

@@ -50,10 +50,9 @@ import org.xml.sax.SAXException;
  */
 public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigitalObjectIdentifier> {
 
-    public static final Namespace DATACITE_NAMESPACE = Namespace.getNamespace("datacite",
-        "http://datacite.org/schema/kernel-3");
+    private static final String KERNEL_3_NAMESPACE_URI = "http://datacite.org/schema/kernel-3";
 
-    public static final String TEST_PREFIX = "UseTestPrefix";
+    private static final String TEST_PREFIX = "UseTestPrefix";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -71,9 +70,11 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
 
     private static final int MAX_URL_LENGTH = 255;
 
-    private static final String DATACITE_SCHEMA_PATH = "xsd/datacite/metadata.xsd";
+    private static final String DEFAULT_DATACITE_SCHEMA_PATH = "xsd/datacite/v3/metadata.xsd";
 
     private static final String TRANSLATE_PREFIX = "component.pi.register.error.";
+
+    private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
 
     private String username;
 
@@ -85,6 +86,12 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
 
     private String registerURL;
 
+    private String registerURLContext;
+
+    private String schemaPath;
+
+    private Namespace nameSpace;
+
     private boolean useTestPrefix;
 
     public MCRDOIRegistrationService(String serviceID) {
@@ -95,15 +102,24 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         password = properties.get("Password");
         useTestPrefix = properties.containsKey(TEST_PREFIX) && Boolean.valueOf(properties.get(TEST_PREFIX));
         transformer = properties.get("Transformer");
-        this.registerURL = properties.get("RegisterBaseURL");
+        registerURL = properties.get("RegisterBaseURL");
+        schemaPath = properties.getOrDefault("Schema", DEFAULT_DATACITE_SCHEMA_PATH);
+        nameSpace = Namespace.getNamespace("datacite",
+            properties.getOrDefault("Namespace", KERNEL_3_NAMESPACE_URI));
+
+        if (!registerURL.endsWith("/")) {
+            registerURL += "/";
+        }
+
+        registerURLContext = properties.getOrDefault("RegisterURLContext", DEFAULT_CONTEXT_PATH);
         host = "mds.datacite.org";
     }
 
-    private static void insertDOI(Document datacite, MCRDigitalObjectIdentifier doi)
+    private void insertDOI(Document datacite, MCRDigitalObjectIdentifier doi)
         throws MCRPersistentIdentifierException {
         XPathExpression<Element> compile = XPathFactory.instance().compile(
             "//datacite:identifier[@identifierType='DOI']",
-            Filters.element(), null, DATACITE_NAMESPACE);
+            Filters.element(), null, nameSpace);
         List<Element> doiList = compile.evaluate(datacite);
 
         if (doiList.size() > 1) {
@@ -115,23 +131,22 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             doiElement.setText(doi.asString());
         } else {
             // must be 0
-            Element doiElement = new Element("identifier", DATACITE_NAMESPACE);
+            Element doiElement = new Element("identifier", nameSpace);
             datacite.getRootElement().addContent(doiElement);
             doiElement.setAttribute("identifierType", "DOI");
             doiElement.setText(doi.asString());
         }
     }
 
-    private static Schema loadDataciteSchema() throws SAXException {
+    private Schema loadDataciteSchema() throws SAXException {
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
-        URL localSchemaURL = MCRDOIRegistrationService.class.getClassLoader().getResource(DATACITE_SCHEMA_PATH);
+        URL localSchemaURL = MCRDOIRegistrationService.class.getClassLoader().getResource(schemaPath);
 
         if (localSchemaURL == null) {
-            throw new MCRException(DATACITE_SCHEMA_PATH + " was not found!");
+            throw new MCRException(DEFAULT_DATACITE_SCHEMA_PATH + " was not found!");
         }
-        Schema schema = schemaFactory.newSchema(localSchemaURL);
-        return schema;
+        return schemaFactory.newSchema(localSchemaURL);
     }
 
     public boolean usesTestPrefix() {
@@ -180,7 +195,8 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
 
         URI registeredURI;
         try {
-            registeredURI = new URI(this.registerURL + "/receive/" + obj.getId().toString());
+            registeredURI = new URI(
+                this.registerURL + registerURLContext.replaceAll("\\$[iI][dD]", obj.getId().toString()));
             dataciteClient.mintDOI(newDOI, registeredURI);
         } catch (URISyntaxException e) {
             throw new MCRException("Base-URL seems to be invalid!", e);
