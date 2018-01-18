@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi;
+package org.mycore.common;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
