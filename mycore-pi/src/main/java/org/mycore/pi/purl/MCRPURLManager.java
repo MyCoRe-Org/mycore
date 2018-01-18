@@ -55,11 +55,17 @@ import org.w3c.dom.Element;
 public class MCRPURLManager {
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String UTF_8_STR = "UTF-8";
+
+    private static final String ADMIN_PATH = "/admin";
+
+    private static final String PURL_PATH = ADMIN_PATH + "/purl";
+
+    private final Charset UTF_8 = Charset.forName(UTF_8_STR);
+
     private String purlServerBaseURL;
 
     private String cookie = null;
-
-    private final Charset UTF_8 = Charset.forName("UTF-8");
 
     public static void main(String[] args) {
         MCRPURLManager app = new MCRPURLManager();
@@ -86,13 +92,13 @@ public class MCRPURLManager {
         try {
             purlServerBaseURL = purlServerURL;
             // Get Cookie
-            URL url = new URL(purlServerBaseURL + "/admin/login/login.bsh?referrer=/docs/index.html");
+            URL url = new URL(purlServerBaseURL + ADMIN_PATH + "/login/login.bsh?referrer=/docs/index.html");
             conn = (HttpURLConnection) url.openConnection();
             conn.connect();
 
             String headerName = null;
             for (int i = 1; (headerName = conn.getHeaderFieldKey(i)) != null; i++) {
-                if (headerName.equals("Set-Cookie")) {
+                if ("Set-Cookie".equals(headerName)) {
                     cookie = conn.getHeaderField(i);
                     LOGGER.debug("Cookie: " + cookie);
                 }
@@ -100,10 +106,10 @@ public class MCRPURLManager {
             conn.disconnect();
 
             // Login
-            String data = "id=" + URLEncoder.encode(user, "UTF-8");
-            data += "&passwd=" + URLEncoder.encode(password, "UTF-8");
+            String data = "id=" + URLEncoder.encode(user, UTF_8_STR);
+            data += "&passwd=" + URLEncoder.encode(password, UTF_8_STR);
 
-            url = new URL(purlServerBaseURL + "/admin/login/login-submit.bsh");
+            url = new URL(purlServerBaseURL + ADMIN_PATH + "/login/login-submit.bsh");
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Cookie", cookie);
@@ -119,7 +125,7 @@ public class MCRPURLManager {
 
                     String line;
                     while ((line = rd.readLine()) != null) {
-                        if (line.trim().equals("PURL User Login Failure")) {
+                        if ("PURL User Login Failure".equals(line.trim())) {
                             cookie = null;
                             break;
                         }
@@ -131,7 +137,7 @@ public class MCRPURLManager {
 
         } catch (IOException e) {
             if (!e.getMessage().contains(
-                "Server returned HTTP response code: 403 for URL: http://purl.uni-rostock.de/docs/index.html")) {
+                "Server returned HTTP response code: 403 for URL: ")) {
                 LOGGER.error(e);
             }
         } finally {
@@ -147,7 +153,7 @@ public class MCRPURLManager {
     public void logout() {
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(purlServerBaseURL + "/admin/logout?referrer=/docs/index.html");
+            URL url = new URL(purlServerBaseURL + ADMIN_PATH + "/logout?referrer=/docs/index.html");
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Cookie", cookie);
@@ -159,7 +165,7 @@ public class MCRPURLManager {
             LOGGER.debug(url.toString() + " -> " + conn.getResponseCode());
         } catch (IOException e) {
             if (!e.getMessage().contains(
-                "Server returned HTTP response code: 403 for URL: http://purl.uni-rostock.de/docs/index.html")) {
+                "Server returned HTTP response code: 403 for URL: ")) {
                 LOGGER.error(e);
             }
         } finally {
@@ -187,10 +193,10 @@ public class MCRPURLManager {
             // urllib.urlencode(dict(type="410", maintainers="admin"))).read().close() #
             // Create a 410 purl
 
-            URL url = new URL(purlServerBaseURL + "/admin/purl" + purl);
+            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
             LOGGER.debug(url.toString());
 
-            String data = "target=" + URLEncoder.encode(target, "UTF-8");
+            String data = "target=" + URLEncoder.encode(target, UTF_8_STR);
             data += "&maintainers=" + maintainers;
             data += "&type=" + type;
 
@@ -210,18 +216,16 @@ public class MCRPURLManager {
             }
             response = conn.getResponseCode();
 
-            if (response != 200) {
-                if (conn.getErrorStream() != null) {
-                    try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
-                        String line = null;
-                        while ((line = rd.readLine()) != null) {
-                            LOGGER.debug(line);
-                        }
+            if (response != 200 && conn.getErrorStream() != null) {
+                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
+                    String line = null;
+                    while ((line = rd.readLine()) != null) {
+                        LOGGER.debug(line);
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -251,8 +255,9 @@ public class MCRPURLManager {
             // urllib.urlencode(dict(type="410", maintainers="admin"))).read().close() #
             // Create a 410 purl
 
-            String strURL = purlServerBaseURL + "/admin/purl" + purl;
-            strURL += "?target=" + URLEncoder.encode(target, "UTF-8") + "&maintainers=" + maintainers + "&type=" + type;
+            String strURL = purlServerBaseURL + PURL_PATH + purl;
+            strURL +=
+                "?target=" + URLEncoder.encode(target, UTF_8_STR) + "&maintainers=" + maintainers + "&type=" + type;
 
             URL url = new URL(strURL);
             LOGGER.debug(url.toString());
@@ -262,13 +267,11 @@ public class MCRPURLManager {
             conn.setRequestMethod("PUT");
             response = conn.getResponseCode();
 
-            if (response != 200) {
-                if (conn.getErrorStream() != null) {
-                    try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
-                        String line = null;
-                        while ((line = rd.readLine()) != null) {
-                            LOGGER.debug(line);
-                        }
+            if (response != 200 && conn.getErrorStream() != null) {
+                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
+                    String line = null;
+                    while ((line = rd.readLine()) != null) {
+                        LOGGER.debug(line);
                     }
                 }
             }
@@ -292,7 +295,7 @@ public class MCRPURLManager {
         int response = 0;
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(purlServerBaseURL + "/admin/purl" + purl);
+            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
             LOGGER.debug(url.toString());
 
             conn = (HttpURLConnection) url.openConnection();
@@ -300,15 +303,13 @@ public class MCRPURLManager {
             conn.setRequestMethod("DELETE");
             response = conn.getResponseCode();
 
-            if (response != 200) {
-                if (conn.getErrorStream() != null) {
-                    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8));
-                    String line = null;
-                    while ((line = rd.readLine()) != null) {
-                        LOGGER.debug(line);
-                    }
-                    rd.close();
+            if (response != 200 || conn.getErrorStream() != null) {
+                BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8));
+                String line = null;
+                while ((line = rd.readLine()) != null) {
+                    LOGGER.debug(line);
                 }
+                rd.close();
             }
 
             conn.disconnect();
@@ -331,7 +332,7 @@ public class MCRPURLManager {
     public boolean isPURLTargetURLUnchanged(String purl, String targetURL) {
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(purlServerBaseURL + "/admin/purl" + purl);
+            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
             conn = (HttpURLConnection) url.openConnection();
             int response = conn.getResponseCode();
 

@@ -18,6 +18,10 @@
 
 package org.mycore.mods.identifier;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Optional;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -27,13 +31,6 @@ import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.purl.MCRPersistentUniformResourceLocator;
-import org.mycore.pi.urn.MCRDNBURNParser;
-import org.mycore.pi.urn.MCRUniformResourceName;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Objects;
-import java.util.Optional;
 
 public class MCRMODSPURLPersistentIdentifierMetadataManager
     extends MCRPersistentIdentifierMetadataManager<MCRPersistentUniformResourceLocator> {

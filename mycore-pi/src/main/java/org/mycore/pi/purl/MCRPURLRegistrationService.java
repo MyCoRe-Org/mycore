@@ -31,10 +31,6 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
 
     private static final String TYPE = "purl";
 
-    private static final String CONTEXT_PURL = "PURL";
-
-    private static final String CONTEXT_OBJECT = "ObjectID";
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String PURL_SERVER_CONFIG = "Server";
@@ -54,7 +50,7 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
     @Override
     protected MCRPersistentUniformResourceLocator registerIdentifier(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        if (!additional.equals("")) {
+        if (!"".equals(additional)) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
@@ -92,7 +88,8 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
     @Override
     protected void delete(MCRPersistentUniformResourceLocator identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-
+        /* deletion is not supported */
+        throw new MCRPersistentIdentifierException("Delete is not supported for " + getType());
     }
 
     @Override

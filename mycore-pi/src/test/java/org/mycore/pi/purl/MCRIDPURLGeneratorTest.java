@@ -18,6 +18,8 @@
 
 package org.mycore.pi.purl;
 
+import static org.mycore.pi.MCRPIRegistrationService.GENERATOR_CONFIG_PREFIX;
+
 import java.util.Map;
 
 import org.junit.Assert;
@@ -54,11 +56,11 @@ public class MCRIDPURLGeneratorTest extends MCRTestCase {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
 
-        testProperties.put("MCR.PI.Generator." + GENERATOR_1, MCRIDPURLGenerator.class.getName());
-        testProperties.put("MCR.PI.Generator." + GENERATOR_1 + ".BaseURLTemplate", TEST_BASE_1);
+        testProperties.put(GENERATOR_CONFIG_PREFIX + GENERATOR_1, MCRIDPURLGenerator.class.getName());
+        testProperties.put(GENERATOR_CONFIG_PREFIX + GENERATOR_1 + ".BaseURLTemplate", TEST_BASE_1);
 
-        testProperties.put("MCR.PI.Generator." + GENERATOR_2, MCRIDPURLGenerator.class.getName());
-        testProperties.put("MCR.PI.Generator." + GENERATOR_2 + ".BaseURLTemplate", TEST_BASE_2);
+        testProperties.put(GENERATOR_CONFIG_PREFIX + GENERATOR_2, MCRIDPURLGenerator.class.getName());
+        testProperties.put(GENERATOR_CONFIG_PREFIX + GENERATOR_2 + ".BaseURLTemplate", TEST_BASE_2);
 
         return testProperties;
     }
