@@ -910,8 +910,11 @@ public class MCRMetsSave {
      */
     public static String getFileBase(String href) {
         String fileName = Paths.get(href).getFileName().toString();
-        String fileBase = fileName.substring(0, fileName.lastIndexOf("."));
-        return MCRXMLFunctions.toNCNameSecondPart(fileBase);
+        int endIndex = fileName.lastIndexOf(".");
+        if(endIndex != -1) {
+            fileName = fileName.substring(0, endIndex);
+        }
+        return MCRXMLFunctions.toNCNameSecondPart(fileName);
     }
 
     /**
