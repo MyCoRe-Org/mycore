@@ -76,9 +76,9 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         OLD_CLASS_NEW_CLASS_MAPPING.put("MCRURNObjectXPathInscriber", "MCRURNObjectXPathMetadataManager");
     }
 
-    public MCRPIRegistrationService(String registrationServiceID, String identType) {
+    public MCRPIRegistrationService(String registrationServiceID, String identifierType) {
         this.registrationServiceID = registrationServiceID;
-        this.type = identType;
+        this.type = identifierType;
     }
 
     public final String getRegistrationServiceID() {
