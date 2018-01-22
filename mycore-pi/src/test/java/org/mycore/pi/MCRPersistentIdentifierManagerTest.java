@@ -3,15 +3,11 @@ package org.mycore.pi;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
@@ -33,6 +29,11 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
     @Rule
     public TemporaryFolder baseDir = new TemporaryFolder();
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     @Test
     public void testGet() {
@@ -80,7 +81,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
         Assert.assertFalse("Register should not have been called!", casted.isRegisterCalled());
         Assert.assertFalse("Update should not have been called!", casted.isUpdatedCalled());
 
-        MCRMockIdentifier identifier = registrationService.fullRegister(mcrObject, "");
+        MCRMockIdentifier identifier = registrationService.register(mcrObject, "", true);
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertTrue("The identifier " + identifier.asString() + " should be registered now!",
@@ -144,7 +145,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
 
     @Override
     protected Map<String, String> getTestProperties() {
-        HashMap<String, String> configuration = new HashMap<>();
+        Map<String, String> configuration = super.getTestProperties();
 
         configuration.put("MCR.Metadata.Store.BaseDir", baseDir.getRoot().getAbsolutePath());
         try {
@@ -175,5 +176,10 @@ public class MCRPersistentIdentifierManagerTest extends MCRJPATestCase {
             MCRMockIdentifierParser.class.getName());
 
         return configuration;
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 }

@@ -85,7 +85,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     }
 
     @Override
-    public MCRDNBURN fullRegister(MCRBase obj, String filePath)
+    public MCRDNBURN register(MCRBase obj, String filePath, boolean updateObject)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, filePath);
 
@@ -210,13 +210,6 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
             .reduce(Predicate::and)
             .orElseThrow(errorInIgnorList)
             .test(path.getOwnerRelativePath());
-    }
-
-    @Override
-    protected void validateAlreadyInscribed(MCRBase obj, String additional, String identType, MCRObjectID id)
-        throws MCRPersistentIdentifierException {
-        //TODO: improve API, don't override method to do nothing
-        LOGGER.info("No incriber in this implementation");
     }
 
     private List<String> getIgnoreFileList() {

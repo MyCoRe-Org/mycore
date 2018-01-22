@@ -20,6 +20,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRGsonUTCDateAdapter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -43,7 +44,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     public static final String GENERATOR_CONFIG_PREFIX = "MCR.PI.Generator.";
 
-    public static final String METADATA_MANAGER_CONFIG_PREFIX = "MCR.PI.Inscriber.";
+    public static final String METADATA_MANAGER_CONFIG_PREFIX = "MCR.PI.MetadataManager.";
 
     public static final String METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX = "MCR.PI.Inscriber.";
 
@@ -121,11 +122,11 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         className = configuration.getString(metadataManagerPropertyKey, null);
 
         if (className == null) {
-            metadataManagerPropertyKey = METADATA_MANAGER_DEPRECATED_PROPERTY_KEY + metadataManager;
+            metadataManagerPropertyKey = METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX + metadataManager;
             className = configuration.getString(metadataManagerPropertyKey, null);
             if (className == null) {
                 throw new MCRConfigurationException(
-                    "Missing property: " + METADATA_MANAGER_CONFIG_PREFIX + metadataManager);
+                    "Missing property: " + METADATA_MANAGER_CONFIG_PREFIX + metadataManager + " or " + metadataManagerPropertyKey);
             }
 
             LOGGER.warn("You should use {} instead of {}", METADATA_MANAGER_CONFIG_PREFIX + metadataManager,
@@ -178,20 +179,9 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         }
     }
 
-    /**
-     * Validates if a object can get a Identifier assigned from this service! <b>Better call super when overwrite!</b>
-     *
-     * @param obj
-     * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
-     * @throws MCRAccessException               if the user does not have the rights to assign a pi to the specific object
-     */
-    public void validateRegistration(MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException, MCRAccessException {
-        String type = getType();
-        MCRObjectID id = obj.getId();
-        validateAlreadyCreated(id, additional);
-        validateAlreadyInscribed(obj, additional, type, id);
-        validatePermission(obj);
+    public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
+        String json = getGson().toJson(databaseEntry);
+        obj.getService().addFlag(PI_FLAG, json);
     }
 
     protected void validatePermission(MCRBase obj) throws MCRAccessException {
@@ -205,15 +195,6 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         }
     }
 
-    protected void validateAlreadyInscribed(MCRBase obj, String additional, String identType, MCRObjectID id)
-        throws MCRPersistentIdentifierException {
-
-        if (getMetadataManager().getIdentifier(obj, additional).isPresent()) {
-            throw new MCRPersistentIdentifierException(
-                "There is already a " + identType + " in the Object " + id.toString());
-        }
-    }
-
     protected void validateAlreadyCreated(MCRObjectID id, String additional) throws MCRPersistentIdentifierException {
         if (isCreated(id, additional)) {
             throw new MCRPersistentIdentifierException("There is already a registered " + getType() + " for Object "
@@ -221,30 +202,51 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         }
     }
 
-    public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
-        String json = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+    private static Gson getGson() {
+        return new GsonBuilder()
+            .registerTypeAdapter(Date.class, new MCRGsonUTCDateAdapter())
+            .setExclusionStrategies(new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes) {
                 String name = fieldAttributes.getName();
 
                 return Stream.of("mcrRevision", "mycoreID", "id", "mcrVersion")
-                    .filter(field -> field.equals(name))
-                    .findFirst()
-                    .isPresent();
+                    .anyMatch(field -> field.equals(name));
             }
 
             @Override
             public boolean shouldSkipClass(Class<?> aClass) {
                 return false;
             }
-        }).create().toJson(databaseEntry);
-        obj.getService().addFlag(PI_FLAG, json);
+            }).create();
     }
 
     /**
+     * Validates if an object can get an Identifier assigned from this service! <b>Better call super when overwrite!</b>
+     *
+     * @param obj
+     * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
+     * @throws MCRAccessException               if the user does not have the rights to assign a pi to the specific object
+     */
+    public void validateRegistration(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException, MCRAccessException {
+        validateAlreadyCreated(obj.getId(), additional);
+        validatePermission(obj);
+    }
+
+    /**
+     * shorthand for {@link #register(MCRBase, String, boolean)} with update = true
+     */
+    public T register(MCRBase obj, String additional)
+        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        return register(obj,additional,true);
+    }
+
+    /**
+     * Adds a identifier to the object.
      * Validates everything, registers a new Identifier, inserts the identifier to object metadata and writes a
      * information to the Database.
-     *
+     * @param updateObject if true this method calls {@link MCRMetadataManager#update(MCRBase)}
      * @param obj the object which has to be identified
      * @return the assigned Identifier
      * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
@@ -252,7 +254,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
-    public T fullRegister(MCRBase obj, String additional)
+    public T register(MCRBase obj, String additional, boolean updateObject)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
         T identifier = this.registerIdentifier(obj, additional);
@@ -262,15 +264,18 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
         addFlagToObject(obj, databaseEntry);
 
-        if (obj instanceof MCRObject) {
-            MCRMetadataManager.update((MCRObject) obj);
-        } else if (obj instanceof MCRDerivate) {
-            try {
-                MCRMetadataManager.update((MCRDerivate) obj);
-            } catch (IOException e) {
-                throw new MCRPersistentIdentifierException("Error while saving derivate!", e);
+        if(updateObject){
+            if (obj instanceof MCRObject) {
+                MCRMetadataManager.update((MCRObject) obj);
+            } else if (obj instanceof MCRDerivate) {
+                try {
+                    MCRMetadataManager.update((MCRDerivate) obj);
+                } catch (IOException e) {
+                    throw new MCRPersistentIdentifierException("Error while saving derivate!", e);
+                }
             }
         }
+
         return identifier;
     }
 
@@ -363,7 +368,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         MCRBase obj = MCRMetadataManager.retrieve(id);
         MCRObjectService service = obj.getService();
         ArrayList<String> flags = service.getFlags(MCRPIRegistrationService.PI_FLAG);
-        Gson gson = new Gson();
+        Gson gson = getGson();
         String stringFlag = flags.stream().filter(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
             return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
