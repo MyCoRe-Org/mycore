@@ -23,11 +23,6 @@ namespace mycore.viewer.widgets.mets {
 
 
     export class MetsStructureBuilder {
-        constructor(private metsDocument: Document, private tilePathBuilder: (href: string) => string) {
-
-        }
-
-
 
         private static METS_NAMESPACE_URI = "http://www.loc.gov/METS/";
         private static XLINK_NAMESPACE_URI = "http://www.w3.org/1999/xlink";
@@ -36,6 +31,20 @@ namespace mycore.viewer.widgets.mets {
         private static TEI_TRANSLATION = "TeiTranslationHref";
 
         private hrefResolverElement = document.createElement("a");
+
+        private _smLinkMap: MyCoReMap<string, Array<string>>;
+        private _chapterIdMap: MyCoReMap<string, model.StructureChapter>;
+        private _idFileMap: MyCoReMap<string, Element>;
+        private _idPhysicalFileMap: MyCoReMap<string, Element>;
+
+        private _chapterImageMap: MyCoReMap<string, model.StructureImage>;
+        private _imageChapterMap: MyCoReMap<string, model.StructureChapter>;
+        private _metsChapter: model.StructureChapter;
+        private _imageList: Array<model.StructureImage>;
+        private _structureModel: MetsStructureModel;
+        private _idImageMap: MyCoReMap<string, model.StructureImage>;
+        private _improvisationMap: MyCoReMap<string, boolean>;
+        private _imageHrefImageMap: MyCoReMap<string, model.StructureImage>;
 
         private static NS_RESOLVER = {
             lookupNamespaceURI: (nsPrefix: String) => {
@@ -47,25 +56,26 @@ namespace mycore.viewer.widgets.mets {
         };
 
         private static NS_MAP = (() => {
-            var nsMap = new MyCoReMap<string, string>();
+            let nsMap = new MyCoReMap<string, string>();
             nsMap.set("mets", MetsStructureBuilder.METS_NAMESPACE_URI);
             nsMap.set("xlink", MetsStructureBuilder.XLINK_NAMESPACE_URI);
             return nsMap;
         })();
 
+        constructor(private metsDocument: Document, private tilePathBuilder: (href: string) => string) {
+
+        }
+
         public processMets(): model.StructureModel {
-            var logicalStructMap = this.getStructMap("LOGICAL");
-            var physicalStructMap = this.getStructMap("PHYSICAL");
-            var files = this.getFiles("IVIEW2");
+            let files = this.getFiles("IVIEW2");
 
             if (files.length == 0) {
                 files = this.getFiles("MASTER");
             }
 
-            var altoFiles = this.getFiles("ALTO");
-            var teiTranscriptionFiles = this.getFiles("TRANSCRIPTION");
-            var teiTranslationFiles = this.getFiles("TRANSLATION");
-
+            let altoFiles = this.getFiles("ALTO");
+            let teiTranscriptionFiles = this.getFiles("TRANSCRIPTION");
+            let teiTranslationFiles = this.getFiles("TRANSLATION");
 
             this._chapterIdMap = new MyCoReMap<string, model.StructureChapter>();
             this._idFileMap = this.getIdFileMap(files);
@@ -75,36 +85,40 @@ namespace mycore.viewer.widgets.mets {
                 this._idFileMap.mergeIn(this.getIdFileMap(altoFiles));
             }
 
-            if(teiTranscriptionFiles != null){
+            if (teiTranscriptionFiles != null) {
                 this._idFileMap.mergeIn(this.getIdFileMap(teiTranscriptionFiles))
             }
 
-            if(teiTranslationFiles != null){
+            if (teiTranslationFiles != null) {
                 this._idFileMap.mergeIn(this.getIdFileMap(teiTranslationFiles))
             }
 
+            this._smLinkMap = new MyCoReMap<string, Array<string>>();
             this._chapterImageMap = new MyCoReMap<string, model.StructureImage>();
             this._imageChapterMap = new MyCoReMap<string, model.StructureChapter>();
             this._improvisationMap = new MyCoReMap<string, boolean>(); // see makeLink
-            this._metsChapter = this.processChapter(null, this.getFirstElementChild(<Element>this.getStructMap("LOGICAL")), 1);
+            this._metsChapter = this.processChapter(null,
+                this.getFirstElementChild(<Element>this.getStructMap("LOGICAL")));
             this._imageHrefImageMap = new MyCoReMap<string, model.StructureImage>();
-            this._imageList = new Array<model.StructureImage>();
+            this._imageList = [];
 
             this._idImageMap = new MyCoReMap<string, model.StructureImage>();
             this.processImages();
 
-            this._structureModel = new widgets.mets.MetsStructureModel( this._metsChapter,
-                    this._imageList,
-                    this._chapterImageMap,
-                    this._imageChapterMap,
-                    this._imageHrefImageMap,
-                    altoFiles != null && altoFiles.length > 0 );
+            this._structureModel = new widgets.mets.MetsStructureModel(
+                this._smLinkMap,
+                this._metsChapter,
+                this._imageList,
+                this._chapterImageMap,
+                this._imageChapterMap,
+                this._imageHrefImageMap,
+                altoFiles != null && altoFiles.length > 0);
 
             return this._structureModel;
         }
 
         public getStructMap(type: string): Node {
-            var logicalStructMapPath = "//mets:structMap[@TYPE='" + type + "']";
+            let logicalStructMapPath = "//mets:structMap[@TYPE='" + type + "']";
             return singleSelectShim(this.metsDocument, logicalStructMapPath, MetsStructureBuilder.NS_MAP);
         }
 
@@ -114,21 +128,19 @@ namespace mycore.viewer.widgets.mets {
          * return the files a Array of nodes
          */
         public getFiles(group: string): Array<Node> {
-            var fileGroupPath = "//mets:fileSec//mets:fileGrp[@USE='" + group + "']";
-            var fileSectionResult = singleSelectShim(this.metsDocument, fileGroupPath, MetsStructureBuilder.NS_MAP);
+            let fileGroupPath = "//mets:fileSec//mets:fileGrp[@USE='" + group + "']";
+            let fileSectionResult = singleSelectShim(this.metsDocument, fileGroupPath, MetsStructureBuilder.NS_MAP);
+            let nodeArray: Array<Node> = [];
             if (fileSectionResult != null) {
-                var nodeArray:Array<Node> = XMLUtil.nodeListToNodeArray(fileSectionResult.childNodes);
-            } else {
-                nodeArray = new Array<Node>();
+                nodeArray = XMLUtil.nodeListToNodeArray(fileSectionResult.childNodes);
             }
-
             return nodeArray;
         }
 
         public getStructLinks(): Array<Element> {
-            var structLinkPath = "//mets:structLink";
-            var structLinkResult: Node = singleSelectShim(this.metsDocument, structLinkPath, MetsStructureBuilder.NS_MAP);
-            var nodeArray: Array<Element> = new Array();
+            let structLinkPath = "//mets:structLink";
+            let structLinkResult: Node = singleSelectShim(this.metsDocument, structLinkPath, MetsStructureBuilder.NS_MAP);
+            let nodeArray: Array<Element> = [];
 
             XMLUtil.iterateChildNodes(structLinkResult, (currentChild: Node) => {
                 if (currentChild instanceof Element || "getAttribute" in currentChild) {
@@ -139,38 +151,23 @@ namespace mycore.viewer.widgets.mets {
             return nodeArray;
         }
 
-        private _chapterIdMap: MyCoReMap<string, model.StructureChapter>;
-        private _idFileMap: MyCoReMap<string, Element>;
-        private _idPhysicalFileMap: MyCoReMap<string, Element>;
-
-        private _chapterImageMap: MyCoReMap<string, model.StructureImage>;
-        private _imageChapterMap: MyCoReMap<string, model.StructureChapter>;
-        private _metsChapter: model.StructureChapter;
-        private _imageList: Array<model.StructureImage>;
-        private _structureModel: MetsStructureModel;
-        private _idImageMap: MyCoReMap<string, model.StructureImage>;
-        private _improvisationMap:MyCoReMap<string, boolean>;
-        private _imageHrefImageMap:MyCoReMap<string, model.StructureImage>;
-
-        private processChapter(parent: model.StructureChapter, chapter: Element, defaultOrder:number): model.StructureChapter {
-            if(chapter.nodeName.toString() == "mets:mptr"){
-                    return;
+        private processChapter(parent: model.StructureChapter, chapter: Element): model.StructureChapter {
+            if (chapter.nodeName.toString() == "mets:mptr") {
+                return;
             }
 
-            var chapterObject = new model.StructureChapter(parent, chapter.getAttribute("TYPE"), chapter.getAttribute("ID"), chapter.getAttribute("LABEL"));
-            var chapterChildren = chapter.childNodes;
+            let chapterObject = new model.StructureChapter(parent, chapter.getAttribute("TYPE"), chapter.getAttribute("ID"), chapter.getAttribute("LABEL"));
+            let chapterChildren = chapter.childNodes;
 
             this._chapterIdMap.set(chapterObject.id, chapterObject);
 
-            var that = this;
-            for (var i = 0; i < chapterChildren.length; i++) {
-                var elem = chapterChildren[i];
+            for (let i = 0; i < chapterChildren.length; i++) {
+                let elem = chapterChildren[i];
                 if ((elem instanceof Element || "getAttribute" in elem)) {
-
                     if (elem.nodeName.indexOf("fptr") != -1) {
                         this.processFPTR(chapterObject, <Element>elem);
                     } else if (elem.nodeName.indexOf("div")) {
-                        chapterObject.chapter.push(that.processChapter(chapterObject, <Element>elem, i+1));
+                        chapterObject.chapter.push(this.processChapter(chapterObject, <Element>elem));
                     }
                 }
 
@@ -179,14 +176,13 @@ namespace mycore.viewer.widgets.mets {
             return chapterObject;
         }
 
-        private processFPTR(parent:model.StructureChapter, fptrElem:Element) {
-            var elem = this.getFirstElementChild(fptrElem);
+        private processFPTR(parent: model.StructureChapter, fptrElem: Element) {
+            let elem = this.getFirstElementChild(fptrElem);
 
             if (elem.nodeName.indexOf("seq")) {
-                XMLUtil.iterateChildNodes(elem, (child:Node)=> {
+                XMLUtil.iterateChildNodes(elem, (child: Node) => {
                     if ((child instanceof Element || "getAttribute" in child)) {
-                        var elem = <Element>child;
-                        this.parseArea(parent, elem);
+                        this.parseArea(parent, <Element>child);
                     }
                 });
             } else if (elem.nodeName.indexOf("area")) {
@@ -194,39 +190,41 @@ namespace mycore.viewer.widgets.mets {
             }
         }
 
-        private parseArea(parent:model.StructureChapter, area:Element) {
+        private parseArea(parent: model.StructureChapter, area: Element) {
             // create blocklist if not exist
-            let blockList:Array<{fileId:string;fromId:string;toId:string}>;
+            let blockList: Array<{ fileId: string; fromId: string; toId: string }>;
             if (!parent.additional.has("blocklist")) {
-                blockList = new Array<{fileId:string;fromId:string;toId:string}>();
+                blockList = [];
                 parent.additional.set("blocklist", blockList);
             } else {
                 blockList = parent.additional.get("blocklist");
             }
             let fileID = area.getAttribute("FILEID");
-            if(fileID == null) {
+            if (fileID == null) {
                 throw `@FILEID of mets:area is required but not set!`;
             }
-            let href:string = this.getAttributeNs(this.getFirstElementChild(this._idFileMap.get(fileID)), "xlink", "href");
-            if(href == null) {
+            let href: string = this.getAttributeNs(this.getFirstElementChild(this._idFileMap.get(fileID)), "xlink", "href");
+            if (href == null) {
                 throw `couldn't find href of @FILEID in mets:area! ${fileID}`;
             }
-            let blockEntry:any = {
+            let blockEntry: any = {
                 fileId: href
             };
             let beType = area.getAttribute("BETYPE");
             if (beType == "IDREF") {
                 blockEntry.fromId = area.getAttribute("BEGIN");
                 blockEntry.toId = area.getAttribute("END");
+            } else {
+                console.warn("mets:area/@FILEID='" + href + "' has no BETYPE attribute");
             }
             blockList.push(blockEntry);
         }
 
         private getIdFileMap(fileGrpChildren: Array<Node>): MyCoReMap<string, Element> {
-            var map = new MyCoReMap<string, Element>();
+            let map = new MyCoReMap<string, Element>();
             fileGrpChildren.forEach((node: Node, childrenIndex: Number) => {
                 if (node instanceof Element || "getAttribute" in node) {
-                    var element: Element = <Element> node;
+                    let element: Element = <Element> node;
                     map.set(element.getAttribute("ID"), element);
                 }
             });
@@ -234,13 +232,13 @@ namespace mycore.viewer.widgets.mets {
         }
 
         private getIdPhysicalFileMap(): MyCoReMap<string, Element> {
-            var map = new MyCoReMap<string, Element>();
-            var physicalStructMap = <Element>this.getStructMap("PHYSICAL");
+            let map = new MyCoReMap<string, Element>();
+            let physicalStructMap = <Element>this.getStructMap("PHYSICAL");
 
-            var metsDivs = this.getFirstElementChild(physicalStructMap).childNodes;
+            let metsDivs = this.getFirstElementChild(physicalStructMap).childNodes;
 
-            for (var i = 0; i < metsDivs.length; i++) {
-                var child = <Element>metsDivs[i];
+            for (let i = 0; i < metsDivs.length; i++) {
+                let child = <Element>metsDivs[i];
                 if ("getAttribute" in child) {
                     map.set(child.getAttribute("ID"), child);
                 }
@@ -268,30 +266,29 @@ namespace mycore.viewer.widgets.mets {
         private processImages() {
             let count = 1;
             this._idPhysicalFileMap.forEach((k: string, v: Element) => {
-                var physFileDiv = this._idPhysicalFileMap.get(k);
-                var image = this.parseFile(physFileDiv, count++);
+                let physFileDiv = this._idPhysicalFileMap.get(k);
+                let image = this.parseFile(physFileDiv, count++);
                 this._imageList.push(image);
                 this._idImageMap.set(k, image);
             });
 
-            this._imageList = this._imageList.sort((x, y)=>x.order - y.order);
+            this._imageList = this._imageList.sort((x, y) => x.order - y.order);
 
             this.makeLinks();
 
             this._imageList = this._imageList.filter((el => this._imageChapterMap.has(el.id)));
-            this._imageList.forEach((image, i)=> {
+            this._imageList.forEach((image, i) => {
                 // fix order
-                image.order = i + 1
+                image.order = i + 1;
                 // build href map
                 this._imageHrefImageMap.set(image.href, image);
             });
         }
 
         private makeLinks() {
-            var structLinkChildren = this.getStructLinks();
-            structLinkChildren.forEach((elem: Element) => {
-                var chapterId = this.getAttributeNs(elem, "xlink", "from");
-                var physFileId = this.getAttributeNs(elem, "xlink", "to");
+            this.getStructLinks().forEach((elem: Element) => {
+                let chapterId = this.getAttributeNs(elem, "xlink", "from");
+                let physFileId = this.getAttributeNs(elem, "xlink", "to");
                 this.makeLink(this._chapterIdMap.get(chapterId), this._idImageMap.get(physFileId));
             });
         }
@@ -310,40 +307,45 @@ namespace mycore.viewer.widgets.mets {
             if (!this._imageChapterMap.has(image.id)) {
                 this._imageChapterMap.set(image.id, chapter);
             }
+
+            if (!this._smLinkMap.has(chapter.id)) {
+                this._smLinkMap.set(chapter.id, []);
+            }
+            this._smLinkMap.get(chapter.id).push(image.href);
         }
 
         // tei/translation.de/THULB_129846422_1801_1802_LLZ_001_18010701_001.xml -> de
-        private extractTranslationLanguage(href:string):string {
+        private extractTranslationLanguage(href: string): string {
             return href.split("/")[1].split(".")[1];
         }
 
-        private parseFile(physFileDiv:Element, defaultOrder:number):model.StructureImage {
-            var img: model.StructureImage;
-            var type: string = physFileDiv.getAttribute("TYPE");
-            var id: string = physFileDiv.getAttribute("ID");
-            var order: number = parseInt(physFileDiv.getAttribute("ORDER") || ""+defaultOrder, 10);
-            var orderLabel: string = physFileDiv.getAttribute("ORDERLABEL");
-            var contentIds:string = physFileDiv.getAttribute("CONTENTIDS");
-            var additionalHrefs = new MyCoReMap<string, string>();
+        private parseFile(physFileDiv: Element, defaultOrder: number): model.StructureImage {
+            let img: model.StructureImage;
+            let type: string = physFileDiv.getAttribute("TYPE");
+            let id: string = physFileDiv.getAttribute("ID");
+            let order: number = parseInt(physFileDiv.getAttribute("ORDER") || "" + defaultOrder, 10);
+            let orderLabel: string = physFileDiv.getAttribute("ORDERLABEL");
+            let contentIds: string = physFileDiv.getAttribute("CONTENTIDS");
+            let additionalHrefs = new MyCoReMap<string, string>();
 
 
-            var imgHref:string = null;
-            var imgMimeType:string = null;
-            this.hrefResolverElement.href ="./";
-            var base = this.hrefResolverElement.href;
+            let imgHref: string = null;
+            let imgMimeType: string = null;
+            this.hrefResolverElement.href = "./";
+            let base = this.hrefResolverElement.href;
 
-            XMLUtil.iterateChildNodes(physFileDiv, (child)=> {
+            XMLUtil.iterateChildNodes(physFileDiv, (child) => {
                 if (child instanceof Element || "getAttribute" in child) {
-                    var childElement = <Element>child;
-                    var fileId = childElement.getAttribute("FILEID");
-                    var file = this._idFileMap.get(fileId);
-                    var href:string = this.getAttributeNs(this.getFirstElementChild(file), "xlink", "href");
-                    var mimetype:string = file.getAttribute("MIMETYPE");
+                    let childElement = <Element>child;
+                    let fileId = childElement.getAttribute("FILEID");
+                    let file = this._idFileMap.get(fileId);
+                    let href: string = this.getAttributeNs(this.getFirstElementChild(file), "xlink", "href");
+                    let mimetype: string = file.getAttribute("MIMETYPE");
 
                     this.hrefResolverElement.href = href;
                     href = this.hrefResolverElement.href.substr(base.length);
 
-                    var use = (<Element>file.parentNode).getAttribute("USE");
+                    let use = (<Element>file.parentNode).getAttribute("USE");
                     if (use == "MASTER" || use == "IVIEW2") {
                         imgHref = href;
                         imgMimeType = mimetype;
@@ -360,17 +362,15 @@ namespace mycore.viewer.widgets.mets {
             });
 
 
-
             // TODO: Fix in mycore (we need a valid URL)
             if (imgHref.indexOf("http:") + imgHref.indexOf("file:") + imgHref.indexOf("urn:") != -3) {
-                var parser = document.createElement('a');
+                let parser = document.createElement('a');
                 parser.href = imgHref;
                 imgHref = parser.pathname;
             }
 
-            var that = this;
             return new model.StructureImage(type, id, order, orderLabel, imgHref, imgMimeType, (cb) => {
-                cb(that.tilePathBuilder(imgHref));
+                cb(this.tilePathBuilder(imgHref));
             }, additionalHrefs, contentIds);
         }
     }

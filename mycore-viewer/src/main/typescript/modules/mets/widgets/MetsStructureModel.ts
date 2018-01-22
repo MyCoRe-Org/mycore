@@ -20,7 +20,9 @@ namespace mycore.viewer.widgets.mets {
 
     export class MetsStructureModel extends model.StructureModel {
 
-        constructor(_rootChapter:model.StructureChapter,
+        constructor(
+                public smLinkMap: MyCoReMap<string, Array<string>>,
+                _rootChapter:model.StructureChapter,
                 _imageList:Array<model.StructureImage>,
                 _chapterToImageMap:MyCoReMap<string,model.StructureImage>,
                 _imageToChapterMap:MyCoReMap<string,model.StructureChapter>,
