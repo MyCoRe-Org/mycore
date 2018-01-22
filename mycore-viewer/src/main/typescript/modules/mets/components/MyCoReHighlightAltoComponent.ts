@@ -30,7 +30,7 @@ namespace mycore.viewer.components {
     export class MyCoReHighlightAltoComponent extends ViewerComponent {
         private pageLayout:widgets.canvas.PageLayout = null;
         private highlightLayer:widgets.canvas.HighlightAltoChapterCanvasPageLayer = new widgets.canvas.HighlightAltoChapterCanvasPageLayer();
-        private _model:model.StructureModel;
+        private _model:widgets.mets.MetsStructureModel;
         private _altoChapterContainer:AltoChapterContainer = null;
 
         private selectedChapter:string = null;
@@ -132,7 +132,7 @@ namespace mycore.viewer.components {
         public handle(e:mycore.viewer.widgets.events.ViewerEvent) {
             if (e.type == events.MetsLoadedEvent.TYPE) {
                 let mle = <events.MetsLoadedEvent> e;
-                this._model = mle.mets.model;
+                this._model = <widgets.mets.MetsStructureModel>mle.mets.model;
                 if (!this.isEnabled) {
                     return;
                 }
@@ -230,30 +230,24 @@ namespace mycore.viewer.components {
 
         private _loadedPages:any = {};
 
-        constructor(private _model:model.StructureModel) {
-            this._model.chapterToImageMap.keys.forEach(chapterId => {
+        constructor(private _model:widgets.mets.MetsStructureModel) {
+            this._model.smLinkMap.forEach((chapterId, linkedImages) => {
                 this.chapters.set(chapterId, new AltoChapter(chapterId));
-            });
-            let blocklistChapters:Array<model.StructureChapter> = this.getAllBlocklistChapters(this._model.rootChapter);
-            this._model.imageList.forEach(image => {
-                let chaptersOfPage:Array<string> = this.pageChapterMap.get(image.href);
-                if (chaptersOfPage == null) {
-                    chaptersOfPage = [];
-                    this.pageChapterMap.set(image.href, chaptersOfPage);
+                for(let imageHref of linkedImages) {
+                    if(!this.pageChapterMap.has(imageHref)) {
+                        this.pageChapterMap.set(imageHref, []);
+                    }
+                    this.pageChapterMap.get(imageHref).push(chapterId);
                 }
-                let altoHref:string = image.additionalHrefs.get("AltoHref");
-                blocklistChapters.filter(chapter => {
-                    return this.getAreaListOfChapter(chapter).some(metsArea => {
-                        return metsArea.altoRef === altoHref;
-                    });
-                }).forEach(chapter => {
-                    chaptersOfPage.push(chapter.id);
-                });
             });
         }
 
-        getAreaListOfChapter(chapter:model.StructureChapter) {
-            return chapter.additional.get("blocklist").map((block:{ fileId:string, fromId:string, toId:string }) => {
+        getAreaListOfChapter(chapter:model.StructureChapter):Array<MetsArea> {
+            let blocklist = chapter.additional.get("blocklist");
+            if(blocklist == null) {
+                return [];
+            }
+            return blocklist.map((block:{ fileId:string, fromId:string, toId:string }) => {
                 return new MetsArea(block.fileId, block.fromId, block.toId);
             });
         }
@@ -340,13 +334,42 @@ namespace mycore.viewer.components {
         }
     }
 
+    /**
+     * Contains the bounding box paragraph information for a chapter.
+     */
     export class AltoChapter {
 
-        public boundingBoxMap:MyCoReMap<string, Array<Rect>>;
+        /**
+         * Map of the original mets:area's read from the mets.xml for this chapter.
+         *
+         * key: image (e.g. ThULB_129489832_1941_Perthes_0034.tif)
+         * value: array of MetsArea's which are assigned to this chapter on the specific page (image)
+         */
+        public metsAreas:MyCoReMap<string, Array<MetsArea>>;
 
+        /**
+         * Map of rectangles's for a given page. Those rectangles's are calculated using the original mets:area's when
+         * adding a page. Each area has a BEGIN and END attribute containing a range of combined paragraphs e.g.
+         * Paragraph_3 to Paragraph_6 (so paragraph 3,4,5 and 6). Each paragraph is converted to a rectangle and those
+         * rectangles are stored in this map (a small padding is added too).
+         *
+         * Important note: Those ALTO paragraph bounding boxes are created when adding a page and never changed after.
+         * They will be used to calculate the bounding box of the whole chapter and for intersection tests.
+         *
+         * key: image (e.g. ThULB_129489832_1941_Perthes_0034.tif)
+         * value: array of rectangles where each rectangle is the bounding box of a ALTO paragraph (+ small padding)
+         */
         public altoRectMap:MyCoReMap<string, Array<Rect>>;
 
-        public metsAreas:MyCoReMap<string, Array<MetsArea>>;
+        /**
+         * Map of rectangles's for a given page. Those rectangles define the bounding box of an AltoChapter for one
+         * page. This map is calculated in the AltoChapterContainer#addPage method using multiple steps (including
+         * maximize(), fixBoundingBox(), fixIntersections(), cutVerticalBoundingBox() and fixEmptyAreas()).
+         *
+         * key: image (e.g. ThULB_129489832_1941_Perthes_0034.tif)
+         * value: array of rectangles
+         */
+        public boundingBoxMap:MyCoReMap<string, Array<Rect>>;
 
         constructor(public chapterId:string) {
             this.boundingBoxMap = new MyCoReMap<string, Array<Rect>>();
@@ -372,7 +395,10 @@ namespace mycore.viewer.components {
             });
         }
 
-        public fixBoundingBox(pageId:string, rect:Rect):boolean {
+        public fixBoundingBox(pageId:string, rect:Rect) {
+            if(rect == null) {
+                return;
+            }
             let thisBoundingBox = this.boundingBoxMap.get(pageId);
             for (let thisBBRect of thisBoundingBox) {
                 if(!thisBBRect.intersectsArea(rect) || this.intersectsText(pageId, rect)) {
@@ -382,9 +408,7 @@ namespace mycore.viewer.components {
                 thisBBRect.difference(rect).forEach(rect => thisBoundingBox.push(rect));
                 this.boundingBoxMap.set(pageId, thisBoundingBox);
                 this.fixBoundingBox(pageId, rect);
-                return true;
             }
-            return false;
         }
 
         /**
