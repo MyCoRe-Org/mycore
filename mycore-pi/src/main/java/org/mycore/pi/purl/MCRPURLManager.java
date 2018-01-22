@@ -61,21 +61,13 @@ public class MCRPURLManager {
 
     private static final String PURL_PATH = ADMIN_PATH + "/purl";
 
+    private static final String COOKIE_HEADER_PARAM = "Cookie";
+
     private final Charset UTF_8 = Charset.forName(UTF_8_STR);
 
     private String purlServerBaseURL;
 
     private String cookie = null;
-
-    public static void main(String[] args) {
-        MCRPURLManager app = new MCRPURLManager();
-        // app.run();
-        System.out.println(app.registerNewPURL("/test/vzg/mycore", "http://www.mycore.org", "302", "test"));
-        System.out.println(app.updateExistingPURL("/test/vzg/mycore", "http://www.mycore.de", "302", "test"));
-        // --> try your newly registered PURL:
-        // http://purl.uni-rostock.de/test/vzg/google/mycore
-        app.logout();
-    }
 
     /**
      * sets the session cookie, if the login was successful
@@ -112,13 +104,13 @@ public class MCRPURLManager {
             url = new URL(purlServerBaseURL + ADMIN_PATH + "/login/login-submit.bsh");
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Cookie", cookie);
+            conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
 
             conn.setDoOutput(true);
             try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8)) {
                 wr.write(data);
                 wr.flush();
-                LOGGER.debug(url.toString() + " -> " + conn.getResponseCode());
+                LOGGER.error(url.toString() + " -> " + conn.getResponseCode());
 
                 // Get the response
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), UTF_8))) {
@@ -156,7 +148,7 @@ public class MCRPURLManager {
             URL url = new URL(purlServerBaseURL + ADMIN_PATH + "/logout?referrer=/docs/index.html");
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Cookie", cookie);
+            conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
 
             conn.setDoOutput(true);
             try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8)) {
@@ -205,7 +197,7 @@ public class MCRPURLManager {
             // Send data
 
             conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Cookie", cookie);
+            conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
             conn.setRequestMethod("POST");
 
             conn.setDoOutput(true);
@@ -216,11 +208,11 @@ public class MCRPURLManager {
             }
             response = conn.getResponseCode();
 
-            if (response != 200 && conn.getErrorStream() != null) {
+            if (response != 200 && conn.getErrorStream() != null && Logger.) {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
                     String line = null;
                     while ((line = rd.readLine()) != null) {
-                        LOGGER.debug(line);
+                        LOGGER.error(line);
                     }
                 }
             }
@@ -263,7 +255,7 @@ public class MCRPURLManager {
             LOGGER.debug(url.toString());
 
             conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Cookie", cookie);
+            conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
             conn.setRequestMethod("PUT");
             response = conn.getResponseCode();
 
@@ -271,7 +263,7 @@ public class MCRPURLManager {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
                     String line = null;
                     while ((line = rd.readLine()) != null) {
-                        LOGGER.debug(line);
+                        LOGGER.error(line);
                     }
                 }
             }
@@ -299,7 +291,7 @@ public class MCRPURLManager {
             LOGGER.debug(url.toString());
 
             conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Cookie", cookie);
+            conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
             conn.setRequestMethod("DELETE");
             response = conn.getResponseCode();
 
@@ -307,7 +299,7 @@ public class MCRPURLManager {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8));
                 String line = null;
                 while ((line = rd.readLine()) != null) {
-                    LOGGER.debug(line);
+                    LOGGER.error(line);
                 }
                 rd.close();
             }
