@@ -88,7 +88,7 @@ public class MCRPURLManager {
             conn = (HttpURLConnection) url.openConnection();
             conn.connect();
 
-            String headerName = null;
+            String headerName;
             for (int i = 1; (headerName = conn.getHeaderFieldKey(i)) != null; i++) {
                 if ("Set-Cookie".equals(headerName)) {
                     cookie = conn.getHeaderField(i);
@@ -208,9 +208,9 @@ public class MCRPURLManager {
             }
             response = conn.getResponseCode();
 
-            if (response != 200 && conn.getErrorStream() != null && Logger.) {
+            if (response != 200 && conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
-                    String line = null;
+                    String line;
                     while ((line = rd.readLine()) != null) {
                         LOGGER.error(line);
                     }
@@ -259,7 +259,7 @@ public class MCRPURLManager {
             conn.setRequestMethod("PUT");
             response = conn.getResponseCode();
 
-            if (response != 200 && conn.getErrorStream() != null) {
+            if (response != 200 && conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
                     String line = null;
                     while ((line = rd.readLine()) != null) {
@@ -295,7 +295,7 @@ public class MCRPURLManager {
             conn.setRequestMethod("DELETE");
             response = conn.getResponseCode();
 
-            if (response != 200 || conn.getErrorStream() != null) {
+            if (response != 200 || conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8));
                 String line = null;
                 while ((line = rd.readLine()) != null) {
@@ -303,8 +303,6 @@ public class MCRPURLManager {
                 }
                 rd.close();
             }
-
-            conn.disconnect();
         } catch (Exception e) {
             LOGGER.error(e);
         } finally {
