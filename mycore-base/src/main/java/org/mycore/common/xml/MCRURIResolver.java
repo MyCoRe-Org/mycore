@@ -159,22 +159,15 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static MCRResolverProvider getExternalResolverProvider() {
-        String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class",
-            null);
-        final MCRResolverProvider emptyResolver = HashMap::new;
-        if (externalClassName == null) {
-            return emptyResolver;
-        }
-        try {
-            Class<?> cl = Class.forName(externalClassName);
-            return (MCRResolverProvider) cl.newInstance();
-        } catch (ClassNotFoundException e) {
-            LOGGER.warn("Could not find external Resolver class", e);
-            return emptyResolver;
-        } catch (InstantiationException | IllegalAccessException e) {
-            LOGGER.warn("Could not instantiate external Resolver class", e);
-            return emptyResolver;
-        }
+        return Optional.ofNullable(MCRConfiguration.instance().getClass(CONFIG_PREFIX + "ExternalResolver.Class", null))
+            .map(c -> {
+                try {
+                    return (MCRResolverProvider) c.newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    LOGGER.warn("Could not instantiate external Resolver class", e);
+                    return null;
+                }
+            }).orElse(HashMap::new);
     }
 
     private HashMap<String, URIResolver> getResolverMapping() {

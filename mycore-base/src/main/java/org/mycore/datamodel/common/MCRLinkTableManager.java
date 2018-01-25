@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -70,7 +69,7 @@ public class MCRLinkTableManager {
     // logger
     static Logger LOGGER = LogManager.getLogger();
 
-    private MCRLinkTableInterface persistenceclass = null;
+    private MCRLinkTableInterface linkTableInstance = null;
 
     /**
      * Returns the link table manager singleton.
@@ -89,20 +88,8 @@ public class MCRLinkTableManager {
      * The constructor of this class.
      */
     protected MCRLinkTableManager() {
-        MCRConfiguration config = MCRConfiguration.instance();
-
         // Load the persistence class
-        String persistclassname = config.getString("MCR.Persistence.LinkTable.Store.Class");
-
-        try {
-            persistenceclass = (MCRLinkTableInterface) Class.forName(persistclassname).newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new MCRException(persistclassname + " ClassNotFoundException");
-        } catch (IllegalAccessException e) {
-            throw new MCRException(persistclassname + " IllegalAccessException");
-        } catch (InstantiationException e) {
-            throw new MCRException(persistclassname + " InstantiationException");
-        }
+        linkTableInstance = MCRConfiguration.instance().getInstanceOf("MCR.Persistence.LinkTable.Store.Class");
     }
 
     /**
@@ -156,7 +143,7 @@ public class MCRLinkTableManager {
         LOGGER.debug("Link in table {} add for {}<-->{} with {} and {}", type, from, to, type, attr);
 
         try {
-            persistenceclass.create(from, to, type, attr);
+            linkTableInstance.create(from, to, type, attr);
         } catch (Exception e) {
             LOGGER.warn("An error occured while adding a dataset from the reference link table, adding not succesful.",
                 e);
@@ -187,7 +174,7 @@ public class MCRLinkTableManager {
         }
 
         try {
-            persistenceclass.delete(from, null, null);
+            linkTableInstance.delete(from, null, null);
         } catch (Exception e) {
             LOGGER.warn("An error occured while deleting a dataset from the" + from
                     + " reference link table, deleting could be not succesful.", e);
@@ -211,7 +198,7 @@ public class MCRLinkTableManager {
             return;
         }
         try {
-            persistenceclass.delete(from, to, type);
+            linkTableInstance.delete(from, to, type);
         } catch (Exception e) {
             LOGGER.warn("An error occured while deleting a dataset from the"
                 + " reference link table, deleting is not succesful.", e);
@@ -244,7 +231,7 @@ public class MCRLinkTableManager {
         }
 
         try {
-            return persistenceclass.countTo(null, to, null, null);
+            return linkTableInstance.countTo(null, to, null, null);
         } catch (Exception e) {
             LOGGER.warn("An error occured while searching for references of " + to + ".", e);
         }
@@ -270,10 +257,10 @@ public class MCRLinkTableManager {
 
         try {
             if (types != null && types.length > 0) {
-                return Stream.of(types).mapToInt(type -> persistenceclass.countTo(null, myTo.get(), type, restriction))
+                return Stream.of(types).mapToInt(type -> linkTableInstance.countTo(null, myTo.get(), type, restriction))
                              .sum();
             }
-            return persistenceclass.countTo(null, myTo.get(), null, restriction);
+            return linkTableInstance.countTo(null, myTo.get(), null, restriction);
         } catch (Exception e) {
             LOGGER.warn("An error occured while searching for references of " + to + ".", e);
             return 0;
@@ -290,7 +277,7 @@ public class MCRLinkTableManager {
      * @return a Map with key=categID and value=counted number of references
      */
     public Map<String, Number> countReferenceCategory(String classid) {
-        return persistenceclass.getCountedMapOfMCRTO(classid);
+        return linkTableInstance.getCountedMapOfMCRTO(classid);
     }
 
     /**
@@ -332,7 +319,7 @@ public class MCRLinkTableManager {
         }
 
         try {
-            return persistenceclass.getSourcesOf(to, null);
+            return linkTableInstance.getSourcesOf(to, null);
         } catch (Exception e) {
             LOGGER.warn("An error occured while searching for references to " + to + ".", e);
             return Collections.emptyList();
@@ -374,7 +361,7 @@ public class MCRLinkTableManager {
         }
 
         try {
-            return persistenceclass.getSourcesOf(to, type);
+            return linkTableInstance.getSourcesOf(to, type);
         } catch (Exception e) {
             LOGGER.warn("An error occured while searching for references to " + to + " with " + type + ".", e);
             return Collections.emptyList();
@@ -399,7 +386,7 @@ public class MCRLinkTableManager {
         LinkedList<String> ll = new LinkedList<>();
         try {
             for (String singleTo : to) {
-                ll.addAll(persistenceclass.getSourcesOf(singleTo, type));
+                ll.addAll(linkTableInstance.getSourcesOf(singleTo, type));
             }
             return ll;
         } catch (Exception e) {
@@ -444,7 +431,7 @@ public class MCRLinkTableManager {
         }
 
         try {
-            return persistenceclass.getDestinationsOf(from, type);
+            return linkTableInstance.getDestinationsOf(from, type);
         } catch (Exception e) {
             LOGGER.warn("An error occured while searching for references from " + from + ".", e);
             return Collections.emptyList();

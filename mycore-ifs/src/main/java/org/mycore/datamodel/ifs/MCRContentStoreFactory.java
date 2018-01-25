@@ -161,26 +161,10 @@ public class MCRContentStoreFactory {
             EXTENDER_CLASSES = new Hashtable<>();
         }
 
-        String storeClass = "MCR.IFS.AVExtender." + storeID + CLASS_SUFFIX;
-
-        String value = MCRConfiguration.instance().getString(storeClass, "");
-
-        if (value.equals("")) {
-            return null;
-        }
-
-        if (!EXTENDER_CLASSES.containsKey(storeID)) {
-            try {
-                @SuppressWarnings("unchecked")
-                Class<MCRAudioVideoExtender> cl = (Class<MCRAudioVideoExtender>) Class.forName(value);
-                EXTENDER_CLASSES.put(storeID, cl);
-            } catch (Exception ex) {
-                String msg = "Could not load AudioVideoExtender class " + value;
-                throw new MCRConfigurationException(msg, ex);
-            }
-        }
-
-        return EXTENDER_CLASSES.get(storeID);
+        return EXTENDER_CLASSES.computeIfAbsent(storeID, key -> {
+            String storeClass = "MCR.IFS.AVExtender." + key + CLASS_SUFFIX;
+            return MCRConfiguration.instance().getClass(storeClass, null);
+        });
     }
 
     /**

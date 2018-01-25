@@ -46,21 +46,16 @@ public abstract class MCRIIIFPresentationImpl {
         }
 
         String classPropertyName = MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName;
-        String className = MCRConfiguration.instance().getString(classPropertyName);
+        Class<MCRIIIFPresentationImpl> classObject = MCRConfiguration.instance().getClass(classPropertyName);
 
         try {
-            @SuppressWarnings("unchecked")
-            Class<MCRIIIFPresentationImpl> classObject = (Class<MCRIIIFPresentationImpl>) Class.forName(className);
             Constructor<MCRIIIFPresentationImpl> constructor = classObject.getConstructor(String.class);
             MCRIIIFPresentationImpl presentationImpl = constructor.newInstance(implName);
             implHolder.put(implName, presentationImpl);
             return presentationImpl;
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + className + ") not found: " + classPropertyName, e);
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException(
-                "Configurated class (" + className + ") needs a string constructor: " + classPropertyName);
+                "Configurated class (" + classObject.getName() + ") needs a string constructor: " + classPropertyName);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new MCRException(e);
         }

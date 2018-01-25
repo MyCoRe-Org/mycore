@@ -369,21 +369,14 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("Configuration property missing: " + name);
         }
 
-        return this.loadClass(classname);
+        return this.instantiateClass(classname);
     }
 
-    <T> T loadClass(String classname) {
+    <T> T instantiateClass(String classname) {
         LogManager.getLogger().debug("Loading Class: {}", classname);
 
         T o = null;
-        Class<? extends T> cl;
-        try {
-            @SuppressWarnings("unchecked")
-            Class<? extends T> forName = (Class<? extends T>) Class.forName(classname);
-            cl = forName;
-        } catch (ClassNotFoundException ex) {
-            throw new MCRConfigurationException("Could not load class " + classname, ex);
-        }
+        Class<? extends T> cl = getClassObject(classname);
 
         try {
             try {
@@ -418,6 +411,16 @@ public class MCRConfiguration {
         return o;
     }
 
+    private static <T> Class<? extends T> getClassObject(String classname) {
+        try {
+            @SuppressWarnings("unchecked")
+            Class<? extends T> forName = (Class<? extends T>) Class.forName(classname.trim());
+            return forName;
+        } catch (ClassNotFoundException ex) {
+            throw new MCRConfigurationException("Could not load class.", ex);
+        }
+    }
+
     /**
      * Returns a new instance of the class specified in the configuration property with the given name.
      *
@@ -435,7 +438,40 @@ public class MCRConfiguration {
             return defaultObj;
         }
 
-        return this.loadClass(classname);
+        return this.instantiateClass(classname);
+    }
+
+    /**
+     * Loads a Java Class defined in property <code>name</code>.
+     * @param name Name of the property
+     * @param <T> Supertype of class defined in <code>name</code>
+     * @return non null Class asignable to <code>&lt;T&gt;</code>
+     * @throws MCRConfigurationException if property is not defined or class could not be loaded
+     */
+    public <T> Class<T> getClass(String name) throws MCRConfigurationException{
+        String className=getString(name).trim();
+        try {
+            @SuppressWarnings("unchecked")
+            Class<T> loaded= (Class<T>) Class.forName(className);
+            return loaded;
+        } catch (ClassNotFoundException e) {
+            throw new MCRConfigurationException("Could not load class defined in property "+name, e);
+        }
+    }
+
+    /**
+     * Loads a Java Class defined in property <code>name</code>.
+     * @param name Name of the property
+     * @param defaultClass default value if property is not defined
+     * @param <T> Supertype of class defined in <code>name</code>
+     * @return non null Class asignable to <code>&lt;T&gt;</code>
+     */
+    public <T> Class<T> getClass(String name, Class<? extends T> defaultClass){
+        try {
+            return getClass(name);
+        } catch (MCRConfigurationException e) {
+            return (Class<T>)defaultClass;
+        }
     }
 
     /**

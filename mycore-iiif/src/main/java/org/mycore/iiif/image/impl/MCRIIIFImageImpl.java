@@ -53,21 +53,16 @@ public abstract class MCRIIIFImageImpl {
         }
 
         String classPropertyName = MCR_IIIF_IMAGE_CONFIG_PREFIX + implName;
-        String className = MCRConfiguration.instance().getString(classPropertyName);
+        Class<MCRIIIFImageImpl> classObject = MCRConfiguration.instance().getClass(classPropertyName);
 
         try {
-            @SuppressWarnings("unchecked")
-            Class<MCRIIIFImageImpl> classObject = (Class<MCRIIIFImageImpl>) Class.forName(className);
             Constructor<MCRIIIFImageImpl> constructor = classObject.getConstructor(String.class);
             MCRIIIFImageImpl imageImpl = constructor.newInstance(implName);
             implHolder.put(implName, imageImpl);
             return imageImpl;
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + className + ") not found: " + classPropertyName, e);
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException(
-                "Configurated class (" + className + ") needs a string constructor: " + classPropertyName);
+                "Configurated class (" + classObject.getName() + ") needs a string constructor: " + classPropertyName);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new MCRException(e);
         }
