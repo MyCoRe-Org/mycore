@@ -42,8 +42,8 @@
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
     <hibernate.version>5.2.10.Final</hibernate.version>
     <hk2.version>2.5.0-b31</hk2.version>
-    <httpcomponents.version>4.5.3</httpcomponents.version>
-    <httpcore.version>4.4.6</httpcore.version>
+    <httpcomponents.version>4.5.5</httpcomponents.version>
+    <httpcore.version>4.4.9</httpcore.version>
     <java.target.version>1.8</java.target.version>
     <jersey.version>2.25</jersey.version>
     <jetty.version>9.3.14.v20161028</jetty.version>
@@ -178,7 +178,7 @@
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
               <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-              <link>http://lucene.apache.org/solr/6_1_0/solr-solrj/</link>
+              <link>http://lucene.apache.org/solr/7_2_1/solr-solrj/</link>
             </links>
           </configuration>
         </plugin>
@@ -567,7 +567,7 @@
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
                 <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-                <link>http://lucene.apache.org/solr/6_1_0/solr-solrj/</link>
+                <link>http://lucene.apache.org/solr/7_2_1/solr-solrj/</link>
               </links>
             </configuration>
             <reportSets>
@@ -867,7 +867,7 @@
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>6.6.0</version>
+        <version>7.2.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>

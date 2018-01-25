@@ -93,10 +93,11 @@ public class MCRSolrCore {
         int socketTimeout = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "SolrClient.SocketTimeout");
 
         // default server
-        solrClient = new HttpSolrClient.Builder(coreURL).build();
+        solrClient = new HttpSolrClient.Builder(coreURL)
+            .withConnectionTimeout(connectionTimeout)
+            .withSocketTimeout(socketTimeout)
+            .build();
         solrClient.setRequestWriter(new BinaryRequestWriter());
-        solrClient.setConnectionTimeout(connectionTimeout);
-        solrClient.setSoTimeout(socketTimeout);
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
             int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
@@ -104,11 +105,11 @@ public class MCRSolrCore {
                 .getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
             concurrentClient = new ConcurrentUpdateSolrClient.Builder(coreURL)
                 .withQueueSize(queueSize)
+                .withConnectionTimeout(connectionTimeout)
+                .withSocketTimeout(socketTimeout)
                 .withThreadCount(threadCount)
                 .build();
             concurrentClient.setRequestWriter(new BinaryRequestWriter());
-            concurrentClient.setConnectionTimeout(connectionTimeout);
-            concurrentClient.setSoTimeout(socketTimeout);
         }
         // shutdown handler
         MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
@@ -130,10 +131,6 @@ public class MCRSolrCore {
     }
 
     public synchronized void shutdown() {
-        int shutdownSocketTimeout = MCRConfiguration.instance()
-            .getInt(CONFIG_PREFIX + "SolrClient.ShutdownSocketTimeout");
-        solrClient.setSoTimeout(shutdownSocketTimeout);
-        concurrentClient.setSoTimeout(shutdownSocketTimeout);
         try {
             shutdownGracefully(solrClient);
             solrClient = null;
