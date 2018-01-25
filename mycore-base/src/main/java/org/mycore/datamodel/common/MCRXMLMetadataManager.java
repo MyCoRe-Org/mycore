@@ -183,14 +183,9 @@ public class MCRXMLMetadataManager {
         baseDir = new File(base);
         checkDir(baseDir, "base");
 
-        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass",
+        Class<?> impl = config.getClassOf("MCR.Metadata.Store.DefaultClass",
             "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
-        Class<?> impl;
-        try {
-            impl = Class.forName(defaultClass);
-        } catch (ClassNotFoundException e) {
-            throw new MCRException("Could not load default class " + defaultClass);
-        }
+        defaultClass = impl.getName();
         if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
             try {
                 String svnBaseValue = config.getString("MCR.Metadata.Store.SVNBase");
