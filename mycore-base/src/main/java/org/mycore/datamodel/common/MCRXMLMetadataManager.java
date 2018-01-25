@@ -103,7 +103,7 @@ public class MCRXMLMetadataManager {
     /**
      * The default IFS2 Metadata store class to use, set by MCR.Metadata.Store.DefaultClass
      */
-    private String defaultClass;
+    private Class defaultClass;
 
     /**
      * The default subdirectory slot layout for IFS2 metadata store, is 4-2-2 for 8-digit IDs,
@@ -178,15 +178,8 @@ public class MCRXMLMetadataManager {
         baseDir = new File(base);
         checkDir(baseDir, "base");
 
-        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass",
-            "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
-        Class<?> impl;
-        try {
-            impl = Class.forName(defaultClass);
-        } catch (ClassNotFoundException e) {
-            throw new MCRException("Could not load default class " + defaultClass);
-        }
-        if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
+        defaultClass = config.getClass("MCR.Metadata.Store.DefaultClass", MCRVersioningMetadataStore.class);
+        if (MCRVersioningMetadataStore.class.isAssignableFrom(defaultClass)) {
             try {
                 String svnBaseValue = config.getString("MCR.Metadata.Store.SVNBase");
                 if (!svnBaseValue.endsWith("/")) {
@@ -289,18 +282,12 @@ public class MCRXMLMetadataManager {
         IllegalAccessException {
         MCRConfiguration config = MCRConfiguration.instance();
         String baseID = getStoryKey(project, objectType);
-        String clazz = config.getString(configPrefix + "Class", null);
+        Class clazz = config.getClass(configPrefix + "Class", null);
         if (clazz == null) {
-            config.set(configPrefix + "Class", defaultClass);
+            config.set(configPrefix + "Class", defaultClass.getName());
             clazz = defaultClass;
         }
-        Class<? extends MCRStore> impl;
-        try {
-            impl = (Class<? extends MCRStore>) Class.forName(clazz);
-        } catch (ClassNotFoundException e) {
-            throw new MCRException("Could not load class " + clazz + " for " + baseID);
-        }
-        if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
+        if (MCRVersioningMetadataStore.class.isAssignableFrom(clazz)) {
             String property = configPrefix + "SVNRepositoryURL";
             String svnURL = config.getString(property, null);
             if (svnURL == null) {
@@ -330,7 +317,7 @@ public class MCRXMLMetadataManager {
         config.set(configPrefix + "ForceXML", true);
         config.set(configPrefix + "ForceDocType", objectType.equals("derivate") ? "mycorederivate" : "mycoreobject");
         createdStores.add(baseID);
-        MCRStoreManager.createStore(baseID, impl);
+        MCRStoreManager.createStore(baseID, clazz);
     }
 
     private void throwStoreDirException(File dir, String project, String objectType, String configPrefix) {
