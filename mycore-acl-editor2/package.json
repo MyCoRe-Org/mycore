@@ -10,7 +10,7 @@
     "grunt-newer": "^0.7.0",
     "grunt-svninfo": "^0.1.4",
     "bootstrap-3-typeahead": "4.0.0",
-    "select2": "3.4.3",
+    "select2": "3.5.1",
     "jquery-stupid-table": "https://github.com/eckstueck/Stupid-Table-Plugin.git"
   },
   "author": "Michel Buechner <michel.buechner@uni-jena.de>",
