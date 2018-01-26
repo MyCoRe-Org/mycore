@@ -15,7 +15,7 @@
 
     <html>
       <head>
-        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 
         <xsl:choose>
           <xsl:when test="xml/properties/property[@name='mobile'] = 'true'">
