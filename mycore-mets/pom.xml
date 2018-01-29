@@ -35,10 +35,10 @@
         <executions>
           <execution>
             <id>editor jasmine tests</id>
-            <phase>test</phase>
             <goals>
               <goal>grunt</goal>
             </goals>
+            <phase>test</phase>
             <configuration>
               <arguments>jasmine</arguments>
               <failOnError>true</failOnError>
