@@ -40,7 +40,6 @@ namespace org.mycore.mets.controller {
     import MCRMetsSimpleModel = org.mycore.mets.model.simple.MCRMetsSimpleModel;
     import StructureSetElement = org.mycore.mets.model.StructureSetElement;
     import MCRMetsPage = org.mycore.mets.model.simple.MCRMetsPage;
-
     import StateEngine = org.mycore.mets.model.state.StateEngine;
     import SectionTypeChange = org.mycore.mets.model.state.SectionTypeChange;
     import SectionLabelChange = org.mycore.mets.model.state.SectionLabelChange;
@@ -55,11 +54,19 @@ namespace org.mycore.mets.controller {
      * The SectionController can be used to display and edit MCRMetsSection.
      */
     export class SectionController {
-        constructor(private $scope: any, i18nModel, structureSet: Array<StructureSetElement>, private $timeout) {
+        public section: MCRMetsSection = null;
+        public edit: any = {type : '', label : null};
+        private i18nModel: any;
+        private structureSet: StructureSetElement[];
+        private stateEngine: StateEngine = null;
+        private simpleModel: MCRMetsSimpleModel;
+        private editorModel: MetsEditorModel;
+
+        constructor(private $scope: any, i18nModel: any, structureSet: StructureSetElement[], private $timeout: any) {
             this.structureSet = structureSet;
             this.i18nModel = i18nModel;
 
-            $scope.$on("editSection", (event, data) => {
+            $scope.$on('editSection', (event, data) => {
                 if (data.section === this.section) {
                     this.startEditLabel();
                 }
@@ -68,19 +75,9 @@ namespace org.mycore.mets.controller {
             this.registerEventHandler($scope);
         }
 
-        private i18nModel;
-        private structureSet: Array<StructureSetElement>;
-
-        private stateEngine: StateEngine = null;
-
-        public section: MCRMetsSection = null;
-        public edit = {type : "", label : null};
-        private simpleModel: MCRMetsSimpleModel;
-        private editorModel: MetsEditorModel;
-
         public init(section: MCRMetsSection, editorModel: MetsEditorModel) {
-            if (typeof section === "undefined" || !(section instanceof MCRMetsSection)) {
-                throw `section is invalid : ${section}`;
+            if (typeof section === 'undefined' || !(section instanceof MCRMetsSection)) {
+                throw new Error(`section is invalid : ${section}`);
             }
 
             this.editorModel = editorModel;
@@ -106,7 +103,6 @@ namespace org.mycore.mets.controller {
                     this.edit.label = null;
                     break;
                 default :
-                    break;
             }
         }
 
@@ -123,10 +119,10 @@ namespace org.mycore.mets.controller {
         public clickAddSection(clickEvent: JQueryMouseEventObject) {
             clickEvent.stopPropagation();
 
-            const newCreatedSection = new MCRMetsSection(MCRMetsSection.createRandomId(), this.structureSet[ 0 ].id, "new");
+            const newCreatedSection = new MCRMetsSection(MCRMetsSection.createRandomId(), this.structureSet[ 0 ].id, 'new');
             const sectionAddChange = new SectionAddChange(newCreatedSection, this.section);
             this.stateEngine.changeModel(sectionAddChange);
-            this.$scope.$emit("AddedSection", <SectionAdded> {
+            this.$scope.$emit('AddedSection', {
                 parent : this.section,
                 addedSection : newCreatedSection
             });
@@ -139,35 +135,13 @@ namespace org.mycore.mets.controller {
         }
 
         public isDeletable() {
-            return this.section !== null && typeof this.section !== "undefined" && this.section.parent !== null;
+            return this.section !== null && typeof this.section !== 'undefined' && this.section.parent !== null;
         }
-
-        private startEditLabel() {
-            this.edit.label = this.section.label || this.i18nModel[ "noOrderLabel" ];
-            this.$scope.$emit("EditLabelStart", <EditLabelStarted> {
-                ofSection : this.section
-            });
-        }
-
-        private registerEventHandler($scope) {
-            $scope.$on("startEditLabel", (event, data: StartEditLabel) => {
-                if (data.ofSection === this.section) {
-                    this.startEditLabel();
-                }
-            });
-        }
-
-        private editInit($event) {
-            /**/
-        }
-
 
         public getPageChildren() {
-
-            let indexLookup = {};
+            const indexLookup = {};
             this.section.linkedPages.forEach((element) => {
-                const index = this.simpleModel.metsPageList.indexOf(element);
-                indexLookup[ element.id ] = index;
+                indexLookup[ element.id ] = this.simpleModel.metsPageList.indexOf(element);
             });
 
             return this.section.linkedPages.sort((page1, page2) => {
@@ -201,7 +175,7 @@ namespace org.mycore.mets.controller {
                 return true;
             }
 
-            for (let cur in curChild.metsSectionList) {
+            for (const cur in curChild.metsSectionList) {
                 if (this.childHasLink(curChild.metsSectionList[ cur ], page)) {
                     return true;
                 }
@@ -213,7 +187,7 @@ namespace org.mycore.mets.controller {
         public link() {
             let change: ModelChange;
 
-            let changes = this.getNotLinkedFromSelection(this.section).map((page) => {
+            const changes = this.getNotLinkedFromSelection(this.section).map((page) => {
                 return new AddSectionLinkChange(this.section, page);
             });
 
@@ -234,8 +208,7 @@ namespace org.mycore.mets.controller {
                 if (linkedPageIndex >= 0) {
                     return linkedPageIndex >= 0;
                 }
-                for (let csi in s.metsSectionList) {
-                    const cs = s.metsSectionList[ csi ];
+                for (const cs of s.metsSectionList) {
                     const has = hasLink(cs, p);
                     if (has) {
                         return true;
@@ -254,6 +227,24 @@ namespace org.mycore.mets.controller {
         public getAlternateOrderlabel(page: MCRMetsPage) {
             return this.editorModel.metsModel.metsPageList.indexOf(page) + 1;
         }
+
+        private startEditLabel() {
+            this.edit.label = this.section.label || this.i18nModel.noOrderLabel;
+            this.$scope.$emit('EditLabelStart', {
+                ofSection : this.section
+            });
+        }
+
+        private registerEventHandler($scope: any) {
+            $scope.$on('startEditLabel', (event: any, data: StartEditLabel) => {
+                if (data.ofSection === this.section) {
+                    this.startEditLabel();
+                }
+            });
+        }
+
+        private editInit($event: any) {
+            /**/
+        }
     }
 }
-

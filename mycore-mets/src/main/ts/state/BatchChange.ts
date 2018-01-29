@@ -18,7 +18,7 @@
 
 namespace org.mycore.mets.model.state {
     export class BatchChange extends ModelChange {
-        constructor(private changes: Array<ModelChange>) {
+        constructor(private changes: ModelChange[]) {
             super();
         }
 
@@ -39,7 +39,7 @@ namespace org.mycore.mets.model.state {
         }
 
         public getDescription(messages: any): string {
-            return this.changes.map((change) => change.getDescription(messages)).join("; ");
+            return this.changes.map((change) => change.getDescription(messages)).join('; ');
         }
     }
 }

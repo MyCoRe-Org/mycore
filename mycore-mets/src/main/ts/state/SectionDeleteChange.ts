@@ -22,20 +22,18 @@
 
 namespace org.mycore.mets.model.state {
     export class SectionDeleteChange extends ModelChange {
+        private insertPosition: number = null;
+        private parent: simple.MCRMetsSection;
+        private deleteLabel: string;
+        private parentLabel: string;
+        private subChanges: ModelChange[] = [];
+
         constructor(private sectionToDelete: simple.MCRMetsSection) {
             super();
             this.parent = this.sectionToDelete.parent;
             this.deleteLabel = sectionToDelete.label;
             this.parentLabel = this.parent.label;
         }
-
-        private insertPosition: number = null;
-        private parent: simple.MCRMetsSection;
-
-        private deleteLabel: string;
-        private parentLabel: string;
-
-        private subChanges: Array<ModelChange> = new Array();
 
         public doChange() {
             // remove child sections first
@@ -60,8 +58,8 @@ namespace org.mycore.mets.model.state {
         }
 
         public getDescription(messages: any): string {
-            const description = messages[ "SectionDeleteDescription" ] || "???SectionDeleteDescription??? {toDelete} {parent}";
-            return description.replace("{toDelete}", this.deleteLabel).replace("{parent}", this.parentLabel);
+            const description = messages.SectionDeleteDescription || '???SectionDeleteDescription??? {toDelete} {parent}';
+            return description.replace('{toDelete}', this.deleteLabel).replace('{parent}', this.parentLabel);
         }
     }
 }

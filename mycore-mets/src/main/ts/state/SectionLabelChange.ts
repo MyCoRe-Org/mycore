@@ -21,12 +21,12 @@
 
 namespace org.mycore.mets.model.state {
     export class SectionLabelChange extends ModelChange {
+        private from: string;
+
         constructor(private section: simple.MCRMetsSection, private to: string, from?: string) {
             super();
             this.from = from || this.section.label;
         }
-
-        private from: string;
 
         public doChange() {
             this.section.label = this.to;
@@ -37,8 +37,8 @@ namespace org.mycore.mets.model.state {
         }
 
         public getDescription(messages: any): string {
-            let description = messages[ "SectionLabelChangeDescription" ] || "???SectionLabelChangeDescription??? {from} {to}";
-            return description.replace("{from}", this.from).replace("{to}", this.to);
+            const description = messages.SectionLabelChangeDescription || '???SectionLabelChangeDescription??? {from} {to}';
+            return description.replace('{from}', this.from).replace('{to}', this.to);
         }
     }
 }

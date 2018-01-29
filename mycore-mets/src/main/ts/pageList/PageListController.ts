@@ -26,11 +26,17 @@ namespace org.mycore.mets.controller {
 
     export class PageListController {
 
-        constructor(ngDraggable, private timeout, modal, hotkeys, i18NModel) {
+        public thumbnails: boolean = false;
+        public editable: boolean;
+        private messages: string[];
+        private model: MetsEditorModel;
+        private prevent: boolean = true;
+
+        constructor(ngDraggable: any, private timeout: any, modal: any, hotkeys: any, i18NModel: any) {
             this.messages = i18NModel.messages;
             hotkeys.add({
-                combo : "up",
-                description : "",
+                combo : 'up',
+                description : '',
                 callback : () => {
                     const pageSelection = this.model.pageSelection;
                     if (pageSelection.from === null) {
@@ -45,8 +51,8 @@ namespace org.mycore.mets.controller {
             });
 
             hotkeys.add({
-                combo : "down",
-                description : "",
+                combo : 'down',
+                description : '',
                 callback : () => {
                     const pageSelection = this.model.pageSelection;
                     if (pageSelection.from === null) {
@@ -61,14 +67,7 @@ namespace org.mycore.mets.controller {
             });
         }
 
-        private messages: Array<string>;
-        private model: MetsEditorModel;
-        private prevent = true;
-
-        public thumbnails: boolean = false;
-        public editable: boolean;
-
-        public init(model: MetsEditorModel, editable: boolean = true, thumbnails = false) {
+        public init(model: MetsEditorModel, editable: boolean = true, thumbnails: boolean = false) {
             this.model = model;
             this.editable = editable;
             this.thumbnails = thumbnails;
@@ -99,15 +98,14 @@ namespace org.mycore.mets.controller {
             return this.model.metsModel.metsPageList.filter(selectedPageFilter);
         }
 
-        public pageClicked(page, event) {
-
+        public pageClicked(page: model.simple.MCRMetsPage, event: any) {
             // prevent selection
             if (this.prevent) {
                 this.prevent = false;
                 return;
             }
 
-            if (angular.element(event.target).is("[type='text']")) {
+            if (angular.element(event.target).is('[type=\'text\']')) {
                 return;
             }
 
@@ -127,7 +125,7 @@ namespace org.mycore.mets.controller {
                 // used shift key
                 if (this.model.pageSelection.from < pageIndex && pageIndex < this.model.pageSelection.to) {
                     // user clicked in range
-                    if (this.model.pageSelection.lastExpand === "top") {
+                    if (this.model.pageSelection.lastExpand === 'top') {
                         this.model.pageSelection.from = pageIndex;
                     } else {
                         this.model.pageSelection.to = pageIndex;
@@ -137,47 +135,44 @@ namespace org.mycore.mets.controller {
                     if (this.model.pageSelection.from > pageIndex) {
                         // user clicked above selection
                         this.model.pageSelection.from = pageIndex;
-                        this.model.pageSelection.lastExpand = "top";
+                        this.model.pageSelection.lastExpand = 'top';
                     } else {
                         // user clicked under selection
                         this.model.pageSelection.to = pageIndex;
-                        this.model.pageSelection.lastExpand = "bottom";
+                        this.model.pageSelection.lastExpand = 'bottom';
                     }
                 }
             }
         }
 
-        dropSuccess(element, position, data, event) {
+        public dropSuccess(element: any, position: any, data: any, event: any) {
             const metsPageList = this.model.metsModel.metsPageList;
 
-            if (typeof this.model.pageSelection === "undefined" ||
+            if (typeof this.model.pageSelection === 'undefined' ||
                 this.model.pageSelection === null ||
                 this.model.pageSelection.from === null ||
                 this.model.pageSelection.to === null ||
                 (!(this.model.pageSelection.from in metsPageList)) ||
                 (!(this.model.pageSelection.to in metsPageList))
             ) {
-                throw new Error("invalid selection!");
+                throw new Error('invalid selection!');
             }
 
             const fromPage = metsPageList[ this.model.pageSelection.from ];
             const toPage = metsPageList[ this.model.pageSelection.to ];
 
             const range = {from : fromPage, to : toPage};
-            const target = {before : position === "before", element : element};
-            console.log(`range  { from: ${fromPage.orderLabel}, to: ${toPage.orderLabel}  }`);
-            console.log(`target { before: ${target.before}, element: ${target.element.orderLabel}}`);
+            const target = {before : position === 'before', element : element};
 
             this.model.stateEngine.changeModel(new PagesMoveChange(metsPageList, range, target));
 
             this.model.pageSelection.from = this.model.pageSelection.to = null;
         }
 
-        public onDragComplete(data, event) {
+        public onDragComplete(data: any, event: any) {
             // workarround because click is triggered before drop success
             this.prevent = true;
         }
 
     }
 }
-

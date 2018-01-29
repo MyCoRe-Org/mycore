@@ -37,45 +37,45 @@ namespace org.mycore.mets.controller {
      * You nee to call the init method.
      */
     export class MCRTreeController {
-        constructor(private $scope,
-                    i18nModel,
-                    ngDraggable,
-                    private $modal,
+        public treeModel: MetsEditorTreeModel;
+        private privateChildFieldName: string;
+        private privateParentFieldName: string;
+        private privateErrorModal: any;
+        private messageModel: any;
+        private metsConfiguration: MetsEditorConfiguration;
+        private stateEngine: StateEngine;
+        private simpleModel: MCRMetsSimpleModel;
+        private editorModel: MetsEditorModel;
+
+        constructor(private $scope: any,
+                    i18nModel: any,
+                    ngDraggable: any,
+                    private $modal: any,
                     editorConfiguration: MetsEditorConfiguration) {
             this.treeModel = new MetsEditorTreeModel();
             this.messageModel = i18nModel;
             this.metsConfiguration = editorConfiguration;
         }
 
-        private privateChildFieldName: string;
-        private privateParentFieldName: string;
-        private privateErrorModal: any;
-        private messageModel;
-        private metsConfiguration: MetsEditorConfiguration;
-        public treeModel: MetsEditorTreeModel;
-        private stateEngine: StateEngine;
-        private simpleModel: MCRMetsSimpleModel;
-        private editorModel: MetsEditorModel;
-
         public init(root: any, childFieldName: string, parentFieldName: string, metsEditorModel: MetsEditorModel) {
-            if (typeof root === "undefined" || root === null) {
-                throw `invalid
+            if (typeof root === 'undefined' || root === null) {
+                throw new Error(`invalid
                 root
                 parameter
                 ${root}
-            `;
-            } else if (typeof childFieldName === "undefined" || childFieldName === null || childFieldName === "") {
-                throw `invalid
+            `);
+            } else if (typeof childFieldName === 'undefined' || childFieldName === null || childFieldName === '') {
+                throw new Error(`invalid
                 childFieldName
                 parameter
                 ${childFieldName}
-            `;
-            } else if (typeof parentFieldName === "undefined" || parentFieldName === null || parentFieldName === "") {
-                throw `invalid
+            `);
+            } else if (typeof parentFieldName === 'undefined' || parentFieldName === null || parentFieldName === '') {
+                throw new Error(`invalid
                 parentFieldName
                 parameter
                 ${parentFieldName}
-            `;
+            `);
             }
 
             this.treeModel.root = root;
@@ -102,14 +102,14 @@ namespace org.mycore.mets.controller {
             this.treeModel.setElementOpen(element, !this.treeModel.getElementOpen(element));
         }
 
-        public buildDropTarget(element: any, position): DropTarget {
+        public buildDropTarget(element: any, position: any): DropTarget {
             return new DropTarget(element, position);
         }
 
         public dropSuccess(target: DropTarget, sourceElement: MCRMetsSection, event: JQueryEventObject) {
             let realTargetElement;
 
-            if (target.position === "after" || target.position === "before") {
+            if (target.position === 'after' || target.position === 'before') {
                 realTargetElement = target.element[ this.privateParentFieldName ];
             } else {
                 realTargetElement = target.element;
@@ -121,16 +121,16 @@ namespace org.mycore.mets.controller {
 
             if (!this.checkConsistent(realTargetElement, sourceElement) && target.element) {
                 const options = {
-                    templateUrl : "error/modal.html",
-                    controller : "ErrorModalController",
-                    size : "lg"
+                    templateUrl : 'error/modal.html',
+                    controller : 'ErrorModalController',
+                    size : 'lg'
                 };
 
                 this.privateErrorModal = this.$modal.open(options);
                 this.privateErrorModal.errorModel = new org.mycore.mets.model.ErrorModalModel(
-                    this.messageModel.messages[ "errorMoveChildTitle" ] || "???errorMoveChildTitle???",
-                    this.messageModel.messages[ "errorMoveChildMessage" ] || "???errorMoveChildMessage???",
-                    this.metsConfiguration.resources + "img/move_parent_to_child.png"
+                    this.messageModel.messages.errorMoveChildTitle || '???errorMoveChildTitle???',
+                    this.messageModel.messages.errorMoveChildMessage || '???errorMoveChildMessage???',
+                    this.metsConfiguration.resources + 'img/move_parent_to_child.png'
                 );
                 const emptyCallback = () => {
                     // do nothing
@@ -155,8 +155,3 @@ namespace org.mycore.mets.controller {
         }
     }
 }
-
-
-
-
-

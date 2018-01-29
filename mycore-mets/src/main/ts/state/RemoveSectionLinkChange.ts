@@ -21,35 +21,14 @@
 
 namespace org.mycore.mets.model.state {
     export class RemoveSectionLinkChange extends ModelChange {
-        constructor(private section: simple.MCRMetsSection, private page: simple.MCRMetsPage) {
-            super();
-            this.pageLabel = page.orderLabel;
-            this.sectionLabel = this.section.label;
-        }
-
         private pageLabel: string;
         private sectionLabel: string;
         private addedTo: MCRMetsSection;
 
-        private getRoot(section = this.section) {
-            return (section.parent !== null) ? this.getRoot(section.parent) : section;
-        }
-
-        private isPageLinked(root: simple.MCRMetsSection, page: simple.MCRMetsPage) {
-            let thisLinked = root.linkedPages.indexOf(page);
-            if (thisLinked) {
-                return true;
-            }
-
-            for (let si in root.metsSectionList) {
-                const childSection = root.metsSectionList[ si ];
-                const childLinked = this.isPageLinked(childSection, page);
-                if (childLinked) {
-                    return true;
-                }
-            }
-
-            return false;
+        constructor(private section: simple.MCRMetsSection, private page: simple.MCRMetsPage) {
+            super();
+            this.pageLabel = page.orderLabel;
+            this.sectionLabel = this.section.label;
         }
 
         public doChange() {
@@ -66,18 +45,37 @@ namespace org.mycore.mets.model.state {
 
         public unDoChange() {
             this.section.linkedPages.push(this.page);
-            if (this.addedTo !== null && typeof this.addedTo !== "undefined") {
+            if (this.addedTo !== null && typeof this.addedTo !== 'undefined') {
                 const linkedPages = this.addedTo.linkedPages;
                 linkedPages.splice(linkedPages.indexOf(this.page), 1);
             }
         }
 
         public getDescription(messages: any): string {
-            return (messages[ "RemoveSectionLinkChangeDescription" ] || "???RemoveSectionLinkChange???")
-                .replace("{pageLabel}", this.pageLabel)
-                .replace("{sectionLabel}", this.sectionLabel);
+            return (messages.RemoveSectionLinkChangeDescription || '???RemoveSectionLinkChange???')
+                .replace('{pageLabel}', this.pageLabel)
+                .replace('{sectionLabel}', this.sectionLabel);
+        }
+
+        private getRoot(section: MCRMetsSection = this.section) {
+            return (section.parent !== null) ? this.getRoot(section.parent) : section;
+        }
+
+        private isPageLinked(root: simple.MCRMetsSection, page: simple.MCRMetsPage) {
+            const thisLinked = root.linkedPages.indexOf(page);
+            if (thisLinked) {
+                return true;
+            }
+
+            for (const childSection of root.metsSectionList) {
+                const childLinked = this.isPageLinked(childSection, page);
+                if (childLinked) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
     }
 }
-

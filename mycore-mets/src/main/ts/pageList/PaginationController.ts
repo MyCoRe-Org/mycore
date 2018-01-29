@@ -25,21 +25,22 @@
 namespace org.mycore.mets.controller {
 
     import MetsEditorModel = org.mycore.mets.model.MetsEditorModel;
+    import PaginationMethod = org.mycore.mets.model.pagination.PaginationMethod;
 
     export class PaginationController {
 
-        constructor(private $modal, private i18nModel, hotkeys) {
+        private metsEditorModel: MetsEditorModel;
+        private changeListModalInstance: any;
+
+        constructor(private $modal: any, private i18nModel: any, hotkeys: any) {
             hotkeys.add({
-                combo : "ctrl+p",
-                description : "",
+                combo : 'ctrl+p',
+                description : '',
                 callback : () => {
                     this.paginationClicked();
                 }
             });
         }
-
-        private metsEditorModel: MetsEditorModel;
-        private changeListModalInstance;
 
         public init(metsEditorModel: MetsEditorModel) {
             this.metsEditorModel = metsEditorModel;
@@ -49,11 +50,12 @@ namespace org.mycore.mets.controller {
             this.openPaginationModal();
         }
 
-        public openPaginationModal(begin = 0, method = model.Pagination.paginationMethods[ 0 ], value = "") {
+        public openPaginationModal(begin: number = 0, method: PaginationMethod
+            = mets.model.pagination.paginationMethods[ 0 ], value: string = '') {
             const options = {
-                templateUrl : "pageList/paginationModal.html",
-                controller : "PaginationModalController",
-                size : "lg"
+                templateUrl : 'pageList/paginationModal.html',
+                controller : 'PaginationModalController',
+                size : 'lg'
             };
 
             this.changeListModalInstance = this.$modal.open(options);
@@ -68,7 +70,7 @@ namespace org.mycore.mets.controller {
                 method,
                 value);
 
-            this.changeListModalInstance.result.then((lChanges: Array<org.mycore.mets.model.state.PageLabelChange>) => {
+            this.changeListModalInstance.result.then((lChanges: org.mycore.mets.model.state.PageLabelChange[]) => {
                 this.metsEditorModel.stateEngine.changeModel(new org.mycore.mets.model.state.BatchChange(lChanges));
             }, () => {
                 // Dismiss
@@ -78,4 +80,3 @@ namespace org.mycore.mets.controller {
 
     }
 }
-

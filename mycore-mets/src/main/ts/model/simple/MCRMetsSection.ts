@@ -23,16 +23,16 @@ namespace org.mycore.mets.model.simple {
         constructor(public id: string,
                     public type: string,
                     public label: string,
-                    public metsSectionList: Array<MCRMetsSection> = [],
+                    public metsSectionList: MCRMetsSection[] = [],
                     public parent: MCRMetsSection = null,
-                    public linkedPages: Array<MCRMetsPage> = [],
-                    public altoLinks: Array<MCRMetsAltoLink> = []) {
+                    public linkedPages: MCRMetsPage[] = [],
+                    public altoLinks: MCRMetsAltoLink[] = []) {
         }
 
         public static createRandomId() {
-            return "log_nnnnnn-nnnn-nnnn-nnnnnnnn".split("n").map((n) => {
+            return 'log_nnnnnn-nnnn-nnnn-nnnnnnnn'.split('n').map((n) => {
                 return n + Math.ceil(15 * Math.random()).toString(36);
-            }).join("");
+            }).join('');
         }
 
         public addSection(section: MCRMetsSection) {
@@ -45,25 +45,15 @@ namespace org.mycore.mets.model.simple {
         }
 
         public addSectionBefore(section: MCRMetsSection, before: MCRMetsSection) {
-            this.addSectionPosition(section, before, "before");
+            this.addSectionPosition(section, before, 'before');
         }
 
         public addSectionAfter(section: MCRMetsSection, after: MCRMetsSection) {
-            this.addSectionPosition(section, after, "after");
+            this.addSectionPosition(section, after, 'after');
         }
 
         public addSectionIndexPosition(section: MCRMetsSection, index: number) {
             this.metsSectionList.splice(index, 0, section);
-            section.parent = this;
-        }
-
-        private addSectionPosition(section: MCRMetsSection, sectionToAdd: MCRMetsSection, position: string) {
-            const index = this.metsSectionList.indexOf(sectionToAdd);
-            if (index === -1) {
-                throw `Cannot insert section  ${section.label} ${position} ${sectionToAdd.label}` +
-                `in parent ${this.label} because ${sectionToAdd.label} is not in this.label`;
-            }
-            this.metsSectionList.splice(index + (position === "after" ? 1 : 0), 0, section);
             section.parent = this;
         }
 
@@ -79,6 +69,15 @@ namespace org.mycore.mets.model.simple {
             };
         }
 
+        private addSectionPosition(section: MCRMetsSection, sectionToAdd: MCRMetsSection, position: string) {
+            const index = this.metsSectionList.indexOf(sectionToAdd);
+            if (index === -1) {
+                throw new Error(`Cannot insert section  ${section.label} ${position} ${sectionToAdd.label}` +
+                    `in parent ${this.label} because ${sectionToAdd.label} is not in this.label`);
+            }
+            this.metsSectionList.splice(index + (position === 'after' ? 1 : 0), 0, section);
+            section.parent = this;
+        }
 
     }
 }

@@ -20,14 +20,10 @@
 
 namespace org.mycore.mets.model {
     export class MetsEditorTreeModel {
-        private indexById: IndexingFunction <{
-            id: string
-        }> = function (objectToIdex: {id: string}) {
-            return objectToIdex.id;
-        };
-
         public root: any = null;
-
+        private indexById: IndexingFunction<{
+            id: string
+        }> = objectToIdex => objectToIdex.id;
         // If a section is in this set, then it is marked as closed in the tree
         private closeSectionSet: IndexSet<any> = new IndexSet<any>(this.indexById);
 
@@ -46,8 +42,8 @@ namespace org.mycore.mets.model {
 
     export class DropTarget {
         constructor(public element: any, public position: string) {
-            if (position !== "after" && position !== "before" && position !== "in") {
-                throw `invalid drag and drop target $position $element`;
+            if (position !== 'after' && position !== 'before' && position !== 'in') {
+                throw new Error(`invalid drag and drop target $position $element`);
             }
         }
     }

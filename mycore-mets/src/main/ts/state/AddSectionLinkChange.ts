@@ -19,18 +19,17 @@
 ///<reference path="../tree/TreeController.ts"/>
 namespace org.mycore.mets.model.state {
     export class AddSectionLinkChange extends ModelChange {
+        private pageLabel: string;
+        private sectionLabel: string;
+        private parent: simple.MCRMetsSection = null;
+
         constructor(private section: simple.MCRMetsSection, private page: simple.MCRMetsPage) {
             super();
             this.pageLabel = page.orderLabel;
             this.sectionLabel = this.section.label;
         }
 
-        private pageLabel: string;
-        private sectionLabel: string;
-        private parent: simple.MCRMetsSection = null;
-
-
-        public findParentWithLink(section = this.section): {pos: number; parentSection: MCRMetsSection} {
+        public findParentWithLink(section: MCRMetsSection = this.section): { pos: number; parentSection: MCRMetsSection } {
             const pos = section.linkedPages.indexOf(this.page);
             if (pos !== -1) {
                 return {pos : pos, parentSection : section};
@@ -43,7 +42,7 @@ namespace org.mycore.mets.model.state {
 
         public doChange() {
             if (this.section.parent !== null) {
-                let {pos, parentSection} = this.findParentWithLink(this.section);
+                const {pos, parentSection} = this.findParentWithLink(this.section);
                 if (parentSection !== null) {
                     this.parent = parentSection;
                     parentSection.linkedPages.splice(pos, 1);
@@ -60,11 +59,9 @@ namespace org.mycore.mets.model.state {
         }
 
         public getDescription(messages: any): string {
-            return (messages[ "AddSectionLinkChangeDescription" ] || "???AddSectionLinkChangeDescription???")
-                .replace("{pageLabel}", this.pageLabel)
-                .replace("{sectionLabel}", this.sectionLabel);
+            return (messages.AddSectionLinkChangeDescription || '???AddSectionLinkChangeDescription???')
+                .replace('{pageLabel}', this.pageLabel)
+                .replace('{sectionLabel}', this.sectionLabel);
         }
-
     }
 }
-

@@ -19,11 +19,11 @@
 namespace org.mycore.mets.model {
 
     export class IndexSet<T> {
+        private privateSetObject: { [index: string]: T; };
+
         constructor(private indexingFunction: IndexingFunction<T>) {
             this.privateSetObject = {};
         }
-
-        private privateSetObject: {[index: string]: T; };
 
         public add(element: T) {
             this.privateSetObject[ this.indexingFunction(element) ] = element;
@@ -35,7 +35,7 @@ namespace org.mycore.mets.model {
 
         public getCount(): number {
             let count = 0;
-            for (let i in this.privateSetObject) {
+            for (const i in this.privateSetObject) {
                 if (this.privateSetObject.hasOwnProperty(i)) {
                     count++;
                 }
@@ -48,8 +48,8 @@ namespace org.mycore.mets.model {
         }
 
         public getAllSelected() {
-            const arr = new Array<T>();
-            for (let i in this.privateSetObject) {
+            const arr = [];
+            for (const i in this.privateSetObject) {
                 if (this.privateSetObject.hasOwnProperty(i)) {
                     arr.push(this.privateSetObject[ i ]);
                 }
@@ -58,8 +58,6 @@ namespace org.mycore.mets.model {
         }
     }
 
-    export interface IndexingFunction<T> {
-        (T): string;
-    }
+    export type IndexingFunction<T> = (key: T) => string;
 
 }

@@ -20,15 +20,15 @@
 
 namespace org.mycore.mets.model.state {
     export class StateEngine {
-        private privateLastChanges: Array<ModelChange> = new Array<ModelChange>();
-        private privateRevertedChanges: Array<ModelChange> = new Array<ModelChange>();
+        private privateLastChanges: ModelChange[] = [];
+        private privateRevertedChanges: ModelChange[] = [];
         private serverState: ModelChange = null;
 
-        public getLastChanges(): Array<ModelChange> {
+        public getLastChanges(): ModelChange[] {
             return this.privateLastChanges.slice(0);
         }
 
-        public getRevertedChanges(): Array<ModelChange> {
+        public getRevertedChanges(): ModelChange[] {
             return this.privateRevertedChanges.slice(0);
         }
 
@@ -40,7 +40,7 @@ namespace org.mycore.mets.model.state {
 
         public back() {
             if (!this.canBack()) {
-                throw "privateLastChanges is empty!";
+                throw new Error('privateLastChanges is empty!');
             } else {
                 const lastChange = this.privateLastChanges.pop();
                 lastChange.unDoChange();
@@ -52,10 +52,9 @@ namespace org.mycore.mets.model.state {
             return this.privateLastChanges.length > 0;
         }
 
-
         public forward() {
             if (!this.canForward()) {
-                throw "privateRevertedChanges is empty!";
+                throw new Error('privateRevertedChanges is empty!');
             } else {
                 const lastRevertedChange = this.privateRevertedChanges.pop();
                 lastRevertedChange.doChange();
@@ -85,7 +84,7 @@ namespace org.mycore.mets.model.state {
 
         private clearRevertedChanges() {
             if (this.privateRevertedChanges.length > 0) {
-                this.privateRevertedChanges = new Array<ModelChange>();
+                this.privateRevertedChanges = [];
             }
         }
     }

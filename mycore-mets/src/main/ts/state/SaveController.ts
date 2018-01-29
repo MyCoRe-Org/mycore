@@ -24,7 +24,9 @@ namespace org.mycore.mets.model.state {
 
     export class SaveController {
 
-        constructor(public i18nModel, private saveService: MetsModelSave) {
+        private metsEditorModel: MetsEditorModel;
+
+        constructor(public i18nModel: any, private saveService: MetsModelSave) {
 
         }
 
@@ -32,20 +34,18 @@ namespace org.mycore.mets.model.state {
             this.metsEditorModel = editorModel;
         }
 
-        private metsEditorModel: MetsEditorModel;
-
-        canSave() {
+        public canSave() {
             return !this.metsEditorModel.stateEngine.isServerState();
         }
 
-        saveClicked() {
+        public saveClicked() {
             this.saveService.save(this.metsEditorModel.targetServlet, this.metsEditorModel.metsModel,
                 (success: boolean) => {
                     if (success) {
                         this.metsEditorModel.stateEngine.markServerState();
-                        alert(this.i18nModel.messages[ "save.success" ]);
+                        alert(this.i18nModel.messages.save.success);
                     } else {
-                        alert(this.i18nModel.messages[ "save.fail" ]);
+                        alert(this.i18nModel.messages.save.fail);
                     }
                 });
         }
