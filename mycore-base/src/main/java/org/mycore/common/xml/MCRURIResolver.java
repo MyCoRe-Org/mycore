@@ -1003,8 +1003,8 @@ public final class MCRURIResolver implements URIResolver {
 
             String categ;
             try {
-                categ = URLDecoder.decode(categID.toString(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
+                categ = MCRXMLFunctions.decodeURIPath(categID.toString());
+            } catch (URISyntaxException e) {
                 categ = categID.toString();
             }
             MCRCategory cl = null;

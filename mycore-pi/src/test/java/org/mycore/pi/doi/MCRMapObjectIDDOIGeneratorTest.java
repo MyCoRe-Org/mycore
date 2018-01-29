@@ -23,6 +23,7 @@ import static org.mycore.pi.doi.MCRDigitalObjectIdentifier.TEST_DOI_PREFIX;
 
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -61,5 +62,10 @@ public class MCRMapObjectIDDOIGeneratorTest extends MCRTestCase {
         testProperties.put("MCR.PI.Generator.MapObjectIDDOI.Prefix.junit_test", TEST_DOI_PREFIX);
         testProperties.put("MCR.PI.Generator.MapObjectIDDOI.Prefix.my_test", TEST_DOI_PREFIX + "/my.");
         return testProperties;
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 }

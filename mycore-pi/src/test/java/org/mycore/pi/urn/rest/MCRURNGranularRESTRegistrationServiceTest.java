@@ -33,6 +33,7 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.access.MCRAccessManager;
@@ -63,6 +64,11 @@ import mockit.MockUp;
 public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase {
     private int numOfDerivFiles = 15;
 
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     @Test
     public void fullRegister() throws Exception {
         new MockContentTypes();
@@ -88,7 +94,7 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
         String serviceID = "TestService";
         MCRURNGranularRESTRegistrationService testService = new MCRURNGranularRESTRegistrationService(serviceID,
             foo);
-        testService.fullRegister(derivate, "");
+        testService.register(derivate, "", true);
         timerTask();
 
         List<MCRPIRegistrationInfo> registeredURNs = MCREntityManagerProvider
@@ -185,5 +191,10 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
         testProperties.put("MCR.URN.DNB.Credentials.Login", "test");
         testProperties.put("MCR.URN.DNB.Credentials.Password", "test");
         return testProperties;
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 }
