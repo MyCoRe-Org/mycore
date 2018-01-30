@@ -95,6 +95,10 @@ import org.xml.sax.SAXException;
  *     <dt>RegistrationConditionProvider</dt>
  *     <dd>Used to detect if the registration should happen. DOI will be created but the real registration will if the
  *     Condition is true. The Parameter is optional and the default condition is always true.</dd>
+ *     <dt>Schema</dt>
+ *     <dd>The path to the schema. (must be in classpath; default is {@link #DEFAULT_DATACITE_SCHEMA_PATH})</dd>
+ *     <dt>Namespace</dt>
+ *     <dd>The namespace for the Datacite version (Default is {@link #KERNEL_3_NAMESPACE_URI}</dd>
  * </dl>
  */
 public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDigitalObjectIdentifier> {
@@ -455,7 +459,7 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
     }
 
     @Override
-    protected Optional<String> getContextInformation(Map<String, String> contextParameters) {
+    protected Optional<String> getJobInformation(Map<String, String> contextParameters) {
         String pattern = "{0} DOI: {1} for object: {2}";
         return Optional.of(MessageFormat
             .format(pattern, getAction(contextParameters).toString(), contextParameters.get(CONTEXT_DOI),
@@ -469,7 +473,7 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
                     "Configured class " + clazz + "(" + MCRPIRegistrationService.REGISTRATION_CONFIG_PREFIX
                         + getRegistrationServiceID() + "." + REGISTRATION_CONDITION_PROVIDER + ")";
                 try {
-                    return ((Class<? extends MCRPIObjectRegistrationConditionProvider>) Class.forName(clazz))
+                    return Class.forName(clazz)
                         .getConstructor()
                         .newInstance();
                 } catch (ClassNotFoundException e) {
@@ -493,6 +497,7 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
                             .getName(), e);
                 }
             })
+            .map(MCRPIObjectRegistrationConditionProvider.class::cast)
             .map(instance -> instance.provideRegistrationCondition(objectType))
             .orElseGet(() -> MCRPIObjectRegistrationConditionProvider.ALWAYS_REGISTER_CONDITION_PROVIDER
                 .provideRegistrationCondition(objectType));

@@ -24,7 +24,7 @@ public class MCRPIRegisterJobAction extends MCRJobAction {
     @Override
     public String name() {
         MCRPIJobRegistrationService<MCRPersistentIdentifier> registrationService = getRegistrationService();
-        return registrationService.getContextInformation(this.job.getParameters()).orElseGet(() -> {
+        return registrationService.getJobInformation(this.job.getParameters()).orElseGet(() -> {
             String action = getAction().toString();
             String registrationServiceID = getRegistrationServiceID();
             return registrationServiceID + " - " + action;

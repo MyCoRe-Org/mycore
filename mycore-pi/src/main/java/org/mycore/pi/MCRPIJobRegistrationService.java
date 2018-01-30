@@ -28,10 +28,11 @@ import org.mycore.user2.MCRUserManager;
 public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentifier>
     extends MCRPIRegistrationService<T> {
 
+    public static final String JOB_API_USER_PROPERTY = "jobApiUser";
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRJobQueue REGISTER_JOB_QUEUE = initializeJobQueue();
-    public static final String JOB_API_USER_PROPERTY = "jobApiUser";
 
     public MCRPIJobRegistrationService(String registrationServiceID, String identType) {
         super(registrationServiceID, identType);
@@ -42,11 +43,11 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
         return MCRJobQueue.getInstance(MCRPIRegisterJobAction.class);
     }
 
-    public abstract void deleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException;
+    protected abstract void deleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException;
 
-    public abstract void updateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException;
+    protected abstract void updateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException;
 
-    public abstract void registerJob(Map<String, String> parameters) throws MCRPersistentIdentifierException;
+    protected abstract void registerJob(Map<String, String> parameters) throws MCRPersistentIdentifierException;
 
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
@@ -169,14 +170,13 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
      * @param contextParameters the parameters of the job
      * @return Some Information what this job will do or just {@link Optional#EMPTY}, then a default message is generated.
      */
-    protected abstract Optional<String> getContextInformation(Map<String, String> contextParameters);
+    protected abstract Optional<String> getJobInformation(Map<String, String> contextParameters);
 
     public void runAsJobUser(PIRunnable task) throws MCRPersistentIdentifierException {
         boolean jobUserPresent = this.getProperties().containsKey(JOB_API_USER_PROPERTY);
         String jobUser = this.getProperties().get(JOB_API_USER_PROPERTY);
         MCRSession session = null;
         MCRUserInformation savedUserInformation = null;
-
 
         if (jobUserPresent) {
             session = MCRSessionMgr.getCurrentSession();
@@ -189,7 +189,6 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
             session.setUserInformation(user);
             LOGGER.info("Continue as User {}", jobUser);
         }
-
 
         try {
             task.run();
@@ -222,7 +221,6 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
             }
         });
     }
-
 
     void delegateRollback(final Map<String, String> contextParameters) throws MCRPersistentIdentifierException {
         runAsJobUser(() -> {
@@ -262,7 +260,7 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
     }
 
     private interface PIRunnable {
-        public void run() throws MCRPersistentIdentifierException;
+        void run() throws MCRPersistentIdentifierException;
     }
 
 }
