@@ -271,12 +271,11 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
     }
 
     private MCRILogicalStructMapTypeProvider getTypeProvider() {
-        String className = MCRConfiguration.instance().getString("MCR.Component.MetsMods.LogicalStructMapTypeProvider",
-            MCRDefaultLogicalStructMapTypeProvider.class.getName());
         try {
-            return (MCRILogicalStructMapTypeProvider) Class.forName(className).newInstance();
+            return MCRConfiguration.instance().getClass("MCR.Component.MetsMods.LogicalStructMapTypeProvider",
+                MCRDefaultLogicalStructMapTypeProvider.class).newInstance();
         } catch (Exception e) {
-            LOGGER.warn("Could not load class {}", className);
+            LOGGER.warn("Could not load class", e);
             return new MCRDefaultLogicalStructMapTypeProvider();
         }
     }

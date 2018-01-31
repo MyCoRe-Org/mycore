@@ -52,13 +52,10 @@ public abstract class MCRMETSGeneratorFactory {
         IGNORE_METS_XML = true;
 
         // get selector
-        String cn = MCRConfiguration.instance().getString("MCR.Component.MetsMods.Generator.Selector",
-            MCRMETSPropertyGeneratorSelector.class.getName());
+        Class<MCRMETSGeneratorSelector> cn = MCRConfiguration.instance()
+            .getClass("MCR.Component.MetsMods.Generator.Selector", MCRMETSPropertyGeneratorSelector.class);
         try {
-            Class<?> classToCheck = Class.forName(cn);
-            Class<? extends MCRMETSGeneratorSelector> generatorSelectorClass = classToCheck
-                .asSubclass(MCRMETSGeneratorSelector.class);
-            GENERATOR_SELECTOR = generatorSelectorClass.newInstance();
+            GENERATOR_SELECTOR = cn.newInstance();
         } catch (Exception cause) {
             GENERATOR_SELECTOR = new MCRMETSPropertyGeneratorSelector();
             throw new MCRException(

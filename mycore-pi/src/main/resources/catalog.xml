@@ -21,20 +21,20 @@
   -->
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
 
-  <system systemId="http://schema.datacite.org/meta/kernel-3/metadata.xsd" uri="xsd/datacite/metadata.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-3/metadata.xsd" uri="xsd/datacite/v3/metadata.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-3/include/datacite-titleType-v3.xsd"
-          uri="xsd/datacite/datacite-titleType-v3.xsd" />
+          uri="xsd/datacite/v3/datacite-titleType-v3.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-3/include/datacite-contributorType-v3.1.xsd"
-          uri="xsd/datacite/datacite-contributorType-v3.1.xsd" />
+          uri="xsd/datacite/v3/datacite-contributorType-v3.1.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-3/include/datacite-dateType-v3.xsd"
-          uri="xsd/datacite/datacite-dateType-v3.xsd" />
+          uri="xsd/datacite/v3/datacite-dateType-v3.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-3/include/datacite-resourceType-v3.xsd"
-          uri="xsd/datacite/datacite-resourceType-v3.xsd" />
+          uri="xsd/datacite/v3/datacite-resourceType-v3.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-3/include/datacite-relationType-v3.1.xsd"
-          uri="xsd/datacite/datacite-relationType-v3.1.xsd" />
+          uri="xsd/datacite/v3/datacite-relationType-v3.1.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-3/include/datacite-relatedIdentifierType-v3.1.xsd"
-          uri="xsd/datacite/datacite-relatedIdentifierType-v3.1.xsd" />
+          uri="xsd/datacite/v3/datacite-relatedIdentifierType-v3.1.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-3/include/datacite-descriptionType-v3.xsd"
-          uri="xsd/datacite/datacite-descriptionType-v3.xsd" />
+          uri="xsd/datacite/v3/datacite-descriptionType-v3.xsd" />
 
 </catalog>

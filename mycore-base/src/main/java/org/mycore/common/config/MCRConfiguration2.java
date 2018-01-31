@@ -58,7 +58,7 @@ public class MCRConfiguration2 {
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public static <T> Optional<T> getInstanceOf(String name) throws MCRConfigurationException {
-        return getString(name).map(MCRConfiguration.instance()::loadClass);
+        return getString(name).map(MCRConfiguration.instance()::instantiateClass);
     }
 
     /**

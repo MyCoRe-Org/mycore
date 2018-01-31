@@ -70,7 +70,8 @@ public class MCRPICommands {
         });
     }
 
-    @MCRCommand(syntax = "migrate urn granular to service id {0}", help = "")
+    @MCRCommand(syntax = "migrate urn granular to service id {0}", help = "Used to migrate urn granular to MyCoRe-PI. " +
+            "{0} should be your granular service id.")
     public static void migrateURNGranularToServiceID(String serviceID) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRXMLMetadataManager.instance().listIDsOfType("derivate").forEach(derivateID -> {
@@ -97,8 +98,10 @@ public class MCRPICommands {
         });
     }
 
-    @MCRCommand(syntax = "try to control {0} with service {1} with additional {2}", help = "")
-    public static void migrateURNGranularToServiceID(String objectIDString, String serviceID, final String additional)
+    @MCRCommand(syntax = "try to control {0} with service {1} with additional {2}", help = "This command tries to" +
+            " read a pi from the object {0} with the MetadataManager from the specified service {1}." +
+            " If the service configuration is right then the pi is under control of MyCoRe.")
+    public static void controlObjectWithServiceAndAdditional(String objectIDString, String serviceID, final String additional)
         throws MCRAccessException, MCRActiveLinkException, IOException {
         String trimAdditional = additional.trim();
         MCRPIRegistrationService<MCRPersistentIdentifier> service = MCRPIRegistrationServiceManager
@@ -131,7 +134,6 @@ public class MCRPICommands {
         MCRPIRegistrationService.addFlagToObject(mcrBase, mcrpi);
         MCRMetadataManager.update(mcrBase);
         LOGGER.info("{}:{} is now under control of {}", objectID, trimAdditional, serviceID);
-
     }
 
     @MCRCommand(syntax = "update all PI of object {0}", help = "Triggers the update method of every Object!")

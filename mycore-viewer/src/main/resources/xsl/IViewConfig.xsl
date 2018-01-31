@@ -16,7 +16,7 @@
     <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
     <html>
       <head>
-        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.min.js"></script>
         <xsl:choose>
           <xsl:when test="xml/properties/property[@name='mobile'] = 'true'">
             <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />

@@ -20,11 +20,13 @@ package org.mycore.pi.doi;
 
 import java.util.Optional;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 
-public class MCRDOIParserTest {
+public class MCRDOIParserTest extends MCRTestCase {
 
     public static final String EXAMPLE_DOI2_PREFIX = "10.22032.0";
 
@@ -55,7 +57,8 @@ public class MCRDOIParserTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         parser = new MCRDOIParser();
     }
 
@@ -70,4 +73,8 @@ public class MCRDOIParserTest {
         testDOI(EXAMPLE_DOI2, EXAMPLE_DOI2_PREFIX, EXAMPLE_DOI2_SUFFIX);
     }
 
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 }

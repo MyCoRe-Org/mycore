@@ -54,16 +54,12 @@ public class MCRPIRegistrationServiceManager {
     public <T extends MCRPersistentIdentifier> MCRPIRegistrationService<T> getRegistrationService(
         String registrationServiceID) {
         String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
-        String className = MCRConfiguration.instance().getString(propertyName);
+        Class<MCRPIRegistrationService<T>> piClass = MCRConfiguration.instance().getClass(propertyName);
 
         try {
-            @SuppressWarnings("unchecked")
-            Class<MCRPIRegistrationService<T>> piClass = (Class<MCRPIRegistrationService<T>>) Class.forName(className);
             Constructor<MCRPIRegistrationService<T>> constructor = piClass.getConstructor(String.class);
 
             return constructor.newInstance(registrationServiceID);
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException("The property : " + propertyName + " points to not existing class!", e);
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException("The property : " + propertyName
                 + " points to existing class, but without string constructor(serviceid)!", e);

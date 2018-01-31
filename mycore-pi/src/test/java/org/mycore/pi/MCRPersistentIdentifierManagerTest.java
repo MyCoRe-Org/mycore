@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,6 +50,11 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
     @Rule
     public TemporaryFolder baseDir = new TemporaryFolder();
 
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     @Test
     public void testGet() throws Exception {
         String mockString = MCRMockIdentifier.MOCK_SCHEME + "http://google.de/";
@@ -69,7 +75,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
 
         MCRObject mcrObject = buildMockObject();
         mockMetadataManager.put(mcrObject.getId(), mcrObject);
-        registrationService.fullRegister(mcrObject, null);
+        registrationService.register(mcrObject, null);
 
         MCRPI mcrpi = MCRPersistentIdentifierManager.getInstance().get(MOCK_SERVICE, mcrObject.getId().toString(), null);
         Assert.assertNotNull(mcrpi);
@@ -104,7 +110,7 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
 
         MCRObject mcrObject = buildMockObject();
         mockMetadataManager.put(mcrObject.getId(), mcrObject);
-        MCRMockIdentifier identifier = registrationService.fullRegister(mcrObject, "");
+        MCRMockIdentifier identifier = registrationService.register(mcrObject, "", true);
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertTrue("The identifier " + identifier.asString() + " should be registered now!",
@@ -197,4 +203,8 @@ public class MCRPersistentIdentifierManagerTest extends MCRStoreTestCase {
         return mcrObject;
     }
 
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 }

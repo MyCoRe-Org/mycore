@@ -39,7 +39,6 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRFileCollectingFileVisitor;
 import org.mycore.pi.MCRPIRegistrationService;
@@ -64,7 +63,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
     }
 
     @Override
-    public MCRDNBURN fullRegister(MCRBase obj, String additional)
+    public MCRDNBURN register(MCRBase obj, String additional, boolean updateObject)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
 
@@ -164,12 +163,6 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
         return newURN;
     }
 
-    @Override
-    protected void validateAlreadyInscribed(MCRBase obj, String additional, String identType, MCRObjectID id)
-        throws MCRPersistentIdentifierException {
-        //TODO: improve API, don't override method to do nothing
-        LOGGER.info("No incriber in this implementation");
-    }
 
     private List<String> getIgnoreFileList() {
         List<String> ignoreFileNamesList = new ArrayList<>();

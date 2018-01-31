@@ -18,6 +18,7 @@
 
 package org.mycore.mods.classification;
 
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,7 +26,9 @@ import javax.xml.parsers.DocumentBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRDOMUtils;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -103,8 +106,16 @@ public final class MCRMODSClassificationSupport {
         if (category == null) {
             return "";
         }
-        return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(),
-            category.getID());
+
+        String id;
+        try {
+            id = MCRXMLFunctions.encodeURIPath(category.getID());
+        } catch (URISyntaxException e) {
+            /* This should be impossible! */
+            throw new MCRException(e);
+        }
+
+        return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(), id);
     }
 
     public static String getClassCategParentLink(final NodeList sources) {
@@ -117,8 +128,17 @@ public final class MCRMODSClassificationSupport {
         if (category == null) {
             return "";
         }
+
+        String id;
+        try {
+            id = MCRXMLFunctions.encodeURIPath(category.getID());
+        } catch (URISyntaxException e) {
+            /* This should be impossible! */
+            throw new MCRException(e);
+        }
+
         return MessageFormat
-            .format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), category.getID());
+            .format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), id);
     }
 
     static String getText(final Element element) {
