@@ -34,10 +34,9 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
-import org.mycore.webtools.processing.MCRProcessableJSONUtil;
 import org.mycore.webtools.processing.socket.MCRProcessableWebsocketSender;
 
-import com.google.gson.JsonObject;
+import com.google.gson.Gson;
 
 /**
  * Websocket implementation of sending processable objects.
@@ -45,15 +44,6 @@ import com.google.gson.JsonObject;
  * @author Matthias Eichner
  */
 public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocketSender {
-
-    enum Type {
-        error,
-        registry,
-        addCollection,
-        removeCollection,
-        updateProcessable,
-        updateCollectionProperty
-    }
 
     private static final AtomicInteger ID_GENERATOR;
 
@@ -69,25 +59,21 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
 
     @Override
     public void sendError(Session session, Integer errorCode) {
-        JsonObject errorMessage = new JsonObject();
-        errorMessage.addProperty("error", errorCode);
-        send(session, errorMessage, Type.error);
+        SocketMessage errorMessage = new ErrorMessage(errorCode);
+        send(session, errorMessage);
     }
 
     @Override
     public void sendRegistry(Session session, MCRProcessableRegistry registry) {
-        JsonObject registryMessage = new JsonObject();
-        send(session, registryMessage, Type.registry);
+        send(session, new RegistryMessage());
         registry.stream().forEach(collection -> addCollection(session, registry, collection));
     }
 
     @Override
     public void addCollection(Session session, MCRProcessableRegistry registry, MCRProcessableCollection collection) {
-        JsonObject addCollectionMessage = new JsonObject();
-        addCollectionMessage.addProperty("id", getId(collection));
-        addCollectionMessage.addProperty("name", collection.getName());
-        addCollectionMessage.add("properties", MCRProcessableJSONUtil.toJSON(collection.getProperties()));
-        send(session, addCollectionMessage, Type.addCollection);
+        AddCollectionMessage message = new AddCollectionMessage(getId(collection), collection.getName(),
+            collection.getProperties());
+        send(session, message);
         collection.stream().forEach(processable -> addProcessable(session, collection, processable));
     }
 
@@ -98,9 +84,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
             return;
         }
         collection.stream().forEach(processable -> removeProcessable(session, processable));
-        JsonObject removeCollectionMessage = new JsonObject();
-        removeCollectionMessage.addProperty("id", id);
-        send(session, removeCollectionMessage, Type.removeCollection);
+        send(session, new RemoveCollectionMessage(id));
     }
 
     @Override
@@ -119,11 +103,9 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
     }
 
     protected void updateProcessable(Session session, MCRProcessable processable, Integer processableId,
-            Integer collectionId) {
-        JsonObject addProcessableMessage = MCRProcessableJSONUtil.toJSON(processable);
-        addProcessableMessage.addProperty("id", processableId);
-        addProcessableMessage.addProperty("collectionId", collectionId);
-        send(session, addProcessableMessage, Type.updateProcessable);
+        Integer collectionId) {
+        ProcessableMessage addProcessableMessage = new ProcessableMessage(processable, processableId, collectionId);
+        send(session, addProcessableMessage);
     }
 
     @Override
@@ -133,11 +115,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
 
     @Override
     public void updateProperty(Session session, MCRProcessableCollection collection, String name, Object value) {
-        JsonObject updatePropertyMessage = new JsonObject();
-        updatePropertyMessage.addProperty("id", getId(collection));
-        updatePropertyMessage.addProperty("propertyName", name);
-        updatePropertyMessage.add("propertyValue", MCRProcessableJSONUtil.toJSON(value));
-        send(session, updatePropertyMessage, Type.updateCollectionProperty);
+        send(session, new UpdateCollectionPropertyMessage(getId(collection), name, value));
     }
 
     public synchronized Integer getId(Object object) {
@@ -158,11 +136,11 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
         return id;
     }
 
-    private void send(Session session, JsonObject responseMessage, Type type) {
-        responseMessage.addProperty("type", type.name());
-        String msg = responseMessage.toString();
+    private void send(Session session, SocketMessage responseMessage) {
+        String msg = new Gson().toJson(responseMessage);
         AsyncSender.send(session, msg);
     }
+
 
     /**
      * Tomcat does not support async sending of messages. We have to implement

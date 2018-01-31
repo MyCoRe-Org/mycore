@@ -1,21 +1,22 @@
 <div class="row">
-	<div class="col-md-5">
-		<a href="javascript:void(0)" (click)="propertiesModal.show()">(P)</a>
-		<span title="{{model.name}}">{{model.name}}</span>
-	</div>
-	<div class="col-md-2">{{model.user}}</div>
-	<div class="col-md-2">{{model.createTime | amDateFormat:'DD.MM HH:mm:ss'}}</div>
-	<div class="col-md-3" [ngSwitch]="model.progress">
-		<div *ngSwitchCase="undefined">
-		  {{model.status}}
-		</div>
-		<div class="progress" *ngSwitchDefault>
-      <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" [style.width]="getProgress()"
-           aria-valuemin="0" aria-valuemax="100">
-        <span>{{model.progressText}}</span>
-      </div>
+    <div class="col-md-5">
+        <a href="javascript:void(0)" (click)="propertiesModal.show()">(P)</a>
+        <span title="{{model.name}}">{{model.name}}</span>
     </div>
-	</div>
+    <div class="col-md-2">{{model.user}}</div>
+    <div class="col-md-2">{{model.createTime | amDateFormat:'DD.MM HH:mm:ss'}}</div>
+    <div class="col-md-3" [ngSwitch]="model.progress">
+        <div *ngSwitchCase="undefined">
+            {{model.status}}
+        </div>
+        <div class="progress" *ngSwitchDefault>
+            <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
+                 [style.width]="getProgress()"
+                 aria-valuemin="0" aria-valuemax="100">
+                <span>{{model.progressText}}</span>
+            </div>
+        </div>
+    </div>
 
     <div bsModal #propertiesModal="bs-modal" class="modal fade propertiesModal" tabindex="-1" role="dialog"
          aria-labelledby="propertiesModal" aria-hidden="true">
@@ -45,19 +46,32 @@
                             </div>
                             <div class="properties-content row">
                                 <div class="col-md-2 propertyKey">Create Time</div>
-                                <div class="col-md-10 propertyValue">{{model.createTime | amDateFormat:'DD.MM HH:mm:ss'}}</div>
+                                <div class="col-md-10 propertyValue">{{model.createTime | amDateFormat:'DD.MM
+                                    HH:mm:ss'}}
+                                </div>
                             </div>
                             <div class="properties-content row">
                                 <div class="col-md-2 propertyKey">Start Time</div>
-                                <div class="col-md-10 propertyValue">{{model.startTime | amDateFormat:'DD.MM HH:mm:ss'}}</div>
+                                <div class="col-md-10 propertyValue">{{model.startTime | amDateFormat:'DD.MM
+                                    HH:mm:ss'}}
+                                </div>
                             </div>
                             <div class="properties-content row">
                                 <div class="col-md-2 propertyKey">End Time</div>
-                                <div class="col-md-10 propertyValue">{{model.endTime | amDateFormat:'DD.MM HH:mm:ss'}}</div>
+                                <div class="col-md-10 propertyValue">{{model.endTime | amDateFormat:'DD.MM HH:mm:ss'}}
+                                </div>
                             </div>
                             <div class="properties-content row" *ngIf="model.status === 'failed'">
                                 <div class="col-md-2 propertyKey">Error</div>
-                                <div class="col-md-10 propertyValue">{{model.error}}</div>
+                                <div class="col-md-10 propertyValue">
+                                    <pre class="scrollContainer">{{model.errorMessage}}</pre>
+                                </div>
+                            </div>
+                            <div class="properties-content row" *ngIf="model.status === 'failed'">
+                                <div class="col-md-2 propertyKey">Stacktrace</div>
+                                <div class="col-md-10 propertyValue">
+                                    <pre class="scrollContainer">{{model.stackTrace}}</pre>
+                                </div>
                             </div>
                         </div>
                     </div>

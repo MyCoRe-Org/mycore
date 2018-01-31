@@ -1,20 +1,20 @@
 /*
- * 
+ *
  * $Revision$ $Date$
- * 
+ *
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
- * 
+ *
  * This program is free software; you can use it, redistribute it and / or
  * modify it under the terms of the GNU General Public License (GPL) as
  * published by the Free Software Foundation; either version 2 of the License or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program, in a file called gpl.txt or license.txt. If not, write to the
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -26,7 +26,9 @@ package org.mycore.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -71,18 +73,18 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This class represent a general set of external methods to support the programming API.
- * 
+ *
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public class MCRUtils {
-    // The file slash
-    private static String SLASH = System.getProperty("file.separator");
-
     // public constant data
     private static final Logger LOGGER = LogManager.getLogger();
+
+    // The file slash
+    private static String SLASH = System.getProperty("file.separator");
 
     /**
      * Reads exactly <code>len</code> bytes from the input stream into the byte array. This method reads repeatedly from
@@ -91,7 +93,7 @@ public class MCRUtils {
      * the bytes are read, the end of the stream is detected, or an exception is thrown. You will always get as many
      * bytes as you asked for unless you get an eof or other exception. Unlike readFully, you find out how many bytes
      * you did get.
-     * 
+     *
      * @param b
      *            the buffer into which the data is read.
      * @param off
@@ -125,7 +127,7 @@ public class MCRUtils {
      * bytes are read, the end of the stream is detected, or an exception is thrown. You will always get as many bytes
      * as you asked for unless you get an eof or other exception. Unlike readFully, you find out how many bytes you did
      * get.
-     * 
+     *
      * @param c
      *            the buffer into which the data is read.
      * @param off
@@ -154,7 +156,7 @@ public class MCRUtils {
 
     /**
      * Writes plain text to a file.
-     * 
+     *
      * @param textToWrite
      *            the text to write into the file
      * @param fileName
@@ -169,7 +171,7 @@ public class MCRUtils {
 
     /**
      * The method return a list of all file names under the given directory and subdirectories of itself.
-     * 
+     *
      * @param basedir
      *            the File instance of the basic directory
      * @return an ArrayList with file names as pathes
@@ -193,7 +195,7 @@ public class MCRUtils {
 
     /**
      * The method return a list of all file names under the given directory and subdirectories of itself.
-     * 
+     *
      * @param basedir
      *            the File instance of the basic directory
      * @param path
@@ -219,7 +221,7 @@ public class MCRUtils {
 
     /**
      * The method return a list of all directory names under the given directory and subdirectories of itself.
-     * 
+     *
      * @param basedir
      *            the File instance of the basic directory
      * @return an ArrayList with directory names as pathes
@@ -240,7 +242,7 @@ public class MCRUtils {
 
     /**
      * The method return a list of all directory names under the given directory and subdirectories of itself.
-     * 
+     *
      * @param basedir
      *            the File instance of the basic directory
      * @param path
@@ -363,7 +365,7 @@ public class MCRUtils {
 
     /**
      * Extracts files in a tar archive. Currently works only on uncompressed tar files.
-     * 
+     *
      * @param source
      *            the uncompressed tar to extract
      * @param expandToDirectory
@@ -488,7 +490,7 @@ public class MCRUtils {
      * @param other Object that first should be compared against, e.g. <code>first.compareTo(other)</code>
      * @param part different <code>compareTo()</code> steps
      * @param <T> object that wants to implement compareTo()
-     * @return  a negative integer, zero, or a positive integer as this object
+     * @return a negative integer, zero, or a positive integer as this object
      *          is less than, equal to, or greater than the specified object.
      *
      * @throws NullPointerException if either <code>first</code> or <code>other</code> is null
@@ -501,5 +503,15 @@ public class MCRUtils {
             .filter(i -> i != 0)
             .findFirst()
             .orElse(0);
+    }
+
+    /**
+     * @param t contains the printStackTrace
+     * @return the stacktrace as string
+     */
+    public static String getStackTraceAsString(Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw)); // closing string writer has no effect
+        return sw.toString();
     }
 }

@@ -24,3 +24,8 @@
 .noProperties {
     color: #AAA;
 }
+
+pre.scrollContainer {
+    overflow: scroll;
+    max-height: 100px;
+}
