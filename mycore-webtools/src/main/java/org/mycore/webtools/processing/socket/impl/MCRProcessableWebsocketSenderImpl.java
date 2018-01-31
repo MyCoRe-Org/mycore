@@ -59,19 +59,19 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
 
     @Override
     public void sendError(Session session, Integer errorCode) {
-        SocketMessage errorMessage = new ErrorMessage(errorCode);
+        MCRWebSocketMessage errorMessage = new MCRErrorMessage(errorCode);
         send(session, errorMessage);
     }
 
     @Override
     public void sendRegistry(Session session, MCRProcessableRegistry registry) {
-        send(session, new RegistryMessage());
+        send(session, new MCRRegistryMessage());
         registry.stream().forEach(collection -> addCollection(session, registry, collection));
     }
 
     @Override
     public void addCollection(Session session, MCRProcessableRegistry registry, MCRProcessableCollection collection) {
-        AddCollectionMessage message = new AddCollectionMessage(getId(collection), collection.getName(),
+        MCRAddCollectionMessage message = new MCRAddCollectionMessage(getId(collection), collection.getName(),
             collection.getProperties());
         send(session, message);
         collection.stream().forEach(processable -> addProcessable(session, collection, processable));
@@ -84,7 +84,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
             return;
         }
         collection.stream().forEach(processable -> removeProcessable(session, processable));
-        send(session, new RemoveCollectionMessage(id));
+        send(session, new MCRRemoveCollectionMessage(id));
     }
 
     @Override
@@ -104,7 +104,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
 
     protected void updateProcessable(Session session, MCRProcessable processable, Integer processableId,
         Integer collectionId) {
-        ProcessableMessage addProcessableMessage = new ProcessableMessage(processable, processableId, collectionId);
+        MCRProcessableMessage addProcessableMessage = new MCRProcessableMessage(processable, processableId, collectionId);
         send(session, addProcessableMessage);
     }
 
@@ -115,7 +115,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
 
     @Override
     public void updateProperty(Session session, MCRProcessableCollection collection, String name, Object value) {
-        send(session, new UpdateCollectionPropertyMessage(getId(collection), name, value));
+        send(session, new MCRUpdateCollectionPropertyMessage(getId(collection), name, value));
     }
 
     public synchronized Integer getId(Object object) {
@@ -136,7 +136,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
         return id;
     }
 
-    private void send(Session session, SocketMessage responseMessage) {
+    private void send(Session session, MCRWebSocketMessage responseMessage) {
         String msg = new Gson().toJson(responseMessage);
         AsyncSender.send(session, msg);
     }
