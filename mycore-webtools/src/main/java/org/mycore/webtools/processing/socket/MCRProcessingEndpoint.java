@@ -131,7 +131,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
 
         private MCRProcessableWebsocketSender sender;
 
-        public SessionListener(Session session, MCRProcessableWebsocketSender sender) {
+        SessionListener(Session session, MCRProcessableWebsocketSender sender) {
             this.session = session;
             this.sender = sender;
         }

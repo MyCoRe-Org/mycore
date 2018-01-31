@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { AppModule } from './app.module';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {AppModule} from './app.module';
 
 platformBrowserDynamic().bootstrapModule(AppModule);

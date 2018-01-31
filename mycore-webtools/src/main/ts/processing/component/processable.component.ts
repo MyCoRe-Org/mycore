@@ -16,23 +16,24 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input } from '@angular/core';
-import { Processable } from '../model/model';
+import {Component, Input} from '@angular/core';
+import {Processable} from '../model/model';
 
-@Component( {
-    selector: "[processable]",
-    templateUrl: "html/processable.html",
-    styleUrls:  ["css/processable.css"]
+@Component({
+    selector: '[processable]',
+    templateUrl: 'html/processable.html',
+    styleUrls: ['css/processable.css']
 })
 export class ProcessableComponent {
 
-    @Input() model: Processable;
+    @Input()
+    public model: Processable;
 
     constructor() {
     }
 
-    getProgress() {
-        return this.model.progress + "%";
+    public getProgress() {
+        return this.model.progress + '%';
     }
 
 }

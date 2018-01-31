@@ -16,80 +16,77 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 
-import { CollectionComponent } from "./collection.component";
-import { ProcessingService } from "./../service/processing.service";
-import { Settings } from "./../settings";
-import { Registry, Collection, Processable } from "../model/model";
+import {ProcessingService} from './../service/processing.service';
+import {Settings} from './../settings';
+import {Registry, Collection} from '../model/model';
 
-import { Subject } from 'rxjs/Rx';
-
-@Component( {
-    selector: "processing",
-    templateUrl: "html/app.html",
-    styleUrls: ["css/app.css"],
+@Component({
+    selector: 'processing',
+    templateUrl: 'html/app.html',
+    styleUrls: ['css/app.css'],
     encapsulation: ViewEncapsulation.None,
     providers: [ProcessingService]
 })
 export class AppComponent {
 
-    errorCode: number;
+    public errorCode: number;
 
-    registry: Registry;
+    public registry: Registry;
 
-    constructor( private processingService: ProcessingService) {
+    constructor(private processingService: ProcessingService) {
         this.connect();
     }
 
-    connect() {
+    public connect() {
         this.processingService.connect();
         this.processingService.observable.subscribe(
-            ( me: MessageEvent ) => this.handleSubscription( me ),
-            ( error: any ) => this.handleError( error ),
+            (me: MessageEvent) => this.handleSubscription(me),
+            (error: any) => this.handleError(error),
             () => this.handleDone()
         );
     }
 
-    handleSubscription( messageEvent: MessageEvent ) {
-        this.handleMessage( JSON.parse( messageEvent.data ) );
+    protected handleSubscription(messageEvent: MessageEvent) {
+        this.handleMessage(JSON.parse(messageEvent.data));
     }
 
-    handleError( error: any ) {
-        console.log( error );
+    protected handleError(error: any) {
+        console.error(error);
     }
 
-    handleDone() {
+    protected handleDone() {
         this.connect();
     }
 
-    handleMessage( data: any ) {
-        let dataType = data.type;
-        if ( dataType == "error" ) {
-            this.errorCode = parseInt( data.error );
+    protected handleMessage(data: any) {
+        const dataType = data.type;
+        if (dataType === 'error') {
+            this.errorCode = parseInt(data.error);
             return;
         }
-        if ( dataType == "registry" ) {
+        if (dataType === 'registry') {
             this.errorCode = null;
             this.registry = new Registry();
         }
-        if ( dataType == "addCollection" ) {
+        if (dataType === 'addCollection') {
             this.registry.addCollection(data);
         }
-        if ( dataType == "updateProcessable" ) {
+        if (dataType === 'updateProcessable') {
             this.registry.updateProcessable(data);
         }
-        if( dataType == "updateCollectionProperty") {
-            let collection: Collection = this.registry.getCollection(data.id);
-            if(collection == null) {
-                console.log("Unable to find collection with id " + data.id);
+        if (dataType === 'updateCollectionProperty') {
+            const collection: Collection = this.registry.getCollection(data.id);
+            if (collection == null) {
+                console.warn('Unable to find collection with id ' + data.id);
                 return;
             }
             collection.setProperty(data.propertyName, data.propertyValue);
         }
     }
 
-    settings(): Settings {
+    public settings(): Settings {
         return Settings;
     }
 
