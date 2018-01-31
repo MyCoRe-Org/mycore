@@ -57,6 +57,7 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
      */
     @SuppressWarnings({ "WeakerAccess", "unused" })
     protected void rollbackDeleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+        // can be used to rollback
     }
 
     /**
@@ -67,6 +68,7 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
      */
     @SuppressWarnings({ "WeakerAccess", "unused" })
     protected void rollbackUpdateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+        // can be used to rollback
     }
 
     /**
@@ -77,6 +79,7 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
      */
     @SuppressWarnings({ "WeakerAccess", "unused" })
     protected void rollbackRegisterJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+        // can be used to rollback
     }
 
     /**
