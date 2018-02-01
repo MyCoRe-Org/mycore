@@ -1,9 +1,11 @@
 package org.mycore.pi;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,8 +13,12 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.condition.MCRPIObjectRegistrationConditionProvider;
+import org.mycore.pi.doi.MCRDOIRegistrationService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
@@ -33,6 +39,8 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRJobQueue REGISTER_JOB_QUEUE = initializeJobQueue();
+
+    protected static final String REGISTRATION_CONDITION_PROVIDER = "RegistrationConditionProvider";
 
     public MCRPIJobRegistrationService(String registrationServiceID, String identType) {
         super(registrationServiceID, identType);
@@ -245,6 +253,44 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
 
     protected PiJobAction getAction(Map<String, String> contextParameters) {
         return PiJobAction.valueOf(contextParameters.get("action"));
+    }
+
+    protected Predicate<MCRBase> getRegistrationCondition(String objectType) {
+        return Optional.ofNullable(getProperties().get(MCRDOIRegistrationService.REGISTRATION_CONDITION_PROVIDER))
+            .map(clazz -> {
+                String errorMessageBegin =
+                    "Configured class " + clazz + "(" + MCRPIRegistrationService.REGISTRATION_CONFIG_PREFIX
+                        + getRegistrationServiceID() + "." + MCRDOIRegistrationService.REGISTRATION_CONDITION_PROVIDER + ")";
+                try {
+                    return Class.forName(clazz)
+                        .getConstructor()
+                        .newInstance();
+                } catch (ClassNotFoundException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " was not found!", e);
+                } catch (IllegalAccessException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " has no public constructor!", e);
+                } catch (InstantiationException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " seems to be abstract!", e);
+                } catch (NoSuchMethodException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " has no default constructor!", e);
+                } catch (InvocationTargetException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " could not be initialized", e);
+                } catch (ClassCastException e) {
+                    throw new MCRConfigurationException(
+                        errorMessageBegin + " needs to extend " + MCRPIObjectRegistrationConditionProvider.class
+                            .getName(), e);
+                }
+            })
+            .map(MCRPIObjectRegistrationConditionProvider.class::cast)
+            .map(instance -> instance.provideRegistrationCondition(objectType))
+            .orElseGet(() -> MCRPIObjectRegistrationConditionProvider.ALWAYS_REGISTER_CONDITION_PROVIDER
+                .provideRegistrationCondition(objectType));
+
     }
 
     public enum PiJobAction {

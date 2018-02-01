@@ -19,7 +19,6 @@
 package org.mycore.pi.doi;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -53,7 +52,6 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -67,9 +65,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIJobRegistrationService;
-import org.mycore.pi.MCRPIRegistrationService;
 import org.mycore.pi.backend.MCRPI;
-import org.mycore.pi.condition.MCRPIObjectRegistrationConditionProvider;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
@@ -132,8 +128,6 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
     private static final String CONTEXT_OBJ = "obj";
 
     private static final String CONTEXT_DOI = "doi";
-
-    private static final String REGISTRATION_CONDITION_PROVIDER = "RegistrationConditionProvider";
 
     private String username;
 
@@ -466,41 +460,4 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
                 contextParameters.get(CONTEXT_OBJ)));
     }
 
-    protected Predicate<MCRBase> getRegistrationCondition(String objectType) {
-        return Optional.ofNullable(getProperties().get(REGISTRATION_CONDITION_PROVIDER))
-            .map(clazz -> {
-                String errorMessageBegin =
-                    "Configured class " + clazz + "(" + MCRPIRegistrationService.REGISTRATION_CONFIG_PREFIX
-                        + getRegistrationServiceID() + "." + REGISTRATION_CONDITION_PROVIDER + ")";
-                try {
-                    return Class.forName(clazz)
-                        .getConstructor()
-                        .newInstance();
-                } catch (ClassNotFoundException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " was not found!", e);
-                } catch (IllegalAccessException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " has no public constructor!", e);
-                } catch (InstantiationException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " seems to be abstract!", e);
-                } catch (NoSuchMethodException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " has no default constructor!", e);
-                } catch (InvocationTargetException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " could not be initialized", e);
-                } catch (ClassCastException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " needs to extend " + MCRPIObjectRegistrationConditionProvider.class
-                            .getName(), e);
-                }
-            })
-            .map(MCRPIObjectRegistrationConditionProvider.class::cast)
-            .map(instance -> instance.provideRegistrationCondition(objectType))
-            .orElseGet(() -> MCRPIObjectRegistrationConditionProvider.ALWAYS_REGISTER_CONDITION_PROVIDER
-                .provideRegistrationCondition(objectType));
-
-    }
 }
