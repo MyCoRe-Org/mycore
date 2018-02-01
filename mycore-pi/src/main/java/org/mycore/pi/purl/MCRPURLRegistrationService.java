@@ -43,6 +43,10 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
 
     private static final String PURL_BASE_URL = "RegisterBaseURL";
 
+    private static final String PURL_CONTEXT_CONFIG = "RegisterContext";
+
+    private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
+
     public MCRPURLRegistrationService(String registrationServiceID) {
         super(registrationServiceID, TYPE);
     }
@@ -68,7 +72,8 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
 
     private String buildTargetURL(MCRBase obj) {
         String baseURL = getProperties().get(PURL_BASE_URL);
-        return baseURL + "receive/" + obj.getId().toString();
+        return baseURL + getProperties().getOrDefault(PURL_CONTEXT_CONFIG, DEFAULT_CONTEXT_PATH)
+            .replaceAll("\\$[iI][dD]", obj.getId().toString());
     }
 
     private void doWithPURLManager(Consumer<MCRPURLManager> action) {
@@ -98,8 +103,9 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
     protected void update(MCRPersistentUniformResourceLocator purl, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         doWithPURLManager((purlManager) -> {
-            if (!purlManager.isPURLTargetURLUnchanged(purl.getUrl().toString(), buildTargetURL(obj))) {
-                purlManager.updateExistingPURL(purl.getUrl().getPath(), buildTargetURL(obj), "302",
+            String targetURL = buildTargetURL(obj);
+            if (!purlManager.isPURLTargetURLUnchanged(purl.getUrl().toString(), targetURL)) {
+                purlManager.updateExistingPURL(purl.getUrl().getPath(), targetURL, "302",
                     getProperties().getOrDefault(
                         PURL_MAINTAINER_CONFIG, "test"));
             }
