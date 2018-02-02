@@ -34,13 +34,13 @@ import org.mycore.user2.MCRUserManager;
 public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentifier>
     extends MCRPIRegistrationService<T> {
 
-    public static final String JOB_API_USER_PROPERTY = "jobApiUser";
+    public static final String JOB_API_USER_PROPERTY = "JobApiUser";
+
+    protected static final String REGISTRATION_CONDITION_PROVIDER = "RegistrationConditionProvider";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRJobQueue REGISTER_JOB_QUEUE = initializeJobQueue();
-
-    protected static final String REGISTRATION_CONDITION_PROVIDER = "RegistrationConditionProvider";
 
     public MCRPIJobRegistrationService(String registrationServiceID, String identType) {
         super(registrationServiceID, identType);
@@ -188,28 +188,34 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
         String jobUser = this.getProperties().get(JOB_API_USER_PROPERTY);
         MCRSession session = null;
         MCRUserInformation savedUserInformation = null;
+        session = MCRSessionMgr.getCurrentSession();
 
         if (jobUserPresent) {
-            session = MCRSessionMgr.getCurrentSession();
             savedUserInformation = session.getUserInformation();
             MCRUser user = MCRUserManager.getUser(jobUser);
 
             /* workaround https://mycore.atlassian.net/browse/MCR-1400*/
             session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
-
             session.setUserInformation(user);
             LOGGER.info("Continue as User {}", jobUser);
         }
 
+        boolean transactionActive = !session.isTransactionActive();
         try {
+            if (transactionActive) {
+                session.beginTransaction();
+            }
             task.run();
         } finally {
+            if (transactionActive && session.isTransactionActive()) {
+                session.commitTransaction();
+            }
+
             if (jobUserPresent) {
-                LOGGER.info("Continue as User {}", savedUserInformation.getUserID());
+                LOGGER.info("Continue as previous User {}", savedUserInformation.getUserID());
 
                 /* workaround https://mycore.atlassian.net/browse/MCR-1400*/
                 session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
-
                 session.setUserInformation(savedUserInformation);
             }
         }
@@ -260,7 +266,8 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
             .map(clazz -> {
                 String errorMessageBegin =
                     "Configured class " + clazz + "(" + MCRPIRegistrationService.REGISTRATION_CONFIG_PREFIX
-                        + getRegistrationServiceID() + "." + MCRDOIRegistrationService.REGISTRATION_CONDITION_PROVIDER + ")";
+                        + getRegistrationServiceID() + "." + MCRDOIRegistrationService.REGISTRATION_CONDITION_PROVIDER
+                        + ")";
                 try {
                     return Class.forName(clazz)
                         .getConstructor()

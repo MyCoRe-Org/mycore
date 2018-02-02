@@ -54,6 +54,12 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
 
     private static final String PURL_BASE_URL = "RegisterBaseURL";
 
+    private static final String PURL_CONTEXT_CONFIG = "RegisterContext";
+
+    private static final String PURL_MAINTAINER_CONFIG = "Maintainer";
+
+    private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
+
     public MCRPURLJobRegistrationService(String registrationServiceID) {
         super(registrationServiceID, TYPE);
     }
@@ -62,17 +68,20 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
     public void registerJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         MCRPersistentUniformResourceLocator purl = getPURLFromJob(parameters);
         String idString = parameters.get(CONTEXT_OBJECT);
-        LOGGER.info("TODO: Register PURL at PURL-Server!");
 
         doWithPURLManager(
-            manager -> manager.registerNewPURL(purl.getUrl().getPath(), buildTargetURL(idString), "302", "test")
+            manager -> manager
+                .registerNewPURL(purl.getUrl().getPath(), buildTargetURL(idString), "302", getProperties().getOrDefault(
+                    PURL_MAINTAINER_CONFIG, "test"))
         );
         this.updateStartRegistrationDate(MCRObjectID.getInstance(idString), "", new Date());
     }
 
     private String buildTargetURL(String objId) {
         String baseURL = getProperties().get(PURL_BASE_URL);
-        return baseURL + "receive/" + objId;
+        return baseURL + getProperties().getOrDefault(PURL_CONTEXT_CONFIG, DEFAULT_CONTEXT_PATH)
+            .replaceAll("\\$[iI][dD]", objId);
+
     }
 
     @Override
@@ -93,7 +102,26 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
 
     @Override
     public void updateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+        String purlString = parameters.get(CONTEXT_PURL);
+        MCRPersistentUniformResourceLocator purl;
 
+        try {
+            purl = new MCRPersistentUniformResourceLocator(
+                new URL(purlString));
+        } catch (MalformedURLException e) {
+            throw new MCRPersistentIdentifierException("Could not parse purl: " + purlString, e);
+        }
+
+        String objId = parameters.get(CONTEXT_OBJECT);
+
+        doWithPURLManager((purlManager) -> {
+            if (!purlManager.isPURLTargetURLUnchanged(purl.getUrl().toString(), buildTargetURL(
+                objId))) {
+                purlManager.updateExistingPURL(purl.getUrl().getPath(), buildTargetURL(objId), "302",
+                    getProperties().getOrDefault(
+                        PURL_MAINTAINER_CONFIG, "test"));
+            }
+        });
     }
 
     @Override
@@ -125,9 +153,8 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
         }
 
         MCRPersistentUniformResourceLocator purl = getNewIdentifier(obj.getId(), additional);
-
-        MCRPURLManager app = new MCRPURLManager();
-
+        // just insert the purl to the object
+        // this will trigger #update
         return purl;
     }
 
@@ -146,12 +173,23 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
                 this.updateStartRegistrationDate(obj.getId(), "", new Date());
                 startRegisterJob(obj, purl);
             }
+        } else {
+            if (isRegistered(obj.getId(), "")) {
+                startUpdateJob(obj, purl);
+            }
         }
     }
 
-    private void startRegisterJob(MCRBase obj, MCRPersistentUniformResourceLocator newDOI) {
+    private void startUpdateJob(MCRBase obj, MCRPersistentUniformResourceLocator purl) {
         HashMap<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(CONTEXT_PURL, newDOI.asString());
+        contextParameters.put(CONTEXT_PURL, purl.asString());
+        contextParameters.put(CONTEXT_OBJECT, obj.getId().toString());
+        this.addUpdateJob(contextParameters);
+    }
+
+    private void startRegisterJob(MCRBase obj, MCRPersistentUniformResourceLocator purl) {
+        HashMap<String, String> contextParameters = new HashMap<>();
+        contextParameters.put(CONTEXT_PURL, purl.asString());
         contextParameters.put(CONTEXT_OBJECT, obj.getId().toString());
         this.addRegisterJob(contextParameters);
     }
