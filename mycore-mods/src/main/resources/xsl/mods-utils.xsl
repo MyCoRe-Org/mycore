@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="i18n mcrxml xalan xlink">
+  xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:xlink="http://www.w3.org/1999/xlink"
+  exclude-result-prefixes="i18n mcrxml xalan xlink"
+>
 
   <xsl:param name="CurrentUser" />
   <xsl:param name="CurrentLang" />
@@ -13,7 +13,8 @@
     <xsl:choose>
       <xsl:when
         test="substring-after(mods:genre[@type='intern']/@valueURI,'#')='article' or
-              (mods:relatedItem/mods:genre='periodical' and mods:identifier/@type='doi')">
+              (mods:relatedItem/mods:genre='periodical' and mods:identifier/@type='doi')"
+      >
         <xsl:value-of select="'article'" />
       </xsl:when>
       <xsl:otherwise>
@@ -72,7 +73,8 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]"
-              mode="mods.printTitle">
+              mode="mods.printTitle"
+            >
               <xsl:with-param name="asHTML" select="$asHTML" />
               <xsl:with-param name="withSubtitle" select="$withSubtitle" />
             </xsl:apply-templates>
@@ -101,14 +103,14 @@
           select="document(..//mods:titleInfo[(@altRepGroup = $altRepGroup) and (string-length(@altFormat) &gt; 0)]/@altFormat)/titleInfo" />
 
         <xsl:if test="$alternateContent/nonSort">
-          <xsl:apply-templates select="$alternateContent/nonSort" mode="copyNode" />
+          <xsl:apply-templates select="$alternateContent/nonSort/node()" mode="unescapeHtml" />
           <xsl:text> </xsl:text>
         </xsl:if>
-        <xsl:apply-templates select="$alternateContent/title" mode="copyNode" />
+        <xsl:apply-templates select="$alternateContent/title/node()" mode="unescapeHtml" />
         <xsl:if test="$withSubtitle and $alternateContent/subTitle">
           <span class="subtitle">
             <xsl:text> : </xsl:text>
-            <xsl:apply-templates select="$alternateContent/subTitle" mode="copyNode" />
+            <xsl:apply-templates select="$alternateContent/subTitle/node()" mode="unescapeHtml" />
           </span>
         </xsl:if>
       </xsl:when>
@@ -133,7 +135,8 @@
     <xsl:choose>
       <xsl:when test="mods:titleInfo/mods:title">
         <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]"
-          mode="mods.printTitle">
+          mode="mods.printTitle"
+        >
           <xsl:with-param name="asHTML" select="$asHTML" />
           <xsl:with-param name="withSubtitle" select="$withSubtitle" />
         </xsl:apply-templates>
@@ -174,7 +177,8 @@
     <xsl:choose>
       <xsl:when test="mods:titleInfo/mods:title">
         <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]"
-          mode="mods.printTitle">
+          mode="mods.printTitle"
+        >
           <xsl:with-param name="asHTML" select="$asHTML" />
           <xsl:with-param name="withSubtitle" select="$withSubtitle" />
         </xsl:apply-templates>
@@ -207,8 +211,7 @@
         <xsl:value-of select="mods:titleInfo[@type=$type]/mods:subTitle" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of
-          select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]/mods:subTitle" />
+        <xsl:value-of select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]/mods:subTitle" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -239,18 +242,16 @@
     <xsl:variable name="name" select="name(.)" />
     <xsl:variable name="localName" select="local-name(.)" />
     <xsl:variable name="altRepGroup" select="@altRepGroup" />
-    <xsl:variable name="hasAlternateFormat"
-      select="count(..//*[(name() = $name) and (@altRepGroup = $altRepGroup) and (string-length(@altFormat) &gt; 0)]) &gt; 0" />
+    <xsl:variable name="hasAlternateFormat" select="count(..//*[(name() = $name) and (@altRepGroup = $altRepGroup) and (string-length(@altFormat) &gt; 0)]) &gt; 0" />
 
     <xsl:choose>
       <xsl:when test="$asHTML and $hasAlternateFormat and not($filtered) and (string-length(@altFormat) = 0)">
         <!-- ignore -->
       </xsl:when>
-      <xsl:when
-        test="$asHTML and $hasAlternateFormat and ((string-length(@altFormat) &gt; 0) or ((string-length(@altFormat) = 0) and $filtered))">
+      <xsl:when test="$asHTML and $hasAlternateFormat and ((string-length(@altFormat) &gt; 0) or ((string-length(@altFormat) = 0) and $filtered))">
         <xsl:variable name="alternateContent"
           select="document(..//*[(name() = $name) and (@altRepGroup = $altRepGroup) and (string-length(@altFormat) &gt; 0)]/@altFormat)/*[name() = $localName]" />
-        <xsl:apply-templates select="$alternateContent" mode="copyNode" />
+        <xsl:apply-templates select="$alternateContent/node()" mode="unescapeHtml" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="." />
@@ -361,7 +362,7 @@
     <a itemprop="creator" href="{$query}">
       <span itemscope="itemscope" itemtype="http://schema.org/Person">
         <span itemprop="name">
-      <xsl:apply-templates select="." mode="nameString" />
+          <xsl:apply-templates select="." mode="nameString" />
         </span>
         <xsl:if test="count($nameIdentifier) &gt; 0">
           <xsl:text>&#160;</xsl:text><!-- add whitespace here -->
@@ -410,14 +411,14 @@
         </xsl:when>
         <xsl:when test="mods:namePart[not(@type)]">
           <xsl:for-each select="mods:namePart[not(@type)]">
-             <xsl:choose>
-                <xsl:when test="position() = 1">
-                  <xsl:value-of select="text()"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat(' ', text())"/>
-                </xsl:otherwise>
-              </xsl:choose>
+            <xsl:choose>
+              <xsl:when test="position() = 1">
+                <xsl:value-of select="text()" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat(' ', text())" />
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
@@ -437,8 +438,19 @@
   <xsl:template match="*" mode="copyNode">
     <xsl:copy-of select="node()" />
   </xsl:template>
+  
+  <xsl:template match="*" mode="unescapeHtml">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" />
+      <xsl:apply-templates mode="unescapeHtml" />
+    </xsl:copy>
+  </xsl:template>
 
-    <xsl:template name="mods.seperateName">
+  <xsl:template match="text()" mode="unescapeHtml">
+    <xsl:value-of select="." disable-output-escaping="yes" />
+  </xsl:template>
+
+  <xsl:template name="mods.seperateName">
     <xsl:param name="displayForm" />
     <xsl:choose>
       <xsl:when test="contains($displayForm, ',')">
