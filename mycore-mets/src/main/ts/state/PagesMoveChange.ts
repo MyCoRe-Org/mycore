@@ -21,7 +21,12 @@
 namespace org.mycore.mets.model.state {
     export class PagesMoveChange extends ModelChange {
 
-        constructor(private pageList: Array<model.simple.MCRMetsPage>,
+        private rangeFromLabel: string;
+        private rangeToLabel: string;
+        private moveToLabel: string;
+        private moveFrom: PagesMoveChangeDestination;
+
+        constructor(private pageList: model.simple.MCRMetsPage[],
                     private range: PagesMoveChangeRange,
                     private moveTo: PagesMoveChangeDestination) {
             super();
@@ -52,11 +57,19 @@ namespace org.mycore.mets.model.state {
             this.moveToLabel = moveTo.element.orderLabel || alternativeLabel;
         }
 
-        private rangeFromLabel: string;
-        private rangeToLabel: string;
-        private moveToLabel: string;
+        private static copy(pl: model.simple.MCRMetsPage[], range: PagesMoveChangeRange, to: PagesMoveChangeDestination) {
+            const startIndex = pl.indexOf(range.from);
+            const count = this.getRangeCount(pl, range, startIndex);
+            const pages = pl.splice(startIndex, count);
+            const destinationIndex = pl.indexOf(to.element) + (to.before ? 0 : 1);
+            const args = (<any> [ destinationIndex, 0 ]).concat(pages);
+            pl.splice.apply(pl, args);
+        }
 
-        private moveFrom: PagesMoveChangeDestination;
+        private static getRangeCount(pl: model.simple.MCRMetsPage[], range: PagesMoveChangeRange,
+                                     startIndex: number = pl.indexOf(range.from)) {
+            return pl.indexOf(range.to) - startIndex + 1;
+        }
 
         public doChange() {
             PagesMoveChange.copy(this.pageList, this.range, this.moveTo);
@@ -67,28 +80,15 @@ namespace org.mycore.mets.model.state {
         }
 
         public getDescription(messages: any) {
-            return (messages[ "PagesMoveChangeDescription" ]
-                .replace("{range.from}", this.rangeFromLabel) || "???PagesMoveChangeDescription???")
-                .replace("{range.to}", this.rangeToLabel)
-                .replace("{move}", this.moveToLabel)
-                .replace("{position}", this.moveTo.before ? messages[ "before" ] : messages[ "after" ]);
+            return (messages.PagesMoveChangeDescription
+                .replace('{range.from}', this.rangeFromLabel) || '???PagesMoveChangeDescription???')
+                .replace('{range.to}', this.rangeToLabel)
+                .replace('{move}', this.moveToLabel)
+                .replace('{position}', this.moveTo.before ? messages.before : messages.after);
         }
-
-        private static copy(pl: Array<model.simple.MCRMetsPage>, range: PagesMoveChangeRange, to: PagesMoveChangeDestination) {
-            const startIndex = pl.indexOf(range.from);
-            const count = this.getRangeCount(pl, range, startIndex);
-            const pages = pl.splice(startIndex, count);
-            const destinationIndex = pl.indexOf(to.element) + (to.before ? 0 : 1 );
-            const args = (<any> [ destinationIndex, 0 ]).concat(pages);
-            pl.splice.apply(pl, args);
-        }
-
-        private static getRangeCount(pl, range, startIndex = pl.indexOf(range.from)) {
-            return pl.indexOf(range.to) - startIndex + 1;
-        }
-
 
     }
+
     export interface PagesMoveChangeDestination {
         before: boolean;
         element: model.simple.MCRMetsPage;

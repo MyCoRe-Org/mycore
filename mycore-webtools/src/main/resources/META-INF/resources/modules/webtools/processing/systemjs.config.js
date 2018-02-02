@@ -35,7 +35,7 @@
     'rxjs':                               'npm:rxjs',
     'moment':                             'npm:moment',
     'angular2-moment':                    'npm:angular2-moment',
-    'ng2-bootstrap':                      'npm:ng2-bootstrap'
+    'ngx-bootstrap':                      'npm:ngx-bootstrap'
   };
   // packages tells the System loader how to load when no filename and/or no extension
   var packages = {
@@ -43,7 +43,7 @@
     'rxjs':                               { defaultExtension: 'js' },
     'moment':                             { main: './moment', defaultExtension: 'js' },
     'angular2-moment':                    { main: './index', defaultExtension: 'js' },
-    'ng2-bootstrap':                      { main: './ng2-bootstrap.umd.min', defaultExtension: 'js' }
+    'ngx-bootstrap':                      { main: './ngx-bootstrap.umd.min', defaultExtension: 'js' }
   };
   var ngPackageNames = [
     'common',

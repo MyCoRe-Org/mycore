@@ -18,7 +18,7 @@
 
 package org.mycore.webtools.session;
 
-import java.awt.*;
+import java.awt.Color;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ import org.mycore.frontend.jersey.MCRJerseyUtil;
 
 /**
  * Resource which provides information about mycore sessions. 
- * 
+ *
  * @author Matthias Eichner
  */
 @Path("session")
@@ -54,7 +54,7 @@ public class MCRSessionResource {
 
     /**
      * Lists all {@link MCRSession}'s in json format.
-     * 
+     *
      * @param resolveHostname (false) if the host names are resolved. Resolving host names takes some
      *          time, so this is deactivated by default
      * @return list of sessions
@@ -67,10 +67,12 @@ public class MCRSessionResource {
         MCRJerseyUtil.checkPermission("manage-sessions");
 
         // get all sessions
-        JsonArray rootJSON = new ArrayList<>(MCRSessionMgr.getAllSessions().values())
-                                  .parallelStream()
-                                  .map(s -> generateSessionJSON(s, resolveHostname))
-                                  .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+        JsonArray rootJSON = new ArrayList<>(MCRSessionMgr.getAllSessions().values()).parallelStream()
+                                                                                     .map(s -> generateSessionJSON(s,
+                                                                                             resolveHostname))
+                                                                                     .collect(JsonArray::new,
+                                                                                             JsonArray::add,
+                                                                                             JsonArray::addAll);
         return Response.status(Status.OK).entity(rootJSON.toString()).build();
     }
 
@@ -93,7 +95,7 @@ public class MCRSessionResource {
 
     /**
      * Builds the session JSON object.
-     * 
+     *
      * @param session the session to represent in JSON format
      * @param resolveHostname if host names should be resolved, adds the property 'hostName'
      * @return a gson JsonObject containing all session information
@@ -120,15 +122,14 @@ public class MCRSessionResource {
         sessionJSON.addProperty("createTime", session.getCreateTime());
         sessionJSON.addProperty("lastAccessTime", session.getLastAccessedTime());
         sessionJSON.addProperty("loginTime", session.getLoginTime());
-        session.getFirstURI()
-            .ifPresent(u -> sessionJSON.addProperty("firstURI", u.toString()));
+        session.getFirstURI().ifPresent(u -> sessionJSON.addProperty("firstURI", u.toString()));
         sessionJSON.add("constructingStacktrace", buildStacktrace(session));
         return sessionJSON;
     }
 
     /**
      * Resolves the host name by the given ip.
-     * 
+     *
      * @param ip the ip to resolve
      * @return the host name or null if the ip couldn't be resolved
      */
@@ -144,7 +145,7 @@ public class MCRSessionResource {
     /**
      * Builds the constructing stack trace for the given session.
      * Containing the class, file, method and line.
-     * 
+     *
      * @param session session
      * @return json array containing all {@link StackTraceElement} as json
      */
@@ -168,7 +169,7 @@ public class MCRSessionResource {
 
     /**
      * Converts an hash code to a hex color code (e.g. #315a4f).
-     * 
+     *
      * @param hashCode the hash code to convert
      * @return a hex color code as string
      */

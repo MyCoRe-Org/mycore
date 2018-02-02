@@ -16,30 +16,30 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Util} from "../util";
-import {Settings} from "../settings";
+import {Util} from '../util';
+import {Settings} from '../settings';
 
 export class Registry {
 
-    collections: Array<Collection> = [];
+    protected collections: Collection[] = [];
 
     public getCollection(id: number): Collection {
         return this.collections.find((collection) => {
-            return collection.id == id;
+            return collection.id === id;
         });
     }
 
     public addCollection(collectionData: any): void {
-        let collection = new Collection();
+        const collection = new Collection();
         Util.mixin(collectionData, collection);
         collection.updatePropertyKeys();
         this.collections.push(collection);
     }
 
     public updateProcessable(processableData: any): void {
-        let collection = this.getCollection(processableData.collectionId);
+        const collection = this.getCollection(processableData.collectionId);
         if (collection == null) {
-            console.log("Unable to find collection with id " + processableData.collectionId);
+            console.warn('Unable to find collection with id ' + processableData.collectionId);
             return;
         }
         collection.updateProcessable(processableData);
@@ -49,34 +49,34 @@ export class Registry {
 
 export class Collection {
 
-    id: number;
+    public id: number;
 
-    name: string;
+    public name: string;
 
     /**
      * Array for fast access.
      */
-    processables: Array<Processable> = [];
+    public processables: Processable[] = [];
 
-    processingProcessables: Array<Processable> = [];
+    public processingProcessables: Processable[] = [];
 
-    createdProcessables: Array<Processable> = [];
+    public createdProcessables: Processable[] = [];
 
-    finishedProcessables: Array<Processable> = [];
+    public finishedProcessables: Processable[] = [];
 
-    properties: { [name: string]: any } = {};
+    public properties: { [name: string]: any } = {};
 
     /**
      * Double storage of property keys due performance reasons.
      */
-    propertyKeys: Array<string> = [];
+    public propertyKeys: string[] = [];
 
     /**
      * Returns the amount of processables with the status === 'created' of this collection.
      *
-     * @returns {Array<Processable>} array of processables
+     * @returns array of processables
      */
-    public getCreatedProcessables(amount: number): Array<Processable> {
+    public getCreatedProcessables(amount: number): Processable[] {
         if (amount >= this.createdProcessables.length) {
             return this.createdProcessables;
         }
@@ -84,16 +84,16 @@ export class Collection {
     }
 
     public updateProcessable(processableData: any): void {
-        let oldProcessable = this.processables[processableData.id];
+        const oldProcessable = this.processables[processableData.id];
         if (oldProcessable == null) {
             // new
             this.addProcessable(processableData);
         } else {
             // update
-            if (oldProcessable.status === "processing" && processableData.status !== "processing") {
+            if (oldProcessable.status === 'processing' && processableData.status !== 'processing') {
                 Util.remove(this.processingProcessables, oldProcessable);
                 this.addProcessable(processableData);
-            } else if (oldProcessable.status === "created" && processableData.status !== "created") {
+            } else if (oldProcessable.status === 'created' && processableData.status !== 'created') {
                 Util.remove(this.createdProcessables, oldProcessable);
                 this.addProcessable(processableData);
             } else {
@@ -104,15 +104,15 @@ export class Collection {
     }
 
     public addProcessable(processableData: any) {
-        let processable = new Processable();
+        const processable = new Processable();
         Util.mixin(processableData, processable);
         this.processables[processable.id] = processable;
-        if (processable.status === "processing") {
+        if (processable.status === 'processing') {
             this.processingProcessables.push(processable);
-        } else if (processable.status === "created") {
+        } else if (processable.status === 'created') {
             this.createdProcessables.push(processable);
         } else {
-            let maxNumberOfFinishedProcess = Number.parseInt(Settings.get("maxNumberFinished", 50));
+            const maxNumberOfFinishedProcess = Number.parseInt(Settings.get('maxNumberFinished', 50));
             if (maxNumberOfFinishedProcess !== -1) {
                 while (this.finishedProcessables.length >= maxNumberOfFinishedProcess) {
                     this.finishedProcessables.shift();
@@ -124,7 +124,7 @@ export class Collection {
     }
 
     public setProperty(name: string, value: any): void {
-        let updateKeys: boolean = name in this.properties;
+        const updateKeys: boolean = name in this.properties;
         this.properties[name] = value;
         if (updateKeys) {
             this.updatePropertyKeys();
@@ -142,34 +142,34 @@ export class Collection {
 
 export class Processable {
 
-    id: number;
+    public id: number;
 
-    collectionId: number;
+    public collectionId: number;
 
-    name: string;
+    public name: string;
 
-    status: string;
+    public status: string;
 
-    createTime: number;
+    public createTime: number;
 
-    startTime: number;
+    public startTime: number;
 
-    endTime: number;
+    public endTime: number;
 
-    took: number;
+    public took: number;
 
-    error: string;
+    public error: string;
 
-    progress: number;
+    public progress: number;
 
-    progressText: string;
+    public progressText: string;
 
-    properties: { [name: string]: any } = {};
+    public properties: { [name: string]: any } = {};
 
     /**
      * Double storage of property keys due performance reasons.
      */
-    propertyKeys: Array<string> = [];
+    public propertyKeys: string[] = [];
 
     public hasProperties() {
         return Object.keys(this.properties).length > 0;

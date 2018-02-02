@@ -17,16 +17,18 @@
  */
 
 namespace org.mycore.mets.model {
+    import PaginationMethod = org.mycore.mets.model.pagination.PaginationMethod;
+
     export class PaginationModalModel {
-        constructor(public messages: {[key: string]: string},
-                    public selectedPages: Array<simple.MCRMetsPage>,
+        public methods: PaginationMethod[] = org.mycore.mets.model.pagination.paginationMethods;
+        public reverse: boolean = false;
+
+        constructor(public messages: { [key: string]: string },
+                    public selectedPages: simple.MCRMetsPage[],
                     public selectedPagesIndex: number,
                     public begin: number = 0,
                     public method: PaginationMethod = null,
-                    public value: string = "1") {
+                    public value: string = '1') {
         }
-
-        public methods = org.mycore.mets.model.Pagination.paginationMethods;
-        public reverse: boolean = false;
     }
 }

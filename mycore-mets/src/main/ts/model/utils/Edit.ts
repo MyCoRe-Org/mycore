@@ -24,4 +24,3 @@ namespace org.mycore.mets.model {
         public of: any;
     }
 }
-

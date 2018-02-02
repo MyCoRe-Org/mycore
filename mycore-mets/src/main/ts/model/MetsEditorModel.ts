@@ -22,32 +22,38 @@
 
 namespace org.mycore.mets.model {
     export class MetsEditorModel {
-        constructor(public configuration: MetsEditorConfiguration) {
-        }
 
-        public static EDITOR_PAGINATION = "pagination";
-        public static EDITOR_STRUCTURING = "structuring";
-        public static EDITOR_ASSOCIATION = "association";
-
-        public mode: string = MetsEditorModel.EDITOR_PAGINATION;
+        public mode: EditorMode = EditorMode.Pagination;
         public dataLoaded: boolean = false;
         public metsModel: simple.MCRMetsSimpleModel;
         public metsId: string;
-        public middleView: string = "sectionTree";
-        public middleViewOptions = [ "sectionTree", "pages" ];
-        public pageSelection = {from : null, to : null, lastExpand : "top"};
+        public middleView: ViewOptions = ViewOptions.SectionTree;
+        public pageSelection: { from: number, to: number, lastExpand: 'top'|'bottom' } = {
+            from : null,
+            to : null,
+            lastExpand : 'top'
+        };
         public targetServlet: string;
         public lockURL: string;
         public unLockURL: string;
         public locked: boolean = false;
-
         public stateEngine: org.mycore.mets.model.state.StateEngine = new org.mycore.mets.model.state.StateEngine();
+
+        constructor(public configuration: MetsEditorConfiguration) {
+        }
 
         public onModelLoad(metsSimpleModel: simple.MCRMetsSimpleModel) {
             this.metsModel = metsSimpleModel;
             this.dataLoaded = true;
         }
 
+    }
 
+    export enum EditorMode {
+        Pagination = 'pagination', Structuring = 'structuring', Association = 'association'
+    }
+
+    export enum ViewOptions {
+        SectionTree = 'sectionTree', Pages = 'pages'
     }
 }

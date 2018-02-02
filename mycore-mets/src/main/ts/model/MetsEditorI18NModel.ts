@@ -22,16 +22,16 @@ namespace org.mycore.mets.model {
     export function i18n($http: ng.IHttpService,
                          $location: ng.ILocationService,
                          $log: ng.ILogService, editorConfiguration: MetsEditorConfiguration) {
-        let metsEditorMessageModel = {messages : new Array()};
+        const metsEditorMessageModel = {messages : []};
 
         (<any> $http.get(editorConfiguration.i18URL)).success((i18nData) => {
-            for (let index in i18nData) {
+            for (const index in i18nData) {
                 if (i18nData.hasOwnProperty(index)) {
                     let betterKey = index;
-                    if (index.indexOf("component.mets.editor") === 0) {
-                        betterKey = index.substr("component.mets.editor.".length);
-                    } else if (index.indexOf("component.mets.dfgStructureSet") === 0) {
-                        betterKey = index.substr("component.mets.dfgStructureSet.".length);
+                    if (index.indexOf('component.mets.editor') === 0) {
+                        betterKey = index.substr('component.mets.editor.'.length);
+                    } else if (index.indexOf('component.mets.dfgStructureSet') === 0) {
+                        betterKey = index.substr('component.mets.dfgStructureSet.'.length);
                     }
                     metsEditorMessageModel.messages[ betterKey ] = i18nData[ index ];
                 }
@@ -39,5 +39,9 @@ namespace org.mycore.mets.model {
         });
 
         return metsEditorMessageModel;
+    }
+
+    export interface I18nModel {
+        messages: any;
     }
 }

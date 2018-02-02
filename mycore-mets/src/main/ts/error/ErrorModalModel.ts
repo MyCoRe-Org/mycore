@@ -22,4 +22,3 @@ namespace org.mycore.mets.model {
         }
     }
 }
-

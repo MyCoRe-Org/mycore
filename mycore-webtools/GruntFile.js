@@ -81,8 +81,8 @@ module.exports = function (grunt) {
                         },
                         {
                           expand: true,
-                          cwd: './node_modules/ng2-bootstrap/bundles',
-                          dest: './target/classes/META-INF/resources/modules/webtools/node_modules/ng2-bootstrap',
+                          cwd: './node_modules/ngx-bootstrap/bundles',
+                          dest: './target/classes/META-INF/resources/modules/webtools/node_modules/ngx-bootstrap',
                           src: [
                               '**'
                           ]

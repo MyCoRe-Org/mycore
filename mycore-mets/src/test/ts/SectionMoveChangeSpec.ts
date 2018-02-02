@@ -19,23 +19,23 @@
 ///<reference path="TestUtils.ts"/>
 
 namespace org.mycore.mets.tests {
-    describe("SectionMoveChange", () => {
+    describe('SectionMoveChange', () => {
 
         let model: org.mycore.mets.model.MetsEditorModel;
         let simpleChange: org.mycore.mets.model.state.SectionMoveChange;
         let sectionToMove: org.mycore.mets.model.simple.MCRMetsSection;
         let moveTarget: org.mycore.mets.model.DropTarget;
-        let moveToIndex = 1;
+        const moveToIndex = 1;
 
-        let emptyMessages = {};
+        const emptyMessages = {};
 
         beforeEach(() => {
-            model = TestUtils.createDefaultModel();
+            model = utils.createDefaultModel();
             sectionToMove = model.metsModel.rootSection.metsSectionList[ 0 ];
         });
 
-        it("can be executed(position=after)", () => {
-            moveTarget = {position : "after", element : model.metsModel.rootSection.metsSectionList[ moveToIndex ]};
+        it('can be executed(position=after)', () => {
+            moveTarget = {position : 'after', element : model.metsModel.rootSection.metsSectionList[ moveToIndex ]};
             simpleChange = new org.mycore.mets.model.state.SectionMoveChange(sectionToMove, moveTarget);
 
             /**
@@ -48,8 +48,8 @@ namespace org.mycore.mets.tests {
             expect(model.metsModel.rootSection.metsSectionList.indexOf(sectionToMove)).toBe(1);
         });
 
-        it("can be executed(position=after) and reverted", () => {
-            moveTarget = {position : "after", element : model.metsModel.rootSection.metsSectionList[ moveToIndex ]};
+        it('can be executed(position=after) and reverted', () => {
+            moveTarget = {position : 'after', element : model.metsModel.rootSection.metsSectionList[ moveToIndex ]};
             simpleChange = new org.mycore.mets.model.state.SectionMoveChange(sectionToMove, moveTarget);
 
             expect(model.metsModel.rootSection.metsSectionList.indexOf(sectionToMove)).toBe(0);
@@ -59,11 +59,11 @@ namespace org.mycore.mets.tests {
             expect(model.metsModel.rootSection.metsSectionList.indexOf(sectionToMove)).toBe(0);
         });
 
-        it("has a description", () => {
-            moveTarget = {position : "after", element : model.metsModel.rootSection.metsSectionList[ moveToIndex ]};
+        it('has a description', () => {
+            moveTarget = {position : 'after', element : model.metsModel.rootSection.metsSectionList[ moveToIndex ]};
             simpleChange = new org.mycore.mets.model.state.SectionMoveChange(sectionToMove, moveTarget);
 
-            let changeDescription = TestUtils.getWords(simpleChange.getDescription(emptyMessages));
+            const changeDescription = utils.getWords(simpleChange.getDescription(emptyMessages));
             expect(changeDescription).toContain(model.metsModel.rootSection.label);
             expect(changeDescription).toContain(moveTarget.position);
             expect(changeDescription).toContain(moveTarget.element.label);

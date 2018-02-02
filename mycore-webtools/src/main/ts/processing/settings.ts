@@ -18,14 +18,14 @@
 
 export class Settings {
 
-    private static PREFIX: string = "mcr.processables.";
+    private static PREFIX: string = 'mcr.processables.';
 
     public static set(name: string, value: any) {
         localStorage.setItem(Settings.PREFIX + name, value);
     }
 
     public static get(name: string, optionalDefault?: any): any {
-        let value = localStorage.getItem(Settings.PREFIX + name);
+        const value = localStorage.getItem(Settings.PREFIX + name);
         return value == null ? optionalDefault : value;
     }
 

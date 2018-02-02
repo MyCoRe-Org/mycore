@@ -20,42 +20,11 @@
 
 namespace org.mycore.mets.model.state {
     export class MetsEditorStateController {
-        constructor(private $modal, public i18nModel, hotkeys) {
+        private stateEngine: StateEngine;
+
+        constructor(private $modal: any, public i18nModel: any, hotkeys: any) {
             this.initHotkeys(hotkeys);
         }
-
-        private initHotkeys(hotkeys) {
-            hotkeys.add({
-                combo : "ctrl+z",
-                description : "",
-                callback : () => {
-                    this.backClicked();
-                }
-            });
-            hotkeys.add({
-                combo : "command+z",
-                description : "",
-                callback : () => {
-                    this.backClicked();
-                }
-            });
-            hotkeys.add({
-                combo : "cmd+shift+z",
-                description : "",
-                callback : () => {
-                    this.nextClicked();
-                }
-            });
-            hotkeys.add({
-                combo : "command+shift+z",
-                description : "",
-                callback : () => {
-                    this.nextClicked();
-                }
-            });
-        }
-
-        private stateEngine: StateEngine;
 
         public init(stateEngine: StateEngine) {
             this.stateEngine = stateEngine;
@@ -83,9 +52,9 @@ namespace org.mycore.mets.model.state {
 
         public listClicked() {
             const options = {
-                templateUrl : "state/changeListModal.html",
-                controller : "MetsEditorChangeListController",
-                size : "lg"
+                templateUrl : 'state/changeListModal.html',
+                controller : 'MetsEditorChangeListController',
+                size : 'lg'
             };
             const modal = this.$modal.open(options);
             modal.changes = this.stateEngine.getLastChanges();
@@ -95,7 +64,36 @@ namespace org.mycore.mets.model.state {
 
             modal.result.then(emptyCallback, emptyCallback);
         }
+
+        private initHotkeys(hotkeys: any) {
+            hotkeys.add({
+                combo : 'ctrl+z',
+                description : '',
+                callback : () => {
+                    this.backClicked();
+                }
+            });
+            hotkeys.add({
+                combo : 'command+z',
+                description : '',
+                callback : () => {
+                    this.backClicked();
+                }
+            });
+            hotkeys.add({
+                combo : 'cmd+shift+z',
+                description : '',
+                callback : () => {
+                    this.nextClicked();
+                }
+            });
+            hotkeys.add({
+                combo : 'command+shift+z',
+                description : '',
+                callback : () => {
+                    this.nextClicked();
+                }
+            });
+        }
     }
 }
-
-

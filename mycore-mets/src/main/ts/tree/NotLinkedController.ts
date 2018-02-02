@@ -21,7 +21,6 @@
 ///<reference path="../model/MetsEditorModel.ts"/>
 ///<reference path="../model/simple/MCRMetsPage.ts"/>
 
-
 namespace org.mycore.mets.controller {
 
     import MCRMetsSection = org.mycore.mets.model.simple.MCRMetsSection;
@@ -30,18 +29,18 @@ namespace org.mycore.mets.controller {
     import MCRMetsPage = org.mycore.mets.model.simple.MCRMetsPage;
 
     export class NotLinkedController {
+        private model: MetsEditorModel;
+
         constructor() {
             /* */
         }
-
-        private model: MetsEditorModel;
 
         public init(model: MetsEditorModel) {
             this.model = model;
         }
 
         public getNotLinkedPages() {
-            let linkedPages = [];
+            const linkedPages = [];
 
             const addLinkedPages = (section: MCRMetsSection) => {
                 section.linkedPages.forEach((p: MCRMetsPage) => {
@@ -58,9 +57,7 @@ namespace org.mycore.mets.controller {
         }
 
         public getPageLabel(p: MCRMetsPage) {
-            return p.orderLabel || "[" + (this.model.metsModel.metsPageList.indexOf(p) + 1) + "]";
+            return p.orderLabel || '[' + (this.model.metsModel.metsPageList.indexOf(p) + 1) + ']';
         }
     }
 }
-
-

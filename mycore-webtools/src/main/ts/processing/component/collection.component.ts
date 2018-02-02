@@ -22,31 +22,28 @@ import {HtmlService} from './../service/html.service';
 import {JsonStringPipe} from './../pipe/json.pipe';
 
 @Component({
-    selector: "collection",
-    templateUrl: "html/collection.html",
-    styleUrls: ["css/collection.css"],
+    selector: 'collection',
+    templateUrl: 'html/collection.html',
+    styleUrls: ['css/collection.css'],
     providers: [HtmlService]
 })
 export class CollectionComponent {
 
-    @Input() model: Collection;
+    @Input()
+    public model: Collection;
 
-    private _showAllCreatedProcessables: boolean;
+    public showAll: boolean;
 
     constructor(private html: HtmlService) {
-        this._showAllCreatedProcessables = false;
+        this.showAll = false;
     }
 
-    get showAllCreatedProcessables() {
-        return this._showAllCreatedProcessables;
+    public showCreatedProcessables() {
+        this.showAll = true;
     }
 
-    showCreatedProcessables() {
-        this._showAllCreatedProcessables = true;
-    }
-
-    hideCreatedProcessables() {
-        this._showAllCreatedProcessables = false;
+    public hideCreatedProcessables() {
+        this.showAll = false;
     }
 
 }
