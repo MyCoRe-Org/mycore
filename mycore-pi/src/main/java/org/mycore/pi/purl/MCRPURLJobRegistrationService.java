@@ -27,8 +27,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -43,8 +41,6 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
     private static final String CONTEXT_PURL = "PURL";
 
     private static final String CONTEXT_OBJECT = "ObjectID";
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String PURL_SERVER_CONFIG = "Server";
 
@@ -126,7 +122,7 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
 
     @Override
     public void deleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
-
+        // deleting ist not supported
     }
 
     @Override
@@ -147,7 +143,7 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
     @Override
     protected MCRPersistentUniformResourceLocator registerIdentifier(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        if (!additional.equals("")) {
+        if (!"".equals(additional)) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
@@ -161,7 +157,7 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
     @Override
     protected void delete(MCRPersistentUniformResourceLocator identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-
+        // not supported
     }
 
     @Override
