@@ -19,7 +19,7 @@
         let existingCss = [];
     for (let i = 0; i <xsl:text>&#60;</xsl:text> document.styleSheets.length; i++) {
           let css = document.styleSheets[i];
-          let src = css.src;
+          let src = css.href;
           if (src != null) {
             existingCss.push(src);
           }
@@ -49,7 +49,6 @@
           script.async = false;
           notLoadedCount++;
           script.onload = function() {
-              console.log("loaded !");
             notLoadedCount--;
 
             if(notLoadedCount==0){
