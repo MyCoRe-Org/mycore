@@ -18,8 +18,6 @@
 
 package org.mycore.solr.index;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
-
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -64,6 +62,8 @@ import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 import org.mycore.util.concurrent.processing.MCRProcessableSupplier;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 /**
  * Base class for indexing with solr.
@@ -482,13 +482,14 @@ public class MCRSolrIndexer {
         MCRFixedUserCallable<List<MCRSolrIndexHandler>> indexTask = new MCRFixedUserCallable<>(
             new MCRSolrIndexTask(indexHandler), MCRSystemUserInformation.getSystemUserInstance());
         MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = SOLR_EXECUTOR.submit(indexTask, priority);
-        supplier.getFuture().whenCompleteAsync(afterIndex(priority), SOLR_SUB_EXECUTOR);
+        supplier.getFuture().whenCompleteAsync(afterIndex(indexHandler, priority), SOLR_SUB_EXECUTOR);
     }
 
-    private static BiConsumer<? super List<MCRSolrIndexHandler>, ? super Throwable> afterIndex(final int priority) {
+    private static BiConsumer<? super List<MCRSolrIndexHandler>, ? super Throwable> afterIndex(
+        final MCRSolrIndexHandler indexHandler, final int priority) {
         return (handlerList, exc) -> {
             if (exc != null) {
-                LOGGER.error("Error while submitting index handler.", exc);
+                LOGGER.error("Error while submitting index handler: " + indexHandler, exc);
                 return;
             }
             if (handlerList == null || handlerList.isEmpty()) {

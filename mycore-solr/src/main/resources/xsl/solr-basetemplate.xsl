@@ -7,7 +7,6 @@
   <xsl:template match="text()" />
 
   <xsl:template match="mycoreobject">
-    <xsl:apply-templates select="." mode="boost" />
     <xsl:apply-templates select="." mode="baseFields" />
     <xsl:for-each select="structure/parents/parent">
       <field name="parent">
@@ -50,7 +49,6 @@
   </xsl:template>
 
   <xsl:template match="mycorederivate">
-    <xsl:apply-templates select="." mode="boost" />
     <xsl:apply-templates select="." mode="baseFields" />
     <xsl:for-each select="derivate/fileset/file/urn | derivate/fileset/@urn">
       <field name="derivateURN">
@@ -144,14 +142,6 @@
     <field name="allMeta">
       <xsl:value-of select="." />
     </field>
-  </xsl:template>
-
-  <xsl:template match="mycoreobject|mycorederivate" mode="boost">
-    <xsl:attribute name="boost">
-      <!-- 2012-11-10T09:08:07.006Z will result in '1.121110090807'-->
-      <xsl:value-of
-      select="concat('1.',substring(ex:format-date(substring-before(service/servdates/servdate[@type='createdate'],'Z'),'yyyyMMddHHmmss'),3))" />
-    </xsl:attribute>
   </xsl:template>
 
 </xsl:stylesheet>
