@@ -50,9 +50,7 @@ public abstract class MCRSolrIndexHandlerFactory {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexHandlerFactory.class);
 
-    private static MCRSolrIndexHandlerFactory instance = (MCRSolrIndexHandlerFactory) MCRConfiguration.instance()
-        .getInstanceOf(CONFIG_PREFIX + "IndexHandler.Factory",
-            MCRSolrContentStreamHandlerFactory.class.getCanonicalName());
+    private static MCRSolrIndexHandlerFactory instance = new MCRSolrLazyInputDocumentHandlerFactory();
 
     public static MCRSolrIndexHandlerFactory getInstance() {
         return instance;
