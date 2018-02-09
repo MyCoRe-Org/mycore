@@ -81,7 +81,7 @@
       <!-- dynamic class fields -->
       <xsl:for-each select="metadata/*[@class='MCRMetaClassification']/*">
         <xsl:variable name="classTree"
-          select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
+          select="document(concat('classification:metadata:0:parents:', @classid, ':', mcrxsl:encodeURIPath(@categid)))/mycoreclass/categories//category" />
         <xsl:variable name="classid" select="@classid" />
         <xsl:variable name="notInherited" select="@inherited = '0'" />
 

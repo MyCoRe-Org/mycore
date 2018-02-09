@@ -31,7 +31,7 @@
     </field>
     <xsl:for-each select="./descendant::*[@classid and @categid]">
       <xsl:variable name="classid" select="@classid" />
-      <xsl:variable name="uri" select="concat('classification:metadata:0:parents:',@classid,':',@categid)" />
+      <xsl:variable name="uri" select="concat('classification:metadata:0:parents:', @classid, ':', mcrxsl:encodeURIPath(@categid))" />
       <xsl:apply-templates select="document($uri)//category" mode="category">
         <xsl:with-param name="classid" select="$classid" />
         <xsl:with-param name="withTopField" select="@inherited = '0'" />
