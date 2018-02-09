@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan">
+  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions">
 
   <xsl:include href="xslInclude:solr-export" />
 
@@ -30,7 +30,7 @@
 
   <xsl:template match="*[@class='MCRMetaClassification']/*">
     <xsl:variable name="classTree"
-      select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
+      select="document(concat('classification:metadata:0:parents:', @classid, ':', mcrxsl:encodeURIPath(@categid)))/mycoreclass/categories//category" />
 
     <xsl:apply-templates mode="classi2fields" select="$classTree">
       <xsl:with-param name="categid" select="@categid" />
