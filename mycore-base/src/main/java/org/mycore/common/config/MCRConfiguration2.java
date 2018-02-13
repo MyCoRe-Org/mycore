@@ -18,7 +18,10 @@
 
 package org.mycore.common.config;
 
+import java.lang.reflect.Method;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +30,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.function.MCRTriConsumer;
 
 /**
@@ -39,13 +44,10 @@ import org.mycore.common.function.MCRTriConsumer;
 public class MCRConfiguration2 {
 
     private static ConcurrentHashMap<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
+    private static Hashtable<SingletonKey, Object> instanceHolder = new Hashtable<>();
 
     public static Map<String, String> getPropertiesMap() {
         return MCRConfiguration.instance().getPropertiesMap();
-    }
-
-    public static Map<String, String> getPropertiesMap(final String startsWith) {
-        return MCRConfiguration.instance().getPropertiesMap(startsWith);
     }
 
     /**
@@ -58,7 +60,7 @@ public class MCRConfiguration2 {
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public static <T> Optional<T> getInstanceOf(String name) throws MCRConfigurationException {
-        return getString(name).map(MCRConfiguration.instance()::instantiateClass);
+        return getString(name).map(MCRConfiguration2::instantiateClass);
     }
 
     /**
@@ -72,7 +74,21 @@ public class MCRConfiguration2 {
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public static <T> Optional<T> getSingleInstanceOf(String name) {
-        return Optional.ofNullable(MCRConfiguration.instance().getSingleInstanceOf(name, null));
+        return getString(name)
+            .map(className -> new SingletonKey(name, className))
+            .map(key -> (T)instanceHolder.computeIfAbsent(key, k -> getInstanceOf(name).orElse(null)));
+    }
+
+    /**
+     * Loads a Java Class defined in property <code>name</code>.
+     * @param name Name of the property
+     * @param <T> Supertype of class defined in <code>name</code>
+     * @return Optional of Class asignable to <code>&lt;T&gt;</code>
+     * @throws MCRConfigurationException
+     *             if the the class can not be loaded or instantiated
+     */
+    public static <T> Optional<Class<? extends T>> getClass(String name) throws MCRConfigurationException{
+        return getString(name).map(MCRConfiguration2::<T>getClassObject);
     }
 
     /**
@@ -81,12 +97,9 @@ public class MCRConfiguration2 {
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as an {@link Optional Optional&lt;String&gt;}
-     * @throws MCRConfigurationException
-     *             if the property with this name is not set
      */
     public static Optional<String> getString(String name) {
-        return Optional
-            .ofNullable(MCRConfiguration.instance().getString(name, null))
+        return MCRConfigurationBase.getString(name)
             .map(String::trim)
             .filter(s -> !s.isEmpty());
     }
@@ -117,27 +130,32 @@ public class MCRConfiguration2 {
         return getString(name).map(mapper).orElseThrow(() -> createConfigurationException(name));
     }
 
-    private static MCRConfigurationException createConfigurationException(String propertyName) {
-        return new MCRConfigurationException("Property '" + propertyName + "' is not set.");
+    public static MCRConfigurationException createConfigurationException(String propertyName) {
+        return new MCRConfigurationException("Configuration property " + propertyName + " is not set.");
     }
 
     /**
-     * Returns the configuration property with the specified name as a list of strings. Values should be delimited by
-     * ','
-     * 
-     * @param name
-     *            the non-null and non-empty name of the configuration property
-     * @return the value of the configuration property as a unmodifiable list of strings.
-     * @throws MCRConfigurationException
-     *             if the property with this name is not set
+     * Splits a String value in a Stream of trimmed non-empty Strings.
+     *
+     * This method can be used to split a property value delimited by ',' into values.
+     *
+     * <p>
+     *     Example:
+     * </p>
+     * <p>
+     * <code>
+     *     MCRConfiguration2.getOrThrow("MCR.ListProp", MCRConfiguration2::splitValue)<br>
+     *         .map(Integer::parseInt)<br>
+     *         .collect(Collectors.toList())<br>
+     * </code>
+     * </p>
+     * @param value a property value
+     * @return a Stream of trimmed, non-empty Strings
      */
-    public static List<String> getStrings(String name) {
-        return getString(name)
-            .map(MCRConfiguration.PROPERTY_SPLITTER::splitAsStream)
-            .orElseThrow(() -> createConfigurationException(name))
+    public static Stream<String> splitValue(String value){
+        return MCRConfigurationBase.PROPERTY_SPLITTER.splitAsStream(value)
             .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .collect(Collectors.toList());
+            .filter(s -> !s.isEmpty());
     }
 
     /**
@@ -181,8 +199,6 @@ public class MCRConfiguration2 {
      * @return the value of the configuration property as a <CODE>float</CODE> value
      * @throws NumberFormatException
      *             if the configuration property is not a <CODE>float</CODE> value
-     * @throws MCRConfigurationException
-     *             if the property with this name is not set
      */
     public static Optional<Float> getFloat(String name) throws NumberFormatException {
         return getString(name).map(Float::parseFloat);
@@ -198,8 +214,6 @@ public class MCRConfiguration2 {
      *         </CODE> value
      * @throws NumberFormatException
      *             if the configuration property is not a <CODE>double</CODE> value
-     * @throws MCRConfigurationException
-     *             if the property with this name is not set
      */
     public static Optional<Double> getDouble(String name) throws NumberFormatException {
         return getString(name).map(Double::parseDouble);
@@ -212,8 +226,6 @@ public class MCRConfiguration2 {
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return <CODE>true</CODE>, if and only if the specified property has the value <CODE>true</CODE>
-     * @throws MCRConfigurationException
-     *             if the property with this name is not set
      */
     public static Optional<Boolean> getBoolean(String name) {
         return getString(name).map(Boolean::parseBoolean);
@@ -231,8 +243,8 @@ public class MCRConfiguration2 {
      *            null</CODE>
      */
     public static void set(final String name, String value) {
-        Optional<String> oldValue = getString(name);
-        MCRConfiguration.instance().set(name, value);
+        Optional<String> oldValue = MCRConfigurationBase.getStringUnchecked(name);
+        MCRConfigurationBase.set(name, value);
         LISTENERS
             .values()
             .stream()
@@ -268,6 +280,53 @@ public class MCRConfiguration2 {
         return LISTENERS.remove(uuid) != null;
     }
 
+    public static <T> T instantiateClass(String classname) {
+        LogManager.getLogger().debug("Loading Class: {}", classname);
+
+        T o = null;
+        Class<? extends T> cl = getClassObject(classname);
+
+        try {
+            try {
+                o = cl.newInstance();
+            } catch (IllegalAccessException | InstantiationException e) {
+                // check for singleton
+                Method[] querymethods = cl.getMethods();
+
+                for (Method querymethod : querymethods) {
+                    if (querymethod.getName().toLowerCase(Locale.ROOT).equals("instance")
+                        || querymethod.getName().toLowerCase(Locale.ROOT).equals("getinstance")) {
+                        Object[] ob = new Object[0];
+                        @SuppressWarnings("unchecked")
+                        T invoke = (T) querymethod.invoke(cl, ob);
+                        o = invoke;
+                        break;
+                    }
+                }
+                if (o == null) {
+                    throw e;
+                }
+            }
+        } catch (ExceptionInInitializerError t){
+            throw new MCRConfigurationException("Could not instantiate class " + classname, t.getException());
+        } catch (Exception t) {
+            throw new MCRConfigurationException("Could not instantiate class " + classname, t);
+        }
+        return o;
+    }
+
+    private static <T> Class<? extends T> getClassObject(String classname) {
+        try {
+            @SuppressWarnings("unchecked")
+            Class<? extends T> forName = (Class<? extends T>) Class.forName(classname.trim());
+            return forName;
+        } catch (ClassNotFoundException ex) {
+            throw new MCRConfigurationException("Could not load class.", ex);
+        }
+    }
+
+
+
     private static class EventListener {
 
         private Predicate<String> keyPredicate;
@@ -283,6 +342,53 @@ public class MCRConfiguration2 {
             this.uuid = UUID.randomUUID();
         }
 
+    }
+    private static class SingletonKey {
+        private String property, className;
+
+        public SingletonKey(String property, String className) {
+            super();
+            this.property = property;
+            this.className = className;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((className == null) ? 0 : className.hashCode());
+            result = prime * result + ((property == null) ? 0 : property.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            SingletonKey other = (SingletonKey) obj;
+            if (className == null) {
+                if (other.className != null) {
+                    return false;
+                }
+            } else if (!className.equals(other.className)) {
+                return false;
+            }
+            if (property == null) {
+                if (other.property != null) {
+                    return false;
+                }
+            } else if (!property.equals(other.property)) {
+                return false;
+            }
+            return true;
+        }
     }
 
 }

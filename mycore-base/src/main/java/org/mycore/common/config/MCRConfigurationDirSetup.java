@@ -78,7 +78,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         loadExternalLibs();
         MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         Map<String, String> properties = configurationLoader.load();
-        MCRConfiguration.instance().initialize(properties, true);
+        MCRConfigurationBase.initialize(properties, true);
         if (servletContext != null) {
             Log4jServletContainerInitializer log4jInitializer = new Log4jServletContainerInitializer();
             try {

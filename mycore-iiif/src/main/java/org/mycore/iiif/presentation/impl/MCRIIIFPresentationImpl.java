@@ -46,10 +46,10 @@ public abstract class MCRIIIFPresentationImpl {
         }
 
         String classPropertyName = MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName;
-        Class<MCRIIIFPresentationImpl> classObject = MCRConfiguration.instance().getClass(classPropertyName);
+        Class<? extends MCRIIIFPresentationImpl> classObject = MCRConfiguration.instance().getClass(classPropertyName);
 
         try {
-            Constructor<MCRIIIFPresentationImpl> constructor = classObject.getConstructor(String.class);
+            Constructor<? extends MCRIIIFPresentationImpl> constructor = classObject.getConstructor(String.class);
             MCRIIIFPresentationImpl presentationImpl = constructor.newInstance(implName);
             implHolder.put(implName, presentationImpl);
             return presentationImpl;

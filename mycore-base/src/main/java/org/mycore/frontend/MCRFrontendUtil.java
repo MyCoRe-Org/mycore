@@ -21,12 +21,11 @@ package org.mycore.frontend;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -46,6 +45,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
@@ -61,7 +61,7 @@ public class MCRFrontendUtil {
 
     private static String BASE_HOST_IP;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRFrontendUtil.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     static {
         prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
@@ -254,45 +254,21 @@ public class MCRFrontendUtil {
      * @return
      */
     private static TreeSet<String> getTrustedProxies() {
-        HashSet<InetAddress> trustedProxies = new HashSet<>();
-
-        String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies");
-        StringTokenizer st = new StringTokenizer(sTrustedProxies, " ,;");
-        while (st.hasMoreTokens()) {
-            String host = st.nextToken().trim();
-            try {
-                Collections.addAll(trustedProxies, InetAddress.getAllByName(host));
-            } catch (UnknownHostException e) {
-                LOGGER.warn("Unknown host: {}", host);
-            }
-        }
-
         // Always trust the local host
-        try {
-            InetAddress[] localAddresses = InetAddress.getAllByName(InetAddress.getLocalHost().getHostName());
-            Collections.addAll(trustedProxies, localAddresses);
-        } catch (UnknownHostException e) {
-            LOGGER.warn("Could not get local host name.", e);
-        }
-        trustedProxies.add(InetAddress.getLoopbackAddress());
-        try {
-            Collections.addAll(trustedProxies, InetAddress.getAllByName("localhost"));
-        } catch (UnknownHostException e) {
-            LOGGER.warn("Could not get IP adresses of 'localhost'.", e);
-        }
-
-        try {
-            String host = new java.net.URL(getBaseURL()).getHost();
-            Collections.addAll(trustedProxies, InetAddress.getAllByName(host));
-        } catch (Exception ex) {
-            LOGGER.warn("Could not determine IP of local host serving:{}", getBaseURL(), ex);
-        }
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Trusted proxies: {}",
-                trustedProxies.stream().map(InetAddress::toString).sorted().collect(Collectors.joining(", ")));
-        }
-        return trustedProxies.stream()
+        return Stream
+            .concat(Stream.of("localhost", URI.create(getBaseURL()).getHost()), MCRConfiguration2
+                .getString("MCR.Request.TrustedProxies").map(MCRConfiguration2::splitValue).orElse(Stream.empty()))
+            .distinct()
+            .peek(proxy -> LOGGER.debug("Trusted proxy: {}", proxy))
+            .map(host -> {
+                try {
+                    return InetAddress.getAllByName(host);
+                } catch (UnknownHostException e) {
+                    LOGGER.warn("Unknown host: {}", host);
+                    return null;
+                }
+            }).filter(Objects::nonNull)
+            .flatMap(Stream::of)
             .map(InetAddress::getHostAddress)
             .collect(Collectors.toCollection(TreeSet::new));
     }
