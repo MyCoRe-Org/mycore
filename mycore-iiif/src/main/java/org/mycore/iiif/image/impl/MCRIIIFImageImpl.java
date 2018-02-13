@@ -53,10 +53,10 @@ public abstract class MCRIIIFImageImpl {
         }
 
         String classPropertyName = MCR_IIIF_IMAGE_CONFIG_PREFIX + implName;
-        Class<MCRIIIFImageImpl> classObject = MCRConfiguration.instance().getClass(classPropertyName);
+        Class<? extends MCRIIIFImageImpl> classObject = MCRConfiguration.instance().getClass(classPropertyName);
 
         try {
-            Constructor<MCRIIIFImageImpl> constructor = classObject.getConstructor(String.class);
+            Constructor<? extends MCRIIIFImageImpl> constructor = classObject.getConstructor(String.class);
             MCRIIIFImageImpl imageImpl = constructor.newInstance(implName);
             implHolder.put(implName, imageImpl);
             return imageImpl;

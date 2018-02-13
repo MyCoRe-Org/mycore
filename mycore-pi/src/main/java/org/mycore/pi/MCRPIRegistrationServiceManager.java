@@ -54,10 +54,10 @@ public class MCRPIRegistrationServiceManager {
     public <T extends MCRPersistentIdentifier> MCRPIRegistrationService<T> getRegistrationService(
         String registrationServiceID) {
         String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
-        Class<MCRPIRegistrationService<T>> piClass = MCRConfiguration.instance().getClass(propertyName);
+        Class<? extends MCRPIRegistrationService<T>> piClass = MCRConfiguration.instance().getClass(propertyName);
 
         try {
-            Constructor<MCRPIRegistrationService<T>> constructor = piClass.getConstructor(String.class);
+            Constructor<? extends MCRPIRegistrationService<T>> constructor = piClass.getConstructor(String.class);
 
             return constructor.newInstance(registrationServiceID);
         } catch (NoSuchMethodException e) {

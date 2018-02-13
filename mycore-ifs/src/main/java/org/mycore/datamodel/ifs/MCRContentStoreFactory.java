@@ -47,7 +47,7 @@ public class MCRContentStoreFactory {
     protected static final Hashtable<String, MCRContentStore> STORES = new Hashtable<>();
 
     /** Hashtable StoreID to Class that implements MCRAudioVideoExtender */
-    protected static Hashtable<String, Class<MCRAudioVideoExtender>> EXTENDER_CLASSES;
+    protected static Hashtable<String, Class<? extends MCRAudioVideoExtender>> EXTENDER_CLASSES;
 
     /** The MCRContentStoreSelector implementation that will be used */
     protected static MCRContentStoreSelector STORE_SELECTOR;
@@ -153,7 +153,7 @@ public class MCRContentStoreFactory {
      *             if the MCRAudioVideoExtender implementation class could not
      *             be loaded
      */
-    protected static Class<MCRAudioVideoExtender> getExtenderClass(String storeID) {
+    protected static Class<? extends MCRAudioVideoExtender> getExtenderClass(String storeID) {
         if (storeID == null || storeID.length() == 0) {
             return null;
         }
@@ -163,7 +163,7 @@ public class MCRContentStoreFactory {
 
         return EXTENDER_CLASSES.computeIfAbsent(storeID, key -> {
             String storeClass = "MCR.IFS.AVExtender." + key + CLASS_SUFFIX;
-            return MCRConfiguration.instance().getClass(storeClass, null);
+            return MCRConfiguration.instance().<MCRAudioVideoExtender>getClass(storeClass, null);
         });
     }
 
@@ -204,7 +204,7 @@ public class MCRContentStoreFactory {
             return null;
         }
 
-        Class<MCRAudioVideoExtender> cl = getExtenderClass(file.getStoreID());
+        Class<? extends MCRAudioVideoExtender> cl = getExtenderClass(file.getStoreID());
 
         try {
             MCRAudioVideoExtender ext = cl.newInstance();

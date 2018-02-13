@@ -18,31 +18,18 @@
 
 package org.mycore.common.config;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRPropertiesResolver;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
@@ -74,28 +61,6 @@ public class MCRConfiguration {
      * The single instance of this class that will be used at runtime
      */
     private static MCRConfiguration singleton;
-
-    private Hashtable<SingletonKey, Object> instanceHolder = new Hashtable<>();
-
-    private File lastModifiedFile;
-
-    static final Pattern PROPERTY_SPLITTER = Pattern.compile(",");
-
-    /**
-     * The properties instance that stores the values that have been read from every configuration file. These
-     * properties are unresolved
-     */
-    protected MCRProperties baseProperties;
-
-    /**
-     * The same as baseProperties but all %properties% are resolved.
-     */
-    protected MCRProperties resolvedProperties;
-
-    /**
-     * List of deprecated properties with their new name
-     */
-    protected MCRProperties deprecatedProperties;
 
     static {
         createSingleton();
@@ -160,178 +125,39 @@ public class MCRConfiguration {
      * @see System#currentTimeMillis()
      */
     public final long getSystemLastModified() {
-        return lastModifiedFile.lastModified();
+        return MCRConfigurationBase.getSystemLastModified();
     }
 
     /**
      * signalize that the system state has changed. Call this method when ever you changed the persistency layer.
      */
     public final void systemModified() {
-        if (!lastModifiedFile.exists()) {
-            try {
-                createLastModifiedFile();
-            } catch (IOException ioException) {
-                throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(),
-                    ioException);
-            }
-        } else if (!lastModifiedFile.setLastModified(System.currentTimeMillis())) {
-            // a problem occurs, when a linux user other than the file owner
-            // tries to change the last modified date
-            // @see Java Bug:
-            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4466073
-            // fixable in Java7 with setTimes() method of new file system API
-            // workaround for now: try to recreate the file
-            // @author Robert Stephan
-            FileOutputStream fout = null;
-            try {
-                try {
-                    fout = new FileOutputStream(lastModifiedFile);
-                    fout.write(new byte[0]);
-                    lastModifiedFile.setWritable(true, false);
-                } finally {
-                    if (fout != null) {
-                        fout.close();
-                    }
-                }
-            } catch (IOException e) {
-                throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(), e);
-            }
-        }
+        MCRConfigurationBase.systemModified();
     }
 
     /**
      * Protected constructor to create the singleton instance
      */
     protected MCRConfiguration() throws IOException {
-        baseProperties = new MCRProperties();
-        resolvedProperties = new MCRProperties();
-        deprecatedProperties = new MCRProperties();
-        loadDeprecatedProperties();
-        createLastModifiedFile();
-    }
-
-    /**
-     * Creates a new .systemTime file in MCR.datadir.
-     */
-    protected void createLastModifiedFile() throws IOException {
-        final String dataDirKey = "MCR.datadir";
-        if (getResolvedProperties().containsKey(dataDirKey)) {
-            File dataDir = new File(getString(dataDirKey));
-            if (dataDir.exists() && dataDir.isDirectory()) {
-                lastModifiedFile = new File(getString(dataDirKey), ".systemTime");
-            } else {
-                System.err.println("WARNING: MCR.dataDir does not exist: " + dataDir.getAbsolutePath());
-            }
-        }
-        if (lastModifiedFile == null) {
-            try {
-                lastModifiedFile = File.createTempFile("MyCoRe", ".systemTime");
-                lastModifiedFile.deleteOnExit();
-            } catch (IOException e) {
-                throw new MCRException("Could not create temporary file, please set property MCR.datadir");
-            }
-        }
-        if (!lastModifiedFile.exists()) {
-            FileOutputStream fout = null;
-            try {
-                fout = new FileOutputStream(lastModifiedFile);
-                fout.write(new byte[0]);
-            } finally {
-                if (fout != null) {
-                    fout.close();
-                }
-            }
-            //allow other users to change this file
-            lastModifiedFile.setWritable(true, false);
-        }
-    }
-
-    private void debug() {
-        Properties tmp = null;
-        String comments = "Active mycore properties";
-        File resolvedPropertiesFile = MCRConfigurationDir.getConfigFile("mycore.resolved.properties");
-        if (resolvedPropertiesFile != null) {
-            tmp = MCRConfiguration.sortProperties(getResolvedProperties());
-            try (FileOutputStream fout = new FileOutputStream(resolvedPropertiesFile)) {
-                tmp.store(fout, comments + "\nDo NOT edit this file!");
-            } catch (IOException e) {
-                LogManager.getLogger()
-                    .warn("Could not store resolved properties to {}", resolvedPropertiesFile.getAbsolutePath(),
-                        e);
-            }
-        }
-
-        Logger logger = LogManager.getLogger();
-        if (logger.isDebugEnabled()) {
-            try (StringWriter sw = new StringWriter(); PrintWriter out = new PrintWriter(sw)) {
-                tmp = tmp == null ? MCRConfiguration.sortProperties(getResolvedProperties()) : tmp;
-                tmp.store(out, comments);
-                out.flush();
-                sw.flush();
-                logger.debug(sw.toString());
-            } catch (IOException e) {
-                logger.debug("Error while debugging mycore properties.", e);
-            }
-        }
     }
 
     /**
      * Substitute all %properties%.
      */
     protected synchronized void resolveProperties() {
-        MCRProperties tmpProperties = MCRProperties.copy(getBaseProperties());
-        MCRPropertiesResolver resolver = new MCRPropertiesResolver(tmpProperties);
-        resolvedProperties = MCRProperties.copy(resolver.resolveAll(tmpProperties));
-    }
-
-    /**
-     * Loads file deprecated.properties that can be used to rename old properties. The file contains a list of renamed
-     * properties: OldPropertyName=NewPropertyName. The old property is automatically replaced with the new name, so
-     * that existing mycore.properties files must not be migrated immediately.
-     */
-    private void loadDeprecatedProperties() {
-        InputStream in = this.getClass().getResourceAsStream("/deprecated.properties");
-        if (in == null) {
-            return;
-        }
-        try {
-            getDeprecatedProperties().load(in);
-            in.close();
-        } catch (Exception exc) {
-            throw new MCRConfigurationException("Could not load configuration file deprecated.properties", exc);
-        }
-    }
-
-    private void checkForDeprecatedProperties(Map<String, String> props) {
-        Map<String, String> depUsedProps = props.entrySet().stream()
-            .filter(e -> getDeprecatedProperties().containsKey(e.getKey()))
-            .collect(Collectors.toMap(Entry::getKey, e -> getDeprecatedProperties().getAsMap().get(e.getKey())));
-        if (!depUsedProps.isEmpty()) {
-            throw new MCRConfigurationException(
-                depUsedProps.entrySet().stream().map(e -> e.getKey() + " ==> " + e.getValue())
-                    .collect(Collectors.joining("\n",
-                        "Found deprecated properties that are defined but will NOT BE USED. Please use the replacements:\n",
-                        "\n")));
-        }
-    }
-
-    private void checkForDeprecatedProperty(String name) throws MCRConfigurationException {
-        if (getDeprecatedProperties().containsKey(name)) {
-            throw new MCRConfigurationException("Cannot set deprecated property " + name + ". Please use "
-                + getDeprecatedProperties().getProperty(name) + " instead.");
-        }
+        MCRConfigurationBase.resolveProperties();
     }
 
     private MCRProperties getResolvedProperties() {
-        return resolvedProperties;
+        return MCRConfigurationBase.getResolvedProperties();
     }
 
     private MCRProperties getBaseProperties() {
-        return baseProperties;
+        return MCRConfigurationBase.getBaseProperties();
     }
 
     public MCRProperties getDeprecatedProperties() {
-        return deprecatedProperties;
+        return MCRConfigurationBase.getDeprecatedProperties();
     }
 
     public Map<String, String> getPropertiesMap() {
@@ -364,61 +190,9 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        String classname = getString(name, defaultname);
-        if (classname == null) {
-            throw new MCRConfigurationException("Configuration property missing: " + name);
-        }
-
-        return this.instantiateClass(classname);
-    }
-
-    <T> T instantiateClass(String classname) {
-        LogManager.getLogger().debug("Loading Class: {}", classname);
-
-        T o = null;
-        Class<? extends T> cl = getClassObject(classname);
-
-        try {
-            try {
-                o = cl.newInstance();
-            } catch (IllegalAccessException | InstantiationException e) {
-                // check for singleton
-                Method[] querymethods = cl.getMethods();
-
-                for (Method querymethod : querymethods) {
-                    if (querymethod.getName().toLowerCase(Locale.ROOT).equals("instance")
-                        || querymethod.getName().toLowerCase(Locale.ROOT).equals("getinstance")) {
-                        Object[] ob = new Object[0];
-                        @SuppressWarnings("unchecked")
-                        T invoke = (T) querymethod.invoke(cl, ob);
-                        o = invoke;
-                        break;
-                    }
-                }
-                if (o == null) {
-                    throw e;
-                }
-            }
-        } catch (Throwable t) {
-            String msg = "Could not instantiate class " + classname;
-            if (t instanceof ExceptionInInitializerError) {
-                Throwable t2 = ((ExceptionInInitializerError) t).getException();
-                throw new MCRConfigurationException(msg, t2);
-            } else {
-                throw new MCRConfigurationException(msg, t);
-            }
-        }
-        return o;
-    }
-
-    private static <T> Class<? extends T> getClassObject(String classname) {
-        try {
-            @SuppressWarnings("unchecked")
-            Class<? extends T> forName = (Class<? extends T>) Class.forName(classname.trim());
-            return forName;
-        } catch (ClassNotFoundException ex) {
-            throw new MCRConfigurationException("Could not load class.", ex);
-        }
+        return defaultname == null ? MCRConfiguration2.getOrThrow(name, MCRConfiguration2::instantiateClass)
+            : MCRConfiguration2.<T> getInstanceOf(name)
+                .orElseGet(() -> MCRConfiguration2.<T> instantiateClass(defaultname));
     }
 
     /**
@@ -433,12 +207,7 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public <T> T getInstanceOf(String name, T defaultObj) {
-        String classname = getString(name, null);
-        if (classname == null) {
-            return defaultObj;
-        }
-
-        return this.instantiateClass(classname);
+        return MCRConfiguration2.<T> getInstanceOf(name).orElse(defaultObj);
     }
 
     /**
@@ -448,15 +217,9 @@ public class MCRConfiguration {
      * @return non null Class asignable to <code>&lt;T&gt;</code>
      * @throws MCRConfigurationException if property is not defined or class could not be loaded
      */
-    public <T> Class<T> getClass(String name) throws MCRConfigurationException{
-        String className=getString(name).trim();
-        try {
-            @SuppressWarnings("unchecked")
-            Class<T> loaded= (Class<T>) Class.forName(className);
-            return loaded;
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException("Could not load class defined in property "+name, e);
-        }
+    public <T> Class<? extends T> getClass(String name) throws MCRConfigurationException{
+        return MCRConfiguration2.<T> getClass(name)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 
     /**
@@ -466,12 +229,8 @@ public class MCRConfiguration {
      * @param <T> Supertype of class defined in <code>name</code>
      * @return non null Class asignable to <code>&lt;T&gt;</code>
      */
-    public <T> Class<T> getClass(String name, Class<? extends T> defaultClass){
-        try {
-            return getClass(name);
-        } catch (MCRConfigurationException e) {
-            return (Class<T>)defaultClass;
-        }
+    public <T> Class<? extends T> getClass(String name, Class<? extends T> defaultClass){
+        return MCRConfiguration2.<T> getClass(name).orElse(defaultClass);
     }
 
     /**
@@ -498,16 +257,9 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public <T> T getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        String className = defaultname == null ? getString(name) : getString(name, defaultname);
-        SingletonKey key = new SingletonKey(name, className);
-        @SuppressWarnings("unchecked")
-        T inst = (T) instanceHolder.get(key);
-        if (inst != null) {
-            return inst;
-        }
-        inst = this.getInstanceOf(name, defaultname); // we need a new instance, get it
-        instanceHolder.put(key, inst); // save the instance in the hashtable
-        return inst;
+        return MCRConfiguration2.<T> getSingleInstanceOf(name).map(Optional::of)
+            .orElseGet(() -> Optional.ofNullable(defaultname).flatMap(MCRConfiguration2::getSingleInstanceOf))
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 
     /**
@@ -534,13 +286,8 @@ public class MCRConfiguration {
      *             if the property with this name is not set
      */
     public String getString(String name) {
-        String value = getString(name, null);
-
-        if (value == null) {
-            throw new MCRConfigurationException("Configuration property " + name + " is not set");
-        }
-
-        return value.trim();
+        return MCRConfigurationBase.getString(name).map(String::trim)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 
     /**
@@ -554,14 +301,9 @@ public class MCRConfiguration {
      *             if the property with this name is not set
      */
     public List<String> getStrings(String name) {
-        String value = getString(name);
-        return splitString(value);
-    }
-
-    private List<String> splitString(String value) {
-        return PROPERTY_SPLITTER.splitAsStream(value)
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
+        return MCRConfigurationBase.getString(name)
+            .map(MCRConfiguration2::splitValue)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name))
             .collect(Collectors.toList());
     }
 
@@ -576,8 +318,10 @@ public class MCRConfiguration {
      * @return the value of the configuration property as a unmodifiable list of strings or <code>defaultValue</code>.
      */
     public List<String> getStrings(String name, List<String> defaultValue) {
-        String value = getString(name, null);
-        return value == null ? defaultValue : splitString(value);
+        return MCRConfigurationBase.getString(name)
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElse(defaultValue);
     }
 
     /**
@@ -591,11 +335,7 @@ public class MCRConfiguration {
      * @return the value of the configuration property as a String
      */
     public String getString(String name, String defaultValue) {
-        if (getBaseProperties().isEmpty()) {
-            throw new MCRConfigurationException("MCRConfiguration is still not initialized");
-        }
-        checkForDeprecatedProperty(name);
-        return getResolvedProperties().getProperty(name, defaultValue);
+        return MCRConfiguration2.getString(name).orElse(defaultValue);
     }
 
     /**
@@ -611,7 +351,7 @@ public class MCRConfiguration {
      *             if the property with this name is not set
      */
     public int getInt(String name) throws NumberFormatException {
-        return Integer.parseInt(getString(name));
+        return MCRConfiguration2.getOrThrow(name, Integer::parseInt);
     }
 
     /**
@@ -630,9 +370,7 @@ public class MCRConfiguration {
      *             </CODE> value
      */
     public int getInt(String name, int defaultValue) throws NumberFormatException {
-        String value = getString(name, null);
-
-        return value == null ? defaultValue : Integer.parseInt(value);
+        return MCRConfiguration2.getInt(name).orElse(defaultValue);
     }
 
     /**
@@ -648,7 +386,7 @@ public class MCRConfiguration {
      *             if the property with this name is not set
      */
     public long getLong(String name) throws NumberFormatException {
-        return Long.parseLong(getString(name));
+        return MCRConfiguration2.getOrThrow(name, Long::parseLong);
     }
 
     /**
@@ -665,9 +403,7 @@ public class MCRConfiguration {
      *             </CODE> value
      */
     public long getLong(String name, long defaultValue) throws NumberFormatException {
-        String value = getString(name, null);
-
-        return value == null ? defaultValue : Long.parseLong(value);
+        return MCRConfiguration2.getLong(name).orElse(defaultValue);
     }
 
     /**
@@ -683,7 +419,7 @@ public class MCRConfiguration {
      *             if the property with this name is not set
      */
     public float getFloat(String name) throws NumberFormatException {
-        return Float.parseFloat(getString(name));
+        return MCRConfiguration2.getOrThrow(name, Float::parseFloat);
     }
 
     /**
@@ -700,9 +436,7 @@ public class MCRConfiguration {
      *             float</CODE> value
      */
     public float getFloat(String name, float defaultValue) throws NumberFormatException {
-        String value = getString(name, null);
-
-        return value == null ? defaultValue : Float.parseFloat(value);
+        return MCRConfiguration2.getFloat(name).orElse(defaultValue);
     }
 
     /**
@@ -719,7 +453,7 @@ public class MCRConfiguration {
      *             if the property with this name is not set
      */
     public double getDouble(String name) throws NumberFormatException {
-        return Double.parseDouble(getString(name));
+        return MCRConfiguration2.getOrThrow(name, Double::parseDouble);
     }
 
     /**
@@ -736,9 +470,7 @@ public class MCRConfiguration {
      *             double</CODE> value
      */
     public double getDouble(String name, double defaultValue) throws NumberFormatException {
-        String value = getString(name, null);
-
-        return value == null ? defaultValue : Double.parseDouble(value);
+        return MCRConfiguration2.getDouble(name).orElse(defaultValue);
     }
 
     /**
@@ -752,9 +484,7 @@ public class MCRConfiguration {
      *             if the property with this name is not set
      */
     public boolean getBoolean(String name) {
-        String value = getString(name);
-
-        return "true".equals(value.trim());
+        return MCRConfiguration2.getOrThrow(name, Boolean::parseBoolean);
     }
 
     /**
@@ -770,9 +500,7 @@ public class MCRConfiguration {
      *            the value to return if the configuration property is not set
      */
     public boolean getBoolean(String name, boolean defaultValue) {
-        String value = getString(name, null);
-
-        return value == null ? defaultValue : "true".equals(value.trim());
+        return MCRConfiguration2.getBoolean(name).orElse(defaultValue);
     }
 
     /**
@@ -787,31 +515,14 @@ public class MCRConfiguration {
      *            null</CODE>
      */
     public void set(String name, String value) {
-        checkForDeprecatedProperty(name);
-        if (value == null) {
-            getBaseProperties().remove(name);
-        } else {
-            getBaseProperties().setProperty(name, value);
-        }
-        resolveProperties();
+        MCRConfiguration2.set(name, value);
     }
 
+    /**
+     *  use {@link MCRConfigurationBase#initialize(Map, boolean)}
+     */
     public synchronized void initialize(Map<String, String> props, boolean clear) {
-        checkForDeprecatedProperties(props);
-        if (clear) {
-            getBaseProperties().clear();
-        } else {
-            getBaseProperties().entrySet()
-                .removeIf(e -> props.containsKey(e.getKey()) && props.get(e.getKey()) == null);
-        }
-        getBaseProperties().putAll(
-            props.entrySet()
-                .stream()
-                .filter(e -> e.getKey() != null)
-                .filter(e -> e.getValue() != null)
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-        resolveProperties();
-        debug();
+        MCRConfigurationBase.initialize(props, clear);
     }
 
     /**
@@ -933,51 +644,4 @@ public class MCRConfiguration {
         return getResolvedProperties().toString();
     }
 
-    private static class SingletonKey {
-        private String property, className;
-
-        public SingletonKey(String property, String className) {
-            super();
-            this.property = property;
-            this.className = className;
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((className == null) ? 0 : className.hashCode());
-            result = prime * result + ((property == null) ? 0 : property.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            SingletonKey other = (SingletonKey) obj;
-            if (className == null) {
-                if (other.className != null) {
-                    return false;
-                }
-            } else if (!className.equals(other.className)) {
-                return false;
-            }
-            if (property == null) {
-                if (other.property != null) {
-                    return false;
-                }
-            } else if (!property.equals(other.property)) {
-                return false;
-            }
-            return true;
-        }
-    }
 }
