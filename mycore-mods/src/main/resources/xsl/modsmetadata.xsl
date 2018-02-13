@@ -713,24 +713,17 @@
         <xsl:variable name="link" select="." />
         <xsl:choose>
           <xsl:when test="contains($link,'ppn') or contains($link,'PPN')">
-            <a>
-              <xsl:attribute name="href">
-                <xsl:choose>
-                  <xsl:when test="contains($link, 'PPN=')">
-                    <xsl:value-of select="$link" />
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:variable xmlns:foaf="http://xmlns.com/foaf/0.1/" name="uriResolved" select="document(mcrxsl:normalizeAbsoluteURL(concat($link,'?format=xml')))//rdf:Description[@rdf:about=normalize-space($link)]/foaf:page/@rdf:resource" />
-                    <xsl:choose>
-                      <xsl:when test="string-length($uriResolved) &gt; 0"><xsl:value-of select="$uriResolved" /></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="$link" /></xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
+            <a class="ppn" href="{$link}">
               <xsl:choose>
-                <xsl:when test="contains($link, 'PPN=')"><xsl:value-of select="substring-after($link, 'PPN=')" /></xsl:when>
-                <xsl:otherwise><xsl:value-of select="substring-after($link, ':ppn:')"/></xsl:otherwise>
+                <xsl:when test="contains($link, 'PPN=')">
+                  <xsl:value-of select="substring-after($link, 'PPN=')" />
+                </xsl:when>
+                <xsl:when test="contains($link, ':ppn:')">
+                  <xsl:value-of select="substring-after($link, ':ppn:')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$link"/>
+                </xsl:otherwise>
               </xsl:choose>
             </a>
           </xsl:when>
