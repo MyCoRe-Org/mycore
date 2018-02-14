@@ -99,13 +99,22 @@ public class MCRPICommands {
         });
     }
 
+    @MCRCommand(syntax = "try to control {0} with service {1}", help = "This command tries to" +
+        " read a pi from the object {0} with the MetadataManager from the specified service {1}." +
+        " If the service configuration is right then the pi is under control of MyCoRe.")
+    public static void controlObjectWithService(String objectIDString, String serviceID)
+        throws MCRAccessException, MCRActiveLinkException, IOException {
+        controlObjectWithServiceAndAdditional(objectIDString, serviceID, null);
+    }
+
     @MCRCommand(syntax = "try to control {0} with service {1} with additional {2}", help = "This command tries to" +
         " read a pi from the object {0} with the MetadataManager from the specified service {1}." +
         " If the service configuration is right then the pi is under control of MyCoRe.")
     public static void controlObjectWithServiceAndAdditional(String objectIDString, String serviceID,
         final String additional)
         throws MCRAccessException, MCRActiveLinkException, IOException {
-        String trimAdditional = additional.trim();
+
+        String trimAdditional = additional != null ? additional.trim() : null;
         MCRPIService<MCRPersistentIdentifier> service = MCRPIServiceManager
             .getInstance().getRegistrationService(serviceID);
 
