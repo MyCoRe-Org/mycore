@@ -803,7 +803,14 @@
   <xsl:template match="mods:url" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.url'),':')" />
+        <xsl:choose>
+          <xsl:when test="@access">
+            <xsl:value-of select="concat(i18n:translate(concat('component.mods.metaData.dictionary.url.',mcrxsl:regexp(@access,' ','_'))),':')" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.url'),':')" />
+          </xsl:otherwise>
+        </xsl:choose>
       </td>
       <td class="metavalue">
         <a>

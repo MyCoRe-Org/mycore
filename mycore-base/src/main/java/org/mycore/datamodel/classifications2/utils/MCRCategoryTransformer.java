@@ -39,9 +39,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
  *          2008) $
  */
@@ -51,9 +51,9 @@ public class MCRCategoryTransformer {
 
     /**
      * transforms a <code>MCRCategory</code> into a JDOM Document.
-     * 
+     *
      * The Document will have a root tag with name "mycoreclass".
-     * 
+     *
      * @param cl
      *            Classification
      */
@@ -67,9 +67,9 @@ public class MCRCategoryTransformer {
 
     /**
      * transforms a <code>MCRCategory</code> into a JDOM Element.
-     * 
+     *
      * The element will have the tag name "category".
-     * 
+     *
      * @param category
      *            a category of a classification
      */
@@ -84,7 +84,7 @@ public class MCRCategoryTransformer {
     /**
      * transforms a <code>Classification</code> into a MCR Editor definition (
      * <code>&lt;items&gt;</code>).
-     * 
+     *
      * @param cl
      *            Classification
      * @param sort
@@ -100,7 +100,7 @@ public class MCRCategoryTransformer {
 
     /**
      * transforms a <code>Classification</code> into a MCR Editor definition (<code>&lt;items&gt;</code>).
-     * 
+     *
      * This method allows you to specify how the labels will look like.
      * <code>labelFormat</code> is simply a String that is parsed for a few
      * key words, that will be replaced by a dynamic value. The following
@@ -111,7 +111,7 @@ public class MCRCategoryTransformer {
      * <li>{description}</li>
      * <li>{count}</li>
      * </ul>
-     * 
+     *
      * @param cl
      *            Classification
      * @param labelFormat
@@ -272,7 +272,8 @@ public class MCRCategoryTransformer {
                 throw new RuntimeException("Error while inserting '" + labtext + "' into: " + labelFormat, e);
             }
             text = ID_PATTERN.matcher(text).replaceAll(cat.getId().getID());
-            text = DESCR_PATTERN.matcher(text).replaceAll(label.getDescription());
+            text = DESCR_PATTERN.matcher(text)
+                .replaceAll(label.getDescription().replace("\\", "\\\\").replace("$", "\\$"));
             int num = countMap == null ? -1 : countMap.get(cat.getId()).intValue();
             if (num >= 0) {
                 text = COUNT_PATTERN.matcher(text).replaceAll(String.valueOf(num));
