@@ -76,7 +76,7 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
             .replaceAll("\\$[iI][dD]", obj.getId().toString());
     }
 
-    private void doWithPURLManager(Consumer<MCRPURLManager> action) {
+    protected void doWithPURLManager(Consumer<MCRPURLManager> action) {
         Map<String, String> props = getProperties();
         String serverURL = props.get(PURL_SERVER_CONFIG);
         String username = props.get(PURL_USER_CONFIG);
