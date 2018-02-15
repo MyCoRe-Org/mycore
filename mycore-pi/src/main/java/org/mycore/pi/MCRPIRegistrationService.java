@@ -18,6 +18,8 @@
 
 package org.mycore.pi;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
@@ -52,8 +54,6 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier> {
 
@@ -202,6 +202,30 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
     public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
         String json = getGson().toJson(databaseEntry);
         obj.getService().addFlag(PI_FLAG, json);
+    }
+
+    /**
+     * Removes a flag from a {@link MCRObject}
+     * @param obj the object
+     * @param databaseEntry the database entry
+     * @return the remove entry parsed from json or null
+     */
+    public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIRegistrationService.PI_FLAG);
+        int flagCount = flags.size();
+        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
+            String flag = flags.get(flagIndex);
+            MCRPI pi = getGson().fromJson(flag, MCRPI.class);
+            if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
+                pi.getAdditional().equals(databaseEntry.getAdditional()) &&
+                pi.getService().equals(databaseEntry.getService()) &&
+                pi.getType().equals(databaseEntry.getType())) {
+                service.removeFlag(flagIndex);
+                return databaseEntry;
+            }
+        }
+        return null;
     }
 
     protected void validatePermission(MCRBase obj) throws MCRAccessException {
