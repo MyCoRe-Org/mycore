@@ -204,6 +204,30 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         obj.getService().addFlag(PI_FLAG, json);
     }
 
+    /**
+     * Removes a flag from a {@link MCRObject}
+     * @param obj the object
+     * @param databaseEntry the database entry
+     * @return the remove entry parsed from json or null
+     */
+    public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIRegistrationService.PI_FLAG);
+        int flagCount = flags.size();
+        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
+            String flag = flags.get(flagIndex);
+            MCRPI pi = getGson().fromJson(flag, MCRPI.class);
+            if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
+                pi.getAdditional().equals(databaseEntry.getAdditional()) &&
+                pi.getService().equals(databaseEntry.getService()) &&
+                pi.getType().equals(databaseEntry.getType())) {
+                service.removeFlag(flagIndex);
+                return databaseEntry;
+            }
+        }
+        return null;
+    }
+
     protected void validatePermission(MCRBase obj) throws MCRAccessException {
         String missingPermission;
         if (!MCRAccessManager.checkPermission(obj.getId(), missingPermission = PERMISSION_WRITE) ||
