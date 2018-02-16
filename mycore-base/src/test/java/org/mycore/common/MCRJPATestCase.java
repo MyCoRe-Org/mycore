@@ -44,7 +44,11 @@ import org.mycore.backend.jpa.MCRJPABootstrapper;
 
 public class MCRJPATestCase extends MCRTestCase {
 
-    protected Optional<EntityManager> entityManager;
+    private EntityManager entityManager;
+
+    protected Optional<EntityManager> getEntityManager(){
+        return Optional.ofNullable(entityManager);
+    }
 
     protected static void printResultSet(ResultSet resultSet, PrintStream out) throws SQLException {
         ResultSetMetaData metaData = resultSet.getMetaData();
@@ -87,12 +91,12 @@ public class MCRJPATestCase extends MCRTestCase {
             .checkEntityManagerFactoryConfiguration(MCREntityManagerProvider.getEntityManagerFactory());
         try {
             LogManager.getLogger().debug("Prepare hibernate test", new RuntimeException());
-            entityManager = Optional.of(MCREntityManagerProvider.getCurrentEntityManager());
+            entityManager = MCREntityManagerProvider.getCurrentEntityManager();
             beginTransaction();
-            entityManager.get().clear();
+            entityManager.clear();
         } catch (RuntimeException e) {
             LogManager.getLogger().error("Error while setting up JPA JUnit test.", e);
-            entityManager = Optional.empty();
+            entityManager = null;
             throw e;
         }
     }
@@ -144,8 +148,8 @@ public class MCRJPATestCase extends MCRTestCase {
         try {
             endTransaction();
         } finally {
-            if (entityManager.isPresent()) {
-                entityManager.get().close();
+            if (entityManager != null) {
+                entityManager.close();
                 dropSchema();
             }
             super.tearDown();
@@ -154,11 +158,11 @@ public class MCRJPATestCase extends MCRTestCase {
     }
 
     protected void beginTransaction() {
-        entityManager.ifPresent(em -> em.getTransaction().begin());
+        getEntityManager().ifPresent(em -> em.getTransaction().begin());
     }
 
     protected void endTransaction() {
-        entityManager.ifPresent(em -> {
+        getEntityManager().ifPresent(em -> {
             EntityTransaction tx = em.getTransaction();
             if (tx != null && tx.isActive()) {
                 if (tx.getRollbackOnly()) {
@@ -181,7 +185,7 @@ public class MCRJPATestCase extends MCRTestCase {
         endTransaction();
         beginTransaction();
         // clear from cache
-        entityManager.ifPresent(EntityManager::clear);
+        getEntityManager().ifPresent(EntityManager::clear);
     }
 
 }
