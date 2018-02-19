@@ -70,7 +70,7 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
         return purl;
     }
 
-    private String buildTargetURL(MCRBase obj) {
+    protected String buildTargetURL(MCRBase obj) {
         String baseURL = getProperties().get(PURL_BASE_URL);
         return baseURL + getProperties().getOrDefault(PURL_CONTEXT_CONFIG, DEFAULT_CONTEXT_PATH)
             .replaceAll("\\$[iI][dD]", obj.getId().toString());
