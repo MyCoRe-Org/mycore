@@ -61,7 +61,7 @@ public class MCRSecureTokenV2 {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);//should never happen for 'SHA-256'
         }
-        digest.update(forHashing.getBytes(StandardCharsets.UTF_8));
+        digest.update(URI.create(forHashing).toASCIIString().getBytes(StandardCharsets.US_ASCII));
         byte[] sha256 = digest.digest();
         hash = Base64.getEncoder()
             .encodeToString(sha256)

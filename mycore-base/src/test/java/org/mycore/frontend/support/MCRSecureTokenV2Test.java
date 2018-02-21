@@ -21,6 +21,8 @@ public class MCRSecureTokenV2Test {
     public final void testGetHash() {
         MCRSecureTokenV2 token = getWowzaSample();
         assertEquals("TgJft5hsjKyC5Rem_EoUNP7xZvxbqVPhhd0GxIcA2oo=", token.getHash());
+        token = getWowzaSample2();
+        assertEquals("5_A2m7LV6pTuLN3lUPvAUN2xI8x_BDrgfXfVi_gT-GA=", token.getHash());
     }
 
     /**
@@ -46,6 +48,14 @@ public class MCRSecureTokenV2Test {
             "myTokenPrefixCustomParameter=abcdef" };
         MCRSecureTokenV2 token = new MCRSecureTokenV2(contentPath, ipAddress, sharedSecret, parameters);
         return token;
+    }
+
+    private static MCRSecureTokenV2 getWowzaSample2() {
+        String contentPath = "vod/_definst_/mp4:Überraschung.mp4";
+        String sharedSecret = "JUnitSecret";
+        String ipAddress = "192.168.1.2";
+        String[] parameters = { };
+        return new MCRSecureTokenV2(contentPath, ipAddress, sharedSecret, parameters);
     }
 
 }
