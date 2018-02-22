@@ -66,6 +66,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -866,6 +867,40 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             }
         });
 
+    }
+
+    @MCRCommand(syntax = "set main file of {0} to {1}", help = "Sets the main file of the derivate with the id {0} to "
+        + "the file with the path {1}")
+    public static void setMainFile(final String derivateIDString, final String filePath) {
+        if (!MCRObjectID.isValid(derivateIDString)) {
+            LOGGER.error("{} is not valid. ", derivateIDString);
+            return;
+        }
+
+        // check for derivate exist
+        final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDString);
+        if (!MCRMetadataManager.exists(derivateID)) {
+            LOGGER.error("{} does not exist!", derivateIDString);
+            return;
+        }
+
+        // remove leading slash
+        String cleanPath = filePath;
+        if (filePath.startsWith(String.valueOf(MCRAbstractFileSystem.SEPARATOR))) {
+            cleanPath = filePath.substring(1, filePath.length());
+        }
+
+        // check for file exist
+        final MCRPath path = MCRPath.getPath(derivateID.toString(), cleanPath);
+        if (!Files.exists(path)) {
+            LOGGER.error("File {} does not exist!", cleanPath);
+            return;
+        }
+
+        final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+        derivate.getDerivate().getInternals().setMainDoc(cleanPath);
+        MCRMetadataManager.updateMCRDerivateXML(derivate);
+        LOGGER.info("The main file of {} is now '{}'!", derivateIDString, cleanPath);
     }
 
 }
