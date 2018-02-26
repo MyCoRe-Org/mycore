@@ -30,7 +30,7 @@
 
   <xed:template id="editor4changeReadUser">
     <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
-      required="true" maxlength="16" />
+      required="true" maxlength="43" />
     <xed:bind xpath="@realm" default="local" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
@@ -86,7 +86,7 @@
       </label>
       <div class="col-md-9 row">
         <mcruser:template name="textInput" xpath="@name" id="userName" inline="true" colsize="sm" colwidth="9"
-          i18n.error="component.user2.admin.inputhints.username" required="true" matches="[a-z0-9\._-]*" maxlength="16" />
+          i18n.error="component.user2.admin.inputhints.username" required="true" matches="[a-z0-9\._-]*" maxlength="43" />
         <mcruser:template name="selectInput" xpath="@realm" default="local" id="realmId" inline="true" colsize="sm" colwidth="3"
           uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
@@ -100,7 +100,7 @@
       </label>
       <div class="col-md-9 row">
         <mcruser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"
-          i18n.error="component.user2.admin.inputhints.username" required="true" maxlength="16" />
+          i18n.error="component.user2.admin.inputhints.username" required="true" maxlength="43" />
         <mcruser:template name="selectInput" xpath="@realm" default="local" id="realmId" disabled="true" inline="true" colsize="sm" colwidth="3"
           uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
@@ -114,23 +114,23 @@
       required="true" matches="[\S]*" />
 
     <xed:validate xpath="user/password" display="global"
-      test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (string-length(.) &lt; 17) and (. = ../password2 ) and (. != ../@name))"
+      test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (. = ../password2 ) and (. != ../@name))"
       i18n="component.user2.admin.inputhints.passwordLocalUsers" />
     <xed:validate xpath="user/password2" display="global"
-      test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and  (string-length(.) &lt; 17) and (../password = . ) and (. != ../@name))" />
+      test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (../password = . ) and (. != ../@name))" />
   </xed:template>
 
   <xed:template id="passwordHint">
-    <mcruser:template name="textInput" xpath="password/@hint" id="hint" i18n="component.user2.admin.passwordHint" maxlength="128" />
+    <mcruser:template name="textInput" xpath="password/@hint" id="hint" i18n="component.user2.admin.passwordHint" maxlength="255" />
   </xed:template>
 
   <xed:template id="realName">
-    <mcruser:template name="textInput" xpath="realName" id="realName" i18n="component.user2.admin.realName" maxlength="64" />
+    <mcruser:template name="textInput" xpath="realName" id="realName" i18n="component.user2.admin.realName" maxlength="255" />
   </xed:template>
 
   <xed:template id="email">
     <mcruser:template name="textInput" xpath="eMail" id="email" i18n="component.user2.admin.email" i18n.error="component.user2.admin.email.syntax"
-      validate="true" matches="\S+@\S+\.\S+" maxlength="64" />
+      validate="true" matches="\S+@\S+\.\S+" maxlength="255" />
   </xed:template>
 
   <xed:template id="owner">
