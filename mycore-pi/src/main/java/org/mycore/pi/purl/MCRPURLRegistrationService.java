@@ -70,13 +70,13 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
         return purl;
     }
 
-    private String buildTargetURL(MCRBase obj) {
+    protected String buildTargetURL(MCRBase obj) {
         String baseURL = getProperties().get(PURL_BASE_URL);
         return baseURL + getProperties().getOrDefault(PURL_CONTEXT_CONFIG, DEFAULT_CONTEXT_PATH)
             .replaceAll("\\$[iI][dD]", obj.getId().toString());
     }
 
-    private void doWithPURLManager(Consumer<MCRPURLManager> action) {
+    protected void doWithPURLManager(Consumer<MCRPURLManager> action) {
         Map<String, String> props = getProperties();
         String serverURL = props.get(PURL_SERVER_CONFIG);
         String username = props.get(PURL_USER_CONFIG);

@@ -8,6 +8,7 @@
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
   <xsl:param name="ServletsBaseURL" />
+  <xsl:param name="MCR.MODS.Utils.shortenTitleLength" />
 
   <xsl:template mode="mods.type" match="mods:mods">
     <xsl:choose>
@@ -269,7 +270,7 @@
     <xsl:variable name="completeTitle">
       <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods" mode="mods.title" />
     </xsl:variable>
-    <xsl:value-of select="mcrxml:shortenText($completeTitle,70)" />
+    <xsl:value-of select="mcrxml:shortenText($completeTitle,$MCR.MODS.Utils.shortenTitleLength)" />
   </xsl:template>
 
   <!--Template for access conditions -->

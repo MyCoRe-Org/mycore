@@ -205,8 +205,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
             newDOI = newDOI.toTestPrefix();
         }
 
-        MCRObject mcrBase = MCRMetadataManager.retrieveMCRObject(obj.getId());
-        Document dataciteDocument = transformToDatacite(newDOI, mcrBase);
+        Document dataciteDocument = transformToDatacite(newDOI, obj);
 
         MCRDataciteClient dataciteClient = getDataciteClient();
         dataciteClient.storeMetadata(dataciteDocument);
@@ -258,7 +257,7 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
         return new MCRDataciteClient(host, username, password, false, this.useTestPrefix);
     }
 
-    private Document transformToDatacite(MCRDigitalObjectIdentifier doi, MCRBase mcrBase)
+    protected Document transformToDatacite(MCRDigitalObjectIdentifier doi, MCRBase mcrBase)
         throws MCRPersistentIdentifierException {
         MCRObjectID id = mcrBase.getId();
         MCRBaseContent content = new MCRBaseContent(mcrBase);
