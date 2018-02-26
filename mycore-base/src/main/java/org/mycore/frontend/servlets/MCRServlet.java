@@ -228,6 +228,8 @@ public class MCRServlet extends HttpServlet {
 
         // Store current session in HttpSession
         theSession.setAttribute(ATTR_MYCORE_SESSION, session.getID());
+        LOGGER.debug("Bound MCRSession {} to HTTPSession {}", session.toString(), theSession.getId());
+
         // store the HttpSession ID in MCRSession
         if (session.put("http.session", theSession.getId()) == null) {
             //first request

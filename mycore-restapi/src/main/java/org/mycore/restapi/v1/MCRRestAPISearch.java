@@ -44,7 +44,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
@@ -59,7 +58,6 @@ import org.mycore.solr.MCRSolrConstants;
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/search")
-@MCRStaticContent
 public class MCRRestAPISearch {
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 

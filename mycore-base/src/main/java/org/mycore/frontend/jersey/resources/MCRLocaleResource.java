@@ -20,7 +20,6 @@ import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.services.i18n.MCRTranslation;
 
 @Path("locale")
-@MCRStaticContent
 public class MCRLocaleResource {
 
     @Context
@@ -58,6 +57,7 @@ public class MCRLocaleResource {
     @GET
     @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
     @Path("languages")
+    @MCRStaticContent
     public String languages() {
         Set<String> availableLanguages = MCRTranslation.getAvailableLanguages();
         return MCRJSONUtils.getJsonArray(availableLanguages).toString();
@@ -73,6 +73,7 @@ public class MCRLocaleResource {
     @GET
     @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
     @Path("translate/{lang}/{key: .*\\*}")
+    @MCRStaticContent
     public String translateJSON(@PathParam("lang") String lang, @PathParam("key") String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
         return MCRJSONUtils.getTranslations(key, lang);
@@ -103,6 +104,7 @@ public class MCRLocaleResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("translate/{lang}/{key: [^\\*]+}")
+    @MCRStaticContent
     public String translateText(@PathParam("lang") String lang, @PathParam("key") String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
         return MCRTranslation.translate(key, MCRTranslation.getLocale(lang));

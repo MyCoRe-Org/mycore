@@ -45,7 +45,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRRestAPIObjectsHelper;
@@ -61,7 +60,6 @@ import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/objects")
-@MCRStaticContent
 public class MCRRestAPIObjects {
     public static final String STYLE_DERIVATEDETAILS = "derivatedetails";
 
