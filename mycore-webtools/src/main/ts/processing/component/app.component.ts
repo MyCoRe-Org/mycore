@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, ViewEncapsulation} from '@angular/core';
+import {Component, ViewEncapsulation, ChangeDetectorRef} from '@angular/core';
 
 import {ProcessingService} from './../service/processing.service';
 import {Settings} from './../settings';
@@ -35,8 +35,17 @@ export class AppComponent {
 
     public registry: Registry;
 
-    constructor(private processingService: ProcessingService) {
+    private dirty: boolean;
+
+    constructor(private processingService: ProcessingService, private changeDetector: ChangeDetectorRef) {
+        this.dirty = false;
         this.connect();
+        this.changeDetector.detach();
+        setInterval(() => {
+            if (this.dirty) {
+                this.changeDetector.detectChanges();
+            }
+        }, 20);
     }
 
     public connect() {
@@ -64,17 +73,21 @@ export class AppComponent {
         const dataType = data.type;
         if (dataType === 'error') {
             this.errorCode = parseInt(data.error);
+            this.changeDetector.detectChanges();
             return;
         }
         if (dataType === 'registry') {
             this.errorCode = null;
             this.registry = new Registry();
+            this.changeDetector.detectChanges();
         }
         if (dataType === 'addCollection') {
             this.registry.addCollection(data);
+            this.changeDetector.detectChanges();
         }
         if (dataType === 'updateProcessable') {
             this.registry.updateProcessable(data);
+            this.dirty = true;
         }
         if (dataType === 'updateCollectionProperty') {
             const collection: Collection = this.registry.getCollection(data.id);
@@ -83,6 +96,7 @@ export class AppComponent {
                 return;
             }
             collection.setProperty(data.propertyName, data.propertyValue);
+            this.dirty = true;
         }
     }
 
