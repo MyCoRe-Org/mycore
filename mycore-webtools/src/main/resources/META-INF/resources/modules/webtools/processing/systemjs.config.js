@@ -64,6 +64,6 @@
     paths,
     map,
     packages
-  }
+  };
   System.config(config);
 }(this));
