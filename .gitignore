@@ -172,5 +172,4 @@ node_modules/
 bower_components/
 typings/
 .tscache/
-yarn.lock
 package-lock.json
