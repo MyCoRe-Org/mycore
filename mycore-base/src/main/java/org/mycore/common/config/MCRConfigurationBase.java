@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -232,6 +233,13 @@ public final class MCRConfigurationBase {
      *             if the properties are not initialized
      */
     public static Optional<String> getString(String name) {
+        if (Objects.requireNonNull(name, "MyCoRe property name must not be null.").trim().isEmpty()) {
+            throw new MCRConfigurationException("MyCoRe property name must not be empty.");
+        }
+        if (name.trim() != name) {
+            throw new MCRConfigurationException(
+                "MyCoRe property name must not contain trailing or leading whitespaces: '" + name + "'");
+        }
         if (getBaseProperties().isEmpty()) {
             throw new MCRConfigurationException("MCRConfiguration is still not initialized");
         }
