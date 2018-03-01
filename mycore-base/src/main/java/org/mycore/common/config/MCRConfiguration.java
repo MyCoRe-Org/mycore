@@ -258,7 +258,10 @@ public class MCRConfiguration {
      */
     public <T> T getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         return MCRConfiguration2.<T> getSingleInstanceOf(name).map(Optional::of)
-            .orElseGet(() -> Optional.ofNullable(defaultname).flatMap(MCRConfiguration2::getSingleInstanceOf))
+            .orElseGet(() -> Optional.ofNullable(defaultname)
+                .map(className -> new MCRConfiguration2.SingletonKey(name, className))
+                .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
+                    k -> MCRConfiguration2.instantiateClass(defaultname))))
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 

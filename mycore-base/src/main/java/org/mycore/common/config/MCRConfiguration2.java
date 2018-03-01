@@ -44,7 +44,7 @@ import org.mycore.common.function.MCRTriConsumer;
 public class MCRConfiguration2 {
 
     private static ConcurrentHashMap<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
-    private static Hashtable<SingletonKey, Object> instanceHolder = new Hashtable<>();
+    static Hashtable<SingletonKey, Object> instanceHolder = new Hashtable<>();
 
     public static Map<String, String> getPropertiesMap() {
         return MCRConfiguration.instance().getPropertiesMap();
@@ -57,7 +57,7 @@ public class MCRConfiguration2 {
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a String, or null
      * @throws MCRConfigurationException
-     *             if the property is not set or the class can not be loaded or instantiated
+     *             if the class can not be loaded or instantiated
      */
     public static <T> Optional<T> getInstanceOf(String name) throws MCRConfigurationException {
         return getString(name).map(MCRConfiguration2::instantiateClass);
@@ -71,7 +71,7 @@ public class MCRConfiguration2 {
      *            non-null and non-empty name of the configuration property
      * @return the instance of the class named by the value of the configuration property
      * @throws MCRConfigurationException
-     *             if the property is not set or the class can not be loaded or instantiated
+     *             if the class can not be loaded or instantiated
      */
     public static <T> Optional<T> getSingleInstanceOf(String name) {
         return getString(name)
@@ -167,8 +167,6 @@ public class MCRConfiguration2 {
      * @return the value of the configuration property as an <CODE>int</CODE> value
      * @throws NumberFormatException
      *             if the configuration property is not an <CODE>int</CODE> value
-     * @throws MCRConfigurationException
-     *             if the property with this name is not set
      */
     public static Optional<Integer> getInt(String name) throws NumberFormatException {
         return getString(name).map(Integer::parseInt);
@@ -183,8 +181,6 @@ public class MCRConfiguration2 {
      * @return the value of the configuration property as a <CODE>long</CODE> value
      * @throws NumberFormatException
      *             if the configuration property is not a <CODE>long</CODE> value
-     * @throws MCRConfigurationException
-     *             if the property with this name is not set
      */
     public static Optional<Long> getLong(String name) throws NumberFormatException {
         return getString(name).map(Long::parseLong);
@@ -343,7 +339,7 @@ public class MCRConfiguration2 {
         }
 
     }
-    private static class SingletonKey {
+    static class SingletonKey {
         private String property, className;
 
         public SingletonKey(String property, String className) {
