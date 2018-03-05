@@ -132,7 +132,8 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
         if (status.equals(MCRProcessableStatus.processing)) {
             this.startTime = Instant.now();
         }
-        if (status.equals(MCRProcessableStatus.successful) || status.equals(MCRProcessableStatus.failed)) {
+        if (status.equals(MCRProcessableStatus.successful) || status.equals(MCRProcessableStatus.failed) ||
+                status.equals(MCRProcessableStatus.canceled)) {
             this.endTime = Instant.now();
         }
         fireStatusChanged(oldStatus);

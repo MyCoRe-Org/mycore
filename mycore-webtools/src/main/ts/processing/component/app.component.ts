@@ -35,17 +35,9 @@ export class AppComponent {
 
     public registry: Registry;
 
-    private dirty: boolean;
-
     constructor(private processingService: ProcessingService, private changeDetector: ChangeDetectorRef) {
-        this.dirty = false;
         this.connect();
         this.changeDetector.detach();
-        setInterval(() => {
-            if (this.dirty) {
-                this.changeDetector.detectChanges();
-            }
-        }, 20);
     }
 
     public connect() {
@@ -87,7 +79,9 @@ export class AppComponent {
         }
         if (dataType === 'updateProcessable') {
             this.registry.updateProcessable(data);
-            this.dirty = true;
+            window.requestAnimationFrame(() => {
+               this.changeDetector.detectChanges();
+            });
         }
         if (dataType === 'updateCollectionProperty') {
             const collection: Collection = this.registry.getCollection(data.id);
@@ -96,7 +90,9 @@ export class AppComponent {
                 return;
             }
             collection.setProperty(data.propertyName, data.propertyValue);
-            this.dirty = true;
+            window.requestAnimationFrame(() => {
+                this.changeDetector.detectChanges();
+            });
         }
     }
 
