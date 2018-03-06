@@ -41,11 +41,6 @@ export class AppComponent {
         this.dirty = false;
         this.connect();
         this.changeDetector.detach();
-        setInterval(() => {
-            if (this.dirty) {
-                this.changeDetector.detectChanges();
-            }
-        }, 20);
     }
 
     public connect() {
@@ -69,34 +64,48 @@ export class AppComponent {
         this.connect();
     }
 
-    protected handleMessage(data: any) {
-        const dataType = data.type;
-        if (dataType === 'error') {
-            this.errorCode = parseInt(data.error);
-            this.changeDetector.detectChanges();
+    private triggerDelayedUpdate() {
+        if (this.dirty) {
             return;
         }
-        if (dataType === 'registry') {
-            this.errorCode = null;
-            this.registry = new Registry();
+        this.dirty = true;
+        window.requestAnimationFrame(() =>{
             this.changeDetector.detectChanges();
-        }
-        if (dataType === 'addCollection') {
-            this.registry.addCollection(data);
-            this.changeDetector.detectChanges();
-        }
-        if (dataType === 'updateProcessable') {
-            this.registry.updateProcessable(data);
-            this.dirty = true;
-        }
-        if (dataType === 'updateCollectionProperty') {
-            const collection: Collection = this.registry.getCollection(data.id);
-            if (collection == null) {
-                console.warn('Unable to find collection with id ' + data.id);
-                return;
-            }
-            collection.setProperty(data.propertyName, data.propertyValue);
-            this.dirty = true;
+            this.dirty = false;
+        });
+    }
+
+    protected handleMessage(data: any) {
+        switch (data.type) {
+            case 'error':
+                this.errorCode = parseInt(data.error);
+                this.changeDetector.detectChanges();
+                break;
+            case 'registry':
+                this.errorCode = null;
+                this.registry = new Registry();
+                this.changeDetector.detectChanges();
+                break;
+            case 'addCollection':
+                this.registry.addCollection(data);
+                this.changeDetector.detectChanges();
+                break;
+            case 'updateProcessable':
+                this.registry.updateProcessable(data);
+                this.triggerDelayedUpdate();
+                break;
+            case 'updateCollectionProperty':
+                const collection: Collection = this.registry.getCollection(data.id);
+                if (collection == null) {
+                    console.warn('Unable to find collection with id ' + data.id);
+                    return;
+                }
+                collection.setProperty(data.propertyName, data.propertyValue);
+                this.triggerDelayedUpdate();
+                break;
+            default:
+                console.warn('Unable to handle data type: ' + data.type);
+
         }
     }
 

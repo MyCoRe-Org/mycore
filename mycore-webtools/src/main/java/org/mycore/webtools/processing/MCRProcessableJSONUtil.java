@@ -18,24 +18,26 @@
 
 package org.mycore.webtools.processing;
 
+import java.time.Instant;
 import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.processing.MCRProcessable;
 
 /**
  * Utility methods for processable API.
- * 
+ *
  * @author Matthias Eichner
  */
 public abstract class MCRProcessableJSONUtil {
 
     /**
      * Converts a processable to json.
-     * 
+     *
      * @param processable the processable to convert
      * @return json object of the processable
      */
@@ -49,8 +51,15 @@ public abstract class MCRProcessableJSONUtil {
         if (!processable.isCreated()) {
             processableJSON.addProperty("startTime", processable.getStartTime().toEpochMilli());
             if (processable.isDone()) {
-                processableJSON.addProperty("endTime", processable.getEndTime().toEpochMilli());
-                processableJSON.addProperty("took", processable.took().toMillis());
+                Instant endTime = processable.getEndTime();
+                if (endTime != null) {
+                    processableJSON.addProperty("endTime", endTime.toEpochMilli());
+                    processableJSON.addProperty("took", processable.took().toMillis());
+                } else {
+                    LogManager.getLogger()
+                              .warn("The processable " + processable.getName() + " (" + processable.getStatus()
+                                      + ") is finished" + " but does not have an end date. This should NEVER happen!");
+                }
             }
         }
         if (processable.isFailed()) {
@@ -71,7 +80,7 @@ public abstract class MCRProcessableJSONUtil {
 
     /**
      * Converts a map of properties to a json representation.
-     * 
+     *
      * @param properties the properties to convert
      * @return a json object containing the properties
      */
@@ -82,7 +91,7 @@ public abstract class MCRProcessableJSONUtil {
 
     /**
      * Converts a object to a json.
-     * 
+     *
      * @param value the value to convert
      * @return a json element
      */
