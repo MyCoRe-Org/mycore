@@ -10,6 +10,7 @@ define([
 	"dojo/query",
 	"dojo/_base/lang", // hitch, clone
 	"dojo/dom-construct",
+    "dojo/dom-style", // style
 	"dojo/_base/json",
 	"mycore/common/I18nManager",
 	"dijit/Toolbar",
@@ -22,7 +23,7 @@ define([
 	"mycore/classification/TreePane",
 	"mycore/common/I18nStore",
 	"mycore/classification/SettingsDialog"
-], function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _SettingsMixin, template, on, dom, query, lang, domConstruct, json, i18n) {
+], function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _SettingsMixin, template, on, dom, query, lang, domConstruct, domStyle, json, i18n) {
 
 /**
  * Create a new instance of the classification editor.
@@ -326,10 +327,12 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		var classEditorNode = this.domNode;
 		var selector = ".dijitDialog, .dijitPopup, .dijitTooltip, .dijitDialogUnderlayWrapper";
 		if(fullscreen) {
+            domStyle.set(this.domNode, "height", "700px");
 			query(selector, this.domNode).forEach(function(node) {
 				domConstruct.place(node, body);
 			});
 		} else {
+            domStyle.set(this.domNode, "height", "100%");
 			query(selector, body).forEach(function(node) {
 				domConstruct.place(node, classEditorNode);
 			});
