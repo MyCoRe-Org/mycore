@@ -105,7 +105,6 @@ export class AppComponent {
                 break;
             default:
                 console.warn('Unable to handle data type: ' + data.type);
-
         }
     }
 
