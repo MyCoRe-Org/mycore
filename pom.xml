@@ -1098,11 +1098,6 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-urn</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mycore</groupId>
         <artifactId>mycore-user2</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1837,7 +1832,6 @@
     <module>mycore-sass</module>
     <module>mycore-solr</module>
     <module>mycore-sword</module>
-    <module>mycore-urn</module>
     <module>mycore-user2</module>
     <module>mycore-viewer</module>
     <module>mycore-wcms2</module>
