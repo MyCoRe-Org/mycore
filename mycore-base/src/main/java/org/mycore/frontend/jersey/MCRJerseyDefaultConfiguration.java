@@ -18,7 +18,8 @@
 
 package org.mycore.frontend.jersey;
 
-import com.google.inject.Injector;
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -29,6 +30,8 @@ import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.inject.MCRInjectorConfig;
+
+import com.google.inject.Injector;
 
 /**
  * Default jersey configuration for mycore.
@@ -94,7 +97,9 @@ public class MCRJerseyDefaultConfiguration implements MCRJerseyConfiguration {
         resourceConfig.register(new AbstractContainerLifecycleListener() {
             @Override
             public void onStartup(Container container) {
-                ServiceLocator serviceLocator = container.getApplicationHandler().getServiceLocator();
+                ServiceLocator serviceLocator = container.getApplicationHandler().getInjectionManager()
+                    .getInstance(ServiceLocator.class);
+                Objects.requireNonNull(serviceLocator, "Cannot get hk2 ServiceLocator from InjectionManager");
                 Injector injector = MCRInjectorConfig.injector();
                 GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
                 GuiceIntoHK2Bridge guiceBridge = serviceLocator.getService(GuiceIntoHK2Bridge.class);
