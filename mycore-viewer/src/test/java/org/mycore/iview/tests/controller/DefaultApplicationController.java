@@ -51,7 +51,7 @@ public class DefaultApplicationController extends ApplicationController {
 
     private static Map<TestDerivate, String> derivateHTMLMapping;
 
-    private static final Logger LOGGER = LogManager.getLogger(DefaultApplicationController.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static Properties PROPERTIES = TestProperties.getInstance();
 
@@ -85,20 +85,20 @@ public class DefaultApplicationController extends ApplicationController {
     }
 
     protected String buildHTMLFile(String name, String startFile, String page) throws IOException {
-        InputStream viewerHTMLFileStream = DefaultApplicationController.class.getClassLoader()
-            .getResourceAsStream("testStub/" + page + ".html");
-        String content = IOUtils.toString(viewerHTMLFileStream, "UTF-8");
-        String result = content.replace("{$name}", name).replace("{$startFile}", startFile).replace("{$baseUrl}",
-            MCRSeleniumTestBase.getBaseUrl(System.getProperty("BaseUrlPort")) + "/test-classes/testFiles/");
-        String fileName = buildFileName(name);
-        String resultLocation = webpath + "/" + fileName;
-        File resultFile = new File(resultLocation);
-        resultFile.getParentFile().mkdirs();
-        FileOutputStream resultStream = new FileOutputStream(resultFile);
-        IOUtils.write(result, resultStream, Charset.defaultCharset());
-        IOUtils.closeQuietly(viewerHTMLFileStream);
-        IOUtils.closeQuietly(resultStream);
-        return resultLocation;
+        try (InputStream viewerHTMLFileStream = DefaultApplicationController.class.getClassLoader()
+            .getResourceAsStream("testStub/" + page + ".html")) {
+            String content = IOUtils.toString(viewerHTMLFileStream, "UTF-8");
+            String result = content.replace("{$name}", name).replace("{$startFile}", startFile).replace("{$baseUrl}",
+                MCRSeleniumTestBase.getBaseUrl(System.getProperty("BaseUrlPort")) + "/test-classes/testFiles/");
+            String fileName = buildFileName(name);
+            String resultLocation = webpath + "/" + fileName;
+            File resultFile = new File(resultLocation);
+            resultFile.getParentFile().mkdirs();
+            try (FileOutputStream resultStream = new FileOutputStream(resultFile)) {
+                IOUtils.write(result, resultStream, Charset.defaultCharset());
+            }
+            return resultLocation;
+        }
     }
 
     private String buildFileName(String name) {
