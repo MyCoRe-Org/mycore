@@ -146,7 +146,7 @@ public class MCRUserAttributeMapper {
                             }
 
                             if (convCls != null) {
-                                MCRUserAttributeConverter converter = convCls.newInstance();
+                                MCRUserAttributeConverter converter = convCls.getDeclaredConstructor().newInstance();
                                 LOGGER.debug("convert value \"{}\" with \"{}\"", value, converter.getClass().getName());
                                 value = converter.convert(value,
                                     attribute.separator != null ? attribute.separator : attrAnno.separator(),
@@ -164,10 +164,8 @@ public class MCRUserAttributeMapper {
                                     LOGGER.debug("map attribute \"{}\" with value \"{}\" to field \"{}\"",
                                         attribute.mapping, value, field.getName());
 
-                                    boolean accState = field.isAccessible();
                                     field.setAccessible(true);
                                     field.set(object, value);
-                                    field.setAccessible(accState);
 
                                     changed = true;
                                 } else if (annotated instanceof Method) {
@@ -176,10 +174,8 @@ public class MCRUserAttributeMapper {
                                     LOGGER.debug("map attribute \"{}\" with value \"{}\" to method \"{}\"",
                                         attribute.mapping, value, method.getName());
 
-                                    boolean accState = method.isAccessible();
                                     method.setAccessible(true);
                                     method.invoke(object, value);
-                                    method.setAccessible(accState);
 
                                     changed = true;
                                 }
@@ -257,10 +253,8 @@ public class MCRUserAttributeMapper {
         if (annotated instanceof Field) {
             final Field field = (Field) annotated;
 
-            boolean accState = field.isAccessible();
             field.setAccessible(true);
             value = field.get(object);
-            field.setAccessible(accState);
         } else if (annotated instanceof Method) {
             Method method = null;
             String name = ((Method) annotated).getName();
@@ -270,10 +264,8 @@ public class MCRUserAttributeMapper {
             }
 
             if (method != null) {
-                boolean accState = method.isAccessible();
                 method.setAccessible(true);
                 value = method.invoke(object);
-                method.setAccessible(accState);
             }
         }
 

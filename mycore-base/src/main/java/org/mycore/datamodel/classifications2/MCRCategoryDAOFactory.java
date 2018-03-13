@@ -50,9 +50,8 @@ public class MCRCategoryDAOFactory {
      * 
      * @param daoClass new dao class
      */
-    public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws IllegalAccessException,
-        InstantiationException {
-        INSTANCE = daoClass.newInstance();
+    public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws ReflectiveOperationException {
+        INSTANCE = daoClass.getDeclaredConstructor().newInstance();
     }
 
 }

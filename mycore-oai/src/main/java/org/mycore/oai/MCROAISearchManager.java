@@ -258,13 +258,4 @@ public class MCROAISearchManager {
         return searcher;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        if (executorService != null && !executorService.isShutdown()) {
-            MCRShutdownHandler.getInstance().removeCloseable(executorService::shutdownNow);
-            executorService.shutdownNow();
-        }
-        super.finalize();
-    }
-
 }

@@ -20,7 +20,6 @@ package org.mycore.common.config;
 
 import java.lang.reflect.Method;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -284,7 +282,7 @@ public class MCRConfiguration2 {
 
         try {
             try {
-                o = cl.newInstance();
+                o = cl.getDeclaredConstructor().newInstance();
             } catch (IllegalAccessException | InstantiationException e) {
                 // check for singleton
                 Method[] querymethods = cl.getMethods();

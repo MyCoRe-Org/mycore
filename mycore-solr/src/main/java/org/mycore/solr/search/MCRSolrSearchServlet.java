@@ -190,7 +190,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         for (Entry<String, String[]> sortParameterEntry : sortParameterEntrys) {
             StringTokenizer st = new StringTokenizer(sortParameterEntry.getKey(), ".");
             st.nextToken(); // skip sort.
-            Integer position = new Integer(st.nextToken());
+            Integer position = Integer.parseInt(st.nextToken());
             String type = st.nextToken();
             String[] valueArray = sortParameterEntry.getValue();
             if (valueArray.length > 0) {

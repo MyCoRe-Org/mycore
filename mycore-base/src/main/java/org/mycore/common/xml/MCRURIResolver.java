@@ -52,6 +52,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
@@ -115,7 +116,6 @@ import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Reads XML documents from various URI types. This resolver is used to read DTDs, XML Schema files, XSL document()
@@ -162,8 +162,8 @@ public final class MCRURIResolver implements URIResolver {
         return Optional.ofNullable(MCRConfiguration.instance().getClass(CONFIG_PREFIX + "ExternalResolver.Class", null))
             .map(c -> {
                 try {
-                    return (MCRResolverProvider) c.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
+                    return (MCRResolverProvider) c.getDeclaredConstructor().newInstance();
+                } catch (ReflectiveOperationException e) {
                     LOGGER.warn("Could not instantiate external Resolver class", e);
                     return null;
                 }
@@ -732,8 +732,8 @@ public final class MCRURIResolver implements URIResolver {
                 if (path.endsWith(".xsl")) {
                     XMLReader reader;
                     try {
-                        reader = XMLReaderFactory.createXMLReader();
-                    } catch (SAXException e) {
+                        reader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
+                    } catch (SAXException | ParserConfigurationException e) {
                         throw new TransformerException(e);
                     }
                     reader.setEntityResolver(MCREntityResolver.instance());
@@ -762,7 +762,7 @@ public final class MCRURIResolver implements URIResolver {
             Object o;
             try {
                 cl = Class.forName(classname);
-                o = cl.newInstance();
+                o = cl.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new TransformerException(e);
             }

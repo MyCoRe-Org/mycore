@@ -175,10 +175,4 @@ public class MCRSolrCore {
         return concurrentClient != null ? concurrentClient : solrClient;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        shutdown();
-        super.finalize();
-    }
-
 }

@@ -123,8 +123,8 @@ public class MCRPersistentIdentifierManager {
     private static MCRPersistentIdentifierParser getParserInstance(
         Class<? extends MCRPersistentIdentifierParser> detectorClass) {
         try {
-            return detectorClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            return detectorClass.getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             return null;
         }
     }

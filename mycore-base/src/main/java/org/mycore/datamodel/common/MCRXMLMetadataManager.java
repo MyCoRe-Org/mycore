@@ -261,7 +261,7 @@ public class MCRXMLMetadataManager {
                 if (forceXML == null) {
                     try {
                         setupStore(project, type, prefix);
-                    } catch (IllegalAccessException | InstantiationException e) {
+                    } catch (ReflectiveOperationException e) {
                         throw new MCRPersistenceException(MessageFormat.format(
                             "Could not instantiate store for project {0} and object type {1}.", project, type), e);
                     }
@@ -278,8 +278,8 @@ public class MCRXMLMetadataManager {
     }
 
     @SuppressWarnings("unchecked")
-    private void setupStore(String project, String objectType, String configPrefix) throws InstantiationException,
-        IllegalAccessException {
+    private void setupStore(String project, String objectType, String configPrefix)
+        throws ReflectiveOperationException {
         MCRConfiguration config = MCRConfiguration.instance();
         String baseID = getStoryKey(project, objectType);
         Class clazz = config.getClass(configPrefix + "Class", null);

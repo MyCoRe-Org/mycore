@@ -29,13 +29,15 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLFilterImpl;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * replacement for <code>org.hsqldb.util.ShutdownServer</code> which is missing
@@ -46,7 +48,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class MCRShutdownServer {
 
-    public static void main(String[] args) throws IOException, SAXException {
+    public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
         Map<String, String> properties = getConnectionProperties();
         String dbURL = properties.get("javax.persistence.jdbc.url");
         String user = properties.get("javax.persistence.jdbc.user");
@@ -64,13 +66,15 @@ public class MCRShutdownServer {
         }
     }
 
-    private static Map<String, String> getConnectionProperties() throws IOException, SAXException {
+    private static Map<String, String> getConnectionProperties()
+        throws IOException, SAXException, ParserConfigurationException {
         String resourceName = "META-INF/persistence.xml";
         URL hibernateCfg = MCRConfigurationDir.getConfigResource(resourceName);
         if (hibernateCfg == null) {
             throw new IOException("Could not find '" + resourceName + "'");
         }
-        PropertyHandler propertyHandler = new PropertyHandler(XMLReaderFactory.createXMLReader());
+        PropertyHandler propertyHandler = new PropertyHandler(
+            MCRXMLParserFactory.getNonValidatingParser().getXMLReader());
         propertyHandler.parse(hibernateCfg.toString());
         return propertyHandler.getProperties();
     }

@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.TooManyListenersException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Templates;
@@ -56,13 +57,13 @@ import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRTemplatesSource;
 import org.mycore.common.xsl.MCRTraceListener;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Transforms XML content using a static XSL stylesheet. The stylesheet is configured via
@@ -164,7 +165,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         this.templates = new Templates[templateSources.length];
     }
 
-    private void checkTemplateUptodate() throws TransformerConfigurationException, SAXException {
+    private void checkTemplateUptodate()
+        throws TransformerConfigurationException, SAXException, ParserConfigurationException {
         boolean check = System.currentTimeMillis() - modifiedChecked > CHECK_PERIOD;
         boolean useCache = MCRConfiguration.instance().getBoolean("MCR.UseXSLTemplateCache", true);
         if (!useCache) {
@@ -190,12 +192,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     @Override
-    public String getEncoding() throws TransformerException, SAXException {
+    public String getEncoding() throws TransformerException, SAXException, ParserConfigurationException {
         return getOutputProperties().getProperty("encoding", "UTF-8");
     }
 
     @Override
-    public String getMimeType() throws TransformerException, SAXException {
+    public String getMimeType() throws TransformerException, SAXException, ParserConfigurationException {
         return getOutputProperties().getProperty("media-type", "text/xml");
     }
 
@@ -211,7 +213,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             XMLReader reader = getXMLReader(transformHandlerList);
             TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
             return transform(source, reader, lastTransformerHandler, parameter);
-        } catch (TransformerException | SAXException e) {
+        } catch (TransformerException | SAXException | ParserConfigurationException e) {
             throw new IOException(e);
         }
     }
@@ -232,7 +234,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             StreamResult result = new StreamResult(out);
             lastTransformerHandler.setResult(result);
             reader.parse(source.getInputSource());
-        } catch (TransformerConfigurationException | SAXException | IllegalArgumentException e) {
+        } catch (TransformerConfigurationException | SAXException | IllegalArgumentException
+            | ParserConfigurationException e) {
             throw new IOException(e);
         } catch (RuntimeException e) {
             if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
@@ -244,7 +247,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
-        MCRParameterCollector parameter) throws IOException, SAXException, TransformerException {
+        MCRParameterCollector parameter)
+        throws IOException, SAXException, TransformerException, ParserConfigurationException {
         return new MCRTransformedContent(source, reader, transformerHandler, getLastModified(), parameter,
             getFileName(source), getMimeType(), getEncoding(), this);
     }
@@ -261,7 +265,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return new MCRByteContent(baos.getBuffer(), 0, baos.size());
     }
 
-    private String getFileName(MCRContent content) throws TransformerException, SAXException {
+    private String getFileName(MCRContent content)
+        throws TransformerException, SAXException, ParserConfigurationException {
         String fileName = content.getName();
         if (fileName == null) {
             return null;
@@ -281,7 +286,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     protected LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
-        throws TransformerConfigurationException, SAXException {
+        throws TransformerConfigurationException, SAXException, ParserConfigurationException {
         checkTemplateUptodate();
         LinkedList<TransformerHandler> xslSteps = new LinkedList<>();
         //every transformhandler shares the same ErrorListener instance
@@ -308,14 +313,16 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return xslSteps;
     }
 
-    protected XMLReader getXMLReader(LinkedList<TransformerHandler> transformHandlerList) throws SAXException {
-        XMLReader reader = XMLReaderFactory.createXMLReader();
+    protected XMLReader getXMLReader(LinkedList<TransformerHandler> transformHandlerList)
+        throws SAXException, ParserConfigurationException {
+        XMLReader reader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         reader.setEntityResolver(ENTITY_RESOLVER);
         reader.setContentHandler(transformHandlerList.getFirst());
         return reader;
     }
 
-    public Properties getOutputProperties() throws TransformerConfigurationException, SAXException {
+    public Properties getOutputProperties()
+        throws TransformerConfigurationException, SAXException, ParserConfigurationException {
         checkTemplateUptodate();
         Templates lastTemplate = templates[templates.length - 1];
         Properties outputProperties = lastTemplate.getOutputProperties();
@@ -326,7 +333,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
      * @see org.mycore.common.content.transformer.MCRContentTransformer#getFileExtension()
      */
     @Override
-    public String getFileExtension() throws TransformerException, SAXException {
+    public String getFileExtension() throws TransformerException, SAXException, ParserConfigurationException {
         String fileExtension = super.fileExtension;
         if (fileExtension != null && !getDefaultExtension().equals(fileExtension)) {
             return fileExtension;

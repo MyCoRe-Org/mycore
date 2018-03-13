@@ -132,9 +132,10 @@ public class MCRXEditorTransformer {
 
     public void setPostProcessor(String clazz) {
         try {
-            MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) Class.forName(clazz).newInstance());
+            MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) Class.forName(clazz).getDeclaredConstructor()
+                .newInstance());
             editorSession.setPostProcessor(instance);
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (ReflectiveOperationException e) {
             throw new MCRException("Could not initialize Post-Processor with class" + clazz, e);
         }
     }

@@ -133,7 +133,7 @@ public class MCRCommandManager {
 
     private Object buildInstanceOfClass(String className) {
         try {
-            return Class.forName(className).newInstance();
+            return Class.forName(className).getDeclaredConstructor().newInstance();
         } catch (Exception ex) {
             String msg = "Could not instantiate class " + className;
             throw new MCRConfigurationException(msg, ex);

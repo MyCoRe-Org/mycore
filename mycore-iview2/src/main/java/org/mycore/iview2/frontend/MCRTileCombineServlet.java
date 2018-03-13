@@ -98,7 +98,7 @@ public class MCRTileCombineServlet extends MCRServlet {
         String footerClassName = getInitParameter(MCRFooterInterface.class.getName());
         if (footerClassName != null) {
             try {
-                footerImpl = (MCRFooterInterface) Class.forName(footerClassName).newInstance();
+                footerImpl = (MCRFooterInterface) Class.forName(footerClassName).getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new ServletException("Could not initialize MCRFooterInterface", e);
             }

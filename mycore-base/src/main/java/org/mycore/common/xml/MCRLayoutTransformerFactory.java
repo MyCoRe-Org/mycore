@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
@@ -101,7 +102,8 @@ public class MCRLayoutTransformerFactory {
         return MediaType.parse(mimeType).is(MediaType.PDF);
     }
 
-    private static String[] getStylesheets(String id, String stylesheet) throws TransformerException, SAXException {
+    private static String[] getStylesheets(String id, String stylesheet)
+        throws TransformerException, SAXException, ParserConfigurationException {
         List<String> ignore = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Ignore",
             Collections.emptyList());
         List<String> defaults = Collections.emptyList();

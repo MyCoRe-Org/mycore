@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -73,7 +74,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
                 document = MCRSolrInputDocumentGenerator.getSolrInputDocument(result.asXML().getRootElement());
             }
             return document;
-        } catch (TransformerConfigurationException | JAXBException | JDOMException e) {
+        } catch (TransformerConfigurationException | JAXBException | JDOMException | ParserConfigurationException e) {
             throw new IOException(e);
         }
     }
@@ -104,7 +105,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
                 MCRContent result = transformer.transform(new MCRJDOMContent(doc));
                 return getSolrInputDocuments(result);
             }
-        } catch (TransformerConfigurationException | JAXBException | JDOMException e) {
+        } catch (TransformerConfigurationException | JAXBException | JDOMException | ParserConfigurationException e) {
             throw new IOException(e);
         }
     }

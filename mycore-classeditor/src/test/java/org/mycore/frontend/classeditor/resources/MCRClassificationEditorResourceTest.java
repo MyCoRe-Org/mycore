@@ -93,7 +93,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
 
         try {
             MCRStoreManager.createStore("jportal_jpclassi", MCRMetadataStore.class);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (ReflectiveOperationException e) {
             LOGGER.error("while creating store jportal_jpclassi", e);
         }
 
