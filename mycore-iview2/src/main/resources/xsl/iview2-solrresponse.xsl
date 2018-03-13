@@ -134,7 +134,7 @@
           <xsl:otherwise>
             <xsl:if test="$isDisplayedEnabled = 'true'">
               <xsl:variable name="objectType" select="substring-before(substring-after($mcrid,'_'),'_')" />
-              <span>
+              <span class="derivateLocked">
                 <!-- Zugriff auf 'Abbildung' gesperrt -->
                 <xsl:value-of select="i18n:translate('metaData.derivateLocked',i18n:translate(concat('metaData.',$objectType,'.[derivates]')))" />
               </span>
