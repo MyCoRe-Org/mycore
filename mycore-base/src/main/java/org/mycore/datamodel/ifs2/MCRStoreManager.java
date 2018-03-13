@@ -27,13 +27,13 @@ public class MCRStoreManager {
     private static final Logger LOGGER = LogManager.getLogger(MCRStoreManager.class);
 
     public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass)
-        throws InstantiationException, IllegalAccessException {
+        throws ReflectiveOperationException {
         return createStore(new MCRStoreDefaultConfig(ID), storeClass);
     }
 
     public static <T extends MCRStore> T createStore(MCRStoreConfig config, Class<T> storeClass)
-        throws InstantiationException, IllegalAccessException {
-        T store = storeClass.newInstance();
+        throws ReflectiveOperationException {
+        T store = storeClass.getDeclaredConstructor().newInstance();
         store.init(config);
         try {
             LOGGER.info("Adding instance of {} as MCRStore '{}'.", storeClass.getSimpleName(), store.getID());

@@ -100,8 +100,8 @@ public class MCRStartupHandler {
 
     private static AutoExecutable getAutoExecutable(String className) {
         try {
-            return (AutoExecutable) Class.forName(className).newInstance();
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            return (AutoExecutable) Class.forName(className).getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             throw new MCRConfigurationException("Could not initialize 'MCR.Startup.Class': " + className, e);
         }
     }

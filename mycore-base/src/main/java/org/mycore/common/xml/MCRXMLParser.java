@@ -18,10 +18,14 @@
 
 package org.mycore.common.xml;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.jdom2.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
 /**
  * Parses XML content and returns it as JDOM document.
@@ -36,4 +40,6 @@ public interface MCRXMLParser {
     boolean isValidating();
 
     Document parseXML(MCRContent content) throws MCRException, SAXParseException;
+
+    XMLReader getXMLReader() throws SAXException, ParserConfigurationException;
 }

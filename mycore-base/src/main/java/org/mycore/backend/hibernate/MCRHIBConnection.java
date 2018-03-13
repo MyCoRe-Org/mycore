@@ -41,12 +41,6 @@ public class MCRHIBConnection {
 
     private static Logger LOGGER = LogManager.getLogger(MCRHIBConnection.class);
 
-    @Override
-    protected void finalize() throws Throwable {
-        System.out.println("\n" + this.getClass() + "is finalized!\n");
-        super.finalize();
-    }
-
     public static synchronized MCRHIBConnection instance() throws MCRPersistenceException {
         if (SINGLETON == null) {
             SINGLETON = new MCRHIBConnection();

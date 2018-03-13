@@ -207,7 +207,7 @@ public class MCRContentStoreFactory {
         Class<? extends MCRAudioVideoExtender> cl = getExtenderClass(file.getStoreID());
 
         try {
-            MCRAudioVideoExtender ext = cl.newInstance();
+            MCRAudioVideoExtender ext = cl.getDeclaredConstructor().newInstance();
             ext.init(file);
             return ext;
         } catch (Exception exc) {

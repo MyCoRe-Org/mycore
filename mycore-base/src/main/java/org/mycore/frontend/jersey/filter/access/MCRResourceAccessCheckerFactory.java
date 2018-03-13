@@ -28,13 +28,13 @@ public class MCRResourceAccessCheckerFactory {
     private static ConcurrentHashMap<Class<? extends MCRResourceAccessChecker>, MCRResourceAccessChecker> implMap = new ConcurrentHashMap<>();
 
     public static <T extends MCRResourceAccessChecker> T getInstance(Class<T> clazz)
-        throws InstantiationException, IllegalAccessException {
+        throws ReflectiveOperationException {
         @SuppressWarnings("unchecked")
         T accessChecker = (T) implMap.get(clazz);
         if (accessChecker != null) {
             return accessChecker;
         }
-        accessChecker = clazz.newInstance();
+        accessChecker = clazz.getDeclaredConstructor().newInstance();
         implMap.put(clazz, accessChecker);
         return accessChecker;
     }

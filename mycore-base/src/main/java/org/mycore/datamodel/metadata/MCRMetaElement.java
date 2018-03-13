@@ -324,12 +324,10 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         for (Element subtag : element_list) {
             MCRMetaInterface obj;
             try {
-                obj = forName.newInstance();
+                obj = forName.getDeclaredConstructor().newInstance();
                 obj.setFromDOM(subtag);
-            } catch (IllegalAccessException e) {
-                throw new MCRException(fullname + " IllegalAccessException");
-            } catch (InstantiationException e) {
-                throw new MCRException(fullname + " InstantiationException");
+            } catch (ReflectiveOperationException e) {
+                throw new MCRException(fullname + " ReflectiveOperationException", e);
             }
 
             list.add(obj);

@@ -72,8 +72,8 @@ public class MCRMetsTestUtil {
 
     public static <T> T instantiate(final String className, final Class<T> type) {
         try {
-            return type.cast(Class.forName(className).newInstance());
-        } catch (final InstantiationException | ClassNotFoundException | IllegalAccessException e) {
+            return type.cast(Class.forName(className).getDeclaredConstructor().newInstance());
+        } catch (final ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }
     }

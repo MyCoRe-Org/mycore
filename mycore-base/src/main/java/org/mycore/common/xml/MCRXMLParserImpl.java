@@ -23,9 +23,12 @@ import java.net.URI;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaderJDOMFactory;
 import org.mycore.common.MCRException;
@@ -33,6 +36,7 @@ import org.mycore.common.content.MCRContent;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
@@ -86,6 +90,24 @@ public class MCRXMLParserImpl implements MCRXMLParser {
                 throw (SAXParseException) cause;
             }
             throw new MCRException(msg, ex);
+        }
+    }
+
+    @Override
+    public XMLReader getXMLReader() throws SAXException, ParserConfigurationException {
+        try {
+            return builder.getXMLReaderFactory().createXMLReader();
+        } catch (JDOMException e) {
+            Throwable cause = e.getCause();
+            if (e != null) {
+                if (cause instanceof SAXException) {
+                    throw (SAXException) cause;
+                }
+                if (cause instanceof ParserConfigurationException) {
+                    throw (ParserConfigurationException) cause;
+                }
+            }
+            throw new MCRException(e);
         }
     }
 

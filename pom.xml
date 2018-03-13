@@ -257,6 +257,32 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>org.bsc.maven</groupId>
+        <artifactId>maven-processor-plugin</artifactId>
+        <version>3.3.3</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>${hibernate.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>generate-jpa-model</id>
+            <goals>
+              <goal>process</goal>
+            </goals>
+            <configuration>
+              <compilerArguments>-implicit:none</compilerArguments>
+              <processors>
+                <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+              </processors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <useIncrementalCompilation>true</useIncrementalCompilation>
@@ -266,18 +292,12 @@
           </compilerArgs>
           <annotationProcessorPaths>
             <path>
-              <groupId>org.hibernate</groupId>
-              <artifactId>hibernate-jpamodelgen</artifactId>
-              <version>${hibernate.version}</version>
-            </path>
-            <path>
               <groupId>org.apache.logging.log4j</groupId>
               <artifactId>log4j-core</artifactId>
               <version>${log4j.version}</version>
             </path>
           </annotationProcessorPaths>
           <annotationProcessors>
-            <annotationProcessor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</annotationProcessor>
             <annotationProcessor>org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor</annotationProcessor>
           </annotationProcessors>
         </configuration>
@@ -744,6 +764,11 @@
         <groupId>io.bit3</groupId>
         <artifactId>jsass</artifactId>
         <version>5.5.6</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.activation</groupId>
+        <artifactId>javax.activation-api</artifactId>
+        <version>1.2.0</version>
       </dependency>
       <dependency>
         <groupId>javax.annotation</groupId>

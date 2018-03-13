@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBResult;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.TransformerHandler;
 
@@ -99,7 +100,8 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
     }
 
     public T getJAXBObject(MCRContent source, MCRParameterCollector parameter)
-        throws TransformerConfigurationException, SAXException, JAXBException, IOException {
+        throws TransformerConfigurationException, SAXException, JAXBException, IOException,
+        ParserConfigurationException {
         LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList(parameter);
         XMLReader reader = getXMLReader(transformHandlerList);
         TransformerHandler lastTransformerHandler = transformHandlerList.getLast();

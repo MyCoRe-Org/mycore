@@ -66,14 +66,14 @@ public class MCRSolrPathDocumentFactory {
                         .forName(accumulatorClassRef)
                         .asSubclass(MCRSolrFileIndexAccumulator.class);
 
-                    return accumulatorClass.newInstance();
+                    return accumulatorClass.getDeclaredConstructor().newInstance();
                 } catch (ClassNotFoundException e) {
                     throw new MCRConfigurationException(
                         "AccumulatorClass configurated in " + ACCUMULATOR_LIST_PROPERTY_NAME + " not found : "
                             + accumulatorClassRef,
                         e);
 
-                } catch (IllegalAccessException | InstantiationException e) {
+                } catch (ReflectiveOperationException e) {
                     throw new MCRConfigurationException(
                         "Construxtor of the AccumulatorClass configurated in " + ACCUMULATOR_LIST_PROPERTY_NAME
                             + " can not be invoked.",

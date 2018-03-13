@@ -21,6 +21,7 @@ package org.mycore.common.xsl;
 import java.io.IOException;
 import java.net.URL;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.sax.SAXSource;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,11 +29,11 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.xml.MCREntityResolver;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXMLResource;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Represents an XSL file that will be used in XSL transformation and which is loaded
@@ -57,8 +58,8 @@ public class MCRTemplatesSource {
     }
 
     /** Have to use SAX here to resolve entities */
-    public SAXSource getSource() throws SAXException {
-        XMLReader reader = XMLReaderFactory.createXMLReader();
+    public SAXSource getSource() throws SAXException, ParserConfigurationException {
+        XMLReader reader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         reader.setEntityResolver(MCREntityResolver.instance());
         URL resourceURL = MCRConfigurationDir.getConfigResource(resource);
         if (resourceURL == null) {

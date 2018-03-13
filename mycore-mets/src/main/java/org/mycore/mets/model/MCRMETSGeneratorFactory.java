@@ -55,7 +55,7 @@ public abstract class MCRMETSGeneratorFactory {
         Class<? extends MCRMETSGeneratorSelector> cn = MCRConfiguration.instance()
             .getClass("MCR.Component.MetsMods.Generator.Selector", MCRMETSPropertyGeneratorSelector.class);
         try {
-            GENERATOR_SELECTOR = cn.newInstance();
+            GENERATOR_SELECTOR = cn.getDeclaredConstructor().newInstance();
         } catch (Exception cause) {
             GENERATOR_SELECTOR = new MCRMETSPropertyGeneratorSelector();
             throw new MCRException(
@@ -178,7 +178,7 @@ public abstract class MCRMETSGeneratorFactory {
                     Class<?> classToCheck = Class.forName(cn);
                     METS_GENERATOR_CLASS = classToCheck.asSubclass(MCRMETSGenerator.class);
                 }
-                return METS_GENERATOR_CLASS.newInstance();
+                return METS_GENERATOR_CLASS.getDeclaredConstructor().newInstance();
             } catch (Exception cause) {
                 throw new MCRException("Unable to instantiate " + cn
                     + ". Please check the 'MCR.Component.MetsMods.Generator' property'.", cause);

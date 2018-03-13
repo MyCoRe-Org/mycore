@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -91,7 +92,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line interface. Robert: Ideas for clean-up -
@@ -845,7 +845,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "transforms a mycore object {0} with the given file or URL {1}",
         order = 280)
     public static void xslt(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException,
-        URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException {
+        URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException,
+        ParserConfigurationException {
         xslt(objectId, xslFilePath, false);
     }
 
@@ -868,12 +869,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                     + "root name and result root name are different.",
             order = 285)
     public static void forceXSLT(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException,
-            URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException {
+        URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException,
+        ParserConfigurationException {
         xslt(objectId, xslFilePath, true);
     }
 
-    private static void xslt(String objectId, String xslFilePath, boolean force) throws IOException, JDOMException, SAXException,
-            URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException {
+    private static void xslt(String objectId, String xslFilePath, boolean force)
+        throws IOException, JDOMException, SAXException,
+        URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException,
+        ParserConfigurationException {
         File xslFile = new File(xslFilePath);
         URL xslURL;
         if (!xslFile.exists()) {
@@ -892,7 +896,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setErrorListener(MCRErrorListener.getInstance());
         transformerFactory.setURIResolver(MCRURIResolver.instance());
-        XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+        XMLReader xmlReader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         xmlReader.setEntityResolver(MCREntityResolver.instance());
         SAXSource styleSource = new SAXSource(xmlReader, new InputSource(xslURL.toURI().toString()));
         Transformer transformer = transformerFactory.newTransformer(styleSource);

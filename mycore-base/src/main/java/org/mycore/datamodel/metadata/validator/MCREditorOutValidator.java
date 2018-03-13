@@ -174,7 +174,7 @@ public class MCREditorOutValidator {
                 @SuppressWarnings("unchecked")
                 Class<? extends MCREditorMetadataValidator> cl = (Class<? extends MCREditorMetadataValidator>) Class
                     .forName(entry.getValue());
-                map.put(className, cl.newInstance());
+                map.put(className, cl.getDeclaredConstructor().newInstance());
             } catch (Exception e) {
                 final String msg = "Cannot instantiate " + entry.getValue() + " as validator for class "
                     + entry.getKey();
@@ -202,7 +202,7 @@ public class MCREditorOutValidator {
         }
         MCRMetaInterface test = null;
         try {
-            test = metaClass.newInstance();
+            test = metaClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new MCRException("Could not instantiate " + metaClass.getCanonicalName());
         }
