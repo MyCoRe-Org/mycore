@@ -53,7 +53,7 @@ public class MCRInjectServiceResourceTest extends MCRJerseyTest {
 
     @Override
     public Application configure() {
-        MCRConfiguration.instance().set("MCR.inject.module.GuiceTest", TestModule.class.getName());
+        MCRConfiguration.instance().set("MCR.Inject.Module.GuiceTest", TestModule.class.getName());
         return super.configure();
     }
 
