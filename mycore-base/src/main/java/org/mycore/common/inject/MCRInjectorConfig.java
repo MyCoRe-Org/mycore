@@ -20,19 +20,19 @@ package org.mycore.common.inject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
-import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
 /**
  * Base entry point for guice injection. Resolves all modules from configuration
- * in MCR.inject.module.XXX = MyGuiceModule.
+ * in MCR.Inject.Module.XXX = MyGuiceModule.
  * 
  * @author Matthias Eichner
  */
@@ -45,11 +45,14 @@ public class MCRInjectorConfig {
     private static List<Module> MODULES;
 
     static {
-        Map<String, String> moduleMap = MCRConfiguration.instance().getPropertiesMap("MCR.inject.module");
-        MODULES = Lists.newArrayList();
-        moduleMap.keySet().stream().map(propertyName -> {
-            return MCRConfiguration.instance().<Module> getInstanceOf(propertyName);
-        }).forEach(MODULES::add);
+        MODULES = MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(e -> e.getKey().startsWith("MCR.Inject.Module."))
+            .map(Map.Entry::getValue)
+            .map(MCRConfiguration2::instantiateClass)
+            .map(Module.class::cast)
+            .collect(Collectors.toList());
         LOGGER.info("Using guice modules: {}", MODULES);
         INJECTOR = Guice.createInjector(MODULES);
     }
