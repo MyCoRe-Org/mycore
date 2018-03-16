@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -50,8 +51,9 @@ public class MCRInjectorConfig {
             .stream()
             .filter(e -> e.getKey().startsWith("MCR.Inject.Module."))
             .map(Map.Entry::getValue)
-            .map(MCRConfiguration2::instantiateClass)
-            .map(Module.class::cast)
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .map(MCRInjectorConfig::instantiateModule)
             .collect(Collectors.toList());
         LOGGER.info("Using guice modules: {}", MODULES);
         INJECTOR = Guice.createInjector(MODULES);
@@ -60,19 +62,31 @@ public class MCRInjectorConfig {
     /**
      * Returns the global injector for mycore.
      * 
-     * @return
+     * @return returns the guice injector
      */
     public static synchronized Injector injector() {
         return INJECTOR;
     }
 
     /**
-     * Returns a list of all guice modules used by the {@link Injector}.
+     * Returns a list of all guice modules used by the {@link Injector}. Be aware that this list immutable and changes
+     * are not reflect on the injector.
      * 
      * @return list of guice modules
      */
     public static synchronized List<Module> modules() {
         return MODULES;
+    }
+
+    private static Module instantiateModule(String classname) {
+        LogManager.getLogger().debug("Loading Guice Module: {}", classname);
+        try {
+            @SuppressWarnings("unchecked")
+            Class<? extends Module> forName = (Class<? extends Module>) Class.forName(classname);
+            return forName.getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new MCRConfigurationException("Could not instantiate Guice Module " + classname, e);
+        }
     }
 
 }

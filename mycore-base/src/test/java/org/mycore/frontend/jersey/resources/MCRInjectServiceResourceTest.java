@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.mycore.common.config.MCRConfiguration;
 
 import com.google.inject.AbstractModule;
+import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRInjectServiceResourceTest extends MCRJerseyTest {
 
@@ -53,7 +54,7 @@ public class MCRInjectServiceResourceTest extends MCRJerseyTest {
 
     @Override
     public Application configure() {
-        MCRConfiguration.instance().set("MCR.Inject.Module.GuiceTest", TestModule.class.getName());
+        MCRConfiguration2.set("MCR.Inject.Module.GuiceTest", TestModule.class.getName());
         return super.configure();
     }
 

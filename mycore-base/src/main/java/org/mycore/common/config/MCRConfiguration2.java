@@ -18,7 +18,7 @@
 
 package org.mycore.common.config;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
@@ -32,6 +32,9 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.function.MCRTriConsumer;
+import org.mycore.common.inject.MCRInjectorConfig;
+
+import com.google.inject.ConfigurationException;
 
 /**
  * DO NOT USE! Work in progress to discuss future development.
@@ -279,34 +282,23 @@ public class MCRConfiguration2 {
 
         T o = null;
         Class<? extends T> cl = getClassObject(classname);
-
         try {
+            return MCRInjectorConfig.injector().getInstance(cl);
+        } catch (ConfigurationException e) {
+            // no default or injectable constructor, check for singleton factory method
             try {
-                o = cl.getDeclaredConstructor().newInstance();
-            } catch (IllegalAccessException | InstantiationException e) {
-                // check for singleton
-                Method[] querymethods = cl.getMethods();
-
-                for (Method querymethod : querymethods) {
-                    if (querymethod.getName().toLowerCase(Locale.ROOT).equals("instance")
-                        || querymethod.getName().toLowerCase(Locale.ROOT).equals("getinstance")) {
-                        Object[] ob = new Object[0];
-                        @SuppressWarnings("unchecked")
-                        T invoke = (T) querymethod.invoke(cl, ob);
-                        o = invoke;
-                        break;
-                    }
-                }
-                if (o == null) {
-                    throw e;
-                }
+                return (T) Stream.of(cl.getMethods())
+                    .filter(m -> m.getReturnType().isAssignableFrom(cl))
+                    .filter(m -> Modifier.isStatic(m.getModifiers()))
+                    .filter(m -> Modifier.isPublic(m.getModifiers()))
+                    .filter(m -> m.getName().toLowerCase(Locale.ROOT).contains("instance"))
+                    .findAny()
+                    .orElseThrow(() -> new MCRConfigurationException("Could not instantiate class " + classname, e))
+                    .invoke(cl, (Object[]) null);
+            } catch (ReflectiveOperationException r) {
+                throw new MCRConfigurationException("Could not instantiate class " + classname, r);
             }
-        } catch (ExceptionInInitializerError t){
-            throw new MCRConfigurationException("Could not instantiate class " + classname, t.getException());
-        } catch (Exception t) {
-            throw new MCRConfigurationException("Could not instantiate class " + classname, t);
         }
-        return o;
     }
 
     private static <T> Class<? extends T> getClassObject(String classname) {
