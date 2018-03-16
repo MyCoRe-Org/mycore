@@ -62,14 +62,15 @@ public class MCRInjectorConfig {
     /**
      * Returns the global injector for mycore.
      * 
-     * @return
+     * @return returns the guice injector
      */
     public static synchronized Injector injector() {
         return INJECTOR;
     }
 
     /**
-     * Returns a list of all guice modules used by the {@link Injector}.
+     * Returns a list of all guice modules used by the {@link Injector}. Be aware that this list immutable and changes
+     * are not reflect on the injector.
      * 
      * @return list of guice modules
      */
