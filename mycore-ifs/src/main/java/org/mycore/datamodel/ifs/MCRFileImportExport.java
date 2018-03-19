@@ -136,8 +136,8 @@ public class MCRFileImportExport {
             throw new MCRUsageException("Not readable: " + path);
         }
 
-        if (local.isFile()) // Import a local file
-        {
+        // Import a local file
+        if (local.isFile()) {
             MCRFilesystemNode existing = dir.getChild(name);
             MCRFile file = null;
 
@@ -153,24 +153,14 @@ public class MCRFileImportExport {
                 file = (MCRFile) existing; // Update existing MCRFile
 
                 // Determine MD5 checksum of local file
-                FileInputStream fin = null;
+                try(FileInputStream fin = new FileInputStream(local); MCRMD5InputStream cis = new MCRMD5InputStream(fin)) {
+                    IOUtils.copy(cis, new MCRDevNull());
+                    String local_md5 = cis.getMD5String();
 
-                try {
-                    fin = new FileInputStream(local);
-                } catch (FileNotFoundException willNotBeThrown) {
-                }
-
-                MCRMD5InputStream cis = new MCRMD5InputStream(fin);
-
-                IOUtils.copy(cis, new MCRDevNull());
-
-                String local_md5 = cis.getMD5String();
-                cis.close();
-
-                // If file content of local file has not changed, do not load it
-                // again
-                if (file.getMD5().equals(local_md5)) {
-                    return;
+                    // If file content of local file has not changed, do not load it again
+                    if (file.getMD5().equals(local_md5)) {
+                        return;
+                    }
                 }
             }
 
