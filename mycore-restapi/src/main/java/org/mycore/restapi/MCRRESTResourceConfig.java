@@ -23,7 +23,7 @@ public class MCRRESTResourceConfig extends MCRJerseyResourceConfig {
 
     @Override
     protected void setupResources() {
-        this.packages((String[]) MCRConfiguration.instance().getStrings(REST_API_PACKAGE).toArray());
+        this.packages(MCRConfiguration.instance().getStrings(REST_API_PACKAGE).toArray(new String[0]));
     }
 
     @Override
