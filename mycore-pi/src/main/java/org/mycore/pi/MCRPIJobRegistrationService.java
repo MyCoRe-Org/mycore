@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -118,9 +119,28 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
     }
 
     /**
+     * If you use {@link #updateRegistrationDate(MCRObjectID, String, Date)} or
+     * {@link #updateStartRegistrationDate(MCRObjectID, String, Date)} then you should validate if the user has the
+     * rights for this. This methods validates this and throws a handsome exception.
+     * @param id of the object
+     */
+    protected void validateJobUserRights(MCRObjectID id) throws MCRPersistentIdentifierException {
+        if (!MCRAccessManager.checkPermission(id, MCRAccessManager.PERMISSION_WRITE)) {
+            throw new MCRPersistentIdentifierException(
+                String.format("The user %s does not have rights to %s the object %s. You should set the property %s to "
+                        + "a user which has the rights.",
+                    MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(),
+                    MCRAccessManager.PERMISSION_WRITE,
+                    id.toString(),
+                    JOB_API_USER_PROPERTY));
+        }
+    }
+
+    /**
      * Can be used to update the registration date in the database. The most {@link MCRPIJobRegistrationService}
      * only add the pi to the object and then to the database, with registration date of null. Later the job will
      * register the pi and then change the registration date to the right value.
+     * <b>If you use this methods from a job you should have called {@link #validateJobUserRights} before!</b>
      * @param mycoreID the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
      * @param additional information like path to a file
      * @param date the new registration date
@@ -135,7 +155,8 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
     /**
      * Can be used to update the startRegistration date in the database. The most {@link MCRPIJobRegistrationService}
      * only add the pi to the object and then to the database, with registration or startRegistration date of null.
-     * After a job is created the Registration service should update the
+     * After a job is created the Registration service should update the date.
+     * <b>If you use this methods from a job you should have called {@link #validateJobUserRights} before!</b>
      * @param mycoreID the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
      * @param additional information like path to a file
      * @param date the new registration date
@@ -184,8 +205,8 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
     protected abstract Optional<String> getJobInformation(Map<String, String> contextParameters);
 
     public void runAsJobUser(PIRunnable task) throws MCRPersistentIdentifierException {
-        boolean jobUserPresent = this.getProperties().containsKey(JOB_API_USER_PROPERTY);
-        String jobUser = this.getProperties().get(JOB_API_USER_PROPERTY);
+        final boolean jobUserPresent = isJobUserPresent();
+        final String jobUser = getJobUser();
         MCRSession session = null;
         MCRUserInformation savedUserInformation = null;
         session = MCRSessionMgr.getCurrentSession();
@@ -219,6 +240,14 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
                 session.setUserInformation(savedUserInformation);
             }
         }
+    }
+
+    private String getJobUser() {
+        return this.getProperties().get(JOB_API_USER_PROPERTY);
+    }
+
+    private boolean isJobUserPresent() {
+        return this.getProperties().containsKey(JOB_API_USER_PROPERTY);
     }
 
     void delegateAction(final Map<String, String> contextParameters) throws MCRPersistentIdentifierException {

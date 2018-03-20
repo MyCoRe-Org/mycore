@@ -64,6 +64,7 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
     public void registerJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         MCRPersistentUniformResourceLocator purl = getPURLFromJob(parameters);
         String idString = parameters.get(CONTEXT_OBJECT);
+        validateJobUserRights(MCRObjectID.getInstance(idString));
 
         doWithPURLManager(
             manager -> manager
@@ -99,6 +100,9 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
     @Override
     public void updateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         String purlString = parameters.get(CONTEXT_PURL);
+        String objId = parameters.get(CONTEXT_OBJECT);
+
+        validateJobUserRights(MCRObjectID.getInstance(objId));
         MCRPersistentUniformResourceLocator purl;
 
         try {
@@ -108,7 +112,6 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
             throw new MCRPersistentIdentifierException("Could not parse purl: " + purlString, e);
         }
 
-        String objId = parameters.get(CONTEXT_OBJECT);
 
         doWithPURLManager((purlManager) -> {
             if (!purlManager.isPURLTargetURLUnchanged(purl.getUrl().toString(), buildTargetURL(

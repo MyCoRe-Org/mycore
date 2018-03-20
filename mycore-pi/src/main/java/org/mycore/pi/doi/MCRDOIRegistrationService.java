@@ -386,6 +386,7 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
         String idString = parameters.get(CONTEXT_OBJ);
 
         MCRObjectID objectID = MCRObjectID.getInstance(idString);
+        this.validateJobUserRights(objectID);
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
 
         Document newDataciteMetadata = transformToDatacite(doi, object);
@@ -416,6 +417,7 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
         String idString = parameters.get(CONTEXT_OBJ);
 
         MCRObjectID objectID = MCRObjectID.getInstance(idString);
+        this.validateJobUserRights(objectID);
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
 
         MCRObject mcrBase = MCRMetadataManager.retrieveMCRObject(objectID);
