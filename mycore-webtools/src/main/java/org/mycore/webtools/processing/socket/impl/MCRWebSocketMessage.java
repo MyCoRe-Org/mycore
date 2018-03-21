@@ -16,29 +16,21 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi;
+package org.mycore.webtools.processing.socket.impl;
 
-import java.io.Serializable;
-import java.util.Date;
+/**
+ * @author Sebastian Hofmann
+ */
+class MCRWebSocketMessage {
 
-public interface MCRPIRegistrationInfo extends Serializable {
-    String getIdentifier();
+    public MCRMessageType type;
 
-    String getType();
+    MCRWebSocketMessage(MCRMessageType type) {
+        this.type = type;
+    }
 
-    String getMycoreID();
-
-    String getAdditional();
-
-    String getMcrVersion();
-
-    int getMcrRevision();
-
-    Date getRegistrationStarted();
-
-    Date getRegistered();
-
-    Date getCreated();
-
-    String getService();
+    public MCRMessageType getType() {
+        return type;
+    }
 }
+

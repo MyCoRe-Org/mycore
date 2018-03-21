@@ -47,6 +47,12 @@ public class MCRIdentifierXSLUtils {
         return registrationService.isCreated(MCRObjectID.getInstance(id), additional);
     }
 
+    public static boolean hasIdentifierRegistrationStarted(String service, String id, String additional) {
+        MCRPIRegistrationService<MCRPersistentIdentifier> registrationService = MCRPIRegistrationServiceManager
+            .getInstance().getRegistrationService(service);
+        return registrationService.hasRegistrationStarted(MCRObjectID.getInstance(id), additional);
+    }
+
     public static boolean hasIdentifierRegistered(String service, String id, String additional) {
         MCRPIRegistrationService<MCRPersistentIdentifier> registrationService = MCRPIRegistrationServiceManager
             .getInstance().getRegistrationService(service);
@@ -68,7 +74,7 @@ public class MCRIdentifierXSLUtils {
      * e.g.
      *   <ul>
      *     <li>&lt;service id="service1" inscribed="false" permission="true" type="urn" /&gt;</li>
-     *     <li>&lt;service id="service2" inscribed="true" permission="false"type="doi" /&gt;</li>
+     *     <li>&lt;service id="service2" inscribed="true" permission="false" type="doi" /&gt;</li>
      *   </ul>
      *
      * @param objectID the object

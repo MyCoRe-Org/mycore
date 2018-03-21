@@ -118,7 +118,7 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
      */
     public void setError(Throwable error) {
         this.error = error;
-        this.status = MCRProcessableStatus.failed;
+        setStatus(MCRProcessableStatus.failed);
     }
 
     /**
