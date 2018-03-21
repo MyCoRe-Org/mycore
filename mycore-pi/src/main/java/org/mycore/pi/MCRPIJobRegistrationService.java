@@ -3,6 +3,7 @@ package org.mycore.pi;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -127,7 +128,8 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
     protected void validateJobUserRights(MCRObjectID id) throws MCRPersistentIdentifierException {
         if (!MCRAccessManager.checkPermission(id, MCRAccessManager.PERMISSION_WRITE)) {
             throw new MCRPersistentIdentifierException(
-                String.format("The user %s does not have rights to %s the object %s. You should set the property %s to "
+                String.format(Locale.ROOT,
+                    "The user %s does not have rights to %s the object %s. You should set the property %s to "
                         + "a user which has the rights.",
                     MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(),
                     MCRAccessManager.PERMISSION_WRITE,
