@@ -23,6 +23,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -34,6 +36,7 @@ import org.apache.commons.io.IOUtils;
  * @author Thomas Scheffler (yagee)
  *
  */
+@Priority(Priorities.AUTHORIZATION)
 public class MCRResourceAccessFilter implements ContainerRequestFilter {
 
     private MCRResourceAccessChecker accessChecker;

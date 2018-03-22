@@ -155,6 +155,10 @@
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
     </dependency>
     <dependency>
@@ -216,7 +220,7 @@
     </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
-      <artifactId>jsr250-api</artifactId>
+      <artifactId>javax.annotation-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.inject</groupId>

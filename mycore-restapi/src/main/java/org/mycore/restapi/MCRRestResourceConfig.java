@@ -18,15 +18,31 @@
 
 package org.mycore.restapi;
 
-import org.apache.logging.log4j.LogManager;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
+import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
+import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
 
+/**
+ * @author Thomas Scheffler (yagee)
+ *
+ */
 public class MCRRestResourceConfig extends ResourceConfig {
 
     public MCRRestResourceConfig(){
         super();
-        LogManager.getLogger().info("Loading rest-api resource config...");
-        new MCRRestConfig().configure(this);
+        String[] restPackages = MCRConfiguration.instance().getStrings("MCR.RestAPI.Resource.Packages").stream()
+            .toArray(String[]::new);
+        packages(restPackages);
+        register(MCRSessionFilter.class);
+        register(MCRTransactionFilter.class);
+        register(MultiPartFeature.class);
+        register(MCRRestFeature.class);
+        register(MCRRestAPIExceptionMapper.class);
+        register(MCRForbiddenExceptionMapper.class);
+        register(MCRNotAuthorizedExceptionMapper.class);
     }
 
 }

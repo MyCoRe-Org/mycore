@@ -15,18 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.restapi.v1.feature;
 
-import java.util.List;
+package org.mycore.restapi;
 
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
-import org.mycore.restapi.MCRRestConfig;
+import java.io.IOException;
 
-public class MCRRESTFeature extends MCRJerseyDefaultFeature {
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 
+@Priority(Priorities.USER - 500)
+public class MCREnableTransactionFilter implements ContainerRequestFilter {
     @Override
-    protected List<String> getPackages() {
-        return MCRConfiguration.instance().getStrings(MCRRestConfig.REST_API_PACKAGE);
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        requestContext.setProperty(MCRTransactionFilter.PROP_REQUIRE_TRANSACTION, true);
     }
 }

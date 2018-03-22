@@ -54,11 +54,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
+import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
-import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
-import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 
@@ -75,8 +73,6 @@ import com.google.gson.stream.JsonWriter;
 public class MCRRestAPIClassifications {
 
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
-
-    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
 
     public static final String FORMAT_JSON = "json";
 
@@ -96,11 +92,8 @@ public class MCRRestAPIClassifications {
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     public Response listClassifications(@Context UriInfo info, @Context HttpServletRequest request,
-        @QueryParam("format") @DefaultValue("json") String format) throws MCRRestAPIException {
-        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/classifications");
+        @QueryParam("format") @DefaultValue("json") String format) {
 
-        String authHeader = MCRJSONWebTokenUtil
-            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         if (FORMAT_XML.equals(format)) {
             StringWriter sw = new StringWriter();
 
@@ -116,7 +109,7 @@ public class MCRRestAPIClassifications {
             try {
                 xout.output(docOut, sw);
                 return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                    .build();
             } catch (IOException e) {
                 //ToDo
             }
@@ -143,7 +136,7 @@ public class MCRRestAPIClassifications {
                 writer.close();
 
                 return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                    .build();
             } catch (IOException e) {
                 //toDo
             }
@@ -181,9 +174,8 @@ public class MCRRestAPIClassifications {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     public Response showObject(@Context HttpServletRequest request, @PathParam("classID") String classID,
         @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") @DefaultValue("") String filter,
-        @QueryParam("style") @DefaultValue("") String style, @QueryParam("callback") @DefaultValue("") String callback)
-        throws MCRRestAPIException {
-        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/classifications");
+        @QueryParam("style") @DefaultValue("") String style,
+        @QueryParam("callback") @DefaultValue("") String callback) {
         String rootCateg = null;
         String lang = null;
         boolean filterNonEmpty = false;
@@ -212,7 +204,7 @@ public class MCRRestAPIClassifications {
         try {
             MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
             if (cl == null) {
-                throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
+                throw new MCRRestAPIException(Status.NOT_FOUND,
                     new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
                         "There is no classification with the given ID."));
             }
@@ -225,7 +217,7 @@ public class MCRRestAPIClassifications {
                 if (e != null) {
                     eRoot = e;
                 } else {
-                    throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
+                    throw new MCRRestAPIException(Status.NOT_FOUND,
                         new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Category not found.",
                             "The classfication does not contain a category with the given ID."));
                 }
@@ -241,24 +233,24 @@ public class MCRRestAPIClassifications {
                 eRoot.removeChildren("category");
             }
 
-            String authHeader = MCRJSONWebTokenUtil
-                .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
             if (FORMAT_JSON.equals(format)) {
                 String json = writeJSON(eRoot, lang, style);
                 //eventually: allow Cross Site Requests: .header("Access-Control-Allow-Origin", "*")
                 if (callback.length() > 0) {
-                    return Response.ok(callback + "(" + json + ")").type("application/javascript; charset=UTF-8")
+                    return Response.ok(callback + "(" + json + ")")
+                        .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
                         .build();
                 } else {
                     return Response.ok(json).type("application/json; charset=UTF-8")
-                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                        .build();
                 }
             }
 
             if (FORMAT_XML.equals(format)) {
                 String xml = writeXML(eRoot, lang);
-                return Response.ok(xml).type("application/xml; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                return Response.ok(xml)
+                    .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+                    .build();
             }
         } catch (Exception e) {
             LogManager.getLogger(this.getClass()).error("Error outputting classification", e);

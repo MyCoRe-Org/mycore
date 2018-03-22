@@ -22,18 +22,9 @@
  */
 package org.mycore.restapi.v1.utils;
 
-import java.net.UnknownHostException;
+import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
-
-import org.mycore.access.mcrimpl.MCRAccessControlSystem;
-import org.mycore.access.mcrimpl.MCRIPAddress;
-import org.mycore.common.MCRUserInformation;
-import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.restapi.v1.errors.MCRRestAPIError;
-import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.user2.MCRUserManager;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * This class contains some generic utility functions for the REST API
@@ -42,50 +33,10 @@ import org.mycore.user2.MCRUserManager;
  */
 public class MCRRestAPIUtil {
 
-    /**
-     * The REST API access permissions (read, write)
-     */
-    public enum MCRRestAPIACLPermission {
-        READ {
-            public String toString() {
-                return "read";
-            }
-        },
-
-        WRITE {
-            public String toString() {
-                return "write";
-            }
-        }
+    public static String getWWWAuthenticateHeader(String s) {
+        return Optional.ofNullable(s).orElse("Basic") + " realm=\""
+            + MCRConfiguration2.getString("MCR.NameOfProject").map(p -> p + ": ").orElse("")
+            + "Rest-API V1" + "\"";
     }
 
-    /**
-     * checks if the given REST API operation is allowed
-     * @param request - the HTTP request
-     * @param permission "read" or "write"
-     * @param path - the REST API path, e.g. /v1/messages
-     * 
-     * @throws MCRRestAPIException if access is restricted
-     */
-    public static void checkRestAPIAccess(HttpServletRequest request, MCRRestAPIACLPermission permission, String path)
-        throws MCRRestAPIException {
-        try {
-            String userID = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(request);
-            MCRUserInformation userInfo = MCRUserManager.getUser(userID);
-            MCRIPAddress theIP = new MCRIPAddress(MCRFrontendUtil.getRemoteAddr(request));
-            String thePath = path.startsWith("/") ? path : "/" + path;
-            String thePermission = permission.toString();
-            MCRAccessControlSystem acs = (MCRAccessControlSystem) MCRAccessControlSystem.instance();
-            boolean hasAPIAccess = acs.checkAccess("restapi:/", thePermission, userInfo, theIP);
-            if (hasAPIAccess && (!acs.hasRule("restapi:" + thePath, thePermission)
-                || acs.checkAccess("restapi:" + thePath, permission.toString(), userInfo, theIP))) {
-                return;
-            }
-        } catch (UnknownHostException e) {
-            // ignore
-        }
-        throw new MCRRestAPIException(Status.FORBIDDEN,
-            new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
-                "Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
-    }
 }

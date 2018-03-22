@@ -88,7 +88,23 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
             return ((WebApplicationException) exc).getResponse();
         }
 
-        return Response.status(Status.INTERNAL_SERVER_ERROR).entity(exc).build();
+        return Response.status(Status.INTERNAL_SERVER_ERROR).entity(new MCRExceptionContainer(exc)).build();
+    }
+
+    private static class MCRExceptionContainer{
+        private Exception exception;
+        public MCRExceptionContainer(Exception e){
+            this.exception=e;
+        }
+
+        public Exception getException(){
+            return exception;
+        }
+
+        public Class<? extends Exception> getType() {
+            return exception.getClass();
+        }
+
     }
 
 }

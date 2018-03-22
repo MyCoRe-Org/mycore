@@ -15,24 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.restapi.v1.errors;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
+package org.mycore.restapi.annotations;
 
-import org.mycore.frontend.jersey.MCRJerseyUtil;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
 
 /**
- * maps a REST API exception to a proper response with message as JSON output
- * 
- * @author Robert Stephan
- * 
- * @version $Revision: $ $Date: $
- *
+ * Used to mark REST methods that require an active JPA transaction
+ * @author Thomas Scheffler (yagee)
  */
-public class MCRRestAPIExceptionMapper implements ExceptionMapper<MCRRestAPIException> {
-    public Response toResponse(MCRRestAPIException ex) {
-        return Response.status(ex.getStatus()).entity(MCRRestAPIError.convertErrorListToJSONString(ex.getErrors()))
-            .type(MCRJerseyUtil.APPLICATION_JSON_UTF8).build();
-    }
+@Target({ ElementType.TYPE, ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MCRRequireTransaction {
 }
