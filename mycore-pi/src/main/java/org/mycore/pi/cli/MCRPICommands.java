@@ -99,7 +99,7 @@ public class MCRPICommands {
         });
     }
 
-    @MCRCommand(syntax = "try to control {0} with service {1}", help = "This command tries to" +
+    @MCRCommand(syntax = "try to control {0} with pi service {1}", help = "This command tries to" +
         " read a pi from the object {0} with the MetadataManager from the specified service {1}." +
         " If the service configuration is right then the pi is under control of MyCoRe.")
     public static void controlObjectWithService(String objectIDString, String serviceID)
@@ -107,7 +107,7 @@ public class MCRPICommands {
         controlObjectWithServiceAndAdditional(objectIDString, serviceID, null);
     }
 
-    @MCRCommand(syntax = "try to control {0} with service {1} with additional {2}", help = "This command tries to" +
+    @MCRCommand(syntax = "try to control {0} with pi service {1} with additional {2}", help = "This command tries to" +
         " read a pi from the object {0} with the MetadataManager from the specified service {1}." +
         " If the service configuration is right then the pi is under control of MyCoRe.")
     public static void controlObjectWithServiceAndAdditional(String objectIDString, String serviceID,
@@ -147,7 +147,7 @@ public class MCRPICommands {
         LOGGER.info("{}:{} is now under control of {}", objectID, trimAdditional, serviceID);
     }
 
-    @MCRCommand(syntax = "remove control {0} with service {1} with additional {2}", help = "This commands removes the "
+    @MCRCommand(syntax = "remove control {0} with pi service {1} with additional {2}", help = "This commands removes the "
         + "pi control from the object {0}(object id) with the serivce {1}(service id) and the additional {2}")
     public static void removeControlFromObject(String objectIDString, String serviceID, String additional)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
@@ -164,7 +164,7 @@ public class MCRPICommands {
         MCRMetadataManager.update(base);
     }
 
-    @MCRCommand(syntax = "remove control {0} with service {1}", help = "This commands removes the "
+    @MCRCommand(syntax = "remove control {0} with pi service {1}", help = "This commands removes the "
         + "pi control from the object {0}(object id) with the serivce {1}(service id)")
     public static void removeControlFromObject(String objectIDString, String serviceID)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
