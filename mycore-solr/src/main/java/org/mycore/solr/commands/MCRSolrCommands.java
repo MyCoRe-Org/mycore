@@ -40,6 +40,7 @@ import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.index.MCRSolrIndexer;
+import org.mycore.solr.schema.MCRSolrSchemaReloader;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
 /**
@@ -224,6 +225,14 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         List<String> ids = MCRSolrSearchUtils.listIDs(solrClient, query);
         MCRObjectCommands.setSelectedObjectIDs(ids);
     }
+    
+	@MCRCommand(syntax = "reload solr schema", 
+			    help = "The command reloads the schema in solr using the solr schema api",
+			    order = 200)
+	public static final void reloadSolrSchema() {
+		MCRSolrSchemaReloader.clearSchema();
+		MCRSolrSchemaReloader.processConfigFiles();
+	}
 
     /**
      * This command tries to identify MyCoRe Objects missing in SOLR and reindexes them using the

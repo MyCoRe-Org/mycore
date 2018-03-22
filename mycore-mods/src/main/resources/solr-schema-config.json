@@ -1,0 +1,10 @@
+[
+	{
+		"add-field": {
+			"name": "recordIdentifier",
+			"type": "string",
+			"multiValued": false,
+			"stored": true
+		}
+	}
+]
