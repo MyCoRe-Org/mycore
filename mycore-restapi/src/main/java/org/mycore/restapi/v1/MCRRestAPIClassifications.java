@@ -58,7 +58,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
-import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
@@ -77,7 +76,6 @@ import com.google.gson.stream.JsonWriter;
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/classifications")
-@MCRStaticContent
 public class MCRRestAPIClassifications {
 
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
