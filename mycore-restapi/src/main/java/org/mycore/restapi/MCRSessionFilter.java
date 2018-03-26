@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -165,8 +166,11 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 userInformation = Optional.of(new MCRJWTUserInformation(jwt));
             } catch (JWTVerificationException e) {
                 LOGGER.error(e.getMessage());
+                LinkedHashMap<String, String> attrs=new LinkedHashMap<>();
+                attrs.put("error", "invalid_token");
+                attrs.put("error_description", e.getMessage());
                 throw new NotAuthorizedException(e.getMessage(), e,
-                    MCRRestAPIUtil.getWWWAuthenticateHeader("Bearer"));
+                    MCRRestAPIUtil.getWWWAuthenticateHeader("Bearer", attrs));
             }
         }
 
@@ -191,7 +195,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             LOGGER.debug("Guest detected, change response from FORBIDDEN to UNAUTHORIZED.");
             responseContext.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
             responseContext.getHeaders().putSingle(HttpHeaders.WWW_AUTHENTICATE,
-                MCRRestAPIUtil.getWWWAuthenticateHeader("Basic"));
+                MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
         }
         addJWTToResponse(requestContext, responseContext);
 

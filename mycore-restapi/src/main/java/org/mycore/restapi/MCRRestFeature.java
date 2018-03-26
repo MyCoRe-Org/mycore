@@ -20,6 +20,7 @@ package org.mycore.restapi;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
@@ -28,6 +29,8 @@ import javax.ws.rs.ext.Provider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
+import org.mycore.frontend.jersey.MCRCacheControl;
+import org.mycore.frontend.jersey.filter.MCRCacheFilter;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 
 /**
@@ -83,4 +86,5 @@ public class MCRRestFeature extends MCRJerseyDefaultFeature {
         context.register(MCRRestAuthorizationFilter.class);
         super.registerAccessFilter(context, resourceClass, resourceMethod);
     }
+
 }

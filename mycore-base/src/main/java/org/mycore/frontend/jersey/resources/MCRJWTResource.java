@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.MCRJWTUtil;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -55,6 +56,10 @@ public class MCRJWTResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @MCRStaticContent
+    @MCRCacheControl(noTransform = true,
+        noStore = true,
+        private_ = @MCRCacheControl.FieldArgument(active = true),
+        noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response getTokenFromSession() throws IOException {
         if (!Optional.ofNullable(request.getSession(false))
             .map(s -> s.getAttribute(MCRServlet.ATTR_MYCORE_SESSION))

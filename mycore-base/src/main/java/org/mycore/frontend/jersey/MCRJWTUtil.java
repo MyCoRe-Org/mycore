@@ -122,7 +122,6 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
             return Response.status(Response.Status.OK)
                 .header("Authorization", "Bearer " + jwt)
                 .entity(sw.toString())
-                .cacheControl(getCacheControl())
                 .build();
         }
     }
@@ -140,7 +139,6 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
             return Response.status(Response.Status.OK)
                 .header("Authorization", "Bearer " + jwt)
                 .entity(sw.toString())
-                .cacheControl(getCacheControl())
                 .build();
         }
     }
@@ -157,17 +155,8 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
             jsonGenerator.close();
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(sw.toString())
-                .cacheControl(getCacheControl())
                 .build();
         }
     }
 
-    private static CacheControl getCacheControl() {
-        CacheControl cc = new CacheControl();
-        cc.setPrivate(true);
-        cc.setNoCache(true);
-        cc.setNoStore(true);
-        cc.setNoTransform(true);
-        return cc;
-    }
 }

@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.MCRJWTUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.frontend.jersey.access.MCRRequireLogin;
@@ -78,6 +79,10 @@ public class MCRRestAPIAuthentication {
     @GET
     @Produces({ MCRJerseyUtil.APPLICATION_JSON_UTF8 })
     @Path("/login")
+    @MCRCacheControl(noTransform = true,
+        noStore = true,
+        private_ = @MCRCacheControl.FieldArgument(active = true),
+        noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response authorize(@DefaultValue("") @HeaderParam("Authorization") String authorization,
         @Context HttpServletRequest req) throws IOException {
         if (authorization.startsWith("Basic ")) {
@@ -90,7 +95,7 @@ public class MCRRestAPIAuthentication {
         }
         throw new NotAuthorizedException(
             "Login failed. Please provide proper user name and password via HTTP Basic Authentication.",
-            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic"));
+            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
     }
 
     public static Optional<String> getToken(MCRUserInformation userInformation, String remoteIp) {
@@ -109,6 +114,10 @@ public class MCRRestAPIAuthentication {
     @GET
     @Path("/renew")
     @MCRRestrictedAccess(MCRRequireLogin.class)
+    @MCRCacheControl(noTransform = true,
+        noStore = true,
+        private_ = @MCRCacheControl.FieldArgument(active = true),
+        noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response renew(@DefaultValue("") @HeaderParam("Authorization") String authorization,
         @Context HttpServletRequest req) throws IOException {
         if (authorization.startsWith("Bearer ")) {
@@ -121,7 +130,7 @@ public class MCRRestAPIAuthentication {
         }
         throw new NotAuthorizedException(
             "Login failed. Please provide a valid JSON Web Token for authentication.",
-            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic"));
+            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
     }
 
     public static void validate(String token) throws JWTVerificationException {

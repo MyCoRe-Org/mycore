@@ -39,7 +39,7 @@ public class MCRForbiddenExceptionMapper implements ExceptionMapper<ForbiddenExc
             LogManager.getLogger().warn("Guest detected");
             return Response.fromResponse(ex.getResponse())
                 .status(Response.Status.UNAUTHORIZED)
-                .header(HttpHeaders.WWW_AUTHENTICATE, MCRRestAPIUtil.getWWWAuthenticateHeader("Basic"))
+                .header(HttpHeaders.WWW_AUTHENTICATE, MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null))
                 .build();
         }
         return ex.getResponse();

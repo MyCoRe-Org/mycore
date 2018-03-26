@@ -20,8 +20,8 @@ package org.mycore.restapi.v1;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -41,6 +41,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -80,19 +81,28 @@ public class MCRRestAPIClassifications {
 
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
+    private Date lastModified = new Date(DAO.getLastModified());
+
+    @Context
+    ContainerRequest request;
+
     /**
      * lists all available classifications as XML or JSON
      * 
      * @param info - the URIInfo object
-     * @param request - the HTTPServletRequest object
      * @param format - the output format ('xml' or 'json)
      * @return a Jersey Response Object
      * @throws MCRRestAPIException
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response listClassifications(@Context UriInfo info, @Context HttpServletRequest request,
+    public Response listClassifications(@Context UriInfo info,
         @QueryParam("format") @DefaultValue("json") String format) {
+
+        Response.ResponseBuilder builder = request.evaluatePreconditions(lastModified);
+        if (builder!=null){
+            return builder.build();
+        }
 
         if (FORMAT_XML.equals(format)) {
             StringWriter sw = new StringWriter();
@@ -108,7 +118,9 @@ public class MCRRestAPIClassifications {
             }
             try {
                 xout.output(docOut, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
+                return Response.ok(sw.toString())
+                    .lastModified(lastModified)
+                    .type("application/xml; charset=UTF-8")
                     .build();
             } catch (IOException e) {
                 //ToDo
@@ -135,7 +147,9 @@ public class MCRRestAPIClassifications {
 
                 writer.close();
 
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
+                return Response.ok(sw.toString())
+                    .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+                    .lastModified(lastModified)
                     .build();
             } catch (IOException e) {
                 //toDo
@@ -163,7 +177,6 @@ public class MCRRestAPIClassifications {
      *      - 'opened' - (together with 'jstree') - all nodes will be opened
      *      - 'disabled' - (together with 'jstree') - all nodes will be disabled
      *      - 'selected' - (together with 'jstree') - all nodes will be selected
-     * @param request - the HTTPServletRequestObject
      * @param callback - used in JSONP to wrap json result into a Javascript function named by callback parameter
      * @return a Jersey Response object
      * @throws MCRRestAPIException
@@ -172,10 +185,16 @@ public class MCRRestAPIClassifications {
     //@Path("/id/{value}{format:(\\.[^/]+?)?}")  -> working, but returns empty string instead of default value
     @Path("/{classID}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response showObject(@Context HttpServletRequest request, @PathParam("classID") String classID,
+    public Response showObject(@PathParam("classID") String classID,
         @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") @DefaultValue("") String filter,
         @QueryParam("style") @DefaultValue("") String style,
         @QueryParam("callback") @DefaultValue("") String callback) {
+
+        Response.ResponseBuilder builder = request.evaluatePreconditions(lastModified);
+        if (builder!=null){
+            return builder.build();
+        }
+
         String rootCateg = null;
         String lang = null;
         boolean filterNonEmpty = false;
@@ -238,6 +257,7 @@ public class MCRRestAPIClassifications {
                 //eventually: allow Cross Site Requests: .header("Access-Control-Allow-Origin", "*")
                 if (callback.length() > 0) {
                     return Response.ok(callback + "(" + json + ")")
+                        .lastModified(lastModified)
                         .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
                         .build();
                 } else {
@@ -249,6 +269,7 @@ public class MCRRestAPIClassifications {
             if (FORMAT_XML.equals(format)) {
                 String xml = writeXML(eRoot, lang);
                 return Response.ok(xml)
+                    .lastModified(lastModified)
                     .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
                     .build();
             }
@@ -484,4 +505,5 @@ public class MCRRestAPIClassifications {
             filterNonEmpty(classId, e.getChildren("category").get(i));
         }
     }
+
 }
