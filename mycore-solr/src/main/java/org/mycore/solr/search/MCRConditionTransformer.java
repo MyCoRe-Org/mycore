@@ -1,24 +1,19 @@
 /*
- * $Id$
- * $Revision: 5697 $ $Date: May 13, 2013 $
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
+ * (GPL) as published by the Free Software Foundation; either version 3
  * of the License or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.solr.search;
@@ -50,6 +45,7 @@ import org.mycore.solr.MCRSolrUtils;
 
 /**
  * @author Thomas Scheffler (yagee)
+ * @author Jens Kupferschmidt
  *
  */
 public class MCRConditionTransformer {
@@ -231,21 +227,22 @@ public class MCRConditionTransformer {
     }
 
     public static SolrQuery getSolrQuery(@SuppressWarnings("rawtypes") MCRCondition condition, List<MCRSortBy> sortBy,
-        int maxResults) {
+        int maxResults, String returnFields) {
         String queryString = getQueryString(condition);
         SolrQuery q = applySortOptions(new SolrQuery(queryString), sortBy);
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
-
+        if (returnFields != null) {
+          q.setFields(returnFields.length() > 0 ? returnFields : "*");
+        }
         String sort = q.getSortField();
-        LOGGER.info("Legacy Query transformed to: " + q.getQuery() + (sort != null ? " " + sort : ""));
+        LOGGER.info("MyCoRe Query transformed to: {}{}{}", q.getQuery(), sort != null ? " " + sort : "", " " + q.getFields());
         return q;
     }
 
     public static String getQueryString(@SuppressWarnings("rawtypes") MCRCondition condition) {
         Set<String> usedFields = new HashSet<>();
-        String queryString = MCRConditionTransformer.toSolrQueryString(condition, usedFields);
-        return queryString;
+        return MCRConditionTransformer.toSolrQueryString(condition, usedFields);
     }
 
     public static SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
@@ -269,15 +266,15 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     public static SolrQuery buildMergedSolrQuery(List<MCRSortBy> sortBy, boolean not, boolean and,
-        HashMap<String, List<MCRCondition>> table, int maxHits) {
+        HashMap<String, List<MCRCondition>> table, int maxHits, String returnFields) {
         List<MCRCondition> queryConditions = table.get("metadata");
         MCRCondition combined = buildSubCondition(queryConditions, and, not);
-        SolrQuery solrRequestQuery = getSolrQuery(combined, sortBy, maxHits);
+        SolrQuery solrRequestQuery = getSolrQuery(combined, sortBy, maxHits, returnFields);
 
         for (Map.Entry<String, List<MCRCondition>> mapEntry : table.entrySet()) {
             if (!mapEntry.getKey().equals("metadata")) {
                 MCRCondition combinedFilterQuery = buildSubCondition(mapEntry.getValue(), and, not);
-                SolrQuery filterQuery = getSolrQuery(combinedFilterQuery, sortBy, maxHits);
+                SolrQuery filterQuery = getSolrQuery(combinedFilterQuery, sortBy, maxHits, returnFields);
                 solrRequestQuery.addFilterQuery(MCRSolrConstants.JOIN_PATTERN + filterQuery.getQuery());
             }
         }
@@ -307,18 +304,13 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     public static HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
-        HashMap<String, List<MCRCondition>> table = new HashMap<String, List<MCRCondition>>();
+        HashMap<String, List<MCRCondition>> table = new HashMap<>();
         @SuppressWarnings("unchecked")
         List<MCRCondition> children = cond.getChildren();
 
         for (MCRCondition child : children) {
             String index = getIndex(child);
-            List<MCRCondition> conditions = table.get(index);
-            if (conditions == null) {
-                conditions = new ArrayList<MCRCondition>();
-                table.put(index, conditions);
-            }
-            conditions.add(child);
+            table.computeIfAbsent(index, k -> new ArrayList<>()).add(child);
         }
         return table;
     }
