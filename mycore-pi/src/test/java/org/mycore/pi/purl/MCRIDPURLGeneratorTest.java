@@ -18,13 +18,14 @@
 
 package org.mycore.pi.purl;
 
-import static org.mycore.pi.MCRPIRegistrationService.GENERATOR_CONFIG_PREFIX;
+import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
 
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -41,12 +42,14 @@ public class MCRIDPURLGeneratorTest extends MCRTestCase {
     @Test
     public void generate() throws MCRPersistentIdentifierException {
         MCRObjectID testID = MCRObjectID.getInstance("my_test_00000001");
+        MCRObject mcrObject = new MCRObject();
+        mcrObject.setId(testID);
 
         MCRIDPURLGenerator generator1 = new MCRIDPURLGenerator(GENERATOR_1);
-        Assert.assertEquals("", generator1.generate(testID, "").asString(), "http://purl.myurl.de/my_test_00000001");
+        Assert.assertEquals("", generator1.generate(mcrObject, "").asString(), "http://purl.myurl.de/my_test_00000001");
 
         MCRIDPURLGenerator generator2 = new MCRIDPURLGenerator(GENERATOR_2);
-        Assert.assertEquals("", generator2.generate(testID, "").asString(),
+        Assert.assertEquals("", generator2.generate(mcrObject, "").asString(),
             "http://purl.myurl.de/my_test_00000001/my_test_00000001/my_test_00000001");
 
     }

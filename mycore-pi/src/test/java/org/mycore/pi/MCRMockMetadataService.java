@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRMockMetadataManager extends MCRPersistentIdentifierMetadataManager<MCRMockIdentifier> {
+public class MCRMockMetadataService extends MCRPIMetadataService<MCRMockIdentifier> {
 
     public static final String TEST_PROPERTY = "mockProperty";
 
@@ -34,7 +34,7 @@ public class MCRMockMetadataManager extends MCRPersistentIdentifierMetadataManag
 
     private Map<String, MCRMockIdentifier> map = new HashMap<>();
 
-    public MCRMockMetadataManager(String inscriberID) {
+    public MCRMockMetadataService(String inscriberID) {
         super(inscriberID);
     }
 

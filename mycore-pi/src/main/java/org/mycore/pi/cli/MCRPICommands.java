@@ -37,12 +37,12 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.pi.MCRPIRegistrationService;
-import org.mycore.pi.MCRPIRegistrationServiceManager;
+import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.MCRPersistentIdentifierEventHandler;
-import org.mycore.pi.MCRPersistentIdentifierManager;
-import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
+import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
@@ -54,13 +54,13 @@ public class MCRPICommands {
 
     @MCRCommand(syntax = "add PI Flags to objects", help = "Should only be used if you used mycore-pi pre 2016 lts!")
     public static void addFlagsToObjects() {
-        MCRPersistentIdentifierManager.getInstance().getList().forEach(registrationInfo -> {
+        MCRPIManager.getInstance().getList().forEach(registrationInfo -> {
             if (registrationInfo.getMcrRevision() <= 35726) {
                 String mycoreID = registrationInfo.getMycoreID();
                 MCRObjectID objectID = MCRObjectID.getInstance(mycoreID);
                 MCRBase base = MCRMetadataManager.retrieve(objectID);
                 LOGGER.info("Add PI-Flag to {}", mycoreID);
-                MCRPIRegistrationService.addFlagToObject(base, (MCRPI) registrationInfo);
+                MCRPIService.addFlagToObject(base, (MCRPI) registrationInfo);
                 try {
                     MCRMetadataManager.update(base);
                 } catch (Exception e) {
@@ -82,13 +82,13 @@ public class MCRPICommands {
             if (urn != null) {
                 LOGGER.info("Found URN in :{}", derivateID);
                 MCRPI derivatePI = new MCRPI(urn, MCRDNBURN.TYPE, derivateID, "", serviceID, new Date());
-                if (MCRPersistentIdentifierManager.getInstance().exist(derivatePI)) {
+                if (MCRPIManager.getInstance().exist(derivatePI)) {
                     LOGGER.warn("PI-Entry for {} already exist!", urn);
                 } else {
                     session.save(derivatePI);
                     derivate.getUrnMap().forEach((file, fileURN) -> {
                         MCRPI filePI = new MCRPI(fileURN, MCRDNBURN.TYPE, derivateID, file, serviceID, new Date());
-                        if (MCRPersistentIdentifierManager.getInstance().exist(filePI)) {
+                        if (MCRPIManager.getInstance().exist(filePI)) {
                             LOGGER.warn("PI-Entry for {} already exist!", fileURN);
                         } else {
                             session.save(fileURN);
@@ -106,10 +106,10 @@ public class MCRPICommands {
         final String additional)
         throws MCRAccessException, MCRActiveLinkException, IOException {
         String trimAdditional = additional.trim();
-        MCRPIRegistrationService<MCRPersistentIdentifier> service = MCRPIRegistrationServiceManager
+        MCRPIService<MCRPersistentIdentifier> service = MCRPIServiceManager
             .getInstance().getRegistrationService(serviceID);
 
-        MCRPersistentIdentifierMetadataManager<MCRPersistentIdentifier> metadataManager = service.getMetadataManager();
+        MCRPIMetadataService<MCRPersistentIdentifier> metadataManager = service.getMetadataService();
 
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
         MCRBase mcrBase = MCRMetadataManager.retrieve(objectID);
@@ -133,7 +133,7 @@ public class MCRPICommands {
             return;
         }
         MCRPI mcrpi = service.insertIdentifierToDatabase(mcrBase, trimAdditional, persistentIdentifier);
-        MCRPIRegistrationService.addFlagToObject(mcrBase, mcrpi);
+        MCRPIService.addFlagToObject(mcrBase, mcrpi);
         MCRMetadataManager.update(mcrBase);
         LOGGER.info("{}:{} is now under control of {}", objectID, trimAdditional, serviceID);
     }
@@ -143,13 +143,13 @@ public class MCRPICommands {
     public static void removeControlFromObject(String objectIDString, String serviceID, String additional)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
-        MCRPI mcrpi = MCRPersistentIdentifierManager.getInstance()
+        MCRPI mcrpi = MCRPIManager.getInstance()
             .get(serviceID, objectIDString, additional != null ? additional.trim() : null);
-        MCRPersistentIdentifierManager.getInstance()
+        MCRPIManager.getInstance()
             .delete(mcrpi.getMycoreID(), mcrpi.getAdditional(), mcrpi.getType(), mcrpi.getService());
 
         MCRBase base = MCRMetadataManager.retrieve(objectID);
-        if (MCRPIRegistrationService.removeFlagFromObject(base, mcrpi) == null) {
+        if (MCRPIService.removeFlagFromObject(base, mcrpi) == null) {
             throw new MCRPersistentIdentifierException("Could not delete Flag of object (flag not found)!");
         }
         MCRMetadataManager.update(base);

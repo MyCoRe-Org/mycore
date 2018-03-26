@@ -20,7 +20,7 @@ package org.mycore.pi;
 
 import java.util.stream.Stream;
 
-public class MCRMockResolver extends MCRPersistentIdentifierResolver<MCRMockIdentifier> {
+public class MCRMockResolver extends MCRPIResolver<MCRMockIdentifier> {
 
     public static final String NAME = "MOCK-Resolver";
 

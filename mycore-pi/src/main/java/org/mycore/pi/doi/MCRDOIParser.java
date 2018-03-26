@@ -20,9 +20,9 @@ package org.mycore.pi.doi;
 
 import java.util.Optional;
 
-import org.mycore.pi.MCRPersistentIdentifierParser;
+import org.mycore.pi.MCRPIParser;
 
-public class MCRDOIParser implements MCRPersistentIdentifierParser<MCRDigitalObjectIdentifier> {
+public class MCRDOIParser implements MCRPIParser<MCRDigitalObjectIdentifier> {
 
     public static final String DIRECTORY_INDICATOR = "10.";
 

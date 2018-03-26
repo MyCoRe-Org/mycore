@@ -18,7 +18,8 @@
 
 package org.mycore.mods.identifier;
 
-import java.util.Objects;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Optional;
 
 import org.jdom2.Element;
@@ -27,31 +28,30 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
+import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.mycore.pi.urn.MCRDNBURNParser;
-import org.mycore.pi.urn.MCRUniformResourceName;
+import org.mycore.pi.purl.MCRPURL;
 
-public class MCRMODSURNPersistentIdentifierMetadataManager
-    extends MCRPersistentIdentifierMetadataManager<MCRUniformResourceName> {
+public class MCRMODSPURLMetadataService
+    extends MCRPIMetadataService<MCRPURL> {
 
-    private static final String MODS_IDENTIFIER_TYPE_URN = "mods:identifier[@type='urn']";
+    private static final String MODS_IDENTIFIER_TYPE_PURL = "mods:identifier[@type='purl']";
 
-    public MCRMODSURNPersistentIdentifierMetadataManager(String inscriberID) {
+    public MCRMODSPURLMetadataService(String inscriberID) {
         super(inscriberID);
     }
 
     @Override
-    public void insertIdentifier(MCRUniformResourceName identifier, MCRBase obj, String additional)
+    public void insertIdentifier(MCRPURL identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(obj);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        wrapper.setElement("identifier", "type", "urn", identifier.asString())
-            .orElseThrow(() -> new MCRException("Could not insert urn into mods document!"));
+        wrapper.setElement("identifier", "type", "purl", identifier.asString())
+            .orElseThrow(() -> new MCRException("Could not insert purl into mods document!"));
     }
 
     @Override
-    public void removeIdentifier(MCRUniformResourceName identifier, MCRBase obj, String additional) {
+    public void removeIdentifier(MCRPURL identifier, MCRBase obj, String additional) {
         // not supported
     }
 
@@ -60,17 +60,19 @@ public class MCRMODSURNPersistentIdentifierMetadataManager
         throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(obj);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        Element element = wrapper.getElement(MODS_IDENTIFIER_TYPE_URN);
+        Element element = wrapper.getElement(MODS_IDENTIFIER_TYPE_PURL);
 
         if (element == null) {
             return Optional.empty();
         }
 
-        String urnText = element.getTextNormalize();
-        return new MCRDNBURNParser()
-            .parse(urnText)
-            .filter(Objects::nonNull)
-            .map(MCRPersistentIdentifier.class::cast);
+        String purlString = element.getTextNormalize();
+        try {
+            return Optional.of(new MCRPURL(new URL(purlString)));
+        } catch (MalformedURLException e) {
+            return Optional.empty();
+        }
+
     }
 
     private MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {

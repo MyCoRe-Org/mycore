@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.MCRPIManager;
 
 /**
  * A Generator which helps to generate a URN with a counter inside.
@@ -47,7 +47,7 @@ public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
         Pattern regExpPattern = Pattern.compile(countPattern);
         Predicate<String> matching = regExpPattern.asPredicate();
 
-        List<MCRPIRegistrationInfo> list = MCRPersistentIdentifierManager.getInstance()
+        List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance()
             .getList(MCRDNBURN.TYPE, -1, -1);
 
         // extract the number of the PI

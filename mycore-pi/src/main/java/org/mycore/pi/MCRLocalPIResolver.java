@@ -24,17 +24,17 @@ import java.util.stream.Stream;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 
-public class MCRLocalPersistentIdentifierResolver extends MCRPersistentIdentifierResolver<MCRPersistentIdentifier> {
+public class MCRLocalPIResolver extends MCRPIResolver<MCRPersistentIdentifier> {
     private final Function<String, String> toReceiveObjectURL = mcrID -> MCRFrontendUtil.getBaseURL() + "receive/"
         + mcrID;
 
-    public MCRLocalPersistentIdentifierResolver() {
+    public MCRLocalPIResolver() {
         super("Local-Resolver");
     }
 
     @Override
     public Stream<String> resolve(MCRPersistentIdentifier identifier) throws MCRIdentifierUnresolvableException {
-        return MCRPersistentIdentifierManager.getInstance()
+        return MCRPIManager.getInstance()
             .getInfo(identifier)
             .stream()
             .map(MCRPIRegistrationInfo::getMycoreID)

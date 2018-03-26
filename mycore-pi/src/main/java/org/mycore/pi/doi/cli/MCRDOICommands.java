@@ -39,10 +39,10 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
+import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.MCRDOIParser;
-import org.mycore.pi.doi.MCRDOIRegistrationService;
+import org.mycore.pi.doi.MCRDOIService;
 import org.mycore.pi.doi.MCRDataciteClient;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
@@ -60,7 +60,7 @@ public class MCRDOICommands {
             + "{1} the registration service from configuration.")
     public static void repairIncompleteRegisteredDOI(String doiString, String serviceID)
         throws MCRPersistentIdentifierException, MCRAccessException, MCRActiveLinkException {
-        MCRDOIRegistrationService registrationService = new MCRDOIRegistrationService(serviceID);
+        MCRDOIService registrationService = new MCRDOIService(serviceID);
         MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
 
         MCRDigitalObjectIdentifier doi = new MCRDOIParser().parse(doiString)
@@ -79,8 +79,8 @@ public class MCRDOICommands {
         }
 
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
-        MCRPersistentIdentifierMetadataManager<MCRDigitalObjectIdentifier> synchronizer = registrationService
-            .getMetadataManager();
+        MCRPIMetadataService<MCRDigitalObjectIdentifier> synchronizer = registrationService
+            .getMetadataService();
 
         if (!registrationService.isRegistered(objectID, doiString)) {
             LOGGER.info("{} is not found in PI-Database. Insert it..", objectID);
@@ -99,7 +99,7 @@ public class MCRDOICommands {
         help = "Contacts the Registration Service and inserts all registered DOIs to the Database. It also updates all media files. The Service ID{0} is the id from the configuration.",
         order = 10)
     public static void synchronizeDatabase(String serviceID) {
-        MCRDOIRegistrationService registrationService = new MCRDOIRegistrationService(serviceID);
+        MCRDOIService registrationService = new MCRDOIService(serviceID);
 
         try {
             MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
@@ -152,7 +152,7 @@ public class MCRDOICommands {
     @MCRCommand(syntax = "repair media list of {0}",
         help = "Sends new media lists to Datacite. The Service ID{0} is the id from the configuration.")
     public static List<String> updateMediaListOfAllDOI(String serviceID) {
-        MCRDOIRegistrationService registrationService = new MCRDOIRegistrationService(serviceID);
+        MCRDOIService registrationService = new MCRDOIService(serviceID);
 
         try {
             MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
@@ -176,7 +176,7 @@ public class MCRDOICommands {
     @MCRCommand(syntax = REPAIR_MEDIALIST_OF_0_AND_SERVICE_1,
         help = "Sends new media list to Datacite. {0} is the DOI. The Service ID{1} is the id from the configuration.")
     public static void updateMediaListForDOI(String doiString, String serviceID) {
-        MCRDOIRegistrationService registrationService = new MCRDOIRegistrationService(serviceID);
+        MCRDOIService registrationService = new MCRDOIService(serviceID);
 
         MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
 

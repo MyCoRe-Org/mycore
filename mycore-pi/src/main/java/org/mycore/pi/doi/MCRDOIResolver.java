@@ -20,14 +20,14 @@ package org.mycore.pi.doi;
 
 import java.util.stream.Stream;
 
-import org.mycore.pi.MCRPersistentIdentifierResolver;
+import org.mycore.pi.MCRPIResolver;
 import org.mycore.pi.doi.rest.MCRDOIRest;
 import org.mycore.pi.doi.rest.MCRDOIRestResponse;
 import org.mycore.pi.doi.rest.MCRDOIRestResponseEntry;
 import org.mycore.pi.doi.rest.MCRDOIRestResponseEntryDataStringValue;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 
-public class MCRDOIResolver extends MCRPersistentIdentifierResolver<MCRDigitalObjectIdentifier> {
+public class MCRDOIResolver extends MCRPIResolver<MCRDigitalObjectIdentifier> {
     public MCRDOIResolver() {
         super("DOI-Resolver");
     }

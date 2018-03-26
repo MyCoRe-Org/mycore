@@ -16,10 +16,26 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi;
+package org.mycore.pi.purl;
 
-import java.util.Optional;
+import java.net.URL;
 
-public interface MCRPersistentIdentifierParser<T extends MCRPersistentIdentifier> {
-    Optional<T> parse(String identifier);
+import org.mycore.pi.MCRPersistentIdentifier;
+
+public class MCRPURL implements MCRPersistentIdentifier {
+
+    private URL url;
+
+    public MCRPURL(URL url) {
+        this.url = url;
+    }
+
+    public URL getUrl() {
+        return url;
+    }
+
+    @Override
+    public String asString() {
+        return url.toString();
+    }
 }

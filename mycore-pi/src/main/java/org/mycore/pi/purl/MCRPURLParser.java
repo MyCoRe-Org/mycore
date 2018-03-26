@@ -22,15 +22,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 
-import org.mycore.pi.MCRPersistentIdentifierParser;
+import org.mycore.pi.MCRPIParser;
 
-public class MCRPURLParser implements MCRPersistentIdentifierParser {
+public class MCRPURLParser implements MCRPIParser {
 
     @Override
     public Optional parse(String identifier) {
         try {
             URL url = new URL(identifier);
-            return Optional.of(new MCRPersistentUniformResourceLocator(url));
+            return Optional.of(new MCRPURL(url));
         } catch (MalformedURLException e) {
             return Optional.empty();
         }

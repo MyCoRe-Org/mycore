@@ -23,9 +23,9 @@ import static org.mycore.pi.urn.MCRUniformResourceName.PREFIX;
 
 import java.util.Optional;
 
-import org.mycore.pi.MCRPersistentIdentifierParser;
+import org.mycore.pi.MCRPIParser;
 
-public class MCRDNBURNParser implements MCRPersistentIdentifierParser<MCRDNBURN> {
+public class MCRDNBURNParser implements MCRPIParser<MCRDNBURN> {
 
     @Override
     public Optional<MCRDNBURN> parse(String identifier) {

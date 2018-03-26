@@ -27,25 +27,50 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
-import org.mycore.pi.doi.MCRDOIParser;
-import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
+import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.urn.MCRDNBURNParser;
+import org.mycore.pi.urn.MCRUniformResourceName;
 
-public class MCRMODSDOIPersistentIdentifierMetadataManager
-    extends MCRPersistentIdentifierMetadataManager<MCRDigitalObjectIdentifier> {
+public class MCRMODSURNPIMetadataService
+    extends MCRPIMetadataService<MCRUniformResourceName> {
 
-    public MCRMODSDOIPersistentIdentifierMetadataManager(String inscriberID) {
+    private static final String MODS_IDENTIFIER_TYPE_URN = "mods:identifier[@type='urn']";
+
+    public MCRMODSURNPIMetadataService(String inscriberID) {
         super(inscriberID);
     }
 
     @Override
-    public void insertIdentifier(MCRDigitalObjectIdentifier identifier, MCRBase base, String additional)
+    public void insertIdentifier(MCRUniformResourceName identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        MCRObject object = checkObject(base);
+        MCRObject object = checkObject(obj);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        wrapper.setElement("identifier", "type", "doi", identifier.asString())
-            .orElseThrow(() -> new MCRException("Could not insert doi into mods document!"));
+        wrapper.setElement("identifier", "type", "urn", identifier.asString())
+            .orElseThrow(() -> new MCRException("Could not insert urn into mods document!"));
+    }
+
+    @Override
+    public void removeIdentifier(MCRUniformResourceName identifier, MCRBase obj, String additional) {
+        // not supported
+    }
+
+    @Override
+    public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
+        MCRObject object = checkObject(obj);
+        MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
+        Element element = wrapper.getElement(MODS_IDENTIFIER_TYPE_URN);
+
+        if (element == null) {
+            return Optional.empty();
+        }
+
+        String urnText = element.getTextNormalize();
+        return new MCRDNBURNParser()
+            .parse(urnText)
+            .filter(Objects::nonNull)
+            .map(MCRPersistentIdentifier.class::cast);
     }
 
     private MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {
@@ -53,28 +78,5 @@ public class MCRMODSDOIPersistentIdentifierMetadataManager
             throw new MCRPersistentIdentifierException(getClass().getName() + " does only support MyCoReObjects!");
         }
         return (MCRObject) base;
-    }
-
-    @Override
-    public void removeIdentifier(MCRDigitalObjectIdentifier identifier, MCRBase obj, String additional) {
-        // not supported
-    }
-
-    @Override
-    public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase base, String additional)
-        throws MCRPersistentIdentifierException {
-        MCRObject object = checkObject(base);
-        MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        Element element = wrapper.getElement("mods:identifier[@type='doi']");
-        if (element == null) {
-            return Optional.empty();
-        }
-
-        String doiText = element.getTextNormalize();
-
-        return new MCRDOIParser()
-            .parse(doiText)
-            .filter(Objects::nonNull)
-            .map(MCRPersistentIdentifier.class::cast);
     }
 }

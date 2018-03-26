@@ -52,6 +52,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -64,11 +65,15 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.pi.MCRPIJobRegistrationService;
+import org.mycore.pi.MCRPIGenerator;
+import org.mycore.pi.MCRPIJobService;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRDatacenterException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 /**
  * Registers {@link MCRDigitalObjectIdentifier} at Datacite.
@@ -78,7 +83,7 @@ import org.xml.sax.SAXException;
  *     <dt>MetadataManager</dt>
  *     <dd>A metadata manager which inserts the {@link MCRDigitalObjectIdentifier} to a object</dd>
  *     <dt>Generator</dt>
- *     <dd>A {@link org.mycore.pi.MCRPersistentIdentifierGenerator} which generates {@link MCRDigitalObjectIdentifier}</dd>
+ *     <dd>A {@link MCRPIGenerator} which generates {@link MCRDigitalObjectIdentifier}</dd>
  *     <dt>Username</dt>
  *     <dd>The username which will be used for authentication </dd>
  *     <dt>Password</dt>
@@ -97,7 +102,7 @@ import org.xml.sax.SAXException;
  *     <dd>The namespace for the Datacite version (Default is {@link #KERNEL_3_NAMESPACE_URI}</dd>
  * </dl>
  */
-public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDigitalObjectIdentifier> {
+public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
 
     private static final String KERNEL_3_NAMESPACE_URI = "http://datacite.org/schema/kernel-3";
 
@@ -147,7 +152,7 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
 
     private boolean useTestPrefix;
 
-    public MCRDOIRegistrationService(String serviceID) {
+    public MCRDOIService(String serviceID) {
         super(serviceID, MCRDigitalObjectIdentifier.TYPE);
 
         Map<String, String> properties = getProperties();
@@ -190,15 +195,37 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
         }
     }
 
-    private Schema loadDataciteSchema() throws SAXException {
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
-        URL localSchemaURL = MCRDOIRegistrationService.class.getClassLoader().getResource(schemaPath);
+    @Override
+    protected void checkConfiguration() throws MCRConfigurationException {
+        super.checkConfiguration();
 
-        if (localSchemaURL == null) {
-            throw new MCRException(DEFAULT_DATACITE_SCHEMA_PATH + " was not found!");
+        loadDataciteSchema();
+
+        try {
+            getDataciteClient().getDOIList();
+        } catch (MCRPersistentIdentifierException e) {
+            throw new MCRConfigurationException("Error while checking credentials!", e);
         }
-        return schemaFactory.newSchema(localSchemaURL);
+
+        if(MCRContentTransformerFactory.getTransformer(this.transformer) == null){
+            throw new MCRConfigurationException("Transformer " + this.transformer + " can not be resolved!");
+        }
+    }
+
+    private Schema loadDataciteSchema() {
+        try {
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
+
+            URL localSchemaURL = MCRDOIService.class.getClassLoader().getResource(schemaPath);
+
+            if (localSchemaURL == null) {
+                throw new MCRConfigurationException(DEFAULT_DATACITE_SCHEMA_PATH + " was not found!");
+            }
+            return schemaFactory.newSchema(localSchemaURL);
+        } catch (SAXException e) {
+            throw new MCRConfigurationException("Error while loading datacite schema!", e);
+        }
     }
 
     public boolean usesTestPrefix() {
@@ -231,23 +258,23 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
         return null;
     }
 
+
     @Override
-    public MCRDigitalObjectIdentifier registerIdentifier(MCRBase obj, String additional)
+    protected MCRDigitalObjectIdentifier getNewIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+        MCRDigitalObjectIdentifier newIdentifier = super.getNewIdentifier(obj, additional);
+        return (useTestPrefix) ? newIdentifier.toTestPrefix() : newIdentifier;
+    }
+
+    @Override
+    public void registerIdentifier(MCRBase obj, String additional, MCRDigitalObjectIdentifier newDOI)
         throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
 
-        MCRDigitalObjectIdentifier newDOI = getNewIdentifier(obj.getId(), additional);
-        if (useTestPrefix) {
-            newDOI = newDOI.toTestPrefix();
-        }
-
         // just to check if valid
         transformToDatacite(newDOI, obj);
-
-        return newDOI;
     }
 
     @Override
@@ -259,7 +286,7 @@ public class MCRDOIRegistrationService extends MCRPIJobRegistrationService<MCRDi
         }
 
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getRegistrationServiceID(), provideRegisterDate(obj, additional), registrationStarted);
+                this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
         MCRHIBConnection.instance().getSession().save(databaseEntry);
         return databaseEntry;
     }

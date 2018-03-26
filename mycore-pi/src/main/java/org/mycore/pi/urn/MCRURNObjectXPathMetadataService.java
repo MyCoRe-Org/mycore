@@ -33,14 +33,14 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPersistentIdentifierMetadataManager;
+import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRURNObjectXPathMetadataManager extends MCRPersistentIdentifierMetadataManager<MCRDNBURN> {
+public class MCRURNObjectXPathMetadataService extends MCRPIMetadataService<MCRDNBURN> {
 
     private static final MCRDNBURNParser PARSER = new MCRDNBURNParser();
 
-    public MCRURNObjectXPathMetadataManager(String inscriberID) {
+    public MCRURNObjectXPathMetadataService(String inscriberID) {
         super(inscriberID);
     }
 

@@ -18,8 +18,7 @@
 
 package org.mycore.pi;
 
-import static org.mycore.pi.MCRPIRegistrationService.METADATA_MANAGER_CONFIG_PREFIX;
-import static org.mycore.pi.MCRPIRegistrationService.METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX;
+import static org.mycore.pi.MCRPIService.METADATA_SERVICE_CONFIG_PREFIX;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,27 +35,18 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * Identifier of type T
  * @param <T>
  */
-public abstract class MCRPersistentIdentifierMetadataManager<T extends MCRPersistentIdentifier> {
+public abstract class MCRPIMetadataService<T extends MCRPersistentIdentifier> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private String metadataManagerID;
 
-    public MCRPersistentIdentifierMetadataManager(String metadataManagerID) {
+    public MCRPIMetadataService(String metadataManagerID) {
         this.metadataManagerID = metadataManagerID;
     }
 
     protected final Map<String, String> getProperties() {
-        Map<String, String> deprecatedProperties = getPropertiesWithPrefix(METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX);
-        Map<String, String> properties = getPropertiesWithPrefix(METADATA_MANAGER_CONFIG_PREFIX);
-
-        deprecatedProperties.forEach((k, v) -> properties.computeIfAbsent(k, (k2) -> {
-            LOGGER.warn("You should rename {}{}.{} to {}{}.{}", METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX,
-                metadataManagerID, k, METADATA_MANAGER_CONFIG_PREFIX, metadataManagerID, k);
-            return v;
-        }));
-
-        return properties;
+        return getPropertiesWithPrefix(METADATA_SERVICE_CONFIG_PREFIX);
     }
 
     protected final Map<String, String> getPropertiesWithPrefix(String configPrefix) {
@@ -65,7 +55,7 @@ public abstract class MCRPersistentIdentifierMetadataManager<T extends MCRPersis
 
         Map<String, String> shortened = new HashMap<>();
 
-        propertiesMap.keySet().stream().forEach(key -> {
+        propertiesMap.keySet().forEach(key -> {
             String newKey = key.substring(configPrefix.length() + metadataManagerID.length() + 1);
             shortened.put(newKey, propertiesMap.get(key));
         });

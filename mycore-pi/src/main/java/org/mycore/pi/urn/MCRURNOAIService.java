@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.pi.MCRPIRegistrationService;
+import org.mycore.pi.MCRPIService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -34,22 +34,20 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 /**
  * This class registers urn for Metadata.
  */
-public class MCRURNOAIRegistrationService extends MCRPIRegistrationService<MCRDNBURN> {
+public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MCRURNOAIRegistrationService(String registrationServiceID) {
+    public MCRURNOAIService(String registrationServiceID) {
         super(registrationServiceID, MCRDNBURN.TYPE);
     }
 
     @Override
-    protected MCRDNBURN registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
-
-        return getNewIdentifier(obj.getId(), additional);
     }
 
     @Override

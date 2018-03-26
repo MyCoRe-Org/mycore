@@ -29,7 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.MCRPIManager;
 
 import com.google.gson.Gson;
 
@@ -41,7 +41,7 @@ public class MCRPersistentIdentifierResolvingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response resolve(@PathParam("identifier") String identifier) {
         HashMap<String, List<String>> resolveMap = new HashMap<>();
-        MCRPersistentIdentifierManager.getInstance().getResolvers().forEach(resolver -> MCRPersistentIdentifierManager
+        MCRPIManager.getInstance().getResolvers().forEach(resolver -> MCRPIManager
             .getInstance().get(identifier)
             .forEach(mcrPersistentIdentifier -> resolveMap.put(resolver.getName(),
                 resolver.resolveSuppress(mcrPersistentIdentifier).collect(Collectors.toList()))));

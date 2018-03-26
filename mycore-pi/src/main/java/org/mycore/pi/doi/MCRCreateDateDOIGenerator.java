@@ -25,13 +25,12 @@ import java.util.Optional;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRISO8601Date;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPersistentIdentifierGenerator;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRCreateDateDOIGenerator extends MCRPersistentIdentifierGenerator<MCRDigitalObjectIdentifier> {
+public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
     private static final String DATE_PATTERN = "yyyyMMdd-HHmmss";
 
@@ -45,9 +44,9 @@ public class MCRCreateDateDOIGenerator extends MCRPersistentIdentifierGenerator<
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRObjectID mcrID, String additional)
+    public MCRDigitalObjectIdentifier generate(MCRBase mcrObj, String additional)
         throws MCRPersistentIdentifierException {
-        Date createdate = MCRMetadataManager.retrieveMCRObject(mcrID).getService().getDate("createdate");
+        Date createdate = mcrObj.getService().getDate("createdate");
         if (createdate != null) {
             MCRISO8601Date mcrdate = new MCRISO8601Date();
             mcrdate.setDate(createdate);
@@ -56,7 +55,7 @@ public class MCRCreateDateDOIGenerator extends MCRPersistentIdentifierGenerator<
             MCRPersistentIdentifier doi = parse.get();
             return (MCRDigitalObjectIdentifier) doi;
         } else {
-            throw new MCRPersistenceException("The object " + mcrID + " doesn't have a createdate!");
+            throw new MCRPersistenceException("The object " + mcrObj.getId() + " doesn't have a createdate!");
         }
     }
 }

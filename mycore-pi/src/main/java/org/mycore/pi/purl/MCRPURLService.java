@@ -24,10 +24,10 @@ import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.pi.MCRPIRegistrationService;
+import org.mycore.pi.MCRPIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPersistentUniformResourceLocator> {
+public class MCRPURLService extends MCRPIService<MCRPURL> {
 
     private static final String TYPE = "purl";
 
@@ -47,19 +47,18 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
 
     private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
 
-    public MCRPURLRegistrationService(String registrationServiceID) {
+    public MCRPURLService(String registrationServiceID) {
         super(registrationServiceID, TYPE);
     }
 
     @Override
-    protected MCRPersistentUniformResourceLocator registerIdentifier(MCRBase obj, String additional)
+    protected void registerIdentifier(MCRBase obj, String additional, MCRPURL purl)
         throws MCRPersistentIdentifierException {
         if (!"".equals(additional)) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
 
-        MCRPersistentUniformResourceLocator purl = getNewIdentifier(obj.getId(), additional);
         LOGGER.info("TODO: Register PURL at PURL-Server!");
 
         doWithPURLManager(
@@ -67,7 +66,6 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
                 .registerNewPURL(purl.getUrl().getPath(), buildTargetURL(obj), "302", getProperties().getOrDefault(
                     PURL_MAINTAINER_CONFIG, "test")));
 
-        return purl;
     }
 
     protected String buildTargetURL(MCRBase obj) {
@@ -93,14 +91,14 @@ public class MCRPURLRegistrationService extends MCRPIRegistrationService<MCRPers
     }
 
     @Override
-    protected void delete(MCRPersistentUniformResourceLocator identifier, MCRBase obj, String additional)
+    protected void delete(MCRPURL identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         /* deletion is not supported */
         throw new MCRPersistentIdentifierException("Delete is not supported for " + getType());
     }
 
     @Override
-    protected void update(MCRPersistentUniformResourceLocator purl, MCRBase obj, String additional)
+    protected void update(MCRPURL purl, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         doWithPURLManager((purlManager) -> {
             String targetURL = buildTargetURL(obj);

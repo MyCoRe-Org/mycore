@@ -22,11 +22,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPersistentIdentifierGenerator;
+import org.mycore.pi.MCRPIGenerator;
 
-public class MCRUUIDDOIGenerator extends MCRPersistentIdentifierGenerator<MCRDigitalObjectIdentifier> {
+public class MCRUUIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
     private final MCRDOIParser mcrdoiParser;
 
@@ -38,7 +38,7 @@ public class MCRUUIDDOIGenerator extends MCRPersistentIdentifierGenerator<MCRDig
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRObjectID mcrID, String additional) {
+    public MCRDigitalObjectIdentifier generate(MCRBase mcrObject, String additional) {
         Optional<MCRDigitalObjectIdentifier> parse = mcrdoiParser.parse(prefix + "/" + UUID.randomUUID());
         MCRPersistentIdentifier doi = parse.get();
         return (MCRDigitalObjectIdentifier) doi;

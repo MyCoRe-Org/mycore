@@ -24,13 +24,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 
-public abstract class MCRPersistentIdentifierResolver<T extends MCRPersistentIdentifier> {
+public abstract class MCRPIResolver<T extends MCRPersistentIdentifier> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final String name;
 
-    public MCRPersistentIdentifierResolver(String name) {
+    public MCRPIResolver(String name) {
         this.name = name;
     }
 

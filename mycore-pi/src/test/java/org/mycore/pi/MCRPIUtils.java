@@ -25,6 +25,7 @@ import java.util.UUID;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -54,7 +55,9 @@ public class MCRPIUtils {
     private static MCRDNBURN generateURNFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {
         String testGenerator = "testGenerator";
         MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator(testGenerator);
-        return mcruuidurnGenerator.generate(mycoreID, "");
+        MCRObject mcrObject1 = new MCRObject();
+        mcrObject1.setId(mycoreID);
+        return mcruuidurnGenerator.generate(mcrObject1, "");
     }
 
     public static String randomFilename() {

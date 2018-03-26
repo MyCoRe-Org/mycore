@@ -19,10 +19,10 @@
 package org.mycore.pi;
 
 import org.junit.Assert;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRMockIdentifierGenerator extends MCRPersistentIdentifierGenerator<MCRMockIdentifier> {
+public class MCRMockIdentifierGenerator extends MCRPIGenerator<MCRMockIdentifier> {
 
     public static final String TEST_PROPERTY = "mockProperty";
 
@@ -33,10 +33,10 @@ public class MCRMockIdentifierGenerator extends MCRPersistentIdentifierGenerator
     }
 
     @Override
-    public MCRMockIdentifier generate(MCRObjectID mcrID, String additional) throws MCRPersistentIdentifierException {
+    public MCRMockIdentifier generate(MCRBase mcrBase, String additional) throws MCRPersistentIdentifierException {
         Assert.assertEquals("Test propterties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
 
         return (MCRMockIdentifier) new MCRMockIdentifierParser()
-            .parse(MCRMockIdentifier.MOCK_SCHEME + mcrID + ":" + additional).get();
+            .parse(MCRMockIdentifier.MOCK_SCHEME + mcrBase.getId() + ":" + additional).get();
     }
 }
