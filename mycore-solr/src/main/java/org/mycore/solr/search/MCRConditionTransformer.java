@@ -238,6 +238,7 @@ public class MCRConditionTransformer {
         SolrQuery q = applySortOptions(new SolrQuery(queryString), sortBy);
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
+        
         if (returnFields != null) {
           q.setFields(returnFields.size() > 0 ? returnFields.stream().collect(Collectors.joining(",")) : "*");
         }
@@ -311,7 +312,7 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     public static HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
-        HashMap<String, List<MCRCondition>> table = new HashMap<>();
+        HashMap<String, List<MCRCondition>> table = new HashMap<String, List<MCRCondition>>();
         @SuppressWarnings("unchecked")
         List<MCRCondition> children = cond.getChildren();
 
