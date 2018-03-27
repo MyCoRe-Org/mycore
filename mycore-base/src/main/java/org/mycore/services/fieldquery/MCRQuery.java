@@ -42,7 +42,7 @@ public class MCRQuery {
     private int maxResults = 0;
 
     /** A list of MCRSortBy criteria, may be empty */
-    private List<MCRSortBy> sortBy = new ArrayList<>();
+    private List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
 
     /** A List of SOLR fields they should be return in the response */
     private List<String> returnFields = new ArrayList<>();
@@ -130,7 +130,7 @@ public class MCRQuery {
      */
     public void setSortBy(List<MCRSortBy> sortBy) {
         if (sortBy == null) {
-            sortBy = new ArrayList<>();
+            sortBy = new ArrayList<MCRSortBy>();
         }
         this.sortBy = sortBy;
         doc = null;
@@ -143,7 +143,7 @@ public class MCRQuery {
      *            a MCRSortBy object
      */
     public void setSortBy(MCRSortBy sortBy) {
-        this.sortBy = new ArrayList<>();
+        this.sortBy = new ArrayList<MCRSortBy>();
         if (sortBy != null) {
             this.sortBy.add(sortBy);
         }
@@ -257,8 +257,8 @@ public class MCRQuery {
         Element sortByElem = xml.getChild("sortBy");
 
         if (sortByElem != null) {
-            List<Element> children = sortByElem.getChildren();
-            sortBy = new ArrayList<>(children.size());
+            List children = sortByElem.getChildren();
+            sortBy = new ArrayList<MCRSortBy>(children.size());
 
             for (Object aChildren : children) {
                 Element sortByChild = (Element) aChildren;
