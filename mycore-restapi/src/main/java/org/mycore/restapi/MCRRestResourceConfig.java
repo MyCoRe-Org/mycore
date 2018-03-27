@@ -18,9 +18,15 @@
 
 package org.mycore.restapi;
 
+import org.apache.logging.log4j.LogManager;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
+import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
+import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
@@ -33,6 +39,7 @@ public class MCRRestResourceConfig extends ResourceConfig {
 
     public MCRRestResourceConfig(){
         super();
+        LogManager.getLogger().error("========MCRRESTResourceConfig======== {}", getApplicationName());
         String[] restPackages = MCRConfiguration.instance().getStrings("MCR.RestAPI.Resource.Packages").stream()
             .toArray(String[]::new);
         packages(restPackages);
@@ -40,9 +47,20 @@ public class MCRRestResourceConfig extends ResourceConfig {
         register(MCRTransactionFilter.class);
         register(MultiPartFeature.class);
         register(MCRRestFeature.class);
+        register(MCRJerseyExceptionMapper.class);
         register(MCRRestAPIExceptionMapper.class);
         register(MCRForbiddenExceptionMapper.class);
         register(MCRNotAuthorizedExceptionMapper.class);
+        register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bindFactory(MCRRequestScopeACLFactory.class)
+                    .proxy(true)
+                    .proxyForSameScope(false)
+                    .to(MCRRequestScopeACL.class)
+                    .in(RequestScoped.class);
+            }
+        });
     }
 
 }

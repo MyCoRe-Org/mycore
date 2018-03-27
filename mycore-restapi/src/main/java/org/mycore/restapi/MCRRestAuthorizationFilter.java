@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.Optional;
 
 import javax.annotation.Priority;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.Priorities;
@@ -29,11 +31,14 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Providers;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
+import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
@@ -43,6 +48,9 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     @Context
     ResourceInfo resourceInfo;
 
+    @Inject
+    private MCRRequestScopeACL aclProvider;
+
     /**
      * checks if the given REST API operation is allowed
      * @param permission "read" or "write"
@@ -50,18 +58,19 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
      *
      * @throws MCRRestAPIException if access is restricted
      */
-    private static void checkRestAPIAccess(MCRRestAPIACLPermission permission, String path)
+    private void checkRestAPIAccess(MCRRestAPIACLPermission permission, String path)
         throws MCRRestAPIException {
         String thePath = path.startsWith("/") ? path : "/" + path;
 
         MCRAccessInterface acl = MCRAccessControlSystem.instance();
         String permStr = permission.toString();
-        boolean hasAPIAccess = acl.checkPermission("restapi://",
+        MCRRequestScopeACL requestScopeACL = aclProvider;
+        boolean hasAPIAccess = requestScopeACL.checkPermission("restapi://",
             permStr);
         if (hasAPIAccess) {
             String objId = "restapi:" + thePath;
             if (acl.hasRule(objId, permStr)) {
-                if (acl.checkPermission(objId, permStr)) {
+                if (requestScopeACL.checkPermission(objId, permStr)) {
                     return;
                 }
             } else {
