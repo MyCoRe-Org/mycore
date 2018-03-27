@@ -35,6 +35,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.frontend.jersey.MCRCacheControl;
+import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 
 public class MCRCacheFilter implements ContainerResponseFilter {
     private static final RuntimeDelegate.HeaderDelegate<CacheControl> HEADER_DELEGATE = RuntimeDelegate.getInstance()
@@ -101,7 +102,8 @@ public class MCRCacheFilter implements ContainerResponseFilter {
                 return;
             }
         }
-        boolean isPrivate = cc.isPrivate() && cc.getPrivateFields().isEmpty();
+        boolean isPrivate = Optional.ofNullable(requestContext.getProperty("foo"))
+            .map(Boolean.class::cast).orElse(false) || (cc.isPrivate() && cc.getPrivateFields().isEmpty());
         boolean isNoCache = cc.isNoCache() && cc.getNoCacheFields().isEmpty();
         if (responseContext.getHeaderString(HttpHeaders.AUTHORIZATION) != null) {
             addAuthorizationHeaderException(cc, isPrivate, isNoCache);
