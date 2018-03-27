@@ -30,7 +30,7 @@ import org.mycore.services.fieldquery.MCRSortBy;
 public class MCRQLSearchUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
-    
+
     private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query",
         "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));
 
@@ -46,9 +46,9 @@ public class MCRQLSearchUtils {
         } else {
             // if there is only one condition its no set condition. we don't need to group
             LOGGER.warn("Condition is not SetCondition.");
-            table = new HashMap<>();
+            table = new HashMap<String, List<MCRCondition>>();
 
-            ArrayList<MCRCondition> conditionList = new ArrayList<>();
+            ArrayList<MCRCondition> conditionList = new ArrayList<MCRCondition>();
             conditionList.add(condition);
 
             table.put("metadata", conditionList);
@@ -73,11 +73,11 @@ public class MCRQLSearchUtils {
         Element conditions = root.getChild("conditions");
 
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
-            Element condition = conditions.getChildren().get(0);
+            Element condition = (Element) conditions.getChildren().get(0);
             renameElements(condition);
 
             // Remove conditions without values
-            List<Element> empty = new ArrayList<>();
+            List<Element> empty = new ArrayList<Element>();
             for (Iterator<Element> it = conditions.getDescendants(new ElementFilter("condition")); it.hasNext();) {
                 Element cond = it.next();
                 if (cond.getAttribute("value") == null) {
@@ -88,7 +88,8 @@ public class MCRQLSearchUtils {
             // Remove empty sort conditions
             Element sortBy = root.getChild("sortBy");
             if (sortBy != null) {
-            	for (Element field : sortBy.getChildren("field")) {
+                for (Iterator<Element> iterator = sortBy.getChildren("field").iterator(); iterator.hasNext();) {
+                    Element field = iterator.next();
                     if (field.getAttributeValue("name", "").length() == 0) {
                         empty.add(field);
                     }
