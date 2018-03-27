@@ -18,13 +18,11 @@
 
 package org.mycore.services.fieldquery;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.parsers.bool.MCRCondition;
 
 /** Represents a query with its condition and optional parameters */
