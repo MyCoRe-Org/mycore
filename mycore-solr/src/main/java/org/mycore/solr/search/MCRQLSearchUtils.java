@@ -2,6 +2,7 @@ package org.mycore.solr.search;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -124,7 +125,7 @@ public class MCRQLSearchUtils {
             String field = new StringTokenizer(element.getAttributeValue("field"), " -,").nextToken();
             String operator = element.getAttributeValue("operator");
             if (operator == null) {
-                LOGGER.warn("No operator defined for field: {}", field);
+                LOGGER.warn("No operator defined for field: " + field);
                 operator = "=";
             }
             element.setAttribute("operator", operator);
@@ -225,21 +226,21 @@ public class MCRQLSearchUtils {
         String maxResults = getReqParameter(req, "maxResults", "0");
         query.setMaxResults(Integer.parseInt(maxResults));
 
-        List<String> sortFields = new ArrayList<>();
+        List<String> sortFields = new ArrayList<String>();
         for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
-            String name = names.nextElement();
+            String name = (String) names.nextElement();
             if (name.contains(".sortField")) {
                 sortFields.add(name);
             }
         }
 
         if (sortFields.size() > 0) {
-            sortFields.sort((arg0, arg1) -> {
+            Collections.sort(sortFields, (arg0, arg1) -> {
                 String s0 = arg0.substring(arg0.indexOf(".sortField"));
                 String s1 = arg1.substring(arg1.indexOf(".sortField"));
                 return s0.compareTo(s1);
             });
-            List<MCRSortBy> sortBy = new ArrayList<>();
+            List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
             for (String name : sortFields) {
                 String sOrder = getReqParameter(req, name, "ascending");
                 boolean order = "ascending".equals(sOrder) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;
