@@ -31,8 +31,8 @@ public class MCRQLSearchUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
     
-    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList("search", "query", "maxResults", 
-    	"numPerPage", "page", "mask", "mode", "redirect" ));
+    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query",
+        "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));
 
     @SuppressWarnings("rawtypes")
     public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {

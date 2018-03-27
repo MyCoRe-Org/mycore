@@ -44,7 +44,7 @@ public class MCRQuery {
     /** A list of MCRSortBy criteria, may be empty */
     private List<MCRSortBy> sortBy = new ArrayList<>();
 
-    /** A CSV-list as String of SOLR fields they should be return in response */
+    /** A List of SOLR fields they should be return in the response */
     private List<String> returnFields = new ArrayList<>();
 
     /** A cached xml representation of the query */

@@ -248,7 +248,8 @@ public class MCRConditionTransformer {
 
     public static String getQueryString(@SuppressWarnings("rawtypes") MCRCondition condition) {
         Set<String> usedFields = new HashSet<>();
-        return MCRConditionTransformer.toSolrQueryString(condition, usedFields);
+        String queryString = MCRConditionTransformer.toSolrQueryString(condition, usedFields);
+        return queryString;
     }
 
     public static SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
@@ -316,7 +317,12 @@ public class MCRConditionTransformer {
 
         for (MCRCondition child : children) {
             String index = getIndex(child);
-            table.computeIfAbsent(index, k -> new ArrayList<>()).add(child);
+            List<MCRCondition> conditions = table.get(index);
+            if (conditions == null) {
+                conditions = new ArrayList<MCRCondition>();
+                table.put(index, conditions);
+            }
+            conditions.add(child);
         }
         return table;
     }
