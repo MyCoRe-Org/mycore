@@ -1,21 +1,3 @@
-/*
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * MyCoRe is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MyCoRe is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.mycore.solr.search;
 
 import java.util.ArrayList;
@@ -48,14 +30,14 @@ import org.mycore.services.fieldquery.MCRSortBy;
 public class MCRQLSearchUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
-
+    
     private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList("search", "query", "maxResults", 
     	"numPerPage", "page", "mask", "mode", "redirect" ));
 
     @SuppressWarnings("rawtypes")
     public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
         int rows = Integer.parseInt(input.getRootElement().getAttributeValue("numPerPage", "10"));
-        String returnFields = query.getReturnFieldsAsString();
+        List <String> returnFields = query.getReturnFields();
         MCRCondition condition = query.getCondition();
         HashMap<String, List<MCRCondition>> table;
 

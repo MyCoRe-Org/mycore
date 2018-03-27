@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ * $Revision: 5697 $ $Date: May 13, 2013 $
+ *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
@@ -7,13 +10,15 @@
  * (GPL) as published by the Free Software Foundation; either version 2
  * of the License or (at your option) any later version.
  *
- * MyCoRe is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
 package org.mycore.solr.search;
@@ -25,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -227,13 +233,13 @@ public class MCRConditionTransformer {
     }
 
     public static SolrQuery getSolrQuery(@SuppressWarnings("rawtypes") MCRCondition condition, List<MCRSortBy> sortBy,
-        int maxResults, String returnFields) {
+        int maxResults, List<String> returnFields) {
         String queryString = getQueryString(condition);
         SolrQuery q = applySortOptions(new SolrQuery(queryString), sortBy);
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
         if (returnFields != null) {
-          q.setFields(returnFields.length() > 0 ? returnFields : "*");
+          q.setFields(returnFields.size() > 0 ? returnFields.stream().collect(Collectors.joining(",")) : "*");
         }
         String sort = q.getSortField();
         LOGGER.info("MyCoRe Query transformed to: {}{}{}", q.getQuery(), sort != null ? " " + sort : "", " " + q.getFields());
@@ -266,7 +272,7 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     public static SolrQuery buildMergedSolrQuery(List<MCRSortBy> sortBy, boolean not, boolean and,
-        HashMap<String, List<MCRCondition>> table, int maxHits, String returnFields) {
+        HashMap<String, List<MCRCondition>> table, int maxHits, List <String> returnFields) {
         List<MCRCondition> queryConditions = table.get("metadata");
         MCRCondition combined = buildSubCondition(queryConditions, and, not);
         SolrQuery solrRequestQuery = getSolrQuery(combined, sortBy, maxHits, returnFields);
