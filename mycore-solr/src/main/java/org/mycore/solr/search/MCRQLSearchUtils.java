@@ -71,7 +71,7 @@ public class MCRQLSearchUtils {
     @SuppressWarnings("rawtypes")
     public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
         int rows = Integer.parseInt(input.getRootElement().getAttributeValue("numPerPage", "10"));
-        String returnFields = query.getReturnFields();
+        String returnFields = query.getReturnFieldsAsString();
         MCRCondition condition = query.getCondition();
         HashMap<String, List<MCRCondition>> table;
 

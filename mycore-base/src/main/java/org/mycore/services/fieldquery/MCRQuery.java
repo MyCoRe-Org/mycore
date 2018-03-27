@@ -19,7 +19,9 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -38,7 +40,7 @@ public class MCRQuery {
 	private List<MCRSortBy> sortBy = new ArrayList<>();
 
 	/** A CSV-list as String of SOLR fields they should be return in response */
-	private String returnFields = "";
+	private List<String> returnFields = new ArrayList<>();
 
 	/** A cached xml representation of the query */
 	private Document doc = null;
@@ -66,7 +68,7 @@ public class MCRQuery {
 	 * @param returnFields
 	 *            the return fields for the SOLR parameter fl
 	 */
-	public MCRQuery(MCRCondition cond, List<MCRSortBy> sortBy, int maxResults, String returnFields) {
+	public MCRQuery(MCRCondition cond, List<MCRSortBy> sortBy, int maxResults, List<String> returnFields) {
 		this.cond = MCRQueryParser.normalizeCondition(cond);
 		this.setSortBy(sortBy);
 		setMaxResults(maxResults);
@@ -144,26 +146,46 @@ public class MCRQuery {
 	}
 
 	/**
-	 * Returns the CSV-list of SOLR-fields they should return for a query
+	 * Returns the list of SOLR-fields they should return for a query
 	 * results
 	 * 
 	 * @return a list of field names, may be empty
 	 */
-	public String getReturnFields() {
+	public List<String> getReturnFields() {
 		return returnFields;
 	}
 
+    /**
+     * Returns the CSV-list of SOLR-fields they should return for a query
+     * results
+     * 
+     * @return a list of field names, may be empty
+     */
+    public String getReturnFieldsAsString() {
+        return returnFields.stream().collect(Collectors.joining(","));
+    }
+
+    /**
+     * Sets the return fields list for the query results
+     * 
+     * @param returnFields
+     *            a list of SOLR return fields, may be empty
+     */
+    public void setReturnFields(List<String> returnFields) {
+        this.returnFields = returnFields == null ? new ArrayList<>() : returnFields;
+    }
+
 	/**
-	 * Sets the return fields for the query results
+	 * Sets the return fields as String for the query results
 	 * 
 	 * @param returnFields
 	 *            a CSV-list of SOLR return fields, may be empty
 	 */
 	public void setReturnFields(String returnFields) {
 		if (returnFields == null || returnFields.length() == 0) {
-			returnFields = "";
+			this.returnFields = new ArrayList<>();
 		}
-		this.returnFields = returnFields;
+		this.returnFields = Arrays.asList(returnFields.split(","));
 	}
 
 	/**
@@ -187,9 +209,9 @@ public class MCRQuery {
 				}
 			}
 
-			if (returnFields != null && returnFields.length() > 0) {
+			if (returnFields != null && returnFields.size() > 0) {
 				Element returns = new Element("returnFields");
-				returns.setText(returnFields);
+				returns.setText(returnFields.stream().collect(Collectors.joining(",")));
 				query.addContent(returns);
 			}
 
@@ -230,7 +252,7 @@ public class MCRQuery {
 		Element sortByElem = xml.getChild("sortBy");
 
 		if (sortByElem != null) {
-			List children = sortByElem.getChildren();
+			List<Element> children = sortByElem.getChildren();
 			sortBy = new ArrayList<>(children.size());
 
 			for (Object aChildren : children) {
