@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,6 +51,7 @@ import org.mycore.solr.MCRSolrUtils;
 
 /**
  * @author Thomas Scheffler (yagee)
+ * @author Jens Kupferschmidt
  *
  */
 public class MCRConditionTransformer {
@@ -231,14 +233,17 @@ public class MCRConditionTransformer {
     }
 
     public static SolrQuery getSolrQuery(@SuppressWarnings("rawtypes") MCRCondition condition, List<MCRSortBy> sortBy,
-        int maxResults) {
+        int maxResults, List<String> returnFields) {
         String queryString = getQueryString(condition);
         SolrQuery q = applySortOptions(new SolrQuery(queryString), sortBy);
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
-
+        
+        if (returnFields != null) {
+          q.setFields(returnFields.size() > 0 ? returnFields.stream().collect(Collectors.joining(",")) : "*");
+        }
         String sort = q.getSortField();
-        LOGGER.info("Legacy Query transformed to: " + q.getQuery() + (sort != null ? " " + sort : ""));
+        LOGGER.info("MyCoRe Query transformed to: {}{}{}", q.getQuery(), sort != null ? " " + sort : "", " " + q.getFields());
         return q;
     }
 
@@ -269,15 +274,15 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     public static SolrQuery buildMergedSolrQuery(List<MCRSortBy> sortBy, boolean not, boolean and,
-        HashMap<String, List<MCRCondition>> table, int maxHits) {
+        HashMap<String, List<MCRCondition>> table, int maxHits, List <String> returnFields) {
         List<MCRCondition> queryConditions = table.get("metadata");
         MCRCondition combined = buildSubCondition(queryConditions, and, not);
-        SolrQuery solrRequestQuery = getSolrQuery(combined, sortBy, maxHits);
+        SolrQuery solrRequestQuery = getSolrQuery(combined, sortBy, maxHits, returnFields);
 
         for (Map.Entry<String, List<MCRCondition>> mapEntry : table.entrySet()) {
             if (!mapEntry.getKey().equals("metadata")) {
                 MCRCondition combinedFilterQuery = buildSubCondition(mapEntry.getValue(), and, not);
-                SolrQuery filterQuery = getSolrQuery(combinedFilterQuery, sortBy, maxHits);
+                SolrQuery filterQuery = getSolrQuery(combinedFilterQuery, sortBy, maxHits, returnFields);
                 solrRequestQuery.addFilterQuery(MCRSolrConstants.JOIN_PATTERN + filterQuery.getQuery());
             }
         }
