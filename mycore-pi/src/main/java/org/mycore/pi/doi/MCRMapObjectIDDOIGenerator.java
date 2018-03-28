@@ -18,11 +18,12 @@
 
 package org.mycore.pi.doi;
 
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+
+import java.util.Optional;
 
 /**
  * Uses mapping from MCRObjectID base to DOI prefix to generate DOIs.
@@ -47,15 +48,15 @@ public class MCRMapObjectIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectI
     public MCRDigitalObjectIdentifier generate(MCRBase mcrObject, String additional)
         throws MCRPersistentIdentifierException {
         final MCRObjectID objectId = mcrObject.getId();
-        final String prefixProperty = "MCR.PI.Generator." + generatorID + ".Prefix." + objectId.getBase();
-        return MCRConfiguration2.getString(prefixProperty)
-            .map(prefix -> {
-                final int objectIdNumberAsInteger = objectId.getNumberAsInteger();
-                return prefix.contains("/") ? prefix + objectIdNumberAsInteger
-                        : prefix + '/' + objectIdNumberAsInteger;
-            })
+        return Optional.ofNullable(getProperties().get("Prefix." + objectId.getBase()))
+                .map(prefix -> {
+                    final int objectIdNumberAsInteger = objectId.getNumberAsInteger();
+                    return prefix.contains("/") ? prefix + objectIdNumberAsInteger
+                            : prefix + '/' + objectIdNumberAsInteger;
+                })
             .flatMap(mcrdoiParser::parse).map(MCRDigitalObjectIdentifier.class::cast)
-            .orElseThrow(() -> new MCRPersistentIdentifierException(prefixProperty + " does is not defined."));
+                .orElseThrow(() -> new MCRPersistentIdentifierException("Prefix." + objectId.getBase() +
+                        " is not defined in " + generatorID + "."));
     }
 
 }

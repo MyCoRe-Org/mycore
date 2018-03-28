@@ -16,52 +16,55 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.urn;
-
-import java.util.List;
-import java.util.Optional;
+package org.mycore.pi;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.Text;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRURNObjectXPathMetadataService extends MCRPIMetadataService<MCRDNBURN> {
+import javax.naming.OperationNotSupportedException;
+import java.util.List;
+import java.util.Optional;
 
-    private static final MCRDNBURNParser PARSER = new MCRDNBURNParser();
+public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersistentIdentifier> {
 
-    public MCRURNObjectXPathMetadataService(String inscriberID) {
+    public MCRPIXPathMetadataService(String inscriberID) {
         super(inscriberID);
     }
 
     @Override
-    public void insertIdentifier(MCRDNBURN identifier, MCRBase obj, String additional)
+    public void insertIdentifier(MCRPersistentIdentifier identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
         MCRNodeBuilder nb = new MCRNodeBuilder();
         try {
             nb.buildElement(xpath, identifier.asString(), xml);
-            MCRBase object = new MCRObject(xml);
-            MCRMetadataManager.update(object);
+            if (obj instanceof MCRObject) {
+                final Element metadata = xml.getRootElement().getChild("metadata");
+                ((MCRObject) obj).getMetadata().setFromDOM(metadata);
+            } else {
+                throw new MCRPersistentIdentifierException(obj.getId() + " is no MCRObject!",
+                        new OperationNotSupportedException(getClass().getName() + " only supports "
+                                + MCRObject.class.getName() + "!"));
+            }
+
         } catch (Exception e) {
-            throw new MCRException("Error while inscribing URN to " + obj.getId(), e);
+            throw new MCRException("Error while inscribing PI to " + obj.getId(), e);
 
         }
     }
 
     @Override
-    public void removeIdentifier(MCRDNBURN identifier, MCRBase obj, String additional) {
+    public void removeIdentifier(MCRPersistentIdentifier identifier, MCRBase obj, String additional) {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
         XPathFactory xPathFactory = XPathFactory.instance();
@@ -79,8 +82,8 @@ public class MCRURNObjectXPathMetadataService extends MCRPIMetadataService<MCRDN
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
         XPathFactory xpfac = XPathFactory.instance();
-        XPathExpression<Text> xp = xpfac.compile(xpath, Filters.text());
-        List<Text> evaluate = xp.evaluate(xml);
+        XPathExpression<Element> xp = xpfac.compile(xpath, Filters.element(), null, MCRConstants.getStandardNamespaces());
+        List<Element> evaluate = xp.evaluate(xml);
         if (evaluate.size() > 1) {
             throw new MCRPersistentIdentifierException(
                 "Got " + evaluate.size() + " matches for " + obj.getId() + " with xpath " + xpath + "");
@@ -90,10 +93,11 @@ public class MCRURNObjectXPathMetadataService extends MCRPIMetadataService<MCRDN
             return Optional.empty();
         }
 
-        Text identifierText = evaluate.listIterator().next();
-        String identifierString = identifierText.getTextNormalize();
+        Element identifierElement = evaluate.listIterator().next();
+        String identifierString = identifierElement.getTextNormalize();
 
-        Optional<MCRDNBURN> parsedIdentifierOptional = PARSER.parse(identifierString);
+        Optional<MCRPersistentIdentifier> parsedIdentifierOptional = MCRPIManager.getInstance()
+                .getParserForType(getProperties().get("Type")).parse(identifierString);
         return parsedIdentifierOptional.map(MCRPersistentIdentifier.class::cast);
     }
 

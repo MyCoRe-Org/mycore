@@ -18,28 +18,16 @@
 
 package org.mycore.mods.identifier;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Optional;
+public class MCRMODSURNMetadataService extends MCRAbstractMODSMetadataService {
 
-import org.jdom2.Element;
-import org.mycore.common.MCRException;
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPIMetadataService;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.mycore.pi.purl.MCRPURL;
-
-public class MCRMODSPURLMetadataService extends MCRAbstractMODSMetadataService {
-
-    public MCRMODSPURLMetadataService(String inscriberID) {
+    public MCRMODSURNMetadataService(String inscriberID) {
         super(inscriberID);
     }
 
     @Override
     protected String getIdentifierType() {
-        return "purl";
+        return "urn";
     }
+
+
 }
