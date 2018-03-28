@@ -97,9 +97,7 @@ public class MCRJerseyDefaultConfiguration implements MCRJerseyConfiguration {
         resourceConfig.register(new AbstractContainerLifecycleListener() {
             @Override
             public void onStartup(Container container) {
-                ServiceLocator serviceLocator = container.getApplicationHandler().getInjectionManager()
-                    .getInstance(ServiceLocator.class);
-                Objects.requireNonNull(serviceLocator, "Cannot get hk2 ServiceLocator from InjectionManager");
+                ServiceLocator serviceLocator = container.getApplicationHandler().getServiceLocator();
                 Injector injector = MCRInjectorConfig.injector();
                 GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
                 GuiceIntoHK2Bridge guiceBridge = serviceLocator.getService(GuiceIntoHK2Bridge.class);
