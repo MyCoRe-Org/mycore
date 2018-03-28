@@ -50,19 +50,20 @@ public class MCRFixedUserCallable<V> extends MCRTransactionableCallable<V> {
 
     @Override
     public V call() throws Exception {
-        boolean hasSession = MCRSessionMgr.hasCurrentSession();
+        final boolean hasSession = MCRSessionMgr.hasCurrentSession();
         this.session = MCRSessionMgr.getCurrentSession();
-        MCRUserInformation currentUser = this.session.getUserInformation();
-        if (hasSession) {
-            if (!currentUser.equals(userInfo)) {
-                throw new MCRException(
-                    "MCRFixedUserCallable is bound to " + currentUser.getUserID() + " and not to "
-                        + userInfo.getUserID() + ".");
-            }
-        } else {
-            this.session.setUserInformation(userInfo);
-        }
         try {
+            MCRUserInformation currentUser = this.session.getUserInformation();
+            if (hasSession) {
+                if (!currentUser.equals(userInfo)) {
+                    throw new MCRException(
+                        "MCRFixedUserCallable is bound to " + currentUser.getUserID() + " and not to "
+                            + userInfo.getUserID() + ".");
+                }
+            } else {
+                this.session.setUserInformation(userInfo);
+            }
+
             return super.call();
         } finally {
             if (!hasSession && this.session != null) {

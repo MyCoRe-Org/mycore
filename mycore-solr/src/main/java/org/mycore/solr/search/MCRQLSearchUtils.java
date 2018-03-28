@@ -41,7 +41,6 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRQuery;
-//import org.mycore.services.fieldquery.MCRSearchServlet;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRSortBy;
@@ -56,6 +55,7 @@ public class MCRQLSearchUtils {
     @SuppressWarnings("rawtypes")
     public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
         int rows = Integer.parseInt(input.getRootElement().getAttributeValue("numPerPage", "10"));
+        List <String> returnFields = query.getReturnFields();
         MCRCondition condition = query.getCondition();
         HashMap<String, List<MCRCondition>> table;
 
@@ -75,8 +75,7 @@ public class MCRQLSearchUtils {
 
         boolean booleanAnd = !(condition instanceof MCROrCondition<?>);
         SolrQuery mergedSolrQuery = MCRConditionTransformer.buildMergedSolrQuery(query.getSortBy(), false, booleanAnd,
-            table,
-            rows);
+            table, rows, returnFields);
         String mask = input.getRootElement().getAttributeValue("mask");
         if (mask != null) {
             mergedSolrQuery.setParam("mask", mask);
@@ -120,6 +119,12 @@ public class MCRQLSearchUtils {
 
             if (sortBy != null && sortBy.getChildren().size() == 0) {
                 sortBy.detach();
+            }
+            
+            // Remove empty returnFields
+            Element returnFields = root.getChild("returnFields");
+            if (returnFields != null && returnFields.getText().length() == 0) {
+            	returnFields.detach();
             }
         }
 

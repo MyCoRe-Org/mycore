@@ -38,7 +38,6 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
@@ -55,7 +54,6 @@ import com.nimbusds.jwt.SignedJWT;
  *
  */
 @Path("/v1/auth")
-@MCRStaticContent
 public class MCRRestAPIAuthentication {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIAuthentication.class);
 

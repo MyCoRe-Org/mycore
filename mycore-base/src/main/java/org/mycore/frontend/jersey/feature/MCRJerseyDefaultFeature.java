@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.jersey.filter.MCRDBTransactionFilter;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
+import org.mycore.frontend.jersey.filter.MCRSessionLockFilter;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 
 /**
@@ -47,7 +48,8 @@ public class MCRJerseyDefaultFeature extends MCRJerseyBaseFeature {
         Method resourceMethod = resourceInfo.getResourceMethod();
         if (isStaticContent(resourceClass, resourceMethod)) {
             // class or method is annotated with MCRStaticContent
-            //   -> do not register any filter
+            //   -> do only register session lock filter
+            context.register(MCRSessionLockFilter.class);
             return;
         }
         String packageName = resourceClass.getPackage().getName();

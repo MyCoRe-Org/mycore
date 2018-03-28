@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCRSessionListener;
 import org.mycore.util.concurrent.MCRReadWriteGuard;
 
@@ -53,6 +54,8 @@ public class MCRSessionMgr {
 
     private static MCRReadWriteGuard listenersGuard = new MCRReadWriteGuard();
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     /**
      * This ThreadLocal is automatically instantiated per thread with a MyCoRe session object containing the default
      * session parameters which are set in the constructor of MCRSession.
@@ -63,6 +66,13 @@ public class MCRSessionMgr {
 
     private static ThreadLocal<Boolean> isSessionAttached = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
+    private static ThreadLocal<Boolean> isSessionCreationLocked = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return Boolean.FALSE;
+        }
+    };
+
     /**
      * This method returns the unique MyCoRe session object for the current Thread. The session object is initialized
      * with the default MyCoRe session data.
@@ -70,6 +80,9 @@ public class MCRSessionMgr {
      * @return MyCoRe MCRSession object
      */
     public static MCRSession getCurrentSession() {
+        if (isSessionCreationLocked.get()) {
+            throw new MCRException("Session creation is locked!");
+        }
         isSessionAttached.set(Boolean.TRUE);
         return theThreadLocalSession.get();
     }
@@ -81,6 +94,15 @@ public class MCRSessionMgr {
      * @see org.mycore.common.events.MCRSessionEvent.Type#activated
      */
     public static void setCurrentSession(MCRSession theSession) {
+        if (hasCurrentSession()) {
+            MCRSession currentSession = getCurrentSession();
+            if (currentSession != theSession && currentSession.getID() != null) {
+                LOGGER.error("Current session will be released: " + currentSession.toString(),
+                    new MCRException("Current thread already has a session attached!"));
+                releaseCurrentSession();
+            }
+
+        }
         theSession.activate();
         theThreadLocalSession.set(theSession);
         isSessionAttached.set(Boolean.TRUE);
@@ -125,6 +147,14 @@ public class MCRSessionMgr {
             return getCurrentSession().getID();
         }
         return null;
+    }
+
+    public static void lock() {
+        isSessionCreationLocked.set(true);
+    }
+
+    public static void unlock() {
+        isSessionCreationLocked.set(false);
     }
 
     /**

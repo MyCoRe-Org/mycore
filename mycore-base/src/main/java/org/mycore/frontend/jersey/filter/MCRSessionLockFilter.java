@@ -16,41 +16,31 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.restapi.v1;
+package org.mycore.frontend.jersey.filter;
 
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
 
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.Provider;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 
-import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
+import org.mycore.common.MCRSessionMgr;
 
 /**
- * Jersey configuration 
- * @author Matthias Eichner
- * 
- * @see MCRJerseyDefaultFeature
- * 
- * @version $Revision: $ $Date: $
- * 
+ * Opposite of {@link MCRSessionHookFilter}.
  */
-@Provider
-public class MCRRestFeature extends MCRJerseyDefaultFeature {
+public class MCRSessionLockFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     @Override
-    protected List<String> getPackages() {
-        return Collections.singletonList("org.mycore.restapi.v1");
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        MCRSessionMgr.lock();
     }
 
     @Override
-    protected void registerSessionHookFilter(FeatureContext context) {
-        // don't register session hook
-    }
-
-    @Override
-    protected void registerTransactionFilter(FeatureContext context) {
-        // don't register transaction filter
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
+        throws IOException {
+        MCRSessionMgr.unlock();
     }
 
 }
