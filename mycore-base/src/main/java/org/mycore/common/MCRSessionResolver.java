@@ -18,16 +18,16 @@
 
 package org.mycore.common;
 
-import java.io.Serializable;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.servlets.MCRServlet;
+
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This Class will be stored in the a {@link javax.servlet.http.HttpSession} and can be used to resolve the
@@ -46,13 +46,8 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
         this.sessionID = sessionID;
     }
 
-    /**
-     * Creates or Gets the resolver of a {@link MCRSession}.
-     * @param session which will be resolved
-     * @return a resolver for the {@link MCRSession}
-     */
-    public static MCRSessionResolver instanceOf(final MCRSession session) {
-        return INSTANCE_MAP.computeIfAbsent(session.getID(), MCRSessionResolver::new);
+    public MCRSessionResolver(final MCRSession session) {
+        this(session.getID());
     }
 
     public final String getSessionID() {
@@ -64,42 +59,43 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
      * @return if is already closed it will return a {@link Optional#empty()}
      */
     public final Optional<MCRSession> resolveSession() {
-        Optional<MCRSession> session = Optional.ofNullable(MCRSessionMgr.getSession(sessionID));
-
-        if (!session.isPresent()) {
-            INSTANCE_MAP.remove(sessionID);
-        }
-
-        return session;
+        return Optional.ofNullable(MCRSessionMgr.getSession(sessionID));
     }
 
     @Override
     public void valueBound(HttpSessionBindingEvent hsbe) {
         Object obj = hsbe.getValue();
-        if (LOGGER.isDebugEnabled() && obj instanceof MCRSession) {
-            LOGGER.debug("Bound MCRSession {} to HttpSession {}", obj, hsbe.getSession().getId());
+        if (LOGGER.isDebugEnabled() && obj instanceof MCRSessionResolver) {
+            LOGGER.debug("Bound MCRSession {} to HttpSession {}", ((MCRSessionResolver) obj).getSessionID(), hsbe.getSession().getId());
         }
     }
 
     @Override
     public void valueUnbound(HttpSessionBindingEvent hsbe) {
-        Object obj = hsbe.getValue();
-        if (obj instanceof MCRSession) {
-            Optional<MCRSessionResolver> newSessionResolver = Optional
+        // hsbe.getValue() does not work right with tomcat
+        Optional<MCRSessionResolver> newSessionResolver = Optional
                 .ofNullable(hsbe.getSession().getAttribute(MCRServlet.ATTR_MYCORE_SESSION))
+                .filter(o -> o instanceof MCRSessionResolver)
                 .map(MCRSessionResolver.class::cast);
-
-            MCRSessionResolver resolver = null;
-            if (!newSessionResolver.isPresent() || !(resolver = newSessionResolver.get()).equals(this)) {
-                LOGGER.warn("Attribute {} is beeing unbound from session!", hsbe.getName());
-                if (resolver != null) {
-                    LOGGER.warn("And replaced by {}", resolver);
-                }
-                MCRSession mcrSession = (MCRSession) obj;
-                mcrSession.close();
+        MCRSessionResolver oldResolver = this;
+        if (newSessionResolver.isPresent() && !oldResolver.equals(newSessionResolver.get())) {
+            LOGGER.warn("Attribute {} is beeing unbound from session {} and replaced by {}!", hsbe.getName(), oldResolver.getSessionID(), newSessionResolver.get());
+            oldResolver.resolveSession().ifPresent(MCRSession::close);
             }
 
-        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MCRSessionResolver that = (MCRSessionResolver) o;
+        return Objects.equals(getSessionID(), that.getSessionID());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSessionID());
     }
 
     @Override
