@@ -127,7 +127,7 @@ public class MCRWebCLIContainer {
      * @return true if the thread is running
      */
     public boolean isRunning() {
-        return !(curFuture == null || curFuture.isDone());
+        return !(curFuture == null || curFuture.isFutureDone());
     }
 
     public static JsonObject getKnownCommands() {

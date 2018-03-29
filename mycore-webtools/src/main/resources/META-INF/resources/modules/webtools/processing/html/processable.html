@@ -46,20 +46,25 @@
                             </div>
                             <div class="properties-content row">
                                 <div class="col-md-2 propertyKey">Create Time</div>
-                                <div class="col-md-10 propertyValue">{{model.createTime | amDateFormat:'DD.MM
-                                    HH:mm:ss'}}
+                                <div class="col-md-10 propertyValue">
+                                    {{model.createTime | amDateFormat:'DD.MM HH:mm:ss'}}
                                 </div>
                             </div>
                             <div class="properties-content row">
                                 <div class="col-md-2 propertyKey">Start Time</div>
-                                <div class="col-md-10 propertyValue">{{model.startTime | amDateFormat:'DD.MM
-                                    HH:mm:ss'}}
+                                <div class="col-md-10 propertyValue">
+                                    {{model.startTime | amDateFormat:'DD.MM HH:mm:ss'}}
                                 </div>
                             </div>
                             <div class="properties-content row">
                                 <div class="col-md-2 propertyKey">End Time</div>
-                                <div class="col-md-10 propertyValue">{{model.endTime | amDateFormat:'DD.MM HH:mm:ss'}}
+                                <div class="col-md-10 propertyValue">
+                                    {{model.endTime | amDateFormat:'DD.MM HH:mm:ss'}}
                                 </div>
+                            </div>
+                            <div class="properties-content row">
+                                <div class="col-md-2 propertyKey">Took</div>
+                                <div class="col-md-10 propertyValue">{{model.took}}ms</div>
                             </div>
                             <div class="properties-content row" *ngIf="model.status === 'failed'">
                                 <div class="col-md-2 propertyKey">Error</div>
