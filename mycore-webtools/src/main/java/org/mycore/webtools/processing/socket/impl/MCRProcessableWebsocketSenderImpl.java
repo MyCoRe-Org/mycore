@@ -104,8 +104,8 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
 
     protected void updateProcessable(Session session, MCRProcessable processable, Integer processableId,
         Integer collectionId) {
-        MCRProcessableMessage addProcessableMessage = new MCRProcessableMessage(processable, processableId, collectionId);
-        send(session, addProcessableMessage);
+        MCRProcessableMessage message = new MCRProcessableMessage(processable, processableId, collectionId);
+        send(session, message);
     }
 
     @Override

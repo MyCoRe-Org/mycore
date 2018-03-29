@@ -119,10 +119,10 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     /**
      * Returns true if this task completed. Completion may be due to normal termination,
      * an exception, or cancellation -- in all of these cases, this method will return true.
-     * 
+     *
      * @return true if this task completed
      */
-    public boolean isDone() {
+    public boolean isFutureDone() {
         return future.isDone();
     }
 
