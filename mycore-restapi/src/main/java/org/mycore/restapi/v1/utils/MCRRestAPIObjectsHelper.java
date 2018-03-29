@@ -185,9 +185,11 @@ public class MCRRestAPIObjectsHelper {
 
         try {
             Document doc = derObj.createXML();
-            Document docContent = listDerivateContentAsXML(derObj, "/", -1, info);
-            if (docContent != null && docContent.hasRootElement()) {
-                doc.getRootElement().addContent(docContent.getRootElement().detach());
+            if (withDetails) {
+                Document docContent = listDerivateContentAsXML(derObj, "/", -1, info);
+                if (docContent != null && docContent.hasRootElement()) {
+                    doc.getRootElement().addContent(docContent.getRootElement().detach());
+                }
             }
 
             StringWriter sw = new StringWriter();

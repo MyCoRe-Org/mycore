@@ -179,7 +179,7 @@ public class MCRRestAPIObjects {
         @PathParam(PARAM_DERID) String derid,
         @QueryParam("style") String style)
         throws MCRRestAPIException {
-        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, false);
+        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, "derivatedetails".equals(style));
     }
 
     /** returns a list of derivates for a given MyCoRe Object 
