@@ -18,16 +18,6 @@
 
 package org.mycore.pi.urn.rest;
 
-import java.util.Optional;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import javax.servlet.ServletContext;
-
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,12 +26,20 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.pi.MCRPIRegistrationInfo;
 
+import javax.servlet.ServletContext;
+import java.util.Optional;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 /**
  * @author shermann
- *
  */
 public class MCRURNGranularRESTRegistrationStarter
-    implements MCRStartupHandler.AutoExecutable, MCRShutdownHandler.Closeable {
+        implements MCRStartupHandler.AutoExecutable, MCRShutdownHandler.Closeable {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -73,17 +71,17 @@ public class MCRURNGranularRESTRegistrationStarter
     @Override
     public void startUp(ServletContext servletContext) {
         getUsernamePassword()
-            .map(this::getEpicureProvider)
-            .map(MCRDNBURNRestClient::new)
-            .map(MCRURNGranularRESTRegistrationTask::new)
-            .map(this::startTimerTask)
-            .orElseGet(this::couldNotStartTask)
-            .accept(LOGGER);
+                .map(this::getEpicureProvider)
+                .map(MCRDNBURNRestClient::new)
+                .map(MCRURNGranularRESTRegistrationTask::new)
+                .map(this::startTimerTask)
+                .orElseGet(this::couldNotStartTask)
+                .accept(LOGGER);
     }
 
     private Consumer<Logger> couldNotStartTask() {
         return logger -> logger.warn("Could not start Task {}",
-            MCRURNGranularRESTRegistrationTask.class.getSimpleName());
+                MCRURNGranularRESTRegistrationTask.class.getSimpleName());
     }
 
     private ScheduledExecutorService getScheduler() {
@@ -98,12 +96,12 @@ public class MCRURNGranularRESTRegistrationStarter
     private Consumer<Logger> startTimerTask(TimerTask task) {
         getScheduler().scheduleAtFixedRate(task, 0, period, timeUnit);
         return logger -> logger.info("Started task {}, refresh every {}{}", task.getClass().getSimpleName(), period,
-            timeUnit);
+                timeUnit);
     }
 
     public Function<MCRPIRegistrationInfo, MCREpicurLite> getEpicureProvider(UsernamePasswordCredentials credentials) {
         return urn -> MCREpicurLite.instance(urn, MCRDerivateURNUtils.getURL(urn))
-            .setCredentials(credentials);
+                .setCredentials(credentials);
     }
 
     public Optional<UsernamePasswordCredentials> getUsernamePassword() {

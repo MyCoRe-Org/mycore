@@ -18,14 +18,14 @@
 
 package org.mycore.pi;
 
-import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
 
 public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
 
@@ -51,7 +51,8 @@ public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
 
     /**
      * generates a {@link MCRPersistentIdentifier}
-     * @param mcrBase the mycore object for which the identifier is generated
+     *
+     * @param mcrBase    the mycore object for which the identifier is generated
      * @param additional additional information dedicated to the object like a mcrpath
      * @return a unique persistence identifier
      * @throws MCRPersistentIdentifierException if something goes wrong while generating

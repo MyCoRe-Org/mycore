@@ -18,6 +18,8 @@
 
 package org.mycore.pi.urn;
 
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -26,31 +28,29 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
-
 /**
  * Builds a new, unique NISS based on the current date and/or time
  * in combination with a counter. The date/time can be formatted with
  * a Java SimpleDateFormat pattern, the counter can be formatted with
  * a Java DecimalFormat pattern. The property "NISSPattern" is used
  * for configuring the instance. Example configuration:
- *
+ * <p>
  * MCR.URN.SubNamespace.Essen.Prefix=urn:nbn:de:465-miless-
  * MCR.URN.SubNamespace.Essen.NISSBuilder=org.mycore.urn.services.MCRNISSBuilderDateCounter
  * MCR.URN.SubNamespace.Essen.NISSPattern=yyyyMMdd-HHmmss-000
- *
+ * <p>
  * Subsequent calls to MCRURN.buildURN( "Essen" ) could then generate
  * the following URNs, for example:
- *
+ * <p>
  * urn:nbn:de:465-miless-20060622-213404-0017
  * urn:nbn:de:465-miless-20060622-213404-0025
  * urn:nbn:de:465-miless-20060622-213448-0013
- *
+ * <p>
  * The last character is the checksum digit.
  * In the first two URNs, the generated date pattern is the same, so
  * the counter is increased (starting at 1). The use of "0" instead of
  * "#" in the pattern produces leading zeros.
- *
+ * <p>
  * A pattern might have no date part (only use counter)
  * or no counter part (only use date pattern)
  *

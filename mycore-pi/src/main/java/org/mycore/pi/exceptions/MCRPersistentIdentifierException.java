@@ -18,9 +18,9 @@
 
 package org.mycore.pi.exceptions;
 
-import java.util.Optional;
-
 import org.mycore.common.MCRCatchException;
+
+import java.util.Optional;
 
 public class MCRPersistentIdentifierException extends MCRCatchException {
 
@@ -45,7 +45,7 @@ public class MCRPersistentIdentifierException extends MCRCatchException {
     }
 
     public MCRPersistentIdentifierException(String message, String translatedAdditionalInformation, int code,
-        Exception cause) {
+                                            Exception cause) {
         super(message, cause);
 
         this.translatedAdditionalInformation = translatedAdditionalInformation;

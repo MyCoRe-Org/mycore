@@ -196,7 +196,7 @@ public class MCRDNBURN extends MCRUniformResourceName {
     public MCRDNBURN withSuffix(String suffix) {
         return new MCRDNBURN(getSubNamespace(), getNamespaceSpecificString() + suffix);
     }
-    
+
     public MCRDNBURN withNamespaceSuffix(String suffix) {
         return new MCRDNBURN(getSubNamespace() + suffix, getNamespaceSpecificString());
     }

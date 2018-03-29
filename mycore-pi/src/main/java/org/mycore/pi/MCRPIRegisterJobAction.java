@@ -1,11 +1,11 @@
 package org.mycore.pi;
 
-import java.util.concurrent.ExecutionException;
-
 import org.mycore.common.MCRException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
+
+import java.util.concurrent.ExecutionException;
 
 public class MCRPIRegisterJobAction extends MCRJobAction {
 
@@ -34,7 +34,7 @@ public class MCRPIRegisterJobAction extends MCRJobAction {
     private MCRPIJobService<MCRPersistentIdentifier> getRegistrationService() {
         String registrationServiceID = getRegistrationServiceID();
         return (MCRPIJobService<MCRPersistentIdentifier>) MCRPIServiceManager.getInstance()
-            .getRegistrationService(registrationServiceID);
+                .getRegistrationService(registrationServiceID);
     }
 
     private MCRPIJobService.PiJobAction getAction() {

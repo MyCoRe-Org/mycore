@@ -7,7 +7,10 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.events.MCRStartupHandler;
 
 import javax.servlet.ServletContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,7 +52,7 @@ public class MCRPIConfigurationChecker implements MCRStartupHandler.AutoExecutab
 
         // check service configuration
         final MCRPIServiceManager serviceManager = MCRPIServiceManager.getInstance();
-        serviceManager.getServiceList().forEach(service->{
+        serviceManager.getServiceList().forEach(service -> {
             LOGGER.info("Check service: " + service.getServiceID());
             service.checkConfiguration();
         });

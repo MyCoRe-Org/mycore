@@ -18,14 +18,6 @@
 
 package org.mycore.pi;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
@@ -46,13 +38,18 @@ import org.mycore.services.queuedjob.MCRJobQueue;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.function.Predicate;
+
 /**
  * Implementation of a {@link MCRPIService} which helps to outsource a registration task to a {@link MCRJob}
  * e.G. send a POST request to a REST api
+ *
  * @param <T>
  */
 public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
-    extends MCRPIService<T> {
+        extends MCRPIService<T> {
 
     public static final String JOB_API_USER_PROPERTY = "JobApiUser";
 
@@ -79,33 +76,36 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
+     *
      * @param parameters the parameters which was passed to {@link #addDeleteJob(Map)}
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
-     * wrong during rollback
+     *                                          wrong during rollback
      */
-    @SuppressWarnings({ "WeakerAccess", "unused" })
+    @SuppressWarnings({"WeakerAccess", "unused"})
     protected void rollbackDeleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         // can be used to rollback
     }
 
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
+     *
      * @param parameters the parameters which was passed to {@link #updateJob(Map)}
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
-     * wrong during rollback
+     *                                          wrong during rollback
      */
-    @SuppressWarnings({ "WeakerAccess", "unused" })
+    @SuppressWarnings({"WeakerAccess", "unused"})
     protected void rollbackUpdateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         // can be used to rollback
     }
 
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
+     *
      * @param parameters the parameters which was passed to {@link #addRegisterJob(Map)}
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
-     * wrong during rollback
+     *                                          wrong during rollback
      */
-    @SuppressWarnings({ "WeakerAccess", "unused" })
+    @SuppressWarnings({"WeakerAccess", "unused"})
     protected void rollbackRegisterJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         // can be used to rollback
     }
@@ -128,6 +128,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     /**
      * Adds a register job which will be called in the persistent {@link MCRJob} environment in a extra thread.
+     *
      * @param contextParameters pass parameters which are needed to register the PI. The parameter action and
      *                          registrationServiceID will be added, because they are necessary to reassign the job to
      *                          the right {@link MCRPIJobService} and method.
@@ -141,18 +142,19 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * If you use {@link #updateRegistrationDate(MCRObjectID, String, Date)} or
      * {@link #updateStartRegistrationDate(MCRObjectID, String, Date)} then you should validate if the user has the
      * rights for this. This methods validates this and throws a handsome exception.
+     *
      * @param id of the object
      */
     protected void validateJobUserRights(MCRObjectID id) throws MCRPersistentIdentifierException {
         if (!MCRAccessManager.checkPermission(id, MCRAccessManager.PERMISSION_WRITE)) {
             throw new MCRPersistentIdentifierException(
-                String.format(Locale.ROOT,
-                    "The user %s does not have rights to %s the object %s. You should set the property %s to "
-                        + "a user which has the rights.",
-                    MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(),
-                    MCRAccessManager.PERMISSION_WRITE,
-                    id.toString(),
-                    JOB_API_USER_PROPERTY));
+                    String.format(Locale.ROOT,
+                            "The user %s does not have rights to %s the object %s. You should set the property %s to "
+                                    + "a user which has the rights.",
+                            MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(),
+                            MCRAccessManager.PERMISSION_WRITE,
+                            id.toString(),
+                            JOB_API_USER_PROPERTY));
         }
     }
 
@@ -161,13 +163,14 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * only add the pi to the object and then to the database, with registration date of null. Later the job will
      * register the pi and then change the registration date to the right value.
      * <b>If you use this methods from a job you should have called {@link #validateJobUserRights} before!</b>
-     * @param mycoreID the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
+     *
+     * @param mycoreID   the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
      * @param additional information like path to a file
-     * @param date the new registration date
+     * @param date       the new registration date
      */
     protected void updateRegistrationDate(MCRObjectID mycoreID, String additional, Date date) {
         MCRPI pi = MCRPIManager.getInstance()
-            .get(this.getServiceID(), mycoreID.toString(), additional);
+                .get(this.getServiceID(), mycoreID.toString(), additional);
         pi.setRegistered(date);
         updateFlag(mycoreID, additional, pi);
     }
@@ -177,19 +180,21 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * only add the pi to the object and then to the database, with registration or startRegistration date of null.
      * After a job is created the Registration service should update the date.
      * <b>If you use this methods from a job you should have called {@link #validateJobUserRights} before!</b>
-     * @param mycoreID the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
+     *
+     * @param mycoreID   the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
      * @param additional information like path to a file
-     * @param date the new registration date
+     * @param date       the new registration date
      */
     protected void updateStartRegistrationDate(MCRObjectID mycoreID, String additional, Date date) {
         MCRPI pi = MCRPIManager.getInstance()
-            .get(this.getServiceID(), mycoreID.toString(), additional);
+                .get(this.getServiceID(), mycoreID.toString(), additional);
         pi.setRegistrationStarted(date);
         updateFlag(mycoreID, additional, pi);
     }
 
     /**
      * Tries to parse a identifier with a specific type.
+     *
      * @param identifier the identifier to parse
      * @return parsed identifier or {@link Optional#EMPTY} if there is no parser for the type or the parser can`t parse
      * the identifier
@@ -197,7 +202,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      */
     protected Optional<T> parseIdentifier(String identifier) {
         MCRPIParser<T> parserForType = MCRPIManager.getInstance()
-            .getParserForType(getType());
+                .getParserForType(getType());
 
         if (parserForType == null) {
             return Optional.empty();
@@ -219,6 +224,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     /**
      * Result of this will be passed to {@link MCRJobAction#name()}
+     *
      * @param contextParameters the parameters of the job
      * @return Some Information what this job will do or just {@link Optional#EMPTY}, then a default message is generated.
      */
@@ -312,40 +318,40 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     protected Predicate<MCRBase> getRegistrationCondition(String objectType) {
         return Optional.ofNullable(getProperties().get(MCRDOIService.REGISTRATION_CONDITION_PROVIDER))
-            .map(clazz -> {
-                String errorMessageBegin =
-                    "Configured class " + clazz + "(" + MCRPIService.REGISTRATION_CONFIG_PREFIX
-                        + getServiceID() + "." + MCRDOIService.REGISTRATION_CONDITION_PROVIDER
-                        + ")";
-                try {
-                    return Class.forName(clazz)
-                        .getConstructor()
-                        .newInstance();
-                } catch (ClassNotFoundException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " was not found!", e);
-                } catch (IllegalAccessException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " has no public constructor!", e);
-                } catch (InstantiationException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " seems to be abstract!", e);
-                } catch (NoSuchMethodException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " has no default constructor!", e);
-                } catch (InvocationTargetException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " could not be initialized", e);
-                } catch (ClassCastException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " needs to extend " + MCRPIObjectRegistrationConditionProvider.class
-                            .getName(), e);
-                }
-            })
-            .map(MCRPIObjectRegistrationConditionProvider.class::cast)
-            .map(instance -> instance.provideRegistrationCondition(objectType))
-            .orElseGet(() -> MCRPIObjectRegistrationConditionProvider.ALWAYS_REGISTER_CONDITION_PROVIDER
-                .provideRegistrationCondition(objectType));
+                .map(clazz -> {
+                    String errorMessageBegin =
+                            "Configured class " + clazz + "(" + MCRPIService.REGISTRATION_CONFIG_PREFIX
+                                    + getServiceID() + "." + MCRDOIService.REGISTRATION_CONDITION_PROVIDER
+                                    + ")";
+                    try {
+                        return Class.forName(clazz)
+                                .getConstructor()
+                                .newInstance();
+                    } catch (ClassNotFoundException e) {
+                        throw new MCRConfigurationException(
+                                errorMessageBegin + " was not found!", e);
+                    } catch (IllegalAccessException e) {
+                        throw new MCRConfigurationException(
+                                errorMessageBegin + " has no public constructor!", e);
+                    } catch (InstantiationException e) {
+                        throw new MCRConfigurationException(
+                                errorMessageBegin + " seems to be abstract!", e);
+                    } catch (NoSuchMethodException e) {
+                        throw new MCRConfigurationException(
+                                errorMessageBegin + " has no default constructor!", e);
+                    } catch (InvocationTargetException e) {
+                        throw new MCRConfigurationException(
+                                errorMessageBegin + " could not be initialized", e);
+                    } catch (ClassCastException e) {
+                        throw new MCRConfigurationException(
+                                errorMessageBegin + " needs to extend " + MCRPIObjectRegistrationConditionProvider.class
+                                        .getName(), e);
+                    }
+                })
+                .map(MCRPIObjectRegistrationConditionProvider.class::cast)
+                .map(instance -> instance.provideRegistrationCondition(objectType))
+                .orElseGet(() -> MCRPIObjectRegistrationConditionProvider.ALWAYS_REGISTER_CONDITION_PROVIDER
+                        .provideRegistrationCondition(objectType));
 
     }
 

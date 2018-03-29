@@ -18,8 +18,6 @@
 
 package org.mycore.mods.identifier;
 
-import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
-
 public class MCRMODSDOIMetadataService extends MCRAbstractMODSMetadataService {
 
     public MCRMODSDOIMetadataService(String inscriberID) {

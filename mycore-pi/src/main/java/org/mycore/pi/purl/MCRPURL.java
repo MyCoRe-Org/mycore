@@ -18,9 +18,9 @@
 
 package org.mycore.pi.purl;
 
-import java.net.URL;
-
 import org.mycore.pi.MCRPersistentIdentifier;
+
+import java.net.URL;
 
 public class MCRPURL implements MCRPersistentIdentifier {
 

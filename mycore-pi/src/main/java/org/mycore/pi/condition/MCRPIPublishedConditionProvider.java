@@ -18,18 +18,19 @@
 
 package org.mycore.pi.condition;
 
+import org.mycore.datamodel.metadata.MCRBase;
+
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import org.mycore.datamodel.metadata.MCRBase;
-
 public class MCRPIPublishedConditionProvider extends MCRPIObjectRegistrationConditionProvider {
 
-    @Override public Predicate<MCRBase> provideRegistrationCondition(String type) {
+    @Override
+    public Predicate<MCRBase> provideRegistrationCondition(String type) {
         return (MCRBase base) -> {
             return Optional.ofNullable(base.getService().getState())
-                .map(state -> state.getID().equals("published"))
-                .orElse(false);
+                    .map(state -> state.getID().equals("published"))
+                    .orElse(false);
         };
     }
 }

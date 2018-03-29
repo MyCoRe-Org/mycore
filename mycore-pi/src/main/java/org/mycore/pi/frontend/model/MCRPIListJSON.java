@@ -18,9 +18,9 @@
 
 package org.mycore.pi.frontend.model;
 
-import java.util.List;
-
 import org.mycore.pi.MCRPIRegistrationInfo;
+
+import java.util.List;
 
 public class MCRPIListJSON {
 

@@ -18,17 +18,6 @@
 
 package org.mycore.pi.urn;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -41,10 +30,21 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRFileCollectingFileVisitor;
-import org.mycore.pi.MCRPIService;
 import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Service for assigning granular URNs to Derivate. You can call it with a Derivate-ID and it will assign a Base-URN for
@@ -64,7 +64,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
 
     @Override
     public MCRDNBURN register(MCRBase obj, String additional, boolean updateObject)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+            throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
 
         MCRObjectDerivate derivate = ((MCRDerivate) obj).getDerivate();
@@ -89,7 +89,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
     }
 
     private MCRDNBURN registerSingleURN(MCRBase obj, String additional, MCRObjectDerivate derivate)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         MCRDNBURN newURN;
         LOGGER.info("Add single urn to {} / {}", obj.getId(), additional);
 
@@ -101,19 +101,19 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
 
         int count = Math.toIntExact(derivate.getFileMetadata().stream().filter(file -> file.getUrn() != null).count());
         MCRDNBURN dnbURN = newURN = (MCRDNBURN) MCRPIManager.getInstance().get(derivate.getURN())
-            .findFirst().get();
+                .findFirst().get();
 
         String setID = obj.getId().getNumberAsString();
         MCRDNBURN urntoAssign = dnbURN.toGranular(setID, count + 1, count + 1);
         derivate.getOrCreateFileMetadata(filePath, urntoAssign.asString()).setUrn(urntoAssign.asString());
         MCRPI databaseEntry = new MCRPI(urntoAssign.asString(), getType(), obj.getId().toString(), additional,
-            this.getServiceID(), new Date());
+                this.getServiceID(), new Date());
         session.save(databaseEntry);
         return newURN;
     }
 
     private MCRDNBURN registerURNsDerivate(MCRBase obj, String additional, MCRObjectDerivate derivate)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         LOGGER.info("Add URNs to all files of {}", obj.getId());
 
         Session session = MCRHIBConnection.instance().getSession();
@@ -130,19 +130,19 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
         List<String> ignoreFileNamesList = getIgnoreFileList();
 
         List<Predicate<String>> predicateList = ignoreFileNamesList
-            .stream()
-            .map(Pattern::compile)
-            .map(Pattern::asPredicate)
-            .collect(Collectors.toList());
+                .stream()
+                .map(Pattern::compile)
+                .map(Pattern::asPredicate)
+                .collect(Collectors.toList());
 
         List<MCRPath> pathList = collectingFileVisitor
-            .getPaths()
-            .stream()
-            .filter(file -> predicateList.stream()
-                .noneMatch(p -> p.test(file.toString().split(":")[1])))
-            .map(p -> (MCRPath) p)
-            .sorted()
-            .collect(Collectors.toList());
+                .getPaths()
+                .stream()
+                .filter(file -> predicateList.stream()
+                        .noneMatch(p -> p.test(file.toString().split(":")[1])))
+                .map(p -> (MCRPath) p)
+                .sorted()
+                .collect(Collectors.toList());
 
         MCRDNBURN newURN = getNewIdentifier(obj, additional);
         String setID = obj.getId().getNumberAsString();
@@ -151,14 +151,14 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
             MCRDNBURN subURN = newURN.toGranular(setID, pathListIndex + 1, pathList.size());
             derivate.getOrCreateFileMetadata(pathList.get(pathListIndex), subURN.asString()).setUrn(subURN.asString());
             MCRPI databaseEntry = new MCRPI(subURN.asString(), getType(), obj.getId().toString(),
-                pathList.get(pathListIndex).getOwnerRelativePath(),
-                this.getServiceID(), null);
+                    pathList.get(pathListIndex).getOwnerRelativePath(),
+                    this.getServiceID(), null);
             session.save(databaseEntry);
         }
 
         derivate.setURN(newURN.asString());
         MCRPI databaseEntry = new MCRPI(newURN.asString(), getType(), obj.getId().toString(), "",
-            this.getServiceID(), new Date());
+                this.getServiceID(), new Date());
         session.save(databaseEntry);
         return newURN;
     }
@@ -182,13 +182,13 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
 
     @Override
     protected void delete(MCRDNBURN identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         throw new MCRPersistentIdentifierException("Delete is not supported for " + getType());
     }
 
     @Override
     protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         //TODO: improve API, don't override method to do nothing
         LOGGER.info("No update in this implementation");
     }

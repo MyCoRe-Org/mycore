@@ -18,26 +18,22 @@
 
 package org.mycore.pi.urn.rest;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * Created by chi on 08.05.17.
@@ -49,17 +45,17 @@ public class MCRHttpsClient {
 
     private static RequestConfig noRedirect() {
         return RequestConfig
-            .copy(RequestConfig.DEFAULT)
-            .setRedirectsEnabled(false)
-            .build();
+                .copy(RequestConfig.DEFAULT)
+                .setRedirectsEnabled(false)
+                .build();
     }
 
     public static CloseableHttpClient getHttpsClient() {
         return HttpClientBuilder
-            .create()
-            .setConnectionTimeToLive(1, TimeUnit.MINUTES)
-            .setSSLContext(SSLContexts.createSystemDefault())
-            .build();
+                .create()
+                .setConnectionTimeToLive(1, TimeUnit.MINUTES)
+                .setSSLContext(SSLContexts.createSystemDefault())
+                .build();
     }
 
     public static CloseableHttpResponse head(String url) {
@@ -82,8 +78,8 @@ public class MCRHttpsClient {
     }
 
     public static <R extends HttpEntityEnclosingRequestBase> CloseableHttpResponse request(
-        Supplier<R> requestSupp, String url,
-        String contentType, HttpEntity entity) {
+            Supplier<R> requestSupp, String url,
+            String contentType, HttpEntity entity) {
 
         try (CloseableHttpClient httpClient = getHttpsClient()) {
             R request = requestSupp.get();

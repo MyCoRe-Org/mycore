@@ -18,27 +18,7 @@
 
 package org.mycore.pi.doi;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -69,6 +49,15 @@ import org.mycore.pi.exceptions.MCRDatacenterAuthenticationException;
 import org.mycore.pi.exceptions.MCRDatacenterException;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Used for DOI registration.
@@ -126,7 +115,7 @@ public class MCRDataciteClient {
         StringBuilder statusStringBuilder = new StringBuilder();
 
         statusStringBuilder.append(statusLine.getStatusCode()).append(" - ").append(statusLine.getReasonPhrase())
-            .append(" - ");
+                .append(" - ");
 
         Scanner scanner = new Scanner(resp.getEntity().getContent(), "UTF-8");
         while (scanner.hasNextLine()) {
@@ -149,7 +138,7 @@ public class MCRDataciteClient {
     }
 
     public List<Map.Entry<String, URI>> getMediaList(final MCRDigitalObjectIdentifier doiParam)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         ArrayList<Map.Entry<String, URI>> entries = new ArrayList<>();
 
         MCRDigitalObjectIdentifier doi = isTestPrefix() ? doiParam.toTestPrefix() : doiParam;
@@ -175,12 +164,12 @@ public class MCRDataciteClient {
                     throw new MCRDatacenterAuthenticationException();
                 case HttpStatus.SC_NOT_FOUND:
                     throw new MCRIdentifierUnresolvableException(doi.asString(),
-                        doi.asString() + " is not resolvable! " + getStatusString(response));
+                            doi.asString() + " is not resolvable! " + getStatusString(response));
                     // return entries; // datacite says no media attached or doi does not exist (not sure what to do)
                 default:
                     throw new MCRDatacenterException(
-                        String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
-                            doi.asString(), getStatusString(response)));
+                            String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
+                                    doi.asString(), getStatusString(response)));
             }
         } catch (IOException e) {
             throw new MCRDatacenterException("Unknown error while set media list", e);
@@ -190,15 +179,15 @@ public class MCRDataciteClient {
     }
 
     public void setMediaList(final MCRDigitalObjectIdentifier doiParam, List<Map.Entry<String, URI>> mediaList)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         MCRDigitalObjectIdentifier doi = isTestPrefix() ? doiParam.toTestPrefix() : doiParam;
         URI requestURI = getRequestURI("/media/" + doi.asString());
 
         HttpPost post = new HttpPost(requestURI);
 
         String requestBodyString = mediaList.stream()
-            .map(buildPair())
-            .collect(Collectors.joining("\r\n"));
+                .map(buildPair())
+                .collect(Collectors.joining("\r\n"));
 
         LOGGER.info(requestBodyString);
 
@@ -217,8 +206,8 @@ public class MCRDataciteClient {
                     throw new MCRDatacenterAuthenticationException();
                 default:
                     throw new MCRDatacenterException(
-                        String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
-                            doi.asString(), getStatusString(response)));
+                            String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
+                                    doi.asString(), getStatusString(response)));
             }
         } catch (IOException e) {
             throw new MCRDatacenterException("Unknown error while set media list", e);
@@ -237,7 +226,7 @@ public class MCRDataciteClient {
 
         try (CloseableHttpClient httpClient = getHttpClient()) {
             post.setEntity(new StringEntity(
-                String.format(Locale.ENGLISH, DOI_REGISTER_REQUEST_TEMPLATE, doi.asString(), url.toString())));
+                    String.format(Locale.ENGLISH, DOI_REGISTER_REQUEST_TEMPLATE, doi.asString(), url.toString())));
             CloseableHttpResponse response = httpClient.execute(post);
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
@@ -249,10 +238,10 @@ public class MCRDataciteClient {
                     throw new MCRDatacenterAuthenticationException();
                 case HttpStatus.SC_PRECONDITION_FAILED:
                     throw new MCRDatacenterException(String.format(Locale.ENGLISH,
-                        "Metadata must be uploaded first! (%s)", getStatusString(response)));
+                            "Metadata must be uploaded first! (%s)", getStatusString(response)));
                 default:
                     throw new MCRDatacenterException(String.format(Locale.ENGLISH,
-                        "Datacenter-Error while minting doi: \"%s\" : %s", doi.asString(), getStatusString(response)));
+                            "Datacenter-Error while minting doi: \"%s\" : %s", doi.asString(), getStatusString(response)));
             }
         } catch (IOException e) {
             throw new MCRDatacenterException("Unknown error while mint new doi", e);
@@ -276,7 +265,7 @@ public class MCRDataciteClient {
                         String line = scanner.nextLine();
                         Optional<MCRDigitalObjectIdentifier> parse = new MCRDOIParser().parse(line);
                         MCRDigitalObjectIdentifier doi = parse
-                            .orElseThrow(() -> new MCRException("Could not parse DOI from Datacite!"));
+                                .orElseThrow(() -> new MCRException("Could not parse DOI from Datacite!"));
                         doiList.add(doi);
                     }
                     return doiList;
@@ -284,8 +273,8 @@ public class MCRDataciteClient {
                     return Collections.emptyList();
                 default:
                     throw new MCRDatacenterException(
-                        String.format(Locale.ENGLISH, "Unknown error while resolving all doi’s \n %d - %s",
-                            statusLine.getStatusCode(), statusLine.getReasonPhrase()));
+                            String.format(Locale.ENGLISH, "Unknown error while resolving all doi’s \n %d - %s",
+                                    statusLine.getStatusCode(), statusLine.getReasonPhrase()));
             }
         } catch (IOException e) {
             throw new MCRDatacenterException("Unknown error while resolving all doi’s", e);
@@ -307,33 +296,33 @@ public class MCRDataciteClient {
                     return new URI(uriString);
                 case HttpStatus.SC_NO_CONTENT:
                     throw new MCRIdentifierUnresolvableException(doiParam.asString(),
-                        "The identifier " + doiParam.asString() + " is currently not resolvable");
+                            "The identifier " + doiParam.asString() + " is currently not resolvable");
                 case HttpStatus.SC_NOT_FOUND:
                     throw new MCRIdentifierUnresolvableException(doiParam.asString(),
-                        "The identifier " + doiParam.asString() + " was not found in the Datacenter!");
+                            "The identifier " + doiParam.asString() + " was not found in the Datacenter!");
                 case HttpStatus.SC_UNAUTHORIZED:
                     throw new MCRDatacenterAuthenticationException();
                 case HttpStatus.SC_INTERNAL_SERVER_ERROR:
                     throw new MCRDatacenterException(
-                        String.format(Locale.ENGLISH, "Datacenter error while resolving doi: \"%s\" : %s",
-                            doiParam.asString(), getStatusString(response)));
+                            String.format(Locale.ENGLISH, "Datacenter error while resolving doi: \"%s\" : %s",
+                                    doiParam.asString(), getStatusString(response)));
                 default:
                     throw new MCRDatacenterException(String.format(Locale.ENGLISH,
-                        "Unknown error while resolving doi: \"%s\" : %s", doiParam.asString(),
-                        getStatusString(response)));
+                            "Unknown error while resolving doi: \"%s\" : %s", doiParam.asString(),
+                            getStatusString(response)));
             }
         } catch (IOException | URISyntaxException ex) {
             throw new MCRDatacenterException(
-                String.format(Locale.ENGLISH, "Unknown error while resolving doi: \"%s\"", doiParam.asString()), ex);
+                    String.format(Locale.ENGLISH, "Unknown error while resolving doi: \"%s\"", doiParam.asString()), ex);
         }
     }
 
     private URI getRequestURI(String path) throws MCRPersistentIdentifierException {
         try {
             URIBuilder builder = new URIBuilder()
-                .setScheme(HTTPS_SCHEME)
-                .setHost(this.host)
-                .setPath(path);
+                    .setScheme(HTTPS_SCHEME)
+                    .setHost(this.host)
+                    .setPath(path);
 
             if (isTestMode()) {
                 builder.setParameter(TEST_MODE_PARAMETER_NAME, "true");
@@ -360,13 +349,13 @@ public class MCRDataciteClient {
                     throw new MCRDatacenterAuthenticationException();
                 case HttpStatus.SC_NO_CONTENT:
                     throw new MCRIdentifierUnresolvableException(doi.asString(),
-                        "The identifier " + doi.asString() + " is currently not resolvable");
+                            "The identifier " + doi.asString() + " is currently not resolvable");
                 case HttpStatus.SC_NOT_FOUND:
                     throw new MCRIdentifierUnresolvableException(doi.asString(),
-                        "The identifier " + doi.asString() + " was not found!");
+                            "The identifier " + doi.asString() + " was not found!");
                 case HttpStatus.SC_GONE:
                     throw new MCRIdentifierUnresolvableException(doi.asString(),
-                        "The identifier " + doi.asString() + " was deleted!");
+                            "The identifier " + doi.asString() + " was deleted!");
                 default:
                     throw new MCRDatacenterException("Unknown return status: " + getStatusString(response));
             }
@@ -386,7 +375,7 @@ public class MCRDataciteClient {
         try (CloseableHttpClient httpClient = getHttpClient()) {
             byte[] documentBytes = documentToByteArray(metadata);
             ByteArrayEntity inputStreamEntity = new ByteArrayEntity(documentBytes,
-                ContentType.create("application/xml", "UTF-8"));
+                    ContentType.create("application/xml", "UTF-8"));
             post.setEntity(inputStreamEntity);
             CloseableHttpResponse response = httpClient.execute(post);
             StatusLine statusLine = response.getStatusLine();
@@ -414,12 +403,12 @@ public class MCRDataciteClient {
                     throw new MCRDatacenterException("Location header not found in response! - " + responseString);
                 case HttpStatus.SC_BAD_REQUEST: // invalid xml or wrong PREFIX
                     throw new MCRDatacenterException("Invalid xml or wrong PREFIX: " + statusLine.getStatusCode()
-                        + " - " + statusLine.getReasonPhrase() + " - " + responseString);
+                            + " - " + statusLine.getReasonPhrase() + " - " + responseString);
                 case HttpStatus.SC_UNAUTHORIZED: // no login
                     throw new MCRDatacenterAuthenticationException();
                 default:
                     throw new MCRDatacenterException("Unknown return status: " + statusLine.getStatusCode() + " - "
-                        + statusLine.getReasonPhrase() + " - " + responseString);
+                            + statusLine.getReasonPhrase() + " - " + responseString);
             }
         } catch (IOException | URISyntaxException e) {
             throw new MCRDatacenterException("Error while storing metadata!", e);
@@ -444,7 +433,7 @@ public class MCRDataciteClient {
                     throw new MCRIdentifierUnresolvableException(doi.asString(), doi.asString() + " was not found!");
                 default:
                     throw new MCRDatacenterException(
-                        "Unknown return status: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase());
+                            "Unknown return status: " + statusLine.getStatusCode() + " - " + statusLine.getReasonPhrase());
             }
         } catch (IOException e) {
             throw new MCRDatacenterException("Error while deleting metadata!", e);
@@ -453,12 +442,12 @@ public class MCRDataciteClient {
 
     private void changeToTestDOI(Document metadata) {
         XPathExpression<Element> compile = XPathFactory.instance().compile(
-            "//datacite:identifier[@identifierType='DOI']", Filters.element(), null,
-            Namespace.getNamespace("datacite", "http://datacite.org/schema/kernel-3"));
+                "//datacite:identifier[@identifierType='DOI']", Filters.element(), null,
+                Namespace.getNamespace("datacite", "http://datacite.org/schema/kernel-3"));
         Element element = compile.evaluateFirst(metadata);
         MCRDigitalObjectIdentifier doi = new MCRDOIParser()
-            .parse(element.getText())
-            .orElseThrow(() -> new MCRException("Datacite Document contains invalid DOI!"));
+                .parse(element.getText())
+                .orElseThrow(() -> new MCRException("Datacite Document contains invalid DOI!"));
         String testDOI = doi.toTestPrefix().asString();
         element.setText(testDOI);
     }

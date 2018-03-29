@@ -42,7 +42,7 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
 
     @Override
     public void insertIdentifier(MCRPersistentIdentifier identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
         MCRNodeBuilder nb = new MCRNodeBuilder();
@@ -72,13 +72,13 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
         List<Element> elements = xp.evaluate(xml);
 
         elements.stream()
-            .filter(element -> element.getTextTrim().equals(identifier.asString()))
-            .forEach(Element::detach);
+                .filter(element -> element.getTextTrim().equals(identifier.asString()))
+                .forEach(Element::detach);
     }
 
     @Override
     public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
         XPathFactory xpfac = XPathFactory.instance();
@@ -86,7 +86,7 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
         List<Element> evaluate = xp.evaluate(xml);
         if (evaluate.size() > 1) {
             throw new MCRPersistentIdentifierException(
-                "Got " + evaluate.size() + " matches for " + obj.getId() + " with xpath " + xpath + "");
+                    "Got " + evaluate.size() + " matches for " + obj.getId() + " with xpath " + xpath + "");
         }
 
         if (evaluate.size() == 0) {

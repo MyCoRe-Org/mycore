@@ -18,11 +18,11 @@
 
 package org.mycore.pi.purl;
 
+import org.mycore.pi.MCRPIParser;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
-
-import org.mycore.pi.MCRPIParser;
 
 public class MCRPURLParser implements MCRPIParser {
 

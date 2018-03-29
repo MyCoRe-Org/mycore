@@ -18,14 +18,10 @@
 
 package org.mycore.pi;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
@@ -36,20 +32,18 @@ import org.mycore.common.MCRGsonUTCDateAdapter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.datamodel.metadata.*;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.MCRDOIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
@@ -83,10 +77,11 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     /**
      * Checks the service parameters.
+     *
      * @throws MCRConfigurationException if parameter is missing or wrong!
      */
-    protected void checkConfiguration() throws MCRConfigurationException{
-        if(getProperties().containsKey("MetadataManager")){
+    protected void checkConfiguration() throws MCRConfigurationException {
+        if (getProperties().containsKey("MetadataManager")) {
             throw new MCRConfigurationException("The MCRPIService " + getServiceID() +
                     " uses old property key MetadataManager");
         }

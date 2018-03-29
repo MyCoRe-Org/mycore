@@ -18,19 +18,14 @@
 
 package org.mycore.pi.urn;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIRegistrationInfo;
+
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.MCRPIManager;
 
 /**
  * A Generator which helps to generate a URN with a counter inside.
@@ -48,24 +43,24 @@ public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
         Predicate<String> matching = regExpPattern.asPredicate();
 
         List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance()
-            .getList(MCRDNBURN.TYPE, -1, -1);
+                .getList(MCRDNBURN.TYPE, -1, -1);
 
         // extract the number of the PI
         Optional<Integer> highestNumber = list.stream()
-            .map(MCRPIRegistrationInfo::getIdentifier)
-            .filter(matching)
-            .map(pi -> {
-                // extract the number of the PI
-                Matcher matcher = regExpPattern.matcher(pi);
-                if (matcher.find() && matcher.groupCount() == 1) {
-                    String group = matcher.group(1);
-                    return Integer.parseInt(group, 10);
-                } else {
-                    return null;
-                }
-            }).filter(Objects::nonNull)
-            .min(Comparator.reverseOrder())
-            .map(n -> n + 1);
+                .map(MCRPIRegistrationInfo::getIdentifier)
+                .filter(matching)
+                .map(pi -> {
+                    // extract the number of the PI
+                    Matcher matcher = regExpPattern.matcher(pi);
+                    if (matcher.find() && matcher.groupCount() == 1) {
+                        String group = matcher.group(1);
+                        return Integer.parseInt(group, 10);
+                    } else {
+                        return null;
+                    }
+                }).filter(Objects::nonNull)
+                .min(Comparator.reverseOrder())
+                .map(n -> n + 1);
         return new AtomicInteger(highestNumber.orElse(0));
     }
 
@@ -80,7 +75,7 @@ public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
      */
     public final synchronized int getCount(String pattern) {
         AtomicInteger count = PATTERN_COUNT_MAP
-            .computeIfAbsent(pattern, this::readCountFromDatabase);
+                .computeIfAbsent(pattern, this::readCountFromDatabase);
 
         return count.getAndIncrement();
     }

@@ -29,8 +29,8 @@ import java.util.Optional;
  * Uses mapping from MCRObjectID base to DOI prefix to generate DOIs.
  * e.g. <code>MCR.PI.Generator.MapObjectIDDOI.Prefix.mycore_mods = 10.5072/my.</code> will map
  * <code>mycore_mods_00004711</code> to <code>10.5072/my.4711</code>
- * @author Thomas Scheffler (yagee)
  *
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRMapObjectIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
@@ -46,7 +46,7 @@ public class MCRMapObjectIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectI
 
     @Override
     public MCRDigitalObjectIdentifier generate(MCRBase mcrObject, String additional)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         final MCRObjectID objectId = mcrObject.getId();
         return Optional.ofNullable(getProperties().get("Prefix." + objectId.getBase()))
                 .map(prefix -> {
@@ -54,7 +54,7 @@ public class MCRMapObjectIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectI
                     return prefix.contains("/") ? prefix + objectIdNumberAsInteger
                             : prefix + '/' + objectIdNumberAsInteger;
                 })
-            .flatMap(mcrdoiParser::parse).map(MCRDigitalObjectIdentifier.class::cast)
+                .flatMap(mcrdoiParser::parse).map(MCRDigitalObjectIdentifier.class::cast)
                 .orElseThrow(() -> new MCRPersistentIdentifierException("Prefix." + objectId.getBase() +
                         " is not defined in " + generatorID + "."));
     }

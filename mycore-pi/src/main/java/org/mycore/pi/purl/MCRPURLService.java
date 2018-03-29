@@ -18,14 +18,14 @@
 
 package org.mycore.pi.purl;
 
-import java.util.Map;
-import java.util.function.Consumer;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class MCRPURLService extends MCRPIService<MCRPURL> {
 
@@ -53,25 +53,25 @@ public class MCRPURLService extends MCRPIService<MCRPURL> {
 
     @Override
     protected void registerIdentifier(MCRBase obj, String additional, MCRPURL purl)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         if (!"".equals(additional)) {
             throw new MCRPersistentIdentifierException(
-                getClass().getName() + " doesn't support additional information! (" + additional + ")");
+                    getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
 
         LOGGER.info("TODO: Register PURL at PURL-Server!");
 
         doWithPURLManager(
-            manager -> manager
-                .registerNewPURL(purl.getUrl().getPath(), buildTargetURL(obj), "302", getProperties().getOrDefault(
-                    PURL_MAINTAINER_CONFIG, "test")));
+                manager -> manager
+                        .registerNewPURL(purl.getUrl().getPath(), buildTargetURL(obj), "302", getProperties().getOrDefault(
+                                PURL_MAINTAINER_CONFIG, "test")));
 
     }
 
     protected String buildTargetURL(MCRBase obj) {
         String baseURL = getProperties().get(PURL_BASE_URL);
         return baseURL + getProperties().getOrDefault(PURL_CONTEXT_CONFIG, DEFAULT_CONTEXT_PATH)
-            .replaceAll("\\$[iI][dD]", obj.getId().toString());
+                .replaceAll("\\$[iI][dD]", obj.getId().toString());
     }
 
     protected void doWithPURLManager(Consumer<MCRPURLManager> action) {
@@ -92,20 +92,20 @@ public class MCRPURLService extends MCRPIService<MCRPURL> {
 
     @Override
     protected void delete(MCRPURL identifier, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         /* deletion is not supported */
         throw new MCRPersistentIdentifierException("Delete is not supported for " + getType());
     }
 
     @Override
     protected void update(MCRPURL purl, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
+            throws MCRPersistentIdentifierException {
         doWithPURLManager((purlManager) -> {
             String targetURL = buildTargetURL(obj);
             if (!purlManager.isPURLTargetURLUnchanged(purl.getUrl().toString(), targetURL)) {
                 purlManager.updateExistingPURL(purl.getUrl().getPath(), targetURL, "302",
-                    getProperties().getOrDefault(
-                        PURL_MAINTAINER_CONFIG, "test"));
+                        getProperties().getOrDefault(
+                                PURL_MAINTAINER_CONFIG, "test"));
             }
         });
 
