@@ -18,18 +18,25 @@
 
 package org.mycore.frontend.jersey.access;
 
-import javax.ws.rs.container.ContainerRequestContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.glassfish.hk2.api.Factory;
+import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.process.internal.RequestScoped;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSystemUserInformation;
 
 public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
 
+    public static final ACLBinder BINDER = new ACLBinder();
+
+    public static Binder getBinder() {
+        return BINDER;
+    }
+
     @Override
     public void dispose(MCRRequestScopeACL mcrRequestScopeACL) {
-        LogManager.getLogger().info("Disposed...");
+        LogManager.getLogger().debug("Disposed...");
     }
 
     @Override
@@ -43,7 +50,7 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
         private boolean isPrivate;
 
         public MCRRequestScopeACLImpl() {
-            LogManager.getLogger().info("Constructor called");
+            LogManager.getLogger().debug("Constructor called");
             this.isPrivate = false;
         }
 
@@ -70,7 +77,7 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
                     .thenAccept(b -> {
                         if (!b) {
                             isPrivate = true;
-                            LogManager.getLogger().info("response is private");
+                            LogManager.getLogger().debug("response is private");
                         }
                     }).join();
             }
@@ -82,7 +89,20 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
 
         @Override
         public boolean isPrivate() {
+            LogManager.getLogger().debug("isPrivate={}", isPrivate);
             return isPrivate;
         }
+    }
+
+    private static class ACLBinder extends AbstractBinder {
+        @Override
+        protected void configure() {
+            bindFactory(MCRRequestScopeACLFactory.class)
+                .proxy(true)
+                .proxyForSameScope(false)
+                .to(MCRRequestScopeACL.class)
+                .in(RequestScoped.class);
+        }
+
     }
 }

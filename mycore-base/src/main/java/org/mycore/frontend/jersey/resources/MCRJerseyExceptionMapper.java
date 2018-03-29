@@ -56,8 +56,12 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exc) {
-        LOGGER.warn(() -> "Error while processing request " + request.getRequestURI(), exc);
         Response response = getResponse(exc);
+        if (exc instanceof WebApplicationException) {
+            LOGGER.warn("{}: {}", request.getRequestURI(), response.getStatus());
+        } else {
+            LOGGER.warn(() -> "Error while processing request " + request.getRequestURI(), exc);
+        }
         if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
             // try to return a html error page
             if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {

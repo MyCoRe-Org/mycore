@@ -18,6 +18,9 @@
 
 package org.mycore.restapi.v1;
 
+import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
+import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -119,9 +122,10 @@ public class MCRRestAPIObjects {
 
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    @Path("/{mcrid}/derivates")
+    @Path("/{" + PARAM_MCRID + "}/derivates")
     public Response listDerivates(@Context UriInfo info,
-        @PathParam("mcrid") String mcrid, @QueryParam("format") @DefaultValue("xml") String format,
+        @PathParam(PARAM_MCRID) String mcrid,
+        @QueryParam("format") @DefaultValue("xml") String format,
         @QueryParam("sort") @DefaultValue("ID:asc") String sort) throws MCRRestAPIException {
         return MCRRestAPIObjectsHelper.listDerivates(info, mcrid, format, sort);
     }
@@ -144,9 +148,10 @@ public class MCRRestAPIObjects {
      */
     @GET
     @Produces(MediaType.TEXT_XML)
-    @Path("/{mcrid}")
+    @Path("/{" + PARAM_MCRID + "}")
     public Response returnMCRObject(@Context UriInfo info,
-        @PathParam("mcrid") String id, @QueryParam("style") String style) throws MCRRestAPIException {
+        @PathParam(PARAM_MCRID) String id, @QueryParam("style") String style)
+        throws MCRRestAPIException {
         return MCRRestAPIObjectsHelper.showMCRObject(id, style, info);
     }
 
@@ -168,9 +173,11 @@ public class MCRRestAPIObjects {
      */
     @GET
     @Produces(MediaType.TEXT_XML)
-    @Path("/{mcrid}/derivates/{derid}")
+    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}")
     public Response returnDerivate(@Context UriInfo info,
-        @PathParam("mcrid") String mcrid, @PathParam("derid") String derid, @QueryParam("style") String style)
+        @PathParam(PARAM_MCRID) String mcrid,
+        @PathParam(PARAM_DERID) String derid,
+        @QueryParam("style") String style)
         throws MCRRestAPIException {
         return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, false);
     }
@@ -199,9 +206,10 @@ public class MCRRestAPIObjects {
 
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MCRJerseyUtil.APPLICATION_JSON_UTF8 })
-    @Path("/{mcrid}/derivates/{derid}/contents{path:(/.*)*}")
+    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/.*)*}")
     public Response listContents(@Context UriInfo info,
-        @Context Request request, @PathParam("mcrid") String mcrid, @PathParam("derid") String derid,
+        @Context Request request, @PathParam(PARAM_MCRID) String mcrid,
+        @PathParam(PARAM_DERID) String derid,
         @PathParam("path") @DefaultValue("/") String path, @QueryParam("format") @DefaultValue("xml") String format,
         @QueryParam("depth") @DefaultValue("-1") int depth) throws MCRRestAPIException {
         return MCRRestAPIObjectsHelper.listContents(info, request, mcrid, derid, format, path, depth);
@@ -222,9 +230,11 @@ public class MCRRestAPIObjects {
      * 
      */
     @GET
-    @Path("/{mcrid}/derivates/{derid}/open")
+    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/open")
     public Response listContents(@Context UriInfo info,
-        @PathParam("mcrid") String mcrObjID, @PathParam("derid") String mcrDerID) throws MCRRestAPIException {
+        @PathParam(PARAM_MCRID) String mcrObjID,
+        @PathParam(PARAM_DERID) String mcrDerID)
+        throws MCRRestAPIException {
         try {
             String url = MCRRestAPIObjectsHelper.retrieveMaindocURL(info, mcrObjID, mcrDerID);
             if (url != null) {
@@ -283,12 +293,12 @@ public class MCRRestAPIObjects {
      */
 
     @POST
-    @Path("/{mcrObjID}/derivates")
+    @Path("/{" + PARAM_MCRID + "}/derivates")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @MCRRequireTransaction
     public Response uploadDerivate(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrObjID") String mcrObjID, @FormDataParam("label") String label,
+        @PathParam(PARAM_MCRID) String mcrObjID, @FormDataParam("label") String label,
         @FormDataParam("overwriteOnExistingLabel") @DefaultValue("false") boolean overwrite)
         throws MCRRestAPIException {
         return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label, overwrite);
@@ -313,12 +323,13 @@ public class MCRRestAPIObjects {
      * @throws MCRRestAPIException
      */
     @POST
-    @Path("/{mcrid}/derivates/{derid}/contents{path:(/.*)*}")
+    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/.*)*}")
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @MCRRequireTransaction
     public Response uploadFile(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrid") String mcrObjID, @PathParam("derid") String mcrDerID,
+        @PathParam(PARAM_MCRID) String mcrObjID,
+        @PathParam(PARAM_DERID) String mcrDerID,
         @FormDataParam("file") InputStream uploadedInputStream,
         @FormDataParam("file") FormDataContentDisposition fileDetails, @FormDataParam("path") String path,
         @FormDataParam("maindoc") @DefaultValue("false") boolean maindoc,
@@ -342,10 +353,12 @@ public class MCRRestAPIObjects {
      * 
      */
     @DELETE
-    @Path("/{mcrObjID}/derivates/{mcrDerID}/contents")
+    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents")
     @MCRRequireTransaction
     public Response deleteFiles(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrObjID") String mcrObjID, @PathParam("mcrDerID") String mcrDerID) throws MCRRestAPIException {
+        @PathParam(PARAM_MCRID) String mcrObjID,
+        @PathParam(PARAM_DERID) String mcrDerID)
+        throws MCRRestAPIException {
         return MCRRestAPIUploadHelper.deleteAllFiles(info, request, mcrObjID, mcrDerID);
     }
 
@@ -363,10 +376,11 @@ public class MCRRestAPIObjects {
      * 
      */
     @DELETE
-    @Path("/{mcrObjID}/derivates/{mcrDerID}")
+    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}")
     @MCRRequireTransaction
     public Response deleteDerivate(@Context UriInfo info, @Context HttpServletRequest request,
-        @PathParam("mcrObjID") String mcrObjID, @PathParam("mcrDerID") String mcrDerID) throws MCRRestAPIException {
+        @PathParam(PARAM_MCRID) String mcrObjID,
+        @PathParam(PARAM_DERID) String mcrDerID) throws MCRRestAPIException {
         return MCRRestAPIUploadHelper.deleteDerivate(info, request, mcrObjID, mcrDerID);
     }
 }

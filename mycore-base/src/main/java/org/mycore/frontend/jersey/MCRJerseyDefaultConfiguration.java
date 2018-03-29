@@ -51,6 +51,7 @@ public class MCRJerseyDefaultConfiguration implements MCRJerseyConfiguration {
 
     @Override
     public void configure(ResourceConfig resourceConfig) {
+        resourceConfig.register(MCRRequestScopeACLFactory.getBinder());
         // setup resources
         setupResources(resourceConfig);
 

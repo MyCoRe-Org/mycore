@@ -24,11 +24,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.RuntimeDelegate;
 
@@ -41,45 +44,52 @@ public class MCRCacheFilter implements ContainerResponseFilter {
     private static final RuntimeDelegate.HeaderDelegate<CacheControl> HEADER_DELEGATE = RuntimeDelegate.getInstance()
         .createHeaderDelegate(CacheControl.class);
 
-    private final CacheControl cc;
+    @Context
+    private ResourceInfo resourceInfo;
 
-    public MCRCacheFilter() {
-        cc = new CacheControl();
-    }
+    @Inject
+    private MCRRequestScopeACL aclProvider;
 
-    public MCRCacheFilter(MCRCacheControl cacheControlAnnotation) {
-        cc = new CacheControl();
-        cc.setMaxAge((int) cacheControlAnnotation.maxAge().unit().toSeconds(cacheControlAnnotation.maxAge().time()));
-        cc.setSMaxAge((int) cacheControlAnnotation.sMaxAge().unit().toSeconds(cacheControlAnnotation.sMaxAge().time()));
-        Optional.ofNullable(cacheControlAnnotation.private_())
-            .filter(MCRCacheControl.FieldArgument::active)
-            .map(MCRCacheControl.FieldArgument::fields)
-            .map(Stream::of)
-            .ifPresent(s -> {
-                cc.setPrivate(true);
-                cc.getPrivateFields().addAll(s.collect(Collectors.toList()));
-            });
-        if (cacheControlAnnotation.public_()) {
-            cc.getCacheExtension().put("public", null);
+    private CacheControl getCacheConrol(MCRCacheControl cacheControlAnnotation) {
+        CacheControl cc = new CacheControl();
+        if (cacheControlAnnotation != null) {
+            cc.setMaxAge(
+                (int) cacheControlAnnotation.maxAge().unit().toSeconds(cacheControlAnnotation.maxAge().time()));
+            cc.setSMaxAge(
+                (int) cacheControlAnnotation.sMaxAge().unit().toSeconds(cacheControlAnnotation.sMaxAge().time()));
+            Optional.ofNullable(cacheControlAnnotation.private_())
+                .filter(MCRCacheControl.FieldArgument::active)
+                .map(MCRCacheControl.FieldArgument::fields)
+                .map(Stream::of)
+                .ifPresent(s -> {
+                    cc.setPrivate(true);
+                    cc.getPrivateFields().addAll(s.collect(Collectors.toList()));
+                });
+            if (cacheControlAnnotation.public_()) {
+                cc.getCacheExtension().put("public", null);
+            }
+            cc.setNoTransform(cacheControlAnnotation.noTransform());
+            cc.setNoStore(cacheControlAnnotation.noStore());
+            Optional.ofNullable(cacheControlAnnotation.noCache())
+                .filter(MCRCacheControl.FieldArgument::active)
+                .map(MCRCacheControl.FieldArgument::fields)
+                .map(Stream::of)
+                .ifPresent(s -> {
+                    cc.setNoCache(true);
+                    cc.getNoCacheFields().addAll(s.collect(Collectors.toList()));
+                });
+            cc.setMustRevalidate(cacheControlAnnotation.mustRevalidate());
+            cc.setProxyRevalidate(cacheControlAnnotation.proxyRevalidate());
+        } else {
+            cc.setNoTransform(false); //should have been default
         }
-        cc.setNoTransform(cacheControlAnnotation.noTransform());
-        cc.setNoStore(cacheControlAnnotation.noStore());
-        Optional.ofNullable(cacheControlAnnotation.noCache())
-            .filter(MCRCacheControl.FieldArgument::active)
-            .map(MCRCacheControl.FieldArgument::fields)
-            .map(Stream::of)
-            .ifPresent(s -> {
-                cc.setNoCache(true);
-                cc.getNoCacheFields().addAll(s.collect(Collectors.toList()));
-            });
-        cc.setMustRevalidate(cacheControlAnnotation.mustRevalidate());
-        cc.setProxyRevalidate(cacheControlAnnotation.proxyRevalidate());
+        return cc;
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
         throws IOException {
-        CacheControl cc = this.cc;
+        CacheControl cc;
         String currentCacheControl = requestContext.getHeaderString(HttpHeaders.CACHE_CONTROL);
         if (currentCacheControl != null) {
             if (responseContext.getHeaderString(HttpHeaders.AUTHORIZATION) == null) {
@@ -101,15 +111,19 @@ public class MCRCacheFilter implements ContainerResponseFilter {
             if (!statusCacheable) {
                 return;
             }
+            cc = getCacheConrol(resourceInfo.getResourceMethod().getAnnotation(MCRCacheControl.class));
         }
-        boolean isPrivate = Optional.ofNullable(requestContext.getProperty("foo"))
-            .map(Boolean.class::cast).orElse(false) || (cc.isPrivate() && cc.getPrivateFields().isEmpty());
+
+        if (aclProvider.isPrivate()) {
+            cc.setPrivate(true);
+            cc.getPrivateFields().clear();
+        }
+
+        boolean isPrivate = cc.isPrivate() && cc.getPrivateFields().isEmpty();
         boolean isNoCache = cc.isNoCache() && cc.getNoCacheFields().isEmpty();
         if (responseContext.getHeaderString(HttpHeaders.AUTHORIZATION) != null) {
             addAuthorizationHeaderException(cc, isPrivate, isNoCache);
         }
-        //TODO if restricted information was used, set cache to private
-        cc.getCacheExtension().put("mcr_cf", null);
         String headerValue = HEADER_DELEGATE.toString(cc);
         LogManager.getLogger()
             .debug(() -> "Cache-Control filter: " + requestContext.getUriInfo().getPath() + " " + headerValue);
@@ -127,8 +141,4 @@ public class MCRCacheFilter implements ContainerResponseFilter {
         }
     }
 
-    @Override
-    public String toString() {
-        return "CacheFilter: Cache-Control=" + HEADER_DELEGATE.toString(cc);
-    }
 }

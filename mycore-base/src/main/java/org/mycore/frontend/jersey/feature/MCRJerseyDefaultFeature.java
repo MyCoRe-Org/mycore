@@ -19,7 +19,6 @@
 package org.mycore.frontend.jersey.feature;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
@@ -27,7 +26,6 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.filter.MCRCacheFilter;
 import org.mycore.frontend.jersey.filter.MCRDBTransactionFilter;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
@@ -49,7 +47,7 @@ public class MCRJerseyDefaultFeature extends MCRJerseyBaseFeature {
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         Class<?> resourceClass = resourceInfo.getResourceClass();
         Method resourceMethod = resourceInfo.getResourceMethod();
-        registerCacheFilter(context, resourceMethod);
+        context.register(MCRCacheFilter.class);
         if (isStaticContent(resourceClass, resourceMethod)) {
             // class or method is annotated with MCRStaticContent
             //   -> do only register session lock filter
@@ -86,11 +84,4 @@ public class MCRJerseyDefaultFeature extends MCRJerseyBaseFeature {
         }
     }
 
-    protected void registerCacheFilter(FeatureContext context, Method resourceMethod) {
-        MCRCacheFilter cacheFilter = Optional.ofNullable(resourceMethod.getAnnotation(MCRCacheControl.class))
-            .map(MCRCacheFilter::new)
-            .orElseGet(MCRCacheFilter::new);
-        LOGGER.debug("Add {} to {}.",cacheFilter, resourceMethod);
-        context.register(cacheFilter);
-    }
 }

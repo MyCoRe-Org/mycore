@@ -24,6 +24,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.CacheControl;
+
 /**
  * Used to define the {@link javax.ws.rs.core.HttpHeaders#CACHE_CONTROL} header via annotation
  */

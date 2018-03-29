@@ -23,7 +23,6 @@ import java.util.Optional;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.Priorities;
@@ -31,9 +30,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Providers;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.access.MCRAccessInterface;
@@ -45,6 +43,11 @@ import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
 
 @Priority(Priorities.AUTHORIZATION)
 public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
+
+    public static final String PARAM_MCRID = "mcrid";
+
+    public static final String PARAM_DERID = "derid";
+
     @Context
     ResourceInfo resourceInfo;
 
@@ -60,6 +63,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
      */
     private void checkRestAPIAccess(MCRRestAPIACLPermission permission, String path)
         throws MCRRestAPIException {
+        LogManager.getLogger().warn(path + ": Checking API access: " + permission);
         String thePath = path.startsWith("/") ? path : "/" + path;
 
         MCRAccessInterface acl = MCRAccessControlSystem.instance();
@@ -82,6 +86,23 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 "Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
     }
 
+    private void checkBaseAccess(MCRRestAPIACLPermission permission, String objectId, String derId)
+        throws MCRRestAPIException {
+        Optional<String> checkable = Optional.ofNullable(derId)
+            .map(Optional::of)
+            .orElseGet(() -> Optional.ofNullable(objectId));
+        checkable.ifPresent(id -> LogManager.getLogger().warn("Checking " + permission + " access on " + id));
+        boolean allowed = checkable
+            .map(id -> aclProvider.checkPermission(id, permission.toString()))
+            .orElse(true);
+        if (allowed) {
+            return;
+        }
+        throw new MCRRestAPIException(Response.Status.FORBIDDEN,
+            new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
+                "Check access right '" + permission + "' on '" + checkable.orElse(null) + "'!"));
+    }
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         MCRRestAPIACLPermission permission;
@@ -92,6 +113,9 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             case HttpMethod.HEAD:
                 permission = MCRRestAPIACLPermission.READ;
                 break;
+            case HttpMethod.DELETE:
+                permission = MCRRestAPIACLPermission.DELETE;
+                break;
             default:
                 permission = MCRRestAPIACLPermission.WRITE;
         }
@@ -99,8 +123,10 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .map(Path::value)
             .ifPresent(path -> {
                 try {
-                    LogManager.getLogger().warn(path + ": Checking API Access: " + permission);
                     checkRestAPIAccess(permission, path);
+                    MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
+                    checkBaseAccess(permission, pathParameters.getFirst(PARAM_MCRID),
+                        pathParameters.getFirst(PARAM_DERID));
                 } catch (MCRRestAPIException e) {
                     LogManager.getLogger().warn("API Access denied!");
                     requestContext.abortWith(new MCRRestAPIExceptionMapper().toResponse(e));
@@ -121,6 +147,12 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         WRITE {
             public String toString() {
                 return "write";
+            }
+        },
+
+        DELETE {
+            public String toString() {
+                return "delete";
             }
         }
     }

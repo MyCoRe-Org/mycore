@@ -23,6 +23,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
@@ -43,6 +44,7 @@ public class MCRRestResourceConfig extends ResourceConfig {
         String[] restPackages = MCRConfiguration.instance().getStrings("MCR.RestAPI.Resource.Packages").stream()
             .toArray(String[]::new);
         packages(restPackages);
+        property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true);
         register(MCRSessionFilter.class);
         register(MCRTransactionFilter.class);
         register(MultiPartFeature.class);
@@ -51,16 +53,9 @@ public class MCRRestResourceConfig extends ResourceConfig {
         register(MCRRestAPIExceptionMapper.class);
         register(MCRForbiddenExceptionMapper.class);
         register(MCRNotAuthorizedExceptionMapper.class);
-        register(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                bindFactory(MCRRequestScopeACLFactory.class)
-                    .proxy(true)
-                    .proxyForSameScope(false)
-                    .to(MCRRequestScopeACL.class)
-                    .in(RequestScoped.class);
-            }
-        });
+        register(MCRRequestScopeACLFactory.getBinder());
+        getInstances().stream()
+            .forEach(LogManager.getLogger()::info);
     }
 
 }
