@@ -436,7 +436,7 @@ public class MCRDataciteClient {
     private void changeToTestDOI(Document metadata) {
         XPathExpression<Element> compile = XPathFactory.instance().compile(
             "//datacite:identifier[@identifierType='DOI']", Filters.element(), null,
-            Namespace.getNamespace("datacite", "http://datacite.org/schema/kernel-3"));
+            metadata.getRootElement().getNamespace());
         Element element = compile.evaluateFirst(metadata);
         MCRDigitalObjectIdentifier doi = (MCRDigitalObjectIdentifier) new MCRDOIParser()
             .parse(element.getText())
