@@ -18,25 +18,23 @@
 
 package org.mycore.common.events;
 
-import java.util.Enumeration;
-import java.util.Optional;
-
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+import java.util.Enumeration;
+
 /**
  * Handles different HttpSession events.
- * 
+ *
  * This class is used to free up MCRSessions when their associated HttpSession
  * is destroyed or a new MCRSession replaces an old one.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRHttpSessionListener implements HttpSessionListener {
@@ -44,7 +42,7 @@ public class MCRHttpSessionListener implements HttpSessionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
      */
     public void sessionCreated(HttpSessionEvent hse) {
@@ -53,16 +51,16 @@ public class MCRHttpSessionListener implements HttpSessionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
      */
     public void sessionDestroyed(HttpSessionEvent hse) {
         // clear MCRSessions
         HttpSession httpSession = hse.getSession();
         LOGGER.debug(() -> "HttpSession " + httpSession.getId() + " is beeing destroyed by " + hse.getSource()
-            + ", clearing up.");
+                + ", clearing up.");
         LOGGER.debug("Removing any MCRSessions from HttpSession");
-        for (Enumeration<String> e = httpSession.getAttributeNames(); e.hasMoreElements();) {
+        for (Enumeration<String> e = httpSession.getAttributeNames(); e.hasMoreElements(); ) {
             String key = e.nextElement();
             if (key.equals(MCRServlet.ATTR_MYCORE_SESSION)) {
                 ((MCRSessionResolver) httpSession.getAttribute(key))

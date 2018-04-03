@@ -27,7 +27,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This Class will be stored in the a {@link javax.servlet.http.HttpSession} and can be used to resolve the
@@ -54,6 +53,7 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
 
     /**
      * Tries to resolve the {@link MCRSession} throught the {@link MCRSessionMgr}
+     *
      * @return if is already closed it will return a {@link Optional#empty()}
      */
     public final Optional<MCRSession> resolveSession() {
@@ -79,7 +79,7 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
         if (newSessionResolver.isPresent() && !oldResolver.equals(newSessionResolver.get())) {
             LOGGER.warn("Attribute {} is beeing unbound from session {} and replaced by {}!", hsbe.getName(), oldResolver.getSessionID(), newSessionResolver.get());
             oldResolver.resolveSession().ifPresent(MCRSession::close);
-            }
+        }
 
     }
 
