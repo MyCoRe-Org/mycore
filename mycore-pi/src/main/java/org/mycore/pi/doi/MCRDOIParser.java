@@ -18,9 +18,9 @@
 
 package org.mycore.pi.doi;
 
-import org.mycore.pi.MCRPIParser;
-
 import java.util.Optional;
+
+import org.mycore.pi.MCRPIParser;
 
 public class MCRDOIParser implements MCRPIParser<MCRDigitalObjectIdentifier> {
 

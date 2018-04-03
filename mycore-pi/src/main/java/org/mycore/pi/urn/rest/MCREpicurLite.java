@@ -18,14 +18,14 @@
 
 package org.mycore.pi.urn.rest;
 
+import java.net.URL;
+
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.pi.MCRPIRegistrationInfo;
-
-import java.net.URL;
 
 import static org.mycore.common.MCRConstants.EPICURLITE_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
@@ -65,8 +65,8 @@ public final class MCREpicurLite {
         Element epicurLite = newEpicureElement("epicurlite");
         epicurLite.addNamespaceDeclaration(XSI_NAMESPACE);
         epicurLite.setAttribute("schemaLocation",
-                "http://nbn-resolving.org/epicurlite http://nbn-resolving.org/schemas/epicurlite/1.0/epicurlite.xsd",
-                XSI_NAMESPACE);
+            "http://nbn-resolving.org/epicurlite http://nbn-resolving.org/schemas/epicurlite/1.0/epicurlite.xsd",
+            XSI_NAMESPACE);
         Document epicurLiteDoc = new Document(epicurLite);
 
         // authentication information
@@ -107,7 +107,7 @@ public final class MCREpicurLite {
 
     public String asXMLString() {
         return new XMLOutputter(
-                Format.getPrettyFormat()).outputString(toXML());
+            Format.getPrettyFormat()).outputString(toXML());
     }
 
     private Element newEpicureElement(String epicurlite) {

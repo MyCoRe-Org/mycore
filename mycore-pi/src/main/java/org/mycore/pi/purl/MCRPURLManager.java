@@ -18,13 +18,6 @@
 
 package org.mycore.pi.purl;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,6 +26,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * PURL Manager to register Persistent URLs on a PURL server
@@ -124,7 +125,7 @@ public class MCRPURLManager {
 
         } catch (IOException e) {
             if (!e.getMessage().contains(
-                    "Server returned HTTP response code: 403 for URL: ")) {
+                "Server returned HTTP response code: 403 for URL: ")) {
                 LOGGER.error(e);
             }
         } finally {
@@ -152,7 +153,7 @@ public class MCRPURLManager {
             LOGGER.debug(url.toString() + " -> " + conn.getResponseCode());
         } catch (IOException e) {
             if (!e.getMessage().contains(
-                    "Server returned HTTP response code: 403 for URL: ")) {
+                "Server returned HTTP response code: 403 for URL: ")) {
                 LOGGER.error(e);
             }
         } finally {
@@ -241,7 +242,7 @@ public class MCRPURLManager {
 
             String strURL = purlServerBaseURL + PURL_PATH + purl;
             strURL +=
-                    "?target=" + URLEncoder.encode(target, UTF_8_STR) + "&maintainers=" + maintainers + "&type=" + type;
+                "?target=" + URLEncoder.encode(target, UTF_8_STR) + "&maintainers=" + maintainers + "&type=" + type;
 
             URL url = new URL(strURL);
             LOGGER.debug(url.toString());

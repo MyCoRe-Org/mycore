@@ -18,12 +18,12 @@
 
 package org.mycore.pi;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
 
@@ -37,7 +37,7 @@ public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
 
     protected final Map<String, String> getProperties() {
         Map<String, String> propertiesMap = MCRConfiguration.instance().getPropertiesMap(
-                GENERATOR_CONFIG_PREFIX + generatorID + ".");
+            GENERATOR_CONFIG_PREFIX + generatorID + ".");
 
         Map<String, String> shortened = new HashMap<>();
 

@@ -18,6 +18,25 @@
 
 package org.mycore.pi.doi;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.MessageFormat;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -39,7 +58,11 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.metadata.*;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIGenerator;
@@ -48,18 +71,6 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
-
-import javax.xml.XMLConstants;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 /**
  * Registers {@link MCRDigitalObjectIdentifier} at Datacite.
@@ -159,10 +170,10 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     }
 
     private void insertDOI(Document datacite, MCRDigitalObjectIdentifier doi)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         XPathExpression<Element> compile = XPathFactory.instance().compile(
-                "//datacite:identifier[@identifierType='DOI']",
-                Filters.element(), null, nameSpace);
+            "//datacite:identifier[@identifierType='DOI']",
+            Filters.element(), null, nameSpace);
         List<Element> doiList = compile.evaluate(datacite);
 
         if (doiList.size() > 1) {
@@ -170,7 +181,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         } else if (doiList.size() == 1) {
             Element doiElement = doiList.stream().findAny().get();
             LOGGER.warn("Found existing DOI({}) in Document will be replaced with {}", doiElement.getTextTrim(),
-                    doi.asString());
+                doi.asString());
             doiElement.setText(doi.asString());
         } else {
             // must be 0
@@ -224,15 +235,15 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
 
     @Override
     public void validateRegistration(MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException, MCRAccessException {
+        throws MCRPersistentIdentifierException, MCRAccessException {
         List<Map.Entry<String, URI>> mediaList = getMediaList((MCRObject) obj);
 
         for (Map.Entry<String, URI> stringURIEntry : mediaList) {
             if (stringURIEntry.getValue().toString().length() > MAX_URL_LENGTH) {
                 throw new MCRPersistentIdentifierException(
-                        "The URI " + stringURIEntry + " from media-list is to long!",
-                        MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_1_1),
-                        ERR_CODE_1_1);
+                    "The URI " + stringURIEntry + " from media-list is to long!",
+                    MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_1_1),
+                    ERR_CODE_1_1);
             }
         }
 
@@ -244,19 +255,19 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         return null;
     }
 
-
     @Override
-    protected MCRDigitalObjectIdentifier getNewIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected MCRDigitalObjectIdentifier getNewIdentifier(MCRBase obj, String additional)
+        throws MCRPersistentIdentifierException {
         MCRDigitalObjectIdentifier newIdentifier = super.getNewIdentifier(obj, additional);
         return (useTestPrefix) ? newIdentifier.toTestPrefix() : newIdentifier;
     }
 
     @Override
     public void registerIdentifier(MCRBase obj, String additional, MCRDigitalObjectIdentifier newDOI)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
-                    getClass().getName() + " doesn't support additional information! (" + additional + ")");
+                getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
 
         // just to check if valid
@@ -272,7 +283,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         }
 
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-                this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
+            this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
         MCRHIBConnection.instance().getSession().save(databaseEntry);
         return databaseEntry;
     }
@@ -297,16 +308,16 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     public List<Map.Entry<String, URI>> getMediaList(MCRObject obj) {
         List<Map.Entry<String, URI>> entryList = new ArrayList<>();
         Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(obj.getId(), 1, TimeUnit.MINUTES)
-                .stream().findFirst();
+            .stream().findFirst();
         derivateIdOptional.ifPresent(derivateId -> {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
             String mainDoc = derivate.getDerivate().getInternals().getMainDoc();
             MCRPath mainDocumentPath = MCRPath.getPath(derivateId.toString(), mainDoc);
             try {
                 String contentType = Optional.ofNullable(MCRContentTypes.probeContentType(mainDocumentPath))
-                        .orElse("application/octet-stream");
+                    .orElse("application/octet-stream");
                 entryList.add(new AbstractMap.SimpleEntry<>(contentType, new URI(this.registerURL + MCRXMLFunctions
-                        .encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId + "/" + mainDoc))));
+                    .encodeURIPath("/servlets/MCRFileNodeServlet/" + derivateId + "/" + mainDoc))));
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Error while detecting the file to register!", e);
             }
@@ -319,7 +330,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     }
 
     protected Document transformToDatacite(MCRDigitalObjectIdentifier doi, MCRBase mcrBase)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         MCRObjectID id = mcrBase.getId();
         MCRBaseContent content = new MCRBaseContent(mcrBase);
 
@@ -335,24 +346,24 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
             } catch (SAXException e) {
                 String translatedInformation = MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_1_2);
                 throw new MCRPersistentIdentifierException(
-                        "The document " + id + " does not generate well formed Datacite!",
-                        translatedInformation, ERR_CODE_1_2, e);
+                    "The document " + id + " does not generate well formed Datacite!",
+                    translatedInformation, ERR_CODE_1_2, e);
             }
             return dataciteDocument;
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRPersistentIdentifierException(
-                    "Could not transform the content of " + id + " with the transformer " + transformer, e);
+                "Could not transform the content of " + id + " with the transformer " + transformer, e);
         }
     }
 
     @Override
     public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         if (hasRegistrationStarted(obj.getId(), additional) || this.isRegistered(obj.getId(), additional)) {
             if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-                    .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
+                .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
                 LOGGER.warn("SuperUser deletes object {} with registered doi {}. Try to set DOI inactive.", obj.getId(),
-                        doi.asString());
+                    doi.asString());
                 if (this.isRegistered(obj.getId(), additional)) {
                     HashMap<String, String> contextParameters = new HashMap<>();
                     contextParameters.put(CONTEXT_DOI, doi.asString());
@@ -368,7 +379,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
 
     @Override
     public void update(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         if (isRegistered(obj.getId(), additional)) {
             HashMap<String, String> contextParameters = new HashMap<>();
             contextParameters.put(CONTEXT_DOI, doi.asString());
@@ -462,19 +473,19 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
      * @throws MCRPersistentIdentifierException
      */
     private MCRDigitalObjectIdentifier getDOIFromJob(Map<String, String> parameters)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         String doiString = parameters.get(CONTEXT_DOI);
         return parseIdentifier(doiString)
-                .orElseThrow(
-                        () -> new MCRPersistentIdentifierException("The String " + doiString + " can not be parsed to a DOI!"));
+            .orElseThrow(
+                () -> new MCRPersistentIdentifierException("The String " + doiString + " can not be parsed to a DOI!"));
     }
 
     @Override
     protected Optional<String> getJobInformation(Map<String, String> contextParameters) {
         String pattern = "{0} DOI: {1} for object: {2}";
         return Optional.of(MessageFormat
-                .format(pattern, getAction(contextParameters).toString(), contextParameters.get(CONTEXT_DOI),
-                        contextParameters.get(CONTEXT_OBJ)));
+            .format(pattern, getAction(contextParameters).toString(), contextParameters.get(CONTEXT_DOI),
+                contextParameters.get(CONTEXT_OBJ)));
     }
 
 }

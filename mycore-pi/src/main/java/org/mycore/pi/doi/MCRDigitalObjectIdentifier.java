@@ -18,9 +18,9 @@
 
 package org.mycore.pi.doi;
 
-import org.mycore.pi.MCRPersistentIdentifier;
-
 import java.util.Locale;
+
+import org.mycore.pi.MCRPersistentIdentifier;
 
 public class MCRDigitalObjectIdentifier implements MCRPersistentIdentifier {
 

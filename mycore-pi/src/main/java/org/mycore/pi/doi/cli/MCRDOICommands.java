@@ -18,6 +18,16 @@
 
 package org.mycore.pi.doi.cli;
 
+import java.net.URI;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
@@ -38,11 +48,6 @@ import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-import java.net.URI;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @MCRCommandGroup(name = "DOI Commands")
 public class MCRDOICommands {
 
@@ -51,15 +56,15 @@ public class MCRDOICommands {
     private static final String REPAIR_MEDIALIST_OF_0_AND_SERVICE_1 = "repair medialist of {0} and service {1}";
 
     @MCRCommand(syntax = "repair incomplete registered doi {0} with registration service {1}",
-            help = "Use this method if a DOI is registered, but not inserted in the Database. {0} is the DOI and "
-                    + "{1} the registration service from configuration.")
+        help = "Use this method if a DOI is registered, but not inserted in the Database. {0} is the DOI and "
+            + "{1} the registration service from configuration.")
     public static void repairIncompleteRegisteredDOI(String doiString, String serviceID)
-            throws MCRPersistentIdentifierException, MCRAccessException, MCRActiveLinkException {
+        throws MCRPersistentIdentifierException, MCRAccessException, MCRActiveLinkException {
         MCRDOIService registrationService = new MCRDOIService(serviceID);
         MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
 
         MCRDigitalObjectIdentifier doi = new MCRDOIParser().parse(doiString)
-                .orElseThrow(() -> new MCRException("Invalid DOI: " + doiString));
+            .orElseThrow(() -> new MCRException("Invalid DOI: " + doiString));
 
         URI uri = dataciteClient.resolveDOI(doi);
         if (!uri.toString().startsWith(registrationService.getRegisterURL())) {
@@ -75,7 +80,7 @@ public class MCRDOICommands {
 
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
         MCRPIMetadataService<MCRDigitalObjectIdentifier> synchronizer = registrationService
-                .getMetadataService();
+            .getMetadataService();
 
         if (!registrationService.isRegistered(objectID, doiString)) {
             LOGGER.info("{} is not found in PI-Database. Insert it..", objectID);
@@ -91,8 +96,8 @@ public class MCRDOICommands {
     }
 
     @MCRCommand(syntax = "repair registered dois {0}",
-            help = "Contacts the Registration Service and inserts all registered DOIs to the Database. It also updates all media files. The Service ID{0} is the id from the configuration.",
-            order = 10)
+        help = "Contacts the Registration Service and inserts all registered DOIs to the Database. It also updates all media files. The Service ID{0} is the id from the configuration.",
+        order = 10)
     public static void synchronizeDatabase(String serviceID) {
         MCRDOIService registrationService = new MCRDOIService(serviceID);
 
@@ -114,7 +119,7 @@ public class MCRDOICommands {
                             if (!registrationService.isRegistered(objectID, "")) {
                                 LOGGER.info("DOI is not registered in MyCoRe. Add to Database: {}", doi.asString());
                                 MCRPI databaseEntry = new MCRPI(doi.asString(), registrationService.getType(),
-                                        objectID.toString(), "", serviceID, new Date());
+                                    objectID.toString(), "", serviceID, new Date());
                                 MCRHIBConnection.instance().getSession().save(databaseEntry);
                             }
 
@@ -145,7 +150,7 @@ public class MCRDOICommands {
     }
 
     @MCRCommand(syntax = "repair media list of {0}",
-            help = "Sends new media lists to Datacite. The Service ID{0} is the id from the configuration.")
+        help = "Sends new media lists to Datacite. The Service ID{0} is the id from the configuration.")
     public static List<String> updateMediaListOfAllDOI(String serviceID) {
         MCRDOIService registrationService = new MCRDOIService(serviceID);
 
@@ -154,13 +159,13 @@ public class MCRDOICommands {
             List<MCRDigitalObjectIdentifier> doiList = dataciteClient.getDOIList();
 
             return doiList.stream()
-                    .filter(doi -> {
-                        boolean isTestDOI = doi.getPrefix().equals(MCRDigitalObjectIdentifier.TEST_DOI_PREFIX);
-                        return !isTestDOI || registrationService.usesTestPrefix();
-                    })
-                    .map(MCRDigitalObjectIdentifier::asString)
-                    .map(doiStr -> MessageFormat.format(REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, doiStr, serviceID))
-                    .collect(Collectors.toList());
+                .filter(doi -> {
+                    boolean isTestDOI = doi.getPrefix().equals(MCRDigitalObjectIdentifier.TEST_DOI_PREFIX);
+                    return !isTestDOI || registrationService.usesTestPrefix();
+                })
+                .map(MCRDigitalObjectIdentifier::asString)
+                .map(doiStr -> MessageFormat.format(REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, doiStr, serviceID))
+                .collect(Collectors.toList());
         } catch (MCRPersistentIdentifierException e) {
             LOGGER.error("Error while receiving DOI list from Registration-Service!", e);
         }
@@ -169,15 +174,15 @@ public class MCRDOICommands {
     }
 
     @MCRCommand(syntax = REPAIR_MEDIALIST_OF_0_AND_SERVICE_1,
-            help = "Sends new media list to Datacite. {0} is the DOI. The Service ID{1} is the id from the configuration.")
+        help = "Sends new media list to Datacite. {0} is the DOI. The Service ID{1} is the id from the configuration.")
     public static void updateMediaListForDOI(String doiString, String serviceID) {
         MCRDOIService registrationService = new MCRDOIService(serviceID);
 
         MCRDataciteClient dataciteClient = registrationService.getDataciteClient();
 
         MCRDigitalObjectIdentifier doi = new MCRDOIParser()
-                .parse(doiString)
-                .orElseThrow(() -> new IllegalArgumentException("The String " + doiString + " is no valid DOI!"));
+            .parse(doiString)
+            .orElseThrow(() -> new IllegalArgumentException("The String " + doiString + " is no valid DOI!"));
 
         try {
             URI uri = dataciteClient.resolveDOI(doi);
@@ -211,9 +216,9 @@ public class MCRDOICommands {
                         */
                         if (!newHashMap.containsKey(e.getKey())) {
                             newHashMap.put(e.getKey(), newMediaList.stream()
-                                    .findFirst()
-                                    .orElseThrow(() -> new MCRException("new media list is empty (this should not happen)"))
-                                    .getValue());
+                                .findFirst()
+                                .orElseThrow(() -> new MCRException("new media list is empty (this should not happen)"))
+                                .getValue());
                         }
                     });
 

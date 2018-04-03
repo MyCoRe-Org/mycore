@@ -18,13 +18,14 @@
 
 package org.mycore.pi.urn;
 
+import java.util.Objects;
+
+import javax.validation.constraints.NotNull;
+
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
 
@@ -46,7 +47,7 @@ public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
      * @throws MCRPersistentIdentifierException if something goes wrong while generating
      */
     protected MCRDNBURN generate(@NotNull String namespace, MCRObjectID mcrID, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         Objects.requireNonNull(namespace, "Namespace for an URN must not be null!");
         return new MCRDNBURN(namespace, buildNISS(mcrID, additional));
     }

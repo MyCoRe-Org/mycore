@@ -18,13 +18,13 @@
 
 package org.mycore.pi.doi;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.MCRPersistentIdentifier;
-
-import java.util.Optional;
-import java.util.UUID;
 
 public class MCRUUIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 

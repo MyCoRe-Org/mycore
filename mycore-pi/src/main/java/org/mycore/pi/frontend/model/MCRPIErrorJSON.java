@@ -18,10 +18,10 @@
 
 package org.mycore.pi.frontend.model;
 
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPIErrorJSON {
 
@@ -44,7 +44,7 @@ public class MCRPIErrorJSON {
             MCRPersistentIdentifierException identifierException = (MCRPersistentIdentifierException) e;
             identifierException.getCode().ifPresent(code -> this.code = Integer.toHexString(code));
             identifierException.getTranslatedAdditionalInformation()
-                    .ifPresent(msg -> this.translatedAdditionalInformation = msg);
+                .ifPresent(msg -> this.translatedAdditionalInformation = msg);
         }
 
         if (e != null) {

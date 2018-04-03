@@ -18,6 +18,13 @@
 
 package org.mycore.pi.urn.rest;
 
+import java.net.URL;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Optional;
+import java.util.function.Function;
+
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -25,13 +32,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.pi.MCRPIRegistrationInfo;
-
-import java.net.URL;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Optional;
-import java.util.function.Function;
 
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
 
@@ -96,7 +96,7 @@ public class MCRDNBURNRestClient {
                 return registerNew(urn);
             case HttpStatus.SC_MOVED_PERMANENTLY:
                 LOGGER.warn("The given URN {} is replaced with a newer version. \n "
-                        + "This newer version should be used instead.", identifier);
+                    + "This newer version should be used instead.", identifier);
                 break;
             case HttpStatus.SC_GONE:
                 LOGGER.warn("The given URN {} is registered in system but marked inactive.", identifier);
@@ -140,13 +140,13 @@ public class MCRDNBURNRestClient {
             case HttpStatus.SC_CREATED:
                 LOGGER.info("URN {} registered to {}", identifier, url);
                 return Optional.ofNullable(response.getFirstHeader("Last-Modified"))
-                        .map(Header::getValue)
-                        .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
-                        .map(Instant::from)
-                        .map(Date::from);
+                    .map(Header::getValue)
+                    .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
+                    .map(Instant::from)
+                    .map(Date::from);
             case HttpStatus.SC_SEE_OTHER:
                 LOGGER.warn("At least one of the given URLs is already registered under another URN, "
-                        + "which means you should use this existing URN instead of assigning a new one.");
+                    + "which means you should use this existing URN instead of assigning a new one.");
                 LOGGER.warn("URN {} could NOT registered to {}.", identifier, url);
                 break;
             case HttpStatus.SC_CONFLICT:
@@ -192,10 +192,10 @@ public class MCRDNBURNRestClient {
             case HttpStatus.SC_NO_CONTENT:
                 LOGGER.info("URN {} updated to {}.", identifier, elp.getUrl());
                 return Optional.ofNullable(response.getFirstHeader("Last-Modified"))
-                        .map(Header::getValue)
-                        .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
-                        .map(Instant::from)
-                        .map(Date::from);
+                    .map(Header::getValue)
+                    .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
+                    .map(Instant::from)
+                    .map(Date::from);
             case HttpStatus.SC_MOVED_PERMANENTLY:
                 LOGGER.warn("URN {} has a newer version.", identifier);
                 break;

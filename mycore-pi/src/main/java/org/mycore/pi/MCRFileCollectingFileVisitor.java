@@ -26,14 +26,14 @@ import java.util.ArrayList;
 
 public class MCRFileCollectingFileVisitor<T> implements FileVisitor<T> {
 
-    public ArrayList<T> getPaths() {
-        return paths;
-    }
-
     private final ArrayList<T> paths;
 
     public MCRFileCollectingFileVisitor() {
         paths = new ArrayList<>();
+    }
+
+    public ArrayList<T> getPaths() {
+        return paths;
     }
 
     @Override

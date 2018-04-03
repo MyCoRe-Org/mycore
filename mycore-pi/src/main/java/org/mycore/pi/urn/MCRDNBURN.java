@@ -30,11 +30,6 @@ public class MCRDNBURN extends MCRUniformResourceName {
 
     public static final String URN_NID = "nbn:de:";
 
-    @Override
-    public String getPREFIX() {
-        return super.getPREFIX() + URN_NID;
-    }
-
     public MCRDNBURN(String subNamespace, String namespaceSpecificString) {
         super(subNamespace, namespaceSpecificString);
     }
@@ -162,6 +157,11 @@ public class MCRDNBURN extends MCRUniformResourceName {
                 return 49;
         }
         throw new IllegalArgumentException("Invalid Character specified: " + c);
+    }
+
+    @Override
+    public String getPREFIX() {
+        return super.getPREFIX() + URN_NID;
     }
 
     /**

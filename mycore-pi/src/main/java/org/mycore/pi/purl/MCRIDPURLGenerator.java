@@ -18,12 +18,12 @@
 
 package org.mycore.pi.purl;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * The property BaseURLTemplate is your url and the {@link MCRIDPURLGenerator} will replace $ID with the actual MyCoRe-ID.
@@ -36,7 +36,7 @@ public class MCRIDPURLGenerator extends MCRPIGenerator<MCRPURL> {
 
     @Override
     public MCRPURL generate(MCRBase mcrObj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
 
         String baseUrlTemplate = getProperties().getOrDefault("BaseURLTemplate", "");
 

@@ -18,19 +18,19 @@
 
 package org.mycore.pi.condition;
 
-import org.mycore.datamodel.metadata.MCRBase;
-
 import java.util.function.Predicate;
+
+import org.mycore.datamodel.metadata.MCRBase;
 
 public abstract class MCRPIObjectRegistrationConditionProvider {
 
     public static final MCRPIObjectRegistrationConditionProvider ALWAYS_REGISTER_CONDITION_PROVIDER =
-            new MCRPIObjectRegistrationConditionProvider() {
-                @Override
-                public Predicate<MCRBase> provideRegistrationCondition(String type) {
-                    return (obj) -> true;
-                }
-            };
+        new MCRPIObjectRegistrationConditionProvider() {
+            @Override
+            public Predicate<MCRBase> provideRegistrationCondition(String type) {
+                return (obj) -> true;
+            }
+        };
 
     public abstract Predicate<MCRBase> provideRegistrationCondition(String type);
 }

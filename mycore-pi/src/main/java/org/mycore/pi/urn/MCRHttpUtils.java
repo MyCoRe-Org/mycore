@@ -30,8 +30,8 @@ import org.apache.http.ssl.SSLContexts;
 public class MCRHttpUtils {
     public static CloseableHttpClient getHttpClient() {
         return HttpClientBuilder
-                .create()
-                .setSSLContext(SSLContexts.createSystemDefault())
-                .build();
+            .create()
+            .setSSLContext(SSLContexts.createSystemDefault())
+            .build();
     }
 }

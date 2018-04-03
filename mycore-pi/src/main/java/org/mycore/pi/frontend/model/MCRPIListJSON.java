@@ -18,19 +18,11 @@
 
 package org.mycore.pi.frontend.model;
 
-import org.mycore.pi.MCRPIRegistrationInfo;
-
 import java.util.List;
 
-public class MCRPIListJSON {
+import org.mycore.pi.MCRPIRegistrationInfo;
 
-    public MCRPIListJSON(String type, int from, int size, int count, List<MCRPIRegistrationInfo> list) {
-        this.type = type;
-        this.from = from;
-        this.size = size;
-        this.count = count;
-        this.list = list;
-    }
+public class MCRPIListJSON {
 
     public String type;
 
@@ -41,4 +33,12 @@ public class MCRPIListJSON {
     public int count;
 
     public List<MCRPIRegistrationInfo> list;
+
+    public MCRPIListJSON(String type, int from, int size, int count, List<MCRPIRegistrationInfo> list) {
+        this.type = type;
+        this.from = from;
+        this.size = size;
+        this.count = count;
+        this.list = list;
+    }
 }

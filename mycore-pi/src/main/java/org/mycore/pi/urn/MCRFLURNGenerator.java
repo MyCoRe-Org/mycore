@@ -18,12 +18,12 @@
 
 package org.mycore.pi.urn;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Builds a new, unique NISS based on the current date and time expressed
@@ -52,8 +52,8 @@ public class MCRFLURNGenerator extends MCRDNBURNGenerator {
         String DDDDD = String.valueOf(yyy * 366 + ddd);
 
         String niss = String.valueOf(DDDDD.charAt(4)) + DDDDD.charAt(2) + DDDDD.charAt(1) + DDDDD.charAt(3)
-                + DDDDD.charAt(0)
-                + sss;
+            + DDDDD.charAt(0)
+            + sss;
 
         if (niss.equals(last)) {
             try {

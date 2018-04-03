@@ -18,19 +18,20 @@
 
 package org.mycore.pi.urn.rest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.urn.MCRDNBURN;
-
-import javax.persistence.EntityTransaction;
-import javax.persistence.RollbackException;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.TimerTask;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.urn.MCRDNBURN;
 
 /**
  * Created by chi on 26.01.17.
@@ -41,9 +42,9 @@ import java.util.function.UnaryOperator;
  */
 public final class MCRURNGranularRESTRegistrationTask extends TimerTask implements Closeable {
 
-    protected static final Logger LOGGER = LogManager.getLogger();
-
     public static final int BATCH_SIZE = 20;
+
+    protected static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRDNBURNRestClient dnburnClient;
 
@@ -54,8 +55,8 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
     @Override
     public void run() {
         UnaryOperator<Integer> register = b -> MCRPIManager
-                .getInstance()
-                .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, dnburnClient::register, b);
+            .getInstance()
+            .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, dnburnClient::register, b);
 
         Integer numOfRegisteredObj = MCRTransactionExec.cute(register).apply(BATCH_SIZE);
 
@@ -85,8 +86,8 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
 
         private static EntityTransaction beginTransaction() {
             EntityTransaction tx = MCREntityManagerProvider
-                    .getCurrentEntityManager()
-                    .getTransaction();
+                .getCurrentEntityManager()
+                .getTransaction();
 
             tx.begin();
             return tx;

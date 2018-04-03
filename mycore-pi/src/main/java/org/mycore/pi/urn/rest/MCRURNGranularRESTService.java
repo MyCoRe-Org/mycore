@@ -18,26 +18,16 @@
 
 package org.mycore.pi.urn.rest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessException;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.*;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.MCRPIService;
-import org.mycore.pi.backend.MCRPI;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.pi.urn.MCRDNBURNParser;
-
-import javax.persistence.EntityTransaction;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -45,6 +35,27 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.persistence.EntityTransaction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIService;
+import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.urn.MCRDNBURN;
+import org.mycore.pi.urn.MCRDNBURNParser;
 
 /**
  * Service for assigning granular URNs to Derivate. You can call it with a Derivate-ID and it will assign a Base-URN for
@@ -65,11 +76,11 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
     public MCRURNGranularRESTService(String registrationServiceID) {
         this(registrationServiceID,
-                MCRURNGranularRESTService::defaultDerivateFileStream);
+            MCRURNGranularRESTService::defaultDerivateFileStream);
     }
 
     public MCRURNGranularRESTService(String registrationServiceID,
-                                     Function<MCRDerivate, Stream<MCRPath>> derivateFileStreamFunc) {
+        Function<MCRDerivate, Stream<MCRPath>> derivateFileStreamFunc) {
         super(registrationServiceID, MCRDNBURN.TYPE);
         this.derivateFileStream = derivateFileStreamFunc;
     }
@@ -80,9 +91,9 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
         try {
             return Files.walk(derivRoot)
-                    .map(MCRPath::toMCRPath)
-                    .filter(p -> !Files.isDirectory(p))
-                    .filter(p -> !p.equals(derivRoot));
+                .map(MCRPath::toMCRPath)
+                .filter(p -> !Files.isDirectory(p))
+                .filter(p -> !p.equals(derivRoot));
         } catch (IOException e) {
             LOGGER.error("I/O error while access the starting file of derivate {}!", derivateId, e);
         } catch (SecurityException s) {
@@ -94,49 +105,49 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
     @Override
     public MCRDNBURN register(MCRBase obj, String filePath, boolean updateObject)
-            throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, filePath);
 
         Supplier<? extends RuntimeException> objIsNotMCRDerivate = () -> new RuntimeException(
-                "Object " + obj.getId() + " is not a MCRDerivate!");
+            "Object " + obj.getId() + " is not a MCRDerivate!");
 
         return Optional.of(obj)
-                .filter(MCRDerivate.class::isInstance)
-                .map(MCRDerivate.class::cast)
-                .map(deriv -> registerURN(deriv, filePath))
-                .orElseThrow(objIsNotMCRDerivate);
+            .filter(MCRDerivate.class::isInstance)
+            .map(MCRDerivate.class::cast)
+            .map(deriv -> registerURN(deriv, filePath))
+            .orElseThrow(objIsNotMCRDerivate);
     }
 
     private MCRDNBURN registerURN(MCRDerivate deriv, String filePath) {
         MCRObjectID derivID = deriv.getId();
 
         Function<String, Integer> countCreatedPI = s -> MCRPIManager
-                .getInstance()
-                .getCreatedIdentifiers(derivID, getType(), getServiceID())
-                .size();
+            .getInstance()
+            .getCreatedIdentifiers(derivID, getType(), getServiceID())
+            .size();
 
         int seed = Optional.of(filePath)
-                .filter(p -> !"".equals(p))
-                .map(countCreatedPI)
-                .map(count -> count + 1)
-                .orElse(1);
+            .filter(p -> !"".equals(p))
+            .map(countCreatedPI)
+            .map(count -> count + 1)
+            .orElse(1);
 
         MCRDNBURN derivURN = Optional
-                .ofNullable(deriv.getDerivate())
-                .map(MCRObjectDerivate::getURN)
-                .flatMap(new MCRDNBURNParser()::parse)
-                .orElseGet(() -> createNewURN(deriv));
+            .ofNullable(deriv.getDerivate())
+            .map(MCRObjectDerivate::getURN)
+            .flatMap(new MCRDNBURNParser()::parse)
+            .orElseGet(() -> createNewURN(deriv));
 
         String setID = derivID.getNumberAsString();
         GranularURNGenerator granularURNGen = new GranularURNGenerator(seed, derivURN, setID);
         Function<MCRPath, Supplier<String>> generateURN = p -> granularURNGen.getURNSupplier();
 
         derivateFileStream.apply(deriv)
-                .filter(notInIgnoreList().and(matchFile(filePath)))
-                .sorted()
-                .collect(Collectors.toMap(generateURN, p -> p, (m1, m2) -> m1,
-                        LinkedHashMap::new))
-                .forEach(createFileMetadata(deriv).andThen(persistURN(deriv)));
+            .filter(notInIgnoreList().and(matchFile(filePath)))
+            .sorted()
+            .collect(Collectors.toMap(generateURN, p -> p, (m1, m2) -> m1,
+                LinkedHashMap::new))
+            .forEach(createFileMetadata(deriv).andThen(persistURN(deriv)));
 
         try {
             MCRMetadataManager.update(deriv);
@@ -145,8 +156,8 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         }
 
         EntityTransaction transaction = MCREntityManagerProvider
-                .getCurrentEntityManager()
-                .getTransaction();
+            .getCurrentEntityManager()
+            .getTransaction();
 
         if (!transaction.isActive()) {
             transaction.begin();
@@ -169,7 +180,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
             if (Boolean.valueOf(getProperties().getOrDefault("supportDfgViewerURN", "false"))) {
                 String suffix = "dfg";
                 persistURNStr(deriv, null, getServiceID() + "-" + suffix)
-                        .accept(() -> derivURN.withNamespaceSuffix(suffix + "-").asString(), "");
+                    .accept(() -> derivURN.withNamespaceSuffix(suffix + "-").asString(), "");
             }
 
             return derivURN;
@@ -193,31 +204,31 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     private BiConsumer<Supplier<String>, String> persistURNStr(MCRDerivate deriv, Date registerDate, String serviceID) {
         return (urnSup, path) -> {
             MCRPI mcrpi = new MCRPI(urnSup.get(), getType(), deriv.getId().toString(), path, serviceID,
-                    registerDate);
+                registerDate);
             MCREntityManagerProvider.getCurrentEntityManager().persist(mcrpi);
         };
     }
 
     private Predicate<MCRPath> matchFile(String ownerRelativPath) {
         return path -> Optional.of(ownerRelativPath)
-                .filter(""::equals)
-                .map(p -> Boolean.TRUE)
-                .orElseGet(() -> path.getOwnerRelativePath().equals(ownerRelativPath));
+            .filter(""::equals)
+            .map(p -> Boolean.TRUE)
+            .orElseGet(() -> path.getOwnerRelativePath().equals(ownerRelativPath));
 
     }
 
     private Predicate<MCRPath> notInIgnoreList() {
         Supplier<? extends RuntimeException> errorInIgnorList = () -> new RuntimeException(
-                "Error in ignore filename list!");
+            "Error in ignore filename list!");
 
         return path -> getIgnoreFileList()
-                .stream()
-                .map(Pattern::compile)
-                .map(Pattern::asPredicate)
-                .map(Predicate::negate)
-                .reduce(Predicate::and)
-                .orElseThrow(errorInIgnorList)
-                .test(path.getOwnerRelativePath());
+            .stream()
+            .map(Pattern::compile)
+            .map(Pattern::asPredicate)
+            .map(Predicate::negate)
+            .reduce(Predicate::and)
+            .orElseThrow(errorInIgnorList)
+            .test(path.getOwnerRelativePath());
     }
 
     private List<String> getIgnoreFileList() {
@@ -232,19 +243,20 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) throws MCRPersistentIdentifierException {
+    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn)
+        throws MCRPersistentIdentifierException {
         // not used in this impl
     }
 
     @Override
     protected void delete(MCRDNBURN identifier, MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         throw new MCRPersistentIdentifierException("Delete is not supported for " + getType());
     }
 
     @Override
     protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         //TODO: improve API, don't override method to do nothing
         LOGGER.info("No update in this implementation");
     }

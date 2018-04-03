@@ -18,6 +18,8 @@
 
 package org.mycore.pi.urn;
 
+import java.io.IOException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -26,8 +28,6 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
-
-import java.io.IOException;
 
 public class MCRDNBPIDefProvider {
     private static final String RESOLVING_URL_TEMPLATE = "https://nbn-resolving.org/resolver?identifier={urn}&verb=full&xml=on";

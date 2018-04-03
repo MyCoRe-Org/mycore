@@ -18,8 +18,6 @@
 
 package org.mycore.pi.urn;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -27,6 +25,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Builds a new, unique NISS based on the current date and/or time

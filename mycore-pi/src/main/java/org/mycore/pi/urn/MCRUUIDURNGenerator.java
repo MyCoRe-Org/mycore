@@ -18,9 +18,9 @@
 
 package org.mycore.pi.urn;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
-
 import java.util.UUID;
+
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Builds a new, unique NISS using Java implementation of the UUID

@@ -18,14 +18,14 @@
 
 package org.mycore.pi;
 
-import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationException;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 
 public class MCRPIServiceManager {
 
@@ -37,23 +37,23 @@ public class MCRPIServiceManager {
 
     public List<String> getServiceIDList() {
         return MCRConfiguration.instance()
-                .getPropertiesMap(REGISTRATION_SERVICE_CONFIG_PREFIX)
-                .keySet()
-                .stream()
-                .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
-                .filter(s -> !s.contains("."))
-                .collect(Collectors.toList());
+            .getPropertiesMap(REGISTRATION_SERVICE_CONFIG_PREFIX)
+            .keySet()
+            .stream()
+            .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
+            .filter(s -> !s.contains("."))
+            .collect(Collectors.toList());
     }
 
     public List<MCRPIService> getServiceList() {
         return getServiceIDList()
-                .stream()
-                .map(this::getRegistrationService)
-                .collect(Collectors.toList());
+            .stream()
+            .map(this::getRegistrationService)
+            .collect(Collectors.toList());
     }
 
     public <T extends MCRPersistentIdentifier> MCRPIService<T> getRegistrationService(
-            String registrationServiceID) {
+        String registrationServiceID) {
         String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
         Class<? extends MCRPIService<T>> piClass = MCRConfiguration.instance().getClass(propertyName);
 
@@ -63,7 +63,7 @@ public class MCRPIServiceManager {
             return constructor.newInstance(registrationServiceID);
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException("The property : " + propertyName
-                    + " points to existing class, but without string constructor(serviceid)!", e);
+                + " points to existing class, but without string constructor(serviceid)!", e);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new MCRException("Cant initialize class the class defined in: " + propertyName, e);
         }

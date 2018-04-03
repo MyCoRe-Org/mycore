@@ -18,6 +18,11 @@
 
 package org.mycore.pi;
 
+import java.util.List;
+import java.util.Optional;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
@@ -30,10 +35,6 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-import javax.naming.OperationNotSupportedException;
-import java.util.List;
-import java.util.Optional;
-
 public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersistentIdentifier> {
 
     public MCRPIXPathMetadataService(String inscriberID) {
@@ -42,7 +43,7 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
 
     @Override
     public void insertIdentifier(MCRPersistentIdentifier identifier, MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
         MCRNodeBuilder nb = new MCRNodeBuilder();
@@ -53,8 +54,8 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
                 ((MCRObject) obj).getMetadata().setFromDOM(metadata);
             } else {
                 throw new MCRPersistentIdentifierException(obj.getId() + " is no MCRObject!",
-                        new OperationNotSupportedException(getClass().getName() + " only supports "
-                                + MCRObject.class.getName() + "!"));
+                    new OperationNotSupportedException(getClass().getName() + " only supports "
+                        + MCRObject.class.getName() + "!"));
             }
 
         } catch (Exception e) {
@@ -72,21 +73,22 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
         List<Element> elements = xp.evaluate(xml);
 
         elements.stream()
-                .filter(element -> element.getTextTrim().equals(identifier.asString()))
-                .forEach(Element::detach);
+            .filter(element -> element.getTextTrim().equals(identifier.asString()))
+            .forEach(Element::detach);
     }
 
     @Override
     public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();
         XPathFactory xpfac = XPathFactory.instance();
-        XPathExpression<Element> xp = xpfac.compile(xpath, Filters.element(), null, MCRConstants.getStandardNamespaces());
+        XPathExpression<Element> xp = xpfac
+            .compile(xpath, Filters.element(), null, MCRConstants.getStandardNamespaces());
         List<Element> evaluate = xp.evaluate(xml);
         if (evaluate.size() > 1) {
             throw new MCRPersistentIdentifierException(
-                    "Got " + evaluate.size() + " matches for " + obj.getId() + " with xpath " + xpath + "");
+                "Got " + evaluate.size() + " matches for " + obj.getId() + " with xpath " + xpath + "");
         }
 
         if (evaluate.size() == 0) {
@@ -97,7 +99,7 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
         String identifierString = identifierElement.getTextNormalize();
 
         Optional<MCRPersistentIdentifier> parsedIdentifierOptional = MCRPIManager.getInstance()
-                .getParserForType(getProperties().get("Type")).parse(identifierString);
+            .getParserForType(getProperties().get("Type")).parse(identifierString);
         return parsedIdentifierOptional.map(MCRPersistentIdentifier.class::cast);
     }
 

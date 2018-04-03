@@ -18,6 +18,9 @@
 
 package org.mycore.pi.urn;
 
+import java.text.ParseException;
+import java.util.Date;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -27,9 +30,6 @@ import org.mycore.pi.MCRPIService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import java.text.ParseException;
-import java.util.Date;
 
 /**
  * This class registers urn for Metadata.
@@ -43,22 +43,23 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
     }
 
     @Override
-    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn) throws MCRPersistentIdentifierException {
+    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn)
+        throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
             throw new MCRPersistentIdentifierException(
-                    getClass().getName() + " doesn't support additional information! (" + additional + ")");
+                getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
     }
 
     @Override
     protected void delete(MCRDNBURN identifier, MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         throw new MCRPersistentIdentifierException("Not supported!");
     }
 
     @Override
     protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         // nothing to do here!
     }
 
@@ -80,8 +81,8 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
         // URN is created. Now we need to check if it is resolvable
         MCRPI mcrpi = getTableEntry(id, additional);
         MCRDNBURN dnburn = new MCRDNBURNParser()
-                .parse(mcrpi.getIdentifier())
-                .orElseThrow(() -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
+            .parse(mcrpi.getIdentifier())
+            .orElseThrow(() -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
 
         try {
             // Find register date in dnb rest

@@ -18,6 +18,10 @@
 
 package org.mycore.pi.doi;
 
+import java.util.Date;
+import java.util.Locale;
+import java.util.Optional;
+
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRISO8601Date;
@@ -25,10 +29,6 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import java.util.Date;
-import java.util.Locale;
-import java.util.Optional;
 
 public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
@@ -45,7 +45,7 @@ public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectId
 
     @Override
     public MCRDigitalObjectIdentifier generate(MCRBase mcrObj, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         Date createdate = mcrObj.getService().getDate("createdate");
         if (createdate != null) {
             MCRISO8601Date mcrdate = new MCRISO8601Date();

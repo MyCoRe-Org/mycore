@@ -18,14 +18,14 @@
 
 package org.mycore.pi.doi;
 
+import java.util.stream.Stream;
+
 import org.mycore.pi.MCRPIResolver;
 import org.mycore.pi.doi.rest.MCRDOIRest;
 import org.mycore.pi.doi.rest.MCRDOIRestResponse;
 import org.mycore.pi.doi.rest.MCRDOIRestResponseEntry;
 import org.mycore.pi.doi.rest.MCRDOIRestResponseEntryDataStringValue;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
-
-import java.util.stream.Stream;
 
 public class MCRDOIResolver extends MCRPIResolver<MCRDigitalObjectIdentifier> {
     public MCRDOIResolver() {
@@ -38,12 +38,12 @@ public class MCRDOIResolver extends MCRPIResolver<MCRDigitalObjectIdentifier> {
 
         if (restResponse.getResponseCode() == 1) {
             return restResponse.getValues()
-                    .stream()
-                    .filter(responseEntry -> responseEntry.getType().equals("URL"))
-                    .map(MCRDOIRestResponseEntry::getData)
-                    .filter(responseEntryData -> responseEntryData.getFormat().equals("string"))
-                    .map(responseEntryData -> ((MCRDOIRestResponseEntryDataStringValue) responseEntryData
-                            .getValue()).getValue());
+                .stream()
+                .filter(responseEntry -> responseEntry.getType().equals("URL"))
+                .map(MCRDOIRestResponseEntry::getData)
+                .filter(responseEntryData -> responseEntryData.getFormat().equals("string"))
+                .map(responseEntryData -> ((MCRDOIRestResponseEntryDataStringValue) responseEntryData
+                    .getValue()).getValue());
         }
 
         return Stream.empty();
