@@ -133,7 +133,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     }
 
     protected synchronized void addObject(MCREvent evt, MCRBase objectOrDerivate) {
-        if (MCRMarkManager.instance().isMarkedForImport(objectOrDerivate.getId())) {
+        // do not add objects which are marked for import or deletion
+        if (MCRMarkManager.instance().isMarked(objectOrDerivate)) {
             return;
         }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
@@ -169,6 +170,17 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     }
 
     protected synchronized void addFile(Path path, BasicFileAttributes attrs) {
+        if(path instanceof MCRPath) {
+            // check if the derivate is marked for deletion
+            MCRPath mcrPath = (MCRPath) path;
+            String owner = mcrPath.getOwner();
+            if(MCRObjectID.isValid(owner)) {
+                MCRObjectID mcrObjectID = MCRObjectID.getInstance(owner);
+                if(MCRMarkManager.instance().isMarkedForDeletion(mcrObjectID)) {
+                    return;
+                }
+            }
+        }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             try {
                 MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,

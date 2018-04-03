@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.common.events.MCREventHandler;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -81,7 +82,7 @@ public class MCRMarkManager {
 
     private Map<MCRObjectID, Operation> marks;
 
-    protected MCRMarkManager() {
+    private MCRMarkManager() {
         this.marks = new ConcurrentHashMap<>();
     }
 
@@ -130,6 +131,21 @@ public class MCRMarkManager {
      */
     public boolean isMarked(MCRObjectID mcrId) {
         return this.marks.containsKey(mcrId);
+    }
+
+    /**
+     * Checks if the given base object is marked. If base is an instance of MCRDerivate, this method checks also if the
+     * linked object is marked.
+     *
+     * @param base the mycore object
+     * @return true if its marked
+     */
+    public boolean isMarked(MCRBase base) {
+        if(base instanceof MCRDerivate) {
+            MCRDerivate derivate = (MCRDerivate) base;
+            return isMarked(derivate.getId()) || isMarked(derivate.getOwnerID());
+        }
+        return isMarked(base.getId());
     }
 
     /**
