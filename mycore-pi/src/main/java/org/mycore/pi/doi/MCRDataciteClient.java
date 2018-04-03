@@ -1,6 +1,26 @@
 package org.mycore.pi.doi;
 
-import org.apache.http.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Scanner;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,15 +51,6 @@ import org.mycore.pi.exceptions.MCRDatacenterAuthenticationException;
 import org.mycore.pi.exceptions.MCRDatacenterException;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Used for DOI registration.
