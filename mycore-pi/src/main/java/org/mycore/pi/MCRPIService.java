@@ -69,8 +69,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     protected static final String METADATA_SERVICE_PROPERTY_KEY = "MetadataService";
 
-    private static Logger LOGGER = LogManager.getLogger();
-
     private final String registrationServiceID;
 
     private final String type;
