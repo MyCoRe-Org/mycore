@@ -36,8 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class MCRSessionResolver implements Serializable, HttpSessionBindingListener {
 
-    private static final ConcurrentHashMap<String, MCRSessionResolver> INSTANCE_MAP = new ConcurrentHashMap<>();
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final String sessionID;
