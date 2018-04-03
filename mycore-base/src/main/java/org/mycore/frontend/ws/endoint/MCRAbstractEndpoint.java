@@ -22,7 +22,9 @@ import java.util.function.Supplier;
 
 import javax.websocket.Session;
 
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSessionResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 
 /**
@@ -71,8 +73,9 @@ public abstract class MCRAbstractEndpoint {
      * @param session the websocket session
      */
     protected void activate(Session session) {
-        String sessionId = (String) session.getUserProperties().get(MCRServlet.ATTR_MYCORE_SESSION);
-        MCRSessionMgr.setCurrentSession(MCRSessionMgr.getSession(sessionId));
+        MCRSession mcrSession = ((MCRSessionResolver) session.getUserProperties().get(MCRServlet.ATTR_MYCORE_SESSION))
+            .resolveSession().get();
+        MCRSessionMgr.setCurrentSession(mcrSession);
     }
 
     /**
