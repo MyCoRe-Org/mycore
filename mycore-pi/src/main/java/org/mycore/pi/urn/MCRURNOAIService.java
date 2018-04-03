@@ -59,7 +59,7 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
     @Override
     protected void update(MCRDNBURN identifier, MCRBase obj, String additional)
             throws MCRPersistentIdentifierException {
-
+        // nothing to do here!
     }
 
     @Override
