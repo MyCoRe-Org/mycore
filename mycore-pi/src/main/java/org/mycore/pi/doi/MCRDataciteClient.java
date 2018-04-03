@@ -103,16 +103,17 @@ public class MCRDataciteClient {
         return outputStream.toByteArray();
     }
 
-    private static String getStatusString(HttpResponse resp) throws IOException {
+    private static String getStatusString(final HttpResponse resp) throws IOException {
         StatusLine statusLine = resp.getStatusLine();
         StringBuilder statusStringBuilder = new StringBuilder();
 
         statusStringBuilder.append(statusLine.getStatusCode()).append(" - ").append(statusLine.getReasonPhrase())
             .append(" - ");
 
-        Scanner scanner = new Scanner(resp.getEntity().getContent(), "UTF-8");
-        while (scanner.hasNextLine()) {
-            statusStringBuilder.append(scanner.nextLine());
+        try (final Scanner scanner = new Scanner(resp.getEntity().getContent(), "UTF-8")) {
+            while (scanner.hasNextLine()) {
+                statusStringBuilder.append(scanner.nextLine());
+            }
         }
 
         return statusStringBuilder.toString();
@@ -144,15 +145,16 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    Scanner scanner = new Scanner(response.getEntity().getContent(), "UTF-8");
-                    while (scanner.hasNextLine()) {
-                        String line = scanner.nextLine();
-                        String[] parts = line.split("=", 2);
-                        String mediaType = parts[0];
-                        URI mediaURI = new URI(parts[1]);
-                        entries.add(new AbstractMap.SimpleEntry<String, URI>(mediaType, mediaURI));
+                    try (final Scanner scanner = new Scanner(response.getEntity().getContent(), "UTF-8")) {
+                        while (scanner.hasNextLine()) {
+                            String line = scanner.nextLine();
+                            String[] parts = line.split("=", 2);
+                            String mediaType = parts[0];
+                            URI mediaURI = new URI(parts[1]);
+                            entries.add(new AbstractMap.SimpleEntry<String, URI>(mediaType, mediaURI));
+                        }
+                        return entries;
                     }
-                    return entries;
                 case HttpStatus.SC_UNAUTHORIZED:
                     throw new MCRDatacenterAuthenticationException();
                 case HttpStatus.SC_NOT_FOUND:
@@ -253,17 +255,17 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    Scanner scanner = new Scanner(entity.getContent(), "UTF-8");
-                    List<MCRDigitalObjectIdentifier> doiList = new ArrayList<>();
-
-                    while (scanner.hasNextLine()) {
-                        String line = scanner.nextLine();
-                        Optional<MCRDigitalObjectIdentifier> parse = new MCRDOIParser().parse(line);
-                        MCRDigitalObjectIdentifier doi = (MCRDigitalObjectIdentifier) parse
-                            .orElseThrow(() -> new MCRException("Could not parse DOI from Datacite!"));
-                        doiList.add(doi);
+                    try (final Scanner scanner = new Scanner(entity.getContent(), "UTF-8")) {
+                        List<MCRDigitalObjectIdentifier> doiList = new ArrayList<>();
+                        while (scanner.hasNextLine()) {
+                            String line = scanner.nextLine();
+                            Optional<MCRDigitalObjectIdentifier> parse = new MCRDOIParser().parse(line);
+                            MCRDigitalObjectIdentifier doi = (MCRDigitalObjectIdentifier) parse
+                                .orElseThrow(() -> new MCRException("Could not parse DOI from Datacite!"));
+                            doiList.add(doi);
+                        }
+                        return doiList;
                     }
-                    return doiList;
                 case HttpStatus.SC_NO_CONTENT:
                     return Collections.emptyList();
                 default:
@@ -287,9 +289,10 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    Scanner scanner = new Scanner(entity.getContent(), "UTF-8");
-                    String uriString = scanner.nextLine();
-                    return new URI(uriString);
+                    try(final Scanner scanner = new Scanner(entity.getContent(), "UTF-8")){
+                        String uriString = scanner.nextLine();
+                        return new URI(uriString);
+                    }
                 case HttpStatus.SC_NO_CONTENT:
                     throw new MCRIdentifierUnresolvableException(doi.asString(),
                         "The identifier " + doi.asString() + " is currently not resolvable");
