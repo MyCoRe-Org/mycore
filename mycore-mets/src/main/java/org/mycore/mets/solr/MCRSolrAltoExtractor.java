@@ -47,22 +47,16 @@ import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
  */
 public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
 
-    static XPathExpression<Element> WORD_EXP;
-
-    static XPathExpression<Element> CONTENT_EXP;
+    static XPathExpression<Element> STRING_EXP;
 
     static {
-        WORD_EXP = XPathFactory.instance()
-            .compile("alto:Layout/alto:Page/alto:PrintSpace//alto:String", Filters.element(), null,
-                MCRConstants.ALTO_NAMESPACE);
-        CONTENT_EXP = XPathFactory.instance()
-            .compile("alto:Layout/alto:Page/alto:PrintSpace//alto:TextLine", Filters.element(),
-                null, MCRConstants.ALTO_NAMESPACE);
+        String exp = "alto:Layout/alto:Page/alto:PrintSpace//alto:String";
+        STRING_EXP = XPathFactory.instance().compile(exp, Filters.element(), null, MCRConstants.ALTO_NAMESPACE);
     }
 
     @Override
     public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)
-        throws IOException {
+            throws IOException {
         String parentPath = MCRPath.toMCRPath(filePath).getParent().getOwnerRelativePath();
         if (!"/alto".equals(parentPath)) {
             return;
@@ -70,17 +64,15 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
         try (InputStream is = Files.newInputStream(filePath)) {
             SAXBuilder builder = new SAXBuilder();
             Document altoDocument = builder.build(is);
-            Element rootElement = altoDocument.getRootElement();
-            extractWords(rootElement).forEach(value -> document.addField("alto_words", value));
-            document.addField("alto_content", extractContent(rootElement));
+            extract(altoDocument.getRootElement(), document);
         } catch (JDOMException e) {
             LogManager.getLogger().error("Unable to parse {}", filePath, e);
         }
     }
 
-    private List<String> extractWords(Element root) {
-        List<String> extracted = new ArrayList<>();
-        for (Element stringElement : WORD_EXP.evaluate(root)) {
+    private void extract(Element root, SolrInputDocument document) {
+        StringBuilder altoContent = new StringBuilder();
+        for (Element stringElement : STRING_EXP.evaluate(root)) {
             String content = stringElement.getAttributeValue("CONTENT");
             String hpos = stringElement.getAttributeValue("HPOS");
             String vpos = stringElement.getAttributeValue("VPOS");
@@ -90,20 +82,12 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
                 continue;
             }
             String regEx = "\\.0";
-            extracted.add(String.join("|", content, hpos.replaceAll(regEx, ""), vpos.replaceAll(regEx, ""),
-                width.replaceAll(regEx, ""), height.replaceAll(regEx, "")));
+            String altoWord = String.join("|", content, hpos.replaceAll(regEx, ""), vpos.replaceAll(regEx, ""),
+                    width.replaceAll(regEx, ""), height.replaceAll(regEx, ""));
+            altoContent.append(content).append(' ');
+            document.addField("alto_words", altoWord);
         }
-        return extracted;
-    }
-
-    private String extractContent(Element root) {
-        return CONTENT_EXP.evaluate(root).stream().map(textLine -> {
-            StringBuilder content = new StringBuilder();
-            for (Element child : textLine.getChildren()) {
-                content.append(child.getName().equals("SP") ? " " : child.getAttributeValue("CONTENT"));
-            }
-            return content.append(" ").toString();
-        }).collect(Collectors.joining()).trim();
+        document.addField("alto_content", altoContent.toString().trim());
     }
 
 }
