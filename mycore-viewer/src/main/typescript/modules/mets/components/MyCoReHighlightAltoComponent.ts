@@ -82,7 +82,7 @@ namespace mycore.viewer.components {
                 return;
             }
             this.selectedChapter = chapterId;
-            if (this._altoChapterContainer === null) {
+            if (this._altoChapterContainer === null || !this._altoChapterContainer.hasLoadedPages()) {
                 return;
             }
             this.highlightLayer.selectedChapter = chapterId != null ? this._altoChapterContainer.chapters.get(chapterId) : null;
@@ -95,7 +95,9 @@ namespace mycore.viewer.components {
         }
 
         public setHighlightChapter(chapterId:string) {
-            if (this._altoChapterContainer === null || this.highlightedChapter === chapterId) {
+            if (this._altoChapterContainer === null ||
+                 !this._altoChapterContainer.hasLoadedPages() ||
+                 this.highlightedChapter === chapterId) {
                 return;
             }
             this.highlightLayer.highlightedChapter = chapterId != null ? this._altoChapterContainer.chapters.get(chapterId) : null;
@@ -240,6 +242,10 @@ namespace mycore.viewer.components {
                     this.pageChapterMap.get(imageHref).push(chapterId);
                 }
             });
+        }
+
+        hasLoadedPages(): boolean {
+            return Object.keys(this._loadedPages).length > 0;
         }
 
         getAreaListOfChapter(chapter:model.StructureChapter):Array<MetsArea> {
