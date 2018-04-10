@@ -27,7 +27,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 
 import org.apache.logging.log4j.LogManager;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -38,6 +37,9 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        if (MCRSessionMgr.isLocked()) {
+            return;
+        }
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         if (mcrSession.isTransactionActive()) {
             LogManager.getLogger().info("Filter scoped JPA transaction is active.");
