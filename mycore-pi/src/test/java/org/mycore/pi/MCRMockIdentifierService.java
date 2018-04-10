@@ -21,10 +21,10 @@ package org.mycore.pi;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRMockIdentifierRegistrationService extends MCRPIRegistrationService<MCRMockIdentifier> {
+public class MCRMockIdentifierService extends MCRPIService<MCRMockIdentifier> {
     protected static final String TYPE = "mock";
 
-    public MCRMockIdentifierRegistrationService(String registrationServiceID) {
+    public MCRMockIdentifierService(String registrationServiceID) {
         super(registrationServiceID, TYPE);
     }
 
@@ -35,10 +35,9 @@ public class MCRMockIdentifierRegistrationService extends MCRPIRegistrationServi
     private boolean updatedCalled = false;
 
     @Override
-    protected MCRMockIdentifier registerIdentifier(MCRBase obj, String additional)
+    protected void registerIdentifier(MCRBase obj, String additional, MCRMockIdentifier mi)
         throws MCRPersistentIdentifierException {
         registerCalled = true;
-        return getNewIdentifier(obj.getId(), "");
     }
 
     @Override

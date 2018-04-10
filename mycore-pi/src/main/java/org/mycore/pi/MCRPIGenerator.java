@@ -18,26 +18,26 @@
 
 package org.mycore.pi;
 
-import static org.mycore.pi.MCRPIRegistrationService.GENERATOR_CONFIG_PREFIX;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public abstract class MCRPersistentIdentifierGenerator<T extends MCRPersistentIdentifier> {
+import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
+
+public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
 
     private String generatorID;
 
-    public MCRPersistentIdentifierGenerator(String generatorID) {
+    public MCRPIGenerator(String generatorID) {
         this.generatorID = generatorID;
     }
 
     protected final Map<String, String> getProperties() {
         Map<String, String> propertiesMap = MCRConfiguration.instance().getPropertiesMap(
-                GENERATOR_CONFIG_PREFIX + generatorID + ".");
+            GENERATOR_CONFIG_PREFIX + generatorID + ".");
 
         Map<String, String> shortened = new HashMap<>();
 
@@ -51,11 +51,12 @@ public abstract class MCRPersistentIdentifierGenerator<T extends MCRPersistentId
 
     /**
      * generates a {@link MCRPersistentIdentifier}
-     * @param mcrID the mycore object for which the identifier is generated
+     *
+     * @param mcrBase    the mycore object for which the identifier is generated
      * @param additional additional information dedicated to the object like a mcrpath
      * @return a unique persistence identifier
      * @throws MCRPersistentIdentifierException if something goes wrong while generating
      */
-    public abstract T generate(MCRObjectID mcrID, String additional) throws MCRPersistentIdentifierException;
+    public abstract T generate(MCRBase mcrBase, String additional) throws MCRPersistentIdentifierException;
 
 }

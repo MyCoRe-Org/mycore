@@ -19,14 +19,14 @@
 package org.mycore.pi.doi.rest;
 
 public class MCRDOIRestResponseEntryData {
+    String format;
+
+    MCRDOIRestResponseEntryDataValue value;
+
     public MCRDOIRestResponseEntryData(String format, MCRDOIRestResponseEntryDataValue value) {
         this.format = format;
         this.value = value;
     }
-
-    String format;
-
-    MCRDOIRestResponseEntryDataValue value;
 
     public MCRDOIRestResponseEntryDataValue getValue() {
         return value;

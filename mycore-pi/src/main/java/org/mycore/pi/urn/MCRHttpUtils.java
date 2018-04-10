@@ -24,6 +24,7 @@ import org.apache.http.ssl.SSLContexts;
 
 /**
  * Created by chi on 31.01.17.
+ *
  * @author Huu Chi Vu
  */
 public class MCRHttpUtils {

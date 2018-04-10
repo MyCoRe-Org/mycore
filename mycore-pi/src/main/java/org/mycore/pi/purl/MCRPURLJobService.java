@@ -30,11 +30,11 @@ import java.util.function.Predicate;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.pi.MCRPIJobRegistrationService;
+import org.mycore.pi.MCRPIJobService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<MCRPersistentUniformResourceLocator> {
+public class MCRPURLJobService extends MCRPIJobService<MCRPURL> {
 
     private static final String TYPE = "purl";
 
@@ -56,13 +56,13 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
 
     private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
 
-    public MCRPURLJobRegistrationService(String registrationServiceID) {
+    public MCRPURLJobService(String registrationServiceID) {
         super(registrationServiceID, TYPE);
     }
 
     @Override
     public void registerJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
-        MCRPersistentUniformResourceLocator purl = getPURLFromJob(parameters);
+        MCRPURL purl = getPURLFromJob(parameters);
         String idString = parameters.get(CONTEXT_OBJECT);
         validateJobUserRights(MCRObjectID.getInstance(idString));
 
@@ -86,12 +86,12 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
         return Optional.empty();
     }
 
-    private MCRPersistentUniformResourceLocator getPURLFromJob(Map<String, String> parameters)
+    private MCRPURL getPURLFromJob(Map<String, String> parameters)
         throws MCRPersistentIdentifierException {
         String purlString = parameters.get(CONTEXT_PURL);
 
         try {
-            return new MCRPersistentUniformResourceLocator(new URL(purlString));
+            return new MCRPURL(new URL(purlString));
         } catch (MalformedURLException e) {
             throw new MCRPersistentIdentifierException("Cannot parse " + purlString);
         }
@@ -103,15 +103,14 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
         String objId = parameters.get(CONTEXT_OBJECT);
 
         validateJobUserRights(MCRObjectID.getInstance(objId));
-        MCRPersistentUniformResourceLocator purl;
+        MCRPURL purl;
 
         try {
-            purl = new MCRPersistentUniformResourceLocator(
+            purl = new MCRPURL(
                 new URL(purlString));
         } catch (MalformedURLException e) {
             throw new MCRPersistentIdentifierException("Could not parse purl: " + purlString, e);
         }
-
 
         doWithPURLManager((purlManager) -> {
             if (!purlManager.isPURLTargetURLUnchanged(purl.getUrl().toString(), buildTargetURL(
@@ -130,7 +129,7 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
 
     @Override
     public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional,
-        MCRPersistentUniformResourceLocator identifier) {
+        MCRPURL identifier) {
         Date registrationStarted = null;
         if (getRegistrationCondition(obj.getId().getTypeId()).test(obj)) {
             registrationStarted = new Date();
@@ -138,33 +137,28 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
         }
 
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getRegistrationServiceID(), provideRegisterDate(obj, additional), registrationStarted);
+            this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
         MCRHIBConnection.instance().getSession().save(databaseEntry);
         return databaseEntry;
     }
 
     @Override
-    protected MCRPersistentUniformResourceLocator registerIdentifier(MCRBase obj, String additional)
+    protected void registerIdentifier(MCRBase obj, String additional, MCRPURL purl)
         throws MCRPersistentIdentifierException {
         if (!"".equals(additional)) {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
-
-        MCRPersistentUniformResourceLocator purl = getNewIdentifier(obj.getId(), additional);
-        // just insert the purl to the object
-        // this will trigger #update
-        return purl;
     }
 
     @Override
-    protected void delete(MCRPersistentUniformResourceLocator identifier, MCRBase obj, String additional)
+    protected void delete(MCRPURL identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         // not supported
     }
 
     @Override
-    protected void update(MCRPersistentUniformResourceLocator purl, MCRBase obj, String additional)
+    protected void update(MCRPURL purl, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         if (!hasRegistrationStarted(obj.getId(), additional)) {
             Predicate<MCRBase> registrationCondition = getRegistrationCondition(obj.getId().getTypeId());
@@ -179,14 +173,14 @@ public class MCRPURLJobRegistrationService extends MCRPIJobRegistrationService<M
         }
     }
 
-    private void startUpdateJob(MCRBase obj, MCRPersistentUniformResourceLocator purl) {
+    private void startUpdateJob(MCRBase obj, MCRPURL purl) {
         HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(CONTEXT_PURL, purl.asString());
         contextParameters.put(CONTEXT_OBJECT, obj.getId().toString());
         this.addUpdateJob(contextParameters);
     }
 
-    private void startRegisterJob(MCRBase obj, MCRPersistentUniformResourceLocator purl) {
+    private void startRegisterJob(MCRBase obj, MCRPURL purl) {
         HashMap<String, String> contextParameters = new HashMap<>();
         contextParameters.put(CONTEXT_PURL, purl.asString());
         contextParameters.put(CONTEXT_OBJECT, obj.getId().toString());

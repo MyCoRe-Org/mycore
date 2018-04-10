@@ -21,21 +21,21 @@ package org.mycore.pi.purl;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.pi.MCRPersistentIdentifierGenerator;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
  * The property BaseURLTemplate is your url and the {@link MCRIDPURLGenerator} will replace $ID with the actual MyCoRe-ID.
  */
-public class MCRIDPURLGenerator extends MCRPersistentIdentifierGenerator<MCRPersistentUniformResourceLocator> {
+public class MCRIDPURLGenerator extends MCRPIGenerator<MCRPURL> {
 
     public MCRIDPURLGenerator(String generatorID) {
         super(generatorID);
     }
 
     @Override
-    public MCRPersistentUniformResourceLocator generate(MCRObjectID mcrID, String additional)
+    public MCRPURL generate(MCRBase mcrObj, String additional)
         throws MCRPersistentIdentifierException {
 
         String baseUrlTemplate = getProperties().getOrDefault("BaseURLTemplate", "");
@@ -45,12 +45,12 @@ public class MCRIDPURLGenerator extends MCRPersistentIdentifierGenerator<MCRPers
 
         do {
             before = replace;
-            replace = baseUrlTemplate.replace("$ID", mcrID.toString());
+            replace = baseUrlTemplate.replace("$ID", mcrObj.getId().toString());
         } while (!replace.equals(before));
 
         try {
             URL url = new URL(replace);
-            return new MCRPersistentUniformResourceLocator(url);
+            return new MCRPURL(url);
         } catch (MalformedURLException e) {
             throw new MCRPersistentIdentifierException("Error while creating URL object from string: " + replace, e);
         }

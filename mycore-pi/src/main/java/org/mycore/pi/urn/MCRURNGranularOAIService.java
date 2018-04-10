@@ -41,8 +41,8 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRFileCollectingFileVisitor;
-import org.mycore.pi.MCRPIRegistrationService;
-import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -50,15 +50,15 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * Service for assigning granular URNs to Derivate. You can call it with a Derivate-ID and it will assign a Base-URN for
  * the Derivate and granular URNs for every file in the Derivate (except IgnoreFileNames). If you then add a file to
  * Derivate you can call with Derivate-ID and additional path of the file. E.g. mir_derivate_00000060 and /image1.jpg
- * <p> <b>Inscriber is ignored with this {@link MCRPIRegistrationService}</b> </p> Configuration Parameter(s): <dl>
+ * <p> <b>Inscriber is ignored with this {@link MCRPIService}</b> </p> Configuration Parameter(s): <dl>
  * <dt>IgnoreFileNames</dt> <dd>Comma seperated list of regex file which should not have a urn assigned. Default:
  * mets\\.xml</dd> </dl>
  */
-public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationService<MCRDNBURN> {
+public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MCRURNGranularOAIRegistrationService(String registrationServiceID) {
+    public MCRURNGranularOAIService(String registrationServiceID) {
         super(registrationServiceID, MCRDNBURN.TYPE);
     }
 
@@ -100,14 +100,14 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
         }
 
         int count = Math.toIntExact(derivate.getFileMetadata().stream().filter(file -> file.getUrn() != null).count());
-        MCRDNBURN dnbURN = newURN = (MCRDNBURN) MCRPersistentIdentifierManager.getInstance().get(derivate.getURN())
+        MCRDNBURN dnbURN = newURN = (MCRDNBURN) MCRPIManager.getInstance().get(derivate.getURN())
             .findFirst().get();
 
         String setID = obj.getId().getNumberAsString();
         MCRDNBURN urntoAssign = dnbURN.toGranular(setID, count + 1, count + 1);
         derivate.getOrCreateFileMetadata(filePath, urntoAssign.asString()).setUrn(urntoAssign.asString());
         MCRPI databaseEntry = new MCRPI(urntoAssign.asString(), getType(), obj.getId().toString(), additional,
-            this.getRegistrationServiceID(), new Date());
+            this.getServiceID(), new Date());
         session.save(databaseEntry);
         return newURN;
     }
@@ -144,7 +144,7 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
             .sorted()
             .collect(Collectors.toList());
 
-        MCRDNBURN newURN = getNewIdentifier(obj.getId(), additional);
+        MCRDNBURN newURN = getNewIdentifier(obj, additional);
         String setID = obj.getId().getNumberAsString();
 
         for (int pathListIndex = 0; pathListIndex < pathList.size(); pathListIndex++) {
@@ -152,17 +152,16 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
             derivate.getOrCreateFileMetadata(pathList.get(pathListIndex), subURN.asString()).setUrn(subURN.asString());
             MCRPI databaseEntry = new MCRPI(subURN.asString(), getType(), obj.getId().toString(),
                 pathList.get(pathListIndex).getOwnerRelativePath(),
-                this.getRegistrationServiceID(), null);
+                this.getServiceID(), null);
             session.save(databaseEntry);
         }
 
         derivate.setURN(newURN.asString());
         MCRPI databaseEntry = new MCRPI(newURN.asString(), getType(), obj.getId().toString(), "",
-            this.getRegistrationServiceID(), new Date());
+            this.getServiceID(), new Date());
         session.save(databaseEntry);
         return newURN;
     }
-
 
     private List<String> getIgnoreFileList() {
         List<String> ignoreFileNamesList = new ArrayList<>();
@@ -176,9 +175,9 @@ public class MCRURNGranularOAIRegistrationService extends MCRPIRegistrationServi
     }
 
     @Override
-    protected MCRDNBURN registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn)
+        throws MCRPersistentIdentifierException {
         // not used in this impl
-        return null;
     }
 
     @Override

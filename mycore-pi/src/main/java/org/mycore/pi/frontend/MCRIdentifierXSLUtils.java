@@ -26,14 +26,13 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.pi.MCRPIRegistrationService;
-import org.mycore.pi.MCRPIRegistrationServiceManager;
+import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.w3c.dom.NodeList;
 
@@ -42,40 +41,40 @@ public class MCRIdentifierXSLUtils {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static boolean hasIdentifierCreated(String service, String id, String additional) {
-        MCRPIRegistrationService<MCRPersistentIdentifier> registrationService = MCRPIRegistrationServiceManager
+        MCRPIService<MCRPersistentIdentifier> registrationService = MCRPIServiceManager
             .getInstance().getRegistrationService(service);
         return registrationService.isCreated(MCRObjectID.getInstance(id), additional);
     }
 
     public static boolean hasIdentifierRegistrationStarted(String service, String id, String additional) {
-        MCRPIRegistrationService<MCRPersistentIdentifier> registrationService = MCRPIRegistrationServiceManager
+        MCRPIService<MCRPersistentIdentifier> registrationService = MCRPIServiceManager
             .getInstance().getRegistrationService(service);
         return registrationService.hasRegistrationStarted(MCRObjectID.getInstance(id), additional);
     }
 
     public static boolean hasIdentifierRegistered(String service, String id, String additional) {
-        MCRPIRegistrationService<MCRPersistentIdentifier> registrationService = MCRPIRegistrationServiceManager
+        MCRPIService<MCRPersistentIdentifier> registrationService = MCRPIServiceManager
             .getInstance().getRegistrationService(service);
         return registrationService.isRegistered(MCRObjectID.getInstance(id), additional);
     }
 
     public static boolean hasManagedPI(String objectID) {
-        return MCRPersistentIdentifierManager.getInstance()
+        return MCRPIManager.getInstance()
             .getRegistered(MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectID))).size() > 0;
     }
 
     public static boolean isManagedPI(String pi, String id) {
-        return MCRPersistentIdentifierManager.getInstance().getInfo(pi).stream().anyMatch(info -> info.getMycoreID()
+        return MCRPIManager.getInstance().getInfo(pi).stream().anyMatch(info -> info.getMycoreID()
             .equals(id));
     }
 
     /**
      * Gets all available services which are configured.
      * e.g.
-     *   <ul>
-     *     <li>&lt;service id="service1" inscribed="false" permission="true" type="urn" /&gt;</li>
-     *     <li>&lt;service id="service2" inscribed="true" permission="false" type="doi" /&gt;</li>
-     *   </ul>
+     * <ul>
+     * <li>&lt;service id="service1" inscribed="false" permission="true" type="urn" /&gt;</li>
+     * <li>&lt;service id="service2" inscribed="true" permission="false" type="doi" /&gt;</li>
+     * </ul>
      *
      * @param objectID the object
      * @return a Nodelist
@@ -85,20 +84,16 @@ public class MCRIdentifierXSLUtils {
         Element e = new Element("list");
 
         MCRBase obj = MCRMetadataManager.retrieve(MCRObjectID.getInstance(objectID));
-        MCRConfiguration.instance().getPropertiesMap("MCR.PI.Registration.")
-            .keySet()
+        MCRPIServiceManager.getInstance().getServiceList()
             .stream()
-            .map(s -> s.substring("MCR.PI.Registration.".length()))
-            .filter(id -> !id.contains("."))
-            .map((serviceID) -> MCRPIRegistrationServiceManager.getInstance().getRegistrationService(serviceID))
             .map((rs -> {
                 Element service = new Element("service");
 
-                service.setAttribute("id", rs.getRegistrationServiceID());
+                service.setAttribute("id", rs.getServiceID());
 
                 // Check if the inscriber of this service can read a PI
                 try {
-                    if (rs.getMetadataManager().getIdentifier(obj, "").isPresent()) {
+                    if (rs.getMetadataService().getIdentifier(obj, "").isPresent()) {
                         service.setAttribute("inscribed", "true");
                     } else {
                         service.setAttribute("inscribed", "false");
@@ -109,7 +104,7 @@ public class MCRIdentifierXSLUtils {
                 }
 
                 // rights
-                String permission = "register-" + rs.getRegistrationServiceID();
+                String permission = "register-" + rs.getServiceID();
                 Boolean canRegister = MCRAccessManager.checkPermission(objectID, "writedb") &&
                     MCRAccessManager.checkPermission(obj.getId(), permission);
 

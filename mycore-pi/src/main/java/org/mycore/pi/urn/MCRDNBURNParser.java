@@ -18,14 +18,14 @@
 
 package org.mycore.pi.urn;
 
+import java.util.Optional;
+
+import org.mycore.pi.MCRPIParser;
+
 import static org.mycore.pi.urn.MCRDNBURN.URN_NID;
 import static org.mycore.pi.urn.MCRUniformResourceName.PREFIX;
 
-import java.util.Optional;
-
-import org.mycore.pi.MCRPersistentIdentifierParser;
-
-public class MCRDNBURNParser implements MCRPersistentIdentifierParser<MCRDNBURN> {
+public class MCRDNBURNParser implements MCRPIParser<MCRDNBURN> {
 
     @Override
     public Optional<MCRDNBURN> parse(String identifier) {

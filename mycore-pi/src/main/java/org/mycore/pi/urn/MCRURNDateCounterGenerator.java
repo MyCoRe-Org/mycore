@@ -34,23 +34,23 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * a Java SimpleDateFormat pattern, the counter can be formatted with
  * a Java DecimalFormat pattern. The property "NISSPattern" is used
  * for configuring the instance. Example configuration:
- *
+ * <p>
  * MCR.URN.SubNamespace.Essen.Prefix=urn:nbn:de:465-miless-
  * MCR.URN.SubNamespace.Essen.NISSBuilder=org.mycore.urn.services.MCRNISSBuilderDateCounter
  * MCR.URN.SubNamespace.Essen.NISSPattern=yyyyMMdd-HHmmss-000
- *
+ * <p>
  * Subsequent calls to MCRURN.buildURN( "Essen" ) could then generate
  * the following URNs, for example:
- *
+ * <p>
  * urn:nbn:de:465-miless-20060622-213404-0017
  * urn:nbn:de:465-miless-20060622-213404-0025
  * urn:nbn:de:465-miless-20060622-213448-0013
- *
+ * <p>
  * The last character is the checksum digit.
  * In the first two URNs, the generated date pattern is the same, so
  * the counter is increased (starting at 1). The use of "0" instead of
  * "#" in the pattern produces leading zeros.
- *
+ * <p>
  * A pattern might have no date part (only use counter)
  * or no counter part (only use date pattern)
  *

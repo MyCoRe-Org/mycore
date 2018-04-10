@@ -45,6 +45,7 @@ import org.mycore.pi.MCRPIRegistrationInfo;
 
 /**
  * Created by chi on 07.02.17.
+ *
  * @author Huu Chi Vu
  */
 public class MCRDerivateURNUtils {
@@ -138,8 +139,7 @@ public class MCRDerivateURNUtils {
     }
 
     /**
-     * @param file
-     *            image file
+     * @param file image file
      * @return if content type is in property <code>MCR.URN.URNGranular.SupportedContentTypes</code>
      * @see MCRContentTypes#probeContentType(Path)
      */

@@ -38,7 +38,6 @@ import org.mycore.pi.MCRPIRegistrationInfo;
 
 /**
  * @author shermann
- *
  */
 public class MCRURNGranularRESTRegistrationStarter
     implements MCRStartupHandler.AutoExecutable, MCRShutdownHandler.Closeable {

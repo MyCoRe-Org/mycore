@@ -30,7 +30,7 @@ import javax.persistence.RollbackException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.urn.MCRDNBURN;
 
 /**
@@ -42,9 +42,9 @@ import org.mycore.pi.urn.MCRDNBURN;
  */
 public final class MCRURNGranularRESTRegistrationTask extends TimerTask implements Closeable {
 
-    protected static final Logger LOGGER = LogManager.getLogger();
-
     public static final int BATCH_SIZE = 20;
+
+    protected static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRDNBURNRestClient dnburnClient;
 
@@ -54,7 +54,7 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
 
     @Override
     public void run() {
-        UnaryOperator<Integer> register = b -> MCRPersistentIdentifierManager
+        UnaryOperator<Integer> register = b -> MCRPIManager
             .getInstance()
             .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, dnburnClient::register, b);
 

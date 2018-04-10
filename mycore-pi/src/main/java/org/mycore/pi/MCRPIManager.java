@@ -44,7 +44,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
 
-public class MCRPersistentIdentifierManager {
+public class MCRPIManager {
     private static final String TYPE = "type";
 
     private static final String MCRID = "mcrId";
@@ -53,19 +53,19 @@ public class MCRPersistentIdentifierManager {
 
     private static final String ADDITIONAL = "additional";
 
-    private static MCRPersistentIdentifierManager instance;
-
     private static final String PARSER_CONFIGURATION = "MCR.PI.Parsers.";
 
     private static final String RESOLVER_CONFIGURATION = "MCR.PI.Resolvers";
 
-    private List<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverList;
+    private static MCRPIManager instance;
 
-    private List<Class<? extends MCRPersistentIdentifierParser<? extends MCRPersistentIdentifier>>> parserList;
+    private List<MCRPIResolver<MCRPersistentIdentifier>> resolverList;
 
-    private Map<String, Class<? extends MCRPersistentIdentifierParser>> typeParserMap;
+    private List<Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserList;
 
-    private MCRPersistentIdentifierManager() {
+    private Map<String, Class<? extends MCRPIParser>> typeParserMap;
+
+    private MCRPIManager() {
         resolverList = new ArrayList<>();
         parserList = new ArrayList<>();
         typeParserMap = new ConcurrentHashMap<>();
@@ -75,7 +75,7 @@ public class MCRPersistentIdentifierManager {
             String type = k.substring(PARSER_CONFIGURATION.length());
             try {
                 @SuppressWarnings("unchecked")
-                Class<? extends MCRPersistentIdentifierParser<?>> parserClass = (Class<? extends MCRPersistentIdentifierParser<?>>) Class
+                Class<? extends MCRPIParser<?>> parserClass = (Class<? extends MCRPIParser<?>>) Class
                     .forName(v);
                 registerParser(type, parserClass);
             } catch (ClassNotFoundException e) {
@@ -87,11 +87,11 @@ public class MCRPersistentIdentifierManager {
             .forEach(className -> {
                 try {
                     @SuppressWarnings("unchecked")
-                    Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClass = (Class<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>>) Class
+                    Class<MCRPIResolver<MCRPersistentIdentifier>> resolverClass = (Class<MCRPIResolver<MCRPersistentIdentifier>>) Class
                         .forName(className);
-                    Constructor<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> resolverClassConstructor = resolverClass
+                    Constructor<MCRPIResolver<MCRPersistentIdentifier>> resolverClassConstructor = resolverClass
                         .getConstructor();
-                    MCRPersistentIdentifierResolver<MCRPersistentIdentifier> resolver = resolverClassConstructor
+                    MCRPIResolver<MCRPersistentIdentifier> resolver = resolverClassConstructor
                         .newInstance();
                     resolverList.add(resolver);
                 } catch (ClassNotFoundException e) {
@@ -112,17 +112,17 @@ public class MCRPersistentIdentifierManager {
 
     }
 
-    public static MCRPersistentIdentifierManager getInstance() {
+    public synchronized static MCRPIManager getInstance() {
         if (instance == null) {
-            instance = new MCRPersistentIdentifierManager();
+            instance = new MCRPIManager();
         }
 
         return instance;
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends MCRPersistentIdentifier> MCRPersistentIdentifierParser<T> getParserInstance(
-        Class<? extends MCRPersistentIdentifierParser> detectorClass) throws ClassCastException {
+    private static <T extends MCRPersistentIdentifier> MCRPIParser<T> getParserInstance(
+        Class<? extends MCRPIParser> detectorClass) throws ClassCastException {
         try {
             return detectorClass.getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
@@ -346,39 +346,41 @@ public class MCRPersistentIdentifierManager {
 
     /**
      * Returns a parser for a specific type of persistent identifier.
+     *
      * @param type the type which should be parsed
-     * @param <T> the type of {@link MCRPersistentIdentifierParser} which should be returned.
-     * @return a MCRPersistentIdentifierParser
+     * @param <T>  the type of {@link MCRPIParser} which should be returned.
+     * @return a MCRPIParser
      * @throws ClassCastException when the wrong type is passed
      */
     @SuppressWarnings("WeakerAccess")
-    public <T extends MCRPersistentIdentifier> MCRPersistentIdentifierParser<T> getParserForType(String type)
+    public <T extends MCRPersistentIdentifier> MCRPIParser<T> getParserForType(String type)
         throws ClassCastException {
         return getParserInstance(typeParserMap.get(type));
     }
 
     /**
      * Registers a parser for a specific type of persistent identifier.
-     * @param type the type of the parser
+     *
+     * @param type        the type of the parser
      * @param parserClass the class of the parser
      */
     @SuppressWarnings("WeakerAccess")
     public void registerParser(
         String type,
-        Class<? extends MCRPersistentIdentifierParser<? extends MCRPersistentIdentifier>> parserClass) {
+        Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>> parserClass) {
 
         this.parserList.add(parserClass);
         this.typeParserMap.put(type, parserClass);
     }
 
-    public List<MCRPersistentIdentifierResolver<MCRPersistentIdentifier>> getResolvers() {
+    public List<MCRPIResolver<MCRPersistentIdentifier>> getResolvers() {
         return this.resolverList;
     }
 
     public Stream<MCRPersistentIdentifier> get(String pi) {
         return parserList
             .stream()
-            .map(MCRPersistentIdentifierManager::getParserInstance)
+            .map(MCRPIManager::getParserInstance)
             .map(p -> p.parse(pi))
             .filter(Optional::isPresent)
             .map(Optional::get)

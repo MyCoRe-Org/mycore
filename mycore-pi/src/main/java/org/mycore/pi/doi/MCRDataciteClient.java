@@ -212,7 +212,8 @@ public class MCRDataciteClient {
                 case HttpStatus.SC_OK:
                     return;
                 case HttpStatus.SC_BAD_REQUEST:
-                    throw new MCRDatacenterException(getStatusString(response)); // non-supported mime-type, not allowed URL domain
+                    throw new MCRDatacenterException(
+                        getStatusString(response)); // non-supported mime-type, not allowed URL domain
                 case HttpStatus.SC_UNAUTHORIZED:
                     throw new MCRDatacenterAuthenticationException();
                 default:
@@ -244,7 +245,8 @@ public class MCRDataciteClient {
                 case HttpStatus.SC_CREATED:
                     return;
                 case HttpStatus.SC_BAD_REQUEST:
-                    throw new MCRDatacenterException(getStatusString(response)); // invalid PREFIX or wrong format, but format is hard defined!
+                    throw new MCRDatacenterException(
+                        getStatusString(response)); // invalid PREFIX or wrong format, but format is hard defined!
                 case HttpStatus.SC_UNAUTHORIZED:
                     throw new MCRDatacenterAuthenticationException();
                 case HttpStatus.SC_PRECONDITION_FAILED:

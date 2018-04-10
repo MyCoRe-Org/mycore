@@ -18,11 +18,8 @@
 
 package org.mycore.pi;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,6 +45,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.doi.MCRDOIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 import com.google.gson.ExclusionStrategy;
@@ -55,148 +53,29 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier> {
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-    public static final String REGISTRATION_CONFIG_PREFIX = "MCR.PI.Registration.";
+public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
+
+    public static final String REGISTRATION_CONFIG_PREFIX = "MCR.PI.Service.";
 
     public static final String GENERATOR_CONFIG_PREFIX = "MCR.PI.Generator.";
 
-    public static final String METADATA_MANAGER_CONFIG_PREFIX = "MCR.PI.MetadataManager.";
-
-    public static final String METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX = "MCR.PI.Inscriber.";
+    public static final String METADATA_SERVICE_CONFIG_PREFIX = "MCR.PI.MetadataService.";
 
     public static final String PI_FLAG = "MyCoRe-PI";
 
-    public static final String FLAG_SEPERATOR = "\\";
+    public static final String GENERATOR_PROPERTY_KEY = "Generator";
 
-    protected static final String METADATA_MANAGER_PROPERTY_KEY = "MetadataManager";
-
-    protected static final String METADATA_MANAGER_DEPRECATED_PROPERTY_KEY = "Inscriber";
+    protected static final String METADATA_SERVICE_PROPERTY_KEY = "MetadataService";
 
     private final String registrationServiceID;
 
     private final String type;
 
-    private static Logger LOGGER = LogManager.getLogger();
-
-    /**
-     * This map can will be used to replace the old IdentifierInscriber class names with the new MetadataManager class
-     * names
-     */
-    private static final HashMap<String, String> OLD_CLASS_NEW_CLASS_MAPPING = new HashMap<>();
-
-    static {
-        OLD_CLASS_NEW_CLASS_MAPPING
-            .put("MCRMODSDOIPersistentIdentifierInscriber", "MCRMODSDOIPersistentIdentifierMetadataManager");
-        OLD_CLASS_NEW_CLASS_MAPPING
-            .put("MCRMODSURNPersistentIdentifierInscriber", "MCRMODSURNPersistentIdentifierMetadataManager");
-        OLD_CLASS_NEW_CLASS_MAPPING.put("MCRURNObjectXPathInscriber", "MCRURNObjectXPathMetadataManager");
-    }
-
-    public MCRPIRegistrationService(String registrationServiceID, String identifierType) {
+    public MCRPIService(String registrationServiceID, String identifierType) {
         this.registrationServiceID = registrationServiceID;
         this.type = identifierType;
-    }
-
-    public final String getRegistrationServiceID() {
-        return registrationServiceID;
-    }
-
-    public static String repairDeprecatedClassNames(final String className, String metadataManagerPropertyKey) {
-        String newClassName = className;
-        for (String key : OLD_CLASS_NEW_CLASS_MAPPING.keySet()) {
-            if (className.contains(key)) {
-                String replacement = OLD_CLASS_NEW_CLASS_MAPPING.get(key);
-                LOGGER.warn("You should replace {} with {} in {}", key, replacement, metadataManagerPropertyKey);
-                newClassName = newClassName.replaceAll(key, replacement);
-            }
-        }
-        return newClassName;
-    }
-
-    public MCRPersistentIdentifierMetadataManager<T> getMetadataManager() {
-        Map<String, String> properties = getProperties();
-        MCRConfiguration configuration = MCRConfiguration.instance();
-
-        String metadataManager;
-        if (properties.containsKey(METADATA_MANAGER_PROPERTY_KEY)) {
-            metadataManager = properties.get(METADATA_MANAGER_PROPERTY_KEY);
-        } else if (properties.containsKey(METADATA_MANAGER_DEPRECATED_PROPERTY_KEY)) {
-            LOGGER.warn(MessageFormat
-                .format("You should use {0}{1}.{2} instead of {3}{4}.{5}", REGISTRATION_CONFIG_PREFIX,
-                    getRegistrationServiceID(), METADATA_MANAGER_PROPERTY_KEY, REGISTRATION_CONFIG_PREFIX,
-                    getRegistrationServiceID(), METADATA_MANAGER_DEPRECATED_PROPERTY_KEY));
-            metadataManager = properties.get(METADATA_MANAGER_DEPRECATED_PROPERTY_KEY);
-        } else {
-            throw new MCRConfigurationException(
-                getRegistrationServiceID() + " has no MetadataManager(or legacy Inscriber)!");
-        }
-
-        String className;
-        String metadataManagerPropertyKey;
-
-        metadataManagerPropertyKey = METADATA_MANAGER_CONFIG_PREFIX + metadataManager;
-        className = configuration.getString(metadataManagerPropertyKey, null);
-
-        if (className == null) {
-            metadataManagerPropertyKey = METADATA_MANAGER_DEPRECATED_CONFIG_PREFIX + metadataManager;
-            className = configuration.getString(metadataManagerPropertyKey, null);
-            if (className == null) {
-                throw new MCRConfigurationException(
-                    "Missing property: " + METADATA_MANAGER_CONFIG_PREFIX + metadataManager + " or "
-                        + metadataManagerPropertyKey);
-            }
-
-            LOGGER.warn("You should use {} instead of {}", METADATA_MANAGER_CONFIG_PREFIX + metadataManager,
-                METADATA_MANAGER_DEPRECATED_PROPERTY_KEY + metadataManager);
-        }
-
-        className = repairDeprecatedClassNames(className, metadataManagerPropertyKey);
-
-        try {
-            @SuppressWarnings("unchecked")
-            Class<MCRPersistentIdentifierMetadataManager<T>> classObject = (Class<MCRPersistentIdentifierMetadataManager<T>>) Class
-                .forName(className);
-            Constructor<MCRPersistentIdentifierMetadataManager<T>> constructor = classObject
-                .getConstructor(String.class);
-            return constructor.newInstance(metadataManager);
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + metadataManagerPropertyKey + ") not found: " + className, e);
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + metadataManagerPropertyKey + ") needs a string constructor: " + className);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new MCRException(e);
-        }
-    }
-
-    private MCRPersistentIdentifierGenerator<T> getGenerator() {
-        Supplier<? extends RuntimeException> generatorPropertiesNotSetError = () -> new MCRConfigurationException(
-            "Configuration property " + REGISTRATION_CONFIG_PREFIX + registrationServiceID
-                + ".Generator is not set");
-
-        String generatorName = Optional.ofNullable(getProperties().get("Generator"))
-            .orElseThrow(generatorPropertiesNotSetError);
-
-        String inscriberPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
-        String className = MCRConfiguration.instance().getString(inscriberPropertyKey);
-
-        try {
-            @SuppressWarnings("unchecked")
-            Class<MCRPersistentIdentifierGenerator<T>> classObject = (Class<MCRPersistentIdentifierGenerator<T>>) Class
-                .forName(className);
-            Constructor<MCRPersistentIdentifierGenerator<T>> constructor = classObject.getConstructor(String.class);
-            return constructor.newInstance(generatorName);
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + inscriberPropertyKey + ") not found: " + className, e);
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + inscriberPropertyKey + ") needs a string constructor: " + className);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new MCRException(e);
-        }
     }
 
     public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
@@ -206,13 +85,14 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     /**
      * Removes a flag from a {@link MCRObject}
-     * @param obj the object
+     *
+     * @param obj           the object
      * @param databaseEntry the database entry
      * @return the remove entry parsed from json or null
      */
     public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIRegistrationService.PI_FLAG);
+        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
         int flagCount = flags.size();
         for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
             String flag = flags.get(flagIndex);
@@ -228,11 +108,109 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         return null;
     }
 
+    private static Gson getGson() {
+        return new GsonBuilder().registerTypeAdapter(Date.class, new MCRGsonUTCDateAdapter())
+            .setExclusionStrategies(new ExclusionStrategy() {
+                @Override
+                public boolean shouldSkipField(FieldAttributes fieldAttributes) {
+                    String name = fieldAttributes.getName();
+
+                    return Stream.of("mcrRevision", "mycoreID", "id", "mcrVersion")
+                        .anyMatch(field -> field.equals(name));
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> aClass) {
+                    return false;
+                }
+            }).create();
+    }
+
+    public final String getServiceID() {
+        return registrationServiceID;
+    }
+
+    /**
+     * Checks the service parameters.
+     *
+     * @throws MCRConfigurationException if parameter is missing or wrong!
+     */
+    protected void checkConfiguration() throws MCRConfigurationException {
+        if (getProperties().containsKey("MetadataManager")) {
+            throw new MCRConfigurationException("The MCRPIService " + getServiceID() +
+                " uses old property key MetadataManager");
+        }
+        getGenerator();
+        getMetadataService();
+    }
+
+    public MCRPIMetadataService<T> getMetadataService() {
+        Map<String, String> properties = getProperties();
+        MCRConfiguration configuration = MCRConfiguration.instance();
+
+        final String metadataManager;
+        if (properties.containsKey(METADATA_SERVICE_PROPERTY_KEY)) {
+            metadataManager = properties.get(METADATA_SERVICE_PROPERTY_KEY);
+        } else {
+            throw new MCRConfigurationException(
+                getServiceID() + " has no " + METADATA_SERVICE_PROPERTY_KEY + "!");
+        }
+
+        final String className = configuration.getString(METADATA_SERVICE_CONFIG_PREFIX
+            + metadataManager);
+
+        try {
+            @SuppressWarnings("unchecked")
+            Class<MCRPIMetadataService<T>> classObject = (Class<MCRPIMetadataService<T>>) Class
+                .forName(className);
+            Constructor<MCRPIMetadataService<T>> constructor = classObject
+                .getConstructor(String.class);
+            return constructor.newInstance(metadataManager);
+        } catch (ClassNotFoundException e) {
+            throw new MCRConfigurationException(
+                "Configurated class (" + (METADATA_SERVICE_CONFIG_PREFIX + metadataManager) + ") not found: "
+                    + className, e);
+        } catch (NoSuchMethodException e) {
+            throw new MCRConfigurationException(
+                "Configurated class (" + (METADATA_SERVICE_CONFIG_PREFIX + metadataManager)
+                    + ") needs a string constructor: " + className);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            throw new MCRException(e);
+        }
+    }
+
+    protected MCRPIGenerator<T> getGenerator() {
+        Supplier<? extends RuntimeException> generatorPropertiesNotSetError = () -> new MCRConfigurationException(
+            "Configuration property " + REGISTRATION_CONFIG_PREFIX + registrationServiceID
+                + "." + GENERATOR_PROPERTY_KEY + " is not set");
+
+        String generatorName = Optional.ofNullable(getProperties().get(GENERATOR_PROPERTY_KEY))
+            .orElseThrow(generatorPropertiesNotSetError);
+
+        String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
+        String className = MCRConfiguration.instance().getString(generatorPropertyKey);
+
+        try {
+            @SuppressWarnings("unchecked")
+            Class<MCRPIGenerator<T>> classObject = (Class<MCRPIGenerator<T>>) Class.forName(className);
+            Constructor<MCRPIGenerator<T>> constructor = classObject.getConstructor(String.class);
+            return constructor.newInstance(generatorName);
+        } catch (ClassNotFoundException e) {
+            throw new MCRConfigurationException(
+                "Configurated class (" + generatorPropertyKey + ") not found: " + className, e);
+        } catch (NoSuchMethodException e) {
+            throw new MCRConfigurationException(
+                "Configurated class (" + generatorPropertyKey + ") needs a string constructor: " + className);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            throw new MCRException(e);
+        }
+    }
+
     protected void validatePermission(MCRBase obj) throws MCRAccessException {
         String missingPermission;
         if (!MCRAccessManager.checkPermission(obj.getId(), missingPermission = PERMISSION_WRITE) ||
             !MCRAccessManager
-                .checkPermission(obj.getId(), missingPermission = "register-" + getRegistrationServiceID())) {
+                .checkPermission(obj.getId(), missingPermission = "register-" + getServiceID())) {
             throw MCRAccessException
                 .missingPermission("Register a " + type + " & Update object.", obj.getId().toString(),
                     missingPermission);
@@ -244,24 +222,6 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
             throw new MCRPersistentIdentifierException("There is already a registered " + getType() + " for Object "
                 + id + " and additional " + additional);
         }
-    }
-
-    private static Gson getGson() {
-        return new GsonBuilder().registerTypeAdapter(Date.class, new MCRGsonUTCDateAdapter())
-            .setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes fieldAttributes) {
-                String name = fieldAttributes.getName();
-
-                return Stream.of("mcrRevision", "mycoreID", "id", "mcrVersion")
-                    .anyMatch(field -> field.equals(name));
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> aClass) {
-                return false;
-            }
-            }).create();
     }
 
     /**
@@ -289,15 +249,15 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * Adds a identifier to the object.
      * Validates everything, registers a new Identifier, inserts the identifier to object metadata and writes a
      * information to the Database.
+     *
      * @param obj the object which has to be identified
      * @return the assigned Identifier
      * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException           the {@link MCRPersistentIdentifierMetadataManager} lets
-     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
+     * @throws MCRActiveLinkException           the {@link MCRPIMetadataService} lets
+     *                                          {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
-    public T register(MCRBase obj)
-            throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+    public T register(MCRBase obj) throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         return this.register(obj, null);
     }
 
@@ -305,20 +265,21 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
      * Validates everything, registers a new Identifier, inserts the identifier to object metadata and writes a
      * information to the Database.
      *
-     * @param obj the object which has to be identified
-     * @param additional additional information for the persistent identifier
+     * @param obj          the object which has to be identified
+     * @param additional   additional information for the persistent identifier
      * @param updateObject if true this method calls {@link MCRMetadataManager#update(MCRBase)}
      * @return the assigned Identifier
      * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException           the {@link MCRPersistentIdentifierMetadataManager} lets
-     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
+     * @throws MCRActiveLinkException           the {@link MCRPIMetadataService} lets
+     *                                          {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
     public T register(MCRBase obj, String additional, boolean updateObject)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
-        T identifier = this.registerIdentifier(obj, additional);
-        this.getMetadataManager().insertIdentifier(identifier, obj, additional);
+        final T identifier = getNewIdentifier(obj, additional);
+        this.registerIdentifier(obj, additional, identifier);
+        this.getMetadataService().insertIdentifier(identifier, obj, additional);
 
         MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier);
 
@@ -341,7 +302,7 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier) {
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getRegistrationServiceID(), provideRegisterDate(obj, additional), null);
+            this.getServiceID(), provideRegisterDate(obj, additional), null);
         MCRHIBConnection.instance().getSession().save(databaseEntry);
         return databaseEntry;
     }
@@ -350,13 +311,14 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         return this.type;
     }
 
-    protected abstract T registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException;
+    protected abstract void registerIdentifier(MCRBase obj, String additional, T pi)
+        throws MCRPersistentIdentifierException;
 
     protected final void onDelete(T identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         delete(identifier, obj, additional);
-        MCRPersistentIdentifierManager.getInstance().delete(obj.getId().toString(), additional, getType(),
-            this.getRegistrationServiceID());
+        MCRPIManager.getInstance().delete(obj.getId().toString(), additional, getType(),
+            this.getServiceID());
     }
 
     protected final void onUpdate(T identifier, MCRBase obj, String additional)
@@ -366,21 +328,23 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     /**
      * Should handle deletion of a Object with the PI.
-     * E.g. The {@link org.mycore.pi.doi.MCRDOIRegistrationService} sets the active flag in Datacite datacentre to false.
+     * E.g. The {@link MCRDOIService} sets the active flag in Datacite datacentre to false.
+     *
      * @param identifier the Identifier
-     * @param obj the deleted object
+     * @param obj        the deleted object
      * @param additional
      * @throws MCRPersistentIdentifierException to abort deletion of the object  or if something went wrong.
-     * (E.G. {@link org.mycore.pi.doi.MCRDOIRegistrationService} throws if not superuser tries to delete the object)
+     *                                          (E.G. {@link MCRDOIService} throws if not superuser tries to delete the object)
      */
     protected abstract void delete(T identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException;
 
     /**
      * Should handle updates of a Object with the PI.
-     * E.g. The {@link org.mycore.pi.doi.MCRDOIRegistrationService} sends the updated metadata to the Datacite datacentre.
+     * E.g. The {@link MCRDOIService} sends the updated metadata to the Datacite datacentre.
+     *
      * @param identifier the Identifier
-     * @param obj the deleted object
+     * @param obj        the deleted object
      * @param additional
      * @throws MCRPersistentIdentifierException to abort update of the object or if something went wrong.
      */
@@ -388,15 +352,15 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         throws MCRPersistentIdentifierException;
 
     public boolean isCreated(MCRObjectID id, String additional) {
-        return MCRPersistentIdentifierManager.getInstance().isCreated(id, additional, type, registrationServiceID);
+        return MCRPIManager.getInstance().isCreated(id, additional, type, registrationServiceID);
     }
 
     public boolean isRegistered(MCRObjectID id, String additional) {
-        return MCRPersistentIdentifierManager.getInstance().isRegistered(id, additional, type, registrationServiceID);
+        return MCRPIManager.getInstance().isRegistered(id, additional, type, registrationServiceID);
     }
 
     public boolean hasRegistrationStarted(MCRObjectID id, String additional) {
-        return MCRPersistentIdentifierManager.getInstance()
+        return MCRPIManager.getInstance()
             .hasRegistrationStarted(id, additional, type, registrationServiceID);
     }
 
@@ -416,19 +380,19 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         return shortened;
     }
 
-    protected final T getNewIdentifier(MCRObjectID id, String additional) throws MCRPersistentIdentifierException {
-        MCRPersistentIdentifierGenerator<T> persitentIdentifierGenerator = getGenerator();
-        return persitentIdentifierGenerator.generate(id, additional);
+    protected T getNewIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+        MCRPIGenerator<T> persitentIdentifierGenerator = getGenerator();
+        return persitentIdentifierGenerator.generate(obj, additional);
     }
 
     protected MCRPI getTableEntry(MCRObjectID id, String additional) {
-        return MCRPersistentIdentifierManager.getInstance().get(getRegistrationServiceID(), id.toString(), additional);
+        return MCRPIManager.getInstance().get(getServiceID(), id.toString(), additional);
     }
 
     public void updateFlag(MCRObjectID id, String additional, MCRPI mcrpi) {
         MCRBase obj = MCRMetadataManager.retrieve(id);
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIRegistrationService.PI_FLAG);
+        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
         Gson gson = getGson();
         String stringFlag = flags.stream().filter(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);

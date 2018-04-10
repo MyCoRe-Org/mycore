@@ -18,19 +18,21 @@
 
 package org.mycore.pi.doi;
 
-import org.mycore.common.config.MCRConfiguration2;
+import java.util.Optional;
+
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.pi.MCRPersistentIdentifierGenerator;
+import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
  * Uses mapping from MCRObjectID base to DOI prefix to generate DOIs.
  * e.g. <code>MCR.PI.Generator.MapObjectIDDOI.Prefix.mycore_mods = 10.5072/my.</code> will map
  * <code>mycore_mods_00004711</code> to <code>10.5072/my.4711</code>
- * @author Thomas Scheffler (yagee)
  *
+ * @author Thomas Scheffler (yagee)
  */
-public class MCRMapObjectIDDOIGenerator extends MCRPersistentIdentifierGenerator<MCRDigitalObjectIdentifier> {
+public class MCRMapObjectIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
     private final MCRDOIParser mcrdoiParser;
 
@@ -43,14 +45,18 @@ public class MCRMapObjectIDDOIGenerator extends MCRPersistentIdentifierGenerator
     }
 
     @Override
-    public MCRDigitalObjectIdentifier generate(MCRObjectID mcrID, String additional)
+    public MCRDigitalObjectIdentifier generate(MCRBase mcrObject, String additional)
         throws MCRPersistentIdentifierException {
-        String prefixProperty = "MCR.PI.Generator." + generatorID + ".Prefix." + mcrID.getBase();
-        return MCRConfiguration2.getString(prefixProperty)
-            .map(prefix -> prefix.contains("/") ? prefix + mcrID.getNumberAsInteger()
-                : prefix + '/' + mcrID.getNumberAsInteger())
+        final MCRObjectID objectId = mcrObject.getId();
+        return Optional.ofNullable(getProperties().get("Prefix." + objectId.getBase()))
+            .map(prefix -> {
+                final int objectIdNumberAsInteger = objectId.getNumberAsInteger();
+                return prefix.contains("/") ? prefix + objectIdNumberAsInteger
+                    : prefix + '/' + objectIdNumberAsInteger;
+            })
             .flatMap(mcrdoiParser::parse).map(MCRDigitalObjectIdentifier.class::cast)
-            .orElseThrow(() -> new MCRPersistentIdentifierException(prefixProperty + " does is not defined."));
+            .orElseThrow(() -> new MCRPersistentIdentifierException("Prefix." + objectId.getBase() +
+                " is not defined in " + generatorID + "."));
     }
 
 }

@@ -18,18 +18,8 @@
 
 package org.mycore.pi;
 
-import java.util.stream.Stream;
+import java.util.Optional;
 
-public class MCRMockResolver extends MCRPIResolver<MCRMockIdentifier> {
-
-    public static final String NAME = "MOCK-Resolver";
-
-    public MCRMockResolver() {
-        super(NAME);
-    }
-
-    @Override
-    public Stream<String> resolve(MCRMockIdentifier identifier) {
-        return Stream.of(identifier.asString());
-    }
+public interface MCRPIParser<T extends MCRPersistentIdentifier> {
+    Optional<T> parse(String identifier);
 }

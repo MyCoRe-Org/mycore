@@ -16,20 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi;
+package org.mycore.mods.identifier;
 
-import java.util.stream.Stream;
+public class MCRMODSDOIMetadataService extends MCRAbstractMODSMetadataService {
 
-public class MCRMockResolver extends MCRPIResolver<MCRMockIdentifier> {
-
-    public static final String NAME = "MOCK-Resolver";
-
-    public MCRMockResolver() {
-        super(NAME);
+    public MCRMODSDOIMetadataService(String inscriberID) {
+        super(inscriberID);
     }
 
     @Override
-    public Stream<String> resolve(MCRMockIdentifier identifier) {
-        return Stream.of(identifier.asString());
+    protected String getIdentifierType() {
+        return "doi";
     }
 }

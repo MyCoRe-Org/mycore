@@ -23,9 +23,9 @@ import org.mycore.pi.MCRPersistentIdentifier;
 public class MCRUniformResourceName implements MCRPersistentIdentifier {
     public static final String PREFIX = "urn:";
 
-    public String getPREFIX() {
-        return PREFIX;
-    }
+    protected String subNamespace;
+
+    protected String namespaceSpecificString;
 
     protected MCRUniformResourceName() {
     }
@@ -35,9 +35,9 @@ public class MCRUniformResourceName implements MCRPersistentIdentifier {
         this.namespaceSpecificString = namespaceSpecificString;
     }
 
-    protected String subNamespace;
-
-    protected String namespaceSpecificString;
+    public String getPREFIX() {
+        return PREFIX;
+    }
 
     public String getSubNamespace() {
         return subNamespace;

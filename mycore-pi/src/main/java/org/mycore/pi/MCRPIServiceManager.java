@@ -27,11 +27,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 
-public class MCRPIRegistrationServiceManager {
+public class MCRPIServiceManager {
 
-    public static final String REGISTRATION_SERVICE_CONFIG_PREFIX = "MCR.PI.Registration.";
+    public static final String REGISTRATION_SERVICE_CONFIG_PREFIX = "MCR.PI.Service.";
 
-    public static MCRPIRegistrationServiceManager getInstance() {
+    public static MCRPIServiceManager getInstance() {
         return InstanceHolder.instance;
     }
 
@@ -41,23 +41,24 @@ public class MCRPIRegistrationServiceManager {
             .keySet()
             .stream()
             .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
+            .filter(s -> !s.contains("."))
             .collect(Collectors.toList());
     }
 
-    public List<MCRPIRegistrationService> getServiceList() {
+    public List<MCRPIService> getServiceList() {
         return getServiceIDList()
             .stream()
             .map(this::getRegistrationService)
             .collect(Collectors.toList());
     }
 
-    public <T extends MCRPersistentIdentifier> MCRPIRegistrationService<T> getRegistrationService(
+    public <T extends MCRPersistentIdentifier> MCRPIService<T> getRegistrationService(
         String registrationServiceID) {
         String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
-        Class<? extends MCRPIRegistrationService<T>> piClass = MCRConfiguration.instance().getClass(propertyName);
+        Class<? extends MCRPIService<T>> piClass = MCRConfiguration.instance().getClass(propertyName);
 
         try {
-            Constructor<? extends MCRPIRegistrationService<T>> constructor = piClass.getConstructor(String.class);
+            Constructor<? extends MCRPIService<T>> constructor = piClass.getConstructor(String.class);
 
             return constructor.newInstance(registrationServiceID);
         } catch (NoSuchMethodException e) {
@@ -69,7 +70,7 @@ public class MCRPIRegistrationServiceManager {
     }
 
     private static class InstanceHolder {
-        private static final MCRPIRegistrationServiceManager instance = new MCRPIRegistrationServiceManager();
+        private static final MCRPIServiceManager instance = new MCRPIServiceManager();
     }
 
 }

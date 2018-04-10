@@ -20,7 +20,7 @@ package org.mycore.pi;
 
 import java.util.Optional;
 
-public class MCRMockIdentifierParser implements MCRPersistentIdentifierParser {
+public class MCRMockIdentifierParser implements MCRPIParser {
 
     @Override
     public Optional<MCRPersistentIdentifier> parse(String identifier) {

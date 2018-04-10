@@ -26,10 +26,10 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
-import org.mycore.pi.MCRPersistentIdentifierResolver;
+import org.mycore.pi.MCRPIResolver;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 
-public class MCRURNResolver extends MCRPersistentIdentifierResolver<MCRDNBURN> {
+public class MCRURNResolver extends MCRPIResolver<MCRDNBURN> {
 
     public MCRURNResolver() {
         super("NBN-Resolver");

@@ -61,7 +61,7 @@ import mockit.MockUp;
  * Created by chi on 09.03.17.
  * @author Huu Chi Vu
  */
-public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase {
+public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
     private int numOfDerivFiles = 15;
 
     @Override
@@ -92,7 +92,7 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
             .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
             .limit(numOfDerivFiles);
         String serviceID = "TestService";
-        MCRURNGranularRESTRegistrationService testService = new MCRURNGranularRESTRegistrationService(serviceID,
+        MCRURNGranularRESTService testService = new MCRURNGranularRESTService(serviceID,
             foo);
         testService.register(derivate, "", true);
         timerTask();
@@ -184,8 +184,8 @@ public class MCRURNGranularRESTRegistrationServiceTest extends MCRStoreTestCase 
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        testProperties.put("MCR.PI.Registration.TestService.Generator", "UUID");
-        testProperties.put("MCR.PI.Registration.TestService.supportDfgViewerURN", Boolean.TRUE.toString());
+        testProperties.put("MCR.PI.Service.TestService.Generator", "UUID");
+        testProperties.put("MCR.PI.Service.TestService.supportDfgViewerURN", Boolean.TRUE.toString());
         testProperties.put("MCR.PI.Generator.UUID", MCRUUIDURNGenerator.class.getName());
         testProperties.put("MCR.PI.Generator.UUID.Namespace", "frontend-");
         testProperties.put("MCR.URN.DNB.Credentials.Login", "test");

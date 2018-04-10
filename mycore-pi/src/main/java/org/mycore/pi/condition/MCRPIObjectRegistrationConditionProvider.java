@@ -26,7 +26,8 @@ public abstract class MCRPIObjectRegistrationConditionProvider {
 
     public static final MCRPIObjectRegistrationConditionProvider ALWAYS_REGISTER_CONDITION_PROVIDER =
         new MCRPIObjectRegistrationConditionProvider() {
-            @Override public Predicate<MCRBase> provideRegistrationCondition(String type) {
+            @Override
+            public Predicate<MCRBase> provideRegistrationCondition(String type) {
                 return (obj) -> true;
             }
         };

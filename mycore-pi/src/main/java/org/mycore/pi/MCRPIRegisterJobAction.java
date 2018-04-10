@@ -23,7 +23,7 @@ public class MCRPIRegisterJobAction extends MCRJobAction {
 
     @Override
     public String name() {
-        MCRPIJobRegistrationService<MCRPersistentIdentifier> registrationService = getRegistrationService();
+        MCRPIJobService<MCRPersistentIdentifier> registrationService = getRegistrationService();
         return registrationService.getJobInformation(this.job.getParameters()).orElseGet(() -> {
             String action = getAction().toString();
             String registrationServiceID = getRegistrationServiceID();
@@ -31,14 +31,14 @@ public class MCRPIRegisterJobAction extends MCRJobAction {
         });
     }
 
-    private MCRPIJobRegistrationService<MCRPersistentIdentifier> getRegistrationService() {
+    private MCRPIJobService<MCRPersistentIdentifier> getRegistrationService() {
         String registrationServiceID = getRegistrationServiceID();
-        return (MCRPIJobRegistrationService<MCRPersistentIdentifier>) MCRPIRegistrationServiceManager.getInstance()
+        return (MCRPIJobService<MCRPersistentIdentifier>) MCRPIServiceManager.getInstance()
             .getRegistrationService(registrationServiceID);
     }
 
-    private MCRPIJobRegistrationService.PiJobAction getAction() {
-        return MCRPIJobRegistrationService.PiJobAction.valueOf(this.job.getParameter("action"));
+    private MCRPIJobService.PiJobAction getAction() {
+        return MCRPIJobService.PiJobAction.valueOf(this.job.getParameter("action"));
     }
 
     private String getRegistrationServiceID() {

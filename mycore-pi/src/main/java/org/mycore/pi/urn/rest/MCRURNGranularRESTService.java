@@ -50,8 +50,8 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.pi.MCRPIRegistrationService;
-import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.MCRPIManager;
+import org.mycore.pi.MCRPIService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
@@ -62,24 +62,24 @@ import org.mycore.pi.urn.MCRDNBURNParser;
  * the Derivate and granular URNs for every file in the Derivate (except IgnoreFileNames). If you then add a file to
  * Derivate you can call with Derivate-ID and additional path of the file. E.g. mir_derivate_00000060 and /image1.jpg
  * <p>
- * <b>Inscriber is ignored with this {@link MCRPIRegistrationService}</b>
+ * <b>Inscriber is ignored with this {@link MCRPIService}</b>
  * </p>
  * Configuration Parameter(s): <dl>
  * <dt>IgnoreFileNames</dt>
  * <dd>Comma seperated list of regex file which should not have a urn assigned. Default: mets\\.xml</dd> </dl>
  */
-public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationService<MCRDNBURN> {
+public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final Function<MCRDerivate, Stream<MCRPath>> derivateFileStream;
 
-    public MCRURNGranularRESTRegistrationService(String registrationServiceID) {
+    public MCRURNGranularRESTService(String registrationServiceID) {
         this(registrationServiceID,
-            MCRURNGranularRESTRegistrationService::defaultDerivateFileStream);
+            MCRURNGranularRESTService::defaultDerivateFileStream);
     }
 
-    public MCRURNGranularRESTRegistrationService(String registrationServiceID,
+    public MCRURNGranularRESTService(String registrationServiceID,
         Function<MCRDerivate, Stream<MCRPath>> derivateFileStreamFunc) {
         super(registrationServiceID, MCRDNBURN.TYPE);
         this.derivateFileStream = derivateFileStreamFunc;
@@ -121,9 +121,9 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     private MCRDNBURN registerURN(MCRDerivate deriv, String filePath) {
         MCRObjectID derivID = deriv.getId();
 
-        Function<String, Integer> countCreatedPI = s -> MCRPersistentIdentifierManager
+        Function<String, Integer> countCreatedPI = s -> MCRPIManager
             .getInstance()
-            .getCreatedIdentifiers(derivID, getType(), getRegistrationServiceID())
+            .getCreatedIdentifiers(derivID, getType(), getServiceID())
             .size();
 
         int seed = Optional.of(filePath)
@@ -172,14 +172,14 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
         MCRObjectID derivID = deriv.getId();
 
         try {
-            MCRDNBURN derivURN = getNewIdentifier(derivID, "");
+            MCRDNBURN derivURN = getNewIdentifier(deriv, "");
             deriv.getDerivate().setURN(derivURN.asString());
 
             persistURNStr(deriv, new Date()).accept(derivURN::asString, "");
 
             if (Boolean.valueOf(getProperties().getOrDefault("supportDfgViewerURN", "false"))) {
                 String suffix = "dfg";
-                persistURNStr(deriv, null, getRegistrationServiceID() + "-" + suffix)
+                persistURNStr(deriv, null, getServiceID() + "-" + suffix)
                     .accept(() -> derivURN.withNamespaceSuffix(suffix + "-").asString(), "");
             }
 
@@ -198,7 +198,7 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     }
 
     private BiConsumer<Supplier<String>, String> persistURNStr(MCRDerivate deriv, Date registerDate) {
-        return (urnSup, path) -> persistURNStr(deriv, registerDate, getRegistrationServiceID()).accept(urnSup, path);
+        return (urnSup, path) -> persistURNStr(deriv, registerDate, getServiceID()).accept(urnSup, path);
     }
 
     private BiConsumer<Supplier<String>, String> persistURNStr(MCRDerivate deriv, Date registerDate, String serviceID) {
@@ -243,10 +243,9 @@ public class MCRURNGranularRESTRegistrationService extends MCRPIRegistrationServ
     }
 
     @Override
-    protected MCRDNBURN registerIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
-        //TODO: improve API, don't override method to do nothing
+    protected void registerIdentifier(MCRBase obj, String additional, MCRDNBURN urn)
+        throws MCRPersistentIdentifierException {
         // not used in this impl
-        return null;
     }
 
     @Override

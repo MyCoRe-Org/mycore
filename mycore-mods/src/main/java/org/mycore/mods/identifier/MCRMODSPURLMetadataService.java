@@ -16,26 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.purl;
+package org.mycore.mods.identifier;
 
-import java.net.URL;
+public class MCRMODSPURLMetadataService extends MCRAbstractMODSMetadataService {
 
-import org.mycore.pi.MCRPersistentIdentifier;
-
-public class MCRPersistentUniformResourceLocator implements MCRPersistentIdentifier {
-
-    private URL url;
-
-    public MCRPersistentUniformResourceLocator(URL url) {
-        this.url = url;
-    }
-
-    public URL getUrl() {
-        return url;
+    public MCRMODSPURLMetadataService(String inscriberID) {
+        super(inscriberID);
     }
 
     @Override
-    public String asString() {
-        return url.toString();
+    protected String getIdentifierType() {
+        return "purl";
     }
 }

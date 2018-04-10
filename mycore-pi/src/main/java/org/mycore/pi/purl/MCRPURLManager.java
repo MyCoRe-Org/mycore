@@ -37,20 +37,19 @@ import org.w3c.dom.Element;
 
 /**
  * PURL Manager to register Persistent URLs on a PURL server
- *
+ * <p>
  * for further documentation see PURLZ Wiki:
  * https://code.google.com/archive/p/persistenturls/wikis
- *
+ * <p>
  * Hint:
  * -----
  * Please check in your code that you do not register / override regular PURLs in test / development
- * by checking: 
- *    if (resolvingURL.contains("localhost")) {
- *          purl = "/test" + purl;
- *    }
+ * by checking:
+ * if (resolvingURL.contains("localhost")) {
+ * purl = "/test" + purl;
+ * }
  *
  * @author Robert Stephan
- *
  */
 public class MCRPURLManager {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -72,12 +71,9 @@ public class MCRPURLManager {
     /**
      * sets the session cookie, if the login was successful
      *
-     * @param purlServerURL
-     *            - the base URL of the PURL server
-     * @param user
-     *            - the PURL server user
-     * @param password
-     *            - the user's password
+     * @param purlServerURL - the base URL of the PURL server
+     * @param user          - the PURL server user
+     * @param password      - the user's password
      */
     public void login(String purlServerURL, String user, String password) {
         HttpURLConnection conn = null;
@@ -171,9 +167,10 @@ public class MCRPURLManager {
 
     /**
      * register a new PURL
-     * @param purl - the PURL
-     * @param target the target URL
-     * @param type - the PURL type
+     *
+     * @param purl        - the PURL
+     * @param target      the target URL
+     * @param type        - the PURL type
      * @param maintainers - the maintainers
      * @return the HTTP Status Code of the request
      */
@@ -229,14 +226,10 @@ public class MCRPURLManager {
     /**
      * updates an existing PURL
      *
-     * @param purl
-     *            - the PURL (relative URL)
-     * @param target
-     *            - the target URL
-     * @param type
-     *            - the PURL type
-     * @param maintainers
-     *            list of maintainers (PURL server users or groups)
+     * @param purl        - the PURL (relative URL)
+     * @param target      - the target URL
+     * @param type        - the PURL type
+     * @param maintainers list of maintainers (PURL server users or groups)
      * @return the HTTP Status Code of the request
      */
     public int updateExistingPURL(String purl, String target, String type, String maintainers) {
@@ -315,7 +308,8 @@ public class MCRPURLManager {
 
     /**
      * check if a purl has the given target url
-     * @param purl - the purl
+     *
+     * @param purl      - the purl
      * @param targetURL - the target URL
      * @return true, if the target URL is registered at the given PURL
      */

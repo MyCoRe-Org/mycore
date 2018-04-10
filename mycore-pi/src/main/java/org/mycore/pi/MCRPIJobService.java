@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.pi;
 
 import java.lang.reflect.InvocationTargetException;
@@ -20,7 +38,7 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.condition.MCRPIObjectRegistrationConditionProvider;
-import org.mycore.pi.doi.MCRDOIRegistrationService;
+import org.mycore.pi.doi.MCRDOIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
@@ -29,12 +47,13 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
- * Implementation of a {@link MCRPIRegistrationService} which helps to outsource a registration task to a {@link MCRJob}
+ * Implementation of a {@link MCRPIService} which helps to outsource a registration task to a {@link MCRJob}
  * e.G. send a POST request to a REST api
+ *
  * @param <T>
  */
-public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentifier>
-    extends MCRPIRegistrationService<T> {
+public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
+    extends MCRPIService<T> {
 
     public static final String JOB_API_USER_PROPERTY = "JobApiUser";
 
@@ -44,7 +63,7 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
 
     private static final MCRJobQueue REGISTER_JOB_QUEUE = initializeJobQueue();
 
-    public MCRPIJobRegistrationService(String registrationServiceID, String identType) {
+    public MCRPIJobService(String registrationServiceID, String identType) {
         super(registrationServiceID, identType);
     }
 
@@ -61,9 +80,10 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
 
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
+     *
      * @param parameters the parameters which was passed to {@link #addDeleteJob(Map)}
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
-     * wrong during rollback
+     *                                          wrong during rollback
      */
     @SuppressWarnings({ "WeakerAccess", "unused" })
     protected void rollbackDeleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
@@ -72,9 +92,10 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
 
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
+     *
      * @param parameters the parameters which was passed to {@link #updateJob(Map)}
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
-     * wrong during rollback
+     *                                          wrong during rollback
      */
     @SuppressWarnings({ "WeakerAccess", "unused" })
     protected void rollbackUpdateJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
@@ -83,9 +104,10 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
 
     /**
      * Hook in to rollback mechanism of {@link MCRJobAction#rollback()} by overwriting this method.
+     *
      * @param parameters the parameters which was passed to {@link #addRegisterJob(Map)}
      * @throws MCRPersistentIdentifierException throw {@link MCRPersistentIdentifierException} if something goes
-     * wrong during rollback
+     *                                          wrong during rollback
      */
     @SuppressWarnings({ "WeakerAccess", "unused" })
     protected void rollbackRegisterJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
@@ -110,9 +132,10 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
 
     /**
      * Adds a register job which will be called in the persistent {@link MCRJob} environment in a extra thread.
+     *
      * @param contextParameters pass parameters which are needed to register the PI. The parameter action and
      *                          registrationServiceID will be added, because they are necessary to reassign the job to
-     *                          the right {@link MCRPIJobRegistrationService} and method.
+     *                          the right {@link MCRPIJobService} and method.
      */
     protected void addRegisterJob(Map<String, String> contextParameters) {
         MCRJob job = createJob(contextParameters, PiJobAction.REGISTER);
@@ -123,6 +146,7 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
      * If you use {@link #updateRegistrationDate(MCRObjectID, String, Date)} or
      * {@link #updateStartRegistrationDate(MCRObjectID, String, Date)} then you should validate if the user has the
      * rights for this. This methods validates this and throws a handsome exception.
+     *
      * @param id of the object
      */
     protected void validateJobUserRights(MCRObjectID id) throws MCRPersistentIdentifierException {
@@ -139,46 +163,49 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
     }
 
     /**
-     * Can be used to update the registration date in the database. The most {@link MCRPIJobRegistrationService}
+     * Can be used to update the registration date in the database. The most {@link MCRPIJobService}
      * only add the pi to the object and then to the database, with registration date of null. Later the job will
      * register the pi and then change the registration date to the right value.
      * <b>If you use this methods from a job you should have called {@link #validateJobUserRights} before!</b>
-     * @param mycoreID the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
+     *
+     * @param mycoreID   the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
      * @param additional information like path to a file
-     * @param date the new registration date
+     * @param date       the new registration date
      */
     protected void updateRegistrationDate(MCRObjectID mycoreID, String additional, Date date) {
-        MCRPI pi = MCRPersistentIdentifierManager.getInstance()
-            .get(this.getRegistrationServiceID(), mycoreID.toString(), additional);
+        MCRPI pi = MCRPIManager.getInstance()
+            .get(this.getServiceID(), mycoreID.toString(), additional);
         pi.setRegistered(date);
         updateFlag(mycoreID, additional, pi);
     }
 
     /**
-     * Can be used to update the startRegistration date in the database. The most {@link MCRPIJobRegistrationService}
+     * Can be used to update the startRegistration date in the database. The most {@link MCRPIJobService}
      * only add the pi to the object and then to the database, with registration or startRegistration date of null.
      * After a job is created the Registration service should update the date.
      * <b>If you use this methods from a job you should have called {@link #validateJobUserRights} before!</b>
-     * @param mycoreID the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
+     *
+     * @param mycoreID   the id of the {@link org.mycore.datamodel.metadata.MCRBase} which has the pi assigned
      * @param additional information like path to a file
-     * @param date the new registration date
+     * @param date       the new registration date
      */
     protected void updateStartRegistrationDate(MCRObjectID mycoreID, String additional, Date date) {
-        MCRPI pi = MCRPersistentIdentifierManager.getInstance()
-            .get(this.getRegistrationServiceID(), mycoreID.toString(), additional);
+        MCRPI pi = MCRPIManager.getInstance()
+            .get(this.getServiceID(), mycoreID.toString(), additional);
         pi.setRegistrationStarted(date);
         updateFlag(mycoreID, additional, pi);
     }
 
     /**
      * Tries to parse a identifier with a specific type.
+     *
      * @param identifier the identifier to parse
      * @return parsed identifier or {@link Optional#EMPTY} if there is no parser for the type or the parser can`t parse
      * the identifier
      * @throws ClassCastException when type does not match the type of T
      */
     protected Optional<T> parseIdentifier(String identifier) {
-        MCRPersistentIdentifierParser<T> parserForType = MCRPersistentIdentifierManager.getInstance()
+        MCRPIParser<T> parserForType = MCRPIManager.getInstance()
             .getParserForType(getType());
 
         if (parserForType == null) {
@@ -193,7 +220,7 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
 
         HashMap<String, String> params = new HashMap<>(contextParameters);
         params.put("action", action.toString());
-        params.put("registrationServiceID", this.getRegistrationServiceID());
+        params.put("registrationServiceID", this.getServiceID());
         job.setParameters(params);
 
         return job;
@@ -201,6 +228,7 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
 
     /**
      * Result of this will be passed to {@link MCRJobAction#name()}
+     *
      * @param contextParameters the parameters of the job
      * @return Some Information what this job will do or just {@link Optional#EMPTY}, then a default message is generated.
      */
@@ -293,11 +321,11 @@ public abstract class MCRPIJobRegistrationService<T extends MCRPersistentIdentif
     }
 
     protected Predicate<MCRBase> getRegistrationCondition(String objectType) {
-        return Optional.ofNullable(getProperties().get(MCRDOIRegistrationService.REGISTRATION_CONDITION_PROVIDER))
+        return Optional.ofNullable(getProperties().get(MCRDOIService.REGISTRATION_CONDITION_PROVIDER))
             .map(clazz -> {
                 String errorMessageBegin =
-                    "Configured class " + clazz + "(" + MCRPIRegistrationService.REGISTRATION_CONFIG_PREFIX
-                        + getRegistrationServiceID() + "." + MCRDOIRegistrationService.REGISTRATION_CONDITION_PROVIDER
+                    "Configured class " + clazz + "(" + MCRPIService.REGISTRATION_CONFIG_PREFIX
+                        + getServiceID() + "." + MCRDOIService.REGISTRATION_CONDITION_PROVIDER
                         + ")";
                 try {
                     return Class.forName(clazz)

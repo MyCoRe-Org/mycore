@@ -36,7 +36,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
-import org.mycore.pi.MCRPersistentIdentifierManager;
+import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
 
@@ -68,7 +68,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
 
         Assert.assertNull("Registered date should be null.", urn1.getRegistered());
 
-        MCRPersistentIdentifierManager.getInstance()
+        MCRPIManager.getInstance()
             .getUnregisteredIdentifiers(urn1.getType())
             .stream()
             .map(MCRPIRegistrationInfo::getIdentifier)
@@ -78,11 +78,11 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         Integer progressedIdentifiersFromDatabase;
         Function<MCRPIRegistrationInfo, Optional<Date>> registerFn = MCRPIUtils.getMCRURNClient()::register;
         do {
-            progressedIdentifiersFromDatabase = MCRPersistentIdentifierManager.getInstance()
+            progressedIdentifiersFromDatabase = MCRPIManager.getInstance()
                 .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, registerFn, BATCH_SIZE);
         } while (progressedIdentifiersFromDatabase > 0);
 
-        boolean registered = MCRPersistentIdentifierManager.getInstance().isRegistered(urn1);
+        boolean registered = MCRPIManager.getInstance().isRegistered(urn1);
         LOGGER.info("Registered: {}", registered);
 
         MCRPI mcrpi = MCREntityManagerProvider.getCurrentEntityManager().find(MCRPI.class, urn1.getId());
@@ -93,7 +93,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
             .map("URN registered: "::concat)
             .ifPresent(LOGGER::info);
 
-        MCRPersistentIdentifierManager.getInstance().getUnregisteredIdentifiers(urn1.getType())
+        MCRPIManager.getInstance().getUnregisteredIdentifiers(urn1.getType())
             .stream()
             .map(MCRPIRegistrationInfo::getIdentifier)
             .map("URN update: "::concat)

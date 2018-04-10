@@ -40,11 +40,11 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.MCRPIRegistrationService;
-import org.mycore.pi.MCRPIRegistrationServiceManager;
+import org.mycore.pi.MCRPIService;
+import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.MCRPersistentIdentifierManager;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.frontend.model.MCRPIErrorJSON;
 import org.mycore.pi.frontend.model.MCRPIListJSON;
@@ -67,11 +67,11 @@ public class MCRPersistentIdentifierRegistrationResource {
         Response errorResponse = validateParameters(from, size);
         if (errorResponse != null)
             return errorResponse;
-        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPersistentIdentifierManager.getInstance().getList(type,
+        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.getInstance().getList(type,
             from, size);
         return Response.status(Response.Status.OK)
             .entity(new Gson().toJson(new MCRPIListJSON(type, from, size,
-                MCRPersistentIdentifierManager.getInstance().getCount(type), mcrpiRegistrationInfos)))
+                MCRPIManager.getInstance().getCount(type), mcrpiRegistrationInfos)))
             .build();
     }
 
@@ -82,11 +82,11 @@ public class MCRPersistentIdentifierRegistrationResource {
         Response errorResponse = validateParameters(from, size);
         if (errorResponse != null)
             return errorResponse;
-        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPersistentIdentifierManager.getInstance().getList(from,
+        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.getInstance().getList(from,
             size);
         return Response.status(Response.Status.OK)
             .entity(new Gson().toJson(new MCRPIListJSON(null, from, size,
-                MCRPersistentIdentifierManager.getInstance().getCount(), mcrpiRegistrationInfos)))
+                MCRPIManager.getInstance().getCount(), mcrpiRegistrationInfos)))
             .build();
     }
 
@@ -96,7 +96,7 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response listServices() {
         return Response
             .status(Response.Status.OK)
-            .entity(MCRPIRegistrationServiceManager
+            .entity(MCRPIServiceManager
                 .getInstance()
                 .getServiceIDList()
                 .stream()
@@ -110,12 +110,12 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response register(@PathParam("serviceName") String serviceName, @PathParam("mycoreId") String mycoreId,
         @DefaultValue("") @QueryParam("additional") String additional) {
 
-        if (!MCRPIRegistrationServiceManager.getInstance().getServiceIDList().contains(serviceName)) {
+        if (!MCRPIServiceManager.getInstance().getServiceIDList().contains(serviceName)) {
             return Response.status(Response.Status.BAD_REQUEST)
                 .entity(buildErrorJSON("No Registration Service found for " + serviceName)).build();
         }
 
-        MCRPIRegistrationService<MCRPersistentIdentifier> registrationService = MCRPIRegistrationServiceManager
+        MCRPIService<MCRPersistentIdentifier> registrationService = MCRPIServiceManager
             .getInstance().getRegistrationService(serviceName);
         MCRObjectID mycoreIDObject;
         try {

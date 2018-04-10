@@ -26,6 +26,7 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -43,16 +44,22 @@ public class MCRMapObjectIDDOIGeneratorTest extends MCRTestCase {
 
     @Test
     public void generate() throws Exception {
-        MCRObjectID junitTest00004711 = MCRObjectID.getInstance("junit_test_00004711");
-        MCRObjectID myTest00000815 = MCRObjectID.getInstance("my_test_00000815");
-        assertEquals(TEST_DOI_PREFIX + "/4711", doiGenerator.generate(junitTest00004711, null).asString());
-        assertEquals(TEST_DOI_PREFIX + "/my.815", doiGenerator.generate(myTest00000815, null).asString());
+        MCRObjectID testID1 = MCRObjectID.getInstance("junit_test_00004711");
+        MCRObject mcrObject1 = new MCRObject();
+        mcrObject1.setId(testID1);
+        MCRObjectID testID2 = MCRObjectID.getInstance("my_test_00000815");
+        MCRObject mcrObject2 = new MCRObject();
+        mcrObject2.setId(testID2);
+        assertEquals(TEST_DOI_PREFIX + "/4711", doiGenerator.generate(mcrObject1, null).asString());
+        assertEquals(TEST_DOI_PREFIX + "/my.815", doiGenerator.generate(mcrObject2, null).asString());
     }
 
     @Test(expected = MCRPersistentIdentifierException.class)
     public void missingMappingTest() throws Exception {
-        MCRObjectID brandNewTest00000001 = MCRObjectID.getInstance("brandNew_test_00000001");
-        doiGenerator.generate(brandNewTest00000001, null);
+        MCRObjectID testID = MCRObjectID.getInstance("brandNew_test_00000001");
+        MCRObject mcrObject = new MCRObject();
+        mcrObject.setId(testID);
+        doiGenerator.generate(mcrObject, null);
     }
 
     @Override
