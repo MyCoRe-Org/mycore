@@ -323,8 +323,7 @@ public class MCRPersistentIdentifierManager {
         final List<MCRPIRegistrationInfo> resultList = em.createQuery(
             getQuery
                 .select(pi)
-                .where(cb.equal(pi.get(MCRPI_.identifier), identifier))
-                .where(cb.equal(pi.get(MCRPI_.type), type)))
+                .where(cb.equal(pi.get(MCRPI_.identifier), identifier),cb.equal(pi.get(MCRPI_.type), type)))
             .getResultList();
         return resultList.size()==0 ? Optional.empty():Optional.of(resultList.get(0));
     }
