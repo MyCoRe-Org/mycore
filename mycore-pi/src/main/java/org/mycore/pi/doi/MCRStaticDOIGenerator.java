@@ -7,8 +7,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPersistentIdentifierGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
-import static org.mycore.pi.MCRPIRegistrationService.GENERATOR_CONFIG_PREFIX;
-
 /**
  * Just for testing. Provides the doi in the doi property.
  */

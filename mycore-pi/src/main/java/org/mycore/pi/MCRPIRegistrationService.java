@@ -1,7 +1,5 @@
 package org.mycore.pi;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -32,13 +30,14 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.mycore.pi.urn.rest.MCRURNGranularRESTRegistrationService;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier> {
 
