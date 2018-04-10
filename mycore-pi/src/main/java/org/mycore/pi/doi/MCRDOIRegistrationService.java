@@ -72,8 +72,6 @@ public class MCRDOIRegistrationService extends MCRPIRegistrationService<MCRDigit
 
     private static final String DEFAULT_DATACITE_SCHEMA_PATH = "xsd/datacite/v3/metadata.xsd";
 
-    private static final String TRANSLATE_PREFIX = "component.pi.register.error.";
-
     private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
 
     private String username;
