@@ -72,26 +72,24 @@ namespace mycore.viewer.widgets.mets {
             if (files.length == 0) {
                 files = this.getFiles("MASTER");
             }
+            this._idFileMap = this.getIdFileMap(files);
 
-            let altoFiles = this.getFiles("ALTO");
-            let teiTranscriptionFiles = this.getFiles("TRANSCRIPTION");
-            let teiTranslationFiles = this.getFiles("TRANSLATION");
+
+            const useFilesMap = new MyCoReMap<string, Array<Node>>();
+            this.getGroups().map(node => {
+                return (<Element>node).getAttribute("USE");
+            })
+                .map(s=>s.toUpperCase())
+                .filter(s => s != "MASTER")
+                .forEach(s => {
+                    let files = this.getFiles(s);
+                    useFilesMap.set(s, files);
+                    this._idFileMap.mergeIn(this.getIdFileMap(files));
+                });
+
 
             this._chapterIdMap = new MyCoReMap<string, model.StructureChapter>();
-            this._idFileMap = this.getIdFileMap(files);
             this._idPhysicalFileMap = this.getIdPhysicalFileMap();
-
-            if (altoFiles != null) {
-                this._idFileMap.mergeIn(this.getIdFileMap(altoFiles));
-            }
-
-            if (teiTranscriptionFiles != null) {
-                this._idFileMap.mergeIn(this.getIdFileMap(teiTranscriptionFiles))
-            }
-
-            if (teiTranslationFiles != null) {
-                this._idFileMap.mergeIn(this.getIdFileMap(teiTranslationFiles))
-            }
 
             this._smLinkMap = new MyCoReMap<string, Array<string>>();
             this._chapterImageMap = new MyCoReMap<string, model.StructureImage>();
@@ -112,7 +110,7 @@ namespace mycore.viewer.widgets.mets {
                 this._chapterImageMap,
                 this._imageChapterMap,
                 this._imageHrefImageMap,
-                altoFiles != null && altoFiles.length > 0);
+                useFilesMap.has("ALTO")  && useFilesMap.get("ALTO").length > 0);
 
             return this._structureModel;
         }
@@ -120,6 +118,23 @@ namespace mycore.viewer.widgets.mets {
         public getStructMap(type: string): Node {
             let logicalStructMapPath = "//mets:structMap[@TYPE='" + type + "']";
             return singleSelectShim(this.metsDocument, logicalStructMapPath, MetsStructureBuilder.NS_MAP);
+        }
+
+        public getGroups() {
+            let fileGroupPath = "//mets:fileSec//mets:fileGrp";
+            var nsResolver = (nsPrefix: string) => {
+                return MetsStructureBuilder.NS_MAP.get(nsPrefix);
+            };
+            let fileSectionResult = (<any>this.metsDocument).evaluate(fileGroupPath, this.metsDocument.documentElement,
+                nsResolver, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
+
+            let nodeArray: Array<Node> = [];
+            let next;
+            while ((next = fileSectionResult.iterateNext()) != null) {
+                nodeArray.push(next);
+            }
+
+            return nodeArray;
         }
 
         /**
@@ -351,10 +366,8 @@ namespace mycore.viewer.widgets.mets {
                         imgMimeType = mimetype;
                     } else if (use === 'ALTO') {
                         additionalHrefs.set(MetsStructureBuilder.ALTO_TEXT, href);
-                    } else if (use === 'TRANSCRIPTION') {
-                        additionalHrefs.set(MetsStructureBuilder.TEI_TRANSCRIPTION, href);
-                    } else if (use === 'TRANSLATION') {
-                        additionalHrefs.set(MetsStructureBuilder.TEI_TRANSLATION + '.' + this.extractTranslationLanguage(href), href);
+                    } else if (use.indexOf("TEI.")==0) {
+                        additionalHrefs.set(use, href);
                     } else {
                         console.warn('Unknown File Group : ' + use);
                     }

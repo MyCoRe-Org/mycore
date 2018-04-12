@@ -26,12 +26,12 @@ public class MCRMetsFile {
 
     private String mimeType;
 
-    private MCRMetsFileUse use;
+    private String use;
 
     public MCRMetsFile() {
     }
 
-    public MCRMetsFile(String id, String href, String mimeType, MCRMetsFileUse use) {
+    public MCRMetsFile(String id, String href, String mimeType, String use) {
         this.id = id;
         this.href = href;
         this.mimeType = mimeType;
@@ -46,11 +46,11 @@ public class MCRMetsFile {
         return id;
     }
 
-    public MCRMetsFileUse getUse() {
+    public String getUse() {
         return use;
     }
 
-    public void setUse(MCRMetsFileUse use) {
+    public void setUse(String use) {
         this.use = use;
     }
 

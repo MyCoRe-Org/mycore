@@ -16,22 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../widgets/XMLImageInformationProvider.ts" />
-/// <reference path="../widgets/tei/TEILayer.ts" />
-/// <reference path="MetsSettings.ts" />
+/// <reference path="../widgets/TEILayer.ts" />
+/// <reference path="TEISettings.ts" />
+
 namespace mycore.viewer.components {
 
     export class MyCoReTEILayerProvider extends ViewerComponent {
 
-        constructor(private _settings:MetsSettings) {
+        constructor(private _settings:TEISettings) {
             super();
             this.contentLocation = this._settings.webApplicationBaseURL + "/servlets/MCRDerivateContentTransformerServlet/" + this._settings.derivate + "/";
         }
 
         private _model:model.StructureModel = null;
-
-        private static TEI_TRANSCRIPTION = "TeiTranscriptionHref";
-        private static TEI_TRANSLATION = "TeiTranslationHref";
         private contentLocation = null;
 
         public init() {
@@ -52,14 +49,9 @@ namespace mycore.viewer.components {
 
                 smle.structureModel._imageList.forEach((image)=> {
                     var additionalHrefs = image.additionalHrefs;
-                    if (additionalHrefs.has(MyCoReTEILayerProvider.TEI_TRANSCRIPTION)) {
-                        transcriptions.set(image.href, additionalHrefs.get(MyCoReTEILayerProvider.TEI_TRANSCRIPTION));
-                    }
-
- 
                     additionalHrefs.forEach((name, href)=> {
-                        if (name.indexOf(MyCoReTEILayerProvider.TEI_TRANSLATION + ".") == 0) {
-                            var language = name.split(".")[ 1 ];
+                        if (name.indexOf( "TEI.") == 0) {
+                            var language = name.substr("TEI.".length).toLocaleLowerCase();
                             if (!translations.has(language)) {
                                 translations.set(language, new MyCoReMap<string, string>());
                             }
@@ -76,7 +68,7 @@ namespace mycore.viewer.components {
                 });
 
                 if (!transcriptions.isEmpty()) {
-                    this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer("transcription", "transcription", transcriptions, this.contentLocation, this._settings.teiStylesheet || "html")));
+                    this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer("transcription", "layer.transcription", transcriptions, this.contentLocation, this._settings.teiStylesheet || "html")));
                 }
 
                 var order = [ "de", "en" ];
@@ -91,7 +83,7 @@ namespace mycore.viewer.components {
                         })
                         .forEach((language)=> {
                             var translationMap = translations.get(language);
-                            this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer("translation_" + language, "translation_" + language, translationMap, this.contentLocation, this._settings.teiStylesheet || "html")));
+                            this.trigger(new events.ProvideLayerEvent(this, new widgets.tei.TEILayer(language,  "layer." + language, translationMap, this.contentLocation, this._settings.teiStylesheet || "html")));
                         });
                 }
 

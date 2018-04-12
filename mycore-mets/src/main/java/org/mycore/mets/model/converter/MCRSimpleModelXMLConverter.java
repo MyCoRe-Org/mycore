@@ -29,7 +29,6 @@ import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
-import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
@@ -112,7 +111,7 @@ public class MCRSimpleModelXMLConverter {
                 String href = simpleFile.getHref();
                 String fileID = simpleFile.getId();
                 String mimeType = simpleFile.getMimeType();
-                MCRMetsFileUse use = simpleFile.getUse();
+                String use = simpleFile.getUse();
 
                 idToNewIDMap.put(simpleFile.getId(), fileID);
                 File file = new File(fileID, mimeType);
@@ -178,11 +177,11 @@ public class MCRSimpleModelXMLConverter {
         }
     }
 
-    private static FileGrp getFileGroup(Mets mets, MCRMetsFileUse use) {
-        FileGrp fileGroup = mets.getFileSec().getFileGroup(use.toString());
+    private static FileGrp getFileGroup(Mets mets, String use) {
+        FileGrp fileGroup = mets.getFileSec().getFileGroup(use);
 
         if (fileGroup == null) {
-            fileGroup = new FileGrp(use.toString());
+            fileGroup = new FileGrp(use);
             mets.getFileSec().addFileGrp(fileGroup);
         }
 

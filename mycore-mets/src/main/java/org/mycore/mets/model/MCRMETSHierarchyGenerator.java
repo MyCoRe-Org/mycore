@@ -51,7 +51,6 @@ import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.header.MetsHdr;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
-import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.struct.Area;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
@@ -220,12 +219,12 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         }
 
         for (FileRef ref : this.files) {
-            MCRMetsFileUse use = MCRMetsFileUse.get(ref.path);
-            FileGrp fileGrp = fileGrps.stream().filter(grp -> grp.getUse().equals(use.toString())).findFirst()
+            String use = MCRMetsModelHelper.getUseForHref(ref.path.getOwnerRelativePath()).orElse("UNKNOWN");
+            FileGrp fileGrp = fileGrps.stream().filter(grp -> grp.getUse().equals(use)).findFirst()
                                       .orElse(null);
             if (fileGrp == null) {
                 LOGGER.warn("Unable to add file '" + ref.toId() + "' because cannot find corresponding group "
-                        + " with @USE='" + use.toString() + "'. Ignore file and continue.");
+                        + " with @USE='" + use + "'. Ignore file and continue.");
                 continue;
             }
             addFile(ref.toId(), fileGrp, ref.getPath(), ref.getContentType());

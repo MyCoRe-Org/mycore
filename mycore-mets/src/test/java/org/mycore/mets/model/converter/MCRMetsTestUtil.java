@@ -32,8 +32,8 @@ import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.mycore.mets.model.MCRMetsModelHelper;
 import org.mycore.mets.model.simple.MCRMetsFile;
-import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.simple.MCRMetsLink;
 import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
@@ -112,16 +112,16 @@ public class MCRMetsTestUtil {
 
     private static void buildSimpleModelPages(MCRMetsSimpleModel metsSimpleModel) {
         MCRMetsPage metsPage1 = new MCRMetsPage("1_P", "1", "URN:special-urn1");
-        metsPage1.getFileList().add(new MCRMetsFile("1_M", "1.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
-        metsPage1.getFileList().add(new MCRMetsFile("1_A", "1.xml", "text/xml", MCRMetsFileUse.ALTO));
+        metsPage1.getFileList().add(new MCRMetsFile("1_M", "1.jpg", "image/jpeg", MCRMetsModelHelper.MASTER_USE));
+        metsPage1.getFileList().add(new MCRMetsFile("1_A", "1.xml", "text/xml", MCRMetsModelHelper.ALTO_USE));
 
         MCRMetsPage metsPage2 = new MCRMetsPage("2_P", "2", "URN:special-urn2");
-        metsPage2.getFileList().add(new MCRMetsFile("2_M", "2.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
-        metsPage2.getFileList().add(new MCRMetsFile("2_A", "2.xml", "text/xml", MCRMetsFileUse.ALTO));
+        metsPage2.getFileList().add(new MCRMetsFile("2_M", "2.jpg", "image/jpeg", MCRMetsModelHelper.MASTER_USE));
+        metsPage2.getFileList().add(new MCRMetsFile("2_A", "2.xml", "text/xml", MCRMetsModelHelper.ALTO_USE));
 
         MCRMetsPage metsPage3 = new MCRMetsPage("3_P", "3", "URN:special-urn3");
-        metsPage3.getFileList().add(new MCRMetsFile("3_M", "3.jpg", "image/jpeg", MCRMetsFileUse.MASTER));
-        metsPage3.getFileList().add(new MCRMetsFile("3_A", "3.xml", "text/xml", MCRMetsFileUse.ALTO));
+        metsPage3.getFileList().add(new MCRMetsFile("3_M", "3.jpg", "image/jpeg",MCRMetsModelHelper.MASTER_USE));
+        metsPage3.getFileList().add(new MCRMetsFile("3_A", "3.xml", "text/xml", MCRMetsModelHelper.ALTO_USE));
 
         metsSimpleModel.getMetsPageList().add(metsPage1);
         metsSimpleModel.getMetsPageList().add(metsPage2);

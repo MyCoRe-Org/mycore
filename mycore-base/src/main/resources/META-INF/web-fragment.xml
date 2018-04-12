@@ -99,7 +99,10 @@
     <servlet-name>DeleteDerivateServlet</servlet-name>
     <url-pattern>/servlets/derivate/delete</url-pattern>
   </servlet-mapping>
-
+  <servlet-mapping>
+    <servlet-name>MCRDerivateContentTransformerServlet</servlet-name>
+    <url-pattern>/servlets/MCRDerivateContentTransformerServlet/*</url-pattern>
+  </servlet-mapping>
   <servlet>
     <servlet-name>MCRLockServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRLockServlet</servlet-class>
@@ -139,6 +142,10 @@
   <servlet id="MCRContainerLoginForm">
     <servlet-name>MCRContainerLoginFormServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRContainerLoginFormServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>MCRDerivateContentTransformerServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRDerivateContentTransformerServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>MCRXSLInfoServlet</servlet-name>

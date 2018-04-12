@@ -82,20 +82,20 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
 
         // script & css
         boolean developerMode = isDebugParameterSet(request);
-        addLocalScript("iview-client-base.js", developerMode);
+        addLocalScript("iview-client-base.js", !developerMode);
         if (mobile) {
-            addLocalScript("iview-client-mobile.js", developerMode);
+            addLocalScript("iview-client-mobile.js", !developerMode);
             addLocalCSS("mobile.css");
         } else {
             if (this.isFramed(request)) {
-                addLocalScript("iview-client-frame.js", developerMode);
+                addLocalScript("iview-client-frame.js", !developerMode);
             } else if (this.getEmbeddedParameter(request) != null) {
-                addLocalScript("iview-client-frame.js", developerMode);
+                addLocalScript("iview-client-frame.js", !developerMode);
                 setProperty("embedded", "true");
                 setProperty("permalink.updateHistory", false);
                 setProperty("chapter.showOnStart", false);
             } else {
-                addLocalScript("iview-client-desktop.js", developerMode);
+                addLocalScript("iview-client-desktop.js", !developerMode);
             }
 
             addLocalCSS("default.css");

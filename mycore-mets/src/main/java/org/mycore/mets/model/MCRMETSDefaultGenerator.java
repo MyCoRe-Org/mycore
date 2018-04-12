@@ -37,6 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -49,7 +50,6 @@ import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
-import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
@@ -111,10 +111,10 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         AmdSec amdSec = new AmdSec("amd_" + owner);
         // file sec
         FileSec fileSec = new FileSec();
-        for (MCRMetsFileUse fileUse : MCRMetsFileUse.values()) {
-            FileGrp fileGrp = new FileGrp(fileUse.toString());
-            fileSec.addFileGrp(fileGrp);
-        }
+        //for (MCRMetsFileUse fileUse : MCRMetsFileUse.values()) {
+        //    FileGrp fileGrp = new FileGrp(fileUse.toString());
+        //    fileSec.addFileGrp(fileGrp);
+        //}
 
         // physical structure
         PhysicalStructMap physicalStructMap = new PhysicalStructMap();
@@ -193,8 +193,9 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         }
 
         //files
-        MCRMetsFileUse fileUse = MCRMetsFileUse.get(href);
-        String fileID = MCRMetsFileUse.getIdPrefix(href) + "_" + baseID;
+        String fileUse = MCRMetsModelHelper.getUseForHref(href)
+            .orElseThrow(() -> new MCRConfigurationException("Could not create METS!"));
+        String fileID = fileUse.replace('.', '_') + "_" + baseID;
         sortFileToGrp(fileSec, file, fileID, href, fileUse);
 
         // physical
@@ -242,17 +243,22 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
     }
 
     private void sortFileToGrp(FileSec fileSec, Map.Entry<MCRPath, BasicFileAttributes> file, String fileID,
-            final String href, MCRMetsFileUse fileUse) throws IOException {
+        final String href, String fileUse) throws IOException {
         // file
         File metsFile = new File(fileID, MCRContentTypes.probeContentType(file.getKey()));
         FLocat fLocat = new FLocat(LOCTYPE.URL, href);
         metsFile.setFLocat(fLocat);
 
-        for (FileGrp fileGrp : fileSec.getFileGroups()) {
-            if (fileGrp.getUse().equalsIgnoreCase(fileUse.toString())) {
-                fileGrp.addFile(metsFile);
-            }
+        this.createOrGetGroup(fileSec, fileUse).addFile(metsFile);
+    }
+
+    private FileGrp createOrGetGroup(FileSec fileSec,String fileUse) {
+        FileGrp fileGroup = fileSec.getFileGroup(fileUse);
+        if (fileGroup == null) {
+            fileGroup = new FileGrp(fileUse);
+            fileSec.addFileGrp(fileGroup);
         }
+        return fileGroup;
     }
 
     /**

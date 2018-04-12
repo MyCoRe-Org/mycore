@@ -63,7 +63,7 @@ public class MCRViewerMetadataConfiguration extends MCRViewerConfiguration {
         }
 
         // script
-        addLocalScript("iview-client-metadata.js", isDebugParameterSet(request));
+        addLocalScript("iview-client-metadata.js", !isDebugParameterSet(request));
 
         return this;
     }

@@ -31,7 +31,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -67,11 +67,11 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.mets.model.MCRMetsModelHelper;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
-import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
@@ -94,8 +94,6 @@ import org.xml.sax.SAXException;
  */
 public class MCRMetsSave {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMetsSave.class);
-
     public static final String ALTO_FOLDER_PREFIX = "alto/";
 
     public static final String TEI_FOLDER_PREFIX = "tei/";
@@ -103,6 +101,10 @@ public class MCRMetsSave {
     public static final String TRANSLATION_FOLDER_PREFIX = "translation.";
 
     public static final String TRANSCRIPTION_FOLDER_PREFIX = "transcription";
+
+    public static final String UNKNOWN_FILEGROUP = "UNKNOWN";
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRMetsSave.class);
 
     /**
      * Saves the content of the given document to file and then adds the file to
@@ -206,6 +208,7 @@ public class MCRMetsSave {
     }
 
     // TODO: should use mets-model api
+
     /**
      * Alters the mets file
      *
@@ -249,7 +252,7 @@ public class MCRMetsSave {
             Element fileSec = getFileGroup(mets, fileGrpUSE);
             fileSec.addContent(fileAsMetsFile.asElement());
 
-            if (fileGrpUSE.equals(MCRMetsFileUse.DEFAULT.toString())) {
+            if (fileGrpUSE.equals(MCRMetsModelHelper.MASTER_USE)) {
                 updateOnImageFile(mets, fileId, relPath);
             } else {
                 updateOnCustomFile(mets, fileId, relPath);
@@ -265,14 +268,13 @@ public class MCRMetsSave {
     private static void updateOnImageFile(Document mets, String fileId, String path) {
         LOGGER.debug("FILE is a image!");
         //check if custom files are present and save the ids
-        String[] customFileGroups = { MCRMetsFileUse.TRANSCRIPTION.toString(), MCRMetsFileUse.ALTO.toString(),
-                MCRMetsFileUse.TRANSLATION.toString() };
+        List<String> customFileGroups = getFileGroups(mets);
 
         // add to structMap physical
         PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE);
         div.add(new Fptr(fileId));
 
-        Arrays.stream(customFileGroups)
+        customFileGroups.stream()
             .map(customFileGroup -> searchFileInGroup(mets, path, customFileGroup))
             .filter(Objects::nonNull)
             .map(Fptr::new)
@@ -292,7 +294,7 @@ public class MCRMetsSave {
     private static void updateOnCustomFile(Document mets, String fileId, String path) {
         LOGGER.debug("FILE is a custom file (ALTO/TEI)!");
 
-        String matchId = searchFileInGroup(mets, path, MCRMetsFileUse.DEFAULT.toString());
+        String matchId = searchFileInGroup(mets, path, MCRMetsModelHelper.MASTER_USE);
 
         if (matchId == null) {
             // there is no file wich belongs to the alto xml so just return
@@ -320,6 +322,14 @@ public class MCRMetsSave {
             MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
         return xpath.evaluateFirst(mets);
+    }
+
+    private static List<String> getFileGroups(Document mets) {
+        final XPathExpression<Attribute> xpath = XPathFactory.instance()
+            .compile("mets:mets/mets:fileSec/mets:fileGrp@USE", Filters.attribute(), null,
+                MCRConstants.METS_NAMESPACE);
+        return xpath.evaluate(mets).stream().map(Attribute::getValue).collect(Collectors.toList());
+
     }
 
     private static Element getFileGroup(Document mets, String fileGrpUSE) {
@@ -397,7 +407,7 @@ public class MCRMetsSave {
      * @return the id of the filegGroup
      */
     public static String getFileGroupUse(MCRPath file) {
-        return MCRMetsFileUse.get(file).toString();
+        return MCRMetsModelHelper.getUseForHref(file.getOwnerRelativePath()).orElse(UNKNOWN_FILEGROUP);
     }
 
     /**
@@ -699,7 +709,8 @@ public class MCRMetsSave {
                         MCRPath mcrPath = MCRPath.toMCRPath(file);
                         String path;
                         try {
-                            path = MCRXMLFunctions.encodeURIPath(mcrPath.getOwnerRelativePath().substring(1));//remove leading '/'
+                            path = MCRXMLFunctions
+                                .encodeURIPath(mcrPath.getOwnerRelativePath().substring(1));//remove leading '/'
                         } catch (URISyntaxException e) {
                             throw new IOException(e);
                         }
@@ -856,11 +867,11 @@ public class MCRMetsSave {
      */
     public static List<MCRPath> listFiles(MCRPath path, Collection<MCRPath> ignore) throws IOException {
         return Files.walk(path)
-                    .filter(Files::isRegularFile)
-                    .map(MCRPath::toMCRPath)
-                    .filter(MCRStreamUtils.not(ignore::contains))
-                    .sorted()
-                    .collect(Collectors.toList());
+            .filter(Files::isRegularFile)
+            .map(MCRPath::toMCRPath)
+            .filter(MCRStreamUtils.not(ignore::contains))
+            .sorted()
+            .collect(Collectors.toList());
     }
 
     /**
@@ -878,9 +889,8 @@ public class MCRMetsSave {
      */
     public static List<FileGrp> buildFileGroups(List<MCRPath> paths) {
         return listFileUse(paths).stream()
-                                 .map(MCRMetsFileUse::toString)
-                                 .map(FileGrp::new)
-                                 .collect(Collectors.toList());
+            .map(FileGrp::new)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -889,10 +899,11 @@ public class MCRMetsSave {
      * @param paths paths to check
      * @return list of <code>MCRMetsFileUse</code>
      */
-    public static List<MCRMetsFileUse> listFileUse(List<MCRPath> paths) {
-        Set<MCRMetsFileUse> fileUseSet = new HashSet<>();
+    public static List<String> listFileUse(List<MCRPath> paths) {
+        Set<String> fileUseSet = new HashSet<>();
         for (MCRPath path : paths) {
-            fileUseSet.add(MCRMetsFileUse.get(path));
+            final Optional<String> use = MCRMetsModelHelper.getUseForHref(path.getOwnerRelativePath().toString());
+            use.ifPresent(fileUseSet::add);
         }
         return new ArrayList<>(fileUseSet);
     }
@@ -911,7 +922,7 @@ public class MCRMetsSave {
     public static String getFileBase(String href) {
         String fileName = Paths.get(href).getFileName().toString();
         int endIndex = fileName.lastIndexOf(".");
-        if(endIndex != -1) {
+        if (endIndex != -1) {
             fileName = fileName.substring(0, endIndex);
         }
         return MCRXMLFunctions.toNCNameSecondPart(fileName);
@@ -939,7 +950,7 @@ public class MCRMetsSave {
      * @return mets:file ID
      */
     public static String getFileId(MCRPath path) {
-        String prefix = MCRMetsFileUse.getIdPrefix(path);
+        String prefix = MCRMetsModelHelper.getUseForHref(path.getOwnerRelativePath()).orElse(UNKNOWN_FILEGROUP);
         String base = getFileBase(path);
         return prefix + "_" + base;
     }

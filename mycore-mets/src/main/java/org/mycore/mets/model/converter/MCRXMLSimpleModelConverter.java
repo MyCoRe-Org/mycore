@@ -30,7 +30,6 @@ import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.simple.MCRMetsAltoLink;
 import org.mycore.mets.model.simple.MCRMetsFile;
-import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.simple.MCRMetsLink;
 import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
@@ -174,7 +173,7 @@ public class MCRXMLSimpleModelConverter {
     private static void addFilesFromGroup(Map<String, MCRMetsFile> idPageMap, FileGrp fileGroup) {
         String fileGroupUse = fileGroup.getUse();
         fileGroup.getFileList().forEach(file -> {
-            MCRMetsFileUse use = Enum.valueOf(MCRMetsFileUse.class, fileGroupUse);
+            String use =  fileGroupUse;
             idPageMap.put(file.getId(), new MCRMetsFile(file.getId(),
                 file.getFLocat().getHref(), file.getMimeType(), use));
         });

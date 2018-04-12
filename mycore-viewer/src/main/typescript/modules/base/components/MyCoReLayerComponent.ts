@@ -37,7 +37,7 @@ namespace mycore.viewer.components {
     export class MyCoReLayerComponent extends ViewerComponent {
         constructor(private _settings:MyCoReViewerSettings) {
             super();
-            this.enabled = Utils.getVar(this._settings, "text.enabled", false) && this._settings.mobile != true;
+            this.enabled = Utils.getVar(this._settings, "text.enabled", "true")==="true" && this._settings.mobile != true;
             this.showLayerOnStart = Utils.getVar(this._settings, "text.showOnStart", [ ]);
         }
 
