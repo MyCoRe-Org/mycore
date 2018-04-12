@@ -18,34 +18,31 @@
 
 package org.mycore.common.events;
 
-import java.util.Enumeration;
-
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSessionResolver;
 import org.mycore.frontend.servlets.MCRServlet;
+
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+import java.util.Enumeration;
 
 /**
  * Handles different HttpSession events.
- * 
+ *
  * This class is used to free up MCRSessions when their associated HttpSession
  * is destroyed or a new MCRSession replaces an old one.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
-public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionBindingListener {
+public class MCRHttpSessionListener implements HttpSessionListener {
     Logger LOGGER = LogManager.getLogger();
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
      */
     public void sessionCreated(HttpSessionEvent hse) {
@@ -54,41 +51,26 @@ public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionB
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
      */
     public void sessionDestroyed(HttpSessionEvent hse) {
         // clear MCRSessions
         HttpSession httpSession = hse.getSession();
         LOGGER.debug(() -> "HttpSession " + httpSession.getId() + " is beeing destroyed by " + hse.getSource()
-            + ", clearing up.");
+                + ", clearing up.");
         LOGGER.debug("Removing any MCRSessions from HttpSession");
-        for (Enumeration<String> e = httpSession.getAttributeNames(); e.hasMoreElements();) {
+        for (Enumeration<String> e = httpSession.getAttributeNames(); e.hasMoreElements(); ) {
             String key = e.nextElement();
             if (key.equals(MCRServlet.ATTR_MYCORE_SESSION)) {
-                MCRSession mcrSession = MCRSessionMgr.getSession((String) httpSession.getAttribute(key));
-                if (mcrSession != null) {
-                    LOGGER.debug("Clean up MCRSession {}", mcrSession);
-                    mcrSession.close();
-                }
+                ((MCRSessionResolver) httpSession.getAttribute(key))
+                        .resolveSession()
+                        .ifPresent(MCRSession::close);
                 // remove reference in httpSession
                 httpSession.removeAttribute(key);
             }
         }
         LOGGER.debug("Clearing up done");
-    }
-
-    public void valueBound(HttpSessionBindingEvent hsbe) {
-    }
-
-    public void valueUnbound(HttpSessionBindingEvent hsbe) {
-        LOGGER.debug("Attribute {} is beeing unbound from session", hsbe.getName());
-        Object obj = hsbe.getValue();
-        if (obj instanceof MCRSession) {
-            MCRSession mcrSession = (MCRSession) obj;
-            mcrSession.close();
-        }
-        LOGGER.debug("Attribute {} is unbounded from session", hsbe.getName());
     }
 
 }

@@ -51,6 +51,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSessionResolver;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
@@ -193,8 +194,9 @@ public class MCRServlet extends HttpServlet {
         }
         MCRSession session = null;
 
-        MCRSession fromHttpSession = Optional.ofNullable((String) theSession.getAttribute(ATTR_MYCORE_SESSION))
-            .map(MCRSessionMgr::getSession)
+        MCRSession fromHttpSession = Optional
+            .ofNullable((MCRSessionResolver) theSession.getAttribute(ATTR_MYCORE_SESSION))
+            .flatMap(MCRSessionResolver::resolveSession)
             .orElse(null);
 
         if (fromHttpSession != null && fromHttpSession.getID() != null) {
@@ -219,9 +221,7 @@ public class MCRServlet extends HttpServlet {
         }
 
         // Store current session in HttpSession
-        theSession.setAttribute(ATTR_MYCORE_SESSION, session.getID());
-        LOGGER.debug("Bound MCRSession {} to HTTPSession {}", session.toString(), theSession.getId());
-
+        theSession.setAttribute(ATTR_MYCORE_SESSION, new MCRSessionResolver(session));
         // store the HttpSession ID in MCRSession
         if (session.put("http.session", theSession.getId()) == null) {
             //first request
