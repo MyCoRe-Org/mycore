@@ -37,7 +37,8 @@ public class MCRNewClassificationPermission implements MCRResourceAccessChecker 
     private static final Logger LOGGER = LogManager.getLogger(MCRNewClassificationPermission.class);
 
     /* (non-Javadoc)
-     * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker#isPermitted(com.sun.jersey.spi.container.ContainerRequest)
+     * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker
+     *  #isPermitted(com.sun.jersey.spi.container.ContainerRequest)
      */
     @Override
     public boolean isPermitted(ContainerRequestContext request) {

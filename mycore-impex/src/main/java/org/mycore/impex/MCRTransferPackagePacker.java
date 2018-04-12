@@ -137,7 +137,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
      */
     @Override
     public void rollback() {
-
+        //do nothing
     }
 
     /**

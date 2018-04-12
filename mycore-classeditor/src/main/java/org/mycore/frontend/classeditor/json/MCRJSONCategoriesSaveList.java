@@ -23,18 +23,21 @@ import java.util.ArrayList;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
+import javax.ws.rs.WebApplicationException;
+
 public class MCRJSONCategoriesSaveList {
     ArrayList<CategorySaveElement> updateList = new ArrayList<>();
 
     ArrayList<CategorySaveElement> deleteList = new ArrayList<>();
 
-    public void add(MCRCategory categ, MCRCategoryID parentID, int index, String status) throws Exception {
+    public void add(MCRCategory categ, MCRCategoryID parentID, int index, String status)
+            throws WebApplicationException {
         if ("updated".equals(status)) {
             updateList.add(new CategorySaveElement(categ, parentID, index));
         } else if ("deleted".equals(status)) {
             deleteList.add(new CategorySaveElement(categ, parentID, index));
         } else {
-            throw new Exception("Unknown status.");
+            throw new WebApplicationException("Unknown status.");
         }
     }
 
@@ -43,7 +46,7 @@ public class MCRJSONCategoriesSaveList {
         private MCRCategoryID parentID;
         private int index;
 
-        public CategorySaveElement(MCRCategory categ, MCRCategoryID parentID, int index) {
+        CategorySaveElement(MCRCategory categ, MCRCategoryID parentID, int index) {
             this.categ = categ;
             this.parentID = parentID;
             this.index = index;

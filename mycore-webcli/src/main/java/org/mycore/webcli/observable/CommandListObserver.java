@@ -47,7 +47,7 @@ public class CommandListObserver implements Observer {
     }
 
     public void update(Observable observable, Object obj) {
-        if (observable == obCommandList && session.isOpen()) {
+        if (observable.equals(obCommandList) && session.isOpen()) {
             JsonObject jObject = new JsonObject();
             jObject.addProperty("type", "commandQueue");
             if (obCommandList.isEmpty()) {

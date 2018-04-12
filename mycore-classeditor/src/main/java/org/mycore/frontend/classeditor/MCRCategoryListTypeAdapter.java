@@ -46,6 +46,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 
+import javax.ws.rs.WebApplicationException;
+
 public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryListWrapper> {
     private JsonSerializationContext serializationContext;
 
@@ -56,7 +58,7 @@ public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryLi
         Map<MCRCategoryID, Boolean> linkMap = categListWrapper.getLinkMap();
 
         if (linkMap == null) {
-            throw new RuntimeException("For serializing link map must not be null.");
+            throw new WebApplicationException("For serializing link map must not be null.");
         }
 
         return categListToJsonArray(categListWrapper.getList(), linkMap);

@@ -45,7 +45,7 @@ public class MCRIIIFPresentationResource {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCache<String, MCRIIIFPresentationManifestQuickAccess> cache = new MCRCache<>(1000,
+    private static final MCRCache<String, MCRIIIFPresentationManifestQuickAccess> CACHE = new MCRCache<>(1000,
         MCRIIIFPresentationResource.class.getName());
 
     private static final String IMPL_PARAM = "impl";
@@ -72,8 +72,9 @@ public class MCRIIIFPresentationResource {
     }
 
     protected MCRIIIFPresentationManifestQuickAccess getManifestQuickAccess(String impl, String identifier) {
-        MCRIIIFPresentationManifestQuickAccess quickAccess;
-        if ((quickAccess = cache.getIfUpToDate(impl + identifier, TimeUnit.HOURS.toMillis(1))) == null) {
+        MCRIIIFPresentationManifestQuickAccess quickAccess = CACHE
+            .getIfUpToDate(impl + identifier, TimeUnit.HOURS.toMillis(1));
+        if (quickAccess == null) {
             long startTime = new Date().getTime();
             MCRIIIFManifest manifest = MCRIIIFPresentationImpl.getInstance(impl).getManifest(identifier);
             long endTime = new Date().getTime();
@@ -81,7 +82,7 @@ public class MCRIIIFPresentationResource {
             LOGGER.info("Manifest {}:{} generation needed: {}ms", impl, identifier, timeNeeded);
 
             quickAccess = new MCRIIIFPresentationManifestQuickAccess(manifest);
-            cache.put(impl + identifier, quickAccess);
+            CACHE.put(impl + identifier, quickAccess);
             correctIDs(manifest, impl, identifier);
         } else {
             LOGGER.info("Manifest {}:{} served from cache", impl, identifier);

@@ -39,6 +39,8 @@ public class MCRJSONCategory implements MCRCategory {
 
     private int positionInParent;
 
+    private MCRCategoryID parentID;
+
     public void setParent(MCRCategory parent) {
         category.setParent(parent);
     }
@@ -125,8 +127,6 @@ public class MCRJSONCategory implements MCRCategory {
     public Optional<MCRLabel> getLabel(String lang) {
         return category.getLabel(lang);
     }
-
-    private MCRCategoryID parentID;
 
     public void setParentID(MCRCategoryID parentID) {
         this.parentID = parentID;

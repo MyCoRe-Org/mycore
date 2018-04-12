@@ -161,8 +161,9 @@ public class MCRWebCLIContainer {
     }
 
     private static void updateKnownCommandsIfNeeded() {
-        if (knownCommands == null)
+        if (knownCommands == null) {
             initializeCommands();
+        }
     }
 
     public void changeWebSocketSession(Session webSocketSession) {
@@ -209,7 +210,7 @@ public class MCRWebCLIContainer {
 
         boolean continueIfOneFails;
 
-        public ProcessCallable(MCRSession session, Session webSocketSession) {
+        ProcessCallable(MCRSession session, Session webSocketSession) {
             this.commands = new ObservableCommandList();
             this.session = session;
             this.webSocketSession = webSocketSession;
@@ -277,15 +278,16 @@ public class MCRWebCLIContainer {
                 List<String> commandsReturned = null;
                 for (List<MCRCommand> cmds : knownCommands.values()) {
                     // previous attempt to run command was successful
-                    if (commandsReturned != null)
+                    if (commandsReturned != null) {
                         break;
+                    }
                     commandsReturned = runCommand(command, cmds);
                 }
                 updateKnownCommandsIfNeeded();
                 session.commitTransaction();
-                if (commandsReturned != null)
+                if (commandsReturned != null) {
                     LOGGER.info("Command processed ({} ms)", System.currentTimeMillis() - start);
-                else {
+                } else {
                     throw new MCRUsageException("Command not understood: " + command);
                 }
             } catch (Exception ex) {
@@ -312,8 +314,7 @@ public class MCRWebCLIContainer {
             List<String> commandsReturned = null;
             for (MCRCommand currentCommand : commandList) {
                 commandsReturned = currentCommand.invoke(command, this.getClass().getClassLoader());
-                if (commandsReturned != null) // Command was executed
-                {
+                if (commandsReturned != null) { // Command was executed
                     // Add commands to queue
                     if (commandsReturned.size() > 0) {
                         LOGGER.info("Queueing {} commands to process", commandsReturned.size());
@@ -346,8 +347,9 @@ public class MCRWebCLIContainer {
                 if (lastCommand != null) {
                     pw.println(lastCommand);
                 }
-                for (String command : commands.getCopyAsArrayList())
+                for (String command : commands.getCopyAsArrayList()) {
                     pw.println(command);
+                }
                 if (failedQueue != null && !failedQueue.isEmpty()) {
                     for (String failedCommand : failedQueue) {
                         pw.println(failedCommand);
@@ -433,6 +435,10 @@ public class MCRWebCLIContainer {
 
     private static class Log4JGrabber extends AbstractAppender {
 
+        public String webCLIThread;
+
+        public ObservableLogEventDeque logEvents;
+
         protected Log4JGrabber(String name, Filter filter, Layout<? extends Serializable> layout) {
             super(name, filter, layout);
         }
@@ -448,10 +454,6 @@ public class MCRWebCLIContainer {
             super.stop();
             logEvents.clear();
         }
-
-        public String webCLIThread;
-
-        public ObservableLogEventDeque logEvents;
 
         public void grabCurrentThread() {
             this.webCLIThread = Thread.currentThread().getName();

@@ -18,7 +18,6 @@
 
 package org.mycore.iiif.presentation.model.attributes;
 
-import org.mycore.iiif.image.model.MCRIIIFImageProfile;
 import org.mycore.iiif.model.MCRIIIFBase;
 
 /**
@@ -33,7 +32,7 @@ import org.mycore.iiif.model.MCRIIIFBase;
 public class MCRIIIFService extends MCRIIIFBase {
 
     /**
-     * This can be a String or also @link {@link MCRIIIFImageProfile}
+     * This can be a String or also @link {@link org.mycore.iiif.image.model.MCRIIIFImageProfile}
      **/
     public String profile;
 

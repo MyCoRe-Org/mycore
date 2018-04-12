@@ -75,7 +75,10 @@ public class MCRIIIFRegionParser {
 
     private MCRIIIFImageSourceRegion parseAbsoluteImageRegion() {
         List<Double> doubles = parseNumbers();
-        Double x1 = doubles.get(0), y1 = doubles.get(1), x2 = doubles.get(2) + x1, y2 = doubles.get(3) + y1;
+        Double x1 = doubles.get(0);
+        Double y1 = doubles.get(1);
+        Double x2 = doubles.get(2) + x1;
+        Double y2 = doubles.get(3) + y1;
         return parseImageRegion((int) Math.round(x1), (int) Math.round(y1), (int) Math.round(x2), (int) Math.round(y2));
     }
 
@@ -91,14 +94,14 @@ public class MCRIIIFRegionParser {
         }
 
         // negative values become 0
-        x1 = Math.max(0, x1);
-        y1 = Math.max(0, y1);
+        int nx1 = Math.max(0, x1);
+        int ny1 = Math.max(0, y1);
 
         // end values bigger then image become as big as image
-        x2 = Math.min(w - 1, x2);
-        y2 = Math.min(h - 1, y2);
+        int nx2 = Math.min(w - 1, x2);
+        int ny2 = Math.min(h - 1, y2);
 
-        return new MCRIIIFImageSourceRegion(x1, y1, x2, y2);
+        return new MCRIIIFImageSourceRegion(nx1, ny1, nx2, ny2);
     }
 
     private boolean isPercent() {
@@ -106,7 +109,7 @@ public class MCRIIIFRegionParser {
     }
 
     private boolean isFull() {
-        return sourceRegion.equals("full");
+        return "full".equals(sourceRegion);
     }
 
     private List<Double> parseNumbers() {

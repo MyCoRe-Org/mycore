@@ -44,6 +44,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.frontend.MCRLayoutUtilities;
@@ -65,7 +67,9 @@ public class MCRWCMSFileBrowserResource {
 
     private ArrayList<String> folderList = new ArrayList<>();
 
-    private String WCMSDataPath = MCRWebPagesSynchronizer.getWCMSDataDir().getPath();
+    private String wcmsDataPath = MCRWebPagesSynchronizer.getWCMSDataDir().getPath();
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRWCMSFileBrowserResource.class);
 
     @Context
     HttpServletRequest request;
@@ -120,12 +124,10 @@ public class MCRWCMSFileBrowserResource {
     @POST
     @Path("/folder")
     public Response addFolder(@QueryParam("path") String path) throws IOException {
-        File WCMSdir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
-        File WepAppdir = new File(MCRWebPagesSynchronizer.getWebAppBaseDir().getPath() + path);
-        if (WCMSdir.mkdir()) {
-            if (WepAppdir.mkdir()) {
-                return Response.ok().build();
-            }
+        File wcmsDir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
+        File wepAppdir = new File(MCRWebPagesSynchronizer.getWebAppBaseDir().getPath() + path);
+        if (wcmsDir.mkdir() && wepAppdir.mkdir()) {
+            return Response.ok().build();
         }
         return Response.status(Status.CONFLICT).build();
     }
@@ -133,15 +135,13 @@ public class MCRWCMSFileBrowserResource {
     @DELETE
     @Path("/folder")
     public Response deleteFolder(@QueryParam("path") String path) throws IOException {
-        File WCMSdir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
-        File WepAppdir = new File(MCRWebPagesSynchronizer.getWebAppBaseDir().getPath() + path);
+        File wcmsDir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
+        File wepAppdir = new File(MCRWebPagesSynchronizer.getWebAppBaseDir().getPath() + path);
 
-        if (WepAppdir.isDirectory()) {
-            if (WepAppdir.list().length < 1) {
-                if (FileUtils.deleteQuietly(WepAppdir)) {
-                    if (FileUtils.deleteQuietly(WCMSdir)) {
-                        return Response.ok().build();
-                    }
+        if (wepAppdir.isDirectory()) {
+            if (wepAppdir.list().length < 1) {
+                if (FileUtils.deleteQuietly(wepAppdir) && FileUtils.deleteQuietly(wcmsDir)) {
+                    return Response.ok().build();
                 }
             } else {
                 return Response.status(Status.FORBIDDEN).build();
@@ -186,7 +186,7 @@ public class MCRWCMSFileBrowserResource {
         try {
             saveFile(inputStream, path + "/" + header.getFileName());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error while saving {}", path, e);
             return Response.status(Status.CONFLICT).build();
         }
         return Response.ok().build();
@@ -194,12 +194,10 @@ public class MCRWCMSFileBrowserResource {
 
     @DELETE
     public Response deleteFile(@QueryParam("path") String path) throws IOException {
-        File WCMSdir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
-        File WepAppdir = new File(MCRWebPagesSynchronizer.getWebAppBaseDir().getPath() + path);
-        if (delete(WCMSdir)) {
-            if (delete(WepAppdir)) {
-                return Response.ok().build();
-            }
+        File wcmsDir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
+        File wepAppdir = new File(MCRWebPagesSynchronizer.getWebAppBaseDir().getPath() + path);
+        if (delete(wcmsDir) && delete(wepAppdir)) {
+            return Response.ok().build();
         }
         return Response.status(Status.CONFLICT).build();
     }
@@ -214,10 +212,10 @@ public class MCRWCMSFileBrowserResource {
         try {
             path = saveFile(inputStream, href + "/" + header.getFileName());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error while saving {}", href + "/" + header.getFileName(), e);
             return "";
         }
-        if (type.equals("images")) {
+        if ("images".equals(type)) {
             return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'"
                 + path.substring(path.lastIndexOf("/") + 1, path.length()) + "', '');</script>";
         }
@@ -226,8 +224,8 @@ public class MCRWCMSFileBrowserResource {
     }
 
     protected String saveFile(InputStream inputStream, String path) throws IOException {
-        path = testIfFileExists(path);
-        OutputStream outputStream = MCRWebPagesSynchronizer.getOutputStream(path);
+        String newPath = testIfFileExists(path);
+        OutputStream outputStream = MCRWebPagesSynchronizer.getOutputStream(newPath);
         int read = 0;
         byte[] bytes = new byte[1024];
 
@@ -236,28 +234,29 @@ public class MCRWCMSFileBrowserResource {
         }
         outputStream.flush();
         outputStream.close();
-        return path;
+        return newPath;
     }
 
     protected String testIfFileExists(String path) {
-        File file = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
+        String newPath = path;
+        File file = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + newPath);
         int i = 1;
         while (file.exists()) {
-            String type = path.substring(path.lastIndexOf("."));
-            String name = path.substring(0, path.lastIndexOf("."));
+            String type = newPath.substring(newPath.lastIndexOf("."));
+            String name = newPath.substring(0, newPath.lastIndexOf("."));
             if (i > 1) {
                 name = name.substring(0, name.lastIndexOf("("));
             }
-            path = name + "(" + i++ + ")" + type;
-            file = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
+            newPath = name + "(" + i++ + ")" + type;
+            file = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + newPath);
         }
-        return path;
+        return newPath;
     }
 
     protected void getallowedPaths(Element element) {
         String pathString = element.getAttribute("dir");
-        if (!pathString.equals("")) {
-            folderList.add(WCMSDataPath + pathString);
+        if (!"".equals(pathString)) {
+            folderList.add(wcmsDataPath + pathString);
         }
         NodeList nodeList = element.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -286,8 +285,9 @@ public class MCRWCMSFileBrowserResource {
                     }
                 }
             }
-            if (jsonArray.size() > 0)
+            if (jsonArray.size() > 0) {
                 jsonObj.add("children", jsonArray);
+            }
             return jsonObj;
         }
         return jsonObj;
@@ -299,11 +299,6 @@ public class MCRWCMSFileBrowserResource {
                 delete(subFile);
             }
         }
-        if (file.exists()) {
-            if (!file.delete()) {
-                return false;
-            }
-        }
-        return true;
+        return !file.exists() || file.delete();
     }
 }

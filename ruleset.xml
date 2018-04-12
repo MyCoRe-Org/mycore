@@ -82,7 +82,7 @@
   <rule ref="rulesets/java/strictexception.xml/AvoidThrowingNullPointerException" />
   <rule ref="rulesets/java/strictexception.xml/AvoidThrowingRawExceptionTypes" />
   <rule ref="rulesets/java/strings.xml/AppendCharacterWithChar" />
-  <rule ref="rulesets/java/strings.xml/AvoidDuplicateLiterals" />
+  <!--<rule ref="rulesets/java/strings.xml/AvoidDuplicateLiterals" />-->
   <rule ref="rulesets/java/strings.xml/InefficientStringBuffering" />
   <rule ref="rulesets/java/strings.xml/StringInstantiation" />
   <rule ref="rulesets/java/strings.xml/StringToString" />

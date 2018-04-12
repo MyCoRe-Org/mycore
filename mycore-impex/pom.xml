@@ -10,7 +10,9 @@
   <artifactId>mycore-impex</artifactId>
   <name>MyCoRe Import Export</name>
   <properties>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>98</manifest.priority>
+    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>

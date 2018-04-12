@@ -208,83 +208,6 @@ public class MCRClassificationEditorResource {
         return deleteOp.getResponse();
     }
 
-    interface OperationInSession {
-        void run();
-    }
-
-    private class DeleteOp implements OperationInSession {
-
-        private MCRJSONCategory category;
-
-        private Response response;
-
-        public DeleteOp(MCRJSONCategory category) {
-            this.category = category;
-        }
-
-        @Override
-        public void run() {
-            MCRCategoryID categoryID = category.getId();
-            if (CATEGORY_DAO.exist(categoryID)) {
-                if (categoryID.isRootID()
-                    && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
-                    throw new WebApplicationException(Status.UNAUTHORIZED);
-                }
-                CATEGORY_DAO.deleteCategory(categoryID);
-                setResponse(Response.status(Status.GONE).build());
-            } else {
-                setResponse(Response.notModified().build());
-            }
-        }
-
-        public Response getResponse() {
-            return response;
-        }
-
-        private void setResponse(Response response) {
-            this.response = response;
-        }
-
-    }
-
-    private class UpdateOp implements OperationInSession {
-
-        private MCRJSONCategory category;
-
-        private JsonObject jsonObject;
-
-        public UpdateOp(MCRJSONCategory category, JsonObject jsonObject) {
-            this.category = category;
-            this.jsonObject = jsonObject;
-        }
-
-        @Override
-        public void run() {
-            MCRCategoryID mcrCategoryID = category.getId();
-            boolean isAdded = isAdded(jsonObject);
-            if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
-                // an added category already exist -> throw conflict error
-                throw new WebApplicationException(
-                    Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID)).build());
-            }
-
-            MCRCategoryID newParentID = category.getParentID();
-            if (newParentID != null && !CATEGORY_DAO.exist(newParentID)) {
-                throw new WebApplicationException(Status.NOT_FOUND);
-            }
-            if (CATEGORY_DAO.exist(category.getId())) {
-                CATEGORY_DAO.setLabels(category.getId(), category.getLabels());
-                CATEGORY_DAO.setURI(category.getId(), category.getURI());
-                if (newParentID != null) {
-                    CATEGORY_DAO.moveCategory(category.getId(), newParentID, category.getPositionInParent());
-                }
-            } else {
-                CATEGORY_DAO.addCategory(newParentID, category.asMCRImpl(), category.getPositionInParent());
-            }
-        }
-
-    }
-
     @POST
     @Path("save")
     @MCRRestrictedAccess(MCRClassificationWritePermission.class)
@@ -394,10 +317,11 @@ public class MCRClassificationEditorResource {
     }
 
     private MCRCategoryID newRandomUUID(String rootID) {
+        String newRootID = rootID;
         if (rootID == null) {
-            rootID = UUID.randomUUID().toString();
+            newRootID = UUID.randomUUID().toString();
         }
-        return new MCRCategoryID(rootID, UUID.randomUUID().toString());
+        return new MCRCategoryID(newRootID, UUID.randomUUID().toString());
     }
 
     private String getCategory(MCRCategoryID id) {
@@ -458,7 +382,7 @@ public class MCRClassificationEditorResource {
 
         private boolean hasParent;
 
-        public SaveElement(String categJson, boolean hasParent) {
+        SaveElement(String categJson, boolean hasParent) {
             this.setCategJson(categJson);
             this.setHasParent(hasParent);
         }
@@ -515,4 +439,80 @@ public class MCRClassificationEditorResource {
         }
     }
 
+    interface OperationInSession {
+        void run();
+    }
+
+    private class DeleteOp implements OperationInSession {
+
+        private MCRJSONCategory category;
+
+        private Response response;
+
+        DeleteOp(MCRJSONCategory category) {
+            this.category = category;
+        }
+
+        @Override
+        public void run() {
+            MCRCategoryID categoryID = category.getId();
+            if (CATEGORY_DAO.exist(categoryID)) {
+                if (categoryID.isRootID()
+                    && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
+                    throw new WebApplicationException(Status.UNAUTHORIZED);
+                }
+                CATEGORY_DAO.deleteCategory(categoryID);
+                setResponse(Response.status(Status.GONE).build());
+            } else {
+                setResponse(Response.notModified().build());
+            }
+        }
+
+        public Response getResponse() {
+            return response;
+        }
+
+        private void setResponse(Response response) {
+            this.response = response;
+        }
+
+    }
+
+    private class UpdateOp implements OperationInSession {
+
+        private MCRJSONCategory category;
+
+        private JsonObject jsonObject;
+
+        UpdateOp(MCRJSONCategory category, JsonObject jsonObject) {
+            this.category = category;
+            this.jsonObject = jsonObject;
+        }
+
+        @Override
+        public void run() {
+            MCRCategoryID mcrCategoryID = category.getId();
+            boolean isAdded = isAdded(jsonObject);
+            if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
+                // an added category already exist -> throw conflict error
+                throw new WebApplicationException(
+                    Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID)).build());
+            }
+
+            MCRCategoryID newParentID = category.getParentID();
+            if (newParentID != null && !CATEGORY_DAO.exist(newParentID)) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+            if (CATEGORY_DAO.exist(category.getId())) {
+                CATEGORY_DAO.setLabels(category.getId(), category.getLabels());
+                CATEGORY_DAO.setURI(category.getId(), category.getURI());
+                if (newParentID != null) {
+                    CATEGORY_DAO.moveCategory(category.getId(), newParentID, category.getPositionInParent());
+                }
+            } else {
+                CATEGORY_DAO.addCategory(newParentID, category.asMCRImpl(), category.getPositionInParent());
+            }
+        }
+
+    }
 }

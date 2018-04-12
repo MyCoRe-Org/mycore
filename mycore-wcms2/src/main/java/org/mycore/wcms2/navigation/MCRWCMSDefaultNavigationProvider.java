@@ -69,8 +69,9 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
             for (MCRNavigationBaseItem childItem : ((MCRNavigationItemContainer) item).getChildren()) {
                 create(childItem, childHierarchyArray, items);
             }
-            if (childHierarchyArray.size() > 0)
+            if (childHierarchyArray.size() > 0) {
                 hierarchyObject.add(JSON_CHILDREN, childHierarchyArray);
+            }
         }
     }
 

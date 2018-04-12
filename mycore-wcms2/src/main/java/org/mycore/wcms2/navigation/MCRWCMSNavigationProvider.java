@@ -58,7 +58,7 @@ public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNaviga
      *   }
      *   items: [
      *     {"wcmsId" : "0", "wcmsType" : "root", "mainTitle" : "My Main Title", "dir" : "/content" ...},
-     *     {"wcmsId" : "1", "wcmsType" : "menu", "id" : "main", "labelMap":{"de":"Hauptmenü links","en":"Main menu left"} ... }
+     *     {"wcmsId" : "1", "wcmsType" : "menu", "id" : "main", "labelMap":{"de":"Hauptmenü","en":"Main menu"} ... }
      *     {"wcmsId" : "2", "wcmsType" : "item", "type" : "intern", "style" : "bold" ...}
      *     ...
      *   ]
