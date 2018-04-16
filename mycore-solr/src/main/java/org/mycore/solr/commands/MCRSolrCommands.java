@@ -232,12 +232,14 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         MCRObjectCommands.setSelectedObjectIDs(ids);
     }
     
-	@MCRCommand(syntax = "reload solr schema", 
+    //reload solr schema for core {coreName} with type {coreType}
+    //reload solr schema for core mir with type default-core
+	@MCRCommand(syntax = "reload solr schema for core {0} with type {1}", 
 			    help = "The command reloads the schema in solr using the solr schema api",
 			    order = 200)
-	public static final void reloadSolrSchema() {
+	public static final void reloadSolrSchema(String coreName, String coreType) {
 		MCRSolrSchemaReloader.clearSchema();
-		MCRSolrSchemaReloader.processConfigFiles();
+		MCRSolrSchemaReloader.processConfigFiles(coreName, coreType);
 	}
 
     /**

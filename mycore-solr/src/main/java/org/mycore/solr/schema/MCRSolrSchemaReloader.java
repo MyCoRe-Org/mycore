@@ -116,13 +116,17 @@ public class MCRSolrSchemaReloader {
 	 * extension to "standard" solr schema api syntax if the structure is a JSON
 	 * array split it and send every single json object
 	 */
-	public static void processConfigFiles() {
-		String solrServerURL = MCRConfiguration.instance().getString("MCR.Module-solr.ServerURL");
-		
+	//reload solr schema for core {coreName} with type {coreType}
+	//reload solr schema for core mir with type default-core
+	public static void processConfigFiles(String coreName, String coreType) {
+	    
+	    
+	    String solrServerURL = MCRConfiguration.instance().getString("MCR.Module-solr.ServerURL");
+
 		try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-			Enumeration<? extends InputStream> files = getInputStreams(SOLR_SCHEMA_UPDATE_FILES, null);
+			Enumeration<? extends InputStream> files = getInputStreams("solr/"+coreType+"/"+SOLR_SCHEMA_UPDATE_FILES, null);
 			while (files.hasMoreElements()) {
-				InputStream is = files.nextElement();
+				try(InputStream is = files.nextElement()){
 				String content = new String(ByteStreams.toByteArray(is), StandardCharsets.UTF_8);
 
 				JsonParser parser = new JsonParser();
@@ -135,7 +139,7 @@ public class MCRSolrSchemaReloader {
 
 				for (JsonElement e : json.getAsJsonArray()) {
 
-					HttpPost post = new HttpPost(solrServerURL + "/schema");
+					HttpPost post = new HttpPost(solrServerURL + "/" + coreName + "/schema");
 					post.setHeader("Content-type", "application/json");
 					post.setEntity(new StringEntity(e.toString()));
 
@@ -152,7 +156,7 @@ public class MCRSolrSchemaReloader {
 								+ response.getStatusLine().getReasonPhrase() + "\n" + respContent);
 					}
 				}
-
+				}
 			}
 
 		} catch (IOException e) {
