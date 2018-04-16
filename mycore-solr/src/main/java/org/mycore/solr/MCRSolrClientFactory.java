@@ -77,6 +77,14 @@ public abstract class MCRSolrClientFactory {
     }
 
     /**
+     * Returns a SolrClient from the SOLR base URL.
+     * This does not reference a specific SOLR core.
+     */
+    public static SolrClient getSolrBaseClient() {
+        return CORE_MAP.get("").getClient();
+    }
+
+    /**
      * Returns the solr client of the default core.
      */
     public static SolrClient getSolrClient() {
@@ -97,6 +105,8 @@ public abstract class MCRSolrClientFactory {
         removeDefaultCore();
         MCRSolrCore defaultCore = new MCRSolrCore(serverURL);
         add(defaultCore);
+        MCRSolrCore baseCore = new MCRSolrCore(defaultCore.serverURL, "");
+        add(baseCore);
         DEFAULT_CORE_NAME = defaultCore.getName();
     }
 
@@ -118,6 +128,11 @@ public abstract class MCRSolrClientFactory {
             defaultCore.shutdown();
             CORE_MAP.remove(defaultCore.getName());
             DEFAULT_CORE_NAME = null;
+        }
+        MCRSolrCore baseCore = getDefaultSolrBaseCore();
+        if (baseCore != null) {
+            baseCore.shutdown();
+            CORE_MAP.remove(baseCore.getName());
         }
     }
 }

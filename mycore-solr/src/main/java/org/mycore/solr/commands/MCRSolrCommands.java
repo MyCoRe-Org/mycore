@@ -295,9 +295,10 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 	public static final void createSolrCore(String name) throws IOException, SolrServerException {
 	    CoreAdminRequest.Create create = new CoreAdminRequest.Create();
 	    create.setCoreName(name);
-	    SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+	    create.setConfigSet("_default");
+	    create.setIsLoadOnStartup(true);
+	    SolrClient solrClient = MCRSolrClientFactory.getSolrBaseClient();
 	    CoreAdminResponse response = create.process(solrClient);
-	    NamedList<NamedList<Object>> result = response.getCoreStatus();
-	    LogManager.getLogger().info("Core Create Status: {}", result.toString());
+	    LogManager.getLogger().info("Core Create Response: {}", response);
 	}
 }
