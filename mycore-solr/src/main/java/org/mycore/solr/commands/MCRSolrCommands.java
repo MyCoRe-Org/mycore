@@ -25,8 +25,13 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.io.IOException;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
+import org.apache.solr.client.solrj.request.CoreAdminRequest;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
+import org.apache.solr.common.util.NamedList;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -42,6 +47,7 @@ import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.schema.MCRSolrSchemaReloader;
 import org.mycore.solr.search.MCRSolrSearchUtils;
+
 
 /**
  * Class provides useful solr related commands.
@@ -282,4 +288,16 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         return result;
     }
 
+
+	@MCRCommand(syntax = "create solr core {0}", 
+            help = "The command creates a new empty core with the given name",
+            order = 210)
+	public static final void createSolrCore(String name) throws IOException, SolrServerException {
+	    CoreAdminRequest.Create create = new CoreAdminRequest.Create();
+	    create.setCoreName(name);
+	    SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+	    CoreAdminResponse response = create.process(solrClient);
+	    NamedList<NamedList<Object>> result = response.getCoreStatus();
+	    LogManager.getLogger().info("Core Create Status: {}", result.toString());
+	}
 }
