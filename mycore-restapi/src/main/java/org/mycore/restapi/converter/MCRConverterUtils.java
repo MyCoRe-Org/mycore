@@ -16,17 +16,23 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.common;
+package org.mycore.restapi.converter;
 
-import java.util.Date;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+final class MCRConverterUtils {
 
-public interface MCRObjectIDDate {
+    private MCRConverterUtils() {
+    }
 
-    @Schema(description = "MCRObjectID as String in form {project}_{type}_{int32}", example = "mir_mods_00004711")
-    String getId();
-
-    Date getLastModified();
-
+    static boolean isType(Type genericType, Class<?> targetType) {
+        if (genericType instanceof ParameterizedType) {
+            Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+            if (type instanceof Class) {
+                return targetType.isAssignableFrom((Class) type);
+            }
+        }
+        return false;
+    }
 }

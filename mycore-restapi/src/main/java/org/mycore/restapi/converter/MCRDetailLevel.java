@@ -16,17 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.common;
+package org.mycore.restapi.converter;
 
-import java.util.Date;
+public enum MCRDetailLevel {
+    summary, normal, detailed;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
-public interface MCRObjectIDDate {
-
-    @Schema(description = "MCRObjectID as String in form {project}_{type}_{int32}", example = "mir_mods_00004711")
-    String getId();
-
-    Date getLastModified();
+    public static final String MEDIA_TYPE_PARAMETER = "detail";
 
 }

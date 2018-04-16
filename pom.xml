@@ -182,7 +182,7 @@
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
               <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-              <link>http://lucene.apache.org/solr/7_2_1/solr-solrj/</link>
+              <link>http://lucene.apache.org/solr/7_3_0/solr-solrj/</link>
             </links>
           </configuration>
         </plugin>
@@ -611,7 +611,7 @@
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
                 <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-                <link>http://lucene.apache.org/solr/7_2_1/solr-solrj/</link>
+                <link>http://lucene.apache.org/solr/7_3_0/solr-solrj/</link>
               </links>
             </configuration>
             <reportSets>
@@ -799,6 +799,11 @@
         <version>5.5.6</version>
       </dependency>
       <dependency>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-jaxrs2</artifactId>
+        <version>2.0.0</version>
+      </dependency>
+      <dependency>
         <groupId>javax.activation</groupId>
         <artifactId>javax.activation-api</artifactId>
         <version>1.2.0</version>
@@ -935,7 +940,7 @@
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>7.2.1</version>
+        <version>7.3.0</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>

@@ -16,17 +16,30 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.common;
+package org.mycore.restapi.v2;
 
 import java.util.Date;
+import java.util.Optional;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 
-public interface MCRObjectIDDate {
+final class MCRRestUtils {
 
-    @Schema(description = "MCRObjectID as String in form {project}_{type}_{int32}", example = "mir_mods_00004711")
-    String getId();
+    public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-    Date getLastModified();
+    public static final String TAG_MYCORE_OBJECT = "mcr_object";
 
+    public static final String TAG_MYCORE_DERIVATE = "mcr_derivate";
+
+    public static final String TAG_MYCORE_FILE = "mcr_file";
+
+    private MCRRestUtils() {
+    }
+
+    static Optional<Response> getCachedResponse(Request request, Date lastModified) {
+        return Optional.ofNullable(request)
+            .map(r -> r.evaluatePreconditions(lastModified))
+            .map(Response.ResponseBuilder::build);
+    }
 }

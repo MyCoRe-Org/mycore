@@ -20,6 +20,11 @@ package org.mycore.datamodel.metadata;
 
 import org.mycore.common.MCRException;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * This class implements all method for special handling with the MCRMetaLink
  * part of a metadata object. The MCRMetaLinkID class present two types. At once
@@ -38,6 +43,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
+@JsonClassDescription("Links to other objects or derivates")
 public final class MCRMetaLinkID extends MCRMetaLink {
     /**
      * initializes with empty values.
@@ -166,6 +172,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
      * 
      * @return the xlink:href element as MCRObjectID
      */
+    @JsonIgnore
     public final MCRObjectID getXLinkHrefID() {
         return MCRObjectID.getInstance(href);
     }
@@ -175,6 +182,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
      * 
      * @return the xlink:from element as MCRObjectID
      */
+    @JsonIgnore
     public final MCRObjectID getXLinkFromID() {
         return MCRObjectID.getInstance(from);
     }
@@ -184,6 +192,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
      * 
      * @return the xlink:to element as MCRObjectID
      */
+    @JsonIgnore
     public final MCRObjectID getXLinkToID() {
         return MCRObjectID.getInstance(to);
     }

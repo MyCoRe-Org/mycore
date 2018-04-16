@@ -16,17 +16,29 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.common;
+package org.mycore.restapi.converter;
 
-import java.util.Date;
+import java.io.IOException;
+import java.io.OutputStream;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Provider;
 
-public interface MCRObjectIDDate {
+import org.mycore.common.content.MCRContent;
 
-    @Schema(description = "MCRObjectID as String in form {project}_{type}_{int32}", example = "mir_mods_00004711")
-    String getId();
+@Provider
+@Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
+public class MCRContentXMLWriter extends MCRContentAbstractWriter {
 
-    Date getLastModified();
+    @Override
+    protected MediaType getTransfomerFormat() {
+        return MediaType.TEXT_XML_TYPE;
+    }
+
+    @Override
+    protected void handleFallback(MCRContent content, OutputStream entityStream) throws IOException {
+        content.sendTo(entityStream);
+    }
 
 }

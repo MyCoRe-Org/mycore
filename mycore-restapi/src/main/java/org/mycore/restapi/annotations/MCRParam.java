@@ -16,17 +16,34 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.common;
+package org.mycore.restapi.annotations;
 
-import java.util.Date;
+import java.lang.annotation.Annotation;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+public @interface MCRParam {
+    public String name();
 
-public interface MCRObjectIDDate {
+    public String value();
 
-    @Schema(description = "MCRObjectID as String in form {project}_{type}_{int32}", example = "mir_mods_00004711")
-    String getId();
+    public static class Factory {
+        public static MCRParam get(String name, String value) {
+            return new MCRParam() {
+                @Override
+                public String name() {
+                    return name;
+                }
 
-    Date getLastModified();
+                @Override
+                public String value() {
+                    return value;
+                }
+
+                @Override
+                public Class<? extends Annotation> annotationType() {
+                    return MCRParam.class;
+                }
+            };
+        }
+    }
 
 }

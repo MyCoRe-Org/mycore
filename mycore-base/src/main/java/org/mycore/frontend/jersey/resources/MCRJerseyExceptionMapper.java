@@ -19,6 +19,7 @@
 package org.mycore.frontend.jersey.resources;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -57,8 +58,8 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(Exception exc) {
         Response response = getResponse(exc);
-        if (exc instanceof WebApplicationException) {
-            LOGGER.warn("{}: {}", request.getRequestURI(), response.getStatus());
+        if (exc instanceof WebApplicationException && !(exc instanceof InternalServerErrorException)) {
+            LOGGER.warn("{}: {}, {}", request.getRequestURI(), response.getStatus(), exc.getMessage());
         } else {
             LOGGER.warn(() -> "Error while processing request " + request.getRequestURI(), exc);
         }
@@ -89,9 +90,21 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
     private Response getResponse(Exception exc) {
         if (exc instanceof WebApplicationException) {
-            return ((WebApplicationException) exc).getResponse();
+            Response response = ((WebApplicationException) exc).getResponse();
+            if (response.hasEntity()) {
+                return response;
+            }
+            return Response.fromResponse(response)
+                .entity(exc.getMessage())
+                .type(MediaType.TEXT_PLAIN_TYPE)
+                .build();
         }
-
+        LOGGER.warn("Content-Type: {}", request.getContentType());
+        MediaType requestType = MediaType.valueOf(request.getContentType());
+        if (requestType.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+            || requestType.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
+            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(exc.getMessage()).build();
+        }
         return Response.status(Status.INTERNAL_SERVER_ERROR).entity(new MCRExceptionContainer(exc)).build();
     }
 

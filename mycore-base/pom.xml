@@ -79,10 +79,12 @@
           <dateFormat>yyyy-MM-dd'T'HH:mm:ssXXX</dateFormat>
           <dateFormatTimeZone>UTC</dateFormatTimeZone>
           <commitIdGenerationMode>full</commitIdGenerationMode>
+          <!--
           <excludeProperties>
             <excludeProperty>.*\.email</excludeProperty>
             <excludeProperty>.*\.host</excludeProperty>
           </excludeProperties>
+-->
         </configuration>
         <executions>
           <execution>
@@ -213,6 +215,10 @@
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-jaxrs2</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>
