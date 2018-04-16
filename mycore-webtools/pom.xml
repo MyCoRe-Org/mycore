@@ -10,7 +10,7 @@
   <artifactId>mycore-webtools</artifactId>
   <name>MyCoRe webtools</name>
   <properties>
-    <manifest.priority>36</manifest.priority>
+    <manifest.priority>85</manifest.priority>
   </properties>
   <build>
     <plugins>

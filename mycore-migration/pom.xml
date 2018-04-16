@@ -10,7 +10,7 @@
   <artifactId>mycore-migration</artifactId>
   <name>MyCoRe migration tools</name>
   <properties>
-    <manifest.priority>31</manifest.priority>
+    <manifest.priority>35</manifest.priority>
   </properties>
   <dependencies>
     <dependency>

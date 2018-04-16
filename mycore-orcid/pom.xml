@@ -10,7 +10,7 @@
   <artifactId>mycore-orcid</artifactId>
   <name>MyCoRe ORCID Integration</name>
   <properties>
-    <manifest.priority>56</manifest.priority>
+    <manifest.priority>55</manifest.priority>
   </properties>
   <dependencies>
     <dependency>

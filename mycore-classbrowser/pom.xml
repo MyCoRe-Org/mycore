@@ -10,7 +10,7 @@
   <artifactId>mycore-classbrowser</artifactId>
   <name>MyCoRe Classification Browser</name>
   <properties>
-    <manifest.priority>13</manifest.priority>
+    <manifest.priority>25</manifest.priority>
   </properties>
   <dependencies>
     <dependency>

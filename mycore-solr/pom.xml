@@ -10,7 +10,7 @@
   <artifactId>mycore-solr</artifactId>
   <name>MyCoRe Solr Support</name>
   <properties>
-    <manifest.priority>49</manifest.priority>
+    <manifest.priority>10</manifest.priority>
   </properties>
   <build>
     <plugins>
