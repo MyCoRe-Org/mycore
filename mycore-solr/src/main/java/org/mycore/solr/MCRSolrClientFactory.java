@@ -129,7 +129,7 @@ public abstract class MCRSolrClientFactory {
             CORE_MAP.remove(defaultCore.getName());
             DEFAULT_CORE_NAME = null;
         }
-        MCRSolrCore baseCore = getDefaultSolrBaseCore();
+        MCRSolrCore baseCore = CORE_MAP.get("");
         if (baseCore != null) {
             baseCore.shutdown();
             CORE_MAP.remove(baseCore.getName());
