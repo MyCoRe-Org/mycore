@@ -21,11 +21,11 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
 
     private String name;
 
-    private List<MCRProcessable> processables;
+    private final List<MCRProcessable> processables;
 
     private Map<String, Object> properties;
 
-    private List<MCRProcessableCollectionListener> listenerList;
+    private final List<MCRProcessableCollectionListener> listenerList;
 
     /**
      * Creates a new collection with the given a human readable name.
@@ -60,7 +60,16 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
 
     @Override
     public Stream<MCRProcessable> stream() {
-        return this.processables.stream();
+        List<MCRProcessable> snapshot;
+        synchronized (this.processables) {
+            snapshot = new ArrayList<>(this.processables);
+        }
+        return snapshot.stream();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.processables.isEmpty();
     }
 
     @Override
