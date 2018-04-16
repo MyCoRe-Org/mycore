@@ -62,7 +62,7 @@ import com.google.gson.JsonParser;
 public class MCRSolrSchemaReloader {
 	private static Logger LOGGER = LogManager.getLogger(MCRSolrSchemaReloader.class);
 
-	private static String SOLR_SCHEMA_UPDATE_FILES = "solr-schema-config.json";
+	private static String SOLR_SCHEMA_UPDATE_FILES = "solr-schema.json";
 
 	private static List<String> SOLR_DEFAULT_FIELDS = Arrays.asList("_text_", "_version_", "id");
 	private static List<String> SOLR_DEFAULT_FIELDTYPES = Arrays.asList("text_general", "long", "plong", "string");

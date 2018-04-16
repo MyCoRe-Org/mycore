@@ -1,0 +1,126 @@
+[
+	{
+		"add-field-type": {
+			"name": "text_de",
+			"class": "solr.TextField",
+			"positionIncrementGap": "100",
+			"analyzer": {
+				"tokenizer": {
+					"class": "solr.StandardTokenizerFactory"
+				},
+				"filters": [
+					{
+						"class": "solr.LowerCaseFilterFactory"
+					},
+					{
+						"class": "solr.StopFilterFactory",
+						"format": "snowball",
+						"words": "lang/stopwords_de.txt",
+						"ignoreCase": "true"
+					},
+					{
+						"class": "solr.GermanNormalizationFilterFactory"
+					},
+					{
+						"class": "solr.GermanLightStemFilterFactory"
+					}
+				]
+			}
+		}
+	},
+	{
+		"add-field": {
+			"name": "allMeta",
+			"type": "text_de",
+			"multiValued": true,
+			"stored": false
+		}
+	},
+	{
+		"add-field": {
+			"name": "category",
+			"type": "string",
+			"multiValued": true
+		}
+	},
+	{
+		"add-field": {
+			"name": "category.top",
+			"type": "string",
+			"multiValued": true
+		}
+	},
+	{
+		"add-field": {
+			"name": "content",
+			"type": "text_general",
+			"stored": false
+		}
+	},
+	{
+		"add-field": {
+			"name": "created",
+			"type": "date"
+		}
+	},
+	{
+		"add-field": {
+			"name": "createdby",
+			"type": "string"
+		}
+	},
+	{
+		"add-field": {
+			"name": "derCount",
+			"type": "int"
+		}
+	},
+	{
+		"add-field": {
+			"name": "derivateID",
+			"type": "string"
+		}
+	},
+	{
+		"add-field": {
+			"name": "maindoc",
+			"type": "string"
+		}
+	},
+	{
+		"add-field": {
+			"name": "modified",
+			"type": "date"
+		}
+	},
+	{
+		"add-field": {
+			"name": "modifiedby",
+			"type": "string"
+		}
+	},
+	{
+		"add-field": {
+			"name": "objectKind",
+			"type": "string"
+		}
+	},
+	{
+		"add-field": {
+			"name": "objectProject",
+			"type": "string"
+		}
+	},
+	{
+		"add-field": {
+			"name": "objectType",
+			"type": "string"
+		}
+	},
+	{
+		"add-field": {
+			"name": "parent",
+			"type": "string"
+		}
+	}
+]
