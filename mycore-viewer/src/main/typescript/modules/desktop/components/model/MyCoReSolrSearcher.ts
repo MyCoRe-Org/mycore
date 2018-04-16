@@ -23,24 +23,32 @@ namespace mycore.viewer.model {
 
     export class MyCoReSolrSearcher extends MyCoReViewerSearcher {
 
-        constructor(private solrHandlerURL:string, private derivateId:string) {
+        constructor(private solrHandlerURL: string, private derivateId: string) {
             super();
         }
 
-        private resolver:(id:string, callback:(id:string, textContent:model.TextContentModel)=> void)=> void = null;
+        private resolver: (id: string, callback: (id: string, textContent: model.TextContentModel) => void) => void = null;
 
-        public index(model:model.StructureModel, textContentResolver:(id:string, callback:(id:string, textContent:model.TextContentModel)=> void)=> void, processIndicator:(x, ofY)=>void) {
+        public index(model: model.StructureModel,
+                     textContentResolver: (id: string,
+                                           callback: (id: string, textContent: model.TextContentModel) => void) => void,
+                     processIndicator: (x, ofY) => void) {
             super.index(model, textContentResolver, processIndicator);
-            model._imageList.forEach((image)=>this._altoHrefPageMap.set(image.additionalHrefs.get(MyCoReSolrSearcher.TEXT_HREF), image));
+            model._imageList.forEach((image) => {
+                const href = image.additionalHrefs.get(MyCoReSolrSearcher.TEXT_HREF);
+                if (href != null) {
+                    this._altoHrefPageMap.set(href, image);
+                }
+            });
             processIndicator(1, 1);
             this.resolver = textContentResolver;
         }
 
-        private static TEXT_HIGHLIGHT_CLASSNAME = "matched";
+        private static TEXT_HIGHLIGHT_CLASSNAME: string = 'matched';
 
         private _altoHrefPageMap = new MyCoReMap<string, model.StructureImage>();
-        private _currentRequest:widgets.solr.SolrSearchRequest = null;
-        private static TEXT_HREF = "AltoHref";
+        private _currentRequest: widgets.solr.SolrSearchRequest = null;
+        private static TEXT_HREF: string = 'AltoHref';
 
         public search(query: string, resultReporter: (objects: Array<ResultObject>) => void,
                       searchCompleteCallback: () => void, count?: number, start?: number) {
@@ -76,7 +84,7 @@ namespace mycore.viewer.model {
 
                 let metsPage = this._altoHrefPageMap.get(altoHref);
                 page.hits.forEach((hit) => {
-                    let contextInnerHTML = hit.hl.split("<em>")
+                    let contextInnerHTML = hit.hl.split('<em>')
                         .join("<em class='" + MyCoReSolrSearcher.TEXT_HIGHLIGHT_CLASSNAME + "'>");
                     let context = document.createElement("div");
                     context.innerHTML = contextInnerHTML;
@@ -95,7 +103,7 @@ namespace mycore.viewer.model {
     }
 
     export class SolrAltoTextContent implements model.TextElement {
-        constructor(position:HighlightPosition, parentId:string) {
+        constructor(position: HighlightPosition, parentId: string) {
             this.angle = 0;
             this.size = new Size2D(position.width, position.height);
             this.pos = new Position2D(position.xpos, position.vpos);
@@ -105,17 +113,17 @@ namespace mycore.viewer.model {
             this.pageHref = parentId;
         }
 
-        public angle:number;
-        public size:Size2D;
-        public pos:Position2D;
-        public fontFamily:string;
-        public fontSize:number;
-        public fromBottomLeft:boolean;
-        public pageHref:string;
-        public text:string;
+        public angle: number;
+        public size: Size2D;
+        public pos: Position2D;
+        public fontFamily: string;
+        public fontSize: number;
+        public fromBottomLeft: boolean;
+        public pageHref: string;
+        public text: string;
 
         toString() {
-            return this.pageHref.toString + "-" + this.pos.toString() + "-" + this.size.toString();
+            return this.pageHref.toString + '-' + this.pos.toString() + '-' + this.size.toString();
         }
     }
 
