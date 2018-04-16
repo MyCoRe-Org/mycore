@@ -119,7 +119,11 @@ public class MCRSolrSchemaReloader {
 	//reload solr schema for core {coreName} with type {coreType}
 	//reload solr schema for core mir with type default-core
 	public static void processConfigFiles(String coreName, String coreType) {
-	    
+	}
+	
+	
+	public static void processSchemaFiles(String coreName, String coreType) {
+	        
 	    
 	    String solrServerURL = MCRConfiguration.instance().getString("MCR.Module-solr.ServerURL");
 

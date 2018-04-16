@@ -239,7 +239,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 			    order = 200)
 	public static final void reloadSolrSchema(String coreName, String coreType) {
 		MCRSolrSchemaReloader.clearSchema();
-		MCRSolrSchemaReloader.processConfigFiles(coreName, coreType);
+		MCRSolrSchemaReloader.processSchemaFiles(coreName, coreType);
 	}
 
     /**
@@ -291,9 +291,20 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
 
-	@MCRCommand(syntax = "create solr core {0}", 
+
+    //reload solr config for core {coreName} with type {coreType}
+    //reload solr config for core mir with type default-core
+    @MCRCommand(syntax = "reload solr config for core {0} with type {1}", 
+                help = "The command reloads the schema in solr using the solr schema api",
+                order = 210)
+    public static final void reloadSolrConfig(String coreName, String coreType) {
+        MCRSolrSchemaReloader.clearSchema();
+        MCRSolrSchemaReloader.processConfigFiles(coreName, coreType);
+    }
+	
+	@MCRCommand(syntax = "create solr core {0}",
             help = "The command creates a new empty core with the given name",
-            order = 210)
+            order = 220)
 	public static final void createSolrCore(String name) throws IOException, SolrServerException {
 	    CoreAdminRequest.Create create = new CoreAdminRequest.Create();
 	    create.setCoreName(name);
