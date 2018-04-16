@@ -125,7 +125,7 @@ public class MCRSolrSchemaReloader {
 	public static void processSchemaFiles(String coreName, String coreType) {
 	        
 	    
-	    String solrServerURL = MCRConfiguration.instance().getString("MCR.Module-solr.ServerURL");
+	    String solrServerURL = MCRConfiguration.instance().getString("MCR.Solr.ServerURL");
 
 		try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 			Enumeration<? extends InputStream> files = getInputStreams("solr/"+coreType+"/"+SOLR_SCHEMA_UPDATE_FILES, null);
