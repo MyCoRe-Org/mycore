@@ -73,7 +73,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
 
         MCRAccessInterface acl = MCRAccessControlSystem.instance();
         String permStr = permission.toString();
-        boolean hasAPIAccess = aclProvider.checkPermission("restapi://",
+        boolean hasAPIAccess = aclProvider.checkPermission("restapi:/",
             permStr);
         if (hasAPIAccess) {
             String objId = "restapi:" + thePath;
