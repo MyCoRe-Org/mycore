@@ -19,6 +19,8 @@
 package org.mycore.frontend.jersey.filter;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -26,6 +28,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -33,6 +36,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.http.HttpStatus;
@@ -128,6 +132,26 @@ public class MCRCacheFilter implements ContainerResponseFilter {
         LogManager.getLogger()
             .debug(() -> "Cache-Control filter: " + requestContext.getUriInfo().getPath() + " " + headerValue);
         responseContext.getHeaders().putSingle(HttpHeaders.CACHE_CONTROL, headerValue);
+        if (Stream.of(resourceInfo.getResourceClass(), resourceInfo.getResourceMethod())
+            .map(t -> t.getAnnotation(Produces.class))
+            .filter(Objects::nonNull)
+            .map(Produces::value)
+            .flatMap(Stream::of)
+            .distinct()
+            .count() > 1) {
+            //resource may produce differenct MediaTypes, we have to set Vary header
+            List<String> varyHeaders = Optional.ofNullable(responseContext.getHeaderString(HttpHeaders.VARY))
+                .map(Object::toString)
+                .map(s -> s.split(","))
+                .map(Stream::of)
+                .orElseGet(Stream::empty)
+                .collect(Collectors.toList());
+            if (!varyHeaders.contains(HttpHeaders.ACCEPT)) {
+                varyHeaders.add(HttpHeaders.ACCEPT);
+            }
+            responseContext.getHeaders().putSingle(HttpHeaders.VARY,
+                varyHeaders.stream().collect(Collectors.joining(",")));
+        }
     }
 
     private void addAuthorizationHeaderException(CacheControl cc, boolean isPrivate, boolean isNoCache) {
