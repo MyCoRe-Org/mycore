@@ -21,8 +21,10 @@ package org.mycore.frontend.jersey.filter;
 import java.io.IOException;
 import java.text.MessageFormat;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -36,6 +38,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 
+@Priority(Priorities.AUTHENTICATION)
 public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     @Context
