@@ -20,8 +20,16 @@ package org.mycore.datamodel.ifs2;
 
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
 import org.mycore.datamodel.common.MCRObjectIDDate;
 
+@XmlRootElement(name = "mycoreobject")
+@XmlType(propOrder = {"id", "lastModified"})
 public class MCRObjectIDDateImpl implements MCRObjectIDDate {
 
     protected Date lastModified;
@@ -38,10 +46,12 @@ public class MCRObjectIDDateImpl implements MCRObjectIDDate {
         this.id = id;
     }
 
+    @XmlAttribute(required = true)
     public Date getLastModified() {
         return lastModified;
     }
 
+    @XmlAttribute(required = true)
     public String getId() {
         return id;
     }

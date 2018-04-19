@@ -34,7 +34,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
 import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
-import org.mycore.restapi.converter.MCRIDListXMLWriter;
+import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
@@ -60,7 +60,7 @@ public class MCRRestResourceConfig extends ResourceConfig {
         LogManager.getLogger().error("========MCRRESTResourceConfig======== {}", getApplicationName());
         String[] restPackages = Stream
             .concat(
-                Stream.of(MCRIDListXMLWriter.class.getPackage().getName(),
+                Stream.of(MCRWrappedXMLWriter.class.getPackage().getName(),
                     OpenApiResource.class.getPackage().getName()),
                 MCRConfiguration.instance().getStrings("MCR.RestAPI.Resource.Packages").stream())
             .toArray(String[]::new);

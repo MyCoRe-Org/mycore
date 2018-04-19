@@ -23,6 +23,7 @@ import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +44,9 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
@@ -60,6 +63,9 @@ import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -92,17 +98,23 @@ public class MCRRestObjects {
         responses = @ApiResponse(
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRObjectIDDate.class)))),
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
+    @XmlElementWrapper(name = "mycoreobjects")
+    @JacksonFeatures(serializationDisable = {SerializationFeature.WRITE_DATES_AS_TIMESTAMPS})
     public Response listObjects() throws IOException {
         Date lastModified = new Date(MCRXMLMetadataManager.instance().getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        List<MCRObjectIDDate> idDates = MCRXMLMetadataManager.instance().listObjectDates().stream()
+        List<? extends MCRObjectIDDate> idDates = MCRXMLMetadataManager.instance().listObjectDates().stream()
             .filter(oid -> !oid.getId().contains("_derivate_"))
             .collect(Collectors.toList());
-        return Response.ok(new GenericEntity<List<MCRObjectIDDate>>(idDates) {
-        })
+        Class<?> t = idDates.stream()
+            .findAny()
+            .map(MCRObjectIDDate::getClass)
+            .orElse((Class) MCRObjectIDDate.class);
+        Type type = TypeUtils.parameterize(idDates.getClass(), t);
+        return Response.ok(new GenericEntity<List<? extends MCRObjectIDDate>>(idDates, type))
             .lastModified(lastModified)
             .build();
     }
