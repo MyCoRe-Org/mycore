@@ -266,10 +266,12 @@ namespace mycore.viewer.widgets.mets {
         private processImages() {
             let count = 1;
             this._idPhysicalFileMap.forEach((k: string, v: Element) => {
-                let physFileDiv = this._idPhysicalFileMap.get(k);
-                let image = this.parseFile(physFileDiv, count++);
-                this._imageList.push(image);
-                this._idImageMap.set(k, image);
+                const physFileDiv = this._idPhysicalFileMap.get(k);
+                const image = this.parseFile(physFileDiv, count++);
+                if (image != null) {
+                    this._imageList.push(image);
+                    this._idImageMap.set(k, image);
+                }
             });
 
             this._imageList = this._imageList.sort((x, y) => x.order - y.order);
@@ -320,51 +322,53 @@ namespace mycore.viewer.widgets.mets {
         }
 
         private parseFile(physFileDiv: Element, defaultOrder: number): model.StructureImage {
-            let img: model.StructureImage;
-            let type: string = physFileDiv.getAttribute("TYPE");
-            let id: string = physFileDiv.getAttribute("ID");
-            let order: number = parseInt(physFileDiv.getAttribute("ORDER") || "" + defaultOrder, 10);
-            let orderLabel: string = physFileDiv.getAttribute("ORDERLABEL");
-            let contentIds: string = physFileDiv.getAttribute("CONTENTIDS");
-            let additionalHrefs = new MyCoReMap<string, string>();
-
+            const type: string = physFileDiv.getAttribute('TYPE');
+            const id: string = physFileDiv.getAttribute('ID');
+            const order: number = parseInt(physFileDiv.getAttribute('ORDER') || '' + defaultOrder, 10);
+            const orderLabel: string = physFileDiv.getAttribute('ORDERLABEL');
+            const contentIds: string = physFileDiv.getAttribute('CONTENTIDS');
+            const additionalHrefs = new MyCoReMap<string, string>();
 
             let imgHref: string = null;
             let imgMimeType: string = null;
-            this.hrefResolverElement.href = "./";
-            let base = this.hrefResolverElement.href;
+            this.hrefResolverElement.href = './';
+            const base = this.hrefResolverElement.href;
 
             XMLUtil.iterateChildNodes(physFileDiv, (child) => {
-                if (child instanceof Element || "getAttribute" in child) {
-                    let childElement = <Element>child;
-                    let fileId = childElement.getAttribute("FILEID");
-                    let file = this._idFileMap.get(fileId);
-                    let href: string = this.getAttributeNs(this.getFirstElementChild(file), "xlink", "href");
-                    let mimetype: string = file.getAttribute("MIMETYPE");
+                if (child instanceof Element || 'getAttribute' in child) {
+                    const childElement = <Element>child;
+                    const fileId = childElement.getAttribute('FILEID');
+                    const file = this._idFileMap.get(fileId);
+                    let href: string = this.getAttributeNs(this.getFirstElementChild(file), 'xlink', 'href');
+                    const mimetype: string = file.getAttribute('MIMETYPE');
 
                     this.hrefResolverElement.href = href;
                     href = this.hrefResolverElement.href.substr(base.length);
 
-                    let use = (<Element>file.parentNode).getAttribute("USE");
-                    if (use == "MASTER" || use == "IVIEW2") {
+                    const use = (<Element>file.parentNode).getAttribute('USE');
+                    if (use === 'MASTER' || use === 'IVIEW2') {
                         imgHref = href;
                         imgMimeType = mimetype;
-                    } else if (use == "ALTO") {
+                    } else if (use === 'ALTO') {
                         additionalHrefs.set(MetsStructureBuilder.ALTO_TEXT, href);
-                    } else if (use == "TRANSCRIPTION") {
+                    } else if (use === 'TRANSCRIPTION') {
                         additionalHrefs.set(MetsStructureBuilder.TEI_TRANSCRIPTION, href);
-                    } else if (use == "TRANSLATION") {
-                        additionalHrefs.set(MetsStructureBuilder.TEI_TRANSLATION + "." + this.extractTranslationLanguage(href), href);
+                    } else if (use === 'TRANSLATION') {
+                        additionalHrefs.set(MetsStructureBuilder.TEI_TRANSLATION + '.' + this.extractTranslationLanguage(href), href);
                     } else {
-                        console.log("Unknown File Group : " + use)
+                        console.warn('Unknown File Group : ' + use);
                     }
                 }
             });
 
+            if (imgHref === null) {
+                console.warn('Unable to find MASTER|IVIEW2 file for ' + id);
+                return null;
+            }
 
             // TODO: Fix in mycore (we need a valid URL)
-            if (imgHref.indexOf("http:") + imgHref.indexOf("file:") + imgHref.indexOf("urn:") != -3) {
-                let parser = document.createElement('a');
+            if (imgHref.indexOf('http:') + imgHref.indexOf('file:') + imgHref.indexOf('urn:') !== -3) {
+                const parser = document.createElement('a');
                 parser.href = imgHref;
                 imgHref = parser.pathname;
             }
