@@ -1,4 +1,3 @@
-
 /*
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -18,11 +17,10 @@
  */
 
 namespace mycore.viewer.widgets.modal {
-    export class IviewPrintModalWindow extends IviewModalWindow {
+    export class ViewerPrintModalWindow extends IviewModalWindow {
 
         constructor(_mobile: boolean) {
             super(_mobile, "CreatePDF");
-            var that = this;
 
             /*this.wrapper.removeClass("bs-modal-sm")
             this.wrapper.addClass("bs-modal-lg")
@@ -30,13 +28,13 @@ namespace mycore.viewer.widgets.modal {
             this.box.removeClass("modal-sm")
             this.box.addClass("modal-lg")
              */
-            this._inputRow = jQuery("<div></div>")
+            this._inputRow = jQuery("<div></div>");
             this._inputRow.addClass("row");
             this._inputRow.appendTo(this.modalBody);
 
             this._previewBox = jQuery("<div></div>");
             this._previewBox.addClass("printPreview");
-            this._previewBox.addClass("col-sm-6");
+            this._previewBox.addClass("col-sm-12");
             this._previewBox.addClass("thumbnail");
             this._previewBox.appendTo(this._inputRow);
 
@@ -45,7 +43,7 @@ namespace mycore.viewer.widgets.modal {
 
             this._pageSelectBox = jQuery("<form></form>");
             this._pageSelectBox.addClass("printForm");
-            this._pageSelectBox.addClass("col-sm-6");
+            this._pageSelectBox.addClass("col-sm-12");
             this._pageSelectBox.appendTo(this._inputRow);
 
             this._selectGroup = jQuery("<div></div>");
@@ -55,13 +53,14 @@ namespace mycore.viewer.widgets.modal {
             this._createRadioAllPages();
             this._createRadioCurrentPage();
             this._createRadioRangePages();
+            this._createRadioChapters();
 
             this._validationRow = jQuery("<div></div>");
             this._validationRow.addClass("row");
             this._validationRow.appendTo(this.modalBody);
 
             this._validationMessage = jQuery("<p></p>");
-            this._validationMessage.addClass("col-sm-6");
+            this._validationMessage.addClass("col-sm-12");
             this._validationMessage.addClass("pull-right");
             this._validationMessage.appendTo(this._validationRow);
 
@@ -77,10 +76,9 @@ namespace mycore.viewer.widgets.modal {
             this._maximalPageNumber.text("");
             this._maximalPageMessage.children().append(this._maximalPageNumber);
 
-            var that = this;
             this._okayButton.click(() => {
-                if (that.okayClickHandler != null) {
-                    that.okayClickHandler();
+                if (this.okayClickHandler != null) {
+                    this.okayClickHandler();
                 }
             });
 
@@ -88,7 +86,8 @@ namespace mycore.viewer.widgets.modal {
 
         private static INPUT_IDENTIFIER = "pages";
         private static INPUT_RANGE_IDENTIFIER = "range";
-        private static INPUT_RANGE_TEXT_IDENTIFIER = IviewPrintModalWindow.INPUT_RANGE_IDENTIFIER + "-text";
+        private static INPUT_RANGE_TEXT_IDENTIFIER = ViewerPrintModalWindow.INPUT_RANGE_IDENTIFIER + "-text";
+        private static INPUT_CHAPTER_VALUE = "chapter";
 
         public static INPUT_ALL_VALUE = "all";
         public static INPUT_RANGE_VALUE = "range";
@@ -119,12 +118,20 @@ namespace mycore.viewer.widgets.modal {
         private _radioRangePagesInput: JQuery;
         private _radioRangePagesInputText: JQuery;
 
+        private _radioChapter: JQuery;
+        private _radioChapterInput: JQuery;
+        private _chapterLabelElement: JQuery;
+        private _radioChapterLabel: JQuery;
+        private _chapterSelect: JQuery;
+
         private _validationMessage: JQuery;
         private _maximalPageMessage: JQuery;
         private _maximalPageNumber: JQuery;
 
         public checkEventHandler: (id: string) => void = null;
         public rangeInputEventHandler: (text: string) => void = null;
+        public chapterInputEventHandler: (id: string) => void = null;
+
         public okayClickHandler: () => void = null;
 
         private _createRadioAllPages() {
@@ -133,15 +140,14 @@ namespace mycore.viewer.widgets.modal {
             this._radioAllPagesLabelElement = jQuery("<label></label>");
             this._radioAllPagesInput = jQuery("<input>");
             this._radioAllPagesInput.attr("type", "radio");
-            this._radioAllPagesInput.attr("name", IviewPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioAllPagesInput.attr("id", IviewPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioAllPagesInput.attr("value", IviewPrintModalWindow.INPUT_ALL_VALUE);
+            this._radioAllPagesInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioAllPagesInput.attr("id", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioAllPagesInput.attr("value", ViewerPrintModalWindow.INPUT_ALL_VALUE);
             this._radioAllPagesLabel = jQuery("<p></p>");
 
-            var that = this;
             this._radioAllPagesInput.change(() => {
-                if (that.checkEventHandler != null) {
-                    that.checkEventHandler(IviewPrintModalWindow.INPUT_ALL_VALUE);
+                if (this.checkEventHandler != null) {
+                    this.checkEventHandler(ViewerPrintModalWindow.INPUT_ALL_VALUE);
                 }
             });
 
@@ -159,15 +165,14 @@ namespace mycore.viewer.widgets.modal {
             this._radioCurrentPageLabelElement = jQuery("<label></label>");
             this._radioCurrentPageInput = jQuery("<input>");
             this._radioCurrentPageInput.attr("type", "radio");
-            this._radioCurrentPageInput.attr("name", IviewPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioCurrentPageInput.attr("id", IviewPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioCurrentPageInput.attr("value", IviewPrintModalWindow.INPUT_CURRENT_VALUE);
+            this._radioCurrentPageInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioCurrentPageInput.attr("id", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioCurrentPageInput.attr("value", ViewerPrintModalWindow.INPUT_CURRENT_VALUE);
             this._radioCurrentPageLabel = jQuery("<p></p>");
 
-            var that = this;
             this._radioCurrentPageInput.change(() => {
-                if (that.checkEventHandler != null) {
-                    that.checkEventHandler(IviewPrintModalWindow.INPUT_CURRENT_VALUE);
+                if (this.checkEventHandler != null) {
+                    this.checkEventHandler(ViewerPrintModalWindow.INPUT_CURRENT_VALUE);
                 }
             });
 
@@ -185,21 +190,21 @@ namespace mycore.viewer.widgets.modal {
             this._radioRangePagesLabelElement = jQuery("<label></label>");
             this._radioRangePagesInput = jQuery("<input>");
             this._radioRangePagesInput.attr("type", "radio");
-            this._radioRangePagesInput.attr("name", IviewPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioRangePagesInput.attr("id", IviewPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioRangePagesInput.attr("value", IviewPrintModalWindow.INPUT_RANGE_VALUE);
+            this._radioRangePagesInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioRangePagesInput.attr("id", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioRangePagesInput.attr("value", ViewerPrintModalWindow.INPUT_RANGE_VALUE);
             this._radioRangePagesLabel = jQuery("<p></p>");
             this._radioRangePagesInputText = jQuery("<input>");
             this._radioRangePagesInputText.addClass("form-control");
             this._radioRangePagesInputText.attr("type", "text");
-            this._radioRangePagesInputText.attr("name", IviewPrintModalWindow.INPUT_RANGE_TEXT_IDENTIFIER);
-            this._radioRangePagesInputText.attr("id", IviewPrintModalWindow.INPUT_RANGE_TEXT_IDENTIFIER);
+            this._radioRangePagesInputText.attr("name", ViewerPrintModalWindow.INPUT_RANGE_TEXT_IDENTIFIER);
+            this._radioRangePagesInputText.attr("id", ViewerPrintModalWindow.INPUT_RANGE_TEXT_IDENTIFIER);
             this._radioRangePagesInputText.attr("placeholder", "1,3-5,8");
 
-            var that = this;
-            var onActivateHandler = () => {
+            const that = this;
+            const onActivateHandler = () => {
                 if (that.checkEventHandler != null) {
-                    that.checkEventHandler(IviewPrintModalWindow.INPUT_RANGE_VALUE);
+                    that.checkEventHandler(ViewerPrintModalWindow.INPUT_RANGE_VALUE);
                 }
                 this._radioRangePagesInputText.focus();
             };
@@ -227,6 +232,42 @@ namespace mycore.viewer.widgets.modal {
             this._radioRangePages.appendTo(this._selectGroup);
         }
 
+        private _createRadioChapters() {
+            this._radioChapter = jQuery("<div></div>");
+            this._radioChapter.addClass("radio");
+
+            this._radioChapterInput = jQuery("<input>");
+            this._radioChapterInput.attr("type", "radio");
+            this._radioChapterInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioChapterInput.attr("id", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioChapterInput.attr("value", ViewerPrintModalWindow.INPUT_CHAPTER_VALUE);
+
+            this._chapterLabelElement = jQuery("<label></label>");
+            this._radioChapterLabel = jQuery("<p></p>");
+            this._chapterSelect = jQuery("<select></select>");
+
+            this._radioRangePages.append(this._chapterLabelElement);
+            this._chapterLabelElement.append(this._radioChapterInput);
+            this._chapterLabelElement.append(this._radioChapterLabel);
+            this._chapterLabelElement.append(this._chapterSelect);
+            this._radioChapter.appendTo(this._selectGroup);
+
+            let onActivate = () => {
+                if (this.checkEventHandler != null) {
+                    this.checkEventHandler(ViewerPrintModalWindow.INPUT_CHAPTER_VALUE);
+                }
+            };
+            this._radioChapterInput.change(onActivate);
+
+            this._chapterSelect.change(()=>{
+                onActivate();
+                this.chapterChecked = true;
+                if(this.chapterInputEventHandler != null) {
+                    this.chapterInputEventHandler(this._chapterSelect.val());
+                }
+            });
+        }
+
         public set rangeChecked(checked: boolean) {
             this._radioRangePagesInput.prop("checked", checked);
         }
@@ -251,14 +292,22 @@ namespace mycore.viewer.widgets.modal {
             return <boolean>this._radioCurrentPageInput.prop("checked");
         }
 
+        public set chapterChecked(checked: boolean) {
+            this._radioChapterInput.prop("checked", checked);
+        }
+
+        public get chapterChecked() {
+            return <boolean>this._radioChapterInput.prop("checked");
+        }
+
         public set validationResult(success: boolean) {
             if (success) {
                 this._validationMessage.removeClass("text-danger");
-                this._validationMessage.addClass("text-success")
+                this._validationMessage.addClass("text-success");
                 this._okayButton.removeClass("disabled");
             } else {
                 this._validationMessage.removeClass("text-success");
-                this._validationMessage.addClass("text-danger")
+                this._validationMessage.addClass("text-danger");
                 this._okayButton.addClass("disabled");
             }
         }
@@ -316,18 +365,34 @@ namespace mycore.viewer.widgets.modal {
             return <string>this._previewImage.attr("src");
         }
 
+        public get chapterLabel(){
+            return this._radioChapterLabel.text();
+        }
 
-        public set maximalPages(number:string) {
+        public set chapterLabel(label:string){
+            this._radioChapterLabel.text(label);
+        }
+
+        public set maximalPages(number: string) {
             this._maximalPageNumber.text(number);
         }
 
-        public set maximalPageMessage(message:string) {
-            this._maximalPageNumber.detach()
-            var messageDiv = this._maximalPageMessage.find(".message");
+        public set maximalPageMessage(message: string) {
+            this._maximalPageNumber.detach();
+            let messageDiv = this._maximalPageMessage.find(".message");
             messageDiv.text(message + " ");
             messageDiv.append(this._maximalPageNumber);
         }
 
+        public setChapterTree(chapters: Array<{ id: string, label: string }>) {
+            this._chapterSelect.html(chapters.map((entry) => {
+                return `<option value="${entry.id}">${entry.label}</option>`;
+            }).join(""));
+        }
+
+        public get chapterInputVal(){
+            return this._chapterSelect.val();
+        }
 
     }
 }
