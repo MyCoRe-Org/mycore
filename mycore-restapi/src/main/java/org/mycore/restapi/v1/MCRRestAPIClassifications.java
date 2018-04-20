@@ -232,7 +232,6 @@ public class MCRRestAPIClassifications {
      * @param info - the URIInfo object
      * @param format - the output format ('xml' or 'json)
      * @return a Jersey Response Object
-     * @throws MCRRestAPIException
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
@@ -321,7 +320,6 @@ public class MCRRestAPIClassifications {
      *      - 'selected' - (together with 'jstree') - all nodes will be selected
      * @param callback - used in JSONP to wrap json result into a Javascript function named by callback parameter
      * @return a Jersey Response object
-     * @throws MCRRestAPIException
      */
     @GET
     //@Path("/id/{value}{format:(\\.[^/]+?)?}")  -> working, but returns empty string instead of default value

@@ -81,7 +81,6 @@ public class MCRRestAPIMessages {
      * 
      * @return a Jersey Response object
      * 
-     * @throws MCRRestAPIException
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
@@ -143,7 +142,6 @@ public class MCRRestAPIMessages {
      * @param format 
      *     Possible values are: props (default) | json | xml (required)
      * @return a Jersey Response Object
-     * @throws MCRRestAPIException    
      */
     @GET
     @Path("/{value}")

@@ -61,6 +61,9 @@ public class MCRRestAPIAuthentication {
 
     public static final String AUDIENCE = "mcr:rest-auth";
 
+    @Context
+    HttpServletRequest req;
+
     /**
      * Unauthenticated requests should return a response whose header contains a HTTP 401 Unauthorized status and a
      * WWW-Authenticate field.
@@ -74,6 +77,7 @@ public class MCRRestAPIAuthentication {
      * the response, which is unusual but not strictly forbidden.
      * 
      * @param authorization - content HTTP Header Authorization
+     * @throws IOException if JWT cannot be written
      * @return response message as JSON
      */
     @GET
@@ -83,8 +87,7 @@ public class MCRRestAPIAuthentication {
         noStore = true,
         private_ = @MCRCacheControl.FieldArgument(active = true),
         noCache = @MCRCacheControl.FieldArgument(active = true))
-    public Response authorize(@DefaultValue("") @HeaderParam("Authorization") String authorization,
-        @Context HttpServletRequest req) throws IOException {
+    public Response authorize(@DefaultValue("") @HeaderParam("Authorization") String authorization) throws IOException {
         if (authorization.startsWith("Basic ")) {
             //login handled by MCRSessionFilter
             Optional<String> jwt = getToken(MCRSessionMgr.getCurrentSession().getUserInformation(),
@@ -118,8 +121,7 @@ public class MCRRestAPIAuthentication {
         noStore = true,
         private_ = @MCRCacheControl.FieldArgument(active = true),
         noCache = @MCRCacheControl.FieldArgument(active = true))
-    public Response renew(@DefaultValue("") @HeaderParam("Authorization") String authorization,
-        @Context HttpServletRequest req) throws IOException {
+    public Response renew(@DefaultValue("") @HeaderParam("Authorization") String authorization) throws IOException {
         if (authorization.startsWith("Bearer ")) {
             //login handled by MCRSessionFilter
             Optional<String> jwt = getToken(MCRSessionMgr.getCurrentSession().getUserInformation(),

@@ -163,9 +163,9 @@ public class MCRWrappedXMLWriter implements MessageBodyWriter<Object> {
             String.format(Locale.ROOT, "<?xml version=\"1.0\" encoding=\"%s\" standalone=\"yes\"?>", c.name())
                 .getBytes(c));
         if (t.isEmpty()) {
-            entityStream.write(String.format("<%s />", rootElement).getBytes(c));
+            entityStream.write(String.format(Locale.ROOT, "<%s />", rootElement).getBytes(c));
         } else {
-            entityStream.write(String.format("<%s>", rootElement).getBytes(c));
+            entityStream.write(String.format(Locale.ROOT, "<%s>", rootElement).getBytes(c));
             Marshaller marshaller = m.get();
             for (Object o : t) {
                 marshaller.marshal(o, entityStream);
