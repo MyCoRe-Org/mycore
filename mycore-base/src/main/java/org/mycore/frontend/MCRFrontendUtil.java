@@ -53,7 +53,15 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRFrontendUtil {
 
-    private static final String PROXY_HEADER = "X-Forwarded-Host";
+    private static final String PROXY_HEADER_HOST = "X-Forwarded-Host";
+
+    private static final String PROXY_HEADER_SCHEME = "X-Forwarded-Proto";
+
+    private static final String PROXY_HEADER_PORT = "X-Forwarded-Port";
+
+    private static final String PROXY_HEADER_PATH = "X-Forwarded-Path";
+
+    private static final String PROXY_HEADER_REMOTE_IP = "X-Forwarded-For";
 
     public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
 
@@ -93,21 +101,29 @@ public class MCRFrontendUtil {
      */
     public static String getBaseURL(ServletRequest req) {
         HttpServletRequest request = (HttpServletRequest) req;
-        StringBuilder webappBase = new StringBuilder(request.getScheme());
-        webappBase.append("://");
-        String proxyHeader = request.getHeader(PROXY_HEADER);
-        if (proxyHeader != null) {
-            StringTokenizer sttoken = new StringTokenizer(proxyHeader, ",");
-            String proxyHost = sttoken.nextToken().trim();
-            webappBase.append(proxyHost);
-        } else {
-            webappBase.append(request.getServerName());
-            int port = request.getServerPort();
-            if (!(port == 80 || request.isSecure() && port == 443)) {
-                webappBase.append(':').append(port);
+        String scheme = req.getScheme();
+        String host = req.getServerName();
+        int serverPort = req.getServerPort();
+        String path = request.getContextPath() + "/";
+
+        if (TRUSTED_PROXIES.contains(req.getRemoteAddr())) {
+            scheme = Optional.ofNullable(request.getHeader(PROXY_HEADER_SCHEME)).orElse(scheme);
+            host = Optional.ofNullable(request.getHeader(PROXY_HEADER_HOST)).orElse(host);
+            serverPort = Optional.ofNullable(request.getHeader(PROXY_HEADER_PORT))
+                .map(Integer::parseInt)
+                .orElse(serverPort);
+            path = Optional.ofNullable(request.getHeader(PROXY_HEADER_PATH)).orElse(path);
+            if (!path.endsWith("/")) {
+                path += "/";
             }
         }
-        webappBase.append(request.getContextPath()).append('/');
+        StringBuilder webappBase = new StringBuilder(scheme);
+        webappBase.append("://");
+        webappBase.append(host);
+        if (!("http".equals(scheme) && serverPort == 80 || "https".equals(scheme) && serverPort == 443)) {
+            webappBase.append(':').append(serverPort);
+        }
+        webappBase.append(path);
         return webappBase.toString();
     }
 
@@ -184,9 +200,9 @@ public class MCRFrontendUtil {
      * Get header to check if request comes in via a proxy. There are two possible header names
      */
     private static String getXForwardedFor(HttpServletRequest req) {
-        String xff = req.getHeader("X-Forwarded-For");
+        String xff = req.getHeader(PROXY_HEADER_REMOTE_IP);
         if ((xff == null) || xff.trim().isEmpty()) {
-            xff = req.getHeader("X_Forwarded_For");
+            xff = req.getHeader(PROXY_HEADER_REMOTE_IP);
         }
         if ((xff == null) || xff.trim().isEmpty())
             return null;
@@ -195,12 +211,12 @@ public class MCRFrontendUtil {
         // if so, take last entry, all others are not reliable because
         // any client may have set the header to any value.
 
-        LOGGER.debug("X-Forwarded-For complete: {}", xff);
+        LOGGER.debug("{} complete: {}", PROXY_HEADER_REMOTE_IP, xff);
         StringTokenizer st = new StringTokenizer(xff, " ,;");
         while (st.hasMoreTokens()) {
             xff = st.nextToken().trim();
         }
-        LOGGER.debug("X-Forwarded-For last: {}", xff);
+        LOGGER.debug("{} last: {}", PROXY_HEADER_REMOTE_IP, xff);
         return xff;
     }
 
