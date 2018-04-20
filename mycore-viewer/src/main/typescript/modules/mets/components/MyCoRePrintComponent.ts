@@ -430,9 +430,9 @@ namespace mycore.viewer.components {
 
                 // case end current
                 if(start!=null && last!=null){
-                    ranges.push(`${start.order+1}-${last.order+1}`);
+                    ranges.push(`${start.order}-${last.order}`);
                 } else if(start!=null){
-                    ranges.push((start.order+1)+"");
+                    ranges.push((start.order)+"");
                 } else {
                 }
                 start = last = null;
