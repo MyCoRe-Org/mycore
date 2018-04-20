@@ -194,6 +194,19 @@ public class MCRRestDerivates {
             description = "MCRObject XML",
             examples = @ExampleObject("<mycoreobject ID=\"{mcrid}\" ..>\n...\n</mycorobject>")) InputStream xmlSource)
         throws IOException {
+        //check preconditions
+        try {
+            long lastModified = MCRXMLMetadataManager.instance().getLastModified(derid);
+            if (lastModified >= 0) {
+                Date lmDate = new Date(lastModified);
+                Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lmDate);
+                if (cachedResponse.isPresent()) {
+                    return cachedResponse.get();
+                }
+            }
+        } catch (Exception e) {
+            //ignore errors as PUT is idempotent
+        }
         boolean create = true;
         if (MCRMetadataManager.exists(derid)) {
             validateDerivateRelation(mcrId, derid);

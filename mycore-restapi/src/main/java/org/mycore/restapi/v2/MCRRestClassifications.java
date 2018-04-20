@@ -119,8 +119,7 @@ public class MCRRestClassifications {
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId)
         throws IOException {
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
-        long categoryLastModified = categoryDAO.getLastModified(classId);
-        Date lastModified = new Date(categoryLastModified > 0 ? categoryLastModified : categoryDAO.getLastModified());
+        Date lastModified = getLastModifiedDate(classId, categoryDAO);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
@@ -133,6 +132,11 @@ public class MCRRestClassifications {
             .entity(MCRClass.getClassification(classification))
             .lastModified(lastModified)
             .build();
+    }
+
+    private static Date getLastModifiedDate(@PathParam(PARAM_CLASSID) String classId, MCRCategoryDAO categoryDAO) {
+        long categoryLastModified = categoryDAO.getLastModified(classId);
+        return new Date(categoryLastModified > 0 ? categoryLastModified : categoryDAO.getLastModified());
     }
 
     @PUT
@@ -158,15 +162,22 @@ public class MCRRestClassifications {
                     .entity("MCRCategoryID mismatch")
                     .build());
         }
-        MCRCategory newCategory = mcrClass.toCategory();
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
-        if (categoryDAO.exist(newCategory.getId())) {
-            categoryDAO.addCategory(null, newCategory);
-            return Response.status(Response.Status.CREATED).build();
+        Response.Status status;
+        if (categoryDAO.exist(MCRCategoryID.rootID(classId))) {
+            categoryDAO.addCategory(null, mcrClass.toCategory());
+            status = Response.Status.CREATED;
         } else {
-            categoryDAO.replaceCategory(newCategory);
-            return Response.status(Response.Status.NO_CONTENT).build();
+            Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request,
+                getLastModifiedDate(classId, categoryDAO));
+            if (cachedResponse.isPresent()) {
+                return cachedResponse.get();
+            }
+            categoryDAO.replaceCategory(mcrClass.toCategory());
+            status = Response.Status.NO_CONTENT;
         }
+        Date lastModifiedDate = getLastModifiedDate(classId, categoryDAO);
+        return Response.status(status).lastModified(lastModifiedDate).build();
     }
 
 }

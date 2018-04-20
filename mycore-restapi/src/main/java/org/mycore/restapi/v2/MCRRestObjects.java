@@ -165,6 +165,19 @@ public class MCRRestObjects {
             description = "MCRObject XML",
             examples = @ExampleObject("<mycoreobject ID=\"{mcrid}\" ..>\n...\n</mycorobject>")) InputStream xmlSource)
         throws IOException {
+        //check preconditions
+        try {
+            long lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+            if (lastModified >= 0) {
+                Date lmDate = new Date(lastModified);
+                Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lmDate);
+                if (cachedResponse.isPresent()) {
+                    return cachedResponse.get();
+                }
+            }
+        } catch (Exception e) {
+            //ignore errors as PUT is idempotent
+        }
         MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null, MCRObject.ROOT_NAME);
         MCRObject updatedObject = null;
         try {
