@@ -49,6 +49,8 @@ import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
 @Priority(Priorities.AUTHORIZATION)
 public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
 
+    public static final String PARAM_CLASSID = "classid";
+
     public static final String PARAM_MCRID = "mcrid";
 
     public static final String PARAM_DERID = "derid";

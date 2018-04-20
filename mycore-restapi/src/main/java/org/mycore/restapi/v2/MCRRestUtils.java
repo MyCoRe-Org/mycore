@@ -28,6 +28,8 @@ final class MCRRestUtils {
 
     public static final String JSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
+    public static final String TAG_MYCORE_CLASSIFICATION = "mcr_class";
+
     public static final String TAG_MYCORE_OBJECT = "mcr_object";
 
     public static final String TAG_MYCORE_DERIVATE = "mcr_derivate";

@@ -29,8 +29,15 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.mycore.common.MCRException;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The composite identifier of a MCRCategory. If <code>rootID == ID</code> the
@@ -43,6 +50,7 @@ import org.mycore.common.MCRException;
  */
 @Embeddable
 @Access(AccessType.FIELD)
+@JsonFormat(shape = JsonFormat.Shape.STRING)
 public class MCRCategoryID implements Serializable {
 
     private static final long serialVersionUID = -5672923571406252855L;
@@ -85,6 +93,7 @@ public class MCRCategoryID implements Serializable {
      * @param categoryId must be in format classificationId:categoryId
      * @return the {@link MCRCategoryID} if any
      */
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static MCRCategoryID fromString(String categoryId) {
         StringTokenizer tok = new StringTokenizer(categoryId, ":");
         String rootId = tok.nextToken();
@@ -205,6 +214,7 @@ public class MCRCategoryID implements Serializable {
      * @see java.lang.Object#toString()
      */
     @Override
+    @JsonValue
     public String toString() {
         if (ID == null || ID.length() == 0) {
             return rootID;
