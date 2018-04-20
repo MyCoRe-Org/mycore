@@ -55,6 +55,13 @@ public interface MCRProcessableCollection {
     Stream<MCRProcessable> stream();
 
     /**
+     * Checks if this collection contains any processable.
+     *
+     * @return true if this collection contains at least on processable
+     */
+    boolean isEmpty();
+
+    /**
      * Returns a map of properties assigned to this processable.
      * 
      * @return the properties map

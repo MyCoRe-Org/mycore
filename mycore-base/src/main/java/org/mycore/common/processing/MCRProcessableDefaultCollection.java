@@ -39,7 +39,7 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
 
     private String name;
 
-    private List<MCRProcessable> processables;
+    private final List<MCRProcessable> processables;
 
     private Map<String, Object> properties;
 
@@ -78,7 +78,16 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
 
     @Override
     public Stream<MCRProcessable> stream() {
-        return this.processables.stream();
+        List<MCRProcessable> snapshot;
+        synchronized (this.processables) {
+            snapshot = new ArrayList<>(this.processables);
+        }
+        return snapshot.stream();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.processables.isEmpty();
     }
 
     @Override
