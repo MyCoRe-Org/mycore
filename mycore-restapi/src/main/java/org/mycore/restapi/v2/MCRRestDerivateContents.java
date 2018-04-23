@@ -112,6 +112,7 @@ public class MCRRestDerivateContents {
         return Response
             .status(Response.Status.PARTIAL_CONTENT)
             .header(HttpHeaders.CONTENT_TYPE, mimeType)
+            .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
             .tag(getETag(mcrPath, fileAttributes))
             .build();
@@ -139,13 +140,12 @@ public class MCRRestDerivateContents {
         if (fileAttributes.isDirectory()) {
             return serveDirectory(mcrPath, fileAttributes);
         }
-        StreamingOutput sout = out -> {
-
-        };
+        StreamingOutput sout = out -> Files.copy(mcrPath, out);
         Response.Status status = Response.Status.OK;
         return Response.status(status)
             .entity(sout)
             .tag(getETag(mcrPath, fileAttributes))
+            .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_TYPE, context.getMimeType(mcrPath.getFileName().toString()))
             .build();
