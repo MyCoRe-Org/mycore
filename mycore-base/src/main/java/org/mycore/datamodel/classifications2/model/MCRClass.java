@@ -42,6 +42,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @XmlRootElement(name = "mycoreclass")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -62,6 +63,7 @@ public class MCRClass {
 
     @XmlElementWrapper(name = "categories")
     @XmlElement(name = "category")
+    @JsonProperty("categories")
     protected List<MCRClassCategory> categories;
 
     @XmlAttribute(name = "ID", required = true)
