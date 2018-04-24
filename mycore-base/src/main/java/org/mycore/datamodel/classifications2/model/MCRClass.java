@@ -57,6 +57,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MCRClass {
 
     @XmlElement(required = true)
+    @JsonProperty("labels")
     protected List<MCRLabel> label;
 
     protected MCRClassURL url;
