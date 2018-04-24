@@ -76,9 +76,10 @@ public abstract class MCRContentAbstractWriter implements MessageBodyWriter<MCRC
             handleFallback(content, entityStream);
         } else if (transformerId.isPresent()) {
             throw new InternalServerErrorException("MCRContentTransformer " + transformerId.get() + " is not defined.");
-        }
+        } else {
         LogManager.getLogger().warn("Could not get MCRContentTransformer from request");
-        handleFallback(content, entityStream);
+            handleFallback(content, entityStream);
+        }
     }
 
     protected abstract MediaType getTransfomerFormat();
