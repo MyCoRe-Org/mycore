@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,14 +44,15 @@ import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 
 @Provider
-@Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
+@Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML + ";charset=UTF-8" })
 public class MCRMetaDefaultListXMLWriter implements MessageBodyWriter<List<? extends MCRMetaDefault>> {
 
     public static final String PARAM_XMLWRAPPER = "xmlWrapper";
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return MediaType.TEXT_XML_TYPE.isCompatible(mediaType) && List.class.isAssignableFrom(type)
+        return Stream.of(MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_XML_TYPE)
+            .anyMatch(t -> t.isCompatible(mediaType)) && List.class.isAssignableFrom(type)
             && MCRConverterUtils.isType(genericType, MCRMetaDefault.class) && getWrapper(annotations).isPresent();
     }
 
@@ -74,9 +74,7 @@ public class MCRMetaDefaultListXMLWriter implements MessageBodyWriter<List<? ext
         if (!wrapper.isPresent()) {
             throw new InternalServerErrorException("Could not get XML wrapping element from annotations.");
         }
-        httpHeaders.putSingle(HttpHeaders.CONTENT_TYPE,
-            new MediaType(MediaType.TEXT_XML_TYPE.getType(), MediaType.TEXT_XML_TYPE.getSubtype(),
-                StandardCharsets.UTF_8.name()));
+        httpHeaders.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_TYPE);
         Element root = new Element(wrapper.get());
         root.addContent(mcrMetaDefaults.stream()
             .map(MCRMetaDefault::createXML)

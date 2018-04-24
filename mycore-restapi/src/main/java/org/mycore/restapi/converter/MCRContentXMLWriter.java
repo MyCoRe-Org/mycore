@@ -28,12 +28,12 @@ import javax.ws.rs.ext.Provider;
 import org.mycore.common.content.MCRContent;
 
 @Provider
-@Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
+@Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML + ";charset=UTF-8" })
 public class MCRContentXMLWriter extends MCRContentAbstractWriter {
 
     @Override
     protected MediaType getTransfomerFormat() {
-        return MediaType.TEXT_XML_TYPE;
+        return MediaType.APPLICATION_XML_TYPE;
     }
 
     @Override
