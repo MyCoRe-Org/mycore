@@ -105,8 +105,9 @@ public class MCRRestAPISearch {
     public Response search(@Context UriInfo info, @Context HttpServletRequest request, @QueryParam("q") String query,
         @QueryParam("sort") String sort, @QueryParam("wt") @DefaultValue("xml") String wt,
         @QueryParam("start") String start, @QueryParam("rows") String rows, @QueryParam("fq") String fq,
-        @QueryParam("fl") String fl, @QueryParam("facet") String facet,
-        @QueryParam("facet.field") List<String> facetFields, @QueryParam("json.wrf") String jsonWrf)
+        @QueryParam("fl") String fl, @QueryParam("facet") String facet, @QueryParam("facet.sort") String facetSort,
+        @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
+        @QueryParam("json.wrf") String jsonWrf)
         throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/search");
         StringBuffer url = new StringBuffer(MCRSolrConstants.SERVER_URL);
@@ -139,6 +140,12 @@ public class MCRRestAPISearch {
             }
             for (String ff : facetFields) {
                 url.append("&facet.field=").append(URLEncoder.encode(ff, "UTF-8"));
+            }
+            if (facetSort != null) {
+                url.append("&facet.sort=").append(facetSort);
+            }
+            if (facetLimit != null) {
+                url.append("&facet.limit=").append(facetLimit);
             }
             if (jsonWrf != null) {
                 url.append("&json.wrf=").append(jsonWrf);
