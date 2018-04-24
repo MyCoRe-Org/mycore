@@ -37,6 +37,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MCRClassCategory",
@@ -75,6 +76,7 @@ public class MCRClassCategory {
         this.url = value;
     }
 
+    @JsonProperty("categories")
     public List<MCRClassCategory> getCategory() {
         if (category == null) {
             category = new ArrayList<MCRClassCategory>();
