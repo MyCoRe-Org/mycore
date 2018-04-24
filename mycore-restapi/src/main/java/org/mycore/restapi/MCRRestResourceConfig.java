@@ -57,6 +57,7 @@ public class MCRRestResourceConfig extends ResourceConfig {
 
     public MCRRestResourceConfig(){
         super();
+        setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API");
         LogManager.getLogger().error("========MCRRESTResourceConfig======== {}", getApplicationName());
         String[] restPackages = Stream
             .concat(
@@ -85,7 +86,7 @@ public class MCRRestResourceConfig extends ResourceConfig {
         Info oasInfo = new Info();
         oas.setInfo(oasInfo);
         oasInfo.setVersion(MCRCoreVersion.getVersion());
-        oasInfo.setTitle(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API");
+        oasInfo.setTitle(getApplicationName());
         License oasLicense = new License();
         oasLicense.setName("GNU General Public License, version 3");
         oasLicense.setUrl("http://www.gnu.org/licenses/gpl-3.0.txt");

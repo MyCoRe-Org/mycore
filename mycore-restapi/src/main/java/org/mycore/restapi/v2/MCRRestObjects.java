@@ -47,6 +47,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
+import org.apache.logging.log4j.LogManager;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
@@ -54,6 +55,9 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs2.MCRMetadataStore;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -139,6 +143,68 @@ public class MCRRestObjects {
             return cachedResponse.get();
         }
         MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id);
+        return Response.ok()
+            .entity(mcrContent,
+                new Annotation[] { MCRParams.Factory
+                    .get(MCRParam.Factory.get(MCRContentAbstractWriter.PARAM_OBJECTTYPE, id.getTypeId())) })
+            .lastModified(lastModified)
+            .build();
+    }
+
+    @GET
+    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
+    @Path("/{" + PARAM_MCRID + "}/versions")
+    @Operation(
+        summary = "Returns MCRObject with the given " + PARAM_MCRID + ".",
+        responses = @ApiResponse(content = @Content(
+            array = @ArraySchema(uniqueItems = true, schema = @Schema(implementation = MCRMetadataVersion.class)))),
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT)
+    @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
+    @XmlElementWrapper(name = "versions")
+    public Response getObjectVersions(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
+        throws IOException {
+        long modified = MCRXMLMetadataManager.instance().getLastModified(id);
+        if (modified < 0) {
+            throw new NotFoundException("MCRObject " + id + " not found");
+        }
+        Date lastModified = new Date(modified);
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
+        if (cachedResponse.isPresent()) {
+            return cachedResponse.get();
+        }
+        List<MCRMetadataVersion> versions = MCRXMLMetadataManager.instance().getVersionedMetaData(id)
+            .listVersions();
+        return Response.ok()
+            .entity(new GenericEntity<List<MCRMetadataVersion>>(versions,
+                TypeUtils.parameterize(List.class, MCRMetadataVersion.class)))
+            .lastModified(lastModified)
+            .build();
+    }
+
+    @GET
+    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1000, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1000, unit = TimeUnit.DAYS)) //will never expire actually
+    @Path("/{" + PARAM_MCRID + "}/versions/{revision}")
+    @Operation(
+        summary = "Returns MCRObject with the given " + PARAM_MCRID + " and revision.",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT)
+    public Response getObjectVersion(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id,
+        @PathParam("revision") long revision)
+        throws IOException {
+        MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id, revision);
+        if (mcrContent == null) {
+            throw new NotFoundException(Response.status(Response.Status.NOT_FOUND).entity("revision_not_found").build());
+        }
+        long modified = mcrContent.lastModified();
+        Date lastModified = new Date(modified);
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
+        if (cachedResponse.isPresent()) {
+            return cachedResponse.get();
+        }
+        LogManager.getLogger().info("OK: {}", mcrContent.getETag());
         return Response.ok()
             .entity(mcrContent,
                 new Annotation[] { MCRParams.Factory
