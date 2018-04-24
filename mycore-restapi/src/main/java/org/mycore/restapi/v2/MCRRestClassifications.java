@@ -69,7 +69,7 @@ public class MCRRestClassifications {
     Request request;
 
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     @Operation(
@@ -107,7 +107,7 @@ public class MCRRestClassifications {
     }
 
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}")
@@ -140,9 +140,9 @@ public class MCRRestClassifications {
     }
 
     @PUT
-    @Consumes({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @Path("/{" + PARAM_CLASSID + "}")
-    @Produces(MediaType.TEXT_XML)
+    @Produces(MediaType.APPLICATION_XML)
     @Operation(
         summary = "Creates Classification with the given " + PARAM_CLASSID + ".",
         responses = {

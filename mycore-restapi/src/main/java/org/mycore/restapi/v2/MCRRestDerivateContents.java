@@ -104,7 +104,7 @@ public class MCRRestDerivateContents {
         if (fileAttributes.isDirectory()) {
             return Response.ok()
                 .variants(Variant
-                    .mediaTypes(MediaType.APPLICATION_JSON_TYPE, MediaType.TEXT_XML_TYPE)
+                    .mediaTypes(MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_XML_TYPE)
                     .build())
                 .build();
         }
@@ -119,7 +119,7 @@ public class MCRRestDerivateContents {
     }
 
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.WILDCARD })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))

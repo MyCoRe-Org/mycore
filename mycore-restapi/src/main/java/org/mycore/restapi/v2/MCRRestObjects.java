@@ -94,7 +94,7 @@ public class MCRRestObjects {
     Request request;
 
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     @Operation(
@@ -124,7 +124,7 @@ public class MCRRestObjects {
     }
 
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_MCRID + "}")
@@ -152,7 +152,7 @@ public class MCRRestObjects {
     }
 
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_MCRID + "}/versions")
@@ -184,7 +184,7 @@ public class MCRRestObjects {
     }
 
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1000, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1000, unit = TimeUnit.DAYS)) //will never expire actually
     @Path("/{" + PARAM_MCRID + "}/versions/{revision}")
@@ -214,7 +214,7 @@ public class MCRRestObjects {
     }
 
     @PUT
-    @Consumes(MediaType.TEXT_XML + ";charset=UTF-8")
+    @Consumes(MediaType.APPLICATION_XML)
     @Path("/{" + PARAM_MCRID + "}")
     @Operation(summary = "Creates or updates MCRObject with the body of this request",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
