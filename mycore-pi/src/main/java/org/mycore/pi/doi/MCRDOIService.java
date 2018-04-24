@@ -97,6 +97,8 @@ import org.xml.sax.SAXException;
  * <dd>The path to the schema. (must be in classpath; default is {@link #DEFAULT_DATACITE_SCHEMA_PATH})</dd>
  * <dt>Namespace</dt>
  * <dd>The namespace for the Datacite version (Default is {@link #KERNEL_3_NAMESPACE_URI}</dd>
+ * <dt>JobApiUser</dt>
+ * <dd>The user which will be used to run the registration/update job</dd>
  * </dl>
  */
 public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
@@ -201,7 +203,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         try {
             getDataciteClient().getDOIList();
         } catch (MCRPersistentIdentifierException e) {
-            throw new MCRConfigurationException("Error while checking credentials!", e);
+            throw new MCRConfigurationException("Error while checking Datacite credentials!", e);
         }
 
         if (MCRContentTransformerFactory.getTransformer(this.transformer) == null) {
