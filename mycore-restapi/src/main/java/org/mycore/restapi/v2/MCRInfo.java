@@ -34,7 +34,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 
 import org.mycore.common.MCRCoreVersion;
 
@@ -85,6 +89,10 @@ public class MCRInfo {
 
         private Set<String> tags;
 
+        private GitInfo() {
+            //JAXB;
+        }
+
         public GitInfo(Map<String, String> props) {
             branch = props.get("git.branch");
             build = new BuildInfo(props);
@@ -103,34 +111,42 @@ public class MCRInfo {
             tags = Stream.of(props.get("git.tags").split(",")).collect(Collectors.toSet());
         }
 
+        @XmlElement
         public BuildInfo getBuild() {
             return build;
         }
 
         @JsonProperty(required = true)
+        @XmlElement
         public GitClosestTag getClosestTag() {
             return closestTag;
         }
 
+        @XmlElement
         public GitCommitInfo getCommit() {
             return commit;
         }
 
         @JsonProperty(required = true)
+        @XmlAttribute
         public boolean isDirty() {
             return dirty;
         }
 
         @JsonProperty(required = true)
+        @XmlElement
         public Map<String, String> getRemoteURL() {
             return remoteURL;
         }
 
+        @XmlElementWrapper(name = "tags")
+        @XmlElement(name = "tag")
         public Set<String> getTags() {
             return tags;
         }
 
         @JsonProperty(required = true)
+        @XmlAttribute
         public String getBranch() {
 
             return branch;
@@ -147,6 +163,10 @@ public class MCRInfo {
 
         private String version;
 
+        private BuildInfo() {
+            //JAXB
+        }
+
         public BuildInfo(Map<String, String> props) {
             time = Instant.parse(props.get("git.build.time"));
             user = new User(props.get("git.build.user.name"), props.get("git.build.user.email"));
@@ -155,18 +175,22 @@ public class MCRInfo {
         }
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = MCRRestUtils.JSON_DATE_FORMAT)
+        @XmlAttribute
         public Date getTime() {
             return Date.from(time);
         }
 
+        @XmlElement
         public User getUser() {
             return user;
         }
 
+        @XmlAttribute
         public String getHost() {
             return host;
         }
 
+        @XmlAttribute
         public String getVersion() {
             return version;
         }
@@ -182,6 +206,10 @@ public class MCRInfo {
 
         private User user;
 
+        private GitCommitInfo() {
+            //JAXB
+        }
+
         public GitCommitInfo(Map<String, String> props) {
             id = new GitId(props);
             message = new GitCommitMessage(props.get("git.commit.message.full"), props.get("git.commit.message.short"));
@@ -190,21 +218,25 @@ public class MCRInfo {
         }
 
         @JsonProperty(required = true)
+        @XmlElement
         public GitId getId() {
             return id;
         }
 
         @JsonProperty(required = true)
+        @XmlElement
         public GitCommitMessage getMessage() {
             return message;
         }
 
         @JsonProperty(required = true)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = MCRRestUtils.JSON_DATE_FORMAT)
+        @XmlAttribute
         public Date getTime() {
             return Date.from(time);
         }
 
+        @XmlElement
         public User getUser() {
             return user;
         }
@@ -216,17 +248,23 @@ public class MCRInfo {
 
         private String name;
 
+        private GitClosestTag() {
+            //JAXB
+        }
+
         public GitClosestTag(Map<String, String> props) {
             name = props.get("git.closest.tag.name");
             commitCount = Integer.parseInt(props.get("git.closest.tag.commit.count"));
         }
 
         @JsonProperty(required = true)
+        @XmlAttribute
         public int getCommitCount() {
             return commitCount;
         }
 
         @JsonProperty(required = true)
+        @XmlAttribute
         public String getName() {
             return name;
         }
@@ -242,6 +280,10 @@ public class MCRInfo {
 
         String full;
 
+        private GitId() {
+            //JAXB
+        }
+
         private GitId(Map<String, String> props) {
             abbrev = props.get("git.commit.id.abbrev");
             describe_short = props.get("git.commit.id.describe-short");
@@ -250,21 +292,25 @@ public class MCRInfo {
         }
 
         @JsonProperty(required = true)
+        @XmlAttribute
         public String getAbbrev() {
             return abbrev;
         }
 
         @JsonProperty(value = "describe-short", required = true)
+        @XmlAttribute
         public String getDescribeShort() {
             return describe_short;
         }
 
         @JsonProperty(required = true)
+        @XmlAttribute
         public String getDescribe() {
             return describe;
         }
 
         @JsonProperty(required = true)
+        @XmlAttribute
         public String getFull() {
             return full;
         }
@@ -276,15 +322,21 @@ public class MCRInfo {
 
         private String short_;
 
+        private GitCommitMessage() {
+            //JAXB
+        }
+
         public GitCommitMessage(String full, String short_) {
             this.full = full;
             this.short_ = short_;
         }
 
+        @XmlValue
         public String getFull() {
             return full;
         }
 
+        @XmlAttribute
         public String getShort() {
             return short_;
         }
@@ -296,16 +348,22 @@ public class MCRInfo {
 
         private String email;
 
+        private User() {
+            //JAXB
+        }
+
         public User(String name, String email) {
             this.name = name;
             this.email = email;
         }
 
         @JsonProperty(required = true)
+        @XmlAttribute
         public String getName() {
             return name;
         }
 
+        @XmlAttribute
         public String getEmail() {
             return email;
         }
