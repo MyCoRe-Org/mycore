@@ -75,6 +75,7 @@ public class MCRRestResourceConfig extends ResourceConfig {
         register(MCRRestAPIExceptionMapper.class);
         register(MCRForbiddenExceptionMapper.class);
         register(MCRNotAuthorizedExceptionMapper.class);
+        register(MCRCORSResponseFilter.class);
         register(MCRRequestScopeACLFactory.getBinder());
         getInstances().stream()
             .forEach(LogManager.getLogger()::info);
