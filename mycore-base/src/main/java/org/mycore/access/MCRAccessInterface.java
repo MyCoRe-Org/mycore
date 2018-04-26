@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUserInformation;
 
 /**
  * This serves as an interface to an underlying access controll system.
@@ -218,7 +219,10 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */
+    @Deprecated
     public boolean checkPermission(String id, String permission, String userID);
+    
+    public boolean checkPermission(String id, String permission, MCRUserInformation userInfo);
 
     /**
      * determines whether the current user has the permission to perform a
@@ -257,7 +261,10 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */
+    @Deprecated
     public boolean checkPermissionForUser(String permission, String userID);
+    
+    public boolean checkPermissionForUser(String permission, MCRUserInformation userInfo);
 
     /**
      * determines whether the current user has the permission to perform a

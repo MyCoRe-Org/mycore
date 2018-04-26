@@ -45,7 +45,12 @@ class MCRGroupClause implements MCRCondition<Object> {
     }
 
     public boolean evaluate(Object o) {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(groupname) ^ not;
+    	if(o==null || !(o instanceof MCRAccessData) || ((MCRAccessData)o).getUserInformation()==null) {
+    		return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(groupname) ^ not;
+    	}
+    	else {
+    		return ((MCRAccessData)o).getUserInformation().isUserInRole(groupname) ^ not;
+    	}
     }
 
     @Override

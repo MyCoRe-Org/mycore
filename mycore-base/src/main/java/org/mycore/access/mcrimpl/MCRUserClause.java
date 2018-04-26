@@ -66,11 +66,20 @@ class MCRUserClause implements MCRCondition<Object> {
     }
 
     public boolean evaluate(Object o) {
-        if (userRegEx != null) {
-            return userRegEx.matcher(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()).matches()
-                ^ not;
-        }
-        return user.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()) ^ not;
+    	if(o == null || !(o instanceof MCRAccessData) || ((MCRAccessData)o).getUserInformation() == null) {
+    		if (userRegEx != null) {
+    			return userRegEx.matcher(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()).matches()
+    					^ not;
+    		}
+    		return user.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()) ^ not;
+    	}
+    	else {
+    		if (userRegEx != null) {
+    			return userRegEx.matcher(((MCRAccessData)o).getUserInformation().getUserID()).matches()
+    					^ not;
+    		}
+    		return user.equals(((MCRAccessData)o).getUserInformation().getUserID()) ^ not;
+    	}
     }
 
     @Override

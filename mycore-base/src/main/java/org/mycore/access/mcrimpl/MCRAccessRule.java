@@ -34,6 +34,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
 
@@ -62,6 +63,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
 
     }
 
+    @Deprecated
     public boolean checkAccess(String userID, Date date, MCRIPAddress ip) {
         if (parsedRule == null) {
             if (userID.equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
@@ -72,6 +74,24 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
         }
         LogManager.getLogger(this.getClass()).debug("new MCRAccessData");
         MCRAccessData data = new MCRAccessData(userID, date, ip);
+        LogManager.getLogger(this.getClass()).debug("new MCRAccessData done.");
+
+        LogManager.getLogger(this.getClass()).debug("evaluate MCRAccessData");
+        boolean returns = parsedRule.evaluate(data);
+        LogManager.getLogger(this.getClass()).debug("evaluate MCRAccessData done.");
+        return returns;
+    }
+    
+    public boolean checkAccess(MCRUserInformation userInfo, Date date, MCRIPAddress ip) {
+        if (parsedRule == null) {
+            if (userInfo.getUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
+                LogManager.getLogger(MCRAccessRule.class).debug("No rule defined, grant access to super user.");
+                return true;
+            }
+            return false;
+        }
+        LogManager.getLogger(this.getClass()).debug("new MCRAccessData");
+        MCRAccessData data = new MCRAccessData(userInfo, date, ip);
         LogManager.getLogger(this.getClass()).debug("new MCRAccessData done.");
 
         LogManager.getLogger(this.getClass()).debug("evaluate MCRAccessData");
@@ -142,7 +162,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
     @Override
     public boolean validate() {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        String userID = session.getUserInformation().getUserID();
+        MCRUserInformation userInfo = session.getUserInformation();
         MCRIPAddress mcripAddress;
         try {
             mcripAddress = new MCRIPAddress(session.getCurrentIP());
@@ -150,6 +170,6 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
             LogManager.getLogger(MCRAccessRule.class).warn("Error while checking rule.", e);
             return false;
         }
-        return checkAccess(userID, new Date(), mcripAddress);
+        return checkAccess(userInfo, new Date(), mcripAddress);
     }
 }
