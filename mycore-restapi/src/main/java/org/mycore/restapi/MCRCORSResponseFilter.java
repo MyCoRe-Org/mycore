@@ -32,7 +32,12 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class MCRCORSResponseFilter implements ContainerResponseFilter {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ORIGIN = "Origin";
 
@@ -46,7 +51,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
     private static final String ACCESS_CONTROL_REQUEST_HEADERS = "Access-Control-Request-Headers";
 
-    private static final String ACCESS_CONTROL_ALLOW_HEADERS = " Access-Control-Allow-Headers";
+    private static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
 
     private static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
 
@@ -78,6 +83,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
         throws IOException {
+        LOGGER.debug("Request-Header: {}", requestContext.getHeaders());
         String origin = requestContext.getHeaderString(ORIGIN);
         if (origin == null) {
             return; //No CORS Request
@@ -102,6 +108,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
                 .collect(Collectors.joining(","));
             responseHeaders.putSingle(HttpHeaders.VARY, vary);
         }
+        LOGGER.debug("Response-Header: {}", responseHeaders);
     }
 
 }
