@@ -38,7 +38,6 @@ import javax.imageio.ImageReader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;

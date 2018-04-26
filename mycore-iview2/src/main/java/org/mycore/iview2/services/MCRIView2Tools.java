@@ -94,8 +94,9 @@ public class MCRIView2Tools {
             // verify support
             if (nameOfMainFile != null && !nameOfMainFile.equals("")) {
                 MCRPath mainFile = MCRPath.getPath(derivateID, '/' + nameOfMainFile);
-                if (mainFile != null && isFileSupported(mainFile))
+                if (isFileSupported(mainFile)) {
                     return mainFile.getRoot().relativize(mainFile).toString();
+                }
             }
         } catch (Exception e) {
             LOGGER.warn("Could not get main file of derivate.", e);

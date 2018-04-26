@@ -73,6 +73,16 @@ import org.mycore.iview2.services.MCRTilingQueue;
 public class MCRIView2Commands extends MCRAbstractCommands {
     private static final Logger LOGGER = LogManager.getLogger(MCRIView2Commands.class);
 
+    private static final String TILE_DERIVATE_TILES_COMMAND_SYNTAX = "tile images of derivate {0}";
+
+    private static final String CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX = "check tiles of derivate {0}";
+
+    private static final String CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX = "check tiles of image {0} {1}";
+
+    private static final String TILE_IMAGE_COMMAND_SYNTAX = "tile image {0} {1}";
+
+    private static final String DEL_DERIVATE_TILES_COMMAND_SYNTAX = "delete tiles of derivate {0}";
+
     /**
      * meta command to tile all images of all derivates.
      * @return list of commands to execute.
@@ -150,8 +160,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         return forAllDerivatesOfObject(objectID, TILE_DERIVATE_TILES_COMMAND_SYNTAX);
     }
 
-    private static final String TILE_DERIVATE_TILES_COMMAND_SYNTAX = "tile images of derivate {0}";
-
     /**
      * meta command to tile all images of this derivate.
      * @param derivateID a derivate ID
@@ -164,15 +172,14 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         return forAllImages(derivateID, TILE_IMAGE_COMMAND_SYNTAX);
     }
 
-    private static final String CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX = "check tiles of derivate {0}";
-
     /**
      * meta command to check (and repair) all tiles of all images of this derivate.
      * @param derivateID a derivate ID
      * @return list of commands to execute.
      */
     @MCRCommand(syntax = CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX,
-        help = "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not ",
+        help = "checks if all images of derivate {0} with a supported image type as main document have valid iview2" +
+                " files and start tiling if not ",
         order = 20)
     public static List<String> checkTilesOfDerivate(String derivateID) throws IOException {
         return forAllImages(derivateID, CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX);
@@ -196,8 +203,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             .collect(Collectors.toList());
     }
 
-    private static final String CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX = "check tiles of image {0} {1}";
-
     @MCRCommand(syntax = "fix dead tile jobs", help = "Deletes entries for files which dont exist anymore!")
     public static void fixDeadEntries() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
@@ -218,7 +223,8 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * @param absoluteImagePath absolute path to image file
      */
     @MCRCommand(syntax = CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX,
-        help = "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one",
+        help = "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or" +
+                " generates new one",
         order = 30)
     public static void checkImage(String derivate, String absoluteImagePath) throws IOException {
         Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
@@ -307,8 +313,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
     }
 
-    private static final String TILE_IMAGE_COMMAND_SYNTAX = "tile image {0} {1}";
-
     /**
      * Tiles this image.
      * @param derivate derivate ID
@@ -386,8 +390,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
         return cmds;
     }
-
-    private static final String DEL_DERIVATE_TILES_COMMAND_SYNTAX = "delete tiles of derivate {0}";
 
     /**
      * Deletes all image tiles of this derivate.
