@@ -20,17 +20,17 @@ package org.mycore.mets.model.simple;
 
 public class MCRMetsAltoLink {
 
-    public MCRMetsAltoLink(MCRMetsFile file, String begin, String end) {
-        this.file = file;
-        this.begin = begin;
-        this.end = end;
-    }
-
     private MCRMetsFile file;
 
     private String begin;
 
     private String end;
+
+    public MCRMetsAltoLink(MCRMetsFile file, String begin, String end) {
+        this.file = file;
+        this.begin = begin;
+        this.end = end;
+    }
 
     public MCRMetsFile getFile() {
         return file;

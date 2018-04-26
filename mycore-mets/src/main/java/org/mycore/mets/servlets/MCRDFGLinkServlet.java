@@ -80,7 +80,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
         String filePath = request.getParameter("file") == null ? "" : request.getParameter("file");
         String derivateID = request.getParameter("deriv") == null ? "" : request.getParameter("deriv");
 
-        if (derivateID.equals("")) {
+        if ("".equals(derivateID)) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Derivate is not set");
         }
 
@@ -147,6 +147,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
                     FLocat fLocat = file.getFLocat();
                     if (fLocat.getHref().equals( MCRXMLFunctions.encodeURIPath(fileHref, true)))
                         fileID = file.getId();
+                    }
                 }
             }
 
@@ -160,8 +161,9 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
                     List<Fptr> fptrList = physicalSubDiv.getChildren();
                     for (Fptr fptr : fptrList) {
-                        if (fptr.getFileId().equals(fileID))
+                        if (fptr.getFileId().equals(fileID)) {
                             orderNumber = index + 1;
+                        }
                     }
                 }
             }
@@ -206,8 +208,9 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
     private boolean useExistingMets(HttpServletRequest request) {
         String useExistingMetsParam = request.getParameter("useExistingMets");
-        if (useExistingMetsParam == null)
+        if (useExistingMetsParam == null) {
             return true;
+        }
         return Boolean.valueOf(useExistingMetsParam);
     }
 

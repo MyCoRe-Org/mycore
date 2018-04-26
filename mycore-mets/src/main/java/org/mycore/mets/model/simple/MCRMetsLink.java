@@ -20,6 +20,10 @@ package org.mycore.mets.model.simple;
 
 public class MCRMetsLink {
 
+    private MCRMetsSection from;
+
+    private MCRMetsPage to;
+
     public MCRMetsLink(MCRMetsSection from, MCRMetsPage to) {
         this.from = from;
         this.to = to;
@@ -27,10 +31,6 @@ public class MCRMetsLink {
 
     public MCRMetsLink() {
     }
-
-    private MCRMetsSection from;
-
-    private MCRMetsPage to;
 
     public MCRMetsSection getFrom() {
         return from;

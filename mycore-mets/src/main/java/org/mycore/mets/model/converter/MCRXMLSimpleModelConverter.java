@@ -110,7 +110,6 @@ public class MCRXMLSimpleModelConverter {
             idSectionMap.put(current.getId(), metsSection);
         }
 
-        List<MCRMetsSection> childSectionList = metsSection.getMetsSectionList();
         current.getChildren()
             .stream()
             .map(section -> MCRXMLSimpleModelConverter.buildSection(section, idSectionMap, metsSection, idFileMap))
