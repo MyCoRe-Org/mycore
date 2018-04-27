@@ -18,9 +18,13 @@
 
 package org.mycore.viewer.configuration;
 
+import java.nio.file.Files;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
 
 public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
@@ -30,7 +34,9 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
         super.setup(request);
 
         // properties
-        setProperty("metsURL", MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + getDerivate(request));
+        final String derivate = getDerivate(request);
+
+        setProperty("metsURL", MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivate);
         String imageXmlPath = MCRConfiguration.instance().getString("MCR.Viewer.BaseURL", null); // Parameter can be used to provide multiple urls
 
         if (imageXmlPath == null || imageXmlPath.isEmpty()) {
@@ -53,7 +59,16 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
             .getString("MCR.Viewer.PDFCreatorRestrictionFormatString", null));
 
         // script
-        addLocalScript("iview-client-mets.js", isDebugParameterSet(request));
+        final boolean debugParameterSet = isDebugParameterSet(request);
+        addLocalScript("iview-client-mets.js", !debugParameterSet);
+
+        final MCRPath teiDirectoryPath = MCRPath.getPath(derivate, "/tei");
+        if (Files.exists(teiDirectoryPath) && Files.isDirectory(teiDirectoryPath)) {
+            addLocalScript("iview-client-tei.js", !debugParameterSet);
+            addLocalCSS("tei.css");
+            MCRConfiguration2.getString("MCR.Viewer.TeiStyle")
+                .ifPresent((style)-> setProperty("teiStylesheet", style));
+        }
 
         return this;
     }

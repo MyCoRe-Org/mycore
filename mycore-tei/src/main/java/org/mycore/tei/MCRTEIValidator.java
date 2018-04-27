@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.coma.model.validation;
+package org.mycore.tei;
 
 import java.io.IOException;
 import java.util.ArrayList;

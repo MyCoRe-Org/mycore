@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.mycore.common.MCRException;
+import org.mycore.mets.model.MCRMetsModelHelper;
 import org.mycore.mets.model.simple.MCRMetsAltoLink;
 import org.mycore.mets.model.simple.MCRMetsFile;
-import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.simple.MCRMetsLink;
 import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
@@ -81,7 +81,7 @@ public class MCRJSONSimpleModelConverter {
     private static Map<String, MCRMetsFile> extractIdFileMap(List<MCRMetsPage> pages) {
         final Map<String, MCRMetsFile> idFileMap = new Hashtable<>();
         pages.forEach(p -> p.getFileList().stream()
-            .filter(file -> file.getUse().equals(MCRMetsFileUse.ALTO))
+            .filter(file -> file.getUse().equals(MCRMetsModelHelper.ALTO_USE))
             .forEach(file -> {
                 idFileMap.put(file.getId(), file);
             }));

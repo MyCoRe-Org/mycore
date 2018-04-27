@@ -25,6 +25,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mycore.tei.MCRTEIValidator;
 import org.xml.sax.SAXException;
 
 public class MCRTEIValidatorTest {

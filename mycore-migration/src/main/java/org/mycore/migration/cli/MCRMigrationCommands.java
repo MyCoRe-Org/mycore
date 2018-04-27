@@ -19,10 +19,13 @@
 package org.mycore.migration.cli;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -44,6 +47,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
@@ -54,6 +59,9 @@ import org.mycore.backend.jpa.links.MCRLINKHREF_;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRStreamContent;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
@@ -280,6 +288,40 @@ public class MCRMigrationCommands {
                     MCRLinkTableManager.ENTRY_TYPE_PARENT))
                 .distinct(true).orderBy(cb.asc(cb.literal(1))))
             .getResultList();
+    }
+
+    // 2017-> 2018
+    @MCRCommand(syntax = "migrate tei entries in mets file of derivate {0}")
+    public static void migrateTEIEntrysOfMetsFileOfDerivate(String derivateIdStr)
+        throws IOException, JDOMException, SAXException {
+        final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIdStr);
+        if (!MCRMetadataManager.exists(derivateID)) {
+            LOGGER.info("Derivate " + derivateIdStr + " does not exist!");
+            return;
+        }
+
+        final MCRPath metsPath = MCRPath.getPath(derivateIdStr, "mets.xml");
+        if (!Files.exists(metsPath)) {
+            LOGGER.info("Derivate " + derivateIdStr + " has not mets.xml!");
+            return;
+        }
+
+        final MCRXSLTransformer transformer = MCRXSLTransformer.getInstance("xsl/mets-translation-migration.xsl");
+
+        final Document xml;
+
+        try (InputStream is = Files.newInputStream(metsPath)) {
+            final MCRContent content = transformer.transform(new MCRStreamContent(is));
+            xml = content.asXML();
+        }
+
+        try (OutputStream os = Files.newOutputStream(metsPath, StandardOpenOption.TRUNCATE_EXISTING)) {
+            final XMLOutputter writer = new XMLOutputter(Format.getPrettyFormat());
+            writer.output(xml, os);
+
+        }
+
+        LOGGER.info("Migrated mets of " + derivateIdStr);
     }
 
     private static void logInfo(MCRPI urn) {

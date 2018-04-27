@@ -27,8 +27,8 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.junit.Assert;
 import org.junit.Before;
+import org.mycore.mets.model.MCRMetsModelHelper;
 import org.mycore.mets.model.simple.MCRMetsFile;
-import org.mycore.mets.model.simple.MCRMetsFileUse;
 import org.mycore.mets.model.simple.MCRMetsSection;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
 
@@ -55,8 +55,6 @@ public class MCRXMLSimpleModelConverterTest {
     public static final String CONTAINED_WORK_TYPE = "contained_work";
 
     public static final String ALL_FILE_MIMETYPE = "image/jpeg";
-
-    public static final MCRMetsFileUse MASTER = MCRMetsFileUse.MASTER;
 
     private MCRMetsSimpleModel metsSimpleModel;
 
@@ -87,8 +85,8 @@ public class MCRXMLSimpleModelConverterTest {
             message = String.format("MimeType %s should match %s", mcrMetsFile.getMimeType(), ALL_FILE_MIMETYPE);
             Assert.assertEquals(message, mcrMetsFile.getMimeType(), ALL_FILE_MIMETYPE);
 
-            message = String.format("File-Use %s should match %s", mcrMetsFile.getUse(), MASTER);
-            Assert.assertEquals(message, mcrMetsFile.getUse(), MASTER);
+            message = String.format("File-Use %s should match %s", mcrMetsFile.getUse(), MCRMetsModelHelper.MASTER_USE);
+            Assert.assertEquals(message, mcrMetsFile.getUse(), MCRMetsModelHelper.MASTER_USE);
         }
     }
 
