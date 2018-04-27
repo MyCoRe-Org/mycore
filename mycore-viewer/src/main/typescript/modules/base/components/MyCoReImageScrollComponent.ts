@@ -78,7 +78,13 @@ namespace mycore.viewer.components {
             this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
             this.trigger(new events.ViewportInitializedEvent(this, this._pageController.viewport));
             var componentContent = this._componentContent;
-            componentContent.css({position : "absolute", top : "0px", left : "0px", right : "15px", bottom : "15px"});
+            componentContent.css({
+                position: "absolute",
+                top: "0px",
+                left: "0px",
+                right: this._settings.mobile ? "0px" : "15px",
+                bottom: "15px"
+            });
             this.initMainView();
 
             var overviewEnabled = Utils.getVar(this._settings, "canvas.overview.enabled", true);
