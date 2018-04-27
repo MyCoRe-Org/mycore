@@ -184,6 +184,21 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
         obj.getService().addFlag(PI_FLAG, json);
     }
 
+    public static boolean hasFlag(MCRObjectID id, String additional, MCRPIRegistrationInfo mcrpi){
+        MCRBase obj = MCRMetadataManager.retrieve(id);
+    return hasFlag(obj, additional, mcrpi);
+    }
+
+    public static boolean hasFlag(MCRBase obj, String additional, MCRPIRegistrationInfo mcrpi){
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIRegistrationService.PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream().anyMatch(_stringFlag -> {
+            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+            return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
+        });
+    }
+
     protected void validatePermission(MCRBase obj) throws MCRAccessException {
         String missingPermission;
         if (!MCRAccessManager.checkPermission(obj.getId(), missingPermission = PERMISSION_WRITE) ||

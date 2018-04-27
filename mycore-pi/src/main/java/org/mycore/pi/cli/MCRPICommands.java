@@ -2,7 +2,9 @@ package org.mycore.pi.cli;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +20,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIRegistrationService;
 import org.mycore.pi.MCRPIRegistrationServiceManager;
 import org.mycore.pi.MCRPersistentIdentifier;
@@ -33,21 +36,43 @@ public class MCRPICommands {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(syntax = "add PI Flags to objects", help = "Should only be used if you used mycore-pi pre 2016 lts!")
-    public static void addFlagsToObjects() {
-        MCRPersistentIdentifierManager.getInstance().getList().forEach(registrationInfo -> {
-            if (registrationInfo.getMcrRevision() <= 35726) {
+    public static List<String> addFlagsToObjects() {
+        return MCRPersistentIdentifierManager.getInstance().getList().stream()
+            .filter(registrationInfo -> {
                 String mycoreID = registrationInfo.getMycoreID();
                 MCRObjectID objectID = MCRObjectID.getInstance(mycoreID);
                 MCRBase base = MCRMetadataManager.retrieve(objectID);
-                LOGGER.info("Add PI-Flag to " + mycoreID);
+                return MCRPIRegistrationService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo);
+            })
+            .map(MCRPIRegistrationInfo::getMycoreID)
+            .distinct()
+            .map(id -> "add PI Flags to object " + id)
+            .collect(Collectors.toList());
+    }
+
+    @MCRCommand(syntax = "add PI Flags to object {0}", help = "Should only be used if you used mycore-pi pre 2016 lts!")
+    public void addFlagToObject(String mycoreIDString) {
+        MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
+        MCRBase base = MCRMetadataManager.retrieve(objectID);
+        final List<MCRPIRegistrationInfo> pi = MCRPersistentIdentifierManager.getInstance().getRegistered(base);
+
+        final boolean addedAFlag = pi.stream().filter(registrationInfo -> {
+            if (!MCRPIRegistrationService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo)) {
+                LOGGER.info("Add PI-Flag to " + mycoreIDString);
                 MCRPIRegistrationService.addFlagToObject(base, (MCRPI) registrationInfo);
-                try {
-                    MCRMetadataManager.update(base);
-                } catch (IOException | MCRAccessException | MCRActiveLinkException e) {
-                    throw new MCRException(e);
-                }
+                return true;
             }
-        });
+            return false;
+        }).count()>0;
+
+        if(addedAFlag){
+            try {
+                MCRMetadataManager.update(base);
+            } catch (IOException | MCRAccessException | MCRActiveLinkException e) {
+                throw new MCRException(e);
+            }
+        }
+
     }
 
     @MCRCommand(syntax = "migrate urn granular to service id {0}", help = "Used to migrate urn granular to MyCoRe-PI. " +
