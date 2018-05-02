@@ -19,6 +19,7 @@
 /// <reference path="../../../desktop/components/model/MyCoReDesktopToolbarModel.ts" />
 namespace mycore.viewer.model {
     export class MyCoReFrameToolbarModel extends model.MyCoReDesktopToolbarModel {
+
         constructor() {
             super("MyCoReFrameToolbar");
         }
@@ -45,6 +46,16 @@ namespace mycore.viewer.model {
             toolbarGroup.addComponent(toolbarButton);
 
 
+        }
+
+        public shrink(){
+            this._sidebarControllGroup.removeComponent(this._sidebarControllDropdownButton);
+            this.removeGroup(this._sidebarControllGroup);
+            if (viewerDeviceSupportTouch) {
+                this._zoomControllGroup.removeComponent(this._zoomInButton);
+                this._zoomControllGroup.removeComponent(this._zoomOutButton);
+                this._zoomControllGroup.removeComponent(this._rotateButton);
+            }
         }
 
 
