@@ -35,14 +35,14 @@ public class MCRPICommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @MCRCommand(syntax = "add PI Flags to objects", help = "Should only be used if you used mycore-pi pre 2016 lts!")
+    @MCRCommand(syntax = "add PI Flags to all objects", help = "Should only be used if you used mycore-pi pre 2016 lts!")
     public static List<String> addFlagsToObjects() {
         return MCRPersistentIdentifierManager.getInstance().getList().stream()
             .filter(registrationInfo -> {
                 String mycoreID = registrationInfo.getMycoreID();
                 MCRObjectID objectID = MCRObjectID.getInstance(mycoreID);
                 MCRBase base = MCRMetadataManager.retrieve(objectID);
-                return MCRPIRegistrationService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo);
+                return !MCRPIRegistrationService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo);
             })
             .map(MCRPIRegistrationInfo::getMycoreID)
             .distinct()
@@ -50,8 +50,8 @@ public class MCRPICommands {
             .collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "add PI Flags to object {0}", help = "Should only be used if you used mycore-pi pre 2016 lts!")
-    public void addFlagToObject(String mycoreIDString) {
+    @MCRCommand(syntax = "add PI Flags to object {0}", help = "see add PI Flags to all objects!")
+    public static void addFlagToObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
         final List<MCRPIRegistrationInfo> pi = MCRPersistentIdentifierManager.getInstance().getRegistered(base);
