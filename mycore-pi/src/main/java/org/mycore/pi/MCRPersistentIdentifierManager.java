@@ -21,6 +21,7 @@ import javax.persistence.criteria.Root;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
@@ -286,7 +287,7 @@ public class MCRPersistentIdentifierManager {
         return getUnregisteredIdentifiers(type, -1);
     }
 
-    public List<MCRPIRegistrationInfo> getRegistered(MCRObject object) {
+    public List<MCRPIRegistrationInfo> getRegistered(MCRBase object) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRPIRegistrationInfo> getQuery = cb.createQuery(MCRPIRegistrationInfo.class);
