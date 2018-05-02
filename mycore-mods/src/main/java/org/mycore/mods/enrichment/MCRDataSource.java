@@ -30,7 +30,7 @@ class MCRDataSource {
 
     private List<MCRIdentifierResolver> resolvers = new ArrayList<>();
 
-    public MCRDataSource(String sourceID) {
+    MCRDataSource(String sourceID) {
         this.sourceID = sourceID;
     }
 

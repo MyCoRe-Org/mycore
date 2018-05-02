@@ -43,7 +43,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.common.events.MCREventHandlerBase
+     * #handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     protected void handleObjectCreated(final MCREvent evt, final MCRObject obj) {
@@ -76,7 +77,8 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectUpdated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.common.events.MCREventHandlerBase
+     * #handleObjectUpdated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     protected void handleObjectUpdated(final MCREvent evt, final MCRObject obj) {
@@ -96,7 +98,8 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectRepaired(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.common.events.MCREventHandlerBase
+     * #handleObjectRepaired(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     protected void handleObjectRepaired(final MCREvent evt, final MCRObject obj) {

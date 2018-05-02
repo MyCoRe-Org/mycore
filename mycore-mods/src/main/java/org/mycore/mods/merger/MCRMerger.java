@@ -32,9 +32,11 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRXMLHelper;
 
 /**
- * MCRMerger is the main and default implementation for comparing and merging MODS elements that are semantically the same.
+ * MCRMerger is the main and default implementation for comparing
+ * and merging MODS elements that are semantically the same.
  * Each MODS element is wrapped by an instance of MCRMerger or one of its subclasses.
- * It contains methods to decide whether the two MODS elements are equal, or probably represent the information maybe with different granularity.
+ * It contains methods to decide whether the two MODS elements are equal, or probably represent the information
+ * maybe with different granularity.
  * If so, the text, elements and attributes are merged so that the "better" information/representation wins.
  * This is done recursively for all child elements, too.
  *
@@ -55,7 +57,8 @@ public class MCRMerger {
 
     /**
      * Returns true, if the element wrapped by this merger probably represents the same information as the other.
-     * The default implementation returns false and may be overwritten by subclasses implementing logic for specific MODS elements.
+     * The default implementation returns false and may be overwritten by subclasses implementing logic
+     * for specific MODS elements.
      */
     public boolean isProbablySameAs(MCRMerger other) {
         return false;
@@ -74,7 +77,8 @@ public class MCRMerger {
     }
 
     /**
-     * Merges the contents of the element wrapped by the other merger into the contents of the element wrapped by this merger.
+     * Merges the contents of the element wrapped by the other merger into the contents of the element wrapped
+     * by this merger.
      * Should only be called if this.isProbablySameAs(other).
      *
      * The default implementation copies all attributes from the other into this if they do not exist in this element.

@@ -38,6 +38,17 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
     private static final Logger LOGGER = LogManager.getLogger(MCRAuthorityAndCode.class);
 
     /**
+     * xml:lang value of category or classification <label> for MODS @authority.
+     */
+    public static final String LABEL_LANG_AUTHORITY = "x-auth";
+
+    /** The authority code */
+    private String authority;
+
+    /** The value code */
+    private String code;
+
+    /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
      */
     public static MCRAuthorityAndCode getAuthorityInfo(org.jdom2.Element modsElement) {
@@ -59,12 +70,13 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
 
     /**
      * Builds the authority info from the given values, does some checks on the values.
-     * 
+     *
      * @return the authority info, or null if the values are illegal or unsupported.
      */
     private static MCRAuthorityAndCode getAuthorityInfo(String authority, String type, String code) {
-        if (authority == null)
+        if (authority == null) {
             return null;
+        }
 
         if ("text".equals(type)) {
             LOGGER.warn("Type 'text' is currently unsupported when resolving a classification category");
@@ -74,24 +86,13 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
     }
 
     /**
-     * xml:lang value of category or classification <label> for MODS @authority.
-     */
-    public static final String LABEL_LANG_AUTHORITY = "x-auth";
-
-    /**
      * Returns the authority code for the given classification
      */
     protected static String getAuthority(MCRCategory classification) {
         return getLabel(classification, LABEL_LANG_AUTHORITY, null);
     }
 
-    /** The authority code */
-    private String authority;
-
-    /** The value code */
-    private String code;
-
-    public MCRAuthorityAndCode(String authority, String code) {
+    MCRAuthorityAndCode(String authority, String code) {
         this.authority = authority;
         this.code = code;
     }

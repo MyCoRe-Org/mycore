@@ -53,7 +53,8 @@ import org.mycore.mods.classification.MCRClassMapper;
 public class MCRMODSWrapper {
 
     //ancestor::mycoreobject required for MCR-927
-    private static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host' and ancestor::mycoreobject/structure/parents/parent or"
+    private static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host'"
+        + " and ancestor::mycoreobject/structure/parents/parent or"
         + " string-length(substring-after(@xlink:href,'_')) > 0 and"
         + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
         + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and" + " contains('"
@@ -71,6 +72,8 @@ public class MCRMODSWrapper {
 
     private static Set<String> SUPPORTED_TYPES = MCRConfiguration.instance().getStrings("MCR.MODS.Types").stream()
         .collect(Collectors.toSet());
+
+    private MCRObject object;
 
     static {
         topLevelElementOrder.add("typeOfResource");
@@ -122,8 +125,6 @@ public class MCRMODSWrapper {
         return SUPPORTED_TYPES.contains(id.getTypeId());
     }
 
-    private MCRObject object;
-
     public MCRMODSWrapper() {
         this(new MCRObject());
     }
@@ -156,8 +157,8 @@ public class MCRMODSWrapper {
         return object;
     }
 
-    public MCRObjectID setID(String projectID, int ID) {
-        MCRObjectID objID = MCRObjectID.getInstance(MCRObjectID.formatID(projectID, MODS_OBJECT_TYPE, ID));
+    public MCRObjectID setID(String projectID, int id) {
+        MCRObjectID objID = MCRObjectID.getInstance(MCRObjectID.formatID(projectID, MODS_OBJECT_TYPE, id));
         object.setId(objID);
         return objID;
     }
@@ -351,6 +352,7 @@ public class MCRMODSWrapper {
 
     private List<Element> getCategoryNodes() {
         return getElements(
-            "mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem)]");
+            "mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI)"
+                + " and not(ancestor::mods:relatedItem)]");
     }
 }

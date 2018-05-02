@@ -51,8 +51,8 @@ public class MCRMODSSorter implements URIResolver {
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        href = href.substring(href.indexOf(":") + 1);
-        Element mods = MCRURIResolver.instance().resolve(href);
+        String subHref = href.substring(href.indexOf(":") + 1);
+        Element mods = MCRURIResolver.instance().resolve(subHref);
         MCRMODSSorter.sort(mods);
         return new JDOMSource(mods);
     }

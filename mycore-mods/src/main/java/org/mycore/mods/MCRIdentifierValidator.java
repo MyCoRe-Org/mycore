@@ -48,27 +48,31 @@ public class MCRIdentifierValidator {
     }
 
     private static boolean checkISBN(String value) {
-        if (value.length() != ISBN13_WITH_DELIM_LENGTH) {
+        String isbn = value;
+        if (isbn.length() != ISBN13_WITH_DELIM_LENGTH) {
             //'-' missing
             return false;
         }
-        value = value.replaceAll("-", "");
-        value = value.replace('x', 'X');
+        isbn = isbn.replaceAll("-", "");
+        isbn = isbn.replace('x', 'X');
         // ISBN- 13
-        if (value.length() == ISBN13_LENGTH) {
+        if (isbn.length() == ISBN13_LENGTH) {
             int checkSum = 0;
             int digit = 0;
             for (int i = 0; i < ISBN13_LENGTH; ++i) {
-                if (value.charAt(i) == 'X')
+                if (isbn.charAt(i) == 'X') {
                     digit = 10;
-                else
-                    digit = Character.digit(value.charAt(i), 10);
-                if (i % 2 == 1)
+                } else {
+                    digit = Character.digit(isbn.charAt(i), 10);
+                }
+                if (i % 2 == 1) {
                     digit *= 3;
+                }
                 checkSum += digit;
             }
-            if (checkSum % 10 == 0)
+            if (checkSum % 10 == 0) {
                 return true;
+            }
         }
         return false;
     }

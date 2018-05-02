@@ -41,7 +41,7 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
      */
     private String code;
 
-    public MCRTypeOfResource(String code) {
+    MCRTypeOfResource(String code) {
         this.code = code;
     }
 

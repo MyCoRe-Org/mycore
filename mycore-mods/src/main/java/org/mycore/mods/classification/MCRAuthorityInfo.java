@@ -45,7 +45,7 @@ abstract class MCRAuthorityInfo {
     /**
      * A cache that maps authority information to the category ID that is represented by that info.
      */
-    private static final MCRCache<String, Object> categoryIDbyAuthorityInfo = new MCRCache<>(1000,
+    private static final MCRCache<String, Object> CATEGORY_ID_BY_AUTHORITY_INFO = new MCRCache<>(1000,
         "Category ID by authority info");
 
     /**
@@ -70,13 +70,14 @@ abstract class MCRAuthorityInfo {
         String key = toString();
         LOGGER.debug("get categoryID for {}", key);
 
-        Object categoryID = categoryIDbyAuthorityInfo.getIfUpToDate(key, DAO.getLastModified());
+        Object categoryID = CATEGORY_ID_BY_AUTHORITY_INFO.getIfUpToDate(key, DAO.getLastModified());
         if (categoryID == null) {
             LOGGER.debug("lookup categoryID for {}", key);
             categoryID = lookupCategoryID();
-            if (categoryID == null)
+            if (categoryID == null) {
                 categoryID = NULL; // Indicate that no matching category found, null can not be cached directly
-            categoryIDbyAuthorityInfo.put(key, categoryID);
+            }
+            CATEGORY_ID_BY_AUTHORITY_INFO.put(key, categoryID);
         }
         return categoryID instanceof MCRCategoryID ? (MCRCategoryID) categoryID : null;
     }

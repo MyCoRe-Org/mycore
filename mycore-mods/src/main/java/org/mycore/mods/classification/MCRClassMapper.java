@@ -55,17 +55,17 @@ public class MCRClassMapper {
 
     private static final String ACCESS_CONDITION = "accessCondition";
 
-    private static final Set<String> authorityElements, authorityURIElements, supported;
+    private static final Set<String> AUTHORITY_ELEMENTS, AUTHORITY_URI_ELEMENTS, SUPPORTED;
 
     private static final String NS_MODS_URI = MCRConstants.MODS_NAMESPACE.getURI();
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static final MCRCache<String, String> authCache = new MCRCache<>(100, "MCRCategory authority");
+    private static final MCRCache<String, String> AUTH_CACHE = new MCRCache<>(100, "MCRCategory authority");
 
-    private static final MCRCache<String, String> authURICache = new MCRCache<>(100, "MCRCategory authorityURI");
+    private static final MCRCache<String, String> AUTH_URI_CACHE = new MCRCache<>(100, "MCRCategory authorityURI");
 
-    private static final MCRCache<MCRAuthKey, MCRAuthorityInfo> authInfoCache = new MCRCache<>(1000,
+    private static final MCRCache<MCRAuthKey, MCRAuthorityInfo> AUTHORITY_INFO_CACHE = new MCRCache<>(1000,
         "MCRAuthorityInfo cache");
 
     static {
@@ -105,24 +105,24 @@ public class MCRClassMapper {
                 }
             }
         }
-        authorityElements = Collections.unmodifiableSet(authority);
-        authorityURIElements = Collections.unmodifiableSet(authorityURI);
+        AUTHORITY_ELEMENTS = Collections.unmodifiableSet(authority);
+        AUTHORITY_URI_ELEMENTS = Collections.unmodifiableSet(authorityURI);
         HashSet<String> merged = new HashSet<>(authorityURI);
         merged.addAll(authority);
         merged.add(ACCESS_CONDITION);
         merged.add(TYPE_OF_RESOURCE);
-        supported = Collections.unmodifiableSet(merged);
+        SUPPORTED = Collections.unmodifiableSet(merged);
     }
 
     private MCRClassMapper() {
     }
 
     public static boolean supportsClassification(org.jdom2.Element modsElement) {
-        return modsElement.getNamespaceURI().equals(NS_MODS_URI) && supported.contains(modsElement.getName());
+        return modsElement.getNamespaceURI().equals(NS_MODS_URI) && SUPPORTED.contains(modsElement.getName());
     }
 
     public static boolean supportsClassification(Element modsElement) {
-        return modsElement.getNamespaceURI().equals(NS_MODS_URI) && supported.contains(modsElement.getLocalName());
+        return modsElement.getNamespaceURI().equals(NS_MODS_URI) && SUPPORTED.contains(modsElement.getLocalName());
     }
 
     public static MCRCategoryID getCategoryID(org.jdom2.Element modsElement) {
@@ -206,15 +206,15 @@ public class MCRClassMapper {
     private static MCRAuthorityInfo getAuthInfo(MCRCategoryID categID, String elementLocalName) {
         MCRAuthKey authKey = new MCRAuthKey(elementLocalName, categID);
         long classLastModified = Math.max(0, DAO.getLastModified(categID.getRootID()));
-        MCRAuthorityInfo authInfo = authInfoCache.getIfUpToDate(authKey, classLastModified);
+        MCRAuthorityInfo authInfo = AUTHORITY_INFO_CACHE.getIfUpToDate(authKey, classLastModified);
         if (authInfo == null) {
             if (elementLocalName.equals(TYPE_OF_RESOURCE)
                 && categID.getRootID().equals(MCRTypeOfResource.TYPE_OF_RESOURCE)) {
                 authInfo = new MCRTypeOfResource(categID.getID().replace('_', ' '));
             }
             if (authInfo == null) {
-                boolean supportCode = authorityElements.contains(elementLocalName);
-                boolean supportURI = authorityURIElements.contains(elementLocalName);
+                boolean supportCode = AUTHORITY_ELEMENTS.contains(elementLocalName);
+                boolean supportURI = AUTHORITY_URI_ELEMENTS.contains(elementLocalName);
                 if (supportCode) {
                     String authority = getAuthority(categID.getRootID());
                     if (authority != null) {
@@ -235,29 +235,29 @@ public class MCRClassMapper {
             if (authInfo == null) {
                 authInfo = new MCRNullAuthInfo();
             }
-            authInfoCache.put(authKey, authInfo, classLastModified);
+            AUTHORITY_INFO_CACHE.put(authKey, authInfo, classLastModified);
         }
         return authInfo instanceof MCRNullAuthInfo ? null : authInfo;
     }
 
     private static String getAuthority(String rootID) {
         long classLastModified = Math.max(0, DAO.getLastModified(rootID));
-        String auth = authCache.getIfUpToDate(rootID, classLastModified);
+        String auth = AUTH_CACHE.getIfUpToDate(rootID, classLastModified);
         if (auth == null) {
             MCRCategory rootCategory = DAO.getRootCategory(MCRCategoryID.rootID(rootID), 0);
             auth = rootCategory.getLabel("x-auth").map(MCRLabel::getText).orElse("");
-            authCache.put(rootID, auth, classLastModified);
+            AUTH_CACHE.put(rootID, auth, classLastModified);
         }
         return auth.isEmpty() ? null : auth;
     }
 
     private static String getAuthorityURI(String rootID) {
         long classLastModified = Math.max(0, DAO.getLastModified(rootID));
-        String authURI = authURICache.getIfUpToDate(rootID, classLastModified);
+        String authURI = AUTH_URI_CACHE.getIfUpToDate(rootID, classLastModified);
         if (authURI == null) {
             MCRCategory rootCategory = DAO.getRootCategory(MCRCategoryID.rootID(rootID), 0);
             authURI = MCRAuthorityWithURI.getAuthorityURI(rootCategory);
-            authURICache.put(rootID, authURI, classLastModified);
+            AUTH_URI_CACHE.put(rootID, authURI, classLastModified);
         }
         return authURI;
     }
@@ -267,7 +267,7 @@ public class MCRClassMapper {
 
         MCRCategoryID categID;
 
-        public MCRAuthKey(String localName, MCRCategoryID categID) {
+        MCRAuthKey(String localName, MCRCategoryID categID) {
             this.localName = localName;
             this.categID = categID;
         }

@@ -37,7 +37,7 @@ class MCRIdentifierResolver {
 
     private String uriPattern;
 
-    public MCRIdentifierResolver(MCRIdentifierType idType, String uriPattern) {
+    MCRIdentifierResolver(MCRIdentifierType idType, String uriPattern) {
         this.idType = idType;
         this.uriPattern = uriPattern;
     }

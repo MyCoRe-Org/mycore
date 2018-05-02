@@ -27,7 +27,8 @@ import java.util.Optional;
 public interface MCRIdentifierDetector<T> {
     /**
      * @param resolvable some thing that can be resolved to a unique identifier
-     * @return a {@link java.util.Map.Entry} with the identifier type as key and the identifier as value. The Optional can be empty if no identifier can be detected or if a error occurs.
+     * @return a {@link java.util.Map.Entry} with the identifier type as key and the identifier as value.
+     * The Optional can be empty if no identifier can be detected or if a error occurs.
      */
     Optional<Map.Entry<String, String>> detect(T resolvable);
 }
