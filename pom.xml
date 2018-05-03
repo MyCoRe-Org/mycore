@@ -753,6 +753,11 @@
         <version>${guice.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-servlet</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.google.zxing</groupId>
         <artifactId>core</artifactId>
         <version>3.3.2</version>

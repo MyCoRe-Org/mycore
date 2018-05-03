@@ -32,6 +32,7 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
 import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
@@ -59,6 +60,7 @@ public class MCRRestResourceConfig extends ResourceConfig {
         super();
         setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API");
         LogManager.getLogger().error("========MCRRESTResourceConfig======== {}", getApplicationName());
+        MCRJerseyDefaultConfiguration.setupGuiceBridge(this);
         String[] restPackages = Stream
             .concat(
                 Stream.of(MCRWrappedXMLWriter.class.getPackage().getName(),
