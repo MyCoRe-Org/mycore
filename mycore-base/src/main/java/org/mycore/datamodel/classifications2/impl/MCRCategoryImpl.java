@@ -113,7 +113,11 @@ import org.mycore.datamodel.classifications2.MCRLabel;
         + " WHERE cat.left = 0 ORDER BY cat.id.rootID"),
     @NamedQuery(name = "MCRCategory.rootIds", query = "SELECT cat.id FROM MCRCategoryImpl cat WHERE cat.left = 0"),
     @NamedQuery(name = "MCRCategory.childCount",
-        query = "SELECT CAST(count(*) AS integer) FROM MCRCategoryImpl children WHERE children.parent=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL))")
+        query = "SELECT CAST(count(*) AS integer) FROM MCRCategoryImpl children WHERE children.parent=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL))"),
+    @NamedQuery(name = "MCRCategoryLink.types",
+        query = "SELECT objectReference.type FROM MCRCategoryLinkImpl"),
+    @NamedQuery(name = "MCRCategoryLink.links",
+        query = "FROM MCRCategoryLinkImpl WHERE objectReference.type=:type")
 })
 
 @Access(AccessType.PROPERTY)

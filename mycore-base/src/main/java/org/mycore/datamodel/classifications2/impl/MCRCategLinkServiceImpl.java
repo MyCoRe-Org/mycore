@@ -365,30 +365,19 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @Override
     public Collection<String> getTypes() {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<String> query = cb.createQuery(String.class);
-        Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
-        return em
-            .createQuery(
-                query
-                    .distinct(true)
-                    .select(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type)))
-            .getResultList();
+        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "types");
+        q.setCacheable(true);
+        q.setReadOnly(true);
+        return (Collection<String>) q.getResultList();
     }
 
     @Override
     public Collection<MCRCategoryLink> getLinks(String type) {
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MCRCategoryLink> query = cb.createQuery(MCRCategoryLink.class);
-        Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
-        return em
-            .createQuery(
-                query
-                    .where(
-                        cb.equal(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type), type)))
-            .getResultList();
+        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "links");
+        q.setCacheable(true);
+        q.setParameter("type", type);
+        q.setReadOnly(true);
+        return (Collection<MCRCategoryLink>) q.getResultList();
     }
 
 }
