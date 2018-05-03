@@ -265,9 +265,9 @@
   <!-- ========== language (0-n) ========== -->
 
   <xsl:template name="language">
-    <xsl:if test="mods:language/mods:languageTerm[@authority='rfc4646' and @type='code']">
+    <xsl:if test="mods:language/mods:languageTerm[@authority='rfc5646' and @type='code']">
       <language>
-        <xsl:value-of select="mods:language/mods:languageTerm[@authority='rfc4646' and @type='code']" />
+        <xsl:value-of select="mods:language/mods:languageTerm[@authority='rfc5646' and @type='code']" />
       </language>
     </xsl:if>
   </xsl:template>

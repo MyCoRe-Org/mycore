@@ -235,7 +235,7 @@
   
   <xsl:template match="mods:language">
     <common:language-code>
-      <xsl:value-of select="mods:languageTerm[@authority='rfc4646'][@type='code']" />
+      <xsl:value-of select="mods:languageTerm[@authority='rfc5646'][@type='code']" />
     </common:language-code>
   </xsl:template>
   
