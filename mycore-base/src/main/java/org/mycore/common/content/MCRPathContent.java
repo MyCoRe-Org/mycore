@@ -38,6 +38,7 @@ import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 /**
  * MCRContent implementation that uses Java 7 {@link FileSystem} features.
@@ -125,7 +126,7 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
 
     @Override
     public String getETag() throws IOException {
-        Object fileKey = Files.getAttribute(path, "fileKey");
+        Object fileKey = Files.getAttribute(path, "md5");
         if (fileKey instanceof String) {
             return fileKey.toString();
         }

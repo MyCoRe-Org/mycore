@@ -186,22 +186,7 @@ public class MCRRestDerivateContents {
     }
 
     private static EntityTag getETag(MCRPath path, MCRFileAttributes attrs) {
-        if (attrs.fileKey() instanceof String) {
-            return EntityTag.valueOf(attrs.fileKey().toString());
-        }
-        long lastModified = attrs.lastModifiedTime().toMillis();
-        long length = attrs.size();
-        if (path == null || length < 0 || lastModified <= 0) {
-            return null;
-        }
-        StringBuilder b = new StringBuilder(32);
-        b.append("W/\"");
-        long lhash = path.hashCode();
-        byte[] unencodedETag = ByteBuffer.allocate(Long.SIZE / 4).putLong(lastModified ^ lhash).putLong(length ^ lhash)
-            .array();
-        b.append(Base64.getEncoder().encodeToString(unencodedETag));
-        b.append('"');
-        return EntityTag.valueOf(b.toString());
+        return new EntityTag(attrs.md5sum());
     }
 
     @XmlRootElement(name = "directory")

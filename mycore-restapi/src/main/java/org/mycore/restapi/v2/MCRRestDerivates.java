@@ -184,7 +184,6 @@ public class MCRRestDerivates {
                 description = "'Invalid body content' or 'MCRObjectID mismatch'"),
             @ApiResponse(responseCode = "201", description = "MCRDerivate successfully created"),
             @ApiResponse(responseCode = "204", description = "MCRDerivate successfully updated"),
-
         })
     @MCRRequireTransaction
     @Path("/{" + PARAM_DERID + "}")
