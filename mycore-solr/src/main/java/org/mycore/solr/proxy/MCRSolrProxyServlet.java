@@ -22,6 +22,7 @@ import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 import static org.mycore.solr.MCRSolrConstants.QUERY_PATH;
 import static org.mycore.solr.MCRSolrConstants.QUERY_XML_PROTOCOL_VERSION;
 import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
+import static org.mycore.solr.MCRSolrConstants.SERVER_BASE_URL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,6 +88,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public static final String QUERY_KEY = MCRSolrProxyServlet.class.getName() + ".query";
 
     public static final String QUERY_HANDLER_PAR_NAME = "qt";
+
+    public static final String QUERY_CORE_PARAMETER = "core";
 
     private static int MAX_CONNECTIONS = MCRConfiguration.instance()
         .getInt(CONFIG_PREFIX + "SelectProxy.MaxConnections");
@@ -198,7 +201,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private void handleQuery(String queryHandlerPath, HttpServletRequest request, HttpServletResponse resp)
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
-        HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter);
+        HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
+            request.getParameter(QUERY_CORE_PARAMETER));
         try {
             LOGGER.info("Sending Request: {}", solrHttpMethod.getURI());
             HttpResponse response = httpClient.execute(solrHost, solrHttpMethod);
@@ -260,8 +264,9 @@ public class MCRSolrProxyServlet extends MCRServlet {
      *            Parameters to use with the Request
      * @return a method to make the request
      */
-    private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params) {
-        return new HttpGet(MessageFormat.format("{0}{1}{2}", SERVER_URL, queryHandlerPath, params.toQueryString()));
+    private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params, String core) {
+        String serverURL =  core != null && !"".equals(core) ? SERVER_BASE_URL + core : SERVER_URL;
+        return new HttpGet(MessageFormat.format("{0}{1}{2}", serverURL, queryHandlerPath, params.toQueryString()));
     }
 
     private static ModifiableSolrParams getSolrQueryParameter(HttpServletRequest request) {
