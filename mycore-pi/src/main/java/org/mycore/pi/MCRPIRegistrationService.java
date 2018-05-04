@@ -1,7 +1,5 @@
 package org.mycore.pi;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -32,11 +30,14 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier> {
 
@@ -56,9 +57,14 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     protected static final String METADATA_MANAGER_DEPRECATED_PROPERTY_KEY = "Inscriber";
 
+    protected static final String TRANSLATE_PREFIX = "component.pi.register.error.";
+
     private final String registrationServiceID;
 
     private final String type;
+
+    // generated identifier is already present in database
+    private static final int ERR_CODE_0_1 = 0x0001;
 
     private static Logger LOGGER = LogManager.getLogger();
 
@@ -372,7 +378,18 @@ public abstract class MCRPIRegistrationService<T extends MCRPersistentIdentifier
 
     protected final T getNewIdentifier(MCRObjectID id, String additional) throws MCRPersistentIdentifierException {
         MCRPersistentIdentifierGenerator<T> persitentIdentifierGenerator = getGenerator();
-        return persitentIdentifierGenerator.generate(id, additional);
+        final T generated = persitentIdentifierGenerator.generate(id, additional);
+        final String generatedIdentifier = generated.asString();
+        final Optional<MCRPIRegistrationInfo> mayInfo = MCRPersistentIdentifierManager.getInstance()
+            .getInfo(generatedIdentifier, getType());
+        if (mayInfo.isPresent()) {
+            final String presentObject = mayInfo.get().getMycoreID();
+            throw new MCRPersistentIdentifierException(
+                "The Generated identifier " + generatedIdentifier + " is already present in database in object "
+                    + presentObject, MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_0_1),
+                ERR_CODE_0_1);
+        }
+        return generated;
     }
 
     protected MCRPI getTableEntry(MCRObjectID id, String additional) {

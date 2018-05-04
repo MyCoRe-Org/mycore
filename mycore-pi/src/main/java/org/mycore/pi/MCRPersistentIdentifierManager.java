@@ -316,6 +316,20 @@ public class MCRPersistentIdentifierManager {
             .getResultList();
     }
 
+    public Optional<MCRPIRegistrationInfo> getInfo(String identifier, String type) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRPIRegistrationInfo> getQuery = cb.createQuery(MCRPIRegistrationInfo.class);
+        Root<MCRPI> pi = getQuery.from(MCRPI.class);
+        final List<MCRPIRegistrationInfo> resultList = em.createQuery(
+            getQuery
+                .select(pi)
+                .where(cb.equal(pi.get(MCRPI_.identifier), identifier),cb.equal(pi.get(MCRPI_.type), type)))
+            .getResultList();
+        return resultList.size()==0 ? Optional.empty():Optional.of(resultList.get(0));
+    }
+
+
     public MCRPersistentIdentifierParser getParserForType(String type) {
         return getParserInstance(typeParserMap.get(type));
     }
