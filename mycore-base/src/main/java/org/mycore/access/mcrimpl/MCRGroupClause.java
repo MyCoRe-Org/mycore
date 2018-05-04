@@ -23,8 +23,11 @@
 
 package org.mycore.access.mcrimpl;
 
+import java.util.Optional;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
@@ -44,9 +47,14 @@ class MCRGroupClause implements MCRCondition<Object> {
         this.not = not;
     }
 
-    public boolean evaluate(Object o) {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(groupname) ^ not;
-    }
+	public boolean evaluate(Object o) {
+		MCRUserInformation userInformation = Optional.ofNullable(o)
+				.filter(obj -> obj instanceof MCRAccessData)
+				.map(MCRAccessData.class::cast)
+				.map(MCRAccessData::getUserInformation)
+				.orElseGet(MCRSessionMgr.getCurrentSession()::getUserInformation);
+		return userInformation.isUserInRole(groupname) ^ not;
+	}
 
     @Override
     public String toString() {
